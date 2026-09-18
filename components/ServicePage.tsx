@@ -20,15 +20,37 @@ function Block({ block, index }: { block: ServiceBlock; index: number }) {
             <div className="subtitle-head-wrap">
               <div className="subtitle-left-icon"></div>
               <div className="subtitle-head">
-                {block.title?.includes("Advertising")
-                  ? "Paid Campaigns & Growth"
-                  : block.title?.includes("Content")
-                  ? "Creative Studio"
-                  : "Core Capabilities"}
+                {block.subtitle ??
+                  (block.title?.includes("Advertising")
+                    ? "Paid Campaigns & Growth"
+                    : block.title?.includes("Content")
+                    ? "Creative Studio"
+                    : "Core Capabilities")}
               </div>
             </div>
             {block.title && <h2 className="heading-title qs-section-heading">{block.title}</h2>}
+            {block.tagline && (
+              <h3
+                style={{
+                  fontSize: "18px",
+                  fontWeight: 700,
+                  marginTop: "-6px",
+                  marginBottom: "12px",
+                  color: "var(--heading-color)",
+                }}
+              >
+                {block.tagline}
+              </h3>
+            )}
             {block.desc && <p className="paragraph-large qs-section-desc">{block.desc}</p>}
+            {block.note && (
+              <p
+                className="paragraph-small qs-section-desc"
+                style={{ fontSize: "14px", fontStyle: "italic", marginTop: "12px" }}
+              >
+                {block.note}
+              </p>
+            )}
             {block.cta && (
               <div className="button-wrap qs-cta-wrap">
                 <Button href={block.cta.href} label={block.cta.label} />
@@ -64,9 +86,22 @@ function Block({ block, index }: { block: ServiceBlock; index: number }) {
           <div className="qs-section-center-head">
             <div className="subtitle-head-wrap">
               <div className="subtitle-left-icon"></div>
-              <div className="subtitle-head">Channels &amp; Networks</div>
+              <div className="subtitle-head">{block.subtitle ?? "Strategic Solutions"}</div>
             </div>
             {block.title && <h2 className="heading-title qs-section-heading">{block.title}</h2>}
+            {block.tagline && (
+              <h3
+                style={{
+                  fontSize: "19px",
+                  fontWeight: 700,
+                  marginTop: "-6px",
+                  marginBottom: "12px",
+                  color: "var(--heading-color)",
+                }}
+              >
+                {block.tagline}
+              </h3>
+            )}
             {block.desc && <p className="paragraph-large qs-section-desc">{block.desc}</p>}
           </div>
           <div className={`qs-platform-grid cols-${block.columns ?? 3}`}>
@@ -120,12 +155,19 @@ function Block({ block, index }: { block: ServiceBlock; index: number }) {
           <div className="qs-split-left">
             <div className="subtitle-head-wrap">
               <div className="subtitle-left-icon"></div>
-              <div className="subtitle-head">Why Choose Quickupp Softech?</div>
+              <div className="subtitle-head">{block.title ?? "Why Choose Quickupp Softech?"}</div>
             </div>
             <h2 className="heading-title qs-section-heading">{block.tagline}</h2>
-            <p className="paragraph-large qs-section-desc">
-              We combine creative storytelling, platform-specific mastery, and data-driven advertising to scale your business predictably.
-            </p>
+            {block.desc && (
+              <p className="paragraph-large qs-section-desc">
+                {block.desc}
+              </p>
+            )}
+            {block.cta && (
+              <div className="button-wrap qs-cta-wrap">
+                <Button href={block.cta.href} label={block.cta.label} />
+              </div>
+            )}
           </div>
           <div className="qs-split-right">
             <div className="qs-why-card-wrap">
@@ -178,7 +220,41 @@ function Block({ block, index }: { block: ServiceBlock; index: number }) {
               </div>
             </div>
             <h2 className="heading-title qs-ai-heading">{block.title}</h2>
-            <p className="qs-ai-desc">{block.desc}</p>
+            {block.intro && (
+              <p className="qs-ai-desc" style={{ marginBottom: block.bullets ? "16px" : "0" }}>
+                {block.intro}
+              </p>
+            )}
+            {block.bullets && block.bullets.length > 0 && (
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+                  gap: "10px 16px",
+                  margin: "18px 0",
+                }}
+              >
+                {block.bullets.map((b, i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <div
+                      style={{
+                        width: "8px",
+                        height: "8px",
+                        borderRadius: "50%",
+                        background: "#def25c",
+                        flexShrink: 0,
+                      }}
+                    ></div>
+                    <span style={{ fontSize: "15px", color: "rgba(255,255,255,0.92)", fontWeight: 500 }}>{b}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {block.desc && (
+              <p className="qs-ai-desc" style={{ marginTop: block.bullets ? "16px" : "0" }}>
+                {block.desc}
+              </p>
+            )}
             {block.cta && (
               <div className="button-wrap qs-cta-wrap" style={{ marginTop: "28px" }}>
                 <Button href={block.cta.href} label={block.cta.label} variant="secondary-bg" />

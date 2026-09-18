@@ -139,6 +139,7 @@ const data: ServicePageData = {
         "Scalable SEO Solutions",
         "Transparent Reporting",
       ],
+      cta: { label: "Talk to Our SEO Experts", href: "/contact" },
     },
     {
       type: "industries",
@@ -158,7 +159,7 @@ const data: ServicePageData = {
     {
       type: "ai",
       title: "AI-Powered SEO",
-      desc: "We use AI to support keyword research, content planning, competitor analysis, content optimization, SEO data analysis and AI search visibility, combined with human strategy and expertise.",
+      desc: "We use AI to support keyword research, content planning, competitor analysis, content optimization, SEO data analysis and AI search visibility—combined with human strategy and expertise.",
       cta: { label: "Explore AI-Powered SEO", href: "/contact" },
     },
     {

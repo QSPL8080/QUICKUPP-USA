@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
-import StubPage from "@/components/StubPage";
+import ServicePage from "@/components/ServicePage";
+import data from "@/data/services/paid-marketing";
 
 export const metadata: Metadata = {
-  title: "Paid Marketing | Quickupp Softech",
-  description: "Paid Marketing — part of Quickupp Softech's services lineup. Full page content is coming soon.",
+  title: data.metaTitle,
+  description: data.metaDescription,
 };
 
 export default function Page() {
-  return <StubPage title="Paid Marketing" crumb="Paid Marketing" />;
+  return <ServicePage data={data} />;
 }
+

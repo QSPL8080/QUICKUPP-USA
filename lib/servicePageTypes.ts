@@ -7,14 +7,19 @@ export interface ProcessStep {
 export interface ListBlock {
   type: "list";
   title: string;
+  subtitle?: string;
+  tagline?: string;
   desc?: string;
   items: string[];
   cta?: { label: string; href: string };
+  note?: string;
 }
 
 export interface DescPairsBlock {
   type: "descPairs";
   title?: string;
+  subtitle?: string;
+  tagline?: string;
   desc?: string;
   items: { title: string; desc: string }[];
   cta?: { label: string; href: string };
@@ -29,8 +34,11 @@ export interface ProcessBlock {
 
 export interface WhyChooseBlock {
   type: "whyChoose";
+  title?: string;
   tagline: string;
+  desc?: string;
   bullets: string[];
+  cta?: { label: string; href: string };
 }
 
 export interface IndustriesBlock {
@@ -41,7 +49,9 @@ export interface IndustriesBlock {
 export interface AiBlock {
   type: "ai";
   title: string;
-  desc: string;
+  intro?: string;
+  bullets?: string[];
+  desc?: string;
   cta?: { label: string; href: string };
 }
 

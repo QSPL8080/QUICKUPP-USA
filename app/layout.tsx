@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import WebflowReinit from "@/components/WebflowReinit";
+import LeadModal from "@/components/LeadModal";
 
 export const metadata: Metadata = {
   title: "Quickupp Softech | Marketing. AI. Technology. Built for Growth.",
@@ -38,6 +39,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
         <link rel="stylesheet" href="/css/mercket.webflow.shared.3eb5ac14d.min.css" />
+        <link rel="stylesheet" href="/css/scaleforge-perfect.css" />
         <Script
           src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"
           strategy="lazyOnload"
@@ -62,6 +64,7 @@ export default function RootLayout({
       </head>
       <body>
         {children}
+        <LeadModal />
         {/* Exactly the script set the Mercket reference home page loads. The extra
             bundles from other template pages were re-initialising Webflow and
             crashing it ("t is not a function"), which froze every animation. */}

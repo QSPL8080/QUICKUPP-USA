@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import StubPage from "@/components/StubPage";
+import ServicePage from "@/components/ServicePage";
+import { data } from "@/data/industries/healthcare";
 
 export const metadata: Metadata = {
-  title: "Healthcare | Quickupp Softech",
-  description: "Healthcare — part of Quickupp Softech's industries lineup. Full page content is coming soon.",
+  title: data.metaTitle,
+  description: data.metaDescription,
 };
 
-export default function Page() {
-  return <StubPage title="Healthcare" crumb="Healthcare" />;
+export default function HealthcareIndustryPage() {
+  return <ServicePage data={data} />;
 }

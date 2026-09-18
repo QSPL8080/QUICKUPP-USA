@@ -1,263 +1,305 @@
-import type { Metadata } from "next";
+"use client";
+
+import React, { useState } from "react";
+import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import PageHero from "@/components/PageHero";
+import Button from "@/components/Button";
+import { blogPosts } from "@/data/blogs";
 
-export const metadata: Metadata = {
-  title: "Blog | Mercket - Webflow HTML website template",
-  description:
-    "Insights, trends, and strategies to help you grow your brand and stay ahead in the digital world.",
-};
-
-const blogPosts = [
-  {
-    href: "/post/the-future-of-employe-engagement-whats-next",
-    img: "blog-img-01",
-    category: "Finance",
-    date: "23 February 2026",
-    title: "The Future of Employe Engagement: What's Next?",
-    authorImg: "testimonial-01",
-    author: "Jacob Moore",
-  },
-  {
-    href: "/post/top-trends-shaping-digital-marketing-in-2026",
-    img: "blog-img-02",
-    category: "Investment",
-    date: "25 February 2026",
-    title: "Top trends shaping digital marketing in 2026",
-    authorImg: "testimonial-03",
-    author: "Julia Taylor",
-  },
-  {
-    href: "/post/how-to-measure-marketing-impact-on-profitability",
-    img: "blog-img-03",
-    category: "Marketing",
-    date: "25 February 2026",
-    title: "How to measure marketing impact on profitability",
-    authorImg: "testimonial-03",
-    author: "Julia Taylor",
-  },
-  {
-    href: "/post/branding-vs-rebranding-what-your-business-needs",
-    img: "blog-img-04",
-    category: "Business",
-    date: "25 February 2026",
-    title: "Branding vs. rebranding: what your business needs",
-    authorImg: "testimonial-02",
-    author: "Paula Den",
-  },
-  {
-    href: "/post/using-analytics-to-improve-performance-and-roi",
-    img: "blog-img-05",
-    category: "Investment",
-    date: "25 February 2026",
-    title: "Using analytics to improve performance and ROI",
-    authorImg: "testimonial-01",
-    author: "Jacob Moore",
-  },
-  {
-    href: "/post/the-role-of-social-media-in-modern-growth-strategy",
-    img: "blog-img-06",
-    category: "Business",
-    date: "25 February 2026",
-    title: "The role of social media in modern growth strategy",
-    authorImg: "testimonial-02",
-    author: "Paula Den",
-  },
+const categories = [
+  "All",
+  "AI & Search Visibility",
+  "Digital Marketing",
+  "AI Automation",
+  "Web Engineering",
+  "eCommerce",
+  "Paid Advertising",
 ];
 
 export default function BlogPage() {
+  const [selectedCategory, setSelectedCategory] = useState("All");
+
+  const filteredPosts =
+    selectedCategory === "All"
+      ? blogPosts
+      : blogPosts.filter((post) => post.category === selectedCategory);
+
   return (
     <>
       <Header />
-      <section className="breadcrumb-section _02">
-        <div className="w-layout-blockcontainer container-large w-container">
-          <div className="breadcrumb-wrap">
-            <div className="breadcrumb-title-animation">
-              <h2 className="breadcrumb-heading-title">Latest Articles</h2>
-            </div>
-          </div>
-          <div className="breadcrumb-bottom-content">
-            <div className="breadcrumb-pages-map">
-              <div className="breadcrumb-pages-text-wrap">
-                <a href="#" className="breadcrumb-pages-text underline">
-                  Home
-                </a>
-                <div className="dashed">/</div>
-              </div>
-              <div className="breadcrumb-pages-text">Blog</div>
-            </div>
-            <div className="breadcrumb-desc-wrap">
-              <div className="breadcrumb-desc">
-                Insights, trends, and strategies to help you grow your brand and
-                stay ahead in the digital world.
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <PageHero
+        title="Marketing, AI & Tech Insights"
+        crumb="Blog"
+        description="Actionable strategies, expert analyses, and growth playbooks from the Quickupp Softech team."
+      />
 
-      <section className="section-gap">
+      {/* Main Blog Content Section with Proper Spacing */}
+      <section className="qs-blog-section" style={{ background: "#f8f9fa" }}>
         <div className="w-layout-blockcontainer container w-container">
-          <div className="blog-one w-dyn-list">
-            <div role="list" className="blog-one-list w-dyn-items">
-              {blogPosts.map((post, i) => (
-                <div
-                  key={i}
-                  data-w-id="c4c5fa6a-b329-cbc7-50e5-2109db4eaf24"
+          {/* Section Header */}
+          <div
+            className="qs-section-center-head"
+            style={{
+              textAlign: "center",
+              maxWidth: "800px",
+              margin: "0 auto 40px auto",
+            }}
+          >
+            <div className="subtitle-head-wrap" style={{ justifyContent: "center" }}>
+              <div className="subtitle-left-icon"></div>
+              <div className="subtitle-head">Articles & Insights</div>
+            </div>
+            <h2
+              className="heading-title qs-section-heading"
+              style={{ fontSize: "clamp(26px, 3.2vw, 38px)", marginTop: "8px", marginBottom: "12px" }}
+            >
+              Latest Strategies, Trends & Playbooks
+            </h2>
+            <p
+              className="paragraph-large"
+              style={{ fontSize: "17px", lineHeight: "1.7", color: "#475467" }}
+            >
+              Practical guides and perspectives on digital marketing, artificial intelligence, software engineering, and search visibility.
+            </p>
+          </div>
+
+          {/* Category Filter Pills */}
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "center",
+              gap: "10px",
+              marginBottom: "48px",
+            }}
+          >
+            {categories.map((cat) => {
+              const isSelected = selectedCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
                   style={{
-                    WebkitTransform:
-                      "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                    MozTransform:
-                      "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                    msTransform:
-                      "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                    transform:
-                      "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                    opacity: 0,
+                    padding: "8px 20px",
+                    borderRadius: "100px",
+                    fontSize: "14px",
+                    fontWeight: isSelected ? 700 : 600,
+                    border: isSelected ? "1px solid #18171c" : "1px solid #e4e7ec",
+                    background: isSelected ? "#18171c" : "#ffffff",
+                    color: isSelected ? "#def25c" : "#475467",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    boxShadow: isSelected
+                      ? "0 4px 12px rgba(24, 23, 28, 0.15)"
+                      : "0 2px 4px rgba(0,0,0,0.02)",
                   }}
-                  role="listitem"
-                  className="blog-one-item w-dyn-item"
                 >
-                  <a
-                    data-w-id="c4c5fa6a-b329-cbc7-50e5-2109db4eaf25"
-                    href={post.href}
-                    className="blog-one-wrap blog-detail w-inline-block"
+                  {cat}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Blog Cards Grid with Fixed Column Widths - Cards NEVER stretch abnormally */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(320px, 370px))",
+              justifyContent: "center",
+              gap: "32px",
+              marginBottom: "64px",
+            }}
+          >
+            {filteredPosts.map((post, i) => (
+              <article
+                key={i}
+                className="qs-blog-card"
+                style={{
+                  background: "#fff",
+                  border: "1px solid #eaecf0",
+                  borderRadius: "20px",
+                  overflow: "hidden",
+                  display: "flex",
+                  flexDirection: "column",
+                  boxShadow: "0 4px 18px rgba(0,0,0,0.03)",
+                  width: "100%",
+                }}
+              >
+                <Link
+                  href={`/blog/${post.slug}`}
+                  className="qs-blog-card-img-wrap"
+                  style={{ height: "220px", overflow: "hidden", position: "relative", display: "block" }}
+                >
+                  <img
+                    src={post.img}
+                    alt={post.title}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                  <div
+                    style={{
+                      position: "absolute",
+                      bottom: "12px",
+                      left: "16px",
+                      background: "rgba(24, 23, 28, 0.75)",
+                      backdropFilter: "blur(6px)",
+                      color: "#fff",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                      padding: "4px 10px",
+                      borderRadius: "6px",
+                    }}
                   >
-                    <div className="blog-one-image">
-                      <div
-                        style={{
-                          width: "200%",
-                          height: "0%",
-                          backgroundColor: "rgba(35,33,47,0.1)",
-                        }}
-                        className="image-bg-overlay"
-                      ></div>
-                      <img
-                        width="auto"
-                        height="auto"
-                        alt={post.img}
-                        src={`/images/${post.img}.jpg`}
-                        style={{
-                          WebkitTransform:
-                            "translate3d(0, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                          MozTransform:
-                            "translate3d(0, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                          msTransform:
-                            "translate3d(0, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                          transform:
-                            "translate3d(0, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                        }}
-                        sizes="(max-width: 767px) 100vw, (max-width: 991px) 727px, 939px"
-                        srcSet={
-                          post.img !== "blog-img-04"
-                            ? `/images/${post.img}-p-500.jpg 500w, /images/${post.img}-p-800.jpg 800w, /images/${post.img}-p-1080.jpg 1080w, /images/${post.img}.jpg 1520w`
-                            : undefined
-                        }
-                        className="blog-one-preview"
-                      />
-                    </div>
-                    <div className="blog-one-inner">
-                      <div className="blog-one-title-wrap">
-                        <div className="blog-one-meta">
-                          <div
-                            data-w-id="c4c5fa6a-b329-cbc7-50e5-2109db4eaf2c"
-                            style={{
-                              WebkitTransform:
-                                "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                              MozTransform:
-                                "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                              msTransform:
-                                "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                              transform:
-                                "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                              opacity: 0,
-                            }}
-                            className="blog-category"
-                          >
-                            <div className="category">(</div>
-                            <div className="category">{post.category}</div>
-                            <div className="category">)</div>
-                          </div>
-                          <div
-                            data-w-id="c4c5fa6a-b329-cbc7-50e5-2109db4eaf32"
-                            style={{
-                              WebkitTransform:
-                                "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                              MozTransform:
-                                "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                              msTransform:
-                                "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                              transform:
-                                "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                              opacity: 0,
-                            }}
-                            className="blog-category"
-                          >
-                            <div className="category">(</div>
-                            <div className="category">{post.date}</div>
-                            <div className="category">)</div>
-                          </div>
-                        </div>
-                        <div
-                          data-w-id="c4c5fa6a-b329-cbc7-50e5-2109db4eaf38"
-                          style={{
-                            WebkitTransform:
-                              "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                            MozTransform:
-                              "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                            msTransform:
-                              "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                            transform:
-                              "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                            opacity: 0,
-                          }}
-                          className="text-style-h2"
-                        >
-                          {post.title}
-                        </div>
-                      </div>
-                      <div className="blog-one-author-wrap">
-                        <div className="blog-one-author-image-wrap">
-                          <img
-                            src={`/images/${post.authorImg}.jpg`}
-                            alt={`Author Image`}
-                            style={{
-                              WebkitTransform:
-                                "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                              MozTransform:
-                                "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                              msTransform:
-                                "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                              transform:
-                                "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                              opacity: 0,
-                            }}
-                            data-w-id="c4c5fa6a-b329-cbc7-50e5-2109db4eaf3b"
-                          />
-                        </div>
-                        <div
-                          data-w-id="c4c5fa6a-b329-cbc7-50e5-2109db4eaf3c"
-                          style={{
-                            WebkitTransform:
-                              "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                            MozTransform:
-                              "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                            msTransform:
-                              "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                            transform:
-                              "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                            opacity: 0,
-                          }}
-                          className="author-name-wrap"
-                        >
-                          <div className="category">By </div>
-                          <div className="category">{post.author}</div>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
+                    {post.readTime}
+                  </div>
+                </Link>
+
+                <div
+                  style={{
+                    padding: "28px 24px",
+                    display: "flex",
+                    flexDirection: "column",
+                    flexGrow: 1,
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginBottom: "14px",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: "12px",
+                        fontWeight: 700,
+                        background: "rgba(222, 242, 92, 0.4)",
+                        color: "#18171c",
+                        padding: "5px 12px",
+                        borderRadius: "8px",
+                      }}
+                    >
+                      {post.category}
+                    </span>
+                    <span style={{ fontSize: "13px", color: "#98a2b3", fontWeight: 500 }}>
+                      {post.date}
+                    </span>
+                  </div>
+
+                  <h3
+                    style={{
+                      fontSize: "19px",
+                      fontWeight: 700,
+                      color: "#18171c",
+                      marginBottom: "12px",
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    <Link
+                      href={`/blog/${post.slug}`}
+                      style={{ color: "#18171c", textDecoration: "none" }}
+                    >
+                      {post.title}
+                    </Link>
+                  </h3>
+
+                  <p
+                    style={{
+                      fontSize: "14.5px",
+                      lineHeight: "1.65",
+                      color: "#475467",
+                      marginBottom: "24px",
+                      flexGrow: 1,
+                    }}
+                  >
+                    {post.desc}
+                  </p>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      paddingTop: "16px",
+                      borderTop: "1px solid #f2f4f7",
+                    }}
+                  >
+                    <span style={{ fontSize: "13px", fontWeight: 600, color: "#667085" }}>
+                      By {post.author}
+                    </span>
+                    <Link
+                      href={`/blog/${post.slug}`}
+                      style={{
+                        fontSize: "14px",
+                        fontWeight: 700,
+                        color: "#18171c",
+                        textDecoration: "none",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "4px",
+                      }}
+                    >
+                      Read Article →
+                    </Link>
+                  </div>
                 </div>
-              ))}
+              </article>
+            ))}
+          </div>
+
+          {/* Bottom Call to Action Box */}
+          <div
+            style={{
+              background: "#18171c",
+              borderRadius: "24px",
+              padding: "48px 40px",
+              textAlign: "center",
+              color: "#fff",
+              border: "1px solid rgba(222, 242, 92, 0.2)",
+              boxShadow: "0 16px 40px rgba(0,0,0,0.1)",
+            }}
+          >
+            <div
+              style={{
+                display: "inline-block",
+                background: "rgba(222, 242, 92, 0.2)",
+                color: "#def25c",
+                fontSize: "12px",
+                fontWeight: 700,
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                padding: "4px 14px",
+                borderRadius: "100px",
+                marginBottom: "16px",
+              }}
+            >
+              Have a Project in Mind?
+            </div>
+            <h3
+              style={{
+                fontSize: "clamp(24px, 3.2vw, 36px)",
+                fontWeight: 800,
+                color: "#fff",
+                marginBottom: "12px",
+              }}
+            >
+              Turn These Strategies Into Business Growth
+            </h3>
+            <p
+              style={{
+                fontSize: "16px",
+                lineHeight: "1.7",
+                color: "rgba(255,255,255,0.8)",
+                maxWidth: "640px",
+                margin: "0 auto 28px auto",
+              }}
+            >
+              Speak with our Marketing, AI, and Software Engineering experts to build a tailored roadmap for your brand.
+            </p>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <Button href="/contact" label="Talk to a Growth Strategist" />
             </div>
           </div>
         </div>

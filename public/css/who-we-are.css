@@ -1,0 +1,598 @@
+/* ==========================================================================
+   Quickupp Softech - Who We Are / About Page (ScaleForge Reference Design)
+   ========================================================================== */
+
+.qs-about-page-root {
+  background: #ffffff;
+  color: #18171c;
+  overflow-x: hidden;
+}
+
+.qs-about-container {
+  max-width: 1320px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px;
+  padding-right: 24px;
+  width: 100%;
+}
+
+/* ==========================================================================
+   1. HERO SECTION
+   ========================================================================== */
+.qs-about-hero-section {
+  position: relative;
+  background: linear-gradient(180deg, #070c18 0%, #0d1527 100%);
+  color: #ffffff;
+  padding-top: 150px;
+  padding-bottom: 90px;
+  overflow: hidden;
+}
+
+.qs-about-hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.22;
+  pointer-events: none;
+}
+.qs-about-hero-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.qs-about-hero-wrap {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1.25fr 0.75fr;
+  gap: 48px;
+  align-items: flex-end;
+}
+@media (max-width: 991px) {
+  .qs-about-hero-wrap {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+
+.qs-about-hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(222, 242, 92, 0.12);
+  border: 1px solid rgba(222, 242, 92, 0.35);
+  color: #def25c;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 100px;
+  margin-bottom: 20px;
+}
+
+.qs-about-hero-title {
+  font-size: clamp(34px, 4.2vw, 56px);
+  font-weight: 800;
+  line-height: 1.15;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  margin-bottom: 20px;
+  font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", sans-serif);
+}
+
+.qs-about-hero-desc {
+  font-size: 18px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 32px;
+  max-width: 640px;
+}
+
+.qs-about-hero-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: #def25c;
+  color: #18171c;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 14px 28px;
+  border-radius: 100px;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 8px 24px rgba(222, 242, 92, 0.25);
+}
+.qs-about-hero-btn:hover {
+  transform: translateY(-2px);
+  background: #ffffff;
+  color: #18171c;
+  box-shadow: 0 12px 30px rgba(255, 255, 255, 0.2);
+}
+
+.qs-about-hero-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 36px 32px;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 220px;
+}
+.qs-about-card-tag {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #def25c;
+  margin-bottom: 24px;
+}
+.qs-about-card-count {
+  font-size: clamp(48px, 5vw, 68px);
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1;
+  margin-bottom: 8px;
+  font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", sans-serif);
+}
+.qs-about-card-label {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+}
+
+/* ==========================================================================
+   2. MANIFESTO & CAPABILITIES SECTION
+   ========================================================================== */
+.qs-manifesto-section {
+  padding: 100px 0;
+  background: #ffffff;
+}
+
+.qs-manifesto-header {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 40px;
+  margin-bottom: 72px;
+}
+@media (max-width: 991px) {
+  .qs-manifesto-header {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.qs-manifesto-tag {
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #b2d415;
+  padding-top: 6px;
+}
+
+.qs-manifesto-quote {
+  font-size: clamp(22px, 2.6vw, 32px);
+  line-height: 1.45;
+  font-weight: 600;
+  color: #18171c;
+  letter-spacing: -0.01em;
+  margin: 0;
+  font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", sans-serif);
+}
+
+.qs-capabilities-list {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid #eaecf0;
+}
+
+.qs-capability-row {
+  display: grid;
+  grid-template-columns: 380px 1fr auto;
+  gap: 32px;
+  align-items: center;
+  padding: 36px 0;
+  border-bottom: 1px solid #eaecf0;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s ease;
+}
+.qs-capability-row:hover {
+  background: #fafbfc;
+  padding-left: 20px;
+  padding-right: 20px;
+  border-radius: 16px;
+}
+@media (max-width: 840px) {
+  .qs-capability-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.qs-cap-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #18171c;
+  font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", sans-serif);
+}
+
+.qs-cap-desc {
+  font-size: 15.5px;
+  line-height: 1.65;
+  color: #475467;
+  margin: 0;
+}
+
+.qs-cap-arrow {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #f2f4f7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+.qs-capability-row:hover .qs-cap-arrow {
+  background: #18171c;
+  color: #def25c;
+  transform: translateX(6px) rotate(-45deg);
+}
+
+/* ==========================================================================
+   3. STATEMENT & VIDEO SECTION
+   ========================================================================= */
+.qs-statement-section {
+  padding: 80px 0;
+  background: #f8f9fa;
+}
+
+.qs-statement-top {
+  margin-bottom: 32px;
+}
+.qs-statement-tag {
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #b2d415;
+  margin-bottom: 10px;
+}
+.qs-statement-heading {
+  font-size: clamp(26px, 3.2vw, 40px);
+  font-weight: 800;
+  color: #18171c;
+  line-height: 1.25;
+}
+
+.qs-statement-video-box {
+  position: relative;
+  border-radius: 28px;
+  overflow: hidden;
+  height: 460px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+}
+.qs-statement-video-box video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.qs-statement-video-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(7, 12, 24, 0.25) 0%, rgba(7, 12, 24, 0.88) 100%);
+  display: flex;
+  align-items: flex-end;
+  padding: 48px 40px;
+}
+.qs-statement-overlay-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #def25c;
+  margin-bottom: 8px;
+}
+.qs-statement-overlay-text {
+  font-size: 16px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 720px;
+  margin: 0;
+}
+
+/* ==========================================================================
+   4. IMPACT METRICS GRID (quick-action)
+   ========================================================================= */
+.qs-impact-section {
+  padding: 100px 0;
+  background: #ffffff;
+}
+
+.qs-impact-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 48px;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.qs-impact-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+@media (max-width: 991px) {
+  .qs-impact-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.qs-impact-card {
+  background: #f8f9fa;
+  border: 1px solid #eaecf0;
+  border-radius: 24px;
+  padding: 44px 36px;
+  transition: all 0.3s ease;
+}
+.qs-impact-card:hover {
+  transform: translateY(-4px);
+  background: #ffffff;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.06);
+  border-color: #d0d5dd;
+}
+.qs-impact-num {
+  font-size: clamp(44px, 4.5vw, 64px);
+  font-weight: 800;
+  color: #18171c;
+  line-height: 1;
+  margin-bottom: 16px;
+  font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", sans-serif);
+}
+.qs-impact-card:nth-child(2) .qs-impact-num {
+  color: #2563eb;
+}
+.qs-impact-card:nth-child(3) .qs-impact-num {
+  color: #b2d415;
+}
+.qs-impact-text {
+  font-size: 15.5px;
+  line-height: 1.65;
+  color: #475467;
+  margin: 0;
+}
+
+/* ==========================================================================
+   5. WHY BUSINESSES CHOOSE QUICKUPP (expertise)
+   ========================================================================= */
+.qs-why-section {
+  padding: 100px 0;
+  background: #f8f9fa;
+}
+
+.qs-why-top {
+  display: grid;
+  grid-template-columns: 1.25fr 0.75fr;
+  gap: 48px;
+  align-items: center;
+  margin-bottom: 64px;
+}
+@media (max-width: 991px) {
+  .qs-why-top {
+    grid-template-columns: 1fr;
+  }
+}
+
+.qs-why-tag {
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #b2d415;
+  margin-bottom: 12px;
+}
+.qs-why-title {
+  font-size: clamp(28px, 3.4vw, 42px);
+  font-weight: 800;
+  color: #18171c;
+  line-height: 1.25;
+  margin-bottom: 16px;
+}
+.qs-why-desc {
+  font-size: 16.5px;
+  line-height: 1.7;
+  color: #475467;
+  margin-bottom: 28px;
+}
+
+.qs-why-stat-box {
+  background: #18171c;
+  color: #ffffff;
+  border-radius: 28px;
+  padding: 40px 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+}
+.qs-why-stat-tag {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #def25c;
+  margin-bottom: 20px;
+}
+.qs-why-stat-num {
+  font-size: clamp(48px, 5vw, 72px);
+  font-weight: 800;
+  color: #def25c;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.qs-why-stat-label {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.qs-pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+@media (max-width: 991px) {
+  .qs-pillars-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.qs-pillar-card {
+  background: #ffffff;
+  border: 1px solid #eaecf0;
+  border-radius: 20px;
+  padding: 36px 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+.qs-pillar-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #18171c;
+  margin-bottom: 14px;
+  line-height: 1.35;
+}
+.qs-pillar-desc {
+  font-size: 15px;
+  line-height: 1.65;
+  color: #475467;
+  margin: 0;
+}
+
+/* ==========================================================================
+   6. TESTIMONIALS SLIDER
+   ========================================================================= */
+.qs-testimonial-section {
+  padding: 100px 0;
+  background: #ffffff;
+}
+
+.qs-testimonial-card {
+  background: #f8f9fa;
+  border: 1px solid #eaecf0;
+  border-radius: 28px;
+  padding: 48px 44px;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 44px;
+  align-items: center;
+}
+@media (max-width: 768px) {
+  .qs-testimonial-card {
+    grid-template-columns: 1fr;
+    padding: 32px 24px;
+    gap: 24px;
+  }
+}
+.qs-test-avatar {
+  width: 100%;
+  height: 240px;
+  border-radius: 20px;
+  object-fit: cover;
+}
+.qs-test-tag {
+  font-size: 13px;
+  font-weight: 800;
+  color: #b2d415;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 16px;
+}
+.qs-test-quote {
+  font-size: clamp(18px, 2.2vw, 24px);
+  line-height: 1.5;
+  font-weight: 600;
+  color: #18171c;
+  margin-bottom: 24px;
+}
+.qs-test-author {
+  font-size: 18px;
+  font-weight: 800;
+  color: #18171c;
+}
+.qs-test-role {
+  font-size: 14px;
+  color: #667085;
+  margin-top: 2px;
+}
+
+/* ==========================================================================
+   7. CLOSING CTA BANNER
+   ========================================================================= */
+.qs-closing-cta-section {
+  padding: 0 0 100px 0;
+  background: #ffffff;
+}
+
+.qs-closing-cta-card {
+  background: linear-gradient(135deg, #070c18 0%, #0d1527 100%);
+  border-radius: 32px;
+  padding: 64px 56px;
+  color: #ffffff;
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 48px;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+@media (max-width: 991px) {
+  .qs-closing-cta-card {
+    grid-template-columns: 1fr;
+    padding: 40px 32px;
+  }
+}
+.qs-cta-tag {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #def25c;
+  margin-bottom: 14px;
+}
+.qs-cta-title {
+  font-size: clamp(30px, 3.8vw, 48px);
+  font-weight: 800;
+  line-height: 1.2;
+  color: #ffffff;
+  margin-bottom: 18px;
+}
+.qs-cta-desc {
+  font-size: 16.5px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.82);
+  margin-bottom: 28px;
+}
+.qs-cta-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  color: #def25c;
+  font-weight: 700;
+  margin-bottom: 32px;
+}
+.qs-cta-img-wrap {
+  border-radius: 20px;
+  overflow: hidden;
+  height: 320px;
+}
+.qs-cta-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

@@ -19,7 +19,7 @@ export default function IndustriesPage() {
         crumb="Industries"
         description="We build marketing, AI and technology solutions tailored to the industries we work with most."
       />
-      <section className="section-gap padding-top-0">
+      <section className="section-gap" style={{ paddingTop: "64px", paddingBottom: "96px" }}>
         <div className="w-layout-blockcontainer container w-container">
           <div className="qs-card-grid">
             {industryItems.map((item) => (

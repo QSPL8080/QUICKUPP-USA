@@ -19,7 +19,7 @@ export default function ServicesPage() {
         crumb="Services"
         description="Explore our full range of digital marketing, AI and technology services, built to help your business grow."
       />
-      <section className="section-gap padding-top-0">
+      <section className="section-gap" style={{ paddingTop: "64px", paddingBottom: "96px" }}>
         <div className="w-layout-blockcontainer container w-container">
           {serviceGroups.map((group) => (
             <div key={group.label}>
