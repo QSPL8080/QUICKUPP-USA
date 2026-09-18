@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -27,6 +27,34 @@ function CheckIcon() {
         fill="currentColor"
       />
     </svg>
+  );
+}
+
+// Interactive Animated Button
+function AnimatedButton({
+  href,
+  label,
+  variant = "primary",
+  className = "",
+}: {
+  href: string;
+  label: string;
+  variant?: "primary" | "secondary";
+  className?: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className={`ms-btn ${variant === "primary" ? "ms-btn-primary" : "ms-btn-secondary"} ${className}`}
+    >
+      <span className="ms-btn-clip">
+        <span className="ms-btn-text-main">{label}</span>
+        <span aria-hidden="true" className="ms-btn-text-hover">
+          {label}
+        </span>
+      </span>
+      <ArrowIcon />
+    </Link>
   );
 }
 
@@ -62,14 +90,14 @@ function BlockRenderer({ block, index }: { block: ServiceBlock; index: number })
         <section className="ms-section">
           <div className="ms-container">
             <div className="ms-split-layout">
-              <div>
+              <div className="ms-reveal ms-reveal-left">
                 <div className="ms-eyebrow">
                   <span className="ms-eyebrow-dot"></span>
                   <span>{block.subtitle ?? "Deliverables"}</span>
                 </div>
                 {block.title && <h2 className="ms-section-title">{block.title}</h2>}
                 {block.tagline && (
-                  <p style={{ fontSize: "18px", fontWeight: 600, color: "var(--ms-accent)", marginBottom: "12px" }}>
+                  <p style={{ fontSize: "18px", fontWeight: 600, color: "#18171c", marginBottom: "12px" }}>
                     {block.tagline}
                   </p>
                 )}
@@ -81,27 +109,24 @@ function BlockRenderer({ block, index }: { block: ServiceBlock; index: number })
                 )}
                 {block.cta && (
                   <div style={{ marginTop: "32px" }}>
-                    <Link href={block.cta.href} className="ms-btn ms-btn-primary">
-                      <span>{block.cta.label}</span>
-                      <ArrowIcon />
-                    </Link>
+                    <AnimatedButton href={block.cta.href} label={block.cta.label} variant="primary" />
                   </div>
                 )}
               </div>
 
-              <div>
+              <div className="ms-reveal ms-stagger-2">
                 <div className="ms-callout-wrap" style={{ padding: "36px 32px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-                    <span style={{ fontSize: "13px", fontWeight: 700, color: "var(--ms-accent)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                    <span style={{ fontSize: "13px", fontWeight: 700, color: "#18171c", letterSpacing: "0.08em", textTransform: "uppercase" }}>
                       Key Focus Areas
                     </span>
-                    <span style={{ fontSize: "12px", background: "rgba(222,242,92,0.12)", color: "var(--ms-accent)", padding: "4px 12px", borderRadius: "100px", fontWeight: 700 }}>
+                    <span style={{ fontSize: "12px", background: "#18171c", color: "#def25c", padding: "4px 12px", borderRadius: "100px", fontWeight: 700 }}>
                       {block.items.length} Deliverables
                     </span>
                   </div>
                   <div className="ms-checklist-group" style={{ margin: 0 }}>
                     {block.items.map((item, i) => (
-                      <div key={i} className="ms-check-item">
+                      <div key={i} className={`ms-check-item ms-reveal ms-stagger-${(i % 5) + 1}`}>
                         <div className="ms-check-icon">
                           <CheckIcon />
                         </div>
@@ -121,23 +146,23 @@ function BlockRenderer({ block, index }: { block: ServiceBlock; index: number })
       return (
         <section className="ms-section ms-section-alt">
           <div className="ms-container">
-            <div className="ms-section-header">
+            <div className="ms-section-header ms-reveal">
               <div className="ms-eyebrow">
                 <span className="ms-eyebrow-dot"></span>
                 <span>{block.subtitle ?? "What's Included"}</span>
               </div>
               {block.title && <h2 className="ms-section-title">{block.title}</h2>}
               {block.tagline && (
-                <p style={{ fontSize: "18px", fontWeight: 600, color: "var(--ms-accent)", marginBottom: "8px" }}>
+                <p style={{ fontSize: "18px", fontWeight: 600, color: "#18171c", marginBottom: "8px" }}>
                   {block.tagline}
                 </p>
               )}
               {block.desc && <p className="ms-section-desc">{block.desc}</p>}
             </div>
 
-            <div className="ms-grid-border">
+            <div className="ms-grid-border ms-reveal ms-stagger-1">
               {block.items.map((item, i) => (
-                <div key={i} className="ms-card-icon">
+                <div key={i} className={`ms-card-icon ms-reveal ms-stagger-${(i % 4) + 1}`}>
                   <div className="ms-card-top-row">
                     <div className="ms-icon-slot">
                       <CardIcon index={i} />
@@ -151,11 +176,8 @@ function BlockRenderer({ block, index }: { block: ServiceBlock; index: number })
             </div>
 
             {block.cta && (
-              <div style={{ marginTop: "40px", textAlign: "center" }}>
-                <Link href={block.cta.href} className="ms-btn ms-btn-secondary">
-                  <span>{block.cta.label}</span>
-                  <ArrowIcon />
-                </Link>
+              <div className="ms-reveal ms-stagger-3" style={{ marginTop: "40px", textAlign: "center" }}>
+                <AnimatedButton href={block.cta.href} label={block.cta.label} variant="secondary" />
               </div>
             )}
           </div>
@@ -167,7 +189,7 @@ function BlockRenderer({ block, index }: { block: ServiceBlock; index: number })
         <section className="ms-section">
           <div className="ms-container">
             <div className="ms-process-split">
-              <div className="ms-process-sticky">
+              <div className="ms-process-sticky ms-reveal ms-reveal-left">
                 <div className="ms-eyebrow">
                   <span className="ms-eyebrow-dot"></span>
                   <span>Process</span>
@@ -177,16 +199,13 @@ function BlockRenderer({ block, index }: { block: ServiceBlock; index: number })
                   Our battle-tested workflow ensures total alignment, disciplined execution, and measurable outcomes at every phase.
                 </p>
                 <div style={{ marginTop: "28px" }}>
-                  <Link href="/contact" className="ms-btn ms-btn-primary">
-                    <span>Discuss Your Project</span>
-                    <ArrowIcon />
-                  </Link>
+                  <AnimatedButton href="/contact" label="Discuss Your Project" variant="primary" />
                 </div>
               </div>
 
               <div className="ms-step-list">
                 {block.steps.map((step, i) => (
-                  <div key={i} className="ms-step-item">
+                  <div key={i} className={`ms-step-item ms-reveal ms-stagger-${(i % 4) + 1}`}>
                     <div className="ms-step-number">{step.num.replace(/^0+/, "") || i + 1}</div>
                     <div>
                       <h3 className="ms-step-heading">{step.title}</h3>
@@ -205,7 +224,7 @@ function BlockRenderer({ block, index }: { block: ServiceBlock; index: number })
         <section className="ms-section ms-section-alt">
           <div className="ms-container">
             <div className="ms-split-layout">
-              <div>
+              <div className="ms-reveal ms-reveal-left">
                 <div className="ms-eyebrow">
                   <span className="ms-eyebrow-dot"></span>
                   <span>{block.title ?? "Why Choose Us"}</span>
@@ -214,10 +233,7 @@ function BlockRenderer({ block, index }: { block: ServiceBlock; index: number })
                 {block.desc && <p className="ms-section-desc">{block.desc}</p>}
                 {block.cta && (
                   <div style={{ marginTop: "32px" }}>
-                    <Link href={block.cta.href} className="ms-btn ms-btn-primary">
-                      <span>{block.cta.label}</span>
-                      <ArrowIcon />
-                    </Link>
+                    <AnimatedButton href={block.cta.href} label={block.cta.label} variant="primary" />
                   </div>
                 )}
               </div>
@@ -225,7 +241,7 @@ function BlockRenderer({ block, index }: { block: ServiceBlock; index: number })
               <div>
                 <div className="ms-checklist-group">
                   {block.bullets.map((b, i) => (
-                    <div key={i} className="ms-check-item">
+                    <div key={i} className={`ms-check-item ms-reveal ms-stagger-${(i % 4) + 1}`}>
                       <div className="ms-check-icon">
                         <CheckIcon />
                       </div>
@@ -243,7 +259,7 @@ function BlockRenderer({ block, index }: { block: ServiceBlock; index: number })
       return (
         <section className="ms-section">
           <div className="ms-container">
-            <div className="ms-section-header is-center">
+            <div className="ms-section-header is-center ms-reveal">
               <div className="ms-eyebrow">
                 <span className="ms-eyebrow-dot"></span>
                 <span>Experience</span>
@@ -254,9 +270,9 @@ function BlockRenderer({ block, index }: { block: ServiceBlock; index: number })
               </p>
             </div>
 
-            <div className="ms-industry-grid">
+            <div className="ms-industry-grid ms-reveal ms-stagger-2">
               {block.industries.map((ind, i) => (
-                <div key={i} className="ms-industry-item">
+                <div key={i} className={`ms-industry-item ms-reveal ms-stagger-${(i % 5) + 1}`}>
                   <span style={{ color: "var(--ms-accent)" }}>✦</span>
                   <span>{ind}</span>
                 </div>
@@ -270,9 +286,9 @@ function BlockRenderer({ block, index }: { block: ServiceBlock; index: number })
       return (
         <section className="ms-section">
           <div className="ms-container">
-            <div className="ms-ai-spotlight">
-              <div className="ms-eyebrow" style={{ color: "var(--ms-accent)" }}>
-                <span className="ms-eyebrow-dot"></span>
+            <div className="ms-ai-spotlight ms-reveal ms-reveal-scale">
+              <div className="ms-eyebrow" style={{ color: "#def25c" }}>
+                <span className="ms-eyebrow-dot" style={{ backgroundColor: "#def25c", borderColor: "#ffffff" }}></span>
                 <span>Next-Gen Innovation</span>
               </div>
               <h2 className="ms-ai-title">{block.title}</h2>
@@ -292,10 +308,7 @@ function BlockRenderer({ block, index }: { block: ServiceBlock; index: number })
 
               {block.cta && (
                 <div style={{ marginTop: "32px" }}>
-                  <Link href={block.cta.href} className="ms-btn ms-btn-primary">
-                    <span>{block.cta.label}</span>
-                    <ArrowIcon />
-                  </Link>
+                  <AnimatedButton href={block.cta.href} label={block.cta.label} variant="primary" />
                 </div>
               )}
             </div>
@@ -307,7 +320,7 @@ function BlockRenderer({ block, index }: { block: ServiceBlock; index: number })
       return (
         <section className="ms-section ms-section-alt">
           <div className="ms-container">
-            <div className="ms-section-header is-center">
+            <div className="ms-section-header is-center ms-reveal">
               <div className="ms-eyebrow">
                 <span className="ms-eyebrow-dot"></span>
                 <span>FAQ</span>
@@ -322,7 +335,7 @@ function BlockRenderer({ block, index }: { block: ServiceBlock; index: number })
               {block.items.map((item, i) => {
                 const isOpen = openFaq === i;
                 return (
-                  <div key={i} className={`ms-faq-item ${isOpen ? "is-active" : ""}`}>
+                  <div key={i} className={`ms-faq-item ms-reveal ms-stagger-${(i % 4) + 1} ${isOpen ? "is-active" : ""}`}>
                     <div className="ms-faq-header" onClick={() => setOpenFaq(isOpen ? null : i)}>
                       <h3 className="ms-faq-question">{item.q}</h3>
                       <div className="ms-faq-toggle">+</div>
@@ -346,11 +359,47 @@ function BlockRenderer({ block, index }: { block: ServiceBlock; index: number })
 }
 
 export default function ServicePage({ data }: { data: ServicePageData }) {
+  const pageRef = useRef<HTMLElement>(null);
+
+  // Scroll Reveal Intersection Observer Hook
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px",
+      }
+    );
+
+    const elements = document.querySelectorAll(
+      ".ms-reveal, .ms-reveal-left, .ms-reveal-scale"
+    );
+    elements.forEach((el) => observer.observe(el));
+
+    // Force hero elements to animate immediately on load
+    const timer = setTimeout(() => {
+      document.querySelectorAll(".ms-hero .ms-reveal, .ms-hero .ms-reveal-scale").forEach((el) => {
+        el.classList.add("is-visible");
+      });
+    }, 100);
+
+    return () => {
+      observer.disconnect();
+      clearTimeout(timer);
+    };
+  }, []);
+
   return (
     <>
       <Header />
 
-      <main className="meridian-service-page">
+      <main ref={pageRef} className="meridian-service-page">
         {/* Load scoped Meridian CSS */}
         <link rel="stylesheet" href="/css/meridian-service.css" />
 
@@ -358,35 +407,29 @@ export default function ServicePage({ data }: { data: ServicePageData }) {
         <section className="ms-hero">
           <div className="ms-container">
             <div className="ms-hero-center">
-              <div className="ms-eyebrow">
+              <div className="ms-eyebrow ms-reveal">
                 <span className="ms-eyebrow-dot"></span>
                 <span>{data.heroEyebrow || data.crumb}</span>
               </div>
-              <h1 className="ms-hero-heading ms-animate-fade-up">{data.heroTitle}</h1>
+              <h1 className="ms-hero-heading ms-reveal ms-stagger-1">{data.heroTitle}</h1>
               {data.heroParagraphs && data.heroParagraphs.length > 0 && (
-                <p className="ms-hero-desc">{data.heroParagraphs[0]}</p>
+                <p className="ms-hero-desc ms-reveal ms-stagger-2">{data.heroParagraphs[0]}</p>
               )}
-              <div className="ms-cta-buttons">
-                <Link href={data.heroCta.href} className="ms-btn ms-btn-primary">
-                  <span>{data.heroCta.label}</span>
-                  <ArrowIcon />
-                </Link>
-                <Link href="#overview" className="ms-btn ms-btn-secondary">
-                  <span>Explore Capabilities</span>
-                  <ArrowIcon />
-                </Link>
+              <div className="ms-cta-buttons ms-reveal ms-stagger-3">
+                <AnimatedButton href={data.heroCta.href} label={data.heroCta.label} variant="primary" />
+                <AnimatedButton href="#overview" label="Explore Capabilities" variant="secondary" />
               </div>
             </div>
 
             {/* Hero Visual Presentation with Meridian Aesthetic */}
-            <div className="ms-hero-visual">
+            <div className="ms-hero-visual ms-reveal-scale ms-stagger-4">
               <img
                 src="/images/about-hero-bg.webp"
                 alt={data.heroTitle}
                 loading="eager"
               />
               <div className="ms-corner-badge">
-                <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "var(--ms-accent)" }}></span>
+                <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#def25c" }}></span>
                 <span>Quickupp Softech • High-Performance Delivery</span>
               </div>
             </div>
@@ -397,7 +440,7 @@ export default function ServicePage({ data }: { data: ServicePageData }) {
         {data.heroParagraphs && data.heroParagraphs.length > 1 && (
           <section id="overview" className="ms-section-sm">
             <div className="ms-container">
-              <div className="ms-callout-wrap">
+              <div className="ms-callout-wrap ms-reveal ms-reveal-scale">
                 <div className="ms-eyebrow">
                   <span className="ms-eyebrow-dot"></span>
                   <span>Overview</span>
@@ -421,23 +464,21 @@ export default function ServicePage({ data }: { data: ServicePageData }) {
         {/* 4. Closing Conversion Banner */}
         <section className="ms-section">
           <div className="ms-container">
-            <div className="ms-closing-card">
-              <div className="ms-eyebrow" style={{ justifyContent: "center" }}>
-                <span className="ms-eyebrow-dot"></span>
+            <div className="ms-closing-card ms-reveal ms-reveal-scale">
+              <div className="ms-eyebrow" style={{ justifyContent: "center", color: "#def25c" }}>
+                <span className="ms-eyebrow-dot" style={{ backgroundColor: "#def25c", borderColor: "#ffffff" }}></span>
                 <span>Ready to Scale</span>
               </div>
               <h2 className="ms-closing-title">{data.closingTitle}</h2>
               <p className="ms-closing-desc">{data.closingDesc}</p>
               <div className="ms-cta-buttons">
                 {data.closingCtas.map((cta, idx) => (
-                  <Link
+                  <AnimatedButton
                     key={idx}
                     href={cta.href}
-                    className={`ms-btn ${idx === 0 ? "ms-btn-primary" : "ms-btn-secondary"}`}
-                  >
-                    <span>{cta.label}</span>
-                    <ArrowIcon />
-                  </Link>
+                    label={cta.label}
+                    variant={idx === 0 ? "primary" : "secondary"}
+                  />
                 ))}
               </div>
             </div>
