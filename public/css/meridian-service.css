@@ -1,0 +1,728 @@
+﻿/* ==========================================================================
+   MERIDIAN SERVICE DESIGN SYSTEM
+   Scoped exclusively for Service Pages (.meridian-service-page)
+   ========================================================================== */
+
+.meridian-service-page {
+  --ms-bg: #080a0f;
+  --ms-bg-card: #0f131c;
+  --ms-bg-card-hover: #151a27;
+  --ms-bg-surface: #121622;
+  --ms-bg-alt: #0a0d14;
+  --ms-text: #f5f5f7;
+  --ms-text-muted: rgba(245, 245, 247, 0.65);
+  --ms-text-faded: rgba(245, 245, 247, 0.45);
+  --ms-accent: #def25c;
+  --ms-accent-hover: #e8fa75;
+  --ms-accent-dark: #181c00;
+  --ms-border: rgba(255, 255, 255, 0.08);
+  --ms-border-hover: rgba(222, 242, 92, 0.35);
+  --ms-radius-sm: 8px;
+  --ms-radius-md: 16px;
+  --ms-radius-lg: 24px;
+  --ms-radius-full: 9999px;
+  
+  background-color: var(--ms-bg);
+  color: var(--ms-text);
+  font-family: inherit;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Base Container */
+.meridian-service-page .ms-container {
+  width: 100%;
+  max-width: 1240px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px;
+  padding-right: 24px;
+  position: relative;
+  z-index: 2;
+}
+
+/* Sections */
+.meridian-service-page .ms-section {
+  padding-top: 96px;
+  padding-bottom: 96px;
+  position: relative;
+}
+
+.meridian-service-page .ms-section-sm {
+  padding-top: 64px;
+  padding-bottom: 64px;
+}
+
+.meridian-service-page .ms-section-alt {
+  background-color: var(--ms-bg-alt);
+  border-top: 1px solid var(--ms-border);
+  border-bottom: 1px solid var(--ms-border);
+}
+
+/* Eyebrow Component */
+.meridian-service-page .ms-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ms-accent);
+  margin-bottom: 16px;
+}
+
+.meridian-service-page .ms-eyebrow-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--ms-accent);
+  box-shadow: 0 0 10px var(--ms-accent);
+  flex-shrink: 0;
+}
+
+/* Hero Section */
+.meridian-service-page .ms-hero {
+  padding-top: 80px;
+  padding-bottom: 60px;
+  position: relative;
+}
+
+.meridian-service-page .ms-hero-center {
+  text-align: center;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.meridian-service-page .ms-hero-heading {
+  font-size: clamp(36px, 5.5vw, 68px);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+  margin-bottom: 24px;
+}
+
+.meridian-service-page .ms-hero-desc {
+  font-size: clamp(17px, 2vw, 20px);
+  line-height: 1.6;
+  color: var(--ms-text-muted);
+  max-width: 780px;
+  margin: 0 auto 36px auto;
+}
+
+.meridian-service-page .ms-hero-visual {
+  position: relative;
+  width: 100%;
+  height: 420px;
+  border-radius: var(--ms-radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--ms-border);
+  margin-top: 48px;
+  background: radial-gradient(circle at 50% 30%, #1c2333 0%, #0c0f17 100%);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+
+.meridian-service-page .ms-hero-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.85;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
+}
+
+.meridian-service-page .ms-hero-visual:hover img {
+  transform: scale(1.03);
+  opacity: 0.95;
+}
+
+/* Geometric Corner Accents */
+.meridian-service-page .ms-corner-badge {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(15, 19, 28, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--ms-border);
+  padding: 10px 18px;
+  border-radius: var(--ms-radius-full);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  z-index: 3;
+}
+
+/* Overview Callout Section */
+.meridian-service-page .ms-callout-wrap {
+  padding: 80px 48px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 100%);
+  border: 1px solid var(--ms-border);
+  border-radius: var(--ms-radius-lg);
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+
+.meridian-service-page .ms-callout-heading {
+  font-size: clamp(24px, 3.2vw, 38px);
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin-top: 12px;
+  margin-bottom: 24px;
+}
+
+.meridian-service-page .ms-callout-subtext {
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--ms-text-muted);
+  max-width: 900px;
+}
+
+/* Headings in Sections */
+.meridian-service-page .ms-section-header {
+  margin-bottom: 48px;
+}
+
+.meridian-service-page .ms-section-header.is-center {
+  text-align: center;
+  max-width: 760px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.meridian-service-page .ms-section-title {
+  font-size: clamp(28px, 3.8vw, 46px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: #ffffff;
+  margin-bottom: 16px;
+}
+
+.meridian-service-page .ms-section-desc {
+  font-size: 16.5px;
+  line-height: 1.65;
+  color: var(--ms-text-muted);
+}
+
+/* Capabilities Grid / "What's Included" */
+.meridian-service-page .ms-grid-border {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1px;
+  background-color: var(--ms-border);
+  border: 1px solid var(--ms-border);
+  border-radius: var(--ms-radius-lg);
+  overflow: hidden;
+}
+
+.meridian-service-page .ms-card-icon {
+  background-color: var(--ms-bg-card);
+  padding: 36px 32px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.35s ease;
+  position: relative;
+}
+
+.meridian-service-page .ms-card-icon:hover {
+  background-color: var(--ms-bg-card-hover);
+  transform: translateY(-2px);
+}
+
+.meridian-service-page .ms-card-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.meridian-service-page .ms-icon-slot {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(222, 242, 92, 0.1);
+  border: 1px solid rgba(222, 242, 92, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ms-accent);
+}
+
+.meridian-service-page .ms-card-num {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--ms-text-faded);
+  font-family: monospace;
+}
+
+.meridian-service-page .ms-card-title {
+  font-size: 21px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 12px;
+  line-height: 1.3;
+}
+
+.meridian-service-page .ms-card-desc {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--ms-text-muted);
+  flex-grow: 1;
+}
+
+/* Horizontal / Step Process Section */
+.meridian-service-page .ms-process-split {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 64px;
+  align-items: flex-start;
+}
+
+@media (max-width: 900px) {
+  .meridian-service-page .ms-process-split {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+
+.meridian-service-page .ms-process-sticky {
+  position: sticky;
+  top: 120px;
+}
+
+.meridian-service-page .ms-step-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: relative;
+}
+
+.meridian-service-page .ms-step-item {
+  background: var(--ms-bg-card);
+  border: 1px solid var(--ms-border);
+  border-radius: var(--ms-radius-md);
+  padding: 28px 24px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.meridian-service-page .ms-step-item:hover {
+  border-color: var(--ms-border-hover);
+  background: var(--ms-bg-card-hover);
+  transform: translateX(4px);
+}
+
+.meridian-service-page .ms-step-number {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(222, 242, 92, 0.12);
+  border: 1px solid var(--ms-accent);
+  color: var(--ms-accent);
+  font-weight: 800;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.meridian-service-page .ms-step-heading {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+.meridian-service-page .ms-step-desc {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ms-text-muted);
+}
+
+/* Split Deliverables / Checklist Section */
+.meridian-service-page .ms-split-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+}
+
+@media (max-width: 860px) {
+  .meridian-service-page .ms-split-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.meridian-service-page .ms-split-visual {
+  position: relative;
+  height: 440px;
+  border-radius: var(--ms-radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--ms-border);
+  background: linear-gradient(135deg, #161b26 0%, #090c13 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 32px;
+}
+
+.meridian-service-page .ms-split-visual-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.45;
+  mix-blend-mode: luminosity;
+  transition: opacity 0.5s ease;
+}
+
+.meridian-service-page .ms-split-visual:hover .ms-split-visual-img {
+  opacity: 0.65;
+}
+
+.meridian-service-page .ms-checklist-group {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 28px;
+  margin-bottom: 32px;
+}
+
+.meridian-service-page .ms-check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--ms-border);
+  border-radius: 12px;
+  transition: all 0.25s ease;
+}
+
+.meridian-service-page .ms-check-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(222, 242, 92, 0.25);
+  transform: translateX(4px);
+}
+
+.meridian-service-page .ms-check-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--ms-accent);
+  color: #080a0f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.meridian-service-page .ms-check-text {
+  font-size: 15px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.5;
+}
+
+/* AI Spotlight Card */
+.meridian-service-page .ms-ai-spotlight {
+  background: radial-gradient(circle at 80% 20%, rgba(222, 242, 92, 0.12) 0%, transparent 60%),
+              linear-gradient(180deg, #131824 0%, #0d111a 100%);
+  border: 1px solid rgba(222, 242, 92, 0.25);
+  border-radius: var(--ms-radius-lg);
+  padding: 56px 44px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+
+.meridian-service-page .ms-ai-title {
+  font-size: clamp(26px, 3.4vw, 42px);
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 16px;
+}
+
+.meridian-service-page .ms-ai-desc {
+  font-size: 16.5px;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 860px;
+}
+
+.meridian-service-page .ms-bullet-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+  margin-bottom: 28px;
+}
+
+.meridian-service-page .ms-bullet-pill {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 8px 18px;
+  border-radius: var(--ms-radius-full);
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.meridian-service-page .ms-bullet-pill::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ms-accent);
+}
+
+/* Industry Pills */
+.meridian-service-page .ms-industry-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.meridian-service-page .ms-industry-item {
+  background: var(--ms-bg-card);
+  border: 1px solid var(--ms-border);
+  padding: 12px 24px;
+  border-radius: var(--ms-radius-full);
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.meridian-service-page .ms-industry-item:hover {
+  background: var(--ms-accent);
+  color: #080a0f;
+  border-color: var(--ms-accent);
+  transform: translateY(-2px);
+}
+
+/* FAQ Accordions */
+.meridian-service-page .ms-faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.meridian-service-page .ms-faq-item {
+  background: var(--ms-bg-card);
+  border: 1px solid var(--ms-border);
+  border-radius: var(--ms-radius-md);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.meridian-service-page .ms-faq-item.is-active {
+  border-color: rgba(222, 242, 92, 0.3);
+  background: var(--ms-bg-card-hover);
+}
+
+.meridian-service-page .ms-faq-header {
+  padding: 22px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.meridian-service-page .ms-faq-question {
+  font-size: 17.5px;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.4;
+}
+
+.meridian-service-page .ms-faq-toggle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--ms-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 16px;
+  flex-shrink: 0;
+  transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease;
+}
+
+.meridian-service-page .ms-faq-item.is-active .ms-faq-toggle {
+  transform: rotate(45deg);
+  background: var(--ms-accent);
+  color: #080a0f;
+  border-color: var(--ms-accent);
+}
+
+.meridian-service-page .ms-faq-body {
+  padding: 0 28px 24px 28px;
+  font-size: 15.5px;
+  line-height: 1.65;
+  color: var(--ms-text-muted);
+}
+
+/* Meridian Signature Button */
+.meridian-service-page .ms-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 28px;
+  border-radius: var(--ms-radius-full);
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.meridian-service-page .ms-btn-primary {
+  background-color: var(--ms-accent);
+  color: #080a0f;
+  border-color: var(--ms-accent);
+  box-shadow: 0 4px 20px rgba(222, 242, 92, 0.25);
+}
+
+.meridian-service-page .ms-btn-primary:hover {
+  background-color: var(--ms-accent-hover);
+  transform: scale(1.02) translateY(-1px);
+  box-shadow: 0 8px 28px rgba(222, 242, 92, 0.35);
+}
+
+.meridian-service-page .ms-btn-secondary {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.meridian-service-page .ms-btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.meridian-service-page .ms-btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  transition: transform 0.25s ease;
+}
+
+.meridian-service-page .ms-btn:hover .ms-btn-icon {
+  transform: translateX(3px) translateY(-1px);
+}
+
+/* Closing CTA Banner */
+.meridian-service-page .ms-closing-card {
+  background: radial-gradient(circle at 50% 0%, rgba(222, 242, 92, 0.15) 0%, transparent 70%),
+              linear-gradient(180deg, #151a26 0%, #090c13 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--ms-radius-lg);
+  padding: 72px 48px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+}
+
+.meridian-service-page .ms-closing-title {
+  font-size: clamp(30px, 4.5vw, 54px);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  color: #ffffff;
+  margin-bottom: 18px;
+}
+
+.meridian-service-page .ms-closing-desc {
+  font-size: 17.5px;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 680px;
+  margin: 0 auto 36px auto;
+}
+
+.meridian-service-page .ms-cta-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Animation utilities */
+@keyframes msFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.meridian-service-page .ms-animate-fade-up {
+  animation: msFadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .meridian-service-page * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+  .meridian-service-page .ms-section {
+    padding-top: 60px;
+    padding-bottom: 60px;
+  }
+  .meridian-service-page .ms-callout-wrap {
+    padding: 40px 24px;
+  }
+  .meridian-service-page .ms-closing-card {
+    padding: 48px 24px;
+  }
+  .meridian-service-page .ms-hero-visual {
+    height: 280px;
+  }
+  .meridian-service-page .ms-card-icon {
+    padding: 28px 20px;
+  }
+}
