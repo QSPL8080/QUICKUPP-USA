@@ -9,17 +9,25 @@ export default function ContactPage() {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
-    projectType: "",
+    phone: "",
     companyName: "",
+    projectType: "",
+    budget: "",
     message: "",
-    agreed: true,
+    agreed: false,
   });
 
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [agreedError, setAgreedError] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.agreed) {
+      setAgreedError(true);
+      return;
+    }
+    setAgreedError(false);
     setSubmitting(true);
     setTimeout(() => {
       setSubmitting(false);
@@ -68,10 +76,12 @@ export default function ContactPage() {
                     setFormData({
                       fullName: "",
                       email: "",
-                      projectType: "",
+                      phone: "",
                       companyName: "",
+                      projectType: "",
+                      budget: "",
                       message: "",
-                      agreed: true,
+                      agreed: false,
                     });
                   }}
                   className="su-submit-btn"
@@ -89,24 +99,23 @@ export default function ContactPage() {
                   </p>
                 </div>
 
-                {/* Field 1: Full Name */}
-                <div className="su-field-group">
-                  <label htmlFor="Full-Name" className="su-field-label">
-                    Full name
-                  </label>
-                  <input
-                    id="Full-Name"
-                    type="text"
-                    required
-                    placeholder="Full Name"
-                    className="su-text-input"
-                    value={formData.fullName}
-                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  />
-                </div>
-
-                {/* Field 2 & 3: Email & Subject Grid */}
+                {/* Row 1: Full Name & Email Address */}
                 <div className="su-form-fields-grid">
+                  <div className="su-field-group">
+                    <label htmlFor="Full-Name" className="su-field-label">
+                      Full name
+                    </label>
+                    <input
+                      id="Full-Name"
+                      type="text"
+                      required
+                      placeholder="Full Name"
+                      className="su-text-input"
+                      value={formData.fullName}
+                      onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                    />
+                  </div>
+
                   <div className="su-field-group">
                     <label htmlFor="Email" className="su-field-label">
                       Email address
@@ -115,16 +124,50 @@ export default function ContactPage() {
                       id="Email"
                       type="email"
                       required
-                      placeholder="Email"
+                      placeholder="Email Address"
                       className="su-text-input"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     />
                   </div>
+                </div>
+
+                {/* Row 2: Phone Number & Company Name */}
+                <div className="su-form-fields-grid">
+                  <div className="su-field-group">
+                    <label htmlFor="Phone-Number" className="su-field-label">
+                      Phone number
+                    </label>
+                    <input
+                      id="Phone-Number"
+                      type="tel"
+                      placeholder="+1 (555) 000-0000"
+                      className="su-text-input"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    />
+                  </div>
 
                   <div className="su-field-group">
+                    <label htmlFor="Company-name" className="su-field-label">
+                      Company name
+                    </label>
+                    <input
+                      id="Company-name"
+                      type="text"
+                      placeholder="Company / Organization"
+                      className="su-text-input"
+                      value={formData.companyName}
+                      onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                {/* Row 3: Subject / Project Type & Estimated Budget */}
+                <div className="su-form-fields-grid">
+                  <div className="su-field-group">
                     <label htmlFor="Type-of-Project" className="su-field-label">
-                      Subject
+                      Subject / Service
                     </label>
                     <select
                       id="Type-of-Project"
@@ -133,7 +176,7 @@ export default function ContactPage() {
                       value={formData.projectType}
                       onChange={(e) => setFormData({ ...formData, projectType: e.target.value })}
                     >
-                      <option value="">Type of Project</option>
+                      <option value="">Select Service</option>
                       <option value="Digital Marketing & SEO">Digital Marketing &amp; SEO</option>
                       <option value="AI Agents & Automation">AI Agents &amp; Automation</option>
                       <option value="Web & Mobile App Development">Web &amp; Mobile App Development</option>
@@ -142,56 +185,97 @@ export default function ContactPage() {
                       <option value="General Inquiry">General Inquiry</option>
                     </select>
                   </div>
+
+                  <div className="su-field-group">
+                    <label htmlFor="Budget-Range" className="su-field-label">
+                      Estimated Budget
+                    </label>
+                    <select
+                      id="Budget-Range"
+                      className="su-select-input"
+                      value={formData.budget}
+                      onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
+                    >
+                      <option value="">Select Budget Range</option>
+                      <option value="Under $5,000">Under $5,000</option>
+                      <option value="$5,000 - $15,000">$5,000 – $15,000</option>
+                      <option value="$15,000 - $50,000">$15,000 – $50,000</option>
+                      <option value="$50,000+">$50,000+</option>
+                      <option value="Not Specified / Flexible">Flexible / Not Sure</option>
+                    </select>
+                  </div>
                 </div>
 
-                {/* Field 4: Company Name */}
-                <div className="su-field-group">
-                  <label htmlFor="Company-name" className="su-field-label">
-                    Company name
-                  </label>
-                  <input
-                    id="Company-name"
-                    type="text"
-                    required
-                    placeholder="Company name"
-                    className="su-text-input"
-                    value={formData.companyName}
-                    onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                  />
-                </div>
-
-                {/* Field 5: Message */}
+                {/* Row 4: Message */}
                 <div className="su-field-group">
                   <label htmlFor="Message" className="su-field-label">
-                    Message
+                    Message / Project Details
                   </label>
                   <textarea
                     id="Message"
                     rows={4}
                     required
-                    placeholder="Message"
+                    placeholder="Tell us about your project, goals, and timeline..."
                     className="su-textarea-input"
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   />
                 </div>
 
-                {/* Checkbox: Privacy Policy */}
-                <label className="su-checkbox-wrap">
+                {/* Checkbox: Privacy Policy (Default Ticked) */}
+                <label className="su-checkbox-wrap" style={{ cursor: "pointer", userSelect: "none" }}>
                   <input
                     type="checkbox"
-                    required
                     checked={formData.agreed}
-                    onChange={(e) => setFormData({ ...formData, agreed: e.target.checked })}
+                    onChange={(e) => {
+                      const isChecked = e.target.checked;
+                      setFormData({ ...formData, agreed: isChecked });
+                      setAgreedError(!isChecked);
+                    }}
                     className="su-checkbox-input"
+                    style={{
+                      accentColor: agreedError ? "#ef4444" : "#0f172a",
+                      borderColor: agreedError ? "#ef4444" : "#dfdfdf",
+                      boxShadow: agreedError ? "0 0 0 2px rgba(239, 68, 68, 0.2)" : "none",
+                    }}
                   />
-                  <span className="su-checkbox-label">
+                  <span
+                    className="su-checkbox-label"
+                    style={{
+                      color: agreedError ? "#dc2626" : "#555151",
+                      fontWeight: agreedError ? 600 : 500,
+                      transition: "color 0.2s ease",
+                    }}
+                  >
                     By submitting this form, you agree to our{" "}
                     <Link href="/privacy-policy" style={{ color: "inherit", textDecoration: "underline" }}>
                       Privacy Policy
                     </Link>
                   </span>
                 </label>
+
+                {/* Red Warning text below checkbox when unticked */}
+                {agreedError && (
+                  <p
+                    style={{
+                      color: "#dc2626",
+                      fontSize: "13px",
+                      fontWeight: 600,
+                      margin: "-12px 0 20px 0",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2.5">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="8" x2="12" y2="12" />
+                      <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                    Please accept the Privacy Policy before submitting your message.
+                  </p>
+                )}
 
                 {/* Submit Button */}
                 <button
