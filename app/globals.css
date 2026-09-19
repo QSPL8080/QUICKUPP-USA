@@ -1374,19 +1374,19 @@ html:not([data-wf-page="6944f1597ac277b25076cc8e"]) .title-overlay {
   background-image: linear-gradient(180deg, rgba(9, 14, 26, 0.9) 0%, rgba(15, 23, 42, 0.96) 100%), url('/images/banner-img.jpg') !important;
   background-position: center;
   background-size: cover;
-  padding: 84px 0 36px !important;
+  padding: 140px 0 54px !important;
   color: #ffffff;
   overflow: hidden;
   text-align: left !important;
 }
 @media (max-width: 991px) {
   .breadcrumb-section {
-    padding: 76px 0 30px !important;
+    padding: 110px 0 40px !important;
   }
 }
 @media (max-width: 640px) {
   .breadcrumb-section {
-    padding: 72px 0 24px !important;
+    padding: 100px 0 32px !important;
   }
 }
 
@@ -3652,18 +3652,18 @@ section.section-gap.padding-top-0 {
 }
 
 /* ==========================================================================
-   TOP SECTION CLEARANCE (CLEARS 64px HEADER CLEANLY WITHOUT EXCESS VOID)
+   TOP SECTION CLEARANCE (GENEROUS BREATHING ROOM FOR FLOATING CAPSULE HEADER)
    ========================================================================== */
 .qs-contact-top-wrap,
 .qs-career-top-wrap {
-  padding-top: 88px !important;
-  padding-bottom: 36px !important;
+  padding-top: 140px !important;
+  padding-bottom: 44px !important;
   text-align: center;
   position: relative;
 }
 
 .sf-hero-section {
-  padding-top: 96px !important;
+  padding-top: 140px !important;
   padding-bottom: 60px !important;
   text-align: left !important;
   position: relative;
@@ -3674,14 +3674,16 @@ section.section-gap.padding-top-0 {
 .inner-banner,
 .lc-hero,
 .rt-inner-hero,
-.qs-service-hero-section {
-  padding-top: 88px !important;
-  padding-bottom: 48px !important;
+.qs-service-hero-section,
+.ms-hero-section,
+.ms-page-container {
+  padding-top: 140px !important;
+  padding-bottom: 54px !important;
   position: relative;
 }
 
 .hero-one-wrap {
-  padding-top: 84px !important;
+  padding-top: 116px !important;
 }
 
 @media (max-width: 991px) {
@@ -3694,9 +3696,13 @@ section.section-gap.padding-top-0 {
   .lc-hero,
   .rt-inner-hero,
   .qs-service-hero-section,
+  .ms-hero-section,
+  .ms-page-container {
+    padding-top: 105px !important;
+    padding-bottom: 30px !important;
+  }
   .hero-one-wrap {
-    padding-top: 76px !important;
-    padding-bottom: 24px !important;
+    padding-top: 96px !important;
   }
 }
 
