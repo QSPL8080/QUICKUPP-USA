@@ -120,7 +120,7 @@ function BlockRenderer({ block, index }: { block: ServiceBlock; index: number })
                     <span style={{ fontSize: "13px", fontWeight: 700, color: "#18171c", letterSpacing: "0.08em", textTransform: "uppercase" }}>
                       Key Focus Areas
                     </span>
-                    <span style={{ fontSize: "12px", background: "#18171c", color: "#def25c", padding: "4px 12px", borderRadius: "100px", fontWeight: 700 }}>
+                    <span style={{ fontSize: "12px", background: "#18171c", color: "#7c3aed", padding: "4px 12px", borderRadius: "100px", fontWeight: 700 }}>
                       {block.items.length} Deliverables
                     </span>
                   </div>
@@ -240,7 +240,7 @@ function BlockRenderer({ block, index }: { block: ServiceBlock; index: number })
 
               <div>
                 <div className="ms-checklist-group">
-                  {block.bullets.map((b, i) => (
+                  {(block.bullets || []).map((b, i) => (
                     <div key={i} className={`ms-check-item ms-reveal ms-stagger-${(i % 4) + 1}`}>
                       <div className="ms-check-icon">
                         <CheckIcon />
@@ -273,7 +273,7 @@ function BlockRenderer({ block, index }: { block: ServiceBlock; index: number })
             <div className="ms-industry-grid ms-reveal ms-stagger-2">
               {block.industries.map((ind, i) => (
                 <div key={i} className={`ms-industry-item ms-reveal ms-stagger-${(i % 5) + 1}`}>
-                  <span style={{ color: "var(--ms-accent)" }}>✦</span>
+                  <span style={{ color: "var(--ms-accent)" }}>Ã¢Å“Â¦</span>
                   <span>{ind}</span>
                 </div>
               ))}
@@ -287,8 +287,8 @@ function BlockRenderer({ block, index }: { block: ServiceBlock; index: number })
         <section className="ms-section">
           <div className="ms-container">
             <div className="ms-ai-spotlight ms-reveal ms-reveal-scale">
-              <div className="ms-eyebrow" style={{ color: "#def25c" }}>
-                <span className="ms-eyebrow-dot" style={{ backgroundColor: "#def25c", borderColor: "#ffffff" }}></span>
+              <div className="ms-eyebrow" style={{ color: "#7c3aed" }}>
+                <span className="ms-eyebrow-dot" style={{ backgroundColor: "#7c3aed", borderColor: "#ffffff" }}></span>
                 <span>Next-Gen Innovation</span>
               </div>
               <h2 className="ms-ai-title">{block.title}</h2>
@@ -429,8 +429,8 @@ export default function ServicePage({ data }: { data: ServicePageData }) {
                 loading="eager"
               />
               <div className="ms-corner-badge">
-                <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#def25c" }}></span>
-                <span>Quickupp Softech • High-Performance Delivery</span>
+                <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#7c3aed" }}></span>
+                <span>Quickupp Softech Ã¢â‚¬Â¢ High-Performance Delivery</span>
               </div>
             </div>
           </div>
@@ -465,8 +465,8 @@ export default function ServicePage({ data }: { data: ServicePageData }) {
         <section className="ms-section">
           <div className="ms-container">
             <div className="ms-closing-card ms-reveal ms-reveal-scale">
-              <div className="ms-eyebrow" style={{ justifyContent: "center", color: "#def25c" }}>
-                <span className="ms-eyebrow-dot" style={{ backgroundColor: "#def25c", borderColor: "#ffffff" }}></span>
+              <div className="ms-eyebrow" style={{ justifyContent: "center", color: "#7c3aed" }}>
+                <span className="ms-eyebrow-dot" style={{ backgroundColor: "#7c3aed", borderColor: "#ffffff" }}></span>
                 <span>Ready to Scale</span>
               </div>
               <h2 className="ms-closing-title">{data.closingTitle}</h2>

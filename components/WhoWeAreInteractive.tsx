@@ -100,7 +100,7 @@ export default function WhoWeAreInteractive() {
     {
       num: "04",
       title: "Transparent Execution & Measurable Impact",
-      desc: "Clear communication, honest advice, and solutions focused on measurable business outcomes—not vanity metrics."
+      desc: "Clear communication, honest advice, and solutions focused on measurable business outcomesâ€”not vanity metrics."
     }
   ];
 
@@ -117,12 +117,12 @@ export default function WhoWeAreInteractive() {
           <div className="sf-hero-grid">
             <div>
               <div className="sf-tag">
-                <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#def25c', display: 'inline-block' }}></span>
+                <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#7c3aed', display: 'inline-block' }}></span>
                 WHO WE ARE
               </div>
               <h1 className="sf-hero-title">
                 Marketing. AI. Technology.<br />
-                <span style={{ color: '#def25c' }}>Built for Growth.</span>
+                <span style={{ color: '#7c3aed' }}>Built for Growth.</span>
               </h1>
               <div className="sf-hero-sub">Your Trusted Digital Growth Partner</div>
               <p className="sf-hero-desc">
@@ -297,7 +297,7 @@ export default function WhoWeAreInteractive() {
                 Whether you want to generate more leads, automate workflows, or build custom software, our multidisciplinary team is ready to help.
               </p>
               <div className="sf-cta-check">
-                <span>✓</span> Free 30-Minute Growth Strategy &amp; Tech Consultation
+                <span>âœ“</span> Free 30-Minute Growth Strategy &amp; Tech Consultation
               </div>
               <div className="sf-btn-row">
                 <Link href="/contact" className="sf-btn-primary">

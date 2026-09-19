@@ -61,9 +61,9 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(222, 242, 92, 0.12);
-  border: 1px solid rgba(222, 242, 92, 0.35);
-  color: #def25c;
+  background: rgba(0, 210, 255, 0.12);
+  border: 1px solid rgba(0, 210, 255, 0.35);
+  color: #00d2ff;
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -95,7 +95,7 @@
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  background: #def25c;
+  background: #00d2ff;
   color: #18171c;
   font-size: 15px;
   font-weight: 700;
@@ -103,7 +103,7 @@
   border-radius: 100px;
   text-decoration: none;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 8px 24px rgba(222, 242, 92, 0.25);
+  box-shadow: 0 8px 24px rgba(0, 210, 255, 0.25);
 }
 .qs-about-hero-btn:hover {
   transform: translateY(-2px);
@@ -129,7 +129,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #def25c;
+  color: #00d2ff;
   margin-bottom: 24px;
 }
 .qs-about-card-count {
@@ -172,7 +172,7 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #b2d415;
+  color: #7c3aed;
   padding-top: 6px;
 }
 
@@ -243,7 +243,7 @@
 }
 .qs-capability-row:hover .qs-cap-arrow {
   background: #18171c;
-  color: #def25c;
+  color: #00d2ff;
   transform: translateX(6px) rotate(-45deg);
 }
 
@@ -263,7 +263,7 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #b2d415;
+  color: #7c3aed;
   margin-bottom: 10px;
 }
 .qs-statement-heading {
@@ -296,7 +296,7 @@
 .qs-statement-overlay-title {
   font-size: 22px;
   font-weight: 800;
-  color: #def25c;
+  color: #00d2ff;
   margin-bottom: 8px;
 }
 .qs-statement-overlay-text {
@@ -360,7 +360,7 @@
   color: #2563eb;
 }
 .qs-impact-card:nth-child(3) .qs-impact-num {
-  color: #b2d415;
+  color: #7c3aed;
 }
 .qs-impact-text {
   font-size: 15.5px;
@@ -395,7 +395,7 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #b2d415;
+  color: #7c3aed;
   margin-bottom: 12px;
 }
 .qs-why-title {
@@ -427,13 +427,13 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #def25c;
+  color: #00d2ff;
   margin-bottom: 20px;
 }
 .qs-why-stat-num {
   font-size: clamp(48px, 5vw, 72px);
   font-weight: 800;
-  color: #def25c;
+  color: #00d2ff;
   line-height: 1;
   margin-bottom: 8px;
 }
@@ -507,7 +507,7 @@
 .qs-test-tag {
   font-size: 13px;
   font-weight: 800;
-  color: #b2d415;
+  color: #7c3aed;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin-bottom: 16px;
@@ -561,7 +561,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #def25c;
+  color: #00d2ff;
   margin-bottom: 14px;
 }
 .qs-cta-title {
@@ -582,7 +582,7 @@
   align-items: center;
   gap: 10px;
   font-size: 15px;
-  color: #def25c;
+  color: #00d2ff;
   font-weight: 700;
   margin-bottom: 32px;
 }

@@ -88,7 +88,7 @@ export default function BlogPage() {
                     fontWeight: isSelected ? 700 : 600,
                     border: isSelected ? "1px solid #18171c" : "1px solid #e4e7ec",
                     background: isSelected ? "#18171c" : "#ffffff",
-                    color: isSelected ? "#def25c" : "#475467",
+                    color: isSelected ? "#7c3aed" : "#475467",
                     cursor: "pointer",
                     transition: "all 0.2s ease",
                     boxShadow: isSelected
@@ -241,7 +241,7 @@ export default function BlogPage() {
                         gap: "4px",
                       }}
                     >
-                      Read Article →
+                      Read Article â†’
                     </Link>
                   </div>
                 </div>
@@ -265,7 +265,7 @@ export default function BlogPage() {
               style={{
                 display: "inline-block",
                 background: "rgba(222, 242, 92, 0.2)",
-                color: "#def25c",
+                color: "#7c3aed",
                 fontSize: "12px",
                 fontWeight: 700,
                 textTransform: "uppercase",

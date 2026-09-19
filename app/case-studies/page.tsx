@@ -108,7 +108,7 @@ export default function CaseStudiesPage() {
                     </p>
                   </div>
 
-                  <div style={{ background: "#f8f9fa", padding: "20px 24px", borderRadius: "14px", borderLeft: "4px solid #b2d415" }}>
+                  <div style={{ background: "#f8f9fa", padding: "20px 24px", borderRadius: "14px", borderLeft: "4px solid #8b5cf6" }}>
                     <div style={{ fontSize: "14px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.06em", color: "#18171c", marginBottom: "8px" }}>
                       Our Solution
                     </div>
@@ -133,7 +133,7 @@ export default function CaseStudiesPage() {
                 >
                   {study.results.map((res, rIdx) => (
                     <div key={rIdx} style={{ textAlign: "center" }}>
-                      <div style={{ fontSize: "clamp(28px, 3.5vw, 38px)", fontWeight: 800, color: "#def25c", lineHeight: 1.1, marginBottom: "6px" }}>
+                      <div style={{ fontSize: "clamp(28px, 3.5vw, 38px)", fontWeight: 800, color: "#7c3aed", lineHeight: 1.1, marginBottom: "6px" }}>
                         {res.num}
                       </div>
                       <div style={{ fontSize: "14px", color: "rgba(255,255,255,0.85)", fontWeight: 500 }}>

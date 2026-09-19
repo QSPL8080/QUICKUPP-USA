@@ -4,14 +4,22 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { serviceGroups, industryItems, aboutItems, resourceItems } from "@/lib/sitemap";
-import MegaMenuPosition from "@/components/MegaMenuPosition";
 
 export default function Header() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const headerRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 15);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Close dropdowns on route navigation
   useEffect(() => {
@@ -48,15 +56,19 @@ export default function Header() {
   };
 
   const handleMouseEnter = (name: string) => {
-    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
-    setOpenDropdown(name);
+    if (typeof window !== "undefined" && window.innerWidth >= 992) {
+      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+      setOpenDropdown(name);
+    }
   };
 
   const handleMouseLeave = () => {
-    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
-    closeTimeoutRef.current = setTimeout(() => {
-      setOpenDropdown(null);
-    }, 350);
+    if (typeof window !== "undefined" && window.innerWidth >= 992) {
+      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = setTimeout(() => {
+        setOpenDropdown(null);
+      }, 180);
+    }
   };
 
   const handleLinkClick = () => {
@@ -66,297 +78,430 @@ export default function Header() {
   };
 
   return (
-    <header ref={headerRef} className="header header-one">
-      <MegaMenuPosition />
-      <div className="header-main header-one">
-        <div className="w-layout-blockcontainer container w-container">
-          <div
-            data-animation="default"
-            data-collapse="medium"
-            data-duration="400"
-            data-easing="ease"
-            data-easing2="ease"
-            role="banner"
-            className={`navbar w-nav ${isMobileNavOpen ? "w-nav-open" : ""}`}
+    <header
+      ref={headerRef}
+      className={`qs-new-header ${scrolled ? "qs-header-scrolled" : ""}`}
+    >
+      <div className="qs-header-container">
+        <div className="qs-header-inner">
+          {/* Brand Logo (Left) */}
+          <Link
+            href="/"
+            className="qs-header-brand-logo"
+            onClick={handleLinkClick}
+            aria-label="Quickupp Softech Home"
           >
-            <div className="logo-wrap">
-              <Link href="/" className="logo-link header-one w-nav-brand qs-brand-link" onClick={handleLinkClick}>
-                <img
-                  src="/images/logo-white.png"
-                  alt="Quickupp Softech LLC"
-                  className="qs-header-logo-img"
-                />
-              </Link>
-              <nav
-                role="navigation"
-                className={`nav-one-menu w-nav-menu ${isMobileNavOpen ? "w--nav-menu-open" : ""}`}
-                style={isMobileNavOpen ? { display: "block", opacity: 1, visibility: "visible" } : undefined}
+            <img
+              src="/images/logo-white.png"
+              alt="Quickupp Softech"
+              className="qs-header-logo-img"
+            />
+          </Link>
+
+          {/* Desktop Navigation Links (Center) */}
+          <nav
+            role="navigation"
+            aria-label="Main Navigation"
+            className={`qs-desktop-nav-wrap ${isMobileNavOpen ? "qs-mobile-nav-active" : ""}`}
+          >
+            <ul className="qs-nav-list-ul">
+              {/* 1. Services Mega Dropdown */}
+              <li
+                className="qs-has-dropdown qs-mega-parent"
+                onMouseEnter={() => handleMouseEnter("services")}
+                onMouseLeave={handleMouseLeave}
               >
-                <ul role="list" className="nav-menu w-list-unstyled">
-                  <li className="nav-list">
-                    <Link href="/" className="nav-link w-inline-block" onClick={handleLinkClick}>
-                      <div className="nav-text-wrap">
-                        <div className="nav-text">Home</div>
-                      </div>
-                    </Link>
-                  </li>
-
-                  {/* Services Dropdown */}
-                  <li
-                    className="nav-list"
-                    onMouseEnter={() => handleMouseEnter("services")}
-                    onMouseLeave={handleMouseLeave}
+                <button
+                  type="button"
+                  className={`qs-nav-item-link ${openDropdown === "services" || pathname.startsWith("/services") ? "is-active" : ""}`}
+                  onClick={(e) => handleToggleClick("services", e)}
+                  aria-expanded={openDropdown === "services"}
+                >
+                  <span>Services</span>
+                  <svg
+                    className={`qs-chevron ${openDropdown === "services" ? "rotate-180" : ""}`}
+                    width="10"
+                    height="6"
+                    viewBox="0 0 10 6"
+                    fill="none"
                   >
-                    <div className={`dropdown-nav qs-mega-dd w-dropdown ${openDropdown === "services" ? "qs-open w--open" : ""}`}>
-                      <div
-                        className="dropdown-toggle w-dropdown-toggle"
-                        onClick={(e) => handleToggleClick("services", e)}
-                        role="button"
-                        tabIndex={0}
-                        aria-expanded={openDropdown === "services"}
-                      >
-                        <div className="nav-link">
-                          <div className="nav-text-wrap">
-                            <div className="nav-text">Services</div>
-                          </div>
-                        </div>
-                        <div className={`down-icon w-icon-dropdown-toggle ${openDropdown === "services" ? "rotate-180" : ""}`}></div>
+                    <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+
+                {openDropdown === "services" && (
+                  <div className="qs-dropdown-menu qs-services-mega">
+                    <div className="qs-mega-header-row">
+                      <div className="qs-mega-header-left">
+                        <span className="qs-mega-sparkle">✦</span>
+                        <span className="qs-mega-header-title">Our Capabilities & Solutions</span>
                       </div>
-                      <nav
-                        className={`dropdown-list qs-mega-panel qs-mega-wide w-dropdown-list ${openDropdown === "services" ? "w--open" : ""}`}
-                        style={openDropdown === "services" ? { display: "block", opacity: 1, visibility: "visible", pointerEvents: "auto" } : undefined}
-                      >
-                        <div className="qs-mega-grid">
-                          {serviceGroups.map((group) => (
-                            <div key={group.label} className="qs-mega-col">
-                              <div className="qs-mega-col-title">{group.label}</div>
-                              {group.items.map((item) => (
-                                <Link
-                                  key={item.href}
-                                  href={item.href}
-                                  className="dropdown-link w-dropdown-link"
-                                  onClick={handleLinkClick}
-                                >
-                                  {item.label}
-                                </Link>
-                              ))}
-                            </div>
-                          ))}
-                        </div>
-                      </nav>
+                      <Link href="/services" className="qs-mega-view-all" onClick={handleLinkClick}>
+                        <span>Explore All Services</span>
+                        <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                          <path d="M2.5 9.5L9.5 2.5M9.5 2.5H3.5M9.5 2.5V8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </Link>
                     </div>
-                  </li>
 
-                  {/* Industries Dropdown */}
-                  <li
-                    className="nav-list"
-                    onMouseEnter={() => handleMouseEnter("industries")}
-                    onMouseLeave={handleMouseLeave}
-                  >
-                    <div className={`dropdown-nav qs-mega-dd w-dropdown ${openDropdown === "industries" ? "qs-open w--open" : ""}`}>
-                      <div
-                        className="dropdown-toggle w-dropdown-toggle"
-                        onClick={(e) => handleToggleClick("industries", e)}
-                        role="button"
-                        tabIndex={0}
-                        aria-expanded={openDropdown === "industries"}
-                      >
-                        <div className="nav-link">
-                          <div className="nav-text-wrap">
-                            <div className="nav-text">Industries</div>
-                          </div>
-                        </div>
-                        <div className={`down-icon w-icon-dropdown-toggle ${openDropdown === "industries" ? "rotate-180" : ""}`}></div>
-                      </div>
-                      <nav
-                        className={`dropdown-list qs-mega-panel qs-industries-wide w-dropdown-list ${openDropdown === "industries" ? "w--open" : ""}`}
-                        style={openDropdown === "industries" ? { display: "block", opacity: 1, visibility: "visible", pointerEvents: "auto" } : undefined}
-                      >
-                        <div className="qs-mega-col-title">Industries We Serve</div>
-                        <div className="qs-industries-grid">
-                          {industryItems.map((item) => (
+                    <div className="qs-services-grid-4col">
+                      {/* Col 1: AI-Powered Digital Marketing Services */}
+                      <div className="qs-mega-col">
+                        <div className="qs-mega-col-title">AI-Powered Digital Marketing Services</div>
+                        <div className="qs-mega-col-links">
+                          {serviceGroups[0]?.items.map((item) => (
                             <Link
                               key={item.href}
                               href={item.href}
-                              className="dropdown-link w-dropdown-link"
+                              className="qs-rich-card-item qs-service-rich-card"
                               onClick={handleLinkClick}
                             >
-                              {item.label}
+                              <span className="qs-rich-icon">{item.icon}</span>
+                              <div className="qs-rich-info">
+                                <div className="qs-rich-label">{item.label}</div>
+                                {item.desc && <div className="qs-rich-desc">{item.desc}</div>}
+                              </div>
                             </Link>
                           ))}
                         </div>
-                      </nav>
-                    </div>
-                  </li>
+                      </div>
 
-                  {/* About Dropdown */}
-                  <li
-                    className="nav-list"
-                    onMouseEnter={() => handleMouseEnter("about")}
-                    onMouseLeave={handleMouseLeave}
-                  >
-                    <div className={`dropdown-nav w-dropdown ${openDropdown === "about" ? "qs-open w--open" : ""}`}>
-                      <div
-                        className="dropdown-toggle w-dropdown-toggle"
-                        onClick={(e) => handleToggleClick("about", e)}
-                        role="button"
-                        tabIndex={0}
-                        aria-expanded={openDropdown === "about"}
-                      >
-                        <div className="nav-link">
-                          <div className="nav-text-wrap">
-                            <div className="nav-text">About</div>
+                      {/* Col 2: AI Video Production & AI & Automation Solutions */}
+                      <div className="qs-mega-col">
+                        <div className="qs-mega-col-title">AI Video Production</div>
+                        <div className="qs-mega-col-links">
+                          {serviceGroups[1]?.items.map((item) => (
+                            <Link
+                              key={item.href}
+                              href={item.href}
+                              className="qs-rich-card-item qs-service-rich-card"
+                              onClick={handleLinkClick}
+                            >
+                              <span className="qs-rich-icon">{item.icon}</span>
+                              <div className="qs-rich-info">
+                                <div className="qs-rich-label">{item.label}</div>
+                                {item.desc && <div className="qs-rich-desc">{item.desc}</div>}
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+
+                        <div className="qs-mega-col-subdivider">
+                          <div className="qs-mega-col-title">AI & Automation Solutions</div>
+                          <div className="qs-mega-col-links">
+                            {serviceGroups[2]?.items.map((item) => (
+                              <Link
+                                key={item.href}
+                                href={item.href}
+                                className="qs-rich-card-item qs-service-rich-card"
+                                onClick={handleLinkClick}
+                              >
+                                <span className="qs-rich-icon">{item.icon}</span>
+                                <div className="qs-rich-info">
+                                  <div className="qs-rich-label">{item.label}</div>
+                                  {item.desc && <div className="qs-rich-desc">{item.desc}</div>}
+                                </div>
+                              </Link>
+                            ))}
                           </div>
                         </div>
-                        <div className={`down-icon w-icon-dropdown-toggle ${openDropdown === "about" ? "rotate-180" : ""}`}></div>
                       </div>
-                      <nav
-                        className={`dropdown-list _w-auto w-dropdown-list ${openDropdown === "about" ? "w--open" : ""}`}
-                        style={openDropdown === "about" ? { display: "block", opacity: 1, visibility: "visible", pointerEvents: "auto" } : undefined}
-                      >
-                        {aboutItems.map((item) => (
-                          <Link
-                            key={item.href}
-                            href={item.href}
-                            className="dropdown-link w-dropdown-link"
-                            onClick={handleLinkClick}
-                          >
-                            {item.label}
-                          </Link>
-                        ))}
-                      </nav>
-                    </div>
-                  </li>
 
-                  {/* Resources Dropdown */}
-                  <li
-                    className="nav-list"
-                    onMouseEnter={() => handleMouseEnter("resources")}
-                    onMouseLeave={handleMouseLeave}
-                  >
-                    <div className={`dropdown-nav w-dropdown ${openDropdown === "resources" ? "qs-open w--open" : ""}`}>
-                      <div
-                        className="dropdown-toggle w-dropdown-toggle"
-                        onClick={(e) => handleToggleClick("resources", e)}
-                        role="button"
-                        tabIndex={0}
-                        aria-expanded={openDropdown === "resources"}
-                      >
-                        <div className="nav-link">
-                          <div className="nav-text-wrap">
-                            <div className="nav-text">Resources</div>
-                          </div>
+                      {/* Col 3: Information Technology Services */}
+                      <div className="qs-mega-col">
+                        <div className="qs-mega-col-title">Information Technology Services</div>
+                        <div className="qs-mega-col-links">
+                          {serviceGroups[3]?.items.map((item) => (
+                            <Link
+                              key={item.href}
+                              href={item.href}
+                              className="qs-rich-card-item qs-service-rich-card"
+                              onClick={handleLinkClick}
+                            >
+                              <span className="qs-rich-icon">{item.icon}</span>
+                              <div className="qs-rich-info">
+                                <div className="qs-rich-label">{item.label}</div>
+                                {item.desc && <div className="qs-rich-desc">{item.desc}</div>}
+                              </div>
+                            </Link>
+                          ))}
                         </div>
-                        <div className={`down-icon w-icon-dropdown-toggle ${openDropdown === "resources" ? "rotate-180" : ""}`}></div>
                       </div>
-                      <nav
-                        className={`dropdown-list _w-auto w-dropdown-list ${openDropdown === "resources" ? "w--open" : ""}`}
-                        style={openDropdown === "resources" ? { display: "block", opacity: 1, visibility: "visible", pointerEvents: "auto" } : undefined}
-                      >
-                        {resourceItems.map((item) => (
-                          <Link
-                            key={item.href}
-                            href={item.href}
-                            className="dropdown-link w-dropdown-link"
-                            onClick={handleLinkClick}
-                          >
-                            {item.label}
-                          </Link>
-                        ))}
-                      </nav>
-                    </div>
-                  </li>
 
-                  <li className="nav-list">
-                    <Link href="/career" className="nav-link w-inline-block" onClick={handleLinkClick}>
-                      <div className="nav-text-wrap">
-                        <div className="nav-text">Careers</div>
+                      {/* Col 4: Staff Augmentation + Action Box */}
+                      <div className="qs-mega-col">
+                        <div className="qs-mega-col-title">Staff Augmentation</div>
+                        <div className="qs-mega-col-links">
+                          {serviceGroups[4]?.items.map((item) => (
+                            <Link
+                              key={item.href}
+                              href={item.href}
+                              className="qs-rich-card-item qs-service-rich-card"
+                              onClick={handleLinkClick}
+                            >
+                              <span className="qs-rich-icon">{item.icon}</span>
+                              <div className="qs-rich-info">
+                                <div className="qs-rich-label">{item.label}</div>
+                                {item.desc && <div className="qs-rich-desc">{item.desc}</div>}
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+
+                        <div className="qs-mega-promo-box">
+                          <div className="qs-promo-header">
+                            <span className="qs-promo-icon">⚡</span>
+                            <span className="qs-promo-tag">Unified Growth Engine</span>
+                          </div>
+                          <div className="qs-promo-desc">Scale marketing, AI & engineering with zero overhead.</div>
+                          <Link href="/contact" className="qs-promo-btn" onClick={handleLinkClick}>
+                            <span>Talk to an Expert</span>
+                            <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                              <path d="M2.5 9.5L9.5 2.5M9.5 2.5H3.5M9.5 2.5V8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          </Link>
+                        </div>
                       </div>
-                    </Link>
-                  </li>
-                  <li className="nav-list">
-                    <Link href="/contact" className="nav-link w-inline-block" onClick={handleLinkClick}>
-                      <div className="nav-text-wrap">
-                        <div className="nav-text">Contact</div>
+                    </div>
+                  </div>
+                )}
+              </li>
+
+              {/* 2. Industries Mega Dropdown */}
+              <li
+                className="qs-has-dropdown qs-mega-parent"
+                onMouseEnter={() => handleMouseEnter("industries")}
+                onMouseLeave={handleMouseLeave}
+              >
+                <button
+                  type="button"
+                  className={`qs-nav-item-link ${openDropdown === "industries" || pathname.startsWith("/industries") ? "is-active" : ""}`}
+                  onClick={(e) => handleToggleClick("industries", e)}
+                  aria-expanded={openDropdown === "industries"}
+                >
+                  <span>Industries</span>
+                  <svg
+                    className={`qs-chevron ${openDropdown === "industries" ? "rotate-180" : ""}`}
+                    width="10"
+                    height="6"
+                    viewBox="0 0 10 6"
+                    fill="none"
+                  >
+                    <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+
+                {openDropdown === "industries" && (
+                  <div className="qs-dropdown-menu qs-industries-mega">
+                    <div className="qs-mega-header-row">
+                      <div className="qs-mega-header-left">
+                        <span className="qs-mega-sparkle">✦</span>
+                        <span className="qs-mega-header-title">Industries We Scale</span>
                       </div>
-                    </Link>
-                  </li>
-                </ul>
-              </nav>
-            </div>
-            <div className="header-right-content display-none-991">
-              <div className="header-social-icons">
-                <a
-                  href="https://www.facebook.com/"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="header-social-link w-inline-block"
+                      <Link href="/industries" className="qs-mega-view-all" onClick={handleLinkClick}>
+                        <span>Explore All Industries</span>
+                        <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                          <path d="M2.5 9.5L9.5 2.5M9.5 2.5H3.5M9.5 2.5V8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </Link>
+                    </div>
+                    <div className="qs-industries-grid">
+                      {industryItems.map((item) => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className="qs-rich-card-item"
+                          onClick={handleLinkClick}
+                        >
+                          <span className="qs-rich-icon">{item.icon}</span>
+                          <div className="qs-rich-info">
+                            <div className="qs-rich-label">{item.label}</div>
+                            {item.desc && <div className="qs-rich-desc">{item.desc}</div>}
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </li>
+
+              {/* 3. About Dropdown */}
+              <li
+                className="qs-has-dropdown qs-mega-parent"
+                onMouseEnter={() => handleMouseEnter("about")}
+                onMouseLeave={handleMouseLeave}
+              >
+                <button
+                  type="button"
+                  className={`qs-nav-item-link ${openDropdown === "about" || pathname.startsWith("/about") ? "is-active" : ""}`}
+                  onClick={(e) => handleToggleClick("about", e)}
+                  aria-expanded={openDropdown === "about"}
                 >
-                  <div className="header-social-icon"></div>
-                </a>
-                <a
-                  href="https://x.com/"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="header-social-link w-inline-block"
+                  <span>About</span>
+                  <svg
+                    className={`qs-chevron ${openDropdown === "about" ? "rotate-180" : ""}`}
+                    width="10"
+                    height="6"
+                    viewBox="0 0 10 6"
+                    fill="none"
+                  >
+                    <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+
+                {openDropdown === "about" && (
+                  <div className="qs-dropdown-menu qs-about-mega">
+                    <div className="qs-mega-header-row">
+                      <div className="qs-mega-header-left">
+                        <span className="qs-mega-sparkle">✦</span>
+                        <span className="qs-mega-header-title">About Quickupp Softech</span>
+                      </div>
+                      <Link href="/about/who-we-are" className="qs-mega-view-all" onClick={handleLinkClick}>
+                        <span>Learn More</span>
+                        <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                          <path d="M2.5 9.5L9.5 2.5M9.5 2.5H3.5M9.5 2.5V8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </Link>
+                    </div>
+                    <div className="qs-about-grid">
+                      {aboutItems.map((item, idx) => (
+                        <Link
+                          key={`${item.href}-${idx}`}
+                          href={item.href}
+                          className="qs-rich-card-item"
+                          onClick={handleLinkClick}
+                        >
+                          <span className="qs-rich-icon">{item.icon}</span>
+                          <div className="qs-rich-info">
+                            <div className="qs-rich-label">{item.label}</div>
+                            {item.desc && <div className="qs-rich-desc">{item.desc}</div>}
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </li>
+
+              {/* 4. Resources Dropdown */}
+              <li
+                className="qs-has-dropdown qs-mega-parent"
+                onMouseEnter={() => handleMouseEnter("resources")}
+                onMouseLeave={handleMouseLeave}
+              >
+                <button
+                  type="button"
+                  className={`qs-nav-item-link ${openDropdown === "resources" || pathname.startsWith("/blog") || pathname.startsWith("/case-studies") || pathname.startsWith("/portfolio") || pathname.startsWith("/testimonials") ? "is-active" : ""}`}
+                  onClick={(e) => handleToggleClick("resources", e)}
+                  aria-expanded={openDropdown === "resources"}
                 >
-                  <div className="header-social-icon"></div>
-                </a>
-                <a
-                  href="https://www.youtube.com/"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="header-social-link w-inline-block"
-                >
-                  <div className="header-social-icon"></div>
-                </a>
-                <a
-                  href="https://www.instagram.com/"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="header-social-link w-inline-block"
-                >
-                  <div className="header-social-icon"></div>
-                </a>
-              </div>
-              <div className="header-btn">
+                  <span>Resources</span>
+                  <svg
+                    className={`qs-chevron ${openDropdown === "resources" ? "rotate-180" : ""}`}
+                    width="10"
+                    height="6"
+                    viewBox="0 0 10 6"
+                    fill="none"
+                  >
+                    <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+
+                {openDropdown === "resources" && (
+                  <div className="qs-dropdown-menu qs-resources-mega">
+                    <div className="qs-mega-header-row">
+                      <div className="qs-mega-header-left">
+                        <span className="qs-mega-sparkle">✦</span>
+                        <span className="qs-mega-header-title">Growth & Insights Hub</span>
+                      </div>
+                      <Link href="/blog" className="qs-mega-view-all" onClick={handleLinkClick}>
+                        <span>Explore All Articles</span>
+                        <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                          <path d="M2.5 9.5L9.5 2.5M9.5 2.5H3.5M9.5 2.5V8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </Link>
+                    </div>
+                    <div className="qs-resources-grid">
+                      {resourceItems.map((item) => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className="qs-rich-card-item"
+                          onClick={handleLinkClick}
+                        >
+                          <span className="qs-rich-icon">{item.icon}</span>
+                          <div className="qs-rich-info">
+                            <div className="qs-rich-label">{item.label}</div>
+                            {item.desc && <div className="qs-rich-desc">{item.desc}</div>}
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </li>
+
+              {/* 5. Careers */}
+              <li>
                 <Link
-                  href="/contact"
-                  data-wf--button--variant="secondary-bg"
-                  className="button-link w-inline-block"
+                  href="/career"
+                  className={`qs-nav-item-link ${pathname === "/career" ? "is-active" : ""}`}
                   onClick={handleLinkClick}
                 >
-                  <div className="button-hover-overlay"></div>
-                  <div className="button-text-wrapper">
-                    <div className="button-text-wrap">
-                      <div className="button-text">Get More Info</div>
-                      <div className="button-text-hover">Get More Info</div>
-                    </div>
-                  </div>
-                  <div className="button-arrow-wrapper">
-                    <div className="button-arrow-wrap">
-                      <img
-                        src="/images/button-arrow.svg"
-                        loading="lazy"
-                        width="20"
-                        height="20"
-                        alt="button-arrow"
-                        className="button-arrow"
-                      />
-                    </div>
-                  </div>
+                  <span>Careers</span>
+                  <span className="qs-nav-hiring-badge">
+                    <span className="qs-hiring-dot" />
+                    <span className="qs-hiring-text">Hiring</span>
+                  </span>
                 </Link>
-              </div>
+              </li>
+
+              {/* 6. Contact */}
+              <li>
+                <Link
+                  href="/contact"
+                  className={`qs-nav-item-link ${pathname === "/contact" ? "is-active" : ""}`}
+                  onClick={handleLinkClick}
+                >
+                  <span>Contact</span>
+                </Link>
+              </li>
+            </ul>
+
+            {/* Mobile Drawer Action Button */}
+            <div className="qs-mobile-drawer-cta">
+              <Link
+                href="/contact"
+                className="qs-new-cta-btn"
+                onClick={handleLinkClick}
+              >
+                <span>Contact Now</span>
+              </Link>
             </div>
-            <div
-              className="menu-button w-nav-button"
-              onClick={() => setIsMobileNavOpen((prev) => !prev)}
-              role="button"
-              tabIndex={0}
-              aria-label="Toggle Navigation Menu"
+          </nav>
+
+          {/* 7. Right Header Action Button (Desktop: Contact Now) */}
+          <div className="qs-header-right-col">
+            <Link
+              href="/contact"
+              className="qs-new-cta-btn"
+              onClick={handleLinkClick}
             >
-              <div className="menu-icon w-icon-nav-menu"></div>
-            </div>
+              <span>Contact Now</span>
+            </Link>
+
+            {/* Mobile Hamburger Toggle */}
+            <button
+              type="button"
+              className={`qs-mobile-toggle-btn ${isMobileNavOpen ? "is-active" : ""}`}
+              onClick={() => setIsMobileNavOpen((prev) => !prev)}
+              aria-label="Toggle Navigation Menu"
+              aria-expanded={isMobileNavOpen}
+            >
+              <span className="qs-hamburger-line" />
+              <span className="qs-hamburger-line" />
+              <span className="qs-hamburger-line" />
+            </button>
           </div>
         </div>
       </div>

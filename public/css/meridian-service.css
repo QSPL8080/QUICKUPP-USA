@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    MERIDIAN SERVICE DESIGN SYSTEM (WITH COMPLETE SCROLL & HOVER ANIMATIONS)
    Scoped exclusively for Service Pages (.meridian-service-page)
    ========================================================================== */
@@ -13,7 +13,7 @@
   --ms-text-muted: #57524e;
   --ms-text-faded: #8c827a;
   --ms-accent: #18171c;
-  --ms-accent-lime: #def25c;
+  --ms-accent-lime: #00d2ff;
   --ms-brand-yellow: #eab308;
   --ms-border: rgba(24, 19, 18, 0.09);
   --ms-border-hover: rgba(24, 19, 18, 0.24);
@@ -76,7 +76,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #def25c;
+  background-color: #00d2ff;
   border: 1.5px solid #18171c;
   flex-shrink: 0;
   animation: msPulse 2s infinite ease-in-out;
@@ -89,10 +89,24 @@
 
 /* Hero Section */
 .meridian-service-page .ms-hero {
-  padding-top: 80px;
-  padding-bottom: 64px;
+  padding-top: 140px;
+  padding-bottom: 60px;
   position: relative;
   background-color: var(--ms-bg);
+}
+
+@media (max-width: 991px) {
+  .meridian-service-page .ms-hero {
+    padding-top: 110px;
+    padding-bottom: 48px;
+  }
+}
+
+@media (max-width: 479px) {
+  .meridian-service-page .ms-hero {
+    padding-top: 90px;
+    padding-bottom: 40px;
+  }
 }
 
 .meridian-service-page .ms-hero-center {
@@ -272,7 +286,7 @@
 
 .meridian-service-page .ms-card-icon:hover .ms-icon-slot {
   background: #18171c;
-  color: #def25c;
+  color: #00d2ff;
   transform: scale(1.08) rotate(-4deg);
 }
 
@@ -350,7 +364,7 @@
   height: 44px;
   border-radius: 50%;
   background: #18171c;
-  color: #def25c;
+  color: #00d2ff;
   font-weight: 800;
   font-size: 16px;
   display: flex;
@@ -423,7 +437,7 @@
   height: 22px;
   border-radius: 50%;
   background: #18171c;
-  color: #def25c;
+  color: #00d2ff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -501,7 +515,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #def25c;
+  background: #00d2ff;
 }
 
 /* Industry Pills */
@@ -531,7 +545,7 @@
 
 .meridian-service-page .ms-industry-item:hover {
   background: #18171c;
-  color: #def25c;
+  color: #00d2ff;
   border-color: #18171c;
   transform: translateY(-3px) scale(1.03);
   box-shadow: 0 8px 20px rgba(0,0,0,0.08);
@@ -602,7 +616,7 @@
 .meridian-service-page .ms-faq-item.is-active .ms-faq-toggle {
   transform: rotate(45deg);
   background: #18171c;
-  color: #def25c;
+  color: #00d2ff;
 }
 
 .meridian-service-page .ms-faq-body {
@@ -675,7 +689,7 @@
 
 .meridian-service-page .ms-btn-primary:hover {
   background-color: #000000;
-  color: #def25c;
+  color: #00d2ff;
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(0,0,0,0.2);
 }

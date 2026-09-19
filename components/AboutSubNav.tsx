@@ -31,8 +31,8 @@ export default function AboutSubNav() {
                   textDecoration: "none",
                   transition: "all 0.25s ease",
                   color: isActive ? "#060b17" : "rgba(255,255,255,0.75)",
-                  background: isActive ? "#def25c" : "rgba(255,255,255,0.06)",
-                  border: isActive ? "1px solid #def25c" : "1px solid rgba(255,255,255,0.12)",
+                  background: isActive ? "#7c3aed" : "rgba(255,255,255,0.06)",
+                  border: isActive ? "1px solid #7c3aed" : "1px solid rgba(255,255,255,0.12)",
                 }}
               >
                 {link.label}

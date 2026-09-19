@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ServicePage from "@/components/ServicePage";
+import IndustryDetailPage from "@/components/IndustryDetailPage";
 import { data } from "@/data/industries/home-services";
 
 export const metadata: Metadata = {
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function HomeServicesIndustryPage() {
-  return <ServicePage data={data} />;
+  return <IndustryDetailPage data={data} />;
 }

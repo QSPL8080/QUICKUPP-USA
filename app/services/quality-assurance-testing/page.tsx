@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import ServicePage from "@/components/ServicePage";
-import { data } from "@/data/services/quality-assurance-testing";
+import ITLifecycleServicePage from "@/components/ITLifecycleServicePage";
+import data from "@/data/services/quality-assurance-testing";
 
 export const metadata: Metadata = {
   title: data.metaTitle,
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <ServicePage data={data} />;
+  return <ITLifecycleServicePage data={data} />;
 }

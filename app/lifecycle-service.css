@@ -1,0 +1,1087 @@
+/* ===== LIFECYCLE CONSULTING INSPIRED IT SERVICES SCOPED STYLES ===== */
+
+.lc-page-wrapper {
+  background-color: #ffffff;
+  color: #102b32;
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+.lc-container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+@media (max-width: 767px) {
+  .lc-container {
+    padding: 0 20px;
+  }
+}
+
+/* ===== BADGES & EYEBROWS ===== */
+.lc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(124, 58, 237, 0.1);
+  color: #7c3aed;
+  border: 1px solid rgba(124, 58, 237, 0.25);
+  margin-bottom: 20px;
+}
+
+.lc-badge-dark {
+  background: rgba(16, 43, 50, 0.06);
+  color: #102b32;
+  border: 1px solid rgba(16, 43, 50, 0.12);
+}
+
+.lc-badge-lime {
+  background: rgba(124, 58, 237, 0.12);
+  color: #7c3aed;
+  border: 1px solid rgba(124, 58, 237, 0.3);
+}
+
+.lc-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
+  flex-shrink: 0;
+}
+
+.lc-dot-lime {
+  background-color: #7c3aed !important;
+}
+
+/* ===== DUAL-TEXT SLIDING BUTTON (LIFECYCLE SIGNATURE) ===== */
+.lc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  position: relative;
+  white-space: nowrap;
+}
+
+.lc-btn-inner {
+  display: inline-flex;
+  flex-direction: column;
+  height: 18px;
+  overflow: hidden;
+  line-height: 18px;
+}
+
+.lc-btn-text-main,
+.lc-btn-text-hover {
+  display: block;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lc-btn:hover .lc-btn-text-main {
+  transform: translateY(-100%);
+}
+
+.lc-btn:hover .lc-btn-text-hover {
+  transform: translateY(-100%);
+}
+
+.lc-arrow-icon {
+  width: 13px;
+  height: 13px;
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.lc-btn:hover .lc-arrow-icon {
+  transform: translate(3px, -3px);
+}
+
+.lc-btn-primary {
+  background: linear-gradient(135deg, #00d2ff 0%, #7c3aed 50%, #ec4899 100%);
+  color: #ffffff !important;
+  border: 1px solid #7c3aed;
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.3);
+}
+
+.lc-btn-primary:hover {
+  background-color: #ffffff;
+  color: #102b32;
+  border-color: #ffffff;
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.lc-btn-secondary {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.lc-btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.lc-btn-dark {
+  background-color: #102b32;
+  color: #ffffff;
+  border: 1px solid #102b32;
+}
+
+.lc-btn-dark:hover {
+  background-color: #183e47;
+  color: #7c3aed;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(16, 43, 50, 0.2);
+}
+
+.lc-btn-outline {
+  background-color: transparent;
+  color: #102b32;
+  border: 1px solid rgba(16, 43, 50, 0.18);
+}
+
+.lc-btn-outline:hover {
+  background-color: #102b32;
+  color: #ffffff;
+  border-color: #102b32;
+  transform: translateY(-2px);
+}
+
+/* ===== 1. HERO SECTION ===== */
+.lc-hero {
+  background-color: #102b32;
+  background-image: 
+    radial-gradient(circle at 80% 20%, rgba(222, 242, 92, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 20% 80%, rgba(13, 31, 36, 0.9) 0%, transparent 60%);
+  padding: 80px 0 100px;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.lc-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 56px;
+  align-items: center;
+  width: 100%;
+}
+
+.lc-hero-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  min-width: 0;
+}
+
+.lc-hero-title {
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(32px, 3.8vw, 52px) !important;
+  font-weight: 800 !important;
+  line-height: 1.16 !important;
+  letter-spacing: -0.025em !important;
+  color: #ffffff !important;
+  margin: 0 0 24px !important;
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+  white-space: normal !important;
+  width: 100% !important;
+  display: block !important;
+}
+
+.lc-hero-lead-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 36px;
+}
+
+.lc-hero-lead {
+  font-size: 19px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 500;
+}
+
+.lc-hero-desc {
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.lc-hero-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.lc-hero-secondary-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #ffffff;
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.lc-hero-secondary-link:hover {
+  color: #7c3aed;
+}
+
+.lc-hero-secondary-link .lc-arrow-icon {
+  transition: transform 0.2s ease;
+}
+
+.lc-hero-secondary-link:hover .lc-arrow-icon {
+  transform: translate(2px, -2px);
+}
+
+/* Glass Dashboard Visual */
+.lc-card-glass {
+  background: rgba(13, 31, 36, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35);
+}
+
+.lc-glass-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.lc-dots-row {
+  display: flex;
+  gap: 6px;
+}
+
+.lc-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.lc-dot-red { background: #ff5f56; }
+.lc-dot-yellow { background: #ffbd2e; }
+.lc-dot-green { background: #27c93f; }
+
+.lc-glass-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.5px;
+}
+
+.lc-badge-mini {
+  font-size: 11px;
+  font-weight: 700;
+  color: #7c3aed;
+  background: rgba(124, 58, 237, 0.1);
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(124, 58, 237, 0.25);
+}
+
+.lc-glass-body {
+  padding: 24px;
+}
+
+.lc-metric-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.lc-metric-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.lc-metric-num {
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+
+.lc-metric-lbl {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.lc-code-preview {
+  background: #081418;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 16px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12.5px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.lc-code-line {
+  color: rgba(255, 255, 255, 0.85);
+}
+.lc-c-keyword { color: #7c3aed; font-weight: 600; }
+.lc-c-func { color: #5ce1e6; }
+.lc-c-string { color: #ffbd2e; }
+.lc-c-prop { color: #a5d8ff; }
+.lc-indent { padding-left: 16px; }
+
+.lc-feature-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.lc-pill {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ===== 2. SECTIONS & SECTION HEADERS ===== */
+.lc-section {
+  padding: 100px 0;
+  position: relative;
+}
+
+.lc-bg-light {
+  background-color: #fafbf8;
+}
+
+.lc-bg-white {
+  background-color: #ffffff;
+}
+
+.lc-bg-dark {
+  background-color: #102b32;
+  color: #ffffff;
+}
+
+.lc-section-head {
+  max-width: 720px;
+  margin-bottom: 56px;
+}
+
+.lc-section-title {
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(28px, 3.4vw, 44px);
+  font-weight: 800;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  color: #102b32;
+  margin: 0 0 16px;
+}
+
+.lc-text-white {
+  color: #ffffff !important;
+}
+
+.lc-text-dim {
+  color: rgba(255, 255, 255, 0.72) !important;
+}
+
+.lc-section-sub {
+  font-size: 17px;
+  line-height: 1.6;
+  color: #4b5563;
+  margin: 0;
+}
+
+/* ===== 3. MODULES GRID (CAPABILITIES) ===== */
+.lc-modules-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+}
+
+.lc-module-card {
+  background: #ffffff;
+  border: 1px solid rgba(16, 43, 50, 0.08);
+  border-radius: 12px;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.lc-module-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(16, 43, 50, 0.2);
+  box-shadow: 0 24px 50px rgba(16, 43, 50, 0.08);
+}
+
+.lc-card-accent {
+  border-top: 4px solid #7c3aed;
+}
+
+.lc-card-top {
+  margin-bottom: 24px;
+}
+
+.lc-card-idx-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.lc-boxed-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: #102b32;
+  color: #7c3aed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.lc-module-num {
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #9ca3af;
+  letter-spacing: 1px;
+}
+
+.lc-card-title {
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 23px;
+  font-weight: 700;
+  color: #102b32;
+  line-height: 1.3;
+  margin: 0 0 12px;
+}
+
+.lc-card-intro {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #4b5563;
+  margin: 0;
+}
+
+.lc-card-bullets-wrap {
+  margin: 20px 0 32px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(16, 43, 50, 0.06);
+}
+
+.lc-bullets-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #6b7280;
+  margin-bottom: 12px;
+}
+
+.lc-bullets-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 16px;
+}
+
+.lc-bullet-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13.5px;
+  line-height: 1.4;
+  color: #374151;
+  font-weight: 500;
+}
+
+.lc-check-dot {
+  color: #102b32;
+  font-weight: 800;
+  font-size: 13px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.lc-card-footer {
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+/* ===== 4. DELIVERABLES / DESC PAIRS ===== */
+.lc-deliverables-wrap {
+  margin-bottom: 40px;
+}
+
+.lc-deliverable-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 36px;
+}
+
+.lc-deliverable-card {
+  background: #fafbf8;
+  border: 1px solid rgba(16, 43, 50, 0.08);
+  border-radius: 8px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.25s ease;
+}
+
+.lc-deliverable-card:hover {
+  background: #ffffff;
+  border-color: #102b32;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(16, 43, 50, 0.06);
+}
+
+.lc-del-num {
+  font-size: 13px;
+  font-weight: 700;
+  color: #102b32;
+  background: #7c3aed;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.lc-del-text {
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 15.5px;
+  font-weight: 600;
+  color: #102b32;
+  margin: 0;
+}
+
+.lc-desc-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 36px;
+}
+
+.lc-desc-card {
+  background: #fafbf8;
+  border: 1px solid rgba(16, 43, 50, 0.08);
+  border-radius: 10px;
+  padding: 32px;
+  transition: all 0.25s ease;
+}
+
+.lc-desc-card:hover {
+  background: #ffffff;
+  border-color: #102b32;
+  transform: translateY(-4px);
+  box-shadow: 0 16px 36px rgba(16, 43, 50, 0.08);
+}
+
+.lc-desc-card .lc-boxed-icon {
+  margin-bottom: 20px;
+}
+
+.lc-desc-title {
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 19px;
+  font-weight: 700;
+  color: #102b32;
+  margin: 0 0 10px;
+}
+
+.lc-desc-p {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: #4b5563;
+  margin: 0;
+}
+
+/* ===== 5. ENGINEERING PROCESS FLOW ===== */
+.lc-process-flow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 24px;
+  margin-top: 50px;
+}
+
+.lc-step-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.lc-step-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #7c3aed;
+  transform: translateY(-4px);
+}
+
+.lc-step-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.lc-step-badge {
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: #102b32;
+  background: #7c3aed;
+  padding: 4px 12px;
+  border-radius: 6px;
+}
+
+.lc-step-connector {
+  width: 40px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.lc-step-title {
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 12px;
+}
+
+.lc-step-desc {
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+/* ===== 6. WHY CHOOSE QUICKUPP ===== */
+.lc-why-grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 64px;
+  align-items: flex-start;
+}
+
+.lc-why-left {
+  position: sticky;
+  top: 100px;
+}
+
+.lc-why-tagline {
+  font-size: 20px;
+  font-weight: 600;
+  color: #102b32;
+  margin: 0 0 16px;
+  line-height: 1.4;
+}
+
+.lc-why-cta-wrap {
+  margin-top: 32px;
+}
+
+.lc-features-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.lc-feature-card {
+  background: #ffffff;
+  border: 1px solid rgba(16, 43, 50, 0.08);
+  border-radius: 10px;
+  padding: 28px;
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  transition: all 0.3s ease;
+}
+
+.lc-feature-card:hover {
+  border-color: #102b32;
+  transform: translateX(4px);
+  box-shadow: 0 14px 32px rgba(16, 43, 50, 0.06);
+}
+
+.lc-feature-info {
+  flex: 1;
+}
+
+.lc-feature-title {
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 17.5px;
+  font-weight: 700;
+  color: #102b32;
+  margin: 0 0 8px;
+}
+
+.lc-feature-desc {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #4b5563;
+  margin: 0;
+}
+
+/* ===== 7. INDUSTRIES PILLS ===== */
+.lc-industries-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.lc-industry-pill {
+  background: #fafbf8;
+  border: 1px solid rgba(16, 43, 50, 0.08);
+  border-radius: 8px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-decoration: none;
+  color: #102b32;
+  font-weight: 600;
+  font-size: 15px;
+  transition: all 0.25s ease;
+}
+
+.lc-industry-pill:hover {
+  background: #102b32;
+  color: #7c3aed;
+  border-color: #102b32;
+  transform: translateY(-2px);
+}
+
+.lc-ind-arrow {
+  color: inherit;
+  transition: transform 0.2s ease;
+}
+
+.lc-industry-pill:hover .lc-ind-arrow {
+  transform: translate(2px, -2px);
+}
+
+/* ===== 8. TWO-COLUMN FAQ ACCORDION ===== */
+.lc-faq-layout {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 64px;
+  align-items: flex-start;
+}
+
+.lc-faq-sidebar {
+  position: sticky;
+  top: 100px;
+}
+
+.lc-faq-heading {
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(28px, 3vw, 40px);
+  font-weight: 800;
+  color: #102b32;
+  line-height: 1.2;
+  margin: 0 0 16px;
+}
+
+.lc-faq-intro {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #4b5563;
+  margin: 0 0 32px;
+}
+
+.lc-faq-contact-card {
+  background: #ffffff;
+  border: 1px solid rgba(16, 43, 50, 0.1);
+  border-radius: 10px;
+  padding: 28px;
+}
+
+.lc-faq-contact-title {
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #102b32;
+  margin-bottom: 8px;
+}
+
+.lc-faq-contact-p {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #6b7280;
+  margin: 0 0 20px;
+}
+
+.lc-faq-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.lc-accordion-item {
+  background: #ffffff;
+  border: 1px solid rgba(16, 43, 50, 0.08);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.lc-accordion-item.lc-acc-open {
+  border-color: #102b32;
+  box-shadow: 0 8px 24px rgba(16, 43, 50, 0.06);
+}
+
+.lc-accordion-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px 28px;
+  background: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.lc-accordion-q {
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: #102b32;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.lc-accordion-toggle {
+  width: 24px;
+  height: 24px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.lc-toggle-line {
+  position: absolute;
+  background-color: #102b32;
+  border-radius: 2px;
+  transition: all 0.25s ease;
+}
+
+.lc-toggle-h {
+  width: 14px;
+  height: 2px;
+  top: 11px;
+  left: 5px;
+}
+
+.lc-toggle-v {
+  width: 2px;
+  height: 14px;
+  top: 5px;
+  left: 11px;
+}
+
+.lc-v-hidden {
+  transform: rotate(90deg);
+  opacity: 0;
+}
+
+.lc-accordion-content {
+  overflow: hidden;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 0 28px;
+}
+
+.lc-acc-open .lc-accordion-content {
+  padding-bottom: 24px;
+}
+
+.lc-accordion-a {
+  font-size: 15px;
+  line-height: 1.65;
+  color: #4b5563;
+  margin: 0;
+}
+
+/* ===== 9. HIGH-IMPACT CLOSING CTA ===== */
+.lc-cta-section {
+  padding: 80px 0 120px;
+}
+
+.lc-cta-box {
+  background: #102b32;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(124, 58, 237, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(13, 31, 36, 0.8) 0%, transparent 50%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 72px 56px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 30px 70px rgba(10, 24, 30, 0.25);
+}
+
+.lc-cta-title {
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(30px, 4vw, 48px);
+  font-weight: 800;
+  line-height: 1.15;
+  color: #ffffff;
+  margin: 0 0 16px;
+  max-width: 800px;
+}
+
+.lc-cta-desc {
+  font-size: 17px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.78);
+  max-width: 640px;
+  margin: 0 0 36px;
+}
+
+.lc-cta-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+/* ===== 10. SCROLL REVEAL ANIMATIONS ===== */
+.lc-reveal {
+  opacity: 0;
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lc-reveal-up {
+  transform: translateY(32px);
+}
+
+.lc-reveal-left {
+  transform: translateX(-32px);
+}
+
+.lc-reveal-right {
+  transform: translateX(32px);
+}
+
+.lc-in-view {
+  opacity: 1 !important;
+  transform: translateY(0) translateX(0) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lc-reveal,
+  .lc-btn,
+  .lc-btn-text-main,
+  .lc-btn-text-hover,
+  .lc-arrow-icon {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+
+/* ===== 11. RESPONSIVE BREAKPOINTS ===== */
+@media (max-width: 1024px) {
+  .lc-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .lc-why-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .lc-why-left {
+    position: static;
+  }
+  .lc-faq-layout {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .lc-faq-sidebar {
+    position: static;
+  }
+}
+
+@media (max-width: 767px) {
+  .lc-section {
+    padding: 60px 0;
+  }
+  .lc-modules-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .lc-module-card {
+    padding: 28px 20px;
+  }
+  .lc-bullets-list {
+    grid-template-columns: 1fr;
+  }
+  .lc-deliverable-grid,
+  .lc-desc-grid {
+    grid-template-columns: 1fr;
+  }
+  .lc-cta-box {
+    padding: 48px 24px;
+  }
+}

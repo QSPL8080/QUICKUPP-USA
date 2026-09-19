@@ -85,7 +85,7 @@ export default function TestimonialsPage() {
               boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
             }}
           >
-            <div style={{ fontSize: "13px", fontWeight: 800, color: "#def25c", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "8px" }}>
+            <div style={{ fontSize: "13px", fontWeight: 800, color: "#7c3aed", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "8px" }}>
               TRUSTED WORLDWIDE
             </div>
             <h2 style={{ fontSize: "clamp(24px, 3.2vw, 36px)", fontWeight: 700, margin: "0 0 12px 0", color: "#fff" }}>
@@ -121,7 +121,7 @@ export default function TestimonialsPage() {
               >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
                   <div style={{ color: "#f59e0b", fontSize: "18px", letterSpacing: "2px" }}>
-                    {"★".repeat(rev.rating)}
+                    {"â˜…".repeat(rev.rating)}
                   </div>
                   <span
                     style={{
@@ -148,7 +148,7 @@ export default function TestimonialsPage() {
                       height: "44px",
                       borderRadius: "50%",
                       background: "#18171c",
-                      color: "#def25c",
+                      color: "#7c3aed",
                       fontWeight: 800,
                       fontSize: "16px",
                       display: "flex",

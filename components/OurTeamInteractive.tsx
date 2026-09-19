@@ -132,12 +132,12 @@ export default function OurTeamInteractive() {
           <div className="sf-hero-grid">
             <div>
               <div className="sf-tag">
-                <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#def25c', display: 'inline-block' }}></span>
+                <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#7c3aed', display: 'inline-block' }}></span>
                 OUR PEOPLE &amp; CULTURE
               </div>
               <h1 className="sf-hero-title">
                 The Minds Behind<br />
-                <span style={{ color: '#def25c' }}>Quickupp Softech.</span>
+                <span style={{ color: '#7c3aed' }}>Quickupp Softech.</span>
               </h1>
               <div className="sf-hero-sub">Multidisciplinary Experts Dedicated to Your Business Growth</div>
               <p className="sf-hero-desc">
@@ -309,7 +309,7 @@ export default function OurTeamInteractive() {
                 Whether you need a dedicated growth pod or specialized staff augmentation, we have the talent and systems ready for you.
               </p>
               <div className="sf-cta-check">
-                <span>✓</span> Direct Access to Senior Strategists &amp; Engineers
+                <span>âœ“</span> Direct Access to Senior Strategists &amp; Engineers
               </div>
               <div className="sf-btn-row">
                 <Link href="/contact" className="sf-btn-primary">

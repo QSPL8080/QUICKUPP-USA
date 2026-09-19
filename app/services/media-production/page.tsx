@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ServicePage from "@/components/ServicePage";
+import RitovexServicePage from "@/components/RitovexServicePage";
 import data from "@/data/services/media-production";
 
 export const metadata: Metadata = {
@@ -8,6 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <ServicePage data={data} />;
+  return <RitovexServicePage data={data} />;
 }
-

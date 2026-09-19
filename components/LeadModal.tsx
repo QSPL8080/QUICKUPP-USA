@@ -64,57 +64,14 @@ export default function LeadModal() {
     }, 900);
   };
 
+  useEffect(() => {
+    const handleOpenModalEvent = () => openModal();
+    window.addEventListener("open-lead-modal", handleOpenModalEvent);
+    return () => window.removeEventListener("open-lead-modal", handleOpenModalEvent);
+  }, []);
+
   return (
     <>
-      {/* Floating Trigger Button (Bottom Right) so users can open anytime */}
-      <button
-        onClick={openModal}
-        aria-label="Request Free Growth Consultation"
-        className="qs-floating-lead-trigger"
-        style={{
-          position: "fixed",
-          bottom: "24px",
-          right: "24px",
-          zIndex: 998,
-          background: "#18171c",
-          color: "#ffffff",
-          border: "1px solid rgba(222, 242, 92, 0.4)",
-          padding: "12px 20px",
-          borderRadius: "100px",
-          fontWeight: 700,
-          fontSize: "14px",
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.25)",
-          cursor: "pointer",
-          transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = "translateY(-3px) scale(1.03)";
-          e.currentTarget.style.borderColor = "#def25c";
-          e.currentTarget.style.boxShadow = "0 14px 36px rgba(222, 242, 92, 0.25)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = "translateY(0) scale(1)";
-          e.currentTarget.style.borderColor = "rgba(222, 242, 92, 0.4)";
-          e.currentTarget.style.boxShadow = "0 10px 30px rgba(0, 0, 0, 0.25)";
-        }}
-      >
-        <span
-          style={{
-            width: "10px",
-            height: "10px",
-            borderRadius: "50%",
-            background: "#def25c",
-            display: "inline-block",
-            boxShadow: "0 0 10px #def25c",
-            animation: "qsPulse 2s infinite",
-          }}
-        />
-        <span>Get Free Growth Plan</span>
-      </button>
-
       {/* Modal Backdrop & Container */}
       {isOpen && (
         <div
@@ -182,7 +139,7 @@ export default function LeadModal() {
                 e.currentTarget.style.color = "#667085";
               }}
             >
-              ✕
+              âœ•
             </button>
 
             {/* LEFT COLUMN: Brand, Value Proposition & Trust Badges */}
@@ -240,7 +197,7 @@ export default function LeadModal() {
                   }}
                 >
                   Your Strategic <br />
-                  <span style={{ color: "#def25c" }}>Technology &amp; Growth</span> Partner
+                  <span style={{ color: "#7c3aed" }}>Technology &amp; Growth</span> Partner
                 </h3>
 
                 <p
@@ -268,7 +225,7 @@ export default function LeadModal() {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        color: "#def25c",
+                        color: "#7c3aed",
                         flexShrink: 0,
                       }}
                     >
@@ -335,7 +292,7 @@ export default function LeadModal() {
                     </div>
                     <div>
                       <div style={{ fontSize: "16px", fontWeight: 800, color: "#ffffff" }}>Global Delivery</div>
-                      <div style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.6)" }}>USA • UAE • India</div>
+                      <div style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.6)" }}>USA â€¢ UAE â€¢ India</div>
                     </div>
                   </div>
                 </div>
@@ -356,17 +313,17 @@ export default function LeadModal() {
                   Certified &amp; Compliant
                 </div>
                 <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                  <span style={{ fontSize: "11px", fontWeight: 700, background: "rgba(255, 255, 255, 0.08)", padding: "4px 8px", borderRadius: "6px", color: "#def25c" }}>
-                    ✓ SOC 2
+                  <span style={{ fontSize: "11px", fontWeight: 700, background: "rgba(255, 255, 255, 0.08)", padding: "4px 8px", borderRadius: "6px", color: "#7c3aed" }}>
+                    âœ“ SOC 2
                   </span>
                   <span style={{ fontSize: "11px", fontWeight: 700, background: "rgba(255, 255, 255, 0.08)", padding: "4px 8px", borderRadius: "6px", color: "#38bdf8" }}>
-                    ✓ HIPAA Ready
+                    âœ“ HIPAA Ready
                   </span>
                   <span style={{ fontSize: "11px", fontWeight: 700, background: "rgba(255, 255, 255, 0.08)", padding: "4px 8px", borderRadius: "6px", color: "#c084fc" }}>
-                    ✓ GDPR
+                    âœ“ GDPR
                   </span>
                   <span style={{ fontSize: "11px", fontWeight: 700, background: "rgba(255, 255, 255, 0.08)", padding: "4px 8px", borderRadius: "6px", color: "#4ade80" }}>
-                    ✓ ISO 27001
+                    âœ“ ISO 27001
                   </span>
                 </div>
               </div>
@@ -400,7 +357,7 @@ export default function LeadModal() {
                       margin: "0 auto 20px auto",
                     }}
                   >
-                    ✓
+                    âœ“
                   </div>
                   <h3 style={{ fontSize: "26px", fontWeight: 800, color: "#18171c", marginBottom: "8px" }}>
                     Thank You!
@@ -412,7 +369,7 @@ export default function LeadModal() {
                     onClick={closeModal}
                     style={{
                       background: "#18171c",
-                      color: "#def25c",
+                      color: "#7c3aed",
                       fontWeight: 700,
                       padding: "12px 28px",
                       borderRadius: "100px",
@@ -510,13 +467,13 @@ export default function LeadModal() {
                           outline: "none",
                         }}
                       >
-                        <option value="+1">🇺🇸 +1 (US)</option>
-                        <option value="+44">🇬🇧 +44 (UK)</option>
-                        <option value="+971">🇦🇪 +971 (UAE)</option>
-                        <option value="+91">🇮🇳 +91 (IN)</option>
-                        <option value="+61">🇦🇺 +61 (AU)</option>
-                        <option value="+49">🇩🇪 +49 (DE)</option>
-                        <option value="+1-CA">🇨🇦 +1 (CA)</option>
+                        <option value="+1">ðŸ‡ºðŸ‡¸ +1 (US)</option>
+                        <option value="+44">ðŸ‡¬ðŸ‡§ +44 (UK)</option>
+                        <option value="+971">ðŸ‡¦ðŸ‡ª +971 (UAE)</option>
+                        <option value="+91">ðŸ‡®ðŸ‡³ +91 (IN)</option>
+                        <option value="+61">ðŸ‡¦ðŸ‡º +61 (AU)</option>
+                        <option value="+49">ðŸ‡©ðŸ‡ª +49 (DE)</option>
+                        <option value="+1-CA">ðŸ‡¨ðŸ‡¦ +1 (CA)</option>
                       </select>
                       <input
                         type="tel"
@@ -590,12 +547,12 @@ export default function LeadModal() {
                           outline: "none",
                         }}
                       >
-                        <option value="Full Growth System (Marketing + AI + Tech)">🚀 Full Growth System (Marketing + AI + Tech)</option>
-                        <option value="AI & Automation Solutions">🤖 AI &amp; Automation Solutions</option>
-                        <option value="Performance Marketing & SEO">📈 Performance Marketing &amp; SEO (AEO/GEO)</option>
-                        <option value="Web & Mobile App Development">💻 Web &amp; Mobile App Development</option>
-                        <option value="AI Video Production (Avatar / UGC)">🎥 AI Video Production (Avatar / UGC)</option>
-                        <option value="Staff Augmentation (IT / Marketing)">👥 Staff Augmentation (IT / Marketing)</option>
+                        <option value="Full Growth System (Marketing + AI + Tech)">ðŸš€ Full Growth System (Marketing + AI + Tech)</option>
+                        <option value="AI & Automation Solutions">ðŸ¤– AI &amp; Automation Solutions</option>
+                        <option value="Performance Marketing & SEO">ðŸ“ˆ Performance Marketing &amp; SEO (AEO/GEO)</option>
+                        <option value="Web & Mobile App Development">ðŸ’» Web &amp; Mobile App Development</option>
+                        <option value="AI Video Production (Avatar / UGC)">ðŸŽ¥ AI Video Production (Avatar / UGC)</option>
+                        <option value="Staff Augmentation (IT / Marketing)">ðŸ‘¥ Staff Augmentation (IT / Marketing)</option>
                       </select>
                     </div>
 
@@ -623,7 +580,7 @@ export default function LeadModal() {
 
                     {/* Privacy Note */}
                     <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#667085" }}>
-                      <span>🔒</span>
+                      <span>ðŸ”’</span>
                       <span>Your information is 100% confidential. We respect your privacy.</span>
                     </div>
 
@@ -634,8 +591,8 @@ export default function LeadModal() {
                       style={{
                         marginTop: "4px",
                         background: "linear-gradient(135deg, #18171c 0%, #2a2832 100%)",
-                        color: "#def25c",
-                        border: "1px solid #def25c",
+                        color: "#7c3aed",
+                        border: "1px solid #7c3aed",
                         padding: "14px 20px",
                         borderRadius: "100px",
                         fontSize: "15px",
@@ -650,14 +607,14 @@ export default function LeadModal() {
                       }}
                       onMouseEnter={(e) => {
                         if (!isSubmitting) {
-                          e.currentTarget.style.background = "#def25c";
+                          e.currentTarget.style.background = "#7c3aed";
                           e.currentTarget.style.color = "#18171c";
                         }
                       }}
                       onMouseLeave={(e) => {
                         if (!isSubmitting) {
                           e.currentTarget.style.background = "linear-gradient(135deg, #18171c 0%, #2a2832 100%)";
-                          e.currentTarget.style.color = "#def25c";
+                          e.currentTarget.style.color = "#7c3aed";
                         }
                       }}
                     >

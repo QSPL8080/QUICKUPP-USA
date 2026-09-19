@@ -116,7 +116,7 @@ export default function WhyChooseUsInteractive() {
     {
       num: "03",
       title: "Agile Sprint Execution",
-      desc: "Our multidisciplinary pod executes in rapid sprints—launching campaigns, engineering features, and deploying automations with weekly demo reviews."
+      desc: "Our multidisciplinary pod executes in rapid sprintsâ€”launching campaigns, engineering features, and deploying automations with weekly demo reviews."
     },
     {
       num: "04",
@@ -138,12 +138,12 @@ export default function WhyChooseUsInteractive() {
           <div className="sf-hero-grid">
             <div>
               <div className="sf-tag">
-                <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#def25c', display: 'inline-block' }}></span>
+                <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#7c3aed', display: 'inline-block' }}></span>
                 WHY CHOOSE US
               </div>
               <h1 className="sf-hero-title">
                 The Growth Partner Built for<br />
-                <span style={{ color: '#def25c' }}>What's Next.</span>
+                <span style={{ color: '#7c3aed' }}>What's Next.</span>
               </h1>
               <div className="sf-hero-sub">Why Ambitious Businesses Partner With Quickupp Softech</div>
               <p className="sf-hero-desc">
@@ -315,7 +315,7 @@ export default function WhyChooseUsInteractive() {
                 Discover how our integrated Marketing, AI, and Technology solutions can transform your customer acquisition and streamline your operations.
               </p>
               <div className="sf-cta-check">
-                <span>✓</span> Free 30-Minute Growth Strategy &amp; Tech Audit
+                <span>âœ“</span> Free 30-Minute Growth Strategy &amp; Tech Audit
               </div>
               <div className="sf-btn-row">
                 <Link href="/contact" className="sf-btn-primary">

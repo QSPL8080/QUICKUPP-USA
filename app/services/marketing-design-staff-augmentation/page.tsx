@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import ServicePage from "@/components/ServicePage";
-import { data } from "@/data/services/marketing-design-staff-augmentation";
+import RitovexServicePage from "@/components/RitovexServicePage";
+import data from "@/data/services/marketing-design-staff-augmentation";
 
 export const metadata: Metadata = {
   title: data.metaTitle,
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <ServicePage data={data} />;
+  return <RitovexServicePage data={data} />;
 }

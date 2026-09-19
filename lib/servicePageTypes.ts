@@ -1,7 +1,8 @@
 export interface ProcessStep {
   num: string;
   title: string;
-  desc: string;
+  desc?: string;
+  text?: string;
 }
 
 export interface ListBlock {
@@ -9,6 +10,7 @@ export interface ListBlock {
   title: string;
   subtitle?: string;
   tagline?: string;
+  intro?: string;
   desc?: string;
   items: string[];
   cta?: { label: string; href: string };
@@ -20,6 +22,7 @@ export interface DescPairsBlock {
   title?: string;
   subtitle?: string;
   tagline?: string;
+  intro?: string;
   desc?: string;
   items: { title: string; desc: string }[];
   cta?: { label: string; href: string };
@@ -29,13 +32,17 @@ export interface DescPairsBlock {
 export interface ProcessBlock {
   type: "process";
   title: string;
+  tagline?: string;
+  intro?: string;
   steps: ProcessStep[];
+  items?: string[];
 }
 
 export interface WhyChooseBlock {
   type: "whyChoose";
   title?: string;
-  tagline: string;
+  tagline?: string;
+  intro?: string;
   desc?: string;
   bullets: string[];
   cta?: { label: string; href: string };
@@ -43,6 +50,8 @@ export interface WhyChooseBlock {
 
 export interface IndustriesBlock {
   type: "industries";
+  title?: string;
+  intro?: string;
   industries: string[];
 }
 
@@ -57,7 +66,24 @@ export interface AiBlock {
 
 export interface FaqBlock {
   type: "faq";
+  title?: string;
+  intro?: string;
   items: { q: string; a: string }[];
+  faqs?: { q: string; a: string }[];
+}
+
+export interface CardsBlock {
+  type: "cards";
+  title?: string;
+  intro?: string;
+  cards: { title: string; text: string; icon?: string }[];
+}
+
+export interface StepsBlock {
+  type: "steps";
+  title?: string;
+  intro?: string;
+  steps: { title: string; text: string; num?: string }[];
 }
 
 export type ServiceBlock =
@@ -67,7 +93,9 @@ export type ServiceBlock =
   | WhyChooseBlock
   | IndustriesBlock
   | AiBlock
-  | FaqBlock;
+  | FaqBlock
+  | CardsBlock
+  | StepsBlock;
 
 export interface ServicePageData {
   metaTitle: string;

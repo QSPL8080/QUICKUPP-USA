@@ -136,7 +136,7 @@ export default async function SingleBlogPage({
                 height: "48px",
                 borderRadius: "50%",
                 background: "#18171c",
-                color: "#def25c",
+                color: "#7c3aed",
                 fontSize: "18px",
                 fontWeight: 800,
                 display: "flex",

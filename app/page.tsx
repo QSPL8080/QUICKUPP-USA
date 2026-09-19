@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ProjectsInteractive from "@/components/ProjectsInteractive";
 import { homeExtraSections } from "@/data/homeExtraSections";
 
 export const metadata: Metadata = {
@@ -239,56 +240,19 @@ export default function Home() {
         </div>
         <div
           data-w-id="a2bc9cf3-4395-f75a-76f6-5e8322781da5"
-          style={{ opacity: 0 }}
           className="hero-one-bottom-section"
         >
           <div className="hero-one-bottom">
             <div className="counter-style-one">
               <div className="counter-numbers">
-                <div className="single-number _01">
-                  <div className="counter-number">1</div>
-                  <div className="counter-number">1</div>
-                  <div className="counter-number">2</div>
-                  <div className="counter-number">3</div>
-                  <div className="counter-number">4</div>
-                  <div className="counter-number">5</div>
-                  <div className="counter-number">6</div>
-                  <div className="counter-number">7</div>
-                  <div className="counter-number">8</div>
-                  <div className="counter-number">1</div>
-                </div>
-                <div className="single-number _02">
-                  <div className="counter-number">5</div>
-                  <div className="counter-number">1</div>
-                  <div className="counter-number">2</div>
-                  <div className="counter-number">3</div>
-                  <div className="counter-number">4</div>
-                  <div className="counter-number">5</div>
-                  <div className="counter-number">6</div>
-                  <div className="counter-number">7</div>
-                  <div className="counter-number">8</div>
-                  <div className="counter-number">5</div>
-                </div>
-                <div className="single-number _01">
-                  <div className="counter-number">1</div>
-                  <div className="counter-number">1</div>
-                  <div className="counter-number">2</div>
-                  <div className="counter-number">3</div>
-                  <div className="counter-number">4</div>
-                  <div className="counter-number">5</div>
-                  <div className="counter-number">6</div>
-                  <div className="counter-number">7</div>
-                  <div className="counter-number">8</div>
-                  <div className="counter-number">1</div>
-                </div>
-                <div className="single-number">K</div>
-                <div className="counter-one-icon">+</div>
+                <span className="single-stat-num">151</span>
+                <span className="single-stat-unit">K</span>
+                <span className="counter-one-icon">+</span>
               </div>
               <div className="text-style-h5">Active Members Globally</div>
             </div>
             <div className="hero-one-bottom-text display-none-767">
-              Thousands of members worldwide are part of our co-working eco
-              system.
+              Thousands of brands worldwide scale with our marketing, AI, and digital growth systems.
             </div>
           </div>
           <div className="hero-one-bottom-curve"></div>
@@ -299,7 +263,6 @@ export default function Home() {
       <section className="section-gap section-margin">
         <div
           data-w-id="318c8f49-211f-1422-d249-74397a9a3d1d"
-          style={{ opacity: 0 }}
           className="client-logo-title"
         >
           1000+ Trusted Clients Over Worldwide
@@ -379,21 +342,12 @@ export default function Home() {
                     Our agency provides a comprehensive suite of marketing
                     growth.
                   </h2>
-                  <div className="title-overlays">
-                    {Array.from({ length: 10 }, (_, i) => (
-                      <div
-                        key={i}
-                        className={`text-title-overlay _${String(i + 1).padStart(2, "0")}`}
-                      ></div>
-                    ))}
-                  </div>
                 </div>
               </div>
               <div className="home-one-about1-inner-columns">
                 <div className="home-one-about1-inner-left-column">
                   <div
                     data-w-id="7fb126df-d1c9-b3f7-50a5-f989a8a7c038"
-                    style={{ opacity: 0 }}
                     className="home-one-about-one"
                   >
                     <div className="home-one-about-circle _02"></div>
@@ -403,29 +357,8 @@ export default function Home() {
                         Monthly Traffic
                       </div>
                       <div className="counter-numbers two">
-                        <div className="single-number _01">
-                          {[3, 1, 2, 3, 4, 5, 6, 7, 8, 3].map((n, i) => (
-                            <div key={i} className="counter-number">
-                              {n}
-                            </div>
-                          ))}
-                        </div>
-                        <div className="single-number _02">
-                          {[3, 1, 2, 3, 4, 5, 6, 7, 8, 3].map((n, i) => (
-                            <div key={i} className="counter-number">
-                              {n}
-                            </div>
-                          ))}
-                        </div>
-                        <div className="single-number">.</div>
-                        <div className="single-number _01">
-                          {[4, 1, 2, 3, 4, 5, 6, 7, 8, 4].map((n, i) => (
-                            <div key={i} className="counter-number">
-                              {n}
-                            </div>
-                          ))}
-                        </div>
-                        <div className="single-number secondary-text">K</div>
+                        <span className="single-stat-num">33.4</span>
+                        <span className="single-stat-unit secondary-text">K</span>
                       </div>
                     </div>
                     <div className="progress-bar home-one-progress">
@@ -446,7 +379,6 @@ export default function Home() {
                     <div className="overflow-hidden">
                       <div
                         data-w-id="ead2f8d6-184f-e553-c540-4197acdeaadc"
-                        style={{ opacity: 0 }}
                         className="home-one-about-text"
                       >
                         We are a passionate marketing agency dedicated to bold,
@@ -458,7 +390,6 @@ export default function Home() {
                     <div className="overflow-hidden">
                       <div
                         data-w-id="3e9c9abb-a0df-1d27-454b-456ee1b54163"
-                        style={{ opacity: 0 }}
                         className="button-wrap"
                       >
                         <a
@@ -492,7 +423,6 @@ export default function Home() {
                     <div className="icon-style-two-wrap">
                       <div
                         data-w-id="cb6a360d-4dc5-9606-63de-1514cd547fb8"
-                        style={{ opacity: 0 }}
                         className="icon-style-two"
                       >
                         <div className="icon-style-two-icon-wrap">
@@ -513,7 +443,6 @@ export default function Home() {
                       </div>
                       <div
                         data-w-id="c565a597-d64c-e744-ee98-8a8fc709eb5f"
-                        style={{ opacity: 0 }}
                         className="icon-style-two"
                       >
                         <div className="icon-style-two-icon-wrap">
@@ -547,7 +476,6 @@ export default function Home() {
                 width="auto"
                 height="auto"
                 alt="home1-about-01"
-                style={{ opacity: 0 }}
                 sizes="(max-width: 767px) 100vw, (max-width: 991px) 728px, 940px, 100vw"
                 data-w-id="3b901ac5-9a84-f166-a27e-0a2f8c45ec25"
                 loading="lazy"
@@ -571,17 +499,9 @@ export default function Home() {
               <div className="heading-subtitle">
                 <div className="heading-title-animation">
                   <h2 className="heading-title service-heading">
-                    We follow a clear strategy of investing in ‍high potential
-                    real estate opportunities ‍growth.
+                    We follow a clear strategy of investing in high potential
+                    digital opportunities and growth.
                   </h2>
-                  <div className="title-overlays">
-                    {Array.from({ length: 10 }, (_, i) => (
-                      <div
-                        key={i}
-                        className={`text-title-overlay _${String(i + 1).padStart(2, "0")} global-bg`}
-                      ></div>
-                    ))}
-                  </div>
                 </div>
               </div>
             </div>
@@ -624,7 +544,7 @@ export default function Home() {
                       title: "Social Management",
                       num: "{05}",
                       img: "service-img-05",
-                      desc: "Social channels are managed with planned content, active engagement to strengthen brand presence",
+                      desc: "Social channels are managed with planned content, active engagement to strengthen brand presence.",
                     },
                   ].map((service, i) => (
                     <div
@@ -638,10 +558,7 @@ export default function Home() {
                         className="service-one-wrap w-inline-block"
                       >
                         <div className="home-one-service-text-wrap">
-                          <div
-                            style={{ opacity: 0 }}
-                            className="home-one-service-text"
-                          >
+                          <div className="home-one-service-text">
                             {service.desc}
                           </div>
                         </div>
@@ -650,49 +567,24 @@ export default function Home() {
                             <img
                               src="/images/secondary-left-icon.svg"
                               loading="lazy"
-                              style={{
-                                display: "block",
-                                transform:
-                                  "translate3d(-60px, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                opacity: 0,
-                              }}
                               alt="secondary-left-icon"
                               className="service-one-icon"
                             />
-                            <div
-                              style={{
-                                transform:
-                                  "translate3d(0px, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                              }}
-                              className="service-one-title-number-wrap"
-                            >
+                            <div className="service-one-title-number-wrap">
                               <div className="service-one-title-wrap">
-                                <div
-                                  style={{ color: "rgba(255,255,255,0.4)" }}
-                                  className="service-one-title"
-                                >
+                                <div className="service-one-title">
                                   {service.title}
                                 </div>
                                 <div className="home-one-service-text two">
                                   {service.desc}
                                 </div>
                               </div>
-                              <div
-                                style={{ color: "rgba(255,255,255,0.4)" }}
-                                className="service-one-number"
-                              >
+                              <div className="service-one-number">
                                 {service.num}
                               </div>
                             </div>
                           </div>
-                          <div
-                            style={{
-                              transform:
-                                "translate3d(0, -30%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                              opacity: 0,
-                            }}
-                            className="service-one-image-wrap"
-                          >
+                          <div className="service-one-image-wrap">
                             <img
                               src={`/images/${service.img}.jpg`}
                               loading="lazy"
@@ -710,7 +602,6 @@ export default function Home() {
               </div>
               <div
                 data-w-id="53b52da4-c64e-e83c-d859-1857c45619c0"
-                style={{ opacity: 0 }}
                 className="button-wrap service-style-one-button"
               >
                 <a
@@ -761,30 +652,11 @@ export default function Home() {
                   Our agency is dedicated to boosting your brand&apos;s reach,
                   generating quality leads
                 </h2>
-                <div className="title-overlays">
-                  {Array.from({ length: 10 }, (_, i) => (
-                    <div
-                      key={i}
-                      className={`text-title-overlay _${String(i + 1).padStart(2, "0")}`}
-                    ></div>
-                  ))}
-                </div>
               </div>
             </div>
             <div className="counter-heading-columns">
               <div
                 data-w-id="78f17ef5-e5f5-54b2-3f46-2a95b252cb8f"
-                style={{
-                  WebkitTransform:
-                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                  MozTransform:
-                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                  msTransform:
-                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                  transform:
-                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                  opacity: 0,
-                }}
                 className="counter-heading-left-column"
               >
                 <div className="button-wrap">
@@ -819,17 +691,6 @@ export default function Home() {
               <div
                 id="w-node-_78f17ef5-e5f5-54b2-3f46-2a95b252cb93-5076cc8e"
                 data-w-id="78f17ef5-e5f5-54b2-3f46-2a95b252cb93"
-                style={{
-                  WebkitTransform:
-                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                  MozTransform:
-                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                  msTransform:
-                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                  transform:
-                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                  opacity: 0,
-                }}
                 className="counter-heading-right-column"
               >
                 <div className="heading-subtitle">
@@ -846,41 +707,24 @@ export default function Home() {
           </div>
           <div
             data-w-id="78f17ef5-e5f5-54b2-3f46-2a95b252cb98"
-            style={{
-              WebkitTransform:
-                "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-              MozTransform:
-                "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-              msTransform:
-                "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-              transform:
-                "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-              opacity: 0,
-            }}
             className="counter-style-three-wrap"
           >
             {[
               {
-                title: "Trusted Use",
-                nums1: [4, 1, 2, 3, 4, 5, 6, 7, 8, 4],
-                nums2: [5, 1, 2, 3, 4, 5, 6, 7, 8, 5],
-                nums3: [0, 1, 2, 3, 4, 5, 6, 7, 8, 0],
+                title: "Trusted Users",
+                num: "450",
                 icon: "+",
                 img: "counter-style-three-img-01",
               },
               {
                 title: "Positive Reviews",
-                nums1: [2, 1, 2, 3, 4, 5, 6, 7, 8, 2],
-                nums2: [5, 1, 2, 3, 4, 5, 6, 7, 8, 5],
-                nums3: null,
+                num: "25",
                 icon: "k",
                 img: "counter-style-three-img-02",
               },
               {
                 title: "Cover Marketing",
-                nums1: [1, 1, 2, 3, 4, 5, 6, 7, 8, 1],
-                nums2: [1, 1, 2, 3, 4, 5, 6, 7, 8, 1],
-                nums3: [0, 1, 2, 3, 4, 5, 6, 7, 8, 0],
+                num: "110",
                 icon: "+",
                 img: "counter-style-three-img-03",
               },
@@ -890,30 +734,8 @@ export default function Home() {
                   <div className="counter-three-title">{counter.title}</div>
                   <div className="icon-style-three-number-wrap">
                     <div className="counter-numbers three">
-                      <div className="single-number _01">
-                        {counter.nums1.map((n, j) => (
-                          <div key={j} className="counter-number">
-                            {n}
-                          </div>
-                        ))}
-                      </div>
-                      <div className="single-number _02">
-                        {counter.nums2.map((n, j) => (
-                          <div key={j} className="counter-number">
-                            {n}
-                          </div>
-                        ))}
-                      </div>
-                      {counter.nums3 && (
-                        <div className="single-number _01">
-                          {counter.nums3.map((n, j) => (
-                            <div key={j} className="counter-number">
-                              {n}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      <div className="counter-one-icon">{counter.icon}</div>
+                      <span className="single-stat-num">{counter.num}</span>
+                      <span className="counter-one-icon">{counter.icon}</span>
                     </div>
                   </div>
                 </div>
@@ -967,160 +789,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="project-section section-gap section-margin">
-        <div className="w-layout-blockcontainer container w-container">
-          <div
-            data-w-id="864277dd-ad4a-e49d-db64-b83731d65738"
-            className="project-height"
-          >
-            <div className="project-one-sticky">
-              <img
-                src="/images/footer-bg.png"
-                loading="lazy"
-                sizes="100vw"
-                srcSet="/images/footer-bg-p-500.png 500w, /images/footer-bg.png 673w"
-                alt="Footer-bg"
-                className="project-one-bg-image"
-              />
-              <div className="project-one-wrap">
-                <div className="project-one-heading-wrap">
-                  <div>
-                    <div className="heading-subtitle">
-                      <div className="subtitle-head-wrap">
-                        <div className="subtitle-left-icon"></div>
-                        <div className="subtitle-head">Our projects</div>
-                      </div>
-                      <div className="heading-title-animation">
-                        <h2 className="heading-title big">Latest work</h2>
-                        <div className="title-overlay light-bg"></div>
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    data-w-id="17138b3a-19fd-3781-74aa-79754375776d"
-                    style={{ opacity: 0 }}
-                    className="project-one-date-wrapper display-none-991"
-                  >
-                    <div className="project-one-date _01">08.2025</div>
-                    <div className="project-one-date _02">10.2025</div>
-                    <div className="project-one-date _03">12.2025</div>
-                    <div className="project-one-date _04">04.2025</div>
-                  </div>
-                </div>
-                <div className="project-one display-none-991">
-                  <div className="project-one-left-column">
-                    <div
-                      data-w-id="a05e4763-ccac-82a1-bd57-86a1268c3b52"
-                      style={{ opacity: 0 }}
-                      className="project-one-desc-wrap"
-                    >
-                      <div className="project-one-desc _01">
-                        We don&apos;t just design. We build experiences that
-                        tell a story and leave a lasting impression.
-                      </div>
-                      <div className="project-one-desc _02">
-                        From insight to execution, we design experiences that
-                        strengthen brands and deliver value.
-                      </div>
-                      <div className="project-one-desc _03">
-                        Smart marketing is more than visuals—it&apos;s about
-                        influence and performance.
-                      </div>
-                      <div className="project-one-desc _04">
-                        Great brands are built on meaningful experiences that
-                        connect and perform.
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    data-w-id="29c9a259-6cf6-043b-95da-2046207897f4"
-                    style={{ opacity: 0 }}
-                    className="project-one-center-column"
-                  >
-                    <div className="project-one-image-wrap">
-                      <img
-                        src="/images/project-01.jpg"
-                        loading="lazy"
-                        alt="project-01"
-                        className="project-one-image _01"
-                      />
-                      <img
-                        src="/images/project-02.jpg"
-                        alt="project-02"
-                        className="project-one-image _02"
-                      />
-                      <img
-                        src="/images/project-03.jpg"
-                        alt="project-03"
-                        className="project-one-image _03"
-                      />
-                      <img
-                        src="/images/project-04.jpg"
-                        alt="project-04"
-                        className="project-one-image _04"
-                      />
-                    </div>
-                  </div>
-                  <div className="project-one-right-column">
-                    <div
-                      data-w-id="6b28a062-b83c-f3d3-6236-521a12aaed98"
-                      style={{ opacity: 0 }}
-                      className="project-one-title-wrap"
-                    >
-                      <div className="project-one-title _01">
-                        Content marketing
-                      </div>
-                      <div className="project-one-title _02">
-                        Revenue Optimization
-                      </div>
-                      <div className="project-one-title _03">
-                        Campaign management
-                      </div>
-                      <div className="project-one-title _04">
-                        Engagement Growth
-                      </div>
-                    </div>
-                    <div
-                      data-w-id="4ed3d0c4-87c9-fdd8-f9c1-c8bdee19c68e"
-                      style={{ opacity: 0 }}
-                      className="button-wrap"
-                    >
-                      <a
-                        href="/portfolio"
-                        data-wf--button--variant="secondary-bg"
-                        data-w-id="8932a183-40ec-c216-e8b4-670b55f18dc8"
-                        className="button-link w-inline-block"
-                      >
-                        <div className="button-hover-overlay"></div>
-                        <div className="button-text-wrapper">
-                          <div className="button-text-wrap">
-                            <div className="button-text">View all Projects</div>
-                            <div className="button-text-hover">
-                              View all Projects
-                            </div>
-                          </div>
-                        </div>
-                        <div className="button-arrow-wrapper">
-                          <div className="button-arrow-wrap">
-                            <img
-                              src="/images/button-arrow.svg"
-                              loading="lazy"
-                              width="20"
-                              height="20"
-                              alt="button-arrow"
-                              className="button-arrow"
-                            />
-                          </div>
-                        </div>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <ProjectsInteractive />
 
       <section className="section-gap">
         <div className="w-layout-blockcontainer container w-container">
@@ -1128,17 +797,6 @@ export default function Home() {
             <div className="team-one-grid">
               <div
                 data-w-id="0341cf5b-1e34-64ca-6947-69c3ea8937e6"
-                style={{
-                  WebkitTransform:
-                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                  MozTransform:
-                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                  msTransform:
-                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                  transform:
-                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                  opacity: 0,
-                }}
                 className="team-one-column"
               >
                 <div className="team-one w-dyn-list">
@@ -1186,17 +844,6 @@ export default function Home() {
                             <div className="team-one-title-wrap">
                               <div
                                 data-w-id="b8be9552-a1c8-561f-73a6-fb73b0d59132"
-                                style={{
-                                  WebkitTransform:
-                                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                  MozTransform:
-                                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                  msTransform:
-                                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                  transform:
-                                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                  opacity: 0,
-                                }}
                               >
                                 <a
                                   href={member.href}
@@ -1209,17 +856,6 @@ export default function Home() {
                                 {[0, 1, 2].map((j) => (
                                   <div
                                     key={j}
-                                    style={{
-                                      WebkitTransform:
-                                        "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                      MozTransform:
-                                        "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                      msTransform:
-                                        "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                      transform:
-                                        "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                      opacity: 0,
-                                    }}
                                   >
                                     <a
                                       href="https://www.facebook.com/"
@@ -1233,36 +869,13 @@ export default function Home() {
                             </div>
                             <div className="team-one-link-wrap">
                               <div
-                                style={{
-                                  WebkitTransform:
-                                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                  MozTransform:
-                                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                  msTransform:
-                                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                  transform:
-                                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                  opacity: 0,
-                                }}
                                 className="team-one-category-wrap"
                               >
                                 <div className="category">(</div>
                                 <div className="category">{member.role}</div>
                                 <div className="category">)</div>
                               </div>
-                              <div
-                                style={{
-                                  WebkitTransform:
-                                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                  MozTransform:
-                                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                  msTransform:
-                                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                  transform:
-                                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                  opacity: 0,
-                                }}
-                              >
+                              <div>
                                 <a
                                   href={member.href}
                                   className="team-one-link w-inline-block"
@@ -1289,17 +902,6 @@ export default function Home() {
               >
                 <div
                   data-w-id="0341cf5b-1e34-64ca-6947-69c3ea893807"
-                  style={{
-                    WebkitTransform:
-                      "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                    MozTransform:
-                      "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                    msTransform:
-                      "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                    transform:
-                      "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                    opacity: 0,
-                  }}
                   className="heading-subtitle center"
                 >
                   <div className="subtitle-head-wrap">
@@ -1308,22 +910,10 @@ export default function Home() {
                   </div>
                   <div className="heading-title-animation">
                     <h2 className="heading-title team-heading">Skilled Team</h2>
-                    <div className="title-overlay bg-white"></div>
                   </div>
                 </div>
                 <div
                   data-w-id="0341cf5b-1e34-64ca-6947-69c3ea893810"
-                  style={{
-                    WebkitTransform:
-                      "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                    MozTransform:
-                      "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                    msTransform:
-                      "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                    transform:
-                      "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                    opacity: 0,
-                  }}
                   className="team-scroll-wrap display-none-767"
                 >
                   <img
@@ -1337,17 +927,6 @@ export default function Home() {
               </div>
               <div
                 data-w-id="0341cf5b-1e34-64ca-6947-69c3ea89387a"
-                style={{
-                  WebkitTransform:
-                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                  MozTransform:
-                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                  msTransform:
-                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                  transform:
-                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                  opacity: 0,
-                }}
                 className="team-one-column"
               >
                 <div className="team-one w-dyn-list">
@@ -1393,19 +972,7 @@ export default function Home() {
                           </a>
                           <div className="team-one-inner">
                             <div className="team-one-title-wrap">
-                              <div
-                                style={{
-                                  WebkitTransform:
-                                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                  MozTransform:
-                                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                  msTransform:
-                                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                  transform:
-                                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                  opacity: 0,
-                                }}
-                              >
+                              <div>
                                 <a
                                   href={member.href}
                                   className="text-style-h2"
@@ -1417,17 +984,6 @@ export default function Home() {
                                 {[0, 1, 2].map((j) => (
                                   <div
                                     key={j}
-                                    style={{
-                                      WebkitTransform:
-                                        "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                      MozTransform:
-                                        "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                      msTransform:
-                                        "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                      transform:
-                                        "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                      opacity: 0,
-                                    }}
                                   >
                                     <a
                                       href="https://www.facebook.com/"
@@ -1441,36 +997,13 @@ export default function Home() {
                             </div>
                             <div className="team-one-link-wrap">
                               <div
-                                style={{
-                                  WebkitTransform:
-                                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                  MozTransform:
-                                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                  msTransform:
-                                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                  transform:
-                                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                  opacity: 0,
-                                }}
                                 className="team-one-category-wrap"
                               >
                                 <div className="category">(</div>
                                 <div className="category">{member.role}</div>
                                 <div className="category">)</div>
                               </div>
-                              <div
-                                style={{
-                                  WebkitTransform:
-                                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                  MozTransform:
-                                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                  msTransform:
-                                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                  transform:
-                                    "translate3d(0, 3.14rem, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)",
-                                  opacity: 0,
-                                }}
-                              >
+                              <div>
                                 <a
                                   href={member.href}
                                   className="team-one-link w-inline-block"

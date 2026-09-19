@@ -120,7 +120,7 @@ export default function PortfolioPage() {
                       position: "absolute",
                       top: "16px",
                       right: "16px",
-                      background: "#def25c",
+                      background: "#7c3aed",
                       color: "#18171c",
                       fontWeight: 800,
                       fontSize: "13px",
@@ -178,8 +178,8 @@ export default function PortfolioPage() {
           <div className="qs-ai-spotlight-box" style={{ padding: "52px 40px", borderRadius: "24px" }}>
             <div className="qs-ai-inner" style={{ maxWidth: "860px", margin: "0 auto", textAlign: "center" }}>
               <div className="subtitle-head-wrap" style={{ justifyContent: "center", marginBottom: "16px" }}>
-                <div className="subtitle-left-icon" style={{ background: "#def25c" }}></div>
-                <div className="subtitle-head" style={{ color: "#def25c" }}>Your Growth Story Starts Here</div>
+                <div className="subtitle-left-icon" style={{ background: "#7c3aed" }}></div>
+                <div className="subtitle-head" style={{ color: "#7c3aed" }}>Your Growth Story Starts Here</div>
               </div>
               <h2 className="heading-title qs-ai-heading" style={{ fontSize: "clamp(28px, 3.6vw, 44px)", marginBottom: "16px" }}>
                 Ready to Build Your Next Milestone?
