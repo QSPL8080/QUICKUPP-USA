@@ -61,7 +61,6 @@ export default function RootLayout({
         <Script id="wf-page-ids" strategy="beforeInteractive">{`
           (function(){var h=document.documentElement;h.setAttribute("data-wf-site","6944f1597ac277b25076ccab");if(location.pathname==="/"){h.setAttribute("data-wf-page","6944f1597ac277b25076cc8e");}})();
         `}</Script>
-        <style>{`@media (min-width:992px){html.w-mod-js:not(.w-mod-ix) [data-w-id="78f17ef5-e5f5-54b2-3f46-2a95b252cc5c"]{opacity:0;}html.w-mod-js:not(.w-mod-ix) [data-w-id="764f8099-87da-861c-d705-882ec8d5310a"]{opacity:0;}}`}</style>
         <Script src="/js/jquery.js" strategy="beforeInteractive" />
       </head>
       <body>

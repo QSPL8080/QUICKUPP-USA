@@ -1295,7 +1295,7 @@ h1, h2, h3, h4, h5, h6,
   }
 }
 
-/* ===== Instant High-Performance Hero Rendering ===== */
+/* ===== Instant 0ms Zero-Delay Hero Typography & Element Rendering ===== */
 .hero-one-section {
   margin-top: 0 !important;
   margin-right: 0 !important;
@@ -1307,64 +1307,67 @@ h1, h2, h3, h4, h5, h6,
 .hero-one-section,
 .hero-one-slider,
 .hero-one-slide,
-.hero-one-wrap {
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-
+.hero-one-wrap,
 .hero-one-content,
 .hero-one-title-wrap,
 .hero-one-title,
 .hero-one-title-small,
+.hero-subtitle-wrap,
 .hero-one-wrapper,
 .hero-one-desc-wrap,
-.hero-one-desc {
+.hero-one-desc,
+.icon-style-one,
+.button-wrap {
   opacity: 1 !important;
   visibility: visible !important;
   transform: none !important;
+  animation: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  transition: none !important;
 }
 
-.hero-one-title-wrap {
-  animation: qsHeroFastFade 0.4s ease-out both;
-}
-.hero-one-wrapper {
-  animation: qsHeroFastFade 0.5s ease-out 0.1s both;
-}
-
-@keyframes qsHeroFastFade {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.hero-one-title {
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.03em !important;
+  font-size: clamp(44px, 5.5vw, 76px) !important;
+  line-height: 1.1 !important;
+  display: block !important;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.6) !important;
 }
 
-/* ===== Guardrail: never let content stay invisible if the legacy Webflow
-   scroll-reveal script (GSAP/ScrollTrigger/IX2) fails to run or errors out
-   mid-navigation. Those scripts set inline opacity:0 as their animation
-   start-state and are responsible for animating it back to 1 - if they
-   throw, the element is stuck invisible forever. This rule guarantees
-   every such element is shown regardless of whether that script succeeds.
-   Verified safe: no inline opacity values other than "0" are used in this
-   codebase, so this cannot hide anything that should stay dimmed. */
-html:not([data-wf-page="6944f1597ac277b25076cc8e"]) [style*="opacity:0"],
-html:not([data-wf-page="6944f1597ac277b25076cc8e"]) [style*="opacity: 0"] {
+.hero-one-title-small {
+  color: #00d2ff !important;
+  font-weight: 700 !important;
+  font-size: 18px !important;
+  letter-spacing: 0.02em !important;
+  display: block !important;
+}
+
+.hero-one-desc {
+  color: #ffffff !important;
+  font-size: clamp(17px, 1.6vw, 21px) !important;
+  line-height: 1.65 !important;
+  font-weight: 500 !important;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7) !important;
+  max-width: 580px !important;
+  display: block !important;
+}
+
+/* Universal guardrail: never allow Webflow script to keep hero or any elements at opacity:0 or covered with overlay masks */
+[style*="opacity:0"],
+[style*="opacity: 0"] {
   opacity: 1 !important;
 }
 
-/* ===== Fix: heading text looked washed-out/gray under a translucent white
-   bar. ".text-title-overlay" bars are a decorative GSAP wipe-reveal mask
-   (white at 70% opacity) that's supposed to slide away off the heading
-   once the broken scroll animation runs. Since it never runs, the bars
-   sit permanently on top of the heading text, dimming it. They are
-   pointer-events:none and purely decorative, so hiding them is safe and
-   simply reveals the (already correctly colored) heading underneath. */
-html:not([data-wf-page="6944f1597ac277b25076cc8e"]) .title-overlays,
-html:not([data-wf-page="6944f1597ac277b25076cc8e"]) .title-overlay {
+.title-overlays,
+.title-overlay,
+.text-title-overlay {
   display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 /* ===== Breadcrumb / PageHero Global Styles ===== */
