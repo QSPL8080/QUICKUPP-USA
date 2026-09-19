@@ -134,7 +134,7 @@ export default function Header() {
                     <div className="qs-mega-header-row">
                       <div className="qs-mega-header-left">
                         <span className="qs-mega-sparkle">✦</span>
-                        <span className="qs-mega-header-title">Our Capabilities & Solutions</span>
+                        <span className="qs-mega-header-title">Our Capabilities &amp; Solutions</span>
                       </div>
                       <Link href="/services" className="qs-mega-view-all" onClick={handleLinkClick}>
                         <span>Explore All Services</span>
@@ -153,14 +153,11 @@ export default function Header() {
                             <Link
                               key={item.href}
                               href={item.href}
-                              className="qs-rich-card-item qs-service-rich-card"
+                              className="qs-menu-link"
                               onClick={handleLinkClick}
                             >
-                              <span className="qs-rich-icon">{item.icon}</span>
-                              <div className="qs-rich-info">
-                                <div className="qs-rich-label">{item.label}</div>
-                                {item.desc && <div className="qs-rich-desc">{item.desc}</div>}
-                              </div>
+                              <span className="qs-menu-link-dot">•</span>
+                              <span className="qs-menu-link-label">{item.label}</span>
                             </Link>
                           ))}
                         </div>
@@ -174,33 +171,27 @@ export default function Header() {
                             <Link
                               key={item.href}
                               href={item.href}
-                              className="qs-rich-card-item qs-service-rich-card"
+                              className="qs-menu-link"
                               onClick={handleLinkClick}
                             >
-                              <span className="qs-rich-icon">{item.icon}</span>
-                              <div className="qs-rich-info">
-                                <div className="qs-rich-label">{item.label}</div>
-                                {item.desc && <div className="qs-rich-desc">{item.desc}</div>}
-                              </div>
+                              <span className="qs-menu-link-dot">•</span>
+                              <span className="qs-menu-link-label">{item.label}</span>
                             </Link>
                           ))}
                         </div>
 
                         <div className="qs-mega-col-subdivider">
-                          <div className="qs-mega-col-title">AI & Automation Solutions</div>
+                          <div className="qs-mega-col-title">AI &amp; Automation Solutions</div>
                           <div className="qs-mega-col-links">
                             {serviceGroups[2]?.items.map((item) => (
                               <Link
                                 key={item.href}
                                 href={item.href}
-                                className="qs-rich-card-item qs-service-rich-card"
+                                className="qs-menu-link"
                                 onClick={handleLinkClick}
                               >
-                                <span className="qs-rich-icon">{item.icon}</span>
-                                <div className="qs-rich-info">
-                                  <div className="qs-rich-label">{item.label}</div>
-                                  {item.desc && <div className="qs-rich-desc">{item.desc}</div>}
-                                </div>
+                                <span className="qs-menu-link-dot">•</span>
+                                <span className="qs-menu-link-label">{item.label}</span>
                               </Link>
                             ))}
                           </div>
@@ -215,14 +206,11 @@ export default function Header() {
                             <Link
                               key={item.href}
                               href={item.href}
-                              className="qs-rich-card-item qs-service-rich-card"
+                              className="qs-menu-link"
                               onClick={handleLinkClick}
                             >
-                              <span className="qs-rich-icon">{item.icon}</span>
-                              <div className="qs-rich-info">
-                                <div className="qs-rich-label">{item.label}</div>
-                                {item.desc && <div className="qs-rich-desc">{item.desc}</div>}
-                              </div>
+                              <span className="qs-menu-link-dot">•</span>
+                              <span className="qs-menu-link-label">{item.label}</span>
                             </Link>
                           ))}
                         </div>
@@ -236,14 +224,11 @@ export default function Header() {
                             <Link
                               key={item.href}
                               href={item.href}
-                              className="qs-rich-card-item qs-service-rich-card"
+                              className="qs-menu-link"
                               onClick={handleLinkClick}
                             >
-                              <span className="qs-rich-icon">{item.icon}</span>
-                              <div className="qs-rich-info">
-                                <div className="qs-rich-label">{item.label}</div>
-                                {item.desc && <div className="qs-rich-desc">{item.desc}</div>}
-                              </div>
+                              <span className="qs-menu-link-dot">•</span>
+                              <span className="qs-menu-link-label">{item.label}</span>
                             </Link>
                           ))}
                         </div>
@@ -253,7 +238,7 @@ export default function Header() {
                             <span className="qs-promo-icon">⚡</span>
                             <span className="qs-promo-tag">Unified Growth Engine</span>
                           </div>
-                          <div className="qs-promo-desc">Scale marketing, AI & engineering with zero overhead.</div>
+                          <div className="qs-promo-desc">Scale marketing, AI &amp; engineering with zero overhead.</div>
                           <Link href="/contact" className="qs-promo-btn" onClick={handleLinkClick}>
                             <span>Talk to an Expert</span>
                             <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
@@ -267,7 +252,7 @@ export default function Header() {
                 )}
               </li>
 
-              {/* 2. Industries Mega Dropdown */}
+              {/* 2. Industries Dropdown */}
               <li
                 className="qs-has-dropdown qs-mega-parent"
                 onMouseEnter={() => handleMouseEnter("industries")}
@@ -292,32 +277,29 @@ export default function Header() {
                 </button>
 
                 {openDropdown === "industries" && (
-                  <div className="qs-dropdown-menu qs-industries-mega">
+                  <div className="qs-dropdown-menu qs-industries-clean-menu">
                     <div className="qs-mega-header-row">
                       <div className="qs-mega-header-left">
                         <span className="qs-mega-sparkle">✦</span>
                         <span className="qs-mega-header-title">Industries We Scale</span>
                       </div>
                       <Link href="/industries" className="qs-mega-view-all" onClick={handleLinkClick}>
-                        <span>Explore All Industries</span>
+                        <span>Explore All</span>
                         <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
                           <path d="M2.5 9.5L9.5 2.5M9.5 2.5H3.5M9.5 2.5V8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                       </Link>
                     </div>
-                    <div className="qs-industries-grid">
+                    <div className="qs-industries-clean-grid">
                       {industryItems.map((item) => (
                         <Link
                           key={item.href}
                           href={item.href}
-                          className="qs-rich-card-item"
+                          className="qs-menu-link"
                           onClick={handleLinkClick}
                         >
-                          <span className="qs-rich-icon">{item.icon}</span>
-                          <div className="qs-rich-info">
-                            <div className="qs-rich-label">{item.label}</div>
-                            {item.desc && <div className="qs-rich-desc">{item.desc}</div>}
-                          </div>
+                          <span className="qs-menu-link-dot">•</span>
+                          <span className="qs-menu-link-label">{item.label}</span>
                         </Link>
                       ))}
                     </div>
@@ -327,7 +309,7 @@ export default function Header() {
 
               {/* 3. About Dropdown */}
               <li
-                className="qs-has-dropdown qs-mega-parent"
+                className="qs-has-dropdown"
                 onMouseEnter={() => handleMouseEnter("about")}
                 onMouseLeave={handleMouseLeave}
               >
@@ -350,32 +332,17 @@ export default function Header() {
                 </button>
 
                 {openDropdown === "about" && (
-                  <div className="qs-dropdown-menu qs-about-mega">
-                    <div className="qs-mega-header-row">
-                      <div className="qs-mega-header-left">
-                        <span className="qs-mega-sparkle">✦</span>
-                        <span className="qs-mega-header-title">About Quickupp Softech</span>
-                      </div>
-                      <Link href="/about/who-we-are" className="qs-mega-view-all" onClick={handleLinkClick}>
-                        <span>Learn More</span>
-                        <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
-                          <path d="M2.5 9.5L9.5 2.5M9.5 2.5H3.5M9.5 2.5V8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      </Link>
-                    </div>
-                    <div className="qs-about-grid">
+                  <div className="qs-dropdown-menu qs-simple-dropdown">
+                    <div className="qs-simple-menu-links">
                       {aboutItems.map((item, idx) => (
                         <Link
                           key={`${item.href}-${idx}`}
                           href={item.href}
-                          className="qs-rich-card-item"
+                          className="qs-menu-link"
                           onClick={handleLinkClick}
                         >
-                          <span className="qs-rich-icon">{item.icon}</span>
-                          <div className="qs-rich-info">
-                            <div className="qs-rich-label">{item.label}</div>
-                            {item.desc && <div className="qs-rich-desc">{item.desc}</div>}
-                          </div>
+                          <span className="qs-menu-link-dot">•</span>
+                          <span className="qs-menu-link-label">{item.label}</span>
                         </Link>
                       ))}
                     </div>
@@ -385,7 +352,7 @@ export default function Header() {
 
               {/* 4. Resources Dropdown */}
               <li
-                className="qs-has-dropdown qs-mega-parent"
+                className="qs-has-dropdown"
                 onMouseEnter={() => handleMouseEnter("resources")}
                 onMouseLeave={handleMouseLeave}
               >
@@ -408,32 +375,17 @@ export default function Header() {
                 </button>
 
                 {openDropdown === "resources" && (
-                  <div className="qs-dropdown-menu qs-resources-mega">
-                    <div className="qs-mega-header-row">
-                      <div className="qs-mega-header-left">
-                        <span className="qs-mega-sparkle">✦</span>
-                        <span className="qs-mega-header-title">Growth & Insights Hub</span>
-                      </div>
-                      <Link href="/blog" className="qs-mega-view-all" onClick={handleLinkClick}>
-                        <span>Explore All Articles</span>
-                        <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
-                          <path d="M2.5 9.5L9.5 2.5M9.5 2.5H3.5M9.5 2.5V8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      </Link>
-                    </div>
-                    <div className="qs-resources-grid">
+                  <div className="qs-dropdown-menu qs-simple-dropdown">
+                    <div className="qs-simple-menu-links">
                       {resourceItems.map((item) => (
                         <Link
                           key={item.href}
                           href={item.href}
-                          className="qs-rich-card-item"
+                          className="qs-menu-link"
                           onClick={handleLinkClick}
                         >
-                          <span className="qs-rich-icon">{item.icon}</span>
-                          <div className="qs-rich-info">
-                            <div className="qs-rich-label">{item.label}</div>
-                            {item.desc && <div className="qs-rich-desc">{item.desc}</div>}
-                          </div>
+                          <span className="qs-menu-link-dot">•</span>
+                          <span className="qs-menu-link-label">{item.label}</span>
                         </Link>
                       ))}
                     </div>

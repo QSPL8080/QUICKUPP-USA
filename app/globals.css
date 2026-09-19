@@ -2873,135 +2873,87 @@ section.section-gap.padding-top-0 {
     transform: translateX(2px) !important;
   }
 
-  /* Spacious 4-column Services Menu */
+  /* Clean 4-column Services Menu */
   .qs-services-mega {
-    width: 1120px !important;
+    width: 1080px !important;
     max-width: calc(100vw - 36px) !important;
+    padding: 22px 28px 24px !important;
   }
 
   .qs-services-grid-4col {
     display: grid !important;
     grid-template-columns: repeat(4, 1fr) !important;
-    gap: 18px 24px !important;
+    gap: 16px 24px !important;
     align-items: start !important;
   }
 
-  /* Spacious 3-column Industries Menu */
-  .qs-industries-mega {
-    width: 920px !important;
+  /* Clean 2-column Industries Menu */
+  .qs-industries-clean-menu {
+    width: 560px !important;
     max-width: calc(100vw - 36px) !important;
-    padding: 24px 28px !important;
+    padding: 20px 24px !important;
   }
 
-  .qs-industries-grid {
+  .qs-industries-clean-grid {
     display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 10px !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 2px 14px !important;
   }
 
-  /* Spacious 2-column About & Resources Menus */
-  .qs-about-mega,
-  .qs-resources-mega {
-    width: 680px !important;
-    max-width: calc(100vw - 36px) !important;
-    padding: 24px 28px !important;
+  /* Simple Vertical Dropdowns (About, Resources) */
+  .qs-simple-dropdown {
+    width: 250px !important;
+    padding: 10px 8px !important;
+    border-radius: 12px !important;
   }
 
-  .qs-about-grid,
-  .qs-resources-grid {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 10px !important;
-  }
-
-  /* Rich Card Items for Dropdowns */
-  .qs-rich-card-item {
-    display: flex !important;
-    align-items: flex-start !important;
-    gap: 12px !important;
-    padding: 12px 14px !important;
-    border-radius: 10px !important;
-    background: rgba(255, 255, 255, 0.03) !important;
-    border: 1px solid rgba(255, 255, 255, 0.06) !important;
-    text-decoration: none !important;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  }
-
-  .qs-rich-card-item:hover {
-    background: rgba(255, 255, 255, 0.08) !important;
-    border-color: rgba(56, 189, 248, 0.35) !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35) !important;
-  }
-
-  /* Compact variation for 4-column services grid */
-  .qs-service-rich-card {
-    padding: 8px 10px !important;
-    gap: 10px !important;
-    border-radius: 8px !important;
-    margin-bottom: 4px !important;
-  }
-
-  .qs-service-rich-card .qs-rich-icon {
-    width: 28px !important;
-    height: 28px !important;
-    font-size: 15px !important;
-    border-radius: 6px !important;
-  }
-
-  .qs-service-rich-card .qs-rich-label {
-    font-size: 12.5px !important;
-  }
-
-  .qs-service-rich-card .qs-rich-desc {
-    font-size: 11px !important;
-    line-height: 1.3 !important;
-    display: -webkit-box !important;
-    -webkit-line-clamp: 2 !important;
-    -webkit-box-orient: vertical !important;
-    overflow: hidden !important;
-  }
-
-  .qs-rich-icon {
-    font-size: 18px !important;
-    line-height: 1 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 36px !important;
-    height: 36px !important;
-    background: rgba(255, 255, 255, 0.05) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 8px !important;
-    flex-shrink: 0 !important;
-  }
-
-  .qs-rich-info {
+  .qs-simple-menu-links {
     display: flex !important;
     flex-direction: column !important;
     gap: 2px !important;
-    flex: 1 !important;
-    min-width: 0 !important;
   }
 
-  .qs-rich-label {
+  /* Clean, Simple, Attractive Menu Links (No heavy cards) */
+  .qs-menu-link {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 7px 10px !important;
+    border-radius: 6px !important;
+    text-decoration: none !important;
+    color: #cbd5e1 !important;
     font-size: 13.5px !important;
-    font-weight: 700 !important;
+    font-weight: 500 !important;
+    line-height: 1.35 !important;
+    transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    background: transparent !important;
+    border: none !important;
+  }
+
+  .qs-menu-link:hover {
+    background: rgba(255, 255, 255, 0.07) !important;
     color: #ffffff !important;
-    letter-spacing: -0.01em !important;
-    line-height: 1.3 !important;
-    transition: color 0.18s ease !important;
+    transform: translateX(3px) !important;
   }
 
-  .qs-rich-card-item:hover .qs-rich-label {
+  .qs-menu-link-dot {
+    font-size: 12px !important;
+    color: #64748b !important;
+    transition: all 0.18s ease !important;
+    line-height: 1 !important;
+    flex-shrink: 0 !important;
+  }
+
+  .qs-menu-link:hover .qs-menu-link-dot {
     color: #38bdf8 !important;
+    transform: scale(1.3) !important;
   }
 
-  .qs-rich-desc {
-    font-size: 11.5px !important;
-    color: #94a3b8 !important;
-    line-height: 1.4 !important;
-    margin: 0 !important;
+  .qs-menu-link-label {
+    color: inherit !important;
+    font-size: inherit !important;
+    font-weight: inherit !important;
+    white-space: normal !important;
   }
 
   .qs-mega-col {
@@ -3017,58 +2969,17 @@ section.section-gap.padding-top-0 {
     color: #38bdf8 !important;
     margin-bottom: 8px !important;
     padding-bottom: 5px !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
   }
 
   .qs-mega-col-links {
     display: flex !important;
     flex-direction: column !important;
-    gap: 2px !important;
+    gap: 1px !important;
   }
 
   .qs-mega-col-subdivider {
     margin-top: 14px !important;
-  }
-
-  .qs-simple-dropdown {
-    width: 240px !important;
-    padding: 12px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 3px !important;
-    border-radius: 14px !important;
-  }
-
-  .qs-dd-item {
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    padding: 7px 10px !important;
-    border-radius: 6px !important;
-    font-size: 13.5px !important;
-    font-weight: 500 !important;
-    color: #cbd5e1 !important;
-    text-decoration: none !important;
-    transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    line-height: 1.35 !important;
-  }
-
-  .qs-dd-item-bullet {
-    font-size: 13px !important;
-    font-weight: 700 !important;
-    color: #64748b !important;
-    transition: all 0.18s ease !important;
-  }
-
-  .qs-dd-item:hover {
-    background: rgba(255, 255, 255, 0.08) !important;
-    color: #ffffff !important;
-    transform: translateX(3px) !important;
-  }
-
-  .qs-dd-item:hover .qs-dd-item-bullet {
-    color: #38bdf8 !important;
-    transform: translateX(2px) !important;
   }
 
   .qs-mega-promo-box {
@@ -3248,12 +3159,18 @@ section.section-gap.padding-top-0 {
     margin-top: 6px !important;
   }
 
-  .qs-dd-item {
-    padding: 8px 0 !important;
+  .qs-menu-link {
+    padding: 8px 6px !important;
     color: #cbd5e1 !important;
-    font-size: 14px !important;
-    display: block !important;
+    font-size: 13.5px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
     text-decoration: none !important;
+  }
+
+  .qs-menu-link:hover {
+    color: #38bdf8 !important;
   }
 
   .qs-mobile-toggle-btn {
