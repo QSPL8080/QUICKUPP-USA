@@ -8,55 +8,20 @@ export default function ScrollTextHighlight() {
 
   useEffect(() => {
     let ticking = false;
-    let headingEntries: {
-      el: HTMLElement;
-      words: HTMLElement[];
-      isDark: boolean;
-    }[] = [];
+    const headingEntries: { el: HTMLElement; words: HTMLElement[]; isDark: boolean }[] = [];
 
-    // Helper to wrap words inside a heading element
     const processHeading = (heading: HTMLElement) => {
-      if (heading.getAttribute("data-scroll-highlighted") === "true") return null;
+      if (heading.dataset.scrollProcessed === "true") return null;
+      heading.dataset.scrollProcessed = "true";
 
-      // Check if heading is in a dark container
-      const darkContainers = [
-        ".service-section", ".project-section", ".marquee-section", ".dark-section",
-        "[data-theme='dark']",
-        // ScaleForge dark sections
-        ".sf-methodology-section", ".sf-cta-section",
-        // Meridian dark sections
-        ".ms-ai-spotlight", ".ms-closing-card",
-        // Adventria dark sections
-        ".rt-our-story", ".rt-work-together-main",
-        // IT Lifecycle dark sections
-        ".lc-bg-dark", ".lc-cta-box",
-        // Ritovex dark sections
-        ".section.services", ".section.benefit-section", ".section.cta",
-      ].join(", ");
-
-      const darkClasses = [
-        "service-heading", "white-text", "white",
-        "rt-text-color-white", "lc-text-white",
-      ];
+      const text = heading.textContent || "";
+      const words = text.trim().split(/\s+/);
+      if (words.length === 0 || (words.length === 1 && words[0] === "")) return null;
 
       const isDark =
-        Boolean(heading.closest(darkContainers)) ||
-        darkClasses.some(cls => heading.classList.contains(cls));
+        heading.classList.contains("dark") ||
+        heading.closest(".dark-section") !== null;
 
-      // Extract text content cleanly
-      const text = heading.textContent || "";
-      const words = text.trim().split(/\s+/).filter(Boolean);
-      if (words.length === 0) return null;
-
-      heading.setAttribute("data-scroll-highlighted", "true");
-      heading.classList.add("qs-scroll-heading");
-      if (isDark) {
-        heading.classList.add("qs-scroll-dark");
-      } else {
-        heading.classList.add("qs-scroll-light");
-      }
-
-      // Build word spans
       heading.innerHTML = "";
       const wordElements: HTMLElement[] = [];
 

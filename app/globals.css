@@ -1554,6 +1554,41 @@ a.button-link[data-wf--button--variant="white-bg"] .button-arrow,
   letter-spacing: -0.025em !important;
 }
 
+/* Dark Background Section Headings (Always Bright Crisp White) */
+.heading-title.white-text,
+.heading-title.white,
+.heading-title.big.white-text,
+.heading-title.service-heading,
+.service-heading,
+.service-section .heading-title,
+.service-section h2,
+.project-section .heading-title,
+.project-one-heading-wrap .heading-title,
+.project-section h2,
+.team-heading,
+.white-text {
+  opacity: 1 !important;
+  font-weight: 800 !important;
+}
+
+.heading-title.white-text,
+.heading-title.white,
+.heading-title.big.white-text,
+.heading-title.service-heading,
+.service-heading,
+.service-section .heading-title,
+.service-section h2,
+.project-section .heading-title,
+.project-one-heading-wrap .heading-title,
+.project-section h2 {
+  color: #ffffff !important;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6) !important;
+}
+
+.team-heading {
+  color: #0f172a !important;
+}
+
 .subtitle-head {
   color: #7c3aed !important;
   font-weight: 800 !important;
@@ -4716,18 +4751,16 @@ section.section-gap.padding-top-0 {
 }
 
 /* ==========================================================================
-   SCROLL-DRIVEN WORD-BY-WORD TEXT HIGHLIGHT
+   GLOBAL HEADING VISIBILITY (100% CRISP CONTRAST AT ALL TIMES)
    ========================================================================== */
 .qs-scroll-heading {
   display: block !important;
-  transition: all 0.3s ease;
+  opacity: 1 !important;
 }
 
 .qs-scroll-word {
   display: inline-block !important;
-  transition: color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-              opacity 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-  will-change: color, opacity;
+  opacity: 1 !important;
   margin-right: 0.27em !important;
 }
 
@@ -4735,30 +4768,18 @@ section.section-gap.padding-top-0 {
   margin-right: 0 !important;
 }
 
-/* Light background sections (default) */
+/* Light background sections */
 .qs-scroll-light .qs-scroll-word {
-  color: #d1d5db !important; /* Soft muted grey when unreached */
-  opacity: 0.45 !important;
-}
-
-.qs-scroll-light .qs-scroll-word.is-active {
-  color: #0f172a !important; /* Real dark slate heading color */
+  color: #0f172a !important;
   opacity: 1 !important;
-  text-shadow: none !important;
 }
 
-/* Dark background sections (Service section, etc.) */
+/* Dark background sections */
 .qs-scroll-dark .qs-scroll-word,
-.service-section .qs-scroll-word {
-  color: #334155 !important; /* Muted dark when unreached */
-  opacity: 0.35 !important;
-}
-
-.qs-scroll-dark .qs-scroll-word.is-active,
-.service-section .qs-scroll-word.is-active {
-  color: #ffffff !important; /* Real white heading color */
+.service-section .qs-scroll-word,
+.project-section .qs-scroll-word {
+  color: #ffffff !important;
   opacity: 1 !important;
-  text-shadow: none !important;
 }
 
 /* Subtitle pill badge animation on scroll */

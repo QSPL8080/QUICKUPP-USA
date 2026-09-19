@@ -3,7 +3,6 @@ import Script from "next/script";
 import "./globals.css";
 import WebflowReinit from "@/components/WebflowReinit";
 import LeadModal from "@/components/LeadModal";
-import ScrollTextHighlight from "@/components/ScrollTextHighlight";
 
 export const metadata: Metadata = {
   title: "Quickupp Softech | Marketing. AI. Technology. Built for Growth.",
@@ -66,7 +65,6 @@ export default function RootLayout({
       <body>
         {children}
         <LeadModal />
-        <ScrollTextHighlight />
         {/* Exactly the script set the Mercket reference home page loads. The extra
             bundles from other template pages were re-initialising Webflow and
             crashing it ("t is not a function"), which froze every animation. */}
