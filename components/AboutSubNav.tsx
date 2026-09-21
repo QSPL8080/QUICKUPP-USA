@@ -9,8 +9,8 @@ export default function AboutSubNav() {
   const links = [
     { label: "Who We Are", href: "/about/who-we-are" },
     { label: "Why Choose Us", href: "/about/why-choose-us" },
+    { label: "Why Businesses Choose Us", href: "/about/why-businesses-choose-us" },
     { label: "Our Approach", href: "/about/our-approach" },
-    { label: "Our Team", href: "/about/our-team" },
   ];
 
   return (

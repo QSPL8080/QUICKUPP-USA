@@ -128,7 +128,8 @@ export default function Footer({ hideCta = false }: { hideCta?: boolean }) {
                 <li><Link href="/about">About Us</Link></li>
                 <li><Link href="/about/who-we-are">Who We Are</Link></li>
                 <li><Link href="/about/why-choose-us">Why Choose Us</Link></li>
-                <li><Link href="/about/our-team">Our Team</Link></li>
+                <li><Link href="/about/why-businesses-choose-us">Why Businesses Choose Us</Link></li>
+                <li><Link href="/about/our-approach">Our Approach</Link></li>
                 <li>
                   <Link href="/career" className="qs-scalient-career-highlight">
                     Careers ↗

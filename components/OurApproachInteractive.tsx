@@ -6,9 +6,11 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export default function OurApproachInteractive() {
+  const [activeTab, setActiveTab] = useState<"discovery" | "build" | "scale">("discovery");
   const [projectsCount, setProjectsCount] = useState<number>(0);
   const [expertsCount, setExpertsCount] = useState<number>(0);
   const [retentionCount, setRetentionCount] = useState<number>(0);
+  const [sliderIndex, setSliderIndex] = useState<number>(0);
   const statsRef = useRef<HTMLDivElement>(null);
   const [hasAnimated, setHasAnimated] = useState(false);
 
@@ -57,277 +59,395 @@ export default function OurApproachInteractive() {
     return () => observer.disconnect();
   }, [hasAnimated]);
 
-  const phases = [
+  const teamMembers = [
     {
-      num: "01",
-      title: "Understand — Start With the Business",
-      subtitle: "First, we listen. Then, we solve.",
-      desc: "We understand your goals, customers, market, competition, challenges and current systems before recommending a solution.",
-      link: "/contact"
+      name: "Alex Rivera",
+      role: "Lead Full-Stack Architect",
+      desc: "Architects resilient cloud architectures, Next.js applications, and continuous deployment pipelines.",
+      img: "/images/team-img-01.jpg",
+      socials: { linkedin: "https://linkedin.com", twitter: "https://x.com", github: "https://github.com" },
     },
     {
-      num: "02",
-      title: "Strategize — Find What Moves the Needle",
-      subtitle: "The right strategy creates the right direction.",
-      desc: "We turn insights into a focused roadmap with clear priorities, actions and measurable objectives across Marketing, AI, and Tech.",
-      link: "/services"
+      name: "Priya Sharma",
+      role: "Senior AI Solutions Specialist",
+      desc: "Directs autonomous RAG pipelines, LLM agent orchestration, and automated enterprise CRM workflows.",
+      img: "/images/team-img-02.jpg",
+      socials: { linkedin: "https://linkedin.com", twitter: "https://x.com", github: "https://github.com" },
     },
     {
-      num: "03",
-      title: "Build — Bring Strategy to Life",
-      subtitle: "One strategy. One connected execution.",
-      desc: "Our teams execute across Marketing, AI and Technology—from performance marketing and SEO to AI automation, websites, and software.",
-      link: "/services/web-design-development"
+      name: "Marcus Chen",
+      role: "Principal Product Designer",
+      desc: "Translates complex business workflows into intuitive, high-conversion UI/UX design systems.",
+      img: "/images/team-img-03.jpg",
+      socials: { linkedin: "https://linkedin.com", twitter: "https://x.com", github: "https://github.com" },
     },
     {
-      num: "04",
-      title: "Optimize — Measure. Learn. Improve.",
-      subtitle: "Launching is not the goal. Better performance is.",
-      desc: "We track performance, analyze results, and continuously improve what we build with CRO, A/B testing, and AI tuning.",
-      link: "/services/paid-marketing"
+      name: "David Vance",
+      role: "Performance Marketing Lead",
+      desc: "Spearheads data-driven ad experimentation, CAC minimization, and cross-channel ROAS growth.",
+      img: "/images/team-img-04.jpg",
+      socials: { linkedin: "https://linkedin.com", twitter: "https://x.com", github: "https://github.com" },
     },
-    {
-      num: "05",
-      title: "Grow — Build for What's Next",
-      subtitle: "Today's solution becomes tomorrow's growth engine.",
-      desc: "We scale what works, identify new opportunities, and evolve your solutions as your business grows.",
-      link: "/contact"
-    }
   ];
 
-  const threePillars = [
-    {
-      num: "01",
-      title: "Marketing Attracts",
-      desc: "Build visibility, generate demand and turn attention into business opportunities across search engines, social media, and AI platforms."
-    },
-    {
-      num: "02",
-      title: "AI Accelerates",
-      desc: "Implement intelligent AI workflows, automated lead handling, chatbots and operational automation to operate faster."
-    },
-    {
-      num: "03",
-      title: "Technology Scales",
-      desc: "High-performance websites, custom web apps, mobile applications and scalable digital infrastructure engineered for growth."
-    }
-  ];
+  const totalSlides = Math.ceil(teamMembers.length / 2);
+
+  const handlePrevSlide = () => {
+    setSliderIndex((prev) => (prev > 0 ? prev - 1 : 0));
+  };
+
+  const handleNextSlide = () => {
+    setSliderIndex((prev) => (prev < totalSlides - 1 ? prev + 1 : prev));
+  };
+
+  const currentTeamPair = teamMembers.slice(sliderIndex * 2, sliderIndex * 2 + 2);
 
   return (
-    <div className="scaleforge-page-root">
+    <>
       <Header />
-
-      {/* 1. HERO SECTION */}
-      <section className="sf-hero-section">
-        <div className="sf-hero-bg">
-          <img src="/images/hero-bg-2.png" alt="Our Approach Background" />
-        </div>
-        <div className="sf-container">
-          <div className="sf-hero-grid">
-            <div>
-              <div className="sf-tag">
-                <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#7c3aed', display: 'inline-block' }}></span>
-                OUR PROVEN METHODOLOGY
+      <main className="mx-about-page">
+        {/* =========================================================================
+            1. HERO SECTION (Mindix Deep Forest Teal Container with Floating Stats)
+            ========================================================================= */}
+        <section className="mx-hero-section">
+          <div className="mx-container">
+            <div className="mx-hero-card">
+              {/* Background Wave Graphic */}
+              <div className="mx-hero-bg-waves" aria-hidden="true">
+                <svg viewBox="0 0 1200 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M0 300C300 100 600 500 900 300C1050 200 1150 250 1200 300V600H0V300Z" fill="rgba(124, 58, 237, 0.02)" />
+                  <path d="M0 400C250 250 500 550 800 350C1000 220 1100 320 1200 380" stroke="rgba(0, 210, 255, 0.3)" strokeWidth="2" strokeDasharray="8 8" />
+                  <path d="M0 200C350 450 700 150 1050 380C1120 420 1180 400 1200 390" stroke="rgba(124, 58, 237, 0.18)" strokeWidth="1.5" />
+                </svg>
               </div>
-              <h1 className="sf-hero-title">
-                Understand. Strategize.<br />
-                <span style={{ color: '#7c3aed' }}>Build. Optimize. Grow.</span>
+
+              {/* Top Center Subtitle Badge matching Contact page */}
+              <div className="mx-subtitle-badge">
+                <span className="mx-badge-dot" />
+                <span>Our Methodology &amp; Approach</span>
+              </div>
+
+              {/* Hero Headline & Subtitle */}
+              <h1 className="mx-hero-title">
+                Understand. Strategize. Build. <span className="mx-gradient-text">Optimize. Grow.</span>
               </h1>
-              <div className="sf-hero-sub">A Disciplined Framework for Compounding Business Growth</div>
-              <p className="sf-hero-desc">
-                Growth is not accidental. It is the result of a disciplined, repeatable system that connects deep business discovery with strategic execution across Marketing, AI, and Technology.
+              <p className="mx-hero-subtitle">
+                A disciplined, data-driven framework connecting marketing strategy, intelligent automation, and robust software engineering into one predictable roadmap.
               </p>
-              <div className="sf-btn-row">
-                <Link href="/contact" className="sf-btn-primary">
-                  <span>Start With Discovery</span>
-                  <div className="sf-btn-icon">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <path d="M7 17L17 7M17 7H7M17 7V17" />
-                    </svg>
-                  </div>
-                </Link>
-                <Link href="/about/our-team" className="sf-btn-secondary">
-                  <span>Meet Our Team →</span>
-                </Link>
-              </div>
-            </div>
 
-            <div className="sf-hero-card">
-              <div className="sf-hero-card-tag">PHILOSOPHY</div>
-              <div className="sf-hero-card-count">5-Step</div>
-              <div className="sf-hero-card-label">
-                Lifecycle connecting discovery, strategy, sprint execution, optimization, and compounding growth.
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 2. THE 5 PHASES LIST */}
-      <section className="sf-manifesto-section">
-        <div className="sf-container">
-          <div className="sf-manifesto-grid">
-            <div className="sf-section-tag">THE 5 PHASES</div>
-            <div>
-              <p className="sf-manifesto-quote">
-                "First, we listen. Then, we solve. The right strategy creates the right direction."
-              </p>
-              <div className="sf-manifesto-callout">
-                One Strategy. One Connected Execution. Compounding Returns.
-              </div>
-            </div>
-          </div>
-
-          <div className="sf-advantages-list">
-            {phases.map((ph, idx) => (
-              <Link key={idx} href={ph.link} className="sf-advantage-row">
-                <div>
-                  <div className="sf-adv-num">PHASE {ph.num}</div>
-                  <div className="sf-adv-title">{ph.title}</div>
-                </div>
-                <div>
-                  <p className="sf-adv-desc">{ph.desc}</p>
-                </div>
-                <div className="sf-adv-arrow">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M5 12h14M12 5l7 7-7 7" />
+              {/* Hero Action Button */}
+              <Link href="/services" className="mx-btn-lime">
+                <span>Explore Our Methodology</span>
+                <div className="mx-btn-icon-circle">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 12h14"></path>
+                    <path d="M12 5l7 7-7 7"></path>
                   </svg>
                 </div>
               </Link>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* 3. VIDEO SHOWCASE BANNER */}
-      <section className="sf-video-section">
-        <div className="sf-container">
-          <div className="sf-video-top">
-            <div className="sf-section-tag">METHODOLOGY IN ACTION</div>
-            <h2 className="sf-video-heading">Disciplined Sprint Delivery</h2>
+              {/* Responsive Bottom Hero Stats Strip (No Overlaps) */}
+              <div className="mx-hero-stats-strip">
+                <div className="mx-hero-stat-badge">
+                  <div className="mx-hero-stat-badge-num">5-Phase</div>
+                  <div className="mx-hero-stat-badge-text">Disciplined lifecycle framework</div>
+                </div>
+                <div className="mx-hero-stat-badge">
+                  <div className="mx-hero-stat-badge-num">100%</div>
+                  <div className="mx-hero-stat-badge-text">Milestone transparency &amp; SLAs</div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="sf-video-container">
-            <video autoPlay muted loop playsInline poster="/images/about-video-poster.jpg">
-              <source src="/images/about-showcase.mp4" type="video/mp4" />
-            </video>
-            <div className="sf-video-overlay">
+        </section>
+
+        {/* =========================================================================
+            2. METHODOLOGY TABS & DUAL PHOTO GRID (Reference Screenshot 2)
+            ========================================================================= */}
+        <section className="mx-tab-section">
+          <div className="mx-container">
+            <div className="mx-tab-grid">
+              {/* Left Column: Heading & Interactive Tabs */}
               <div>
-                <div className="sf-video-overlay-title">Iterative &amp; Data-Driven</div>
-                <p className="sf-video-overlay-desc">
-                  Every sprint delivers measurable value. We analyze user data, refine conversion funnels, and tune AI models to keep your business growing.
+                <span className="mx-sub-badge">OUR METHODOLOGY</span>
+                <h2 className="mx-section-heading">
+                  From initial discovery to continuous scaling with radical transparency
+                </h2>
+
+                {/* Switchable Pill Tabs */}
+                <div className="mx-tabs-bar">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("discovery")}
+                    className={`mx-tab-btn ${activeTab === "discovery" ? "is-active" : ""}`}
+                  >
+                    01. Understand &amp; Strategize
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("build")}
+                    className={`mx-tab-btn ${activeTab === "build" ? "is-active" : ""}`}
+                  >
+                    02. Build &amp; Deploy
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("scale")}
+                    className={`mx-tab-btn ${activeTab === "scale" ? "is-active" : ""}`}
+                  >
+                    03. Optimize &amp; Scale
+                  </button>
+                </div>
+
+                {/* Tab Dynamic Content */}
+                <div className="mx-tab-content-box">
+                  {activeTab === "discovery" && (
+                    <p className="mx-tab-paragraph">
+                      We dive deep into your market dynamics, ICP conversion barriers, unit economics, and competitive gaps. We listen first, audit your existing funnel and tech stack, and craft a clear prioritized roadmap designed to move the commercial needle.
+                    </p>
+                  )}
+                  {activeTab === "build" && (
+                    <p className="mx-tab-paragraph">
+                      Our multidisciplinary execution pod works in tight 2-week agile sprints—launching high-ROI ad funnels, building Next.js web applications, and deploying custom AI automation workflows with weekly demo reviews and zero vendor silos.
+                    </p>
+                  )}
+                  {activeTab === "scale" && (
+                    <p className="mx-tab-paragraph">
+                      Launching is not the finish line. We rigorously test conversion funnels, benchmark model response latencies, run multivariate CRO experiments, and scale what works to ensure compounding revenue and efficiency over time.
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Right Column: Stacked Dual Overlapping Photography */}
+              <div className="mx-photo-stack">
+                <div className="mx-photo-img-wrap img-back">
+                  <img
+                    src="/images/home-two-about.jpg"
+                    alt="Quickupp Strategy Workshop"
+                    className="mx-photo-img"
+                  />
+                </div>
+                <div className="mx-photo-img-wrap img-front">
+                  <img
+                    src="/images/home1-about-01.jpg"
+                    alt="Quickupp Sprint Review"
+                    className="mx-photo-img"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* 4-Metric Counter Strip with Top Line */}
+            <div ref={statsRef} className="mx-metrics-strip">
+              <div className="mx-metric-card">
+                <div className="mx-metric-num-row">
+                  <span className="mx-metric-big-num">{projectsCount}+</span>
+                  <span className="mx-metric-sup">/ Launches</span>
+                </div>
+                <div className="mx-metric-label">Solutions Shipped</div>
+              </div>
+
+              <div className="mx-metric-card">
+                <div className="mx-metric-num-row">
+                  <span className="mx-metric-big-num">{expertsCount}+</span>
+                  <span className="mx-metric-sup">/ Pod Experts</span>
+                </div>
+                <div className="mx-metric-label">Senior Practitioners</div>
+              </div>
+
+              <div className="mx-metric-card">
+                <div className="mx-metric-num-row">
+                  <span className="mx-metric-big-num">{retentionCount}%</span>
+                  <span className="mx-metric-sup">/ Retention</span>
+                </div>
+                <div className="mx-metric-label">Long-Term Partnerships</div>
+              </div>
+
+              <div className="mx-metric-card">
+                <div className="mx-metric-num-row">
+                  <span className="mx-metric-big-num">14-Day</span>
+                  <span className="mx-metric-sup">/ Sprints</span>
+                </div>
+                <div className="mx-metric-label">Rapid Shipping Cycles</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* =========================================================================
+            3. VIBRANT LIME "WHAT WE DO" CAPABILITIES CONTAINER (Reference Screenshot 3)
+            ========================================================================= */}
+        <section className="mx-lime-section">
+          <div className="mx-container">
+            <div className="mx-lime-box">
+              <div className="mx-lime-header">
+                <span className="mx-lime-sub">CORE DELIVERY PILLARS</span>
+                <h2 className="mx-lime-title">
+                  How we ensure predictable execution across every engagement
+                </h2>
+              </div>
+
+              {/* Double Line Divider */}
+              <div className="mx-lime-divider">
+                <div className="mx-lime-divider-line"></div>
+                <div className="mx-lime-divider-line"></div>
+              </div>
+
+              {/* 4-Column Feature Grid */}
+              <div className="mx-lime-grid-4">
+                <div className="mx-lime-col">
+                  <div className="mx-lime-col-icon-wrap">🔍</div>
+                  <h3 className="mx-lime-col-title">Deep Discovery</h3>
+                  <p className="mx-lime-col-desc">
+                    Aligning technical requirements and commercial targets before writing code or running ads.
+                  </p>
+                  <div className="mx-lime-col-bottom-line"></div>
+                </div>
+
+                <div className="mx-lime-col">
+                  <div className="mx-lime-col-icon-wrap">⚡</div>
+                  <h3 className="mx-lime-col-title">Unified Pods</h3>
+                  <p className="mx-lime-col-desc">
+                    Engineers, AI architects, and growth marketers collaborating synchronously under one unified strategy.
+                  </p>
+                  <div className="mx-lime-col-bottom-line"></div>
+                </div>
+
+                <div className="mx-lime-col">
+                  <div className="mx-lime-col-icon-wrap">🧪</div>
+                  <h3 className="mx-lime-col-title">Rigorous QA &amp; Testing</h3>
+                  <p className="mx-lime-col-desc">
+                    Automated end-to-end testing, security audits, and latency benchmarking on all deliverables.
+                  </p>
+                  <div className="mx-lime-col-bottom-line"></div>
+                </div>
+
+                <div className="mx-lime-col">
+                  <div className="mx-lime-col-icon-wrap">📈</div>
+                  <h3 className="mx-lime-col-title">Continuous CRO</h3>
+                  <p className="mx-lime-col-desc">
+                    Data-driven multivariate testing and algorithmic campaign optimization to compound returns.
+                  </p>
+                  <div className="mx-lime-col-bottom-line"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* =========================================================================
+            4. TEAM MEMBERS & CULTURE SLIDER (Reference Screenshot 4)
+            ========================================================================= */}
+        <section className="mx-team-section">
+          <div className="mx-container">
+            <div className="mx-team-header-row">
+              <div className="mx-team-header-left">
+                <span className="mx-sub-badge">METHODOLOGY ARCHITECTS</span>
+                <h2 className="mx-section-heading" style={{ margin: "4px 0 0" }}>
+                  The strategists and engineers steering your growth roadmap
+                </h2>
+              </div>
+              <Link href="/contact" className="mx-btn-lime">
+                <span>Start Your Growth Plan</span>
+                <div className="mx-btn-icon-circle">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 12h14"></path>
+                    <path d="M12 5l7 7-7 7"></path>
+                  </svg>
+                </div>
+              </Link>
+            </div>
+
+            {/* Slider Cards Container */}
+            <div className="mx-slider-wrap">
+              <div className="mx-team-grid">
+                {currentTeamPair.map((member, idx) => (
+                  <div key={idx} className="mx-team-card">
+                    <div className="mx-team-img-wrap">
+                      <img src={member.img} alt={member.name} className="mx-team-img" />
+                    </div>
+                    <div className="mx-team-info">
+                      <h3 className="mx-team-name">{member.name}</h3>
+                      <div className="mx-team-role">{member.role}</div>
+                      <div className="mx-team-divider"></div>
+                      <p className="mx-team-desc">{member.desc}</p>
+                      <div className="mx-social-row">
+                        <a href={member.socials.linkedin} target="_blank" rel="noopener noreferrer" className="mx-social-btn" aria-label="LinkedIn">
+                          in
+                        </a>
+                        <a href={member.socials.twitter} target="_blank" rel="noopener noreferrer" className="mx-social-btn" aria-label="Twitter / X">
+                          𝕏
+                        </a>
+                        <a href={member.socials.github} target="_blank" rel="noopener noreferrer" className="mx-social-btn" aria-label="GitHub">
+                          ⌥
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Slider Controls (< and >) */}
+              <div className="mx-slider-controls">
+                <button
+                  type="button"
+                  onClick={handlePrevSlide}
+                  disabled={sliderIndex === 0}
+                  className="mx-nav-arrow-btn"
+                  aria-label="Previous Team Slide"
+                >
+                  ←
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNextSlide}
+                  disabled={sliderIndex === totalSlides - 1}
+                  className="mx-nav-arrow-btn"
+                  aria-label="Next Team Slide"
+                >
+                  →
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* =========================================================================
+            5. MINDIX-INSPIRED BOTTOM CTA
+            ========================================================================= */}
+        <section className="mx-cta-section">
+          <div className="mx-container">
+            <div className="mx-cta-card">
+              <div className="mx-cta-content">
+                <span className="mx-sub-badge">START WITH DISCOVERY</span>
+                <h2 className="mx-cta-title">
+                  Ready for a Disciplined Approach to Growth?
+                </h2>
+                <p className="mx-cta-desc">
+                  Schedule a complimentary 30-minute discovery call to see how our 5-phase framework can accelerate your marketing and streamline your operations.
                 </p>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 4. IMPACT STATS GRID (Live Counters) */}
-      <section className="sf-impact-section" ref={statsRef}>
-        <div className="sf-container">
-          <div className="sf-impact-header">
-            <div>
-              <div className="sf-section-tag">EXECUTION EXCELLENCE</div>
-              <h2 className="sf-video-heading">Proven by the Numbers</h2>
-            </div>
-          </div>
-
-          <div className="sf-impact-grid">
-            <div className="sf-impact-card">
-              <div className="sf-impact-num">{projectsCount}+</div>
-              <p className="sf-impact-text">
-                Successful projects delivered across web platforms, marketing campaigns, and custom AI systems.
-              </p>
-            </div>
-            <div className="sf-impact-card">
-              <div className="sf-impact-num">{expertsCount}+</div>
-              <p className="sf-impact-text">
-                Specialized growth strategists, AI engineers, and full-stack software architects.
-              </p>
-            </div>
-            <div className="sf-impact-card">
-              <div className="sf-impact-num">{retentionCount}%</div>
-              <p className="sf-impact-text">
-                Client retention driven by consistent delivery and measurable commercial outcomes.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 5. DARK PILLARS SECTION */}
-      <section className="sf-methodology-section">
-        <div className="sf-container">
-          <div className="sf-methodology-top">
-            <div>
-              <div className="sf-stat-box-tag">CONNECTED GROWTH</div>
-              <h2 className="sf-methodology-title">
-                Three Pillars Connected Into One System
-              </h2>
-              <p className="sf-methodology-desc">
-                When Marketing, AI, and Technology are integrated seamlessly, every dollar spent compounds in efficiency.
-              </p>
-            </div>
-
-            <div className="sf-stat-box-dark">
-              <div className="sf-stat-box-tag">AGILE VELOCITY</div>
-              <div className="sf-stat-box-num">2-Wk</div>
-              <div className="sf-stat-box-label">
-                Sprint cycles with continuous testing, feedback, and feature deployments.
-              </div>
-            </div>
-          </div>
-
-          <div className="sf-pillars-grid">
-            {threePillars.map((pil, idx) => (
-              <div key={idx} className="sf-pillar-card">
-                <div className="sf-pillar-num">PILLAR {pil.num}</div>
-                <div className="sf-pillar-title">{pil.title}</div>
-                <p className="sf-pillar-desc">{pil.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 6. CLOSING CTA SECTION */}
-      <section className="sf-cta-section" style={{ paddingTop: '80px' }}>
-        <div className="sf-container">
-          <div className="sf-cta-box">
-            <div>
-              <div className="sf-tag">START YOUR PROJECT</div>
-              <h2 className="sf-cta-title">
-                Ready for a Disciplined Approach to Growth?
-              </h2>
-              <p className="sf-cta-desc">
-                Book a strategic discovery call to see how our 5-phase framework can accelerate your marketing pipeline and streamline your technology.
-              </p>
-              <div className="sf-cta-check">
-                <span>✓</span> Free Discovery Session &amp; Growth Audit
-              </div>
-              <div className="sf-btn-row">
-                <Link href="/contact" className="sf-btn-primary">
-                  <span>Book a Discovery Session</span>
-                  <div className="sf-btn-icon">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <path d="M7 17L17 7M17 7H7M17 7V17" />
+              <div className="mx-cta-actions">
+                <Link href="/contact" className="mx-btn-lime">
+                  <span>Book Discovery Session</span>
+                  <div className="mx-btn-icon-circle">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14"></path>
+                      <path d="M12 5l7 7-7 7"></path>
                     </svg>
                   </div>
                 </Link>
-                <Link href="/about/our-team" className="sf-btn-secondary">
-                  <span>Meet Our Team →</span>
+                <Link href="/services" className="mx-btn-outline-white">
+                  Explore All Services
                 </Link>
               </div>
             </div>
-
-            <div className="sf-cta-img-wrap">
-              <img src="/images/cta-banner-bg.jpg" alt="Quickupp Softech Approach" />
-            </div>
           </div>
-        </div>
-      </section>
-
+        </section>
+      </main>
       <Footer />
-    </div>
+    </>
   );
 }
+

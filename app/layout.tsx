@@ -40,6 +40,7 @@ export default function RootLayout({
         />
         <link rel="stylesheet" href="/css/mercket.webflow.shared.3eb5ac14d.min.css" />
         <link rel="stylesheet" href="/css/scaleforge-perfect.css" />
+        <link rel="stylesheet" href="/css/mindix-about.css" />
         <link rel="preload" as="image" href="/images/slider-01-01.jpg" fetchPriority="high" />
         <Script
           src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"

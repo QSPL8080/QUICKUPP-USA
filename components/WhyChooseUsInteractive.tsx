@@ -6,9 +6,11 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export default function WhyChooseUsInteractive() {
+  const [activeTab, setActiveTab] = useState<"engine" | "revenue" | "ai">("engine");
   const [roasCount, setRoasCount] = useState<number>(0);
   const [speedCount, setSpeedCount] = useState<number>(0);
   const [uptimeCount, setUptimeCount] = useState<number>(0);
+  const [sliderIndex, setSliderIndex] = useState<number>(0);
   const statsRef = useRef<HTMLDivElement>(null);
   const [hasAnimated, setHasAnimated] = useState(false);
 
@@ -20,7 +22,7 @@ export default function WhyChooseUsInteractive() {
           let r = 0;
           const rTimer = setInterval(() => {
             r += 1;
-            if (r >= 5) {
+            if (r >= 4) {
               setRoasCount(4.8);
               clearInterval(rTimer);
             } else {
@@ -57,289 +59,396 @@ export default function WhyChooseUsInteractive() {
     return () => observer.disconnect();
   }, [hasAnimated]);
 
-  const advantages = [
+  const teamMembers = [
     {
-      num: "01",
-      title: "Three Capabilities Under One Roof",
-      subtitle: "Marketing, AI & Technology working as one unified engine.",
-      desc: "No more juggling disconnected agencies, freelance designers, and separate developers. We provide an integrated team and single-source accountability for your growth.",
-      link: "/services"
+      name: "Alex Rivera",
+      role: "Lead Full-Stack Architect",
+      desc: "Enterprise Next.js architecture, high-throughput microservices, and sub-second web performance.",
+      img: "/images/team-img-01.jpg",
+      socials: { linkedin: "https://linkedin.com", twitter: "https://x.com", github: "https://github.com" },
     },
     {
-      num: "02",
-      title: "Revenue & Outcome-Driven Focus",
-      subtitle: "We prioritize actual revenue and CAC over vanity clicks.",
-      desc: "Every campaign, automation workflow, and software feature we build is directly mapped to business metrics: customer acquisition cost, conversion lift, and lifetime value.",
-      link: "/services/paid-marketing"
+      name: "Priya Sharma",
+      role: "Senior AI Solutions Specialist",
+      desc: "Autonomous LLM agents, RAG document search, and conversational lead qualification bots.",
+      img: "/images/team-img-02.jpg",
+      socials: { linkedin: "https://linkedin.com", twitter: "https://x.com", github: "https://github.com" },
     },
     {
-      num: "03",
-      title: "AI-First Unfair Advantage",
-      subtitle: "Harness cutting-edge AI to automate operations and scale output.",
-      desc: "From generative AI video production and automated lead qualification agents to AI Search Optimization (GEO & AEO), we ensure your business leads the modern digital landscape.",
-      link: "/services/ai-automation-solutions"
+      name: "Marcus Chen",
+      role: "Principal Product Designer",
+      desc: "High-converting UI systems, Figma auto-layouts, and user experience conversion optimization.",
+      img: "/images/team-img-03.jpg",
+      socials: { linkedin: "https://linkedin.com", twitter: "https://x.com", github: "https://github.com" },
     },
     {
-      num: "04",
-      title: "Enterprise-Grade Engineering Standards",
-      subtitle: "Modern tech stacks engineered for speed, security, and scale.",
-      desc: "We build on modern Next.js, TypeScript, cloud microservices, and robust APIs designed to handle massive traffic with sub-second speeds and 99.9% uptime.",
-      link: "/services/web-design-development"
+      name: "David Vance",
+      role: "Performance Marketing Lead",
+      desc: "Multi-channel paid acquisition across Google & Meta with strict CAC thresholds and ROAS scaling.",
+      img: "/images/team-img-04.jpg",
+      socials: { linkedin: "https://linkedin.com", twitter: "https://x.com", github: "https://github.com" },
     },
-    {
-      num: "05",
-      title: "Radical Transparency & Dedicated Pods",
-      subtitle: "Direct access to senior strategists with zero middlemen.",
-      desc: "No opaque retainers or confusing account management layers. You receive live analytics dashboards, weekly sprint demos, and direct access to your execution pod.",
-      link: "/about/our-approach"
-    },
-    {
-      num: "06",
-      title: "Agile Sprints & Rapid Speed to Market",
-      subtitle: "Deliver value in weeks rather than dragging out quarters.",
-      desc: "Our agile 2-week sprint cycles allow us to rapidly launch high-converting landing pages, ad campaigns, AI workflows, and software features.",
-      link: "/contact"
-    }
   ];
 
-  const methodologySteps = [
-    {
-      num: "01",
-      title: "Discovery & Alignment",
-      desc: "We conduct deep stakeholder interviews, analyze customer journeys, and audit your digital stack to identify high-impact growth levers."
-    },
-    {
-      num: "02",
-      title: "Integrated Roadmap",
-      desc: "We design a cross-functional strategy connecting Marketing campaigns, AI automations, and Technology infrastructure into clear sprint milestones."
-    },
-    {
-      num: "03",
-      title: "Agile Sprint Execution",
-      desc: "Our multidisciplinary pod executes in rapid sprints—launching campaigns, engineering features, and deploying automations with weekly demo reviews."
-    },
-    {
-      num: "04",
-      title: "Optimization & Scaling",
-      desc: "We track real-time conversion data, run A/B split tests, tune AI models, and scale winning channels to compound your business returns."
-    }
-  ];
+  const totalSlides = Math.ceil(teamMembers.length / 2);
+
+  const handlePrevSlide = () => {
+    setSliderIndex((prev) => (prev > 0 ? prev - 1 : 0));
+  };
+
+  const handleNextSlide = () => {
+    setSliderIndex((prev) => (prev < totalSlides - 1 ? prev + 1 : prev));
+  };
+
+  const currentTeamPair = teamMembers.slice(sliderIndex * 2, sliderIndex * 2 + 2);
+
 
   return (
-    <div className="scaleforge-page-root">
+    <>
       <Header />
-
-      {/* 1. HERO SECTION */}
-      <section className="sf-hero-section">
-        <div className="sf-hero-bg">
-          <img src="/images/hero-bg-2.png" alt="Why Choose Us Background" />
-        </div>
-        <div className="sf-container">
-          <div className="sf-hero-grid">
-            <div>
-              <div className="sf-tag">
-                <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#7c3aed', display: 'inline-block' }}></span>
-                WHY CHOOSE US
+      <main className="mx-about-page">
+        {/* =========================================================================
+            1. HERO SECTION (Mindix Deep Forest Teal Container with Floating Stats)
+            ========================================================================= */}
+        <section className="mx-hero-section">
+          <div className="mx-container">
+            <div className="mx-hero-card">
+              {/* Background Wave Graphic */}
+              <div className="mx-hero-bg-waves" aria-hidden="true">
+                <svg viewBox="0 0 1200 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M0 300C300 100 600 500 900 300C1050 200 1150 250 1200 300V600H0V300Z" fill="rgba(124, 58, 237, 0.02)" />
+                  <path d="M0 400C250 250 500 550 800 350C1000 220 1100 320 1200 380" stroke="rgba(0, 210, 255, 0.3)" strokeWidth="2" strokeDasharray="8 8" />
+                  <path d="M0 200C350 450 700 150 1050 380C1120 420 1180 400 1200 390" stroke="rgba(124, 58, 237, 0.18)" strokeWidth="1.5" />
+                </svg>
               </div>
-              <h1 className="sf-hero-title">
-                The Growth Partner Built for<br />
-                <span style={{ color: '#7c3aed' }}>What's Next.</span>
+
+              {/* Top Center Subtitle Badge matching Contact page */}
+              <div className="mx-subtitle-badge">
+                <span className="mx-badge-dot" />
+                <span>The Quickupp Advantage</span>
+              </div>
+
+              {/* Hero Headline & Subtitle */}
+              <h1 className="mx-hero-title">
+                Why Ambitious Businesses <span className="mx-gradient-text">Choose Quickupp</span>
               </h1>
-              <div className="sf-hero-sub">Why Ambitious Businesses Partner With Quickupp Softech</div>
-              <p className="sf-hero-desc">
-                Modern business growth requires more than isolated marketing campaigns or disconnected software. It requires a synchronized ecosystem where Marketing drives customer acquisition, AI automates operations, and Technology provides a resilient foundation for scale.
+              <p className="mx-hero-subtitle">
+                We eliminate fragmented vendors, slow delivery, and vanity metrics with a high-velocity Marketing, AI, and Software Engineering engine built for measurable growth.
               </p>
-              <div className="sf-btn-row">
-                <Link href="/contact" className="sf-btn-primary">
-                  <span>Schedule a Consultation</span>
-                  <div className="sf-btn-icon">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <path d="M7 17L17 7M17 7H7M17 7V17" />
-                    </svg>
-                  </div>
-                </Link>
-                <Link href="/about/our-approach" className="sf-btn-secondary">
-                  <span>See Our Approach →</span>
-                </Link>
-              </div>
-            </div>
 
-            <div className="sf-hero-card">
-              <div className="sf-hero-card-tag">OUR PROMISE</div>
-              <div className="sf-hero-card-count">100%</div>
-              <div className="sf-hero-card-label">
-                Single-source accountability across Marketing, AI &amp; Software Engineering. No disconnected vendors, no excuses.
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 2. MANIFESTO & ADVANTAGES LIST (Interactive Hover Rows with Rotating Arrows) */}
-      <section className="sf-manifesto-section">
-        <div className="sf-container">
-          <div className="sf-manifesto-grid">
-            <div className="sf-section-tag">OUR ADVANTAGE</div>
-            <div>
-              <p className="sf-manifesto-quote">
-                "We bring together strategy, creativity, artificial intelligence, and software engineering to solve real business challenges and build compounding growth."
-              </p>
-              <div className="sf-manifesto-callout">
-                Three Capabilities. One Growth Partner. Zero Vendor Friction.
-              </div>
-            </div>
-          </div>
-
-          <div className="sf-advantages-list">
-            {advantages.map((adv, idx) => (
-              <Link key={idx} href={adv.link} className="sf-advantage-row">
-                <div>
-                  <div className="sf-adv-num">{adv.num} / ADVANTAGE</div>
-                  <div className="sf-adv-title">{adv.title}</div>
-                </div>
-                <div>
-                  <p className="sf-adv-desc">{adv.desc}</p>
-                </div>
-                <div className="sf-adv-arrow">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M5 12h14M12 5l7 7-7 7" />
+              {/* Hero Action Button */}
+              <Link href="/services" className="mx-btn-lime">
+                <span>Explore Our Solutions</span>
+                <div className="mx-btn-icon-circle">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 12h14"></path>
+                    <path d="M12 5l7 7-7 7"></path>
                   </svg>
                 </div>
               </Link>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* 3. VIDEO SHOWCASE BANNER */}
-      <section className="sf-video-section">
-        <div className="sf-container">
-          <div className="sf-video-top">
-            <div className="sf-section-tag">INTEGRATED EXECUTION</div>
-            <h2 className="sf-video-heading">Engineered for Real-World Business Impact</h2>
+              {/* Responsive Bottom Hero Stats Strip (No Overlaps) */}
+              <div className="mx-hero-stats-strip">
+                <div className="mx-hero-stat-badge">
+                  <div className="mx-hero-stat-badge-num">4.8x</div>
+                  <div className="mx-hero-stat-badge-text">Average ad ROAS &amp; revenue lift</div>
+                </div>
+                <div className="mx-hero-stat-badge">
+                  <div className="mx-hero-stat-badge-num">99.9%</div>
+                  <div className="mx-hero-stat-badge-text">Cloud uptime &amp; enterprise SLA reliability</div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="sf-video-container">
-            <video autoPlay muted loop playsInline poster="/images/about-video-poster.jpg">
-              <source src="/images/about-showcase.mp4" type="video/mp4" />
-            </video>
-            <div className="sf-video-overlay">
+        </section>
+
+        {/* =========================================================================
+            2. ADVANTAGE TABS & DUAL PHOTO GRID (Reference Screenshot 2)
+            ========================================================================= */}
+        <section className="mx-tab-section">
+          <div className="mx-container">
+            <div className="mx-tab-grid">
+              {/* Left Column: Heading & Interactive Tabs */}
               <div>
-                <div className="sf-video-overlay-title">Strategy Meets Execution</div>
-                <p className="sf-video-overlay-desc">
-                  Whether launching high-converting multi-channel ad funnels, deploying custom AI workflow agents, or building enterprise cloud applications, our unified pod delivers results that scale.
+                <span className="mx-sub-badge">UNFAIR ADVANTAGE</span>
+                <h2 className="mx-section-heading">
+                  A unified growth framework designed for speed, ROI &amp; engineering excellence
+                </h2>
+
+                {/* Switchable Pill Tabs */}
+                <div className="mx-tabs-bar">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("engine")}
+                    className={`mx-tab-btn ${activeTab === "engine" ? "is-active" : ""}`}
+                  >
+                    3-in-1 Engine
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("revenue")}
+                    className={`mx-tab-btn ${activeTab === "revenue" ? "is-active" : ""}`}
+                  >
+                    Revenue-First Focus
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("ai")}
+                    className={`mx-tab-btn ${activeTab === "ai" ? "is-active" : ""}`}
+                  >
+                    AI-Native Tooling
+                  </button>
+                </div>
+
+                {/* Tab Dynamic Content */}
+                <div className="mx-tab-content-box">
+                  {activeTab === "engine" && (
+                    <p className="mx-tab-paragraph">
+                      Most businesses manage 3-4 disconnected vendors: an SEO agency, a paid media contractor, an AI tool provider, and a web developer. Quickupp unifies all three disciplines under one roof with single-source accountability, faster turnaround, and zero vendor friction.
+                    </p>
+                  )}
+                  {activeTab === "revenue" && (
+                    <p className="mx-tab-paragraph">
+                      We track and optimize for what actually moves the needle: customer acquisition cost (CAC), pipeline volume, conversion lift, and customer lifetime value (LTV)—not vanity impressions, likes, or empty traffic.
+                    </p>
+                  )}
+                  {activeTab === "ai" && (
+                    <p className="mx-tab-paragraph">
+                      From autonomous multi-agent CRM qualification bots and generative AI video avatars to Generative Engine Optimization (GEO/AEO), we equip your brand with cutting-edge AI capabilities that 10x your operational leverage.
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Right Column: Stacked Dual Overlapping Photography */}
+              <div className="mx-photo-stack">
+                <div className="mx-photo-img-wrap img-back">
+                  <img
+                    src="/images/home1-about-01.jpg"
+                    alt="Quickupp Engineering Excellence"
+                    className="mx-photo-img"
+                  />
+                </div>
+                <div className="mx-photo-img-wrap img-front">
+                  <img
+                    src="/images/home-two-about.jpg"
+                    alt="Quickupp Client Collaboration"
+                    className="mx-photo-img"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* 4-Metric Counter Strip with Top Line */}
+            <div ref={statsRef} className="mx-metrics-strip">
+              <div className="mx-metric-card">
+                <div className="mx-metric-num-row">
+                  <span className="mx-metric-big-num">{roasCount}x</span>
+                  <span className="mx-metric-sup">/ ROAS</span>
+                </div>
+                <div className="mx-metric-label">Average Ad Return</div>
+              </div>
+
+              <div className="mx-metric-card">
+                <div className="mx-metric-num-row">
+                  <span className="mx-metric-big-num">{speedCount}x</span>
+                  <span className="mx-metric-sup">/ Speed</span>
+                </div>
+                <div className="mx-metric-label">Rapid Sprint Delivery</div>
+              </div>
+
+              <div className="mx-metric-card">
+                <div className="mx-metric-num-row">
+                  <span className="mx-metric-big-num">{uptimeCount}%</span>
+                  <span className="mx-metric-sup">/ Uptime</span>
+                </div>
+                <div className="mx-metric-label">Enterprise Reliability</div>
+              </div>
+
+              <div className="mx-metric-card">
+                <div className="mx-metric-num-row">
+                  <span className="mx-metric-big-num">0</span>
+                  <span className="mx-metric-sup">/ Silos</span>
+                </div>
+                <div className="mx-metric-label">Unified Execution Pods</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* =========================================================================
+            3. VIBRANT LIME "WHAT WE DO" CAPABILITIES CONTAINER (Reference Screenshot 3)
+            ========================================================================= */}
+        <section className="mx-lime-section">
+          <div className="mx-container">
+            <div className="mx-lime-box">
+              <div className="mx-lime-header">
+                <span className="mx-lime-sub">THE QUICKUPP PILLARS</span>
+                <h2 className="mx-lime-title">
+                  Engineered to outperform traditional marketing &amp; dev agencies
+                </h2>
+              </div>
+
+              {/* Double Line Divider */}
+              <div className="mx-lime-divider">
+                <div className="mx-lime-divider-line"></div>
+                <div className="mx-lime-divider-line"></div>
+              </div>
+
+              {/* 4-Column Feature Grid */}
+              <div className="mx-lime-grid-4">
+                <div className="mx-lime-col">
+                  <div className="mx-lime-col-icon-wrap">🎯</div>
+                  <h3 className="mx-lime-col-title">Dedicated Senior Pods</h3>
+                  <p className="mx-lime-col-desc">
+                    Direct collaboration with senior growth marketers and architects—zero junior hand-offs or confusing middle managers.
+                  </p>
+                  <div className="mx-lime-col-bottom-line"></div>
+                </div>
+
+                <div className="mx-lime-col">
+                  <div className="mx-lime-col-icon-wrap">⚡</div>
+                  <h3 className="mx-lime-col-title">2-Week Agile Sprints</h3>
+                  <p className="mx-lime-col-desc">
+                    Rapid iteration cycles with live demo walkthroughs, continuous feature shipping, and fast turnaround times.
+                  </p>
+                  <div className="mx-lime-col-bottom-line"></div>
+                </div>
+
+                <div className="mx-lime-col">
+                  <div className="mx-lime-col-icon-wrap">💻</div>
+                  <h3 className="mx-lime-col-title">Modern Cloud Stacks</h3>
+                  <p className="mx-lime-col-desc">
+                    Production builds using Next.js 15, TypeScript, Tailwind, GraphQL, AWS, and serverless Edge infrastructure.
+                  </p>
+                  <div className="mx-lime-col-bottom-line"></div>
+                </div>
+
+                <div className="mx-lime-col">
+                  <div className="mx-lime-col-icon-wrap">📊</div>
+                  <h3 className="mx-lime-col-title">Transparent Dashboards</h3>
+                  <p className="mx-lime-col-desc">
+                    24/7 access to live conversion dashboards, pipeline metrics, ad attribution, and transparent sprint boards.
+                  </p>
+                  <div className="mx-lime-col-bottom-line"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* =========================================================================
+            4. TEAM MEMBERS & CULTURE SLIDER (Reference Screenshot 4)
+            ========================================================================= */}
+        <section className="mx-team-section">
+          <div className="mx-container">
+            <div className="mx-team-header-row">
+              <div className="mx-team-header-left">
+                <span className="mx-sub-badge">POD LEADERSHIP</span>
+                <h2 className="mx-section-heading" style={{ margin: "4px 0 0" }}>
+                  Experienced practitioners committed to your business scale
+                </h2>
+              </div>
+              <Link href="/about/our-approach" className="mx-btn-lime">
+                <span>Explore Our Approach</span>
+                <div className="mx-btn-icon-circle">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 12h14"></path>
+                    <path d="M12 5l7 7-7 7"></path>
+                  </svg>
+                </div>
+              </Link>
+            </div>
+
+            {/* Slider Cards Container */}
+            <div className="mx-slider-wrap">
+              <div className="mx-team-grid">
+                {currentTeamPair.map((member, idx) => (
+                  <div key={idx} className="mx-team-card">
+                    <div className="mx-team-img-wrap">
+                      <img src={member.img} alt={member.name} className="mx-team-img" />
+                    </div>
+                    <div className="mx-team-info">
+                      <h3 className="mx-team-name">{member.name}</h3>
+                      <div className="mx-team-role">{member.role}</div>
+                      <div className="mx-team-divider"></div>
+                      <p className="mx-team-desc">{member.desc}</p>
+                      <div className="mx-social-row">
+                        <a href={member.socials.linkedin} target="_blank" rel="noopener noreferrer" className="mx-social-btn" aria-label="LinkedIn">
+                          in
+                        </a>
+                        <a href={member.socials.twitter} target="_blank" rel="noopener noreferrer" className="mx-social-btn" aria-label="Twitter / X">
+                          𝕏
+                        </a>
+                        <a href={member.socials.github} target="_blank" rel="noopener noreferrer" className="mx-social-btn" aria-label="GitHub">
+                          ⌥
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Slider Controls (< and >) */}
+              <div className="mx-slider-controls">
+                <button
+                  type="button"
+                  onClick={handlePrevSlide}
+                  disabled={sliderIndex === 0}
+                  className="mx-nav-arrow-btn"
+                  aria-label="Previous Team Slide"
+                >
+                  ←
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNextSlide}
+                  disabled={sliderIndex === totalSlides - 1}
+                  className="mx-nav-arrow-btn"
+                  aria-label="Next Team Slide"
+                >
+                  →
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* =========================================================================
+            5. MINDIX-INSPIRED BOTTOM CTA
+            ========================================================================= */}
+        <section className="mx-cta-section">
+          <div className="mx-container">
+            <div className="mx-cta-card">
+              <div className="mx-cta-content">
+                <span className="mx-sub-badge">EVALUATE YOUR ADVANTAGE</span>
+                <h2 className="mx-cta-title">
+                  Ready to Experience the Quickupp Growth Model?
+                </h2>
+                <p className="mx-cta-desc">
+                  Book a free 30-minute growth roadmap audit with our senior strategy and technology team today.
                 </p>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 4. IMPACT STATS GRID (Live Counters) */}
-      <section className="sf-impact-section" ref={statsRef}>
-        <div className="sf-container">
-          <div className="sf-impact-header">
-            <div>
-              <div className="sf-section-tag">PROVEN TRACK RECORD</div>
-              <h2 className="sf-video-heading">Measured in Real Business Outcomes</h2>
-            </div>
-          </div>
-
-          <div className="sf-impact-grid">
-            <div className="sf-impact-card">
-              <div className="sf-impact-num">{roasCount}x</div>
-              <p className="sf-impact-text">
-                Average Return on Ad Spend (ROAS) generated across Google, Meta, and LinkedIn performance marketing campaigns.
-              </p>
-            </div>
-            <div className="sf-impact-card">
-              <div className="sf-impact-num">{speedCount}x</div>
-              <p className="sf-impact-text">
-                Operational speed increase with our automated lead routing, custom AI workflows, and CRM integrations.
-              </p>
-            </div>
-            <div className="sf-impact-card">
-              <div className="sf-impact-num">{uptimeCount}%</div>
-              <p className="sf-impact-text">
-                Uptime and enterprise reliability across all custom websites, cloud microservices, and mobile applications.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 5. DARK METHODOLOGY SECTION */}
-      <section className="sf-methodology-section">
-        <div className="sf-container">
-          <div className="sf-methodology-top">
-            <div>
-              <div className="sf-stat-box-tag">DISCIPLINED METHODOLOGY</div>
-              <h2 className="sf-methodology-title">
-                A 4-Step Framework Built for Predictable Scale
-              </h2>
-              <p className="sf-methodology-desc">
-                We eliminate guesswork through a structured lifecycle that aligns marketing strategy, artificial intelligence, and software engineering at every phase.
-              </p>
-            </div>
-
-            <div className="sf-stat-box-dark">
-              <div className="sf-stat-box-tag">CLIENT RETENTION</div>
-              <div className="sf-stat-box-num">98%</div>
-              <div className="sf-stat-box-label">
-                Long-term client partnerships built on transparency, compounding ROI, and consistent delivery.
-              </div>
-            </div>
-          </div>
-
-          <div className="sf-pillars-grid">
-            {methodologySteps.map((step, idx) => (
-              <div key={idx} className="sf-pillar-card">
-                <div className="sf-pillar-num">PHASE {step.num}</div>
-                <div className="sf-pillar-title">{step.title}</div>
-                <p className="sf-pillar-desc">{step.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 6. CLOSING CTA SECTION */}
-      <section className="sf-cta-section" style={{ paddingTop: '80px' }}>
-        <div className="sf-container">
-          <div className="sf-cta-box">
-            <div>
-              <div className="sf-tag">LET'S BUILD TOGETHER</div>
-              <h2 className="sf-cta-title">
-                Ready to Accelerate Your Growth?
-              </h2>
-              <p className="sf-cta-desc">
-                Discover how our integrated Marketing, AI, and Technology solutions can transform your customer acquisition and streamline your operations.
-              </p>
-              <div className="sf-cta-check">
-                <span>✓</span> Free 30-Minute Growth Strategy &amp; Tech Audit
-              </div>
-              <div className="sf-btn-row">
-                <Link href="/contact" className="sf-btn-primary">
-                  <span>Schedule Your Consultation</span>
-                  <div className="sf-btn-icon">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <path d="M7 17L17 7M17 7H7M17 7V17" />
+              <div className="mx-cta-actions">
+                <Link href="/contact" className="mx-btn-lime">
+                  <span>Schedule Strategy Call</span>
+                  <div className="mx-btn-icon-circle">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14"></path>
+                      <path d="M12 5l7 7-7 7"></path>
                     </svg>
                   </div>
                 </Link>
-                <Link href="/services" className="sf-btn-secondary">
-                  <span>Explore All Services →</span>
+                <Link href="/case-studies" className="mx-btn-outline-white">
+                  View Verified ROI
                 </Link>
               </div>
             </div>
-
-            <div className="sf-cta-img-wrap">
-              <img src="/images/cta-banner-bg.jpg" alt="Quickupp Softech Growth" />
-            </div>
           </div>
-        </div>
-      </section>
-
+        </section>
+      </main>
       <Footer />
-    </div>
+    </>
   );
 }
+

@@ -6,9 +6,12 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export default function WhoWeAreInteractive() {
+  const [activeTab, setActiveTab] = useState<"marketing" | "ai" | "technology">("marketing");
   const [clientsCount, setClientsCount] = useState<number>(0);
-  const [retentionCount, setRetentionCount] = useState<number>(0);
+  const [expertsCount, setExpertsCount] = useState<number>(0);
   const [projectsCount, setProjectsCount] = useState<number>(0);
+  const [retentionCount, setRetentionCount] = useState<number>(0);
+  const [sliderIndex, setSliderIndex] = useState<number>(0);
   const statsRef = useRef<HTMLDivElement>(null);
   const [hasAnimated, setHasAnimated] = useState(false);
 
@@ -28,16 +31,16 @@ export default function WhoWeAreInteractive() {
             }
           }, 35);
 
-          let r = 0;
-          const rTimer = setInterval(() => {
-            r += 3;
-            if (r >= 98) {
-              setRetentionCount(98);
-              clearInterval(rTimer);
+          let e = 0;
+          const eTimer = setInterval(() => {
+            e += 1;
+            if (e >= 30) {
+              setExpertsCount(30);
+              clearInterval(eTimer);
             } else {
-              setRetentionCount(r);
+              setExpertsCount(e);
             }
-          }, 40);
+          }, 45);
 
           let p = 0;
           const pTimer = setInterval(() => {
@@ -49,6 +52,17 @@ export default function WhoWeAreInteractive() {
               setProjectsCount(p);
             }
           }, 35);
+
+          let r = 0;
+          const rTimer = setInterval(() => {
+            r += 3;
+            if (r >= 98) {
+              setRetentionCount(98);
+              clearInterval(rTimer);
+            } else {
+              setRetentionCount(r);
+            }
+          }, 40);
         }
       },
       { threshold: 0.2 }
@@ -57,271 +71,462 @@ export default function WhoWeAreInteractive() {
     return () => observer.disconnect();
   }, [hasAnimated]);
 
-  const capabilities = [
+  const teamMembers = [
     {
-      num: "01",
-      title: "Marketing",
-      subtitle: "Attract the right customers.",
-      desc: "Build visibility, generate demand and turn attention into business opportunities across SEO, AI Search Visibility (AEO/GEO), Paid Ads, Social Media, and Video Production.",
-      link: "/services"
+      name: "Alex Rivera",
+      role: "Lead Full-Stack Architect",
+      desc: "Architects scalable Next.js systems, high-throughput microservices, and secure cloud pipelines for enterprise clients.",
+      img: "/images/team-img-01.jpg",
+      socials: { linkedin: "https://linkedin.com", twitter: "https://x.com", github: "https://github.com" },
     },
     {
-      num: "02",
-      title: "AI & Automation",
-      subtitle: "Automate smarter. Work faster.",
-      desc: "Implement intelligent AI workflows, automated lead handling, AI video production, chatbots, and operational automation to help your business operate faster and scale efficiently.",
-      link: "/services/ai-automation-solutions"
+      name: "Priya Sharma",
+      role: "Senior AI Solutions Specialist",
+      desc: "Designs intelligent multi-agent workflows, autonomous RAG pipelines, and conversational WhatsApp business engines.",
+      img: "/images/team-img-02.jpg",
+      socials: { linkedin: "https://linkedin.com", twitter: "https://x.com", github: "https://github.com" },
     },
     {
-      num: "03",
-      title: "Technology",
-      subtitle: "Build the digital foundation for scale.",
-      desc: "High-performance websites, custom web applications, mobile apps, enterprise software, and scalable digital infrastructure engineered for performance, security, and growth.",
-      link: "/services/web-design-development"
-    }
+      name: "Marcus Chen",
+      role: "Principal Product Designer",
+      desc: "Crafts high-converting UX design systems, interactive component libraries, and award-winning digital experiences.",
+      img: "/images/team-img-03.jpg",
+      socials: { linkedin: "https://linkedin.com", twitter: "https://x.com", github: "https://github.com" },
+    },
+    {
+      name: "David Vance",
+      role: "Performance Marketing Lead",
+      desc: "Manages data-driven acquisition across Google, Meta, and LinkedIn with strict CAC benchmarks and ROAS scaling.",
+      img: "/images/team-img-04.jpg",
+      socials: { linkedin: "https://linkedin.com", twitter: "https://x.com", github: "https://github.com" },
+    },
   ];
 
-  const whyPartnerPillars = [
-    {
-      num: "01",
-      title: "Three Capabilities Under One Roof",
-      desc: "Marketing attracts customers. AI automates processes. Technology scales the foundation. When all three work together, your business moves faster and grows more predictably."
-    },
-    {
-      num: "02",
-      title: "No Disconnected Vendors",
-      desc: "No more managing separate marketing agencies, AI tools, and development companies. We provide one integrated team and one clear strategy."
-    },
-    {
-      num: "03",
-      title: "Solutions Built Around Growth",
-      desc: "We don't push one-size-fits-all packages. We build what your business needs to attract customers, streamline operations, and scale."
-    },
-    {
-      num: "04",
-      title: "Transparent Execution & Measurable Impact",
-      desc: "Clear communication, honest advice, and solutions focused on measurable business outcomes—not vanity metrics."
-    }
-  ];
+  const totalSlides = Math.ceil(teamMembers.length / 2);
+
+  const handlePrevSlide = () => {
+    setSliderIndex((prev) => (prev > 0 ? prev - 1 : 0));
+  };
+
+  const handleNextSlide = () => {
+    setSliderIndex((prev) => (prev < totalSlides - 1 ? prev + 1 : prev));
+  };
+
+  const currentTeamPair = teamMembers.slice(sliderIndex * 2, sliderIndex * 2 + 2);
 
   return (
-    <div className="scaleforge-page-root">
+    <>
       <Header />
-
-      {/* 1. HERO SECTION */}
-      <section className="sf-hero-section">
-        <div className="sf-hero-bg">
-          <img src="/images/hero-bg-2.png" alt="Who We Are Background" />
-        </div>
-        <div className="sf-container">
-          <div className="sf-hero-grid">
-            <div>
-              <div className="sf-tag">
-                <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#7c3aed', display: 'inline-block' }}></span>
-                WHO WE ARE
+      <main className="mx-about-page">
+        {/* =========================================================================
+            1. HERO SECTION (WHO WE ARE)
+            ========================================================================= */}
+        <section className="mx-hero-section">
+          <div className="mx-container">
+            <div className="mx-hero-seamless">
+              {/* Background Wave Graphic */}
+              <div className="mx-hero-bg-waves" aria-hidden="true">
+                <svg viewBox="0 0 1200 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M0 300C300 100 600 500 900 300C1050 200 1150 250 1200 300V600H0V300Z" fill="rgba(124, 58, 237, 0.02)" />
+                  <path d="M0 400C250 250 500 550 800 350C1000 220 1100 320 1200 380" stroke="rgba(0, 210, 255, 0.3)" strokeWidth="2" strokeDasharray="8 8" />
+                  <path d="M0 200C350 450 700 150 1050 380C1120 420 1180 400 1200 390" stroke="rgba(124, 58, 237, 0.18)" strokeWidth="1.5" />
+                </svg>
               </div>
-              <h1 className="sf-hero-title">
-                Marketing. AI. Technology.<br />
-                <span style={{ color: '#7c3aed' }}>Built for Growth.</span>
+
+              {/* Top Center Subtitle Badge matching Contact page */}
+              <div className="mx-subtitle-badge">
+                <span className="mx-badge-dot" />
+                <span>Marketing, AI &amp; Technology Agency</span>
+              </div>
+
+              {/* Hero Headline & Subtitle */}
+              <h1 className="mx-hero-title">
+                Marketing. AI. Technology. <span className="mx-gradient-text">Built for Growth.</span>
               </h1>
-              <div className="sf-hero-sub">Your Trusted Digital Growth Partner</div>
-              <p className="sf-hero-desc">
-                Quickupp Softech is a full-service Marketing, AI &amp; Technology company helping ambitious businesses grow, scale and stay ahead in an increasingly digital world.
+              <p className="mx-hero-subtitle">
+                Quickupp Softech is a full-service Marketing, AI &amp; Technology company helping ambitious businesses grow, scale and stay ahead in an increasingly digital world. We bring together the power of digital marketing, artificial intelligence and technology to help businesses attract the right customers, build stronger brands, improve operations and create meaningful digital experiences.
               </p>
-              <p className="sf-hero-desc" style={{ marginTop: "-16px" }}>
-                We bring together the power of digital marketing, artificial intelligence and technology to help businesses attract the right customers, build stronger brands, improve operations and create meaningful digital experiences.
-              </p>
-              <div className="sf-btn-row">
-                <Link href="/contact" className="sf-btn-primary">
-                  <span>Schedule a Consultation</span>
-                  <div className="sf-btn-icon">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <path d="M7 17L17 7M17 7H7M17 7V17" />
-                    </svg>
-                  </div>
-                </Link>
-                <Link href="/about/why-choose-us" className="sf-btn-secondary">
-                  <span>Why Choose Us →</span>
-                </Link>
-              </div>
-            </div>
 
-            <div className="sf-hero-card">
-              <div className="sf-hero-card-tag">OUR PROMISE</div>
-              <div className="sf-hero-card-count">100%</div>
-              <div className="sf-hero-card-label">
-                We don't just deliver services. We build solutions designed around your growth.
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 2. THREE CAPABILITIES SECTION */}
-      <section className="sf-manifesto-section">
-        <div className="sf-container">
-          <div className="sf-manifesto-grid">
-            <div className="sf-section-tag">THREE CAPABILITIES</div>
-            <div>
-              <p className="sf-manifesto-quote">
-                "The way businesses grow is changing faster than ever. Quickupp Softech connects Marketing, AI, and Technology into one connected growth engine."
-              </p>
-              <div className="sf-manifesto-callout">
-                Marketing attracts. AI accelerates. Technology scales.
-              </div>
-            </div>
-          </div>
-
-          <div className="sf-advantages-list">
-            {capabilities.map((cap, idx) => (
-              <Link key={idx} href={cap.link} className="sf-advantage-row">
-                <div>
-                  <div className="sf-adv-num">{cap.num} / CAPABILITY</div>
-                  <div className="sf-adv-title">{cap.title}</div>
-                </div>
-                <div>
-                  <p className="sf-adv-desc">{cap.desc}</p>
-                </div>
-                <div className="sf-adv-arrow">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M5 12h14M12 5l7 7-7 7" />
+              {/* Hero Action Button */}
+              <Link href="/services" className="mx-btn-lime">
+                <span>Explore All Services</span>
+                <div className="mx-btn-icon-circle">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 12h14"></path>
+                    <path d="M12 5l7 7-7 7"></path>
                   </svg>
                 </div>
               </Link>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* 3. VIDEO SHOWCASE BANNER */}
-      <section className="sf-video-section">
-        <div className="sf-container">
-          <div className="sf-video-top">
-            <div className="sf-section-tag">SOLUTIONS DESIGNED FOR SCALE</div>
-            <h2 className="sf-video-heading">Connecting Strategy, Creativity &amp; Engineering</h2>
+              {/* Responsive Bottom Hero Stats Strip (No Overlaps) */}
+              <div className="mx-hero-stats-strip">
+                <div className="mx-hero-stat-badge">
+                  <div className="mx-hero-stat-badge-num">99%</div>
+                  <div className="mx-hero-stat-badge-text">Client retention &amp; high-ROI delivery</div>
+                </div>
+                <div className="mx-hero-stat-badge">
+                  <div className="mx-hero-stat-badge-num">24/7</div>
+                  <div className="mx-hero-stat-badge-text">Global engineering &amp; strategy support</div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="sf-video-container">
-            <video autoPlay muted loop playsInline poster="/images/about-video-poster.jpg">
-              <source src="/images/about-showcase.mp4" type="video/mp4" />
-            </video>
-            <div className="sf-video-overlay">
+        </section>
+
+        {/* =========================================================================
+            2. MARKETING. AI. TECHNOLOGY. (Three Capabilities. One Growth Partner.)
+            ========================================================================= */}
+        <section className="mx-tab-section">
+          <div className="mx-container">
+            <div className="mx-tab-grid">
+              {/* Left Column: Heading & Interactive Tabs */}
               <div>
-                <div className="sf-video-overlay-title">Built for Long-Term Partnership</div>
-                <p className="sf-video-overlay-desc">
-                  From performance marketing and SEO to AI automation, websites, mobile applications, and custom software, we combine execution to solve real business challenges.
+                <span className="mx-sub-badge">MARKETING. AI. TECHNOLOGY.</span>
+                <h2 className="mx-section-heading">
+                  Three Capabilities. <span className="mx-gradient-text">One Growth Partner.</span>
+                </h2>
+                <p className="mx-tab-paragraph" style={{ marginBottom: "20px" }}>
+                  The way businesses grow is changing faster than ever. Today, customers discover brands through search engines, social media, AI platforms and digital experiences. At the same time, businesses are adopting automation and intelligent technologies to work faster, operate more efficiently and deliver better customer experiences. We bring these capabilities together under one roof.
+                </p>
+
+                {/* Switchable Pill Tabs */}
+                <div className="mx-tabs-bar">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("marketing")}
+                    className={`mx-tab-btn ${activeTab === "marketing" ? "is-active" : ""}`}
+                  >
+                    MARKETING
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("ai")}
+                    className={`mx-tab-btn ${activeTab === "ai" ? "is-active" : ""}`}
+                  >
+                    AI
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("technology")}
+                    className={`mx-tab-btn ${activeTab === "technology" ? "is-active" : ""}`}
+                  >
+                    TECHNOLOGY
+                  </button>
+                </div>
+
+                {/* Tab Dynamic Content */}
+                <div className="mx-tab-content-box">
+                  {activeTab === "marketing" && (
+                    <p className="mx-tab-paragraph">
+                      We help businesses get discovered, generate demand and convert attention into customers. From social media marketing and SEO to Google Ads, Meta Ads, content marketing and lead generation, we create growth strategies designed to improve visibility, attract the right audience and deliver measurable business outcomes.
+                    </p>
+                  )}
+                  {activeTab === "ai" && (
+                    <p className="mx-tab-paragraph">
+                      We help businesses use artificial intelligence to work smarter, automate repetitive processes and create better customer experiences. From AI chatbots and AI agents to workflow automation, AI-powered lead qualification and custom AI solutions, we help turn AI opportunities into practical solutions that create real business value.
+                    </p>
+                  )}
+                  {activeTab === "technology" && (
+                    <p className="mx-tab-paragraph">
+                      We help businesses build the digital infrastructure they need to operate, compete and scale. From websites and mobile applications to SaaS platforms, CRM and ERP systems, web applications and custom software, we transform ideas and business requirements into scalable digital solutions.
+                    </p>
+                  )}
+                </div>
+
+                <div style={{ marginTop: "24px", padding: "16px 20px", background: "rgba(124, 58, 237, 0.06)", borderLeft: "3px solid var(--mx-primary)", borderRadius: "8px" }}>
+                  <p style={{ margin: 0, fontSize: "14.5px", fontWeight: 600, color: "var(--mx-text-heading)" }}>
+                    Marketing attracts. AI accelerates. Technology scales. Together, they create a stronger foundation for sustainable business growth.
+                  </p>
+                </div>
+              </div>
+
+              {/* Right Column: Stacked Dual Overlapping Photography */}
+              <div className="mx-photo-stack">
+                <div className="mx-photo-img-wrap img-back">
+                  <img
+                    src="/images/home-two-about.jpg"
+                    alt="Quickupp Engineering Culture"
+                    className="mx-photo-img"
+                  />
+                </div>
+                <div className="mx-photo-img-wrap img-front">
+                  <img
+                    src="/images/home1-about-01.jpg"
+                    alt="Quickupp Strategy Collaboration"
+                    className="mx-photo-img"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* 4-Metric Counter Strip with Top Line */}
+            <div ref={statsRef} className="mx-metrics-strip">
+              <div className="mx-metric-card">
+                <div className="mx-metric-num-row">
+                  <span className="mx-metric-big-num">{clientsCount}+</span>
+                  <span className="mx-metric-sup">/ Clients</span>
+                </div>
+                <div className="mx-metric-label">Businesses Scaled</div>
+              </div>
+
+              <div className="mx-metric-card">
+                <div className="mx-metric-num-row">
+                  <span className="mx-metric-big-num">{expertsCount}+</span>
+                  <span className="mx-metric-sup">/ Experts</span>
+                </div>
+                <div className="mx-metric-label">AI &amp; Tech Team</div>
+              </div>
+
+              <div className="mx-metric-card">
+                <div className="mx-metric-num-row">
+                  <span className="mx-metric-big-num">{projectsCount}+</span>
+                  <span className="mx-metric-sup">/ Projects</span>
+                </div>
+                <div className="mx-metric-label">Solutions Deployed</div>
+              </div>
+
+              <div className="mx-metric-card">
+                <div className="mx-metric-num-row">
+                  <span className="mx-metric-big-num">{retentionCount}%</span>
+                  <span className="mx-metric-sup">/ Retention</span>
+                </div>
+                <div className="mx-metric-label">Long-Term Partnerships</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* =========================================================================
+            3. MORE THAN AN AGENCY (Your Business. Our Expertise. One Growth Journey.)
+            ========================================================================= */}
+        <section className="mx-partnership-section">
+          <div className="mx-container">
+            <div className="mx-partnership-box">
+              <div className="mx-partnership-header">
+                <span className="mx-partnership-sub">MORE THAN AN AGENCY</span>
+                <h2 className="mx-partnership-title">
+                  Your Business. Our Expertise. <span className="mx-gradient-text">One Growth Journey.</span>
+                </h2>
+                <p style={{ fontSize: "16px", lineHeight: "1.7", color: "var(--mx-text-body)", marginTop: "16px" }}>
+                  We believe the best partnerships go beyond simply completing tasks. Businesses don&apos;t need another vendor that only manages campaigns, builds websites or delivers software. They need a growth partner who understands where they are today, where they want to go and what it will take to get there. That&apos;s why we work as an extension of your team.
+                </p>
+                <p style={{ fontSize: "15px", lineHeight: "1.65", color: "var(--mx-text-body)", marginTop: "12px" }}>
+                  Before recommending a strategy, campaign or technology solution, we take the time to understand your business, market, customers, competition, challenges and growth objectives.
+                </p>
+              </div>
+
+              {/* Double Line Divider */}
+              <div className="mx-partnership-divider">
+                <div className="mx-partnership-divider-line"></div>
+                <div className="mx-partnership-divider-line"></div>
+              </div>
+
+              {/* Whether your goal is to: 10 Key Goals Grid */}
+              <div style={{ textAlign: "center", marginBottom: "16px" }}>
+                <span style={{ fontSize: "13px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--mx-primary)" }}>
+                  Whether your goal is to:
+                </span>
+              </div>
+
+              <div className="mx-goals-grid">
+                <div className="mx-goal-item">
+                  <div className="mx-goal-check">✓</div>
+                  <span>Generate more qualified leads</span>
+                </div>
+                <div className="mx-goal-item">
+                  <div className="mx-goal-check">✓</div>
+                  <span>Increase your online visibility</span>
+                </div>
+                <div className="mx-goal-item">
+                  <div className="mx-goal-check">✓</div>
+                  <span>Build a stronger and more recognizable brand</span>
+                </div>
+                <div className="mx-goal-item">
+                  <div className="mx-goal-check">✓</div>
+                  <span>Improve marketing performance and ROI</span>
+                </div>
+                <div className="mx-goal-item">
+                  <div className="mx-goal-check">✓</div>
+                  <span>Automate repetitive business processes</span>
+                </div>
+                <div className="mx-goal-item">
+                  <div className="mx-goal-check">✓</div>
+                  <span>Implement AI into your operations</span>
+                </div>
+                <div className="mx-goal-item">
+                  <div className="mx-goal-check">✓</div>
+                  <span>Build a high-performing website or digital product</span>
+                </div>
+                <div className="mx-goal-item">
+                  <div className="mx-goal-check">✓</div>
+                  <span>Develop custom software or business platforms</span>
+                </div>
+                <div className="mx-goal-item">
+                  <div className="mx-goal-check">✓</div>
+                  <span>Improve customer experiences through technology</span>
+                </div>
+                <div className="mx-goal-item">
+                  <div className="mx-goal-check">✓</div>
+                  <span>Expand and scale into new markets</span>
+                </div>
+              </div>
+
+              <div style={{ textAlign: "center", marginTop: "24px" }}>
+                <p style={{ fontSize: "15px", fontWeight: 600, color: "var(--mx-text-heading)", margin: 0 }}>
+                  We bring together the right people, strategies, technology and tools to help you move forward with clarity and confidence.
                 </p>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* 4. IMPACT STATS GRID (Live Counters) */}
-      <section className="sf-impact-section" ref={statsRef}>
-        <div className="sf-container">
-          <div className="sf-impact-header">
-            <div>
-              <div className="sf-section-tag">GLOBAL TRACK RECORD</div>
-              <h2 className="sf-video-heading">Our Impact in Numbers</h2>
-            </div>
-          </div>
-
-          <div className="sf-impact-grid">
-            <div className="sf-impact-card">
-              <div className="sf-impact-num">{clientsCount}+</div>
-              <p className="sf-impact-text">
-                Global clients served across the United States, UK, Middle East, and international markets.
-              </p>
-            </div>
-            <div className="sf-impact-card">
-              <div className="sf-impact-num">{retentionCount}%</div>
-              <p className="sf-impact-text">
-                Client retention rate driven by transparent communication and compounding business results.
-              </p>
-            </div>
-            <div className="sf-impact-card">
-              <div className="sf-impact-num">{projectsCount}+</div>
-              <p className="sf-impact-text">
-                Successful digital projects, AI automations, and custom software platforms delivered.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 5. DARK METHODOLOGY SECTION */}
-      <section className="sf-methodology-section">
-        <div className="sf-container">
-          <div className="sf-methodology-top">
-            <div>
-              <div className="sf-stat-box-tag">THE QUICKUPP DIFFERENCE</div>
-              <h2 className="sf-methodology-title">
-                Why Businesses Partner With Quickupp Softech
-              </h2>
-              <p className="sf-methodology-desc">
-                We combine strategy, creativity, technology and execution to solve real business challenges without disconnected silos.
-              </p>
-            </div>
-
-            <div className="sf-stat-box-dark">
-              <div className="sf-stat-box-tag">LONG-TERM VALUE</div>
-              <div className="sf-stat-box-num">3-in-1</div>
-              <div className="sf-stat-box-label">
-                Marketing, AI &amp; Technology unified under one roof for accelerated speed to market.
+        {/* =========================================================================
+            4. BUILT AROUND YOUR BUSINESS. FOCUSED ON YOUR GROWTH.
+            ========================================================================= */}
+        <section className="mx-tab-section" style={{ paddingTop: "20px" }}>
+          <div className="mx-container">
+            <div style={{ background: "#ffffff", border: "1px solid var(--mx-border)", borderRadius: "28px", padding: "54px 44px", boxShadow: "0 10px 30px -8px rgba(15, 23, 42, 0.06)" }}>
+              <div style={{ maxWidth: "880px", margin: "0 auto", textAlign: "center" }}>
+                <span className="mx-sub-badge">BUILT AROUND YOUR BUSINESS</span>
+                <h2 className="mx-section-heading" style={{ marginBottom: "20px" }}>
+                  Focused on Your Growth
+                </h2>
+                <p className="mx-tab-paragraph" style={{ marginBottom: "16px" }}>
+                  Every business is different. That&apos;s why we don&apos;t believe in a one-size-fits-all approach. Your challenges, customers, goals and opportunities are unique. Our approach is built around understanding those factors and creating the right combination of Marketing, AI and Technology to support your next stage of growth.
+                </p>
+                <p className="mx-tab-paragraph" style={{ marginBottom: "16px" }}>
+                  Whether you need a focused solution in one area or an integrated strategy across multiple capabilities, Quickupp Softech provides the expertise and execution to help turn opportunities into measurable progress.
+                </p>
+                <p className="mx-tab-paragraph" style={{ fontWeight: 600, color: "var(--mx-primary)" }}>
+                  Your next stage of growth may start with a marketing campaign, a stronger digital presence, an AI solution, a website, an automation workflow or a new digital product. Wherever it starts, we&apos;re here to help you build what comes next.
+                </p>
               </div>
             </div>
           </div>
+        </section>
 
-          <div className="sf-pillars-grid">
-            {whyPartnerPillars.map((pil, idx) => (
-              <div key={idx} className="sf-pillar-card">
-                <div className="sf-pillar-num">PILLAR {pil.num}</div>
-                <div className="sf-pillar-title">{pil.title}</div>
-                <p className="sf-pillar-desc">{pil.desc}</p>
+        {/* =========================================================================
+            5. TEAM MEMBERS & CULTURE SLIDER
+            ========================================================================= */}
+        <section className="mx-team-section">
+          <div className="mx-container">
+            <div className="mx-team-header-row">
+              <div className="mx-team-header-left">
+                <span className="mx-sub-badge">OUR TEAM &amp; EXPERTISE</span>
+                <h2 className="mx-section-heading" style={{ margin: "4px 0 0" }}>
+                  Meet our growth strategists, engineers, and AI architects in practice
+                </h2>
               </div>
-            ))}
+              <Link href="/about/our-approach" className="mx-btn-lime">
+                <span>Explore Our Approach</span>
+                <div className="mx-btn-icon-circle">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 12h14"></path>
+                    <path d="M12 5l7 7-7 7"></path>
+                  </svg>
+                </div>
+              </Link>
+            </div>
+
+            {/* Slider Cards Container */}
+            <div className="mx-slider-wrap">
+              <div className="mx-team-grid">
+                {currentTeamPair.map((member, idx) => (
+                  <div key={idx} className="mx-team-card">
+                    <div className="mx-team-img-wrap">
+                      <img src={member.img} alt={member.name} className="mx-team-img" />
+                    </div>
+                    <div className="mx-team-info">
+                      <h3 className="mx-team-name">{member.name}</h3>
+                      <div className="mx-team-role">{member.role}</div>
+                      <div className="mx-team-divider"></div>
+                      <p className="mx-team-desc">{member.desc}</p>
+                      <div className="mx-social-row">
+                        <a href={member.socials.linkedin} target="_blank" rel="noopener noreferrer" className="mx-social-btn" aria-label="LinkedIn">
+                          in
+                        </a>
+                        <a href={member.socials.twitter} target="_blank" rel="noopener noreferrer" className="mx-social-btn" aria-label="Twitter / X">
+                          𝕏
+                        </a>
+                        <a href={member.socials.github} target="_blank" rel="noopener noreferrer" className="mx-social-btn" aria-label="GitHub">
+                          ⌥
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Slider Controls (< and >) */}
+              <div className="mx-slider-controls">
+                <button
+                  type="button"
+                  onClick={handlePrevSlide}
+                  disabled={sliderIndex === 0}
+                  className="mx-nav-arrow-btn"
+                  aria-label="Previous Team Slide"
+                >
+                  ←
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNextSlide}
+                  disabled={sliderIndex === totalSlides - 1}
+                  className="mx-nav-arrow-btn"
+                  aria-label="Next Team Slide"
+                >
+                  →
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* 6. CLOSING CTA SECTION */}
-      <section className="sf-cta-section" style={{ paddingTop: '80px' }}>
-        <div className="sf-container">
-          <div className="sf-cta-box">
-            <div>
-              <div className="sf-tag">LET'S TALK GROWTH</div>
-              <h2 className="sf-cta-title">
-                Ready to Grow Your Business? Let's Talk.
-              </h2>
-              <p className="sf-cta-desc">
-                Whether you want to generate more leads, automate workflows, or build custom software, our multidisciplinary team is ready to help.
-              </p>
-              <div className="sf-cta-check">
-                <span>✓</span> Free 30-Minute Growth Strategy &amp; Tech Consultation
+        {/* =========================================================================
+            6. READY TO BUILD WHAT'S NEXT? (Bottom CTA Banner)
+            ========================================================================= */}
+        <section className="mx-cta-section">
+          <div className="mx-container">
+            <div className="mx-cta-card">
+              <div className="mx-cta-content">
+                <span className="mx-sub-badge">
+                  ONE PARTNER. THREE CAPABILITIES. UNLIMITED POSSIBILITIES.
+                </span>
+                <h2 className="mx-cta-title">
+                  Ready to Build What&apos;s Next?
+                </h2>
+                <p style={{ fontSize: "17px", fontWeight: 700, color: "var(--mx-text-heading)", margin: "0 0 10px 0" }}>
+                  Let&apos;s Turn Your Growth Goals Into Action.
+                </p>
+                <p className="mx-cta-desc" style={{ marginBottom: "16px" }}>
+                  Your next stage of growth shouldn&apos;t be limited by disconnected agencies, outdated processes or technology that doesn&apos;t keep up with your ambitions. Whether you need to generate more customers, strengthen your digital presence, automate your business with AI, or build technology that helps you scale, Quickupp Softech brings the strategy, expertise and execution to make it happen.
+                </p>
+                <p style={{ fontSize: "14.5px", color: "var(--mx-primary)", fontWeight: 600, margin: "0 0 8px 0" }}>
+                  Marketing to attract. • AI to accelerate. • Technology to scale.
+                </p>
+                <p style={{ fontSize: "14.5px", color: "var(--mx-text-body)", margin: 0 }}>
+                  Let&apos;s understand your business, identify the opportunities and build a growth strategy designed around your goals. Your growth starts with a conversation. <strong style={{ color: "var(--mx-text-heading)" }}>LET&apos;S BUILD YOUR GROWTH STORY.</strong>
+                </p>
               </div>
-              <div className="sf-btn-row">
-                <Link href="/contact" className="sf-btn-primary">
-                  <span>Schedule a Consultation</span>
-                  <div className="sf-btn-icon">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <path d="M7 17L17 7M17 7H7M17 7V17" />
+              <div className="mx-cta-actions">
+                <Link href="/contact" className="mx-btn-lime">
+                  <span>Talk to Our Experts</span>
+                  <div className="mx-btn-icon-circle">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14"></path>
+                      <path d="M12 5l7 7-7 7"></path>
                     </svg>
                   </div>
                 </Link>
-                <Link href="/about/why-choose-us" className="sf-btn-secondary">
-                  <span>Why Choose Us →</span>
+                <Link href="/contact" className="mx-btn-outline-white">
+                  Start Your Project
                 </Link>
               </div>
             </div>
-
-            <div className="sf-cta-img-wrap">
-              <img src="/images/cta-banner-bg.jpg" alt="Quickupp Softech Who We Are" />
-            </div>
           </div>
-        </div>
-      </section>
-
+        </section>
+      </main>
       <Footer />
-    </div>
+    </>
   );
 }

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import PageHero from "@/components/PageHero";
-import { resourceItems } from "@/lib/sitemap";
+import ResourceCtaBanner from "@/components/ResourceCtaBanner";
+import { blogPosts } from "@/data/blogs";
 
 export const metadata: Metadata = {
   title: "Resources & Insights | Quickupp Softech",
@@ -10,85 +11,147 @@ export const metadata: Metadata = {
     "Access industry insights, case studies, client testimonials, and featured portfolios from Quickupp Softech.",
 };
 
-const resourceCards = [
+const hubCategories = [
   {
     title: "Blogs & Insights",
     href: "/blog",
-    desc: "Actionable articles on AI search visibility, digital marketing trends, SEO, automation, and web development strategies.",
-    eyebrow: "Thought Leadership",
+    desc: "Actionable playbooks on AI search visibility, digital marketing trends, SEO, automation, and web development strategies.",
+    tag: "THOUGHT LEADERSHIP",
     cta: "Read Articles",
   },
   {
     title: "Case Studies",
     href: "/case-studies",
     desc: "In-depth breakdowns of real client challenges, our custom solutions, and verified ROI metrics across industries.",
-    eyebrow: "Proven Results",
+    tag: "PROVEN RESULTS",
     cta: "View Case Studies",
   },
   {
     title: "Portfolio",
     href: "/portfolio",
     desc: "Explore featured projects in Web & App Development, SaaS Engineering, AI Video Production, and Performance Marketing.",
-    eyebrow: "Featured Work",
+    tag: "FEATURED WORK",
     cta: "Explore Portfolio",
   },
   {
     title: "Client Testimonials",
     href: "/testimonials",
-    desc: "Hear what founders, CMOs, and enterprise leaders have to say about working with Quickupp Softech.",
-    eyebrow: "Social Proof",
+    desc: "Hear what founders, CMOs, and enterprise leaders have to say about partnering with Quickupp Softech.",
+    tag: "SOCIAL PROOF",
     cta: "Read Reviews",
   },
 ];
 
 export default function ResourcesPage() {
-  return (
-    <>
-      <Header />
-      <PageHero
-        title="Knowledge, Results &amp; Insights"
-        crumb="Resources"
-        description="Learn how we solve complex digital challenges and help businesses grow with Marketing, AI, and Technology."
-      />
+  const topArticles = blogPosts.slice(0, 3);
 
-      <section className="section-gap" style={{ paddingTop: "64px", paddingBottom: "96px" }}>
-        <div className="w-layout-blockcontainer container w-container">
-          <div className="qs-card-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "28px" }}>
-            {resourceCards.map((res, i) => (
-              <a
-                key={i}
-                href={res.href}
-                className="qs-card"
-                style={{
-                  background: "#fff",
-                  border: "1px solid #eaecf0",
-                  borderRadius: "20px",
-                  padding: "36px 28px",
-                  display: "flex",
-                  flexDirection: "column",
-                  textDecoration: "none",
-                  boxShadow: "0 4px 18px rgba(0,0,0,0.03)",
-                }}
-              >
-                <div style={{ fontSize: "13px", fontWeight: 700, color: "#98a2b3", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>
-                  {res.eyebrow}
+  return (
+    <div className="res-page-wrap">
+      <Header />
+
+      {/* Hero Header */}
+      <section style={{ padding: "50px 0 40px" }}>
+        <div className="res-container">
+          <div className="res-section-head" style={{ maxWidth: "800px" }}>
+            <div className="res-tag">
+              <span className="res-tag-dot"></span>
+              RESOURCE HUB
+            </div>
+            <h1 className="res-section-title">
+              A quiet place to learn and{" "}
+              <span className="res-heading-accent">scale</span>
+            </h1>
+            <p
+              style={{
+                fontSize: "17px",
+                lineHeight: "1.7",
+                color: "#475569",
+                marginTop: "14px",
+              }}
+            >
+              Explore our strategic insights, verified client case studies, live production portfolio, and founder reviews.
+            </p>
+          </div>
+
+          {/* 2x2 Hub Categories Grid */}
+          <div className="res-hub-grid">
+            {hubCategories.map((cat, idx) => (
+              <Link key={idx} href={cat.href} className="res-hub-card">
+                <div className="res-tag" style={{ marginBottom: "8px" }}>
+                  <span className="res-tag-dot"></span>
+                  {cat.tag}
                 </div>
-                <h3 style={{ fontSize: "24px", fontWeight: 700, color: "#18171c", marginBottom: "12px" }}>
-                  {res.title}
-                </h3>
-                <p style={{ fontSize: "15px", lineHeight: "1.65", color: "#475467", marginBottom: "20px", flexGrow: 1 }}>
-                  {res.desc}
-                </p>
-                <div style={{ fontWeight: 700, color: "#18171c", fontSize: "15px" }}>
-                  {res.cta} →
+                <h2 className="res-hub-card-title">{cat.title}</h2>
+                <p className="res-hub-card-desc">{cat.desc}</p>
+                <div className="res-hub-card-link">
+                  {cat.cta}
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M5 12h14"></path>
+                    <path d="M12 5l7 7-7 7"></path>
+                  </svg>
                 </div>
-              </a>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
+      {/* Featured Insights Section */}
+      <section style={{ padding: "30px 0 60px", background: "#f8fafc", borderTop: "1px solid #e2e8f0", borderBottom: "1px solid #e2e8f0" }}>
+        <div className="res-container">
+          <div className="res-section-head" style={{ paddingTop: "40px" }}>
+            <div className="res-tag">
+              <span className="res-tag-dot"></span>
+              LATEST ARTICLES
+            </div>
+            <h2 className="res-section-title">
+              Featured Insights &amp; <span className="res-heading-accent">Playbooks</span>
+            </h2>
+          </div>
+
+          <div className="res-grid-3">
+            {topArticles.map((post, idx) => (
+              <Link key={idx} href={`/blog/${post.slug}`} className="res-card">
+                <div className="res-card-img-wrap">
+                  <img src={post.img} alt={post.title} className="res-card-img" />
+                  <div className="res-card-pill">
+                    <span className="res-card-pill-dot"></span>
+                    {post.category}
+                  </div>
+                </div>
+                <div className="res-card-meta">
+                  {post.date} • {post.readTime}
+                </div>
+                <h3 className="res-card-title">{post.title}</h3>
+                <p className="res-card-desc">{post.desc}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Bottom CTA Banner */}
+      <ResourceCtaBanner
+        tag="GET STARTED"
+        title="Your First Step Toward Scalable Growth"
+        titleAccent="Starts Here"
+        primaryHref="/contact"
+        primaryLabel="Schedule a Strategy Call"
+        secondaryHref="/case-studies"
+        secondaryLabel="Explore Case Studies"
+      />
+
       <Footer />
-    </>
+    </div>
   );
 }
+

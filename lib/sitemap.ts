@@ -73,11 +73,10 @@ export const industryItems: NavItem[] = [
 ];
 
 export const aboutItems: NavItem[] = [
-  { label: "Who we are", href: "/about/who-we-are", desc: "Our mission, global team, and engineering culture", icon: "🌐", built: true },
+  { label: "Who We Are", href: "/about/who-we-are", desc: "Our mission, global team, and engineering culture", icon: "🌐", built: true },
   { label: "Why Choose Us", href: "/about/why-choose-us", desc: "How our unified growth system outperforms agencies", icon: "🎯", built: true },
-  { label: "Why Businesses Choose Us", href: "/about/why-choose-us", desc: "Proven ROI, enterprise reliability & tech delivery", icon: "🚀", built: true },
+  { label: "Why Businesses Choose Us", href: "/about/why-businesses-choose-us", desc: "Built around your business, focused on what comes next", icon: "🚀", built: true },
   { label: "Our Approach", href: "/about/our-approach", desc: "Data-driven strategy, rapid execution & optimization", icon: "🔄", built: true },
-  { label: "Our Team", href: "/about/our-team", desc: "Meet the world-class marketers & AI engineers", icon: "👥", built: true },
 ];
 
 export const resourceItems: NavItem[] = [
