@@ -60,35 +60,35 @@ export default function OurApproachInteractive() {
   const phases = [
     {
       num: "01",
-      title: "Understand â€” Start With the Business",
+      title: "Understand — Start With the Business",
       subtitle: "First, we listen. Then, we solve.",
       desc: "We understand your goals, customers, market, competition, challenges and current systems before recommending a solution.",
       link: "/contact"
     },
     {
       num: "02",
-      title: "Strategize â€” Find What Moves the Needle",
+      title: "Strategize — Find What Moves the Needle",
       subtitle: "The right strategy creates the right direction.",
       desc: "We turn insights into a focused roadmap with clear priorities, actions and measurable objectives across Marketing, AI, and Tech.",
       link: "/services"
     },
     {
       num: "03",
-      title: "Build â€” Bring Strategy to Life",
+      title: "Build — Bring Strategy to Life",
       subtitle: "One strategy. One connected execution.",
-      desc: "Our teams execute across Marketing, AI and Technologyâ€”from performance marketing and SEO to AI automation, websites, and software.",
+      desc: "Our teams execute across Marketing, AI and Technology—from performance marketing and SEO to AI automation, websites, and software.",
       link: "/services/web-design-development"
     },
     {
       num: "04",
-      title: "Optimize â€” Measure. Learn. Improve.",
+      title: "Optimize — Measure. Learn. Improve.",
       subtitle: "Launching is not the goal. Better performance is.",
       desc: "We track performance, analyze results, and continuously improve what we build with CRO, A/B testing, and AI tuning.",
       link: "/services/paid-marketing"
     },
     {
       num: "05",
-      title: "Grow â€” Build for What's Next",
+      title: "Grow — Build for What's Next",
       subtitle: "Today's solution becomes tomorrow's growth engine.",
       desc: "We scale what works, identify new opportunities, and evolve your solutions as your business grows.",
       link: "/contact"
@@ -303,7 +303,7 @@ export default function OurApproachInteractive() {
                 Book a strategic discovery call to see how our 5-phase framework can accelerate your marketing pipeline and streamline your technology.
               </p>
               <div className="sf-cta-check">
-                <span>âœ“</span> Free Discovery Session &amp; Growth Audit
+                <span>✓</span> Free Discovery Session &amp; Growth Audit
               </div>
               <div className="sf-btn-row">
                 <Link href="/contact" className="sf-btn-primary">

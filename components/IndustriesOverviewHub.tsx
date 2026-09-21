@@ -186,8 +186,8 @@ export default function IndustriesOverviewHub() {
 
   return (
     <div className="ind-page-wrapper">
-      <link rel="stylesheet" href="/css/industry-system.css" />
       <Header />
+
 
       {/* 1. HERO SECTION */}
       <section className="ind-hero-section">

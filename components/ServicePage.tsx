@@ -430,7 +430,7 @@ export default function ServicePage({ data }: { data: ServicePageData }) {
               />
               <div className="ms-corner-badge">
                 <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#7c3aed" }}></span>
-                <span>Quickupp Softech Ã¢â‚¬Â¢ High-Performance Delivery</span>
+                <span>Quickupp Softech • High-Performance Delivery</span>
               </div>
             </div>
           </div>

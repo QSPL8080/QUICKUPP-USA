@@ -241,7 +241,7 @@ export default function BlogPage() {
                         gap: "4px",
                       }}
                     >
-                      Read Article â†’
+                      Read Article →
                     </Link>
                   </div>
                 </div>

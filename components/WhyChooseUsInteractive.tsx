@@ -116,7 +116,7 @@ export default function WhyChooseUsInteractive() {
     {
       num: "03",
       title: "Agile Sprint Execution",
-      desc: "Our multidisciplinary pod executes in rapid sprintsâ€”launching campaigns, engineering features, and deploying automations with weekly demo reviews."
+      desc: "Our multidisciplinary pod executes in rapid sprints—launching campaigns, engineering features, and deploying automations with weekly demo reviews."
     },
     {
       num: "04",
@@ -315,7 +315,7 @@ export default function WhyChooseUsInteractive() {
                 Discover how our integrated Marketing, AI, and Technology solutions can transform your customer acquisition and streamline your operations.
               </p>
               <div className="sf-cta-check">
-                <span>âœ“</span> Free 30-Minute Growth Strategy &amp; Tech Audit
+                <span>✓</span> Free 30-Minute Growth Strategy &amp; Tech Audit
               </div>
               <div className="sf-btn-row">
                 <Link href="/contact" className="sf-btn-primary">

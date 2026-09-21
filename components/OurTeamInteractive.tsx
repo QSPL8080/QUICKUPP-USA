@@ -309,7 +309,7 @@ export default function OurTeamInteractive() {
                 Whether you need a dedicated growth pod or specialized staff augmentation, we have the talent and systems ready for you.
               </p>
               <div className="sf-cta-check">
-                <span>âœ“</span> Direct Access to Senior Strategists &amp; Engineers
+                <span>✓</span> Direct Access to Senior Strategists &amp; Engineers
               </div>
               <div className="sf-btn-row">
                 <Link href="/contact" className="sf-btn-primary">

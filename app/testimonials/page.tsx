@@ -121,7 +121,7 @@ export default function TestimonialsPage() {
               >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
                   <div style={{ color: "#f59e0b", fontSize: "18px", letterSpacing: "2px" }}>
-                    {"â˜…".repeat(rev.rating)}
+                    {"★".repeat(rev.rating)}
                   </div>
                   <span
                     style={{

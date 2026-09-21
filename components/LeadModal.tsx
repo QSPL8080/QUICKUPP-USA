@@ -18,18 +18,16 @@ export default function LeadModal() {
     message: "",
   });
 
-  // Popup automatically after 15 seconds
+  // Popup automatically after 10 seconds (and every 10 seconds if closed without submitting)
   useEffect(() => {
-    // Check if dismissed in this session
-    const hasSeenModal = sessionStorage.getItem("qs_lead_modal_seen");
-    if (hasSeenModal) return;
+    if (isOpen || isSubmitted) return;
 
     const timer = setTimeout(() => {
       setIsOpen(true);
-    }, 15000); // 15 seconds
+    }, 10000); // 10 seconds
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [isOpen, isSubmitted]);
 
   // Listen for custom trigger event or Escape key
   useEffect(() => {
@@ -44,7 +42,6 @@ export default function LeadModal() {
 
   const closeModal = () => {
     setIsOpen(false);
-    sessionStorage.setItem("qs_lead_modal_seen", "true");
   };
 
   const openModal = () => {
@@ -60,7 +57,6 @@ export default function LeadModal() {
     setTimeout(() => {
       setIsSubmitting(false);
       setIsSubmitted(true);
-      sessionStorage.setItem("qs_lead_modal_seen", "true");
     }, 900);
   };
 
@@ -139,7 +135,10 @@ export default function LeadModal() {
                 e.currentTarget.style.color = "#667085";
               }}
             >
-              âœ•
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
             </button>
 
             {/* LEFT COLUMN: Brand, Value Proposition & Trust Badges */}
@@ -292,7 +291,7 @@ export default function LeadModal() {
                     </div>
                     <div>
                       <div style={{ fontSize: "16px", fontWeight: 800, color: "#ffffff" }}>Global Delivery</div>
-                      <div style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.6)" }}>USA â€¢ UAE â€¢ India</div>
+                      <div style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.6)" }}>USA • UAE • India</div>
                     </div>
                   </div>
                 </div>
@@ -314,16 +313,16 @@ export default function LeadModal() {
                 </div>
                 <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
                   <span style={{ fontSize: "11px", fontWeight: 700, background: "rgba(255, 255, 255, 0.08)", padding: "4px 8px", borderRadius: "6px", color: "#7c3aed" }}>
-                    âœ“ SOC 2
+                    ✓ SOC 2
                   </span>
                   <span style={{ fontSize: "11px", fontWeight: 700, background: "rgba(255, 255, 255, 0.08)", padding: "4px 8px", borderRadius: "6px", color: "#38bdf8" }}>
-                    âœ“ HIPAA Ready
+                    ✓ HIPAA Ready
                   </span>
                   <span style={{ fontSize: "11px", fontWeight: 700, background: "rgba(255, 255, 255, 0.08)", padding: "4px 8px", borderRadius: "6px", color: "#c084fc" }}>
-                    âœ“ GDPR
+                    ✓ GDPR
                   </span>
                   <span style={{ fontSize: "11px", fontWeight: 700, background: "rgba(255, 255, 255, 0.08)", padding: "4px 8px", borderRadius: "6px", color: "#4ade80" }}>
-                    âœ“ ISO 27001
+                    ✓ ISO 27001
                   </span>
                 </div>
               </div>
@@ -357,7 +356,9 @@ export default function LeadModal() {
                       margin: "0 auto 20px auto",
                     }}
                   >
-                    âœ“
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
                   </div>
                   <h3 style={{ fontSize: "26px", fontWeight: 800, color: "#18171c", marginBottom: "8px" }}>
                     Thank You!
@@ -467,13 +468,13 @@ export default function LeadModal() {
                           outline: "none",
                         }}
                       >
-                        <option value="+1">ðŸ‡ºðŸ‡¸ +1 (US)</option>
-                        <option value="+44">ðŸ‡¬ðŸ‡§ +44 (UK)</option>
-                        <option value="+971">ðŸ‡¦ðŸ‡ª +971 (UAE)</option>
-                        <option value="+91">ðŸ‡®ðŸ‡³ +91 (IN)</option>
-                        <option value="+61">ðŸ‡¦ðŸ‡º +61 (AU)</option>
-                        <option value="+49">ðŸ‡©ðŸ‡ª +49 (DE)</option>
-                        <option value="+1-CA">ðŸ‡¨ðŸ‡¦ +1 (CA)</option>
+                        <option value="+1">🇺🇸 +1 (US)</option>
+                        <option value="+44">🇬🇧 +44 (UK)</option>
+                        <option value="+971">🇦🇪 +971 (UAE)</option>
+                        <option value="+91">🇮🇳 +91 (IN)</option>
+                        <option value="+61">🇦🇺 +61 (AU)</option>
+                        <option value="+49">🇩🇪 +49 (DE)</option>
+                        <option value="+1-CA">🇨🇦 +1 (CA)</option>
                       </select>
                       <input
                         type="tel"
@@ -547,12 +548,12 @@ export default function LeadModal() {
                           outline: "none",
                         }}
                       >
-                        <option value="Full Growth System (Marketing + AI + Tech)">ðŸš€ Full Growth System (Marketing + AI + Tech)</option>
-                        <option value="AI & Automation Solutions">ðŸ¤– AI &amp; Automation Solutions</option>
-                        <option value="Performance Marketing & SEO">ðŸ“ˆ Performance Marketing &amp; SEO (AEO/GEO)</option>
-                        <option value="Web & Mobile App Development">ðŸ’» Web &amp; Mobile App Development</option>
-                        <option value="AI Video Production (Avatar / UGC)">ðŸŽ¥ AI Video Production (Avatar / UGC)</option>
-                        <option value="Staff Augmentation (IT / Marketing)">ðŸ‘¥ Staff Augmentation (IT / Marketing)</option>
+                        <option value="Full Growth System (Marketing + AI + Tech)">🚀 Full Growth System (Marketing + AI + Tech)</option>
+                        <option value="AI & Automation Solutions">🤖 AI &amp; Automation Solutions</option>
+                        <option value="Performance Marketing & SEO">📈 Performance Marketing &amp; SEO (AEO/GEO)</option>
+                        <option value="Web & Mobile App Development">💻 Web &amp; Mobile App Development</option>
+                        <option value="AI Video Production (Avatar / UGC)">🎥 AI Video Production (Avatar / UGC)</option>
+                        <option value="Staff Augmentation (IT / Marketing)">👥 Staff Augmentation (IT / Marketing)</option>
                       </select>
                     </div>
 
@@ -580,7 +581,7 @@ export default function LeadModal() {
 
                     {/* Privacy Note */}
                     <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#667085" }}>
-                      <span>ðŸ”’</span>
+                      <span>🔒</span>
                       <span>Your information is 100% confidential. We respect your privacy.</span>
                     </div>
 

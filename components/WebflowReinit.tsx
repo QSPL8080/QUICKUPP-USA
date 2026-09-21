@@ -18,46 +18,35 @@ type WebflowGlobal = {
  */
 export default function WebflowReinit() {
   const pathname = usePathname();
-  const first = useRef(true);
+  const isFirstMount = useRef(true);
 
   useEffect(() => {
     const html = document.documentElement;
-    if (pathname === "/") html.setAttribute("data-wf-page", HOME_PAGE_ID);
-    else html.removeAttribute("data-wf-page");
-
-    const timers: number[] = [];
-    // Webflow checks "scroll into view" animations on the browser's load/scroll
-    // events. In Next.js the Webflow scripts start after "load" has already fired,
-    // so nudge it with scroll/resize events until the first sections animate in.
-    const kick = () => {
-      window.dispatchEvent(new Event("scroll"));
-      window.dispatchEvent(new Event("resize"));
-    };
-
-    if (first.current) {
-      first.current = false;
-      [300, 900, 1800, 3000].forEach((ms) => timers.push(window.setTimeout(kick, ms)));
+    if (pathname === "/") {
+      html.setAttribute("data-wf-page", HOME_PAGE_ID);
     } else {
+      html.removeAttribute("data-wf-page");
+    }
+
+    // On initial mount, let Webflow initialize naturally from script tag without extra kicks
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      return;
+    }
+
+    // On client-side route transitions, gently sync Webflow once without spamming repeated timers
+    const timer = window.setTimeout(() => {
       const wf = (window as unknown as { Webflow?: WebflowGlobal }).Webflow;
       if (wf) {
-        timers.push(
-          window.setTimeout(() => {
-            try {
-              wf.destroy?.();
-              wf.ready?.();
-              const ix2 = wf.require?.("ix2");
-              ix2?.destroy?.();
-              ix2?.init?.();
-            } catch {
-              /* ignore – content stays visible via CSS fallback */
-            }
-            kick();
-          }, 50),
-        );
-        [400, 1000, 2000].forEach((ms) => timers.push(window.setTimeout(kick, ms)));
+        try {
+          wf.ready?.();
+        } catch {
+          /* ignore – content stays visible via CSS */
+        }
       }
-    }
-    return () => timers.forEach((t) => window.clearTimeout(t));
+    }, 80);
+
+    return () => window.clearTimeout(timer);
   }, [pathname]);
 
   return null;
