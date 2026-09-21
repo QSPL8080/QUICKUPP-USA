@@ -8559,5 +8559,90 @@ section.section-gap.padding-top-0 {
   }
 }
 
+/* ========================================================================= */
+/* ASSURIX WEBFLOW REPLICA DESIGN SYSTEM FOR INDUSTRY SUBPAGES */
+/* ========================================================================= */
+.font-lexend,
+.assurix-page {
+  font-family: "Lexend", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
 
+.assurix-page h1,
+.assurix-page h2,
+.assurix-page h3,
+.assurix-page h4,
+.assurix-page h5 {
+  font-family: "Lexend", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  color: #001d28;
+  letter-spacing: -0.03em;
+}
 
+.assurix-bg {
+  background-color: #f4f5f5 !important;
+}
+
+.assurix-card-hover {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease;
+}
+
+.assurix-card-hover:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px -10px rgba(0, 29, 40, 0.08);
+}
+
+.assurix-btn-green {
+  background-color: #3b742a !important;
+  color: #ffffff !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.assurix-btn-green:hover {
+  background-color: #316223 !important;
+  box-shadow: 0 10px 25px -5px rgba(59, 116, 42, 0.4);
+  transform: translateY(-2px);
+}
+
+@keyframes assurixNumberTrain {
+  0% {
+    transform: translateY(30px);
+    opacity: 0;
+    filter: blur(4px);
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+.animate-number-train {
+  animation: assurixNumberTrain 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.assurix-arrow-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #001d28;
+  font-weight: 600;
+  text-decoration: none;
+  transition: gap 0.2s ease, color 0.2s ease;
+}
+
+.assurix-arrow-link:hover {
+  gap: 10px;
+  color: #0b7b8b;
+}
+
+.assurix-arrow-link svg {
+  transition: transform 0.2s ease;
+}
+
+.assurix-arrow-link:hover svg {
+  transform: translate(2px, 2px);
+}
