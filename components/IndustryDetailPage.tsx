@@ -99,178 +99,105 @@ function AnimatedCheckList({ bullets }: { bullets: string[] }) {
 
 function LiveGrowthTelemetryCard({ crumb }: { crumb: string }) {
   const milestones = [
-    { label: "Month 1", title: "Setup & Indexing", stat: "+45%", leads: "220 leads", x: 45, y: 108 },
-    { label: "Month 3", title: "Funnel Acceleration", stat: "+160%", leads: "840 leads", x: 140, y: 78 },
-    { label: "Month 6", title: "Market Domination", stat: "+275%", leads: "1,620 leads", x: 260, y: 48 },
-    { label: "Scale Phase", title: "AI Multiplier", stat: "+380%", leads: "3,450+ leads", x: 375, y: 18 },
+    { label: "Month 1", title: "Setup & Indexing", stat: "+45%", leads: "220+ leads", x: 30, y: 80 },
+    { label: "Month 3", title: "Funnel Acceleration", stat: "+160%", leads: "840+ leads", x: 125, y: 58 },
+    { label: "Month 6", title: "Scale & Dominance", stat: "+275%", leads: "1,620+ leads", x: 235, y: 34 },
+    { label: "Scale Phase", title: "AI Compounding", stat: "+380%", leads: "3,450+ leads", x: 340, y: 12 },
   ];
 
   const [activeIdx, setActiveIdx] = useState(3);
-  const [liveEventIdx, setLiveEventIdx] = useState(0);
-
-  const liveEvents = [
-    `⚡ [AI Lead Engine] Real-time lead qualified & routed in 4.2s`,
-    `📈 [Search Dominance] 14 High-intent keywords ranked #1`,
-    `🎯 [Conversion Funnel] 28 Consultations booked in last 24h`,
-    `🛡️ [Data Security] 100% HIPAA compliance & encryption active`,
-  ];
-
-  React.useEffect(() => {
-    const timer = setInterval(() => {
-      setLiveEventIdx((prev) => (prev + 1) % liveEvents.length);
-    }, 3200);
-    return () => clearInterval(timer);
-  }, [liveEvents.length]);
-
   const activeMilestone = milestones[activeIdx];
 
   return (
-    <div className="su-innovation-card">
-      {/* Top Header */}
-      <div className="su-visual-header">
-        <div className="su-live-indicator">
-          <span className="su-pulse-dot" />
-          <span className="su-live-status-text">LIVE TELEMETRY ENGINE</span>
-        </div>
-        <div className="su-growth-index-pill">
-          <span>{crumb} Growth Index</span>
-          <span className="su-trend-up">↗ +380%</span>
-        </div>
-      </div>
-
-      {/* Live Event Activity Feed Banner */}
-      <div className="su-live-feed-banner">
-        <span className="su-live-feed-dot" />
-        <span key={liveEventIdx} className="su-live-feed-text">
-          {liveEvents[liveEventIdx]}
-        </span>
-      </div>
-
-      {/* Interactive Chart Container */}
-      <div className="su-chart-container">
-        <div className="su-chart-top-label">
-          <div className="su-chart-metric-info">
-            <span className="su-chart-metric-title">Performance Velocity</span>
-            <span className="su-chart-active-stat">{activeMilestone.stat}</span>
+    <div className="su-growth-card">
+      {/* Card Header */}
+      <div className="su-gc-header">
+        <div>
+          <div className="su-gc-tag">
+            <span className="su-gc-dot" />
+            <span>Growth Impact Engine</span>
           </div>
-          <span className="su-chart-badge-tag">INTERACTIVE RADAR</span>
+          <h3 className="su-gc-title">{crumb} Performance ROI</h3>
+        </div>
+        <div className="su-gc-badge">
+          <span>↗ +380%</span>
+        </div>
+      </div>
+
+      {/* Interactive Growth Trajectory Chart */}
+      <div className="su-gc-chart-box">
+        <div className="su-gc-chart-status">
+          <span className="su-gc-phase-name">{activeMilestone.title}</span>
+          <span className="su-gc-phase-stat">{activeMilestone.stat} Surge ({activeMilestone.leads})</span>
         </div>
 
-        <div className="su-svg-chart-wrap">
-          <svg viewBox="0 0 400 130" className="su-svg-chart" preserveAspectRatio="none">
+        <div className="su-gc-svg-wrap">
+          <svg viewBox="0 0 370 95" className="su-gc-svg" preserveAspectRatio="none">
             <defs>
-              <linearGradient id="chartLineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#00d2ff" />
-                <stop offset="45%" stopColor="#8b5cf6" />
-                <stop offset="100%" stopColor="#ec4899" />
+              <linearGradient id="suGrowthLine" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#2563eb" />
+                <stop offset="50%" stopColor="#7c3aed" />
+                <stop offset="100%" stopColor="#10b981" />
               </linearGradient>
-              <linearGradient id="chartAreaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#00d2ff" stopOpacity="0.32" />
-                <stop offset="50%" stopColor="#8b5cf6" stopOpacity="0.12" />
-                <stop offset="100%" stopColor="#ec4899" stopOpacity="0.0" />
+              <linearGradient id="suGrowthArea" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#7c3aed" stopOpacity="0.16" />
+                <stop offset="100%" stopColor="#7c3aed" stopOpacity="0.0" />
               </linearGradient>
-              <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="3" result="blur" />
-                <feComposite in="SourceGraphic" in2="blur" operator="over" />
-              </filter>
             </defs>
 
-            {/* Grid Lines */}
-            <line x1="0" y1="20" x2="400" y2="20" stroke="rgba(255,255,255,0.06)" strokeDasharray="3 3" />
-            <line x1="0" y1="60" x2="400" y2="60" stroke="rgba(255,255,255,0.06)" strokeDasharray="3 3" />
-            <line x1="0" y1="100" x2="400" y2="100" stroke="rgba(255,255,255,0.06)" strokeDasharray="3 3" />
+            {/* Subtle Grid Lines */}
+            <line x1="0" y1="25" x2="370" y2="25" stroke="#e2e8f0" strokeDasharray="3 3" />
+            <line x1="0" y1="60" x2="370" y2="60" stroke="#e2e8f0" strokeDasharray="3 3" />
 
-            {/* Y-Axis Reference Values */}
-            <text x="6" y="24" fill="rgba(255,255,255,0.3)" fontSize="8.5" fontWeight="600">+400%</text>
-            <text x="6" y="64" fill="rgba(255,255,255,0.3)" fontSize="8.5" fontWeight="600">+200%</text>
-            <text x="6" y="104" fill="rgba(255,255,255,0.3)" fontSize="8.5" fontWeight="600">0%</text>
-
-            {/* Smooth Area Fill */}
+            {/* Area Fill */}
             <path
-              d="M 0,115 C 60,112 100,85 140,78 C 200,60 220,50 260,48 C 310,40 340,24 400,16 L 400,130 L 0,130 Z"
-              fill="url(#chartAreaGrad)"
+              d="M 0,86 C 50,84 80,66 125,58 C 175,48 195,40 235,34 C 285,26 305,16 370,10 L 370,95 L 0,95 Z"
+              fill="url(#suGrowthArea)"
             />
 
-            {/* Glowing Chart Path */}
+            {/* Smooth Growth Line */}
             <path
-              d="M 0,115 C 60,112 100,85 140,78 C 200,60 220,50 260,48 C 310,40 340,24 400,16"
+              d="M 0,86 C 50,84 80,66 125,58 C 175,48 195,40 235,34 C 285,26 305,16 370,10"
               fill="none"
-              stroke="url(#chartLineGrad)"
-              strokeWidth="3.5"
+              stroke="url(#suGrowthLine)"
+              strokeWidth="3"
               strokeLinecap="round"
-              filter="url(#neonGlow)"
             />
 
-            {/* Active Vertical Laser Scan Line */}
-            <line
-              x1={activeMilestone.x}
-              y1="0"
-              x2={activeMilestone.x}
-              y2="130"
-              stroke="rgba(0, 210, 255, 0.45)"
-              strokeWidth="1.5"
-              strokeDasharray="2 2"
-              className="su-laser-scan-line"
-            />
-
-            {/* Data Nodes */}
+            {/* Data Points */}
             {milestones.map((m, idx) => {
               const isSelected = activeIdx === idx;
               return (
                 <g
                   key={idx}
-                  className="su-chart-node-group"
                   onClick={() => setActiveIdx(idx)}
                   onMouseEnter={() => setActiveIdx(idx)}
                   style={{ cursor: "pointer" }}
                 >
                   {isSelected && (
-                    <circle
-                      cx={m.x}
-                      cy={m.y}
-                      r="12"
-                      fill="none"
-                      stroke={idx === 3 ? "#ec4899" : "#00d2ff"}
-                      strokeWidth="1.5"
-                      className="su-radar-ring"
-                    />
+                    <circle cx={m.x} cy={m.y} r="9" fill="none" stroke="#7c3aed" strokeWidth="2" opacity="0.35" />
                   )}
                   <circle
                     cx={m.x}
                     cy={m.y}
-                    r={isSelected ? 6 : 4}
-                    fill={idx === 3 ? "#ec4899" : idx === 2 ? "#8b5cf6" : "#00d2ff"}
+                    r={isSelected ? 5.5 : 4}
+                    fill={isSelected ? "#7c3aed" : "#2563eb"}
                     stroke="#ffffff"
-                    strokeWidth={isSelected ? 2 : 1}
+                    strokeWidth="2"
                   />
                 </g>
               );
             })}
           </svg>
-
-          {/* Dynamic Floating Tooltip */}
-          <div
-            className="su-chart-tooltip"
-            style={{
-              left: `${Math.min(Math.max((activeMilestone.x / 400) * 100, 22), 76)}%`,
-              transform: "translateX(-50%)",
-            }}
-          >
-            <span className="su-tooltip-dot" />
-            <div className="su-tooltip-content">
-              <span className="su-tooltip-title">{activeMilestone.title}</span>
-              <span className="su-tooltip-sub">{activeMilestone.stat} Surge • {activeMilestone.leads}</span>
-            </div>
-          </div>
         </div>
 
-        {/* Milestone Selector Tabs */}
-        <div className="su-chart-x-axis">
+        {/* Milestone Switcher Tabs */}
+        <div className="su-gc-tabs">
           {milestones.map((m, idx) => (
             <button
               key={idx}
               type="button"
-              className={`su-axis-btn ${activeIdx === idx ? "su-axis-btn-active" : ""}`}
+              className={`su-gc-tab ${activeIdx === idx ? "is-active" : ""}`}
               onClick={() => setActiveIdx(idx)}
               onMouseEnter={() => setActiveIdx(idx)}
             >
@@ -280,88 +207,42 @@ function LiveGrowthTelemetryCard({ crumb }: { crumb: string }) {
         </div>
       </div>
 
-      {/* 3 Metric Rows with Realistic Numerical Data & Progress Bars */}
-      <div className="su-graph-bar-wrap">
-        {/* Row 1: Cyan / Blue */}
-        <div className="su-graph-row">
-          <div className="su-graph-label">
-            <div className="su-metric-name">
-              <span className="su-color-indicator su-color-cyan" />
-              <span>Search &amp; Organic Acquisition</span>
-            </div>
-            <div className="su-metric-right">
-              <span className="su-metric-subval">148.2k reach</span>
-              <span className="su-stat-pill su-pill-cyan">+320%</span>
-            </div>
+      {/* 2 Clear Metric Rows */}
+      <div className="su-gc-metrics">
+        <div className="su-gc-metric-row">
+          <div className="su-gc-metric-head">
+            <span className="su-gc-metric-title">Search &amp; Organic Acquisition</span>
+            <span className="su-gc-metric-pill su-pill-blue">+320%</span>
           </div>
-          <div className="su-graph-track">
-            <div className="su-graph-fill su-fill-cyan" style={{ width: "88%" }}>
-              <span className="su-fill-shimmer" />
-            </div>
+          <div className="su-gc-bar-track">
+            <div className="su-gc-bar-fill su-fill-blue" style={{ width: "86%" }} />
           </div>
         </div>
 
-        {/* Row 2: Purple / Pink */}
-        <div className="su-graph-row">
-          <div className="su-graph-label">
-            <div className="su-metric-name">
-              <span className="su-color-indicator su-color-purple" />
-              <span>High-Intent Enquiries</span>
-            </div>
-            <div className="su-metric-right">
-              <span className="su-metric-subval">2,840 booked</span>
-              <span className="su-stat-pill su-pill-purple">+245%</span>
-            </div>
+        <div className="su-gc-metric-row">
+          <div className="su-gc-metric-head">
+            <span className="su-gc-metric-title">High-Intent Lead Volume</span>
+            <span className="su-gc-metric-pill su-pill-purple">+245%</span>
           </div>
-          <div className="su-graph-track">
-            <div className="su-graph-fill su-fill-purple" style={{ width: "76%" }}>
-              <span className="su-fill-shimmer" />
-            </div>
-          </div>
-        </div>
-
-        {/* Row 3: Emerald / Teal */}
-        <div className="su-graph-row">
-          <div className="su-graph-label">
-            <div className="su-metric-name">
-              <span className="su-color-indicator su-color-emerald" />
-              <span>AI Qualification &amp; Nurture</span>
-            </div>
-            <div className="su-metric-right">
-              <span className="su-metric-subval">Instant &lt; 5s triage</span>
-              <span className="su-stat-pill su-pill-emerald">98.4%</span>
-            </div>
-          </div>
-          <div className="su-graph-track">
-            <div className="su-graph-fill su-fill-emerald" style={{ width: "98%" }}>
-              <span className="su-fill-shimmer" />
-            </div>
+          <div className="su-gc-bar-track">
+            <div className="su-gc-bar-fill su-fill-purple" style={{ width: "74%" }} />
           </div>
         </div>
       </div>
 
-      {/* Bottom KPI Footer */}
-      <div className="su-kpi-footer">
-        <div className="su-kpi-pill">
-          <span className="su-kpi-icon">⚡</span>
-          <div>
-            <div className="su-kpi-val">&lt; 15 min</div>
-            <div className="su-kpi-lbl">Lead Response</div>
-          </div>
+      {/* Bottom KPI 3-Tile Summary */}
+      <div className="su-gc-kpis">
+        <div className="su-gc-kpi-item">
+          <span className="su-gc-kpi-val">&lt; 15m</span>
+          <span className="su-gc-kpi-lbl">Lead Response</span>
         </div>
-        <div className="su-kpi-pill">
-          <span className="su-kpi-icon">📈</span>
-          <div>
-            <div className="su-kpi-val">4.8x</div>
-            <div className="su-kpi-lbl">Pipeline ROI</div>
-          </div>
+        <div className="su-gc-kpi-item">
+          <span className="su-gc-kpi-val">4.8x</span>
+          <span className="su-gc-kpi-lbl">Pipeline ROI</span>
         </div>
-        <div className="su-kpi-pill">
-          <span className="su-kpi-icon">🛡️</span>
-          <div>
-            <div className="su-kpi-val">100%</div>
-            <div className="su-kpi-lbl">Enterprise Safe</div>
-          </div>
+        <div className="su-gc-kpi-item">
+          <span className="su-gc-kpi-val">100%</span>
+          <span className="su-gc-kpi-lbl">Enterprise Safe</span>
         </div>
       </div>
     </div>
