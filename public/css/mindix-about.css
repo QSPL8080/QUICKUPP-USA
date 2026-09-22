@@ -414,12 +414,12 @@
 }
 
 .mx-section-heading {
-  font-size: clamp(28px, 3.4vw, 44px);
+  font-size: clamp(22px, 2.4vw, 32px);
   font-weight: 800;
-  line-height: 1.2;
+  line-height: 1.25;
   color: var(--mx-text-heading);
-  letter-spacing: -0.03em;
-  margin: 0 0 24px 0;
+  letter-spacing: -0.025em;
+  margin: 0 0 20px 0;
 }
 
 /* Interactive Pill Tab Buttons (Matches .res-filter-pill) */
@@ -488,35 +488,61 @@
   overflow: hidden;
   box-shadow: 0 20px 48px -10px rgba(15, 23, 42, 0.12);
   border: 4px solid #ffffff;
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), z-index 0.3s ease;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, z-index 0.3s ease;
+  will-change: transform, opacity;
 }
 
 .mx-photo-img-wrap.img-back {
   width: 62%;
   height: 340px;
-  left: 0;
-  bottom: 0;
+  right: 0;
+  top: 0;
   z-index: 1;
+  animation: mxPhotoSlideBack 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .mx-photo-img-wrap.img-front {
   width: 64%;
   height: 380px;
-  right: 0;
-  top: 0;
+  left: 0;
+  bottom: 0;
   z-index: 2;
+  animation: mxPhotoSlideFront 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
+}
+
+@keyframes mxPhotoSlideBack {
+  0% {
+    opacity: 0;
+    transform: translate(60px, -45px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes mxPhotoSlideFront {
+  0% {
+    opacity: 0;
+    transform: translate(-60px, 45px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
 }
 
 .mx-photo-img-wrap:hover {
-  transform: scale(1.03);
+  transform: scale(1.03) translate(0, 0) !important;
+  box-shadow: 0 24px 56px -8px rgba(124, 58, 237, 0.2);
   z-index: 3;
 }
 
 .mx-photo-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
 }
 
 @media (max-width: 600px) {
@@ -654,11 +680,11 @@
 
 .mx-partnership-title,
 .mx-lime-title {
-  font-size: clamp(26px, 3.4vw, 42px);
+  font-size: clamp(22px, 2.4vw, 32px);
   font-weight: 800;
   color: var(--mx-text-heading) !important;
-  line-height: 1.2;
-  letter-spacing: -0.03em;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
   margin: 0;
 }
 
@@ -1080,11 +1106,11 @@
 }
 
 .mx-cta-title {
-  font-size: clamp(26px, 3.4vw, 42px);
+  font-size: clamp(22px, 2.4vw, 32px);
   font-weight: 800;
-  line-height: 1.22;
+  line-height: 1.25;
   color: var(--mx-text-heading);
-  letter-spacing: -0.03em;
+  letter-spacing: -0.025em;
   margin: 10px 0 16px 0;
 }
 
@@ -1624,11 +1650,32 @@
 }
 
 .mx-process-stage-title {
-  font-size: clamp(26px, 2.5vw, 34px);
+  font-size: clamp(20px, 2vw, 26px);
   font-weight: 800;
   color: var(--mx-text-heading);
   margin: 0;
   letter-spacing: -0.02em;
+}
+
+/* Modern Monochrome Icon Box (Black & White Trendy Aesthetic) */
+.mx-monochrome-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: #0f172a;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.16);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mx-lime-col:hover .mx-monochrome-icon-box {
+  background: #000000;
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
 }
 
 .mx-process-stage-desc {
@@ -1701,6 +1748,7 @@
   align-items: center;
   padding-bottom: 12px;
   border-bottom: 1px solid var(--mx-border);
+  gap: 14px;
 }
 
 .mx-process-telemetry-label {
@@ -1709,12 +1757,14 @@
   color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  flex-shrink: 0;
 }
 
 .mx-process-telemetry-val {
   font-size: 13.5px;
   font-weight: 800;
   color: var(--mx-text-heading);
+  text-align: right;
 }
 
 .mx-process-next-btn {

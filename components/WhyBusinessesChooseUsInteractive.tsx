@@ -6,47 +6,9 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export default function WhyBusinessesChooseUsInteractive() {
-  const [activeTab, setActiveTab] = useState<"marketing" | "ai" | "tech">("marketing");
-  const [yearsCount, setYearsCount] = useState<number>(0);
-  const [retentionCount, setRetentionCount] = useState<number>(0);
-  const [hasAnimated, setHasAnimated] = useState(false);
-  const statsRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !hasAnimated) {
-          setHasAnimated(true);
-          let y = 0;
-          const yTimer = setInterval(() => {
-            y += 1;
-            if (y >= 10) {
-              setYearsCount(10);
-              clearInterval(yTimer);
-            } else {
-              setYearsCount(y);
-            }
-          }, 80);
-
-          let r = 80;
-          const rTimer = setInterval(() => {
-            r += 1;
-            if (r >= 98) {
-              setRetentionCount(98);
-              clearInterval(rTimer);
-            } else {
-              setRetentionCount(r);
-            }
-          }, 30);
-        }
-      },
-      { threshold: 0.2 }
-    );
-    if (statsRef.current) observer.observe(statsRef.current);
-    return () => observer.disconnect();
-  }, [hasAnimated]);
-
   const [filterCategory, setFilterCategory] = useState<"all" | "strategy" | "execution" | "scale">("all");
+  const [activeDiffIdx, setActiveDiffIdx] = useState<number>(0);
+  const [activeWorkStep, setActiveWorkStep] = useState<number>(0);
 
   const whatSetsApart = [
     {
@@ -54,7 +16,8 @@ export default function WhyBusinessesChooseUsInteractive() {
       category: "strategy",
       title: "One Partner. Multiple Capabilities.",
       desc: "Marketing, creative, technology and AI often require multiple vendors. Quickupp brings these capabilities together, making it easier to manage projects, align strategies and execute connected solutions.",
-      tag: "Marketing. AI. Technology. Built for Growth.",
+      subtext: "Marketing. AI. Technology. Built for Growth.",
+      tag: "Unified Capabilities",
       ctaText: "Explore Our Capabilities",
       ctaHref: "/services",
     },
@@ -64,6 +27,7 @@ export default function WhyBusinessesChooseUsInteractive() {
       title: "Business-First Thinking",
       desc: "We take the time to understand what actually matters to your business before recommending a solution. Whether the objective is customer acquisition, digital transformation, automation or market expansion, our work starts with the business problem—not the service.",
       tag: "Strategic Problem Solving",
+      subtext: null,
       ctaText: null,
       ctaHref: null,
     },
@@ -72,7 +36,8 @@ export default function WhyBusinessesChooseUsInteractive() {
       category: "strategy",
       title: "Solutions Built Around Your Requirements",
       desc: "No two businesses operate the same way. We adapt our approach to your industry, audience, processes, objectives and stage of growth rather than forcing you into a standard package.",
-      tag: "Tailored Architecture",
+      tag: "Tailored Delivery",
+      subtext: null,
       ctaText: null,
       ctaHref: null,
     },
@@ -82,6 +47,7 @@ export default function WhyBusinessesChooseUsInteractive() {
       title: "Strong Execution",
       desc: "Ideas only create value when they are executed well. Our teams bring together strategy, creative, marketing and technology expertise to move projects from planning to implementation, measurement and refinement.",
       tag: "End-to-End Delivery",
+      subtext: null,
       ctaText: "Discuss Your Project",
       ctaHref: "/contact",
     },
@@ -91,16 +57,17 @@ export default function WhyBusinessesChooseUsInteractive() {
       title: "Practical AI Adoption",
       desc: "We focus on where AI can create real business value. From AI chatbots and agents to lead qualification, workflow automation, CRM processes and customer support, we identify practical use cases that can improve efficiency and customer experiences.",
       tag: "Applied Intelligence",
+      subtext: null,
       ctaText: "Explore AI Solutions",
-      ctaHref: "/services/ai-automation-solutions",
+      ctaHref: "/services",
     },
     {
       num: "06",
       category: "execution",
       title: "Outcome-Oriented Approach",
-      desc: "We look beyond completed tasks. Depending on the engagement, our work supports clear, measurable objectives rather than vanity metrics.",
+      desc: "We look beyond completed tasks. Depending on the engagement, our work can support objectives such as:",
       tag: "Measurable Business Value",
-      points: [
+      outcomes: [
         "Generating qualified opportunities",
         "Improving conversion",
         "Increasing online visibility",
@@ -109,6 +76,7 @@ export default function WhyBusinessesChooseUsInteractive() {
         "Strengthening digital experiences",
         "Creating scalable systems",
       ],
+      subtext: "The objective is to create measurable business value.",
       ctaText: null,
       ctaHref: null,
     },
@@ -116,7 +84,7 @@ export default function WhyBusinessesChooseUsInteractive() {
       num: "07",
       category: "scale",
       title: "Industry-Aware Expertise",
-      desc: "Our experience spans key global verticals. This allows us to understand different customer journeys, buying decisions and business requirements while developing solutions specific to each market.",
+      desc: "Our experience spans Healthcare, Home Services, Professional Services, Education, IT & SaaS, eCommerce, Real Estate, Interior Design, Travel & Hospitality and Automotive. This allows us to understand different customer journeys, buying decisions and business requirements while developing solutions specific to each market.",
       tag: "Multi-Vertical Experience",
       industryChips: [
         "Healthcare",
@@ -130,6 +98,7 @@ export default function WhyBusinessesChooseUsInteractive() {
         "Travel & Hospitality",
         "Automotive",
       ],
+      subtext: null,
       ctaText: "Explore Our Industries",
       ctaHref: "/industries",
     },
@@ -139,6 +108,7 @@ export default function WhyBusinessesChooseUsInteractive() {
       title: "Built With Scalability in Mind",
       desc: "Your requirements today may not be the same six months from now. We consider future needs when developing marketing systems, websites, applications, automation and technology solutions—so what we build can evolve with your business.",
       tag: "Future-Proof Architecture",
+      subtext: null,
       ctaText: null,
       ctaHref: null,
     },
@@ -148,6 +118,7 @@ export default function WhyBusinessesChooseUsInteractive() {
       title: "Clear Communication",
       desc: "Good work requires good communication. We maintain clear expectations around scope, timelines, priorities, progress and performance, giving you visibility throughout the engagement.",
       tag: "Transparent Collaboration",
+      subtext: null,
       ctaText: null,
       ctaHref: null,
     },
@@ -157,6 +128,7 @@ export default function WhyBusinessesChooseUsInteractive() {
       title: "Global Perspective",
       desc: "Businesses today can reach customers far beyond their local market. Our experience across India and international markets helps us approach digital growth with a broader understanding of audiences, competition and market expansion.",
       tag: "International Reach",
+      subtext: null,
       ctaText: null,
       ctaHref: null,
     },
@@ -165,9 +137,6 @@ export default function WhyBusinessesChooseUsInteractive() {
   const filteredDistinctions = whatSetsApart.filter(
     (item) => filterCategory === "all" || item.category === filterCategory
   );
-
-  const [activeDiffIdx, setActiveDiffIdx] = useState<number>(0);
-  const [activeWorkStep, setActiveWorkStep] = useState<number>(0);
 
   const differenceItems = [
     {
@@ -180,7 +149,7 @@ export default function WhyBusinessesChooseUsInteractive() {
     {
       step: "02 • CONVERSION",
       title: "Conversion Engine",
-      desc: "A high-performing website can convert it.",
+      desc: "A website can convert it.",
       tag: "Experience & UI/UX",
       insight: "Fast, frictionless digital experiences turn qualified traffic into paying customers.",
     },
@@ -213,7 +182,7 @@ export default function WhyBusinessesChooseUsInteractive() {
         "Technical architecture & legacy workflow bottleneck assessment",
       ],
       telemetry: {
-        timeline: "Sprint 0 • Days 1–10",
+        timeline: "Phase 01 • Discovery",
         lead: "Strategic Growth Lead",
         goal: "Zero Assumptions & Total Alignment",
       },
@@ -230,7 +199,7 @@ export default function WhyBusinessesChooseUsInteractive() {
         "KPI benchmarks, ROI targets & measurement framework",
       ],
       telemetry: {
-        timeline: "Sprint 1 • Days 11–20",
+        timeline: "Phase 02 • Planning",
         lead: "Lead Solutions Architect",
         goal: "Clear Roadmaps & Defined Timelines",
       },
@@ -247,7 +216,7 @@ export default function WhyBusinessesChooseUsInteractive() {
         "Rigorous cross-browser QA testing & performance benchmarking",
       ],
       telemetry: {
-        timeline: "Sprint 2+ • High-Velocity Sprints",
+        timeline: "Phase 03 • Implementation",
         lead: "Engineering & Marketing Squad",
         goal: "Velocity with Production Excellence",
       },
@@ -264,7 +233,7 @@ export default function WhyBusinessesChooseUsInteractive() {
         "Data-driven bottleneck detection & user behavioral insights",
       ],
       telemetry: {
-        timeline: "Continuous • Real-Time Dashboards",
+        timeline: "Phase 04 • Performance",
         lead: "Data & Performance Specialist",
         goal: "Measurable Business Outcomes",
       },
@@ -281,7 +250,7 @@ export default function WhyBusinessesChooseUsInteractive() {
         "Ongoing feature development aligned with market growth",
       ],
       telemetry: {
-        timeline: "Ongoing Growth Partnership",
+        timeline: "Phase 05 • Optimization",
         lead: "Dedicated Growth Partner Team",
         goal: "Long-Term Compounding Advantage",
       },
@@ -307,7 +276,7 @@ export default function WhyBusinessesChooseUsInteractive() {
 
       <main>
         {/* =========================================================================
-            1. HERO SECTION
+            1. HERO SECTION (WHY BUSINESSES CHOOSE US)
             ========================================================================= */}
         <section className="mx-hero-section">
           <div className="mx-container">
@@ -321,10 +290,10 @@ export default function WhyBusinessesChooseUsInteractive() {
                 </svg>
               </div>
 
-              {/* Top Center Subtitle Badge matching Contact page */}
+              {/* Top Center Subtitle Badge */}
               <div className="mx-subtitle-badge">
                 <span className="mx-badge-dot" />
-                <span>Why Businesses Choose Us</span>
+                <span>WHY BUSINESSES CHOOSE US</span>
               </div>
 
               {/* Hero Headline & Subtitle */}
@@ -345,18 +314,6 @@ export default function WhyBusinessesChooseUsInteractive() {
                   </svg>
                 </div>
               </Link>
-
-              {/* Responsive Bottom Hero Stats Strip (No Overlaps) */}
-              <div className="mx-hero-stats-strip">
-                <div className="mx-hero-stat-badge">
-                  <div className="mx-hero-stat-badge-num">10+</div>
-                  <div className="mx-hero-stat-badge-text">Key industries scaled globally</div>
-                </div>
-                <div className="mx-hero-stat-badge">
-                  <div className="mx-hero-stat-badge-num">99.9%</div>
-                  <div className="mx-hero-stat-badge-text">On-time execution &amp; milestone SLA</div>
-                </div>
-              </div>
             </div>
           </div>
         </section>
@@ -536,10 +493,10 @@ export default function WhyBusinessesChooseUsInteractive() {
                       {item.desc}
                     </p>
 
-                    {/* Point 06 Bullet Checklist */}
-                    {item.points && (
+                    {/* Point 06 Outcome Checklist */}
+                    {item.outcomes && (
                       <div className="mx-distinction-points">
-                        {item.points.map((pt, idx) => (
+                        {item.outcomes.map((pt, idx) => (
                           <div key={idx} className="mx-distinction-point-item">
                             <span className="mx-distinction-point-check">✓</span>
                             <span>{pt}</span>
@@ -559,9 +516,18 @@ export default function WhyBusinessesChooseUsInteractive() {
                       </div>
                     )}
 
+                    {/* Subtext Highlight */}
+                    {item.subtext && (
+                      <div style={{ marginTop: "auto", paddingTop: "12px", borderTop: "1px dashed var(--mx-border)" }}>
+                        <p style={{ margin: 0, fontSize: "13.5px", fontWeight: 700, color: "var(--mx-primary)" }}>
+                          {item.subtext}
+                        </p>
+                      </div>
+                    )}
+
                     {/* CTA Link */}
                     {item.ctaText && item.ctaHref && (
-                      <div>
+                      <div style={{ marginTop: "4px" }}>
                         <Link href={item.ctaHref} className="mx-distinction-cta">
                           <span>{item.ctaText}</span>
                           <span style={{ fontSize: "16px" }}>→</span>
@@ -586,9 +552,14 @@ export default function WhyBusinessesChooseUsInteractive() {
                 <h2 className="mx-partnership-title">
                   We Connect <span className="mx-gradient-text">the Pieces.</span>
                 </h2>
-                <p style={{ fontSize: "16.5px", lineHeight: "1.7", color: "var(--mx-text-body)", marginTop: "16px" }}>
-                  Our advantage is understanding how these pieces can work together. Instead of looking at isolated requirements, we look at the bigger business opportunity and connect the right capabilities around it.
-                </p>
+                <div style={{ maxWidth: "780px", margin: "16px auto 0", textAlign: "center" }}>
+                  <p style={{ fontSize: "15px", lineHeight: "1.7", color: "var(--mx-text-body)", margin: "0 0 8px 0" }}>
+                    A marketing campaign can generate demand. A website can convert it. AI can automate what happens next. Technology can help the entire system scale.
+                  </p>
+                  <p style={{ fontSize: "15px", lineHeight: "1.7", color: "var(--mx-text-body)", margin: 0, fontWeight: 600 }}>
+                    Our advantage is understanding how these pieces can work together. Instead of looking at isolated requirements, we look at the bigger business opportunity and connect the right capabilities around it.
+                  </p>
+                </div>
               </div>
 
               {/* Animated Interactive 4-Node Flow Pipeline */}
@@ -656,7 +627,7 @@ export default function WhyBusinessesChooseUsInteractive() {
         {/* =========================================================================
             4. HOW WE WORK (5-Phase Modern Delivery Framework)
             ========================================================================= */}
-        <section className="mx-tab-section" ref={statsRef}>
+        <section className="mx-tab-section">
           <div className="mx-container">
             <div style={{ textAlign: "center", maxWidth: "800px", margin: "0 auto 36px" }}>
               <span className="mx-sub-badge">HOW WE WORK</span>
@@ -765,6 +736,9 @@ export default function WhyBusinessesChooseUsInteractive() {
                     >
                       <div className="mx-process-mini-num">STEP {phase.step}</div>
                       <div className="mx-process-mini-title">{phase.title}</div>
+                      <p style={{ fontSize: "12.5px", color: "var(--mx-text-body)", margin: "6px 0 0 0", lineHeight: "1.4" }}>
+                        {phase.desc}
+                      </p>
                     </div>
                   );
                 })}
@@ -784,8 +758,11 @@ export default function WhyBusinessesChooseUsInteractive() {
                 <h2 className="mx-cta-title">
                   Ready to explore what we can build for your business?
                 </h2>
-                <p className="mx-cta-desc">
+                <p className="mx-cta-desc" style={{ marginBottom: "16px" }}>
                   From improving customer acquisition to modernizing operations, Quickupp helps businesses bring together the people, strategies and technology required for their next stage. One Partner for Marketing, AI &amp; Technology.
+                </p>
+                <p style={{ fontSize: "15px", color: "var(--mx-primary)", fontWeight: 700, margin: 0 }}>
+                  Ready to explore what we can build for your business?
                 </p>
               </div>
 

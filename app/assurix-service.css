@@ -480,11 +480,11 @@
 }
 
 .asx-valprop-title {
-  font-size: 38px;
-  line-height: 1.18;
+  font-size: clamp(22px, 2.4vw, 32px);
+  line-height: 1.25;
   font-weight: 800;
   color: #001d28;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.025em;
   margin: 12px 0 16px;
 }
 
@@ -800,11 +800,11 @@
 }
 
 .asx-story-title {
-  font-size: 38px;
-  line-height: 1.18;
+  font-size: clamp(22px, 2.4vw, 32px);
+  line-height: 1.25;
   font-weight: 800;
   color: #001d28;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.025em;
   margin: 12px 0 18px;
 }
 
@@ -1080,8 +1080,8 @@
 }
 
 .asx-cta-title {
-  font-size: 42px;
-  line-height: 1.15;
+  font-size: clamp(22px, 2.4vw, 32px);
+  line-height: 1.25;
   font-weight: 800;
   color: #ffffff;
   margin: 0 0 16px;
@@ -1356,11 +1356,11 @@
 }
 
 .asx-who-title {
-  font-size: 42px;
-  line-height: 1.14;
+  font-size: clamp(22px, 2.4vw, 32px);
+  line-height: 1.25;
   font-weight: 800;
   color: #001d28;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.025em;
   margin: 0 0 20px;
   font-family: 'Lexend', sans-serif;
 }
