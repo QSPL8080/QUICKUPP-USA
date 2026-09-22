@@ -66,7 +66,7 @@ export default function RootLayout({
       </head>
       <body>
         {children}
-        <LeadModal />
+        {/* <LeadModal /> */}
         {/* Exactly the script set the Mercket reference home page loads. The extra
             bundles from other template pages were re-initialising Webflow and
             crashing it ("t is not a function"), which froze every animation. */}

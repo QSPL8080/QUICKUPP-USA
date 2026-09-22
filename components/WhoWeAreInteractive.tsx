@@ -136,7 +136,7 @@ export default function WhoWeAreInteractive() {
               {/* Top Center Subtitle Badge matching Contact page */}
               <div className="mx-subtitle-badge">
                 <span className="mx-badge-dot" />
-                <span>Marketing, AI &amp; Technology Agency</span>
+                <span>Your Trusted Digital Growth Partner</span>
               </div>
 
               {/* Hero Headline & Subtitle */}
@@ -144,7 +144,7 @@ export default function WhoWeAreInteractive() {
                 Marketing. AI. Technology. <span className="mx-gradient-text">Built for Growth.</span>
               </h1>
               <p className="mx-hero-subtitle">
-                Quickupp Softech is a full-service Marketing, AI &amp; Technology company helping ambitious businesses grow, scale and stay ahead in an increasingly digital world. We bring together the power of digital marketing, artificial intelligence and technology to help businesses attract the right customers, build stronger brands, improve operations and create meaningful digital experiences.
+                Quickupp Softech is a full-service Marketing, AI &amp; Technology company helping ambitious businesses grow, scale and stay ahead in an increasingly digital world. We bring together the power of digital marketing, artificial intelligence and technology to help businesses attract the right customers, build stronger brands, improve operations and create meaningful digital experiences. From performance marketing and SEO to AI automation, AI-powered search visibility, websites, mobile applications and custom software, we combine strategy, creativity, technology and execution to solve real business challenges. We don&apos;t just deliver services. We build solutions designed around your growth.
               </p>
 
               {/* Hero Action Button */}
@@ -387,12 +387,15 @@ export default function WhoWeAreInteractive() {
           <div className="mx-container">
             <div style={{ background: "#ffffff", border: "1px solid var(--mx-border)", borderRadius: "28px", padding: "54px 44px", boxShadow: "0 10px 30px -8px rgba(15, 23, 42, 0.06)" }}>
               <div style={{ maxWidth: "880px", margin: "0 auto", textAlign: "center" }}>
-                <span className="mx-sub-badge">BUILT AROUND YOUR BUSINESS</span>
+                <span className="mx-sub-badge">BUILT AROUND YOUR BUSINESS. FOCUSED ON YOUR GROWTH.</span>
                 <h2 className="mx-section-heading" style={{ marginBottom: "20px" }}>
-                  Focused on Your Growth
+                  Every Business Is Different. <span className="mx-gradient-text">Focused on Your Growth.</span>
                 </h2>
                 <p className="mx-tab-paragraph" style={{ marginBottom: "16px" }}>
-                  Every business is different. That&apos;s why we don&apos;t believe in a one-size-fits-all approach. Your challenges, customers, goals and opportunities are unique. Our approach is built around understanding those factors and creating the right combination of Marketing, AI and Technology to support your next stage of growth.
+                  Every business is different. That&apos;s why we don&apos;t believe in a one-size-fits-all approach.
+                </p>
+                <p className="mx-tab-paragraph" style={{ marginBottom: "16px" }}>
+                  Your challenges, customers, goals and opportunities are unique. Our approach is built around understanding those factors and creating the right combination of Marketing, AI and Technology to support your next stage of growth.
                 </p>
                 <p className="mx-tab-paragraph" style={{ marginBottom: "16px" }}>
                   Whether you need a focused solution in one area or an integrated strategy across multiple capabilities, Quickupp Softech provides the expertise and execution to help turn opportunities into measurable progress.
