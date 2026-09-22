@@ -224,6 +224,35 @@ function getImagesForIndustry(crumb: string) {
   );
 }
 
+function renderGradientTitle(title: string) {
+  if (!title) return null;
+  const dotParts = title.split(". ").filter(Boolean);
+  if (dotParts.length >= 2) {
+    const splitIndex = Math.ceil(dotParts.length / 2);
+    const firstHalf = dotParts.slice(0, splitIndex).join(". ") + (splitIndex < dotParts.length ? "." : "");
+    const secondHalf = dotParts.slice(splitIndex).join(". ");
+    return (
+      <>
+        <span>{firstHalf} </span>
+        <span className="asx-gradient-text">{secondHalf}</span>
+      </>
+    );
+  }
+  const words = title.split(" ");
+  if (words.length >= 4) {
+    const mid = Math.ceil(words.length / 2);
+    const firstHalf = words.slice(0, mid).join(" ");
+    const secondHalf = words.slice(mid).join(" ");
+    return (
+      <>
+        <span>{firstHalf} </span>
+        <span className="asx-gradient-text">{secondHalf}</span>
+      </>
+    );
+  }
+  return title;
+}
+
 export default function IndustryDetailPage({ data }: { data: ServicePageData }) {
   const images = getImagesForIndustry(data.crumb);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -350,7 +379,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                 </div>
 
                 <h1 className="asx-hero-title">
-                  {data.heroTitle}
+                  {renderGradientTitle(data.heroTitle)}
                 </h1>
 
                 {data.heroParagraphs && data.heroParagraphs[0] && (
@@ -570,7 +599,8 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                 </div>
 
                 <h2 className="asx-valprop-title">
-                  {"Protect your " + data.crumb.toLowerCase() + " practice and secure your growth"}
+                  {"Protect your " + data.crumb.toLowerCase() + " practice and "}
+                  <span className="asx-gradient-text">secure your growth</span>
                 </h2>
 
                 <p className="asx-valprop-desc">
@@ -691,7 +721,8 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                 </div>
 
                 <h2 className="asx-story-title">
-                  Experience reliability, transparency and true commitment
+                  {"Experience reliability, transparency and "}
+                  <span className="asx-gradient-text">true commitment</span>
                 </h2>
 
                 <p className="asx-story-desc">
@@ -720,7 +751,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
           <section className="asx-section" style={{ borderTop: "1px solid #e5eaee" }}>
             <div className="asx-container">
               <div className="asx-section-header-center">
-                <h2 style={{ fontSize: "32px", fontWeight: 800, color: "#001d28", margin: "0 0 10px" }}>
+                <h2 style={{ fontSize: "clamp(22px, 2.4vw, 32px)", fontWeight: 800, color: "#001d28", margin: "0 0 10px" }}>
                   {"Comprehensive " + data.crumb + " solutions tailored for you"}
                 </h2>
                 <p style={{ fontSize: "15px", color: "#2c436b", margin: 0 }}>
@@ -815,7 +846,8 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                 {/* Right Column: Title, Subtitle, Bullets, Divider, Checkmarks, Schedule Button */}
                 <div className="asx-who-content">
                   <h2 className="asx-who-title">
-                    {"Affordable & scalable growth for every " + data.crumb.toLowerCase() + " stage"}
+                    {"Affordable & scalable growth for "}
+                    <span className="asx-gradient-text">{"every " + data.crumb.toLowerCase() + " stage"}</span>
                   </h2>
 
                   <div className="asx-who-subtitle">
@@ -862,8 +894,8 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
           <section className="asx-section" style={{ borderTop: "1px solid #e5eaee" }}>
             <div className="asx-container">
               <div className="asx-section-header-center">
-                <h2 style={{ fontSize: "34px", fontWeight: 800, color: "#001d28", margin: "0 0 12px" }}>
-                  {processBlock.title}
+                <h2 style={{ fontSize: "clamp(22px, 2.4vw, 32px)", fontWeight: 800, color: "#001d28", margin: "0 0 12px" }}>
+                  {renderGradientTitle(processBlock.title)}
                 </h2>
                 <p style={{ fontSize: "15px", color: "#2c436b", margin: 0 }}>
                   A structured, transparent methodology delivering predictable outcomes.
@@ -903,7 +935,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
           <section className="asx-section" style={{ background: "#ffffff", borderTop: "1px solid #e5eaee" }}>
             <div className="asx-container-sm">
               <div className="asx-section-header-center">
-                <h2 style={{ fontSize: "32px", fontWeight: 800, color: "#001d28", margin: "0 0 10px" }}>
+                <h2 style={{ fontSize: "clamp(22px, 2.4vw, 32px)", fontWeight: 800, color: "#001d28", margin: "0 0 10px" }}>
                   Frequently Asked Questions
                 </h2>
                 <p style={{ fontSize: "15px", color: "#2c436b", margin: 0 }}>
@@ -945,7 +977,9 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
           <div className="asx-container">
             <div className="asx-cta-box">
               <h2 className="asx-cta-title">
-                {"Ready to scale your "}<span>{data.crumb}</span>{" brand?"}
+                {"Ready to scale your "}
+                <span className="asx-gradient-text">{data.crumb}</span>
+                {" brand?"}
               </h2>
 
               <p className="asx-cta-desc">

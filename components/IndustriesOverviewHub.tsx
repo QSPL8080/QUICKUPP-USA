@@ -140,8 +140,8 @@ export default function IndustriesOverviewHub() {
               <span>Full-Stack Industry Solutions</span>
             </div>
 
-            <h1 style={{ fontSize: "48px", fontWeight: 800, color: "#001d28", margin: "0 0 16px", letterSpacing: "-0.03em" }}>
-              Industries We Scale with <span style={{ color: "#0b7b8b" }}>Marketing & AI</span>
+            <h1 style={{ fontSize: "clamp(28px, 3.4vw, 44px)", fontWeight: 800, color: "#001d28", margin: "0 0 16px", letterSpacing: "-0.03em" }}>
+              Industries We Scale with <span className="asx-gradient-text">Marketing &amp; AI</span>
             </h1>
             <p style={{ fontSize: "16px", color: "#2c436b", maxWidth: "600px", margin: "0 auto" }}>
               Select your industry below to explore tailored growth strategies, proven conversion funnels, and automated AI systems.

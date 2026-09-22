@@ -8576,6 +8576,13 @@ section.section-gap.padding-top-0 {
   letter-spacing: -0.03em;
 }
 
+.asx-gradient-text {
+  background: linear-gradient(135deg, #00d2ff 0%, #6366f1 50%, #a855f7 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  display: inline !important;
+}
+
 .assurix-bg {
   background-color: #f4f5f5 !important;
 }
