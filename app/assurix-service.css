@@ -345,8 +345,18 @@
 
 .asx-section-header-center {
   text-align: center;
-  max-width: 680px;
-  margin: 0 auto 52px;
+  max-width: 980px;
+  margin: 0 auto 48px;
+}
+
+.asx-one-line-heading {
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .asx-one-line-heading {
+    white-space: normal;
+  }
 }
 
 .asx-section-intro {

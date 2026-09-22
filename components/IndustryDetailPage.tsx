@@ -750,11 +750,11 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
         {descPairsBlock && (
           <section className="asx-section" style={{ borderTop: "1px solid #e5eaee" }}>
             <div className="asx-container">
-              <div className="asx-section-header-center">
-                <h2 style={{ fontSize: "clamp(22px, 2.4vw, 32px)", fontWeight: 800, color: "#001d28", margin: "0 0 10px" }}>
+              <div className="asx-section-header-center" style={{ maxWidth: "1050px" }}>
+                <h2 className="asx-one-line-heading" style={{ fontSize: "clamp(18px, 2.1vw, 28px)", fontWeight: 800, color: "#001d28", margin: "0 0 10px", letterSpacing: "-0.02em" }}>
                   {"Comprehensive " + data.crumb + " solutions tailored for you"}
                 </h2>
-                <p style={{ fontSize: "15px", color: "#2c436b", margin: 0 }}>
+                <p style={{ fontSize: "15px", color: "#2c436b", margin: "0 auto", maxWidth: "680px" }}>
                   {descPairsBlock.desc || "End-to-end digital capabilities designed to generate patient inquiries and elevate brand trust."}
                 </p>
               </div>
