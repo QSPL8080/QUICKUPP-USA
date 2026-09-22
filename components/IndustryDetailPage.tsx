@@ -382,11 +382,11 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                   {renderGradientTitle(data.heroTitle)}
                 </h1>
 
-                {data.heroParagraphs && data.heroParagraphs[0] && (
-                  <p className="asx-hero-desc">
-                    {data.heroParagraphs[0]}
+                {data.heroParagraphs && data.heroParagraphs.map((p, idx) => (
+                  <p key={idx} className="asx-hero-desc" style={idx > 0 ? { marginTop: "-16px" } : {}}>
+                    {p}
                   </p>
-                )}
+                ))}
 
                 <div className="asx-hero-btns">
                   <Link
@@ -846,16 +846,20 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                 {/* Right Column: Title, Subtitle, Bullets, Divider, Checkmarks, Schedule Button */}
                 <div className="asx-who-content">
                   <h2 className="asx-who-title">
-                    {"Affordable & scalable growth for "}
-                    <span className="asx-gradient-text">{"every " + data.crumb.toLowerCase() + " stage"}</span>
+                    {listBlock.title ? renderGradientTitle(listBlock.title) : (
+                      <>
+                        {"Affordable & scalable growth for "}
+                        <span className="asx-gradient-text">{"every " + data.crumb.toLowerCase() + " stage"}</span>
+                      </>
+                    )}
                   </h2>
 
                   <div className="asx-who-subtitle">
-                    {data.crumb + " benefits"}
+                    {listBlock.subtitle || (data.crumb + " benefits")}
                   </div>
 
                   <ul className="asx-who-bullets">
-                    {listBlock.items.slice(0, 5).map((item, idx) => (
+                    {listBlock.items.slice(0, listBlock.items.length > 2 ? listBlock.items.length - 2 : listBlock.items.length).map((item, idx) => (
                       <li key={idx} className="asx-who-bullet-item">
                         <span className="asx-who-bullet-dot" />
                         <span>{item}</span>
@@ -863,22 +867,24 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                     ))}
                   </ul>
 
-                  <hr className="asx-who-divider" />
+                  {listBlock.items.length > 2 && (
+                    <>
+                      <hr className="asx-who-divider" />
 
-                  <div className="asx-who-checks">
-                    <div className="asx-who-check-item">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                      <span>{listBlock.items[5] || "24/7 AI Triage & Direct Scheduling"}</span>
-                    </div>
-                    <div className="asx-who-check-item">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                      <span>{listBlock.items[6] || "Dedicated Growth Strategist Support"}</span>
-                    </div>
-                  </div>
+                      <div className="asx-who-checks">
+                        {listBlock.items.slice(listBlock.items.length - 2).map((item, idx) => (
+                          <div key={idx} className="asx-who-check-item">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span>{item}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
 
                   <div>
-                    <Link href="#contact" className="asx-btn-dark">
-                      Schedule a call
+                    <Link href={listBlock.cta?.href || "/contact"} className="asx-btn-dark">
+                      {listBlock.cta?.label || "Schedule a call"}
                     </Link>
                   </div>
                 </div>
@@ -977,9 +983,13 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
           <div className="asx-container">
             <div className="asx-cta-box">
               <h2 className="asx-cta-title">
-                {"Ready to scale your "}
-                <span className="asx-gradient-text">{data.crumb}</span>
-                {" brand?"}
+                {data.closingTitle ? renderGradientTitle(data.closingTitle) : (
+                  <>
+                    {"Ready to scale your "}
+                    <span className="asx-gradient-text">{data.crumb}</span>
+                    {" brand?"}
+                  </>
+                )}
               </h2>
 
               <p className="asx-cta-desc">
@@ -987,8 +997,8 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
               </p>
 
               <div style={{ display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap" }}>
-                <Link href="/contact" className="asx-btn-green" style={{ padding: "16px 36px", fontSize: "15px" }}>
-                  {"Get Your " + data.crumb + " Quote"}
+                <Link href={data.closingCtas?.[0]?.href || "/contact"} className="asx-btn-green" style={{ padding: "16px 36px", fontSize: "15px" }}>
+                  {data.closingCtas?.[0]?.label || ("Get Your " + data.crumb + " Quote")}
                 </Link>
 
                 <Link
