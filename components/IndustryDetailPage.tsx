@@ -653,28 +653,28 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                     <div className="asx-sup-list">
                       <div className="asx-sup-row is-active">
                         <div className="asx-sup-person">
-                          <div style={{ width: "38px", height: "38px", borderRadius: "50%", background: "#7c3aed", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: "14px" }}>
+                          <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "#7c3aed", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: "12px", flexShrink: 0 }}>
                             QS
                           </div>
                           <div>
                             <div className="asx-sup-name">{data.crumb + " Strategist"}</div>
-                            <div className="asx-sup-role">Healthcare Growth Team</div>
+                            <div className="asx-sup-role" style={{ fontSize: "10px", color: "#64748b" }}>Healthcare Growth Team</div>
                           </div>
                         </div>
-                        <span style={{ color: "#7c3aed" }}><CheckSvg size={14} /></span>
+                        <span style={{ color: "#7c3aed" }}><CheckSvg size={13} /></span>
                       </div>
 
                       <div className="asx-sup-row">
                         <div className="asx-sup-person">
-                          <div style={{ width: "38px", height: "38px", borderRadius: "50%", background: "#001d28", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: "14px" }}>
+                          <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "#001d28", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: "12px", flexShrink: 0 }}>
                             AI
                           </div>
                           <div>
                             <div className="asx-sup-name">AI Workflow Engineer</div>
-                            <div className="asx-sup-role">Automation & Lead Routing</div>
+                            <div className="asx-sup-role" style={{ fontSize: "10px", color: "#64748b" }}>Automation & Lead Routing</div>
                           </div>
                         </div>
-                        <span style={{ color: "#94a3b8" }}><CheckSvg size={14} /></span>
+                        <span style={{ color: "#94a3b8" }}><CheckSvg size={13} /></span>
                       </div>
                     </div>
                   </div>

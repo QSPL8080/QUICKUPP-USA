@@ -525,32 +525,24 @@
   gap: 16px;
   opacity: 0;
   transform: translateY(24px);
-  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.asx-valprop-visible .asx-valprop-item:nth-child(1) {
+.asx-valprop-visible .asx-valprop-item {
   opacity: 1;
   transform: translateY(0);
-  transition-delay: 0.1s;
 }
 
-.asx-valprop-visible .asx-valprop-item:nth-child(2) {
-  opacity: 1;
-  transform: translateY(0);
-  transition-delay: 0.28s;
-}
-
-.asx-valprop-visible .asx-valprop-item:nth-child(3) {
-  opacity: 1;
-  transform: translateY(0);
-  transition-delay: 0.46s;
-}
-
-.asx-valprop-visible .asx-valprop-item:nth-child(4) {
-  opacity: 1;
-  transform: translateY(0);
-  transition-delay: 0.64s;
-}
+.asx-valprop-visible .asx-valprop-item:nth-child(1) { transition-delay: 0.05s; }
+.asx-valprop-visible .asx-valprop-item:nth-child(2) { transition-delay: 0.10s; }
+.asx-valprop-visible .asx-valprop-item:nth-child(3) { transition-delay: 0.15s; }
+.asx-valprop-visible .asx-valprop-item:nth-child(4) { transition-delay: 0.20s; }
+.asx-valprop-visible .asx-valprop-item:nth-child(5) { transition-delay: 0.25s; }
+.asx-valprop-visible .asx-valprop-item:nth-child(6) { transition-delay: 0.30s; }
+.asx-valprop-visible .asx-valprop-item:nth-child(7) { transition-delay: 0.35s; }
+.asx-valprop-visible .asx-valprop-item:nth-child(8) { transition-delay: 0.40s; }
+.asx-valprop-visible .asx-valprop-item:nth-child(9) { transition-delay: 0.45s; }
+.asx-valprop-visible .asx-valprop-item:nth-child(10) { transition-delay: 0.50s; }
 
 .asx-valprop-check {
   width: 28px;
@@ -565,7 +557,7 @@
   font-size: 13px;
   font-weight: 700;
   flex-shrink: 0;
-  margin-top: 3px;
+  margin-top: 2px;
   transition: transform 0.4s ease;
 }
 
@@ -574,10 +566,11 @@
 }
 
 .asx-valprop-item-title {
-  font-size: 17.5px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 600;
   color: #001d28;
-  margin: 0 0 4px;
+  margin: 0;
+  line-height: 1.45;
 }
 
 .asx-valprop-item-desc {
@@ -657,10 +650,10 @@
   position: absolute;
   right: 0;
   bottom: 0;
-  width: 230px;
+  width: 260px;
   background: #ffffff;
   border-radius: 20px;
-  padding: 18px;
+  padding: 18px 20px;
   box-shadow: 0 20px 48px rgba(0, 29, 40, 0.14);
   border: 1px solid #edf2f7;
   z-index: 3;
@@ -683,9 +676,10 @@
 }
 
 .asx-sup-sub {
-  font-size: 10px;
+  font-size: 11px;
   color: #64748b;
   margin: 0 0 14px;
+  white-space: nowrap;
 }
 
 .asx-sup-list {
