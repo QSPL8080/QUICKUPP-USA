@@ -120,25 +120,11 @@ function ArrowDownRightSvg({ size = 14 }: { size?: number }) {
   );
 }
 
-function ThreeDotsSvg({ size = 14 }: { size?: number }) {
+function SparkleSvg({ size = 18 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
-      <circle cx="12" cy="5" r="2" />
-      <circle cx="12" cy="12" r="2" />
-      <circle cx="12" cy="19" r="2" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
     </svg>
-  );
-}
-
-function StarRatingSvg() {
-  return (
-    <div style={{ display: "flex", gap: "2px", color: "#7c3aed" }}>
-      {[...Array(5)].map((_, i) => (
-        <svg key={i} width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-        </svg>
-      ))}
-    </div>
   );
 }
 
@@ -262,7 +248,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
   const [isMuted, setIsMuted] = useState(true);
   const [showReplay, setShowReplay] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [activeStep, setActiveStep] = useState<number>(4);
+  const [activeStep, setActiveStep] = useState<number>(0);
 
   useEffect(() => {
     const vid = videoRef.current;
@@ -316,40 +302,13 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
     setShowReplay(false);
   };
 
-  // Find blocks
+  // Find blocks from data
   const descPairsBlock = data.blocks.find((b) => b.type === "descPairs") as DescPairsBlock | undefined;
   const listBlock = data.blocks.find((b) => b.type === "list") as ListBlock | undefined;
   const processBlock = data.blocks.find((b) => b.type === "process") as ProcessBlock | undefined;
   const whyChooseBlock = data.blocks.find((b) => b.type === "whyChoose") as WhyChooseBlock | undefined;
   const faqBlock = data.blocks.find((b) => b.type === "faq") as FaqBlock | undefined;
-
-  // Derive value prop checklist items
-  const valuePropItems = whyChooseBlock?.bullets && whyChooseBlock.bullets.length >= 4
-    ? whyChooseBlock.bullets.slice(0, 4).map((b) => {
-        const parts = b.split(" - ");
-        return {
-          title: parts[0],
-          desc: parts[1] || "Tailored execution designed specifically for sustainable " + data.crumb + " growth and client acquisition.",
-        };
-      })
-    : [
-        {
-          title: "Predictable Patient & Client Acquisition",
-          desc: "High-intent digital marketing systems that consistently attract qualified " + data.crumb + " enquiries.",
-        },
-        {
-          title: "Intelligent AI Workflow Automation",
-          desc: "Automate qualification, instant booking, and follow-ups to respond to prospects in seconds.",
-        },
-        {
-          title: "Domain Authority & Reputation",
-          desc: "Establish undisputed local market leadership through 5-star reviews and search prominence.",
-        },
-        {
-          title: "Transparent Reporting & Guaranteed ROI",
-          desc: "Full pipeline visibility, transparent analytics, and dedicated strategist support.",
-        },
-      ];
+  const aiBlocks = data.blocks.filter((b) => b.type === "ai") as AiBlock[];
 
   return (
     <div className="asx-page">
@@ -357,7 +316,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
 
       <main style={{ paddingTop: "100px" }}>
         {/* ========================================================================= */}
-        {/* ASSURIX SECTION 1: HERO V7 */}
+        {/* 1. HERO SECTION */}
         {/* ========================================================================= */}
         <section className="asx-hero-section">
           <div className="asx-container">
@@ -375,7 +334,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
               <div>
                 <div className="asx-tag-pill">
                   <span className="asx-tag-dot" />
-                  <span>{(data.heroEyebrow || data.crumb) + " Growth & AI Ecosystem"}</span>
+                  <span>{data.heroEyebrow || data.crumb}</span>
                 </div>
 
                 <h1 className="asx-hero-title">
@@ -396,8 +355,8 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                     {data.heroCta?.label || "Get Industry Strategy"}
                   </Link>
 
-                  <a href="#services-breakdown" className="asx-btn-outline">
-                    <span>Explore Capabilities</span>
+                  <a href="#services-section" className="asx-btn-outline">
+                    <span>Explore Services</span>
                     <span style={{ fontSize: "14px" }}>↓</span>
                   </a>
                 </div>
@@ -408,21 +367,11 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                 <div className="asx-counter-card">
                   <div className="asx-counter-row">
                     <div className="asx-counter-val">
-                      <span>235K</span>
+                      <span>120</span>
                       <span className="asx-counter-plus">+</span>
                     </div>
                     <div className="asx-counter-lbl">
-                      {"Qualified " + data.crumb + " Inquiries Generated"}
-                    </div>
-                  </div>
-
-                  <div className="asx-counter-row">
-                    <div className="asx-counter-val">
-                      <span>85</span>
-                      <span className="asx-counter-plus">%</span>
-                    </div>
-                    <div className="asx-counter-lbl">
-                      Client Retention & Growth Rate
+                      Global Industry Clients & Partners
                     </div>
                   </div>
 
@@ -432,7 +381,17 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                       <span className="asx-counter-plus">%</span>
                     </div>
                     <div className="asx-counter-lbl">
-                      On-Time AI Pipeline Delivery
+                      Client Satisfaction & Retention
+                    </div>
+                  </div>
+
+                  <div className="asx-counter-row">
+                    <div className="asx-counter-val">
+                      <span>200</span>
+                      <span className="asx-counter-plus">+</span>
+                    </div>
+                    <div className="asx-counter-lbl">
+                      Digital Growth Projects Delivered
                     </div>
                   </div>
                 </div>
@@ -442,7 +401,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
         </section>
 
         {/* ========================================================================= */}
-        {/* ASSURIX SECTION 2: CURVED HERO MEDIA BANNER */}
+        {/* 2. CURVED HERO MEDIA BANNER */}
         {/* ========================================================================= */}
         <section className="asx-media-wrap">
           <div className="asx-media-box">
@@ -459,7 +418,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
             <div className="asx-media-overlay">
               <div className="asx-media-top">
                 <span className="asx-media-badge">
-                  {"✦ " + data.crumb + " Growth Media"}
+                  {"✦ " + (data.heroEyebrow || data.crumb) + " Growth"}
                 </span>
 
                 <div className="asx-media-controls">
@@ -510,253 +469,20 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
         </section>
 
         {/* ========================================================================= */}
-        {/* ASSURIX SECTION 3: SERVICE V5 (3 Cards with Top Floating Badges) */}
-        {/* ========================================================================= */}
-        <section id="services-breakdown" className="asx-section">
-          <div className="asx-container">
-            <div className="asx-section-header-center">
-              <p className="asx-section-intro">
-                {"We guide your " + data.crumb + " business through full-funnel growth — "}
-                <span>from initial enquiry to loyal client.</span>
-              </p>
-            </div>
-
-            <div className="asx-cards-grid-3">
-              {/* Card 1: Family & Care Needs (Reference SS 1) */}
-              <div className="asx-card-v5">
-                <div className="asx-card-top-badge">
-                  <AsxFamilyCareSvg />
-                </div>
-                <div>
-                  <h3 className="asx-card-title">{"Your " + data.crumb.toLowerCase() + "’s needs"}</h3>
-                  <p className="asx-card-desc">
-                    {"Ensure your key operations and growth goals are taken care of even in your absence."}
-                  </p>
-                </div>
-                <div className="asx-card-footer">
-                  <Link href="#contact" className="asx-arrow-link">
-                    <span>Read more</span>
-                    <ArrowDownRightSvg />
-                  </Link>
-                </div>
-              </div>
-
-              {/* Card 2: Income / Revenue Replacement (Reference SS 1) */}
-              <div className="asx-card-v5">
-                <div className="asx-card-top-badge">
-                  <AsxIncomeMoneySvg />
-                </div>
-                <div>
-                  <h3 className="asx-card-title">Revenue & pipeline growth</h3>
-                  <p className="asx-card-desc">
-                    {"Keep your organization’s future secure when inquiries or revenue streams fluctuate unexpectedly."}
-                  </p>
-                </div>
-                <div className="asx-card-footer">
-                  <Link href="#contact" className="asx-arrow-link">
-                    <span>Read more</span>
-                    <ArrowDownRightSvg />
-                  </Link>
-                </div>
-              </div>
-
-              {/* Card 3: Critical Support & Certainty (Reference SS 1) */}
-              <div className="asx-card-v5">
-                <div className="asx-card-top-badge">
-                  <AsxMedicalPulseSvg />
-                </div>
-                <div>
-                  <h3 className="asx-card-title">Operational certainty</h3>
-                  <p className="asx-card-desc">
-                    {"Reliable enterprise-level systems to maintain high performance and balance for your brand."}
-                  </p>
-                </div>
-                <div className="asx-card-footer">
-                  <Link href="#contact" className="asx-arrow-link">
-                    <span>Read more</span>
-                    <ArrowDownRightSvg />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ========================================================================= */}
-        {/* ASSURIX SECTION 4: VALUE PROPOSITION WITH STAGGERED ENTRANCE & CONVERGING VISUALS (Screenshot 1) */}
-        {/* ========================================================================= */}
-        <section
-          ref={valPropRef}
-          className={"asx-section " + (valPropVisible ? "asx-valprop-visible" : "")}
-          style={{ borderTop: "1px solid #e5eaee" }}
-        >
-          <div className="asx-container">
-            <div className="asx-valprop-grid">
-              {/* Left Column: Staggered Checklist Value Props */}
-              <div>
-                <div className="asx-tag-pill" style={{ background: "#ffffff", borderColor: "#dce3e4", color: "#001d28" }}>
-                  <span>{data.crumb + " Advantage"}</span>
-                </div>
-
-                <h2 className="asx-valprop-title">
-                  {"Protect your " + data.crumb.toLowerCase() + " practice and "}
-                  <span className="asx-gradient-text">secure your growth</span>
-                </h2>
-
-                <p className="asx-valprop-desc">
-                  Our comprehensive growth framework safeguards your marketing investments, connects AI automations, and builds resilient inbound pipelines.
-                </p>
-
-                <div className="asx-valprop-list">
-                  {valuePropItems.map((item, idx) => (
-                    <div key={idx} className="asx-valprop-item">
-                      <div className="asx-valprop-check">
-                        <CheckSvg size={13} />
-                      </div>
-                      <div>
-                        <h4 className="asx-valprop-item-title">{item.title}</h4>
-                        <p className="asx-valprop-item-desc">{item.desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Right Column: Overlapping Converging Arch + Circle + Support Card Visual */}
-              <div className="asx-valprop-visual">
-                <img
-                  src={images.arch}
-                  alt={data.crumb + " architecture"}
-                  className="asx-arch-img"
-                  loading="lazy"
-                />
-
-                <img
-                  src={images.circle}
-                  alt={data.crumb + " consultation"}
-                  className="asx-circle-img"
-                  loading="lazy"
-                />
-
-                <div className="asx-support-card">
-                  <div className="asx-sup-title">Dedicated Growth Team</div>
-                  <div className="asx-sup-sub">Track active campaigns and sprint velocity</div>
-
-                  <div className="asx-sup-list">
-                    <div className="asx-sup-row">
-                      <div className="asx-sup-person">
-                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=60&q=80" alt="Elijah" />
-                        <div>
-                          <div className="asx-sup-name">Elijah Metz</div>
-                          <div className="asx-sup-role">{data.crumb + " Consultant"}</div>
-                        </div>
-                      </div>
-                      <span style={{ color: "#94a3b8" }}><ThreeDotsSvg size={13} /></span>
-                    </div>
-
-                    <div className="asx-sup-row is-active">
-                      <div className="asx-sup-person">
-                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=60&q=80" alt="Hannah" />
-                        <div>
-                          <div className="asx-sup-name">Hannah Rohan</div>
-                          <div className="asx-sup-role">AI Automation Lead</div>
-                        </div>
-                      </div>
-                      <span style={{ color: "#7c3aed" }}><ThreeDotsSvg size={13} /></span>
-                    </div>
-
-                    <div className="asx-sup-row">
-                      <div className="asx-sup-person">
-                        <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=60&q=80" alt="Elisa" />
-                        <div>
-                          <div className="asx-sup-name">Elisa Ritchie</div>
-                          <div className="asx-sup-role">Campaign Director</div>
-                        </div>
-                      </div>
-                      <span style={{ color: "#94a3b8" }}><ThreeDotsSvg size={13} /></span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ========================================================================= */}
-        {/* ASSURIX SECTION 5: ABOUT V3 (Story Split Section) */}
-        {/* ========================================================================= */}
-        <section className="asx-section" style={{ borderTop: "1px solid #e5eaee" }}>
-          <div className="asx-container">
-            <div className="asx-story-grid">
-              {/* Left Column: Image with Floating Proof Badge */}
-              <div className="asx-story-img-wrap">
-                <img
-                  src={images.story}
-                  alt={data.crumb + " story"}
-                  loading="lazy"
-                />
-
-                <div className="asx-social-proof">
-                  <div className="asx-sp-title">50K+ happy clients</div>
-                  <div className="asx-sp-avatars">
-                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&q=80" alt="Client" />
-                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=80&q=80" alt="Client" />
-                    <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=80&q=80" alt="Client" />
-                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=80&q=80" alt="Client" />
-                  </div>
-                  <div className="asx-sp-bar">
-                    <div className="asx-sp-fill" />
-                  </div>
-                  <div className="asx-sp-rating">
-                    <span>4.9 / 5.0 Rating</span>
-                    <StarRatingSvg />
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Column: Story Copy + Counter + Green Button */}
-              <div>
-                <div className="asx-tag-pill" style={{ background: "#ffffff", borderColor: "#dce3e4", color: "#001d28" }}>
-                  <span>Our story</span>
-                </div>
-
-                <h2 className="asx-story-title">
-                  {"Experience reliability, transparency and "}
-                  <span className="asx-gradient-text">true commitment</span>
-                </h2>
-
-                <p className="asx-story-desc">
-                  {"We stand by our promise to deliver dependable marketing, open communication, and unwavering technical support, ensuring your " + data.crumb + " brand grows predictably every step of the way."}
-                </p>
-
-                <div className="asx-story-kpis">
-                  <div className="asx-kpi-block">
-                    <span className="asx-kpi-num">35+</span>
-                    <span className="asx-kpi-text">Years of collective leadership & expertise</span>
-                  </div>
-
-                  <Link href={data.heroCta?.href || "/contact"} className="asx-btn-green">
-                    Get a free quote
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ========================================================================= */}
-        {/* ASSURIX SECTION 6: COMPREHENSIVE OUTLINE GRID (Service v4 Exact Replica) */}
+        {/* 3. MARKETING SERVICES OUTLINE GRID (descPairsBlock) */}
         {/* ========================================================================= */}
         {descPairsBlock && (
-          <section className="asx-section" style={{ borderTop: "1px solid #e5eaee" }}>
+          <section id="services-section" className="asx-section" style={{ borderTop: "1px solid #e5eaee" }}>
             <div className="asx-container">
               <div className="asx-section-header-center" style={{ maxWidth: "1050px" }}>
                 <h2 className="asx-one-line-heading" style={{ fontSize: "clamp(18px, 2.1vw, 28px)", fontWeight: 800, color: "#001d28", margin: "0 0 10px", letterSpacing: "-0.02em" }}>
-                  {"Comprehensive " + data.crumb + " solutions tailored for you"}
+                  {descPairsBlock.title || ("Our " + data.crumb + " Marketing Services")}
                 </h2>
-                <p style={{ fontSize: "15px", color: "#2c436b", margin: "0 auto", maxWidth: "680px" }}>
-                  {descPairsBlock.desc || "End-to-end digital capabilities designed to generate patient inquiries and elevate brand trust."}
-                </p>
+                {descPairsBlock.desc && (
+                  <p style={{ fontSize: "15px", color: "#2c436b", margin: "0 auto", maxWidth: "680px" }}>
+                    {descPairsBlock.desc}
+                  </p>
+                )}
               </div>
 
               <div className="asx-outline-marquee-wrap">
@@ -766,15 +492,15 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                     <div key={"orig-" + idx} className="asx-outline-card">
                       <div>
                         <div className="asx-icon-box">
-                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                          <SparkleSvg size={20} />
                         </div>
                         <h3 className="asx-outline-title">{item.title}</h3>
                         <p className="asx-outline-desc">{item.desc}</p>
                       </div>
 
                       <div style={{ marginTop: "20px", paddingTop: "12px", borderTop: "1px solid #f1f5f9" }}>
-                        <Link href="#contact" className="asx-arrow-link" style={{ fontSize: "12px" }}>
-                          <span>Learn more</span>
+                        <Link href="/contact" className="asx-arrow-link" style={{ fontSize: "12px" }}>
+                          <span>Enquire now</span>
                           <ArrowDownRightSvg size={12} />
                         </Link>
                       </div>
@@ -786,15 +512,15 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                     <div key={"dup-" + idx} className="asx-outline-card">
                       <div>
                         <div className="asx-icon-box">
-                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                          <SparkleSvg size={20} />
                         </div>
                         <h3 className="asx-outline-title">{item.title}</h3>
                         <p className="asx-outline-desc">{item.desc}</p>
                       </div>
 
                       <div style={{ marginTop: "20px", paddingTop: "12px", borderTop: "1px solid #f1f5f9" }}>
-                        <Link href="#contact" className="asx-arrow-link" style={{ fontSize: "12px" }}>
-                          <span>Learn more</span>
+                        <Link href="/contact" className="asx-arrow-link" style={{ fontSize: "12px" }}>
+                          <span>Enquire now</span>
                           <ArrowDownRightSvg size={12} />
                         </Link>
                       </div>
@@ -807,13 +533,213 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
         )}
 
         {/* ========================================================================= */}
-        {/* ASSURIX SECTION 7: WHO WE SERVE (Reference SS-2 3-Image Collage + Checklist Split Replica) */}
+        {/* 4. FIRST AI / MARKETING ECOSYSTEM SECTION (aiBlocks[0]) */}
+        {/* ========================================================================= */}
+        {aiBlocks[0] && (
+          <section className="asx-section" style={{ borderTop: "1px solid #e5eaee" }}>
+            <div className="asx-container">
+              <div className="asx-section-header-center" style={{ maxWidth: "860px" }}>
+                <div className="asx-tag-pill" style={{ background: "#ffffff", borderColor: "#dce3e4", color: "#001d28" }}>
+                  <span>{data.crumb + " Ecosystem"}</span>
+                </div>
+                <h2 style={{ fontSize: "clamp(22px, 2.4vw, 32px)", fontWeight: 800, color: "#001d28", margin: "12px 0 14px" }}>
+                  {renderGradientTitle(aiBlocks[0].title)}
+                </h2>
+                {aiBlocks[0].intro && (
+                  <p className="asx-section-intro" style={{ fontSize: "16px", color: "#2c436b", lineHeight: 1.65 }}>
+                    {aiBlocks[0].intro}
+                  </p>
+                )}
+              </div>
+
+              {aiBlocks[0].bullets && aiBlocks[0].bullets.length > 0 && (
+                <div className="asx-cards-grid-3" style={{ marginTop: "36px" }}>
+                  {aiBlocks[0].bullets.map((pillar, idx) => (
+                    <div key={idx} className="asx-card-v5" style={{ minHeight: "auto", padding: "28px 24px" }}>
+                      <div className="asx-card-top-badge" style={{ width: "48px", height: "48px", background: "#f1f5f9", borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "center", color: "#7c3aed", fontWeight: 800, fontSize: "15px" }}>
+                        {"0" + (idx + 1)}
+                      </div>
+                      <div style={{ marginTop: "12px" }}>
+                        <h3 className="asx-card-title" style={{ fontSize: "19px", marginBottom: "8px" }}>{pillar}</h3>
+                        <p className="asx-card-desc" style={{ fontSize: "14px", margin: 0 }}>
+                          {"Strategic " + pillar.toLowerCase() + " optimization connected directly to patient acquisition and brand authority."}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {aiBlocks[0].desc && (
+                <div style={{ marginTop: "32px", padding: "20px 28px", background: "#ffffff", borderRadius: "16px", border: "1px solid #e2e8f0", textAlign: "center" }}>
+                  <p style={{ margin: 0, fontSize: "15px", fontWeight: 600, color: "#001d28" }}>
+                    {aiBlocks[0].desc}
+                  </p>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* ========================================================================= */}
+        {/* 5. WHY CHOOSE US (whyChooseBlock) */}
+        {/* ========================================================================= */}
+        {whyChooseBlock && (
+          <section
+            ref={valPropRef}
+            className={"asx-section " + (valPropVisible ? "asx-valprop-visible" : "")}
+            style={{ borderTop: "1px solid #e5eaee" }}
+          >
+            <div className="asx-container">
+              <div className="asx-valprop-grid">
+                {/* Left Column: Bullets Checklist */}
+                <div>
+                  <div className="asx-tag-pill" style={{ background: "#ffffff", borderColor: "#dce3e4", color: "#001d28" }}>
+                    <span>{whyChooseBlock.tagline || (data.crumb + " Expertise")}</span>
+                  </div>
+
+                  <h2 className="asx-valprop-title">
+                    {renderGradientTitle(whyChooseBlock.title || "Why Choose Quickupp Softech?")}
+                  </h2>
+
+                  {whyChooseBlock.desc && (
+                    <p className="asx-valprop-desc">
+                      {whyChooseBlock.desc}
+                    </p>
+                  )}
+
+                  <div className="asx-valprop-list" style={{ display: "grid", gridTemplateColumns: "1fr", gap: "12px" }}>
+                    {whyChooseBlock.bullets.map((bullet, idx) => (
+                      <div key={idx} className="asx-valprop-item" style={{ marginBottom: 0 }}>
+                        <div className="asx-valprop-check">
+                          <CheckSvg size={13} />
+                        </div>
+                        <div>
+                          <h4 className="asx-valprop-item-title" style={{ fontSize: "15px", fontWeight: 600, color: "#001d28" }}>{bullet}</h4>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {whyChooseBlock.cta && (
+                    <div style={{ marginTop: "28px" }}>
+                      <Link href={whyChooseBlock.cta.href || "/contact"} className="asx-btn-green">
+                        {whyChooseBlock.cta.label}
+                      </Link>
+                    </div>
+                  )}
+                </div>
+
+                {/* Right Column: Visual Arch & Circles */}
+                <div className="asx-valprop-visual">
+                  <img
+                    src={images.arch}
+                    alt={data.crumb + " growth"}
+                    className="asx-arch-img"
+                    loading="lazy"
+                  />
+
+                  <img
+                    src={images.circle}
+                    alt={data.crumb + " expertise"}
+                    className="asx-circle-img"
+                    loading="lazy"
+                  />
+
+                  <div className="asx-support-card">
+                    <div className="asx-sup-title">Dedicated Growth Partner</div>
+                    <div className="asx-sup-sub">Integrated Marketing + AI + Technology</div>
+
+                    <div className="asx-sup-list">
+                      <div className="asx-sup-row is-active">
+                        <div className="asx-sup-person">
+                          <div style={{ width: "38px", height: "38px", borderRadius: "50%", background: "#7c3aed", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: "14px" }}>
+                            QS
+                          </div>
+                          <div>
+                            <div className="asx-sup-name">{data.crumb + " Strategist"}</div>
+                            <div className="asx-sup-role">Healthcare Growth Team</div>
+                          </div>
+                        </div>
+                        <span style={{ color: "#7c3aed" }}><CheckSvg size={14} /></span>
+                      </div>
+
+                      <div className="asx-sup-row">
+                        <div className="asx-sup-person">
+                          <div style={{ width: "38px", height: "38px", borderRadius: "50%", background: "#001d28", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: "14px" }}>
+                            AI
+                          </div>
+                          <div>
+                            <div className="asx-sup-name">AI Workflow Engineer</div>
+                            <div className="asx-sup-role">Automation & Lead Routing</div>
+                          </div>
+                        </div>
+                        <span style={{ color: "#94a3b8" }}><CheckSvg size={14} /></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* ========================================================================= */}
+        {/* 6. SECOND AI / AI-POWERED GROWTH BLOCK (aiBlocks[1]) */}
+        {/* ========================================================================= */}
+        {aiBlocks[1] && (
+          <section className="asx-section" style={{ borderTop: "1px solid #e5eaee" }}>
+            <div className="asx-container">
+              <div className="asx-section-header-center" style={{ maxWidth: "860px" }}>
+                <div className="asx-tag-pill" style={{ background: "#ffffff", borderColor: "#dce3e4", color: "#001d28" }}>
+                  <span>AI Automation & Growth</span>
+                </div>
+                <h2 style={{ fontSize: "clamp(22px, 2.4vw, 32px)", fontWeight: 800, color: "#001d28", margin: "12px 0 14px" }}>
+                  {renderGradientTitle(aiBlocks[1].title)}
+                </h2>
+                {aiBlocks[1].intro && (
+                  <p className="asx-section-intro" style={{ fontSize: "16px", color: "#2c436b", lineHeight: 1.65 }}>
+                    {aiBlocks[1].intro}
+                  </p>
+                )}
+              </div>
+
+              {aiBlocks[1].bullets && aiBlocks[1].bullets.length > 0 && (
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: "16px", marginTop: "36px" }}>
+                  {aiBlocks[1].bullets.map((capability, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        background: "#ffffff",
+                        border: "1px solid #e2e8f0",
+                        borderRadius: "16px",
+                        padding: "20px 22px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "14px",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.02)",
+                      }}
+                    >
+                      <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "rgba(124, 58, 237, 0.08)", color: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        <CheckSvg size={15} />
+                      </div>
+                      <span style={{ fontSize: "15px", fontWeight: 600, color: "#001d28" }}>{capability}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* ========================================================================= */}
+        {/* 7. BUSINESSES WE HELP (listBlock) */}
         {/* ========================================================================= */}
         {listBlock && (
-          <section className="asx-who-split-section">
+          <section className="asx-who-split-section" style={{ borderTop: "1px solid #e5eaee" }}>
             <div className="asx-container">
               <div className="asx-who-split-grid">
-                {/* Left Column: Reference SS-2 Exact 3 Shaped Overlapping Images Collage */}
+                {/* Left Column: 3 Shaped Overlapping Images Collage */}
                 <div className="asx-collage-wrap">
                   {/* Right Main Tall Arch */}
                   <div className="asx-collage-tall-box">
@@ -824,7 +750,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                     />
                   </div>
 
-                  {/* Top-Left Overlapping Floating Circle with White Halo Border */}
+                  {/* Top-Left Overlapping Floating Circle */}
                   <div className="asx-collage-circle-box">
                     <img
                       src={images.circle}
@@ -843,20 +769,23 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                   </div>
                 </div>
 
-                {/* Right Column: Title, Subtitle, Bullets, Divider, Checkmarks, Schedule Button */}
+                {/* Right Column: Title, Subtitle, Bullets, Checkmarks, CTA */}
                 <div className="asx-who-content">
                   <h2 className="asx-who-title">
-                    {listBlock.title ? renderGradientTitle(listBlock.title) : (
-                      <>
-                        {"Affordable & scalable growth for "}
-                        <span className="asx-gradient-text">{"every " + data.crumb.toLowerCase() + " stage"}</span>
-                      </>
-                    )}
+                    {renderGradientTitle(listBlock.title || (data.crumb + " Businesses We Help"))}
                   </h2>
 
-                  <div className="asx-who-subtitle">
-                    {listBlock.subtitle || (data.crumb + " benefits")}
-                  </div>
+                  {listBlock.subtitle && (
+                    <div className="asx-who-subtitle">
+                      {listBlock.subtitle}
+                    </div>
+                  )}
+
+                  {listBlock.desc && (
+                    <p style={{ fontSize: "15px", color: "#2c436b", margin: "0 0 20px" }}>
+                      {listBlock.desc}
+                    </p>
+                  )}
 
                   <ul className="asx-who-bullets">
                     {listBlock.items.slice(0, listBlock.items.length > 2 ? listBlock.items.length - 2 : listBlock.items.length).map((item, idx) => (
@@ -874,7 +803,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                       <div className="asx-who-checks">
                         {listBlock.items.slice(listBlock.items.length - 2).map((item, idx) => (
                           <div key={idx} className="asx-who-check-item">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                            <CheckSvg size={16} />
                             <span>{item}</span>
                           </div>
                         ))}
@@ -882,9 +811,9 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                     </>
                   )}
 
-                  <div>
+                  <div style={{ marginTop: "24px" }}>
                     <Link href={listBlock.cta?.href || "/contact"} className="asx-btn-dark">
-                      {listBlock.cta?.label || "Schedule a call"}
+                      {listBlock.cta?.label || "Get Industry Strategy"}
                     </Link>
                   </div>
                 </div>
@@ -894,7 +823,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
         )}
 
         {/* ========================================================================= */}
-        {/* ASSURIX SECTION 8: GROWTH PROCESS (Screenshots 2 & 3 Exact Replica) */}
+        {/* 8. GROWTH PROCESS (processBlock) */}
         {/* ========================================================================= */}
         {processBlock && (
           <section className="asx-section" style={{ borderTop: "1px solid #e5eaee" }}>
@@ -922,6 +851,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                       onClick={() => setActiveStep(idx)}
                       onMouseEnter={() => setActiveStep(idx)}
                       className={"asx-step-card " + (isSelected ? "is-active" : "")}
+                      style={{ cursor: "pointer" }}
                     >
                       <span className="asx-step-badge">{step.num}</span>
                       <h3 className="asx-step-title">{step.title}</h3>
@@ -935,14 +865,14 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
         )}
 
         {/* ========================================================================= */}
-        {/* ASSURIX SECTION 9: FAQ ACCORDION (Service v7) */}
+        {/* 9. FAQ ACCORDION (faqBlock) */}
         {/* ========================================================================= */}
         {faqBlock && faqBlock.items && (
           <section className="asx-section" style={{ background: "#ffffff", borderTop: "1px solid #e5eaee" }}>
             <div className="asx-container-sm">
               <div className="asx-section-header-center">
                 <h2 style={{ fontSize: "clamp(22px, 2.4vw, 32px)", fontWeight: 800, color: "#001d28", margin: "0 0 10px" }}>
-                  Frequently Asked Questions
+                  {faqBlock.title || "Frequently Asked Questions"}
                 </h2>
                 <p style={{ fontSize: "15px", color: "#2c436b", margin: 0 }}>
                   {"Everything you need to know about our " + data.crumb + " growth framework."}
@@ -977,7 +907,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
         )}
 
         {/* ========================================================================= */}
-        {/* ASSURIX SECTION 10: DARK MIDNIGHT CTA BANNER */}
+        {/* 10. CLOSING CTA BANNER */}
         {/* ========================================================================= */}
         <section style={{ padding: "64px 24px" }}>
           <div className="asx-container">
@@ -993,12 +923,12 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
               </h2>
 
               <p className="asx-cta-desc">
-                {data.closingDesc || "Get transparent execution, predictable patient inquiries, and reliable AI automation tailored for your growth."}
+                {data.closingDesc}
               </p>
 
               <div style={{ display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap" }}>
                 <Link href={data.closingCtas?.[0]?.href || "/contact"} className="asx-btn-green" style={{ padding: "16px 36px", fontSize: "15px" }}>
-                  {data.closingCtas?.[0]?.label || ("Get Your " + data.crumb + " Quote")}
+                  {data.closingCtas?.[0]?.label || ("Talk to Our " + data.crumb + " Team")}
                 </Link>
 
                 <Link
