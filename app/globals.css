@@ -5693,6 +5693,107 @@ section.section-gap.padding-top-0 {
   margin: 0;
 }
 
+/* Compact Values Grid (reduces excessive whitespace & card height) */
+.sc-values-compact-section {
+  padding: 42px 0 46px;
+  background: #ffffff;
+}
+
+.sc-values-compact-header {
+  text-align: center;
+  max-width: 620px;
+  margin: 0 auto 22px;
+}
+
+.sc-values-compact-title {
+  font-size: clamp(20px, 2.2vw, 28px);
+  font-weight: 800;
+  color: #0b0f17;
+  letter-spacing: -0.025em;
+  margin: 0 0 6px;
+}
+
+.sc-values-compact-desc {
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.sc-values-compact-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+@media (max-width: 860px) {
+  .sc-values-compact-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}
+
+@media (max-width: 520px) {
+  .sc-values-compact-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sc-values-compact-card {
+  background: #f8fafc;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 12px;
+  padding: 13px 18px;
+  position: relative;
+  transition: all 0.2s ease;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.sc-values-compact-card:hover {
+  background: #ffffff;
+  transform: translateY(-2px);
+  border-color: rgba(99, 102, 241, 0.35);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+}
+
+.sc-values-compact-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2.5px;
+  background: linear-gradient(90deg, #38bdf8, #818cf8);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.sc-values-compact-card:hover::before {
+  opacity: 1;
+}
+
+.sc-values-compact-number {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #6366f1;
+  margin-bottom: 4px;
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+.sc-values-compact-title {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.35;
+}
+
 /* 5. Why We're Right Choice */
 .sc-choice-section {
   padding: 80px 0;

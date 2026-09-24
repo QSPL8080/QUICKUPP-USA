@@ -161,18 +161,18 @@ export default function AIVideoServicePage({
           // -------------------------------------------------------------------
           if (bIdx % 3 === 0) {
             return (
-              <section key={bIdx} className="sc-values-section" style={{ backgroundColor: "#ffffff" }}>
+              <section key={bIdx} className="sc-values-compact-section">
                 <div className="w-layout-blockcontainer container w-container">
-                  <div className="sc-section-header">
-                    <h2 className="sc-section-title">{blockTitle}</h2>
-                    {blockDesc && <p className="sc-section-desc">{blockDesc}</p>}
+                  <div className="sc-values-compact-header">
+                    <h2 className="sc-values-compact-title">{blockTitle}</h2>
+                    {blockDesc && <p className="sc-values-compact-desc">{blockDesc}</p>}
                   </div>
 
-                  <div className="sc-values-grid">
+                  <div className="sc-values-compact-grid">
                     {items.map((item, idx) => (
-                      <div key={idx} className="sc-value-card">
-                        <div className="sc-value-number">{String(idx + 1).padStart(2, "0")}</div>
-                        <div className="sc-value-title">{item}</div>
+                      <div key={idx} className="sc-values-compact-card">
+                        <div className="sc-values-compact-number">{String(idx + 1).padStart(2, "0")}</div>
+                        <div className="sc-values-compact-title">{item}</div>
                       </div>
                     ))}
                   </div>
