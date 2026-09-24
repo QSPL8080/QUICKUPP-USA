@@ -14,75 +14,10 @@ import type {
   FaqBlock,
 } from "@/lib/servicePageTypes";
 
-function AsxFamilyCareSvg() {
-  return (
-    <svg width="38" height="38" viewBox="0 0 64 64" fill="none" stroke="#001d28" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      {/* 3 People figures */}
-      <circle cx="32" cy="19" r="4.5" />
-      <path d="M25 33c0-3.9 3.1-7 7-7s7 3.1 7 7" />
-      <circle cx="21" cy="23" r="3.5" />
-      <path d="M15 37c0-3.3 2.7-6 6-6" />
-      <circle cx="43" cy="23" r="3.5" />
-      <path d="M43 31c3.3 0 6 2.7 6 6" />
-      {/* Left Hand cupping */}
-      <path d="M12 39c2 7 8 12 15 13" />
-      <path d="M10 36c2.5-3 7-4 12-2l7 3" />
-      <path d="M17 31l-7 5" />
-      {/* Right Hand cupping */}
-      <path d="M52 39c-2 7-8 12-15 13" />
-      <path d="M54 36c-2.5-3-7-4-12-2l-7 3" />
-      <path d="M47 31l7 5" />
-    </svg>
-  );
-}
-
-function AsxIncomeMoneySvg() {
-  return (
-    <svg width="38" height="38" viewBox="0 0 64 64" fill="none" stroke="#001d28" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      {/* Money Bag on seat */}
-      <path d="M32 14c-1.5 0-2.5 1-2.5 2.5 0 .5.5 1 1 1.5-3 1.5-5 4.5-5 8 0 4.5 3.8 8 8.5 8s8.5-3.5 8.5-8c0-3.5-2-6.5-5-8 .5-.5 1-1 1-1.5 0-1.5-1-2.5-2.5-2.5" />
-      {/* Dollar symbol inside bag */}
-      <path d="M33.5 21.5h-2.5a1.2 1.2 0 0 0 0 2.4h2a1.2 1.2 0 0 1 0 2.4H30" />
-      <path d="M32 20v7.5" />
-      {/* Rocking chair backrest slats */}
-      <path d="M22 22l6 14" />
-      <path d="M18 17l6 19" />
-      {/* Chair Seat */}
-      <path d="M22 36h22" />
-      {/* Chair Legs */}
-      <path d="M24 36l-4 13" />
-      <path d="M40 36l3 13" />
-      <path d="M20 44l22 2" />
-      {/* Curved Rocking Runner at bottom */}
-      <path d="M14 50c9 5 27 5 36-1" />
-    </svg>
-  );
-}
-
-function AsxMedicalPulseSvg() {
-  return (
-    <svg width="38" height="38" viewBox="0 0 64 64" fill="none" stroke="#001d28" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      {/* Heart Shape */}
-      <path d="M43.5 14c-4.2 0-7.8 2.5-9.5 6.2-1.7-3.7-5.3-6.2-9.5-6.2-5.8 0-10.5 4.7-10.5 10.5 0 8.5 11 16.5 20 23.3 9-6.8 20-14.8 20-23.3 0-5.8-4.7-10.5-10.5-10.5Z" />
-      {/* ECG Pulse Line */}
-      <path d="M18 24.5h5.5l2.5-5 3.5 10 3-7 2.5 2h5" />
-      {/* Coin with $ at bottom left */}
-      <circle cx="21" cy="46" r="6" />
-      <path d="M22 43.5h-1.8a1 1 0 0 0 0 2h1.6a1 1 0 0 1 0 2h-1.8" />
-      <path d="M21 42.5v7" />
-      {/* Upward Growth Arrows at bottom right */}
-      <path d="M39 49l4-8 4 8" />
-      <path d="M43 41v9" />
-      <path d="M46 45l3-6 3 6" />
-      <path d="M49 39v7" />
-    </svg>
-  );
-}
-
 // Inline Clean SVG Components
 function CheckSvg({ size = 14 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="20 6 9 17 4 12" />
     </svg>
   );
@@ -126,6 +61,159 @@ function SparkleSvg({ size = 18 }: { size?: number }) {
       <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
     </svg>
   );
+}
+
+// Clean & Simple Category Icon Resolver
+function getCategoryIcon(name: string) {
+  const n = name.toLowerCase();
+
+  if (n.includes("legal")) {
+    return (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 3v18M3 7l9-4 9 4M3 7l3 9a3 3 0 0 0 6 0L9 7M15 7l3 9a3 3 0 0 0 6 0l-3-9" />
+      </svg>
+    );
+  }
+  if (n.includes("accounting") || n.includes("tax")) {
+    return (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="4" y="2" width="16" height="20" rx="2" />
+        <line x1="8" y1="6" x2="16" y2="6" />
+        <line x1="16" y1="14" x2="16" y2="18" />
+        <line x1="12" y1="14" x2="12" y2="18" />
+        <line x1="8" y1="14" x2="8" y2="18" />
+      </svg>
+    );
+  }
+  if (n.includes("financial")) {
+    return (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+        <polyline points="17 6 23 6 23 12" />
+      </svg>
+    );
+  }
+  if (n.includes("business")) {
+    return (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="7" width="20" height="14" rx="2" />
+        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+      </svg>
+    );
+  }
+  if (n.includes("management")) {
+    return (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </svg>
+    );
+  }
+  if (n.includes("it consulting") || n.includes("it ")) {
+    return (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="4" y="4" width="16" height="16" rx="2" />
+        <rect x="9" y="9" width="6" height="6" />
+        <line x1="9" y1="1" x2="9" y2="4" />
+        <line x1="15" y1="1" x2="15" y2="4" />
+      </svg>
+    );
+  }
+  if (n.includes("marketing") || n.includes("creative")) {
+    return (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+      </svg>
+    );
+  }
+  if (n.includes("hr") || n.includes("recruitment")) {
+    return (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+        <circle cx="8.5" cy="7" r="4" />
+      </svg>
+    );
+  }
+  if (n.includes("real estate")) {
+    return (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
+        <path d="M6 12H4a2 2 0 0 0-2 2v8h20v-8a2 2 0 0 0-2-2h-2" />
+      </svg>
+    );
+  }
+  if (n.includes("architecture") || n.includes("design")) {
+    return (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+      </svg>
+    );
+  }
+  if (n.includes("engineering") || n.includes("technical")) {
+    return (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="3" />
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2" />
+      </svg>
+    );
+  }
+  if (n.includes("b2b") || n.includes("other")) {
+    return (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      </svg>
+    );
+  }
+
+  // Home Services
+  if (n.includes("plumbing")) {
+    return (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+      </svg>
+    );
+  }
+  if (n.includes("electrical")) {
+    return (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+      </svg>
+    );
+  }
+  if (n.includes("hvac")) {
+    return (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07l14.14-14.14" />
+      </svg>
+    );
+  }
+  if (n.includes("cleaning")) {
+    return (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 3l1.912 5.813a2 2 0 0 0 1.275 1.275L21 12l-5.813 1.912a2 2 0 0 0-1.275 1.275L12 21" />
+      </svg>
+    );
+  }
+  if (n.includes("roofing")) {
+    return (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+      </svg>
+    );
+  }
+  if (n.includes("pest")) {
+    return (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      </svg>
+    );
+  }
+
+  return <CheckSvg size={14} />;
 }
 
 // Industry imagery mapping for high-resolution Assurix-style imagery
@@ -302,14 +390,6 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
     setShowReplay(false);
   };
 
-  // Find blocks from data
-  const descPairsBlock = data.blocks.find((b) => b.type === "descPairs") as DescPairsBlock | undefined;
-  const listBlock = data.blocks.find((b) => b.type === "list") as ListBlock | undefined;
-  const processBlock = data.blocks.find((b) => b.type === "process") as ProcessBlock | undefined;
-  const whyChooseBlock = data.blocks.find((b) => b.type === "whyChoose") as WhyChooseBlock | undefined;
-  const faqBlock = data.blocks.find((b) => b.type === "faq") as FaqBlock | undefined;
-  const aiBlocks = data.blocks.filter((b) => b.type === "ai") as AiBlock[];
-
   return (
     <div className="asx-page">
       <Header />
@@ -469,445 +549,511 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
         </section>
 
         {/* ========================================================================= */}
-        {/* 3. MARKETING SERVICES OUTLINE GRID (descPairsBlock) */}
+        {/* 3. DYNAMIC BLOCKS RENDERING */}
         {/* ========================================================================= */}
-        {descPairsBlock && (
-          <section id="services-section" className="asx-section" style={{ borderTop: "1px solid #e5eaee" }}>
-            <div className="asx-container">
-              <div className="asx-section-header-center" style={{ maxWidth: "1050px" }}>
-                <h2 className="asx-one-line-heading" style={{ fontSize: "clamp(18px, 2.1vw, 28px)", fontWeight: 800, color: "#001d28", margin: "0 0 10px", letterSpacing: "-0.02em" }}>
-                  {descPairsBlock.title || ("Our " + data.crumb + " Marketing Services")}
-                </h2>
-                {descPairsBlock.desc && (
-                  <p style={{ fontSize: "15px", color: "#2c436b", margin: "0 auto", maxWidth: "680px" }}>
-                    {descPairsBlock.desc}
-                  </p>
-                )}
-              </div>
-
-              <div className="asx-outline-marquee-wrap">
-                <div className="asx-outline-marquee-track">
-                  {/* Set 1 */}
-                  {descPairsBlock.items.map((item, idx) => (
-                    <div key={"orig-" + idx} className="asx-outline-card">
-                      <div>
-                        <div className="asx-icon-box">
-                          <SparkleSvg size={20} />
-                        </div>
-                        <h3 className="asx-outline-title">{item.title}</h3>
-                        <p className="asx-outline-desc">{item.desc}</p>
-                      </div>
-
-                      <div style={{ marginTop: "20px", paddingTop: "12px", borderTop: "1px solid #f1f5f9" }}>
-                        <Link href="/contact" className="asx-arrow-link" style={{ fontSize: "12px" }}>
-                          <span>Enquire now</span>
-                          <ArrowDownRightSvg size={12} />
-                        </Link>
-                      </div>
-                    </div>
-                  ))}
-
-                  {/* Set 2 (Duplicate for Seamless Infinite Loop) */}
-                  {descPairsBlock.items.map((item, idx) => (
-                    <div key={"dup-" + idx} className="asx-outline-card">
-                      <div>
-                        <div className="asx-icon-box">
-                          <SparkleSvg size={20} />
-                        </div>
-                        <h3 className="asx-outline-title">{item.title}</h3>
-                        <p className="asx-outline-desc">{item.desc}</p>
-                      </div>
-
-                      <div style={{ marginTop: "20px", paddingTop: "12px", borderTop: "1px solid #f1f5f9" }}>
-                        <Link href="/contact" className="asx-arrow-link" style={{ fontSize: "12px" }}>
-                          <span>Enquire now</span>
-                          <ArrowDownRightSvg size={12} />
-                        </Link>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* ========================================================================= */}
-        {/* 4. FIRST AI / MARKETING ECOSYSTEM SECTION (aiBlocks[0]) */}
-        {/* ========================================================================= */}
-        {aiBlocks[0] && (
-          <section className="asx-section" style={{ borderTop: "1px solid #e5eaee" }}>
-            <div className="asx-container">
-              <div className="asx-section-header-center" style={{ maxWidth: "860px" }}>
-                <div className="asx-tag-pill" style={{ background: "#ffffff", borderColor: "#dce3e4", color: "#001d28" }}>
-                  <span>{data.crumb + " Ecosystem"}</span>
-                </div>
-                <h2 style={{ fontSize: "clamp(22px, 2.4vw, 32px)", fontWeight: 800, color: "#001d28", margin: "12px 0 14px" }}>
-                  {renderGradientTitle(aiBlocks[0].title)}
-                </h2>
-                {aiBlocks[0].intro && (
-                  <p className="asx-section-intro" style={{ fontSize: "16px", color: "#2c436b", lineHeight: 1.65 }}>
-                    {aiBlocks[0].intro}
-                  </p>
-                )}
-              </div>
-
-              {aiBlocks[0].bullets && aiBlocks[0].bullets.length > 0 && (
-                <div className="asx-cards-grid-3" style={{ marginTop: "36px" }}>
-                  {aiBlocks[0].bullets.map((pillar, idx) => (
-                    <div key={idx} className="asx-card-v5" style={{ minHeight: "auto", padding: "28px 24px" }}>
-                      <div className="asx-card-top-badge" style={{ width: "48px", height: "48px", background: "#f1f5f9", borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "center", color: "#7c3aed", fontWeight: 800, fontSize: "15px" }}>
-                        {"0" + (idx + 1)}
-                      </div>
-                      <div style={{ marginTop: "12px" }}>
-                        <h3 className="asx-card-title" style={{ fontSize: "19px", marginBottom: "8px" }}>{pillar}</h3>
-                        <p className="asx-card-desc" style={{ fontSize: "14px", margin: 0 }}>
-                          {"Strategic " + pillar.toLowerCase() + " optimization connected directly to patient acquisition and brand authority."}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {aiBlocks[0].desc && (
-                <div style={{ marginTop: "32px", padding: "20px 28px", background: "#ffffff", borderRadius: "16px", border: "1px solid #e2e8f0", textAlign: "center" }}>
-                  <p style={{ margin: 0, fontSize: "15px", fontWeight: 600, color: "#001d28" }}>
-                    {aiBlocks[0].desc}
-                  </p>
-                </div>
-              )}
-            </div>
-          </section>
-        )}
-
-        {/* ========================================================================= */}
-        {/* 5. WHY CHOOSE US (whyChooseBlock) */}
-        {/* ========================================================================= */}
-        {whyChooseBlock && (
-          <section
-            ref={valPropRef}
-            className={"asx-section " + (valPropVisible ? "asx-valprop-visible" : "")}
-            style={{ borderTop: "1px solid #e5eaee" }}
-          >
-            <div className="asx-container">
-              <div className="asx-valprop-grid">
-                {/* Left Column: Bullets Checklist */}
-                <div>
-                  <div className="asx-tag-pill" style={{ background: "#ffffff", borderColor: "#dce3e4", color: "#001d28" }}>
-                    <span>{whyChooseBlock.tagline || (data.crumb + " Expertise")}</span>
+        {data.blocks.map((block, bIdx) => {
+          if (block.type === "descPairs") {
+            const descPairsBlock = block as DescPairsBlock;
+            const isMarquee = descPairsBlock.items.length >= 8;
+            return (
+              <section key={bIdx} id={bIdx === 0 || bIdx === 2 ? "services-section" : undefined} className="asx-section" style={{ borderTop: "1px solid #e5eaee" }}>
+                <div className="asx-container">
+                  <div className="asx-section-header-center" style={{ maxWidth: "1050px", marginBottom: descPairsBlock.desc ? "20px" : "36px" }}>
+                    <h2 className="asx-one-line-heading" style={{ fontSize: "clamp(18px, 1.8vw, 24px)", fontWeight: 800, color: "#001d28", margin: "0", letterSpacing: "-0.02em" }}>
+                      {renderGradientTitle(descPairsBlock.title || ("Our " + data.crumb + " Marketing Services"))}
+                    </h2>
+                    {descPairsBlock.subtitle && (
+                      <p style={{ fontSize: "14px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "#7c3aed", margin: "8px 0 0" }}>
+                        {descPairsBlock.subtitle}
+                      </p>
+                    )}
+                    {descPairsBlock.desc && (
+                      <p style={{ fontSize: "15px", color: "#2c436b", margin: "10px auto 0", maxWidth: "680px" }}>
+                        {descPairsBlock.desc}
+                      </p>
+                    )}
                   </div>
 
-                  <h2 className="asx-valprop-title">
-                    {renderGradientTitle(whyChooseBlock.title || "Why Choose Quickupp Softech?")}
-                  </h2>
+                  {isMarquee ? (
+                    <div className="asx-outline-marquee-wrap">
+                      <div className="asx-outline-marquee-track">
+                        {/* Set 1 */}
+                        {descPairsBlock.items.map((item, idx) => (
+                          <div key={"orig-" + idx} className="asx-outline-card">
+                            <div>
+                              <div className="asx-icon-box">
+                                <SparkleSvg size={20} />
+                              </div>
+                              <h3 className="asx-outline-title">{item.title}</h3>
+                              <p className="asx-outline-desc">{item.desc}</p>
+                            </div>
 
-                  {whyChooseBlock.desc && (
-                    <p className="asx-valprop-desc">
-                      {whyChooseBlock.desc}
-                    </p>
+                            <div style={{ marginTop: "20px", paddingTop: "12px", borderTop: "1px solid #f1f5f9" }}>
+                              <Link href="/contact" className="asx-arrow-link" style={{ fontSize: "12px" }}>
+                                <span>Enquire now</span>
+                                <ArrowDownRightSvg size={12} />
+                              </Link>
+                            </div>
+                          </div>
+                        ))}
+
+                        {/* Set 2 (Duplicate for Seamless Loop) */}
+                        {descPairsBlock.items.map((item, idx) => (
+                          <div key={"dup-" + idx} className="asx-outline-card">
+                            <div>
+                              <div className="asx-icon-box">
+                                <SparkleSvg size={20} />
+                              </div>
+                              <h3 className="asx-outline-title">{item.title}</h3>
+                              <p className="asx-outline-desc">{item.desc}</p>
+                            </div>
+
+                            <div style={{ marginTop: "20px", paddingTop: "12px", borderTop: "1px solid #f1f5f9" }}>
+                              <Link href="/contact" className="asx-arrow-link" style={{ fontSize: "12px" }}>
+                                <span>Enquire now</span>
+                                <ArrowDownRightSvg size={12} />
+                              </Link>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "20px" }}>
+                      {descPairsBlock.items.map((item, idx) => (
+                        <div
+                          key={idx}
+                          style={{
+                            background: "#ffffff",
+                            border: "1px solid #e2e8f0",
+                            borderRadius: "18px",
+                            padding: "26px",
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "space-between",
+                            boxShadow: "0 2px 10px rgba(0, 0, 0, 0.02)",
+                          }}
+                        >
+                          <div>
+                            <div style={{ width: "40px", height: "40px", borderRadius: "12px", background: "rgba(124, 58, 237, 0.08)", color: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "16px" }}>
+                              <SparkleSvg size={20} />
+                            </div>
+                            <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#001d28", margin: "0 0 10px", lineHeight: 1.3 }}>
+                              {item.title}
+                            </h3>
+                            <p style={{ fontSize: "14.5px", color: "#2c436b", lineHeight: 1.6, margin: 0 }}>
+                              {item.desc}
+                            </p>
+                          </div>
+
+                          <div style={{ marginTop: "20px", paddingTop: "14px", borderTop: "1px solid #f1f5f9" }}>
+                            <Link href="/contact" className="asx-arrow-link" style={{ fontSize: "13px" }}>
+                              <span>Enquire now</span>
+                              <ArrowDownRightSvg size={13} />
+                            </Link>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   )}
 
-                  <div className="asx-valprop-list" style={{ display: "grid", gridTemplateColumns: "1fr", gap: "12px" }}>
-                    {whyChooseBlock.bullets.map((bullet, idx) => (
-                      <div key={idx} className="asx-valprop-item" style={{ marginBottom: 0 }}>
-                        <div className="asx-valprop-check">
-                          <CheckSvg size={13} />
-                        </div>
-                        <div>
-                          <h4 className="asx-valprop-item-title" style={{ fontSize: "15px", fontWeight: 600, color: "#001d28" }}>{bullet}</h4>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {whyChooseBlock.cta && (
-                    <div style={{ marginTop: "28px" }}>
-                      <Link href={whyChooseBlock.cta.href || "/contact"} className="asx-btn-green">
-                        {whyChooseBlock.cta.label}
+                  {descPairsBlock.cta && (
+                    <div style={{ marginTop: "36px", textAlign: "center" }}>
+                      <Link href={descPairsBlock.cta.href || "/contact"} className="asx-btn-green">
+                        {descPairsBlock.cta.label}
                       </Link>
                     </div>
                   )}
                 </div>
+              </section>
+            );
+          }
 
-                {/* Right Column: Visual Arch & Circles */}
-                <div className="asx-valprop-visual">
-                  <img
-                    src={images.arch}
-                    alt={data.crumb + " growth"}
-                    className="asx-arch-img"
-                    loading="lazy"
-                  />
+          if (block.type === "list") {
+            const listBlock = block as ListBlock;
+            const isSplitCollage = bIdx === 0 || (listBlock.subtitle && listBlock.items.length <= 10 && listBlock.items[0]?.length > 25);
 
-                  <img
-                    src={images.circle}
-                    alt={data.crumb + " expertise"}
-                    className="asx-circle-img"
-                    loading="lazy"
-                  />
-
-                  <div className="asx-support-card">
-                    <div className="asx-sup-title">Dedicated Growth Partner</div>
-                    <div className="asx-sup-sub">Integrated Marketing + AI + Technology</div>
-
-                    <div className="asx-sup-list">
-                      <div className="asx-sup-row is-active">
-                        <div className="asx-sup-person">
-                          <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "#7c3aed", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: "12px", flexShrink: 0 }}>
-                            QS
-                          </div>
-                          <div>
-                            <div className="asx-sup-name">{data.crumb + " Strategist"}</div>
-                            <div className="asx-sup-role" style={{ fontSize: "10px", color: "#64748b" }}>Healthcare Growth Team</div>
-                          </div>
+            if (isSplitCollage) {
+              return (
+                <section key={bIdx} className="asx-who-split-section" style={{ borderTop: "1px solid #e5eaee" }}>
+                  <div className="asx-container">
+                    <div className="asx-who-split-grid">
+                      <div className="asx-collage-wrap">
+                        <div className="asx-collage-tall-box">
+                          <img src={images.story} alt={data.crumb + " practice"} loading="lazy" />
                         </div>
-                        <span style={{ color: "#7c3aed" }}><CheckSvg size={13} /></span>
+                        <div className="asx-collage-circle-box">
+                          <img src={images.circle} alt={data.crumb + " segment"} loading="lazy" />
+                        </div>
+                        <div className="asx-collage-dome-box">
+                          <img src={images.arch} alt={data.crumb + " growth"} loading="lazy" />
+                        </div>
                       </div>
 
-                      <div className="asx-sup-row">
-                        <div className="asx-sup-person">
-                          <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "#001d28", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: "12px", flexShrink: 0 }}>
-                            AI
+                      <div className="asx-who-content">
+                        <h2 className="asx-who-title">
+                          {renderGradientTitle(listBlock.title || (data.crumb + " Businesses We Help"))}
+                        </h2>
+
+                        {listBlock.subtitle && (
+                          <div className="asx-who-subtitle">
+                            {listBlock.subtitle}
                           </div>
-                          <div>
-                            <div className="asx-sup-name">AI Workflow Engineer</div>
-                            <div className="asx-sup-role" style={{ fontSize: "10px", color: "#64748b" }}>Automation & Lead Routing</div>
-                          </div>
+                        )}
+
+                        {listBlock.desc && (
+                          <p style={{ fontSize: "15px", color: "#2c436b", margin: "0 0 20px" }}>
+                            {listBlock.desc}
+                          </p>
+                        )}
+
+                        <ul className="asx-who-bullets" style={{ marginTop: "20px" }}>
+                          {listBlock.items.slice(0, listBlock.items.length > 2 ? listBlock.items.length - 2 : listBlock.items.length).map((item, idx) => (
+                            <li key={idx} className="asx-who-bullet-item">
+                              <span className="asx-who-bullet-dot" />
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+
+                        {listBlock.items.length > 2 && (
+                          <>
+                            <hr className="asx-who-divider" />
+                            <div className="asx-who-checks">
+                              {listBlock.items.slice(listBlock.items.length - 2).map((item, idx) => (
+                                <div key={idx} className="asx-who-check-item">
+                                  <CheckSvg size={16} />
+                                  <span>{item}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </>
+                        )}
+
+                        <div style={{ marginTop: "24px" }}>
+                          <Link href={listBlock.cta?.href || "/contact"} className="asx-btn-dark">
+                            {listBlock.cta?.label || "Get Industry Strategy"}
+                          </Link>
                         </div>
-                        <span style={{ color: "#94a3b8" }}><CheckSvg size={13} /></span>
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
+                </section>
+              );
+            }
 
-        {/* ========================================================================= */}
-        {/* 6. SECOND AI / AI-POWERED GROWTH BLOCK (aiBlocks[1]) */}
-        {/* ========================================================================= */}
-        {aiBlocks[1] && (
-          <section className="asx-section" style={{ borderTop: "1px solid #e5eaee" }}>
-            <div className="asx-container">
-              <div className="asx-section-header-center" style={{ maxWidth: "860px" }}>
-                <div className="asx-tag-pill" style={{ background: "#ffffff", borderColor: "#dce3e4", color: "#001d28" }}>
-                  <span>AI Automation & Growth</span>
-                </div>
-                <h2 style={{ fontSize: "clamp(22px, 2.4vw, 32px)", fontWeight: 800, color: "#001d28", margin: "12px 0 14px" }}>
-                  {renderGradientTitle(aiBlocks[1].title)}
-                </h2>
-                {aiBlocks[1].intro && (
-                  <p className="asx-section-intro" style={{ fontSize: "16px", color: "#2c436b", lineHeight: 1.65 }}>
-                    {aiBlocks[1].intro}
-                  </p>
-                )}
-              </div>
+            // Clean, Proper, Elegant Grid Layout for List Blocks
+            return (
+              <section key={bIdx} className="asx-section" style={{ borderTop: "1px solid #e5eaee" }}>
+                <div className="asx-container">
+                  <div className="asx-section-header-center" style={{ maxWidth: "860px", marginBottom: "36px" }}>
+                    <h2 style={{ fontSize: "clamp(18px, 1.8vw, 24px)", fontWeight: 800, color: "#001d28", margin: "0 0 10px" }}>
+                      {renderGradientTitle(listBlock.title)}
+                    </h2>
+                    {listBlock.tagline && (
+                      <p style={{ fontSize: "15px", fontWeight: 600, color: "#7c3aed", margin: "0 0 8px" }}>
+                        {listBlock.tagline}
+                      </p>
+                    )}
+                    {listBlock.desc && (
+                      <p style={{ fontSize: "15.5px", color: "#2c436b", lineHeight: 1.6, margin: 0 }}>
+                        {listBlock.desc}
+                      </p>
+                    )}
+                  </div>
 
-              {aiBlocks[1].bullets && aiBlocks[1].bullets.length > 0 && (
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: "16px", marginTop: "36px" }}>
-                  {aiBlocks[1].bullets.map((capability, idx) => (
-                    <div
-                      key={idx}
-                      style={{
-                        background: "#ffffff",
-                        border: "1px solid #e2e8f0",
-                        borderRadius: "16px",
-                        padding: "20px 22px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "14px",
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.02)",
-                      }}
-                    >
-                      <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "rgba(124, 58, 237, 0.08)", color: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                        <CheckSvg size={15} />
-                      </div>
-                      <span style={{ fontSize: "15px", fontWeight: 600, color: "#001d28" }}>{capability}</span>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "16px" }}>
+                    {listBlock.items.map((item, idx) => {
+                      const icon = getCategoryIcon(item);
+                      return (
+                        <div
+                          key={idx}
+                          className="asx-simple-card-item"
+                          style={{
+                            background: "#ffffff",
+                            border: "1px solid #e2e8f0",
+                            borderRadius: "14px",
+                            padding: "18px 22px",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "14px",
+                            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.02)",
+                            transition: "all 0.2s ease",
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: "38px",
+                              height: "38px",
+                              borderRadius: "10px",
+                              background: "rgba(124, 58, 237, 0.08)",
+                              color: "#7c3aed",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              flexShrink: 0,
+                            }}
+                          >
+                            {icon}
+                          </div>
+                          <span style={{ fontSize: "15px", fontWeight: 600, color: "#001d28", lineHeight: 1.35 }}>
+                            {item}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {listBlock.cta && (
+                    <div style={{ marginTop: "36px", textAlign: "center" }}>
+                      <Link href={listBlock.cta.href || "/contact"} className="asx-btn-green">
+                        {listBlock.cta.label}
+                      </Link>
                     </div>
-                  ))}
+                  )}
                 </div>
-              )}
-            </div>
-          </section>
-        )}
+              </section>
+            );
+          }
 
-        {/* ========================================================================= */}
-        {/* 7. BUSINESSES WE HELP (listBlock) */}
-        {/* ========================================================================= */}
-        {listBlock && (
-          <section className="asx-who-split-section" style={{ borderTop: "1px solid #e5eaee" }}>
-            <div className="asx-container">
-              <div className="asx-who-split-grid">
-                {/* Left Column: 3 Shaped Overlapping Images Collage */}
-                <div className="asx-collage-wrap">
-                  {/* Right Main Tall Arch */}
-                  <div className="asx-collage-tall-box">
-                    <img
-                      src={images.story}
-                      alt={data.crumb + " practice"}
-                      loading="lazy"
-                    />
+          if (block.type === "ai") {
+            const aiBlock = block as AiBlock;
+            return (
+              <section key={bIdx} className="asx-section" style={{ borderTop: "1px solid #e5eaee" }}>
+                <div className="asx-container">
+                  <div className="asx-section-header-center" style={{ maxWidth: "860px" }}>
+                    <h2 style={{ fontSize: "clamp(18px, 1.8vw, 24px)", fontWeight: 800, color: "#001d28", margin: "0 0 14px" }}>
+                      {renderGradientTitle(aiBlock.title)}
+                    </h2>
+                    {aiBlock.intro && (
+                      <p className="asx-section-intro" style={{ fontSize: "16px", color: "#2c436b", lineHeight: 1.65, whiteSpace: "pre-line", margin: 0 }}>
+                        {aiBlock.intro}
+                      </p>
+                    )}
                   </div>
 
-                  {/* Top-Left Overlapping Floating Circle */}
-                  <div className="asx-collage-circle-box">
-                    <img
-                      src={images.circle}
-                      alt={data.crumb + " segment"}
-                      loading="lazy"
-                    />
-                  </div>
-
-                  {/* Bottom-Left Flush Arch Dome */}
-                  <div className="asx-collage-dome-box">
-                    <img
-                      src={images.arch}
-                      alt={data.crumb + " growth"}
-                      loading="lazy"
-                    />
-                  </div>
-                </div>
-
-                {/* Right Column: Title, Subtitle, Bullets, Checkmarks, CTA */}
-                <div className="asx-who-content">
-                  <h2 className="asx-who-title">
-                    {renderGradientTitle(listBlock.title || (data.crumb + " Businesses We Help"))}
-                  </h2>
-
-                  {listBlock.subtitle && (
-                    <div className="asx-who-subtitle">
-                      {listBlock.subtitle}
+                  {aiBlock.bullets && aiBlock.bullets.length > 0 && (
+                    <div className="asx-ecosystem-grid" style={{ marginTop: "36px" }}>
+                      {aiBlock.bullets.map((pillar, idx) => (
+                        <div key={idx} className="asx-ecosystem-card">
+                          <span className="asx-ecosystem-badge">
+                            {"0" + (idx + 1)}
+                          </span>
+                          <h3 className="asx-ecosystem-title">{pillar}</h3>
+                        </div>
+                      ))}
                     </div>
                   )}
 
-                  {listBlock.desc && (
-                    <p style={{ fontSize: "15px", color: "#2c436b", margin: "0 0 20px" }}>
-                      {listBlock.desc}
-                    </p>
+                  {aiBlock.desc && (
+                    <div className="asx-ecosystem-footer">
+                      <p style={{ margin: 0, fontSize: "15px", fontWeight: 600, color: "#001d28" }}>
+                        {aiBlock.desc}
+                      </p>
+                    </div>
                   )}
 
-                  <ul className="asx-who-bullets">
-                    {listBlock.items.slice(0, listBlock.items.length > 2 ? listBlock.items.length - 2 : listBlock.items.length).map((item, idx) => (
-                      <li key={idx} className="asx-who-bullet-item">
-                        <span className="asx-who-bullet-dot" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  {aiBlock.cta && (
+                    <div style={{ marginTop: "32px", textAlign: "center" }}>
+                      <Link href={aiBlock.cta.href || "/contact"} className="asx-btn-green">
+                        {aiBlock.cta.label}
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </section>
+            );
+          }
 
-                  {listBlock.items.length > 2 && (
-                    <>
-                      <hr className="asx-who-divider" />
+          if (block.type === "whyChoose") {
+            const whyChooseBlock = block as WhyChooseBlock;
+            return (
+              <section
+                key={bIdx}
+                ref={valPropRef}
+                className={"asx-section " + (valPropVisible ? "asx-valprop-visible" : "")}
+                style={{ borderTop: "1px solid #e5eaee" }}
+              >
+                <div className="asx-container">
+                  <div className="asx-valprop-grid">
+                    <div>
+                      {whyChooseBlock.tagline && (
+                        <div className="asx-tag-pill" style={{ background: "#ffffff", borderColor: "#dce3e4", color: "#001d28" }}>
+                          <span>{whyChooseBlock.tagline}</span>
+                        </div>
+                      )}
 
-                      <div className="asx-who-checks">
-                        {listBlock.items.slice(listBlock.items.length - 2).map((item, idx) => (
-                          <div key={idx} className="asx-who-check-item">
-                            <CheckSvg size={16} />
-                            <span>{item}</span>
+                      <h2 className="asx-valprop-title" style={{ margin: "0 0 20px" }}>
+                        {renderGradientTitle(whyChooseBlock.title || "Why Choose Quickupp Softech?")}
+                      </h2>
+
+                      {whyChooseBlock.desc && (
+                        <p className="asx-valprop-desc">
+                          {whyChooseBlock.desc}
+                        </p>
+                      )}
+
+                      <div className="asx-valprop-list" style={{ display: "grid", gridTemplateColumns: "1fr", gap: "14px" }}>
+                        {whyChooseBlock.bullets.map((bullet, idx) => (
+                          <div key={idx} className="asx-valprop-item" style={{ marginBottom: 0 }}>
+                            <div className="asx-valprop-check">
+                              <CheckSvg size={14} />
+                            </div>
+                            <div>
+                              <h4 className="asx-valprop-item-title" style={{ fontSize: "15.5px", fontWeight: 600, color: "#001d28" }}>{bullet}</h4>
+                            </div>
                           </div>
                         ))}
                       </div>
-                    </>
-                  )}
 
-                  <div style={{ marginTop: "24px" }}>
-                    <Link href={listBlock.cta?.href || "/contact"} className="asx-btn-dark">
-                      {listBlock.cta?.label || "Get Industry Strategy"}
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* ========================================================================= */}
-        {/* 8. GROWTH PROCESS (processBlock) */}
-        {/* ========================================================================= */}
-        {processBlock && (
-          <section className="asx-section" style={{ borderTop: "1px solid #e5eaee" }}>
-            <div className="asx-container">
-              <div className="asx-section-header-center">
-                <h2 style={{ fontSize: "clamp(22px, 2.4vw, 32px)", fontWeight: 800, color: "#001d28", margin: "0 0 12px" }}>
-                  {renderGradientTitle(processBlock.title)}
-                </h2>
-                <p style={{ fontSize: "15px", color: "#2c436b", margin: 0 }}>
-                  A structured, transparent methodology delivering predictable outcomes.
-                </p>
-              </div>
-
-              <div
-                className="asx-process-grid"
-                style={{
-                  gridTemplateColumns: "repeat(" + processBlock.steps.length + ", minmax(0, 1fr))",
-                }}
-              >
-                {processBlock.steps.map((step, idx) => {
-                  const isSelected = activeStep === idx;
-                  return (
-                    <div
-                      key={idx}
-                      onClick={() => setActiveStep(idx)}
-                      onMouseEnter={() => setActiveStep(idx)}
-                      className={"asx-step-card " + (isSelected ? "is-active" : "")}
-                      style={{ cursor: "pointer" }}
-                    >
-                      <span className="asx-step-badge">{step.num}</span>
-                      <h3 className="asx-step-title">{step.title}</h3>
-                      <p className="asx-step-desc">{step.desc || step.text}</p>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* ========================================================================= */}
-        {/* 9. FAQ ACCORDION (faqBlock) */}
-        {/* ========================================================================= */}
-        {faqBlock && faqBlock.items && (
-          <section className="asx-section" style={{ background: "#ffffff", borderTop: "1px solid #e5eaee" }}>
-            <div className="asx-container-sm">
-              <div className="asx-section-header-center">
-                <h2 style={{ fontSize: "clamp(22px, 2.4vw, 32px)", fontWeight: 800, color: "#001d28", margin: "0 0 10px" }}>
-                  {faqBlock.title || "Frequently Asked Questions"}
-                </h2>
-                <p style={{ fontSize: "15px", color: "#2c436b", margin: 0 }}>
-                  {"Everything you need to know about our " + data.crumb + " growth framework."}
-                </p>
-              </div>
-
-              <div className="asx-faq-list">
-                {faqBlock.items.map((faq, idx) => {
-                  const isOpen = openFaq === idx;
-                  return (
-                    <div key={idx} className="asx-faq-item">
-                      <button
-                        type="button"
-                        onClick={() => setOpenFaq(isOpen ? null : idx)}
-                        className="asx-faq-q"
-                      >
-                        <span>{faq.q}</span>
-                        <PlusCrossSvg isOpen={isOpen} size={18} />
-                      </button>
-
-                      {isOpen && (
-                        <div className="asx-faq-a">
-                          {faq.a}
+                      {whyChooseBlock.cta && (
+                        <div style={{ marginTop: "32px" }}>
+                          <Link href={whyChooseBlock.cta.href || "/contact"} className="asx-btn-green">
+                            {whyChooseBlock.cta.label}
+                          </Link>
                         </div>
                       )}
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
-        )}
+
+                    <div className="asx-valprop-visual">
+                      <img src={images.arch} alt={data.crumb + " growth"} className="asx-arch-img" loading="lazy" />
+                      <img src={images.circle} alt={data.crumb + " expertise"} className="asx-circle-img" loading="lazy" />
+                      <div className="asx-support-card">
+                        <div className="asx-sup-title">Dedicated Growth Partner</div>
+                        <div className="asx-sup-sub">Integrated Marketing + AI + Technology</div>
+
+                        <div className="asx-sup-list">
+                          <div className="asx-sup-row is-active">
+                            <div className="asx-sup-person">
+                              <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "#7c3aed", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: "12px", flexShrink: 0 }}>
+                                QS
+                              </div>
+                              <div>
+                                <div className="asx-sup-name">{data.crumb + " Strategist"}</div>
+                                <div className="asx-sup-role" style={{ fontSize: "10px", color: "#64748b" }}>Growth Team</div>
+                              </div>
+                            </div>
+                            <span style={{ color: "#7c3aed" }}><CheckSvg size={13} /></span>
+                          </div>
+
+                          <div className="asx-sup-row">
+                            <div className="asx-sup-person">
+                              <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "#001d28", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: "12px", flexShrink: 0 }}>
+                                AI
+                              </div>
+                              <div>
+                                <div className="asx-sup-name">AI Workflow Engineer</div>
+                                <div className="asx-sup-role" style={{ fontSize: "10px", color: "#64748b" }}>Automation & Lead Routing</div>
+                              </div>
+                            </div>
+                            <span style={{ color: "#94a3b8" }}><CheckSvg size={13} /></span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            );
+          }
+
+          if (block.type === "process") {
+            const processBlock = block as ProcessBlock;
+            return (
+              <section key={bIdx} className="asx-section" style={{ borderTop: "1px solid #e5eaee" }}>
+                <div className="asx-container">
+                  <div className="asx-section-header-center" style={{ marginBottom: "36px" }}>
+                    <h2 style={{ fontSize: "clamp(18px, 1.8vw, 24px)", fontWeight: 800, color: "#001d28", margin: 0 }}>
+                      {renderGradientTitle(processBlock.title)}
+                    </h2>
+                    {processBlock.tagline && (
+                      <p style={{ fontSize: "15px", color: "#2c436b", margin: "10px 0 0" }}>
+                        {processBlock.tagline}
+                      </p>
+                    )}
+                    {processBlock.intro && (
+                      <p style={{ fontSize: "15px", color: "#2c436b", margin: "10px 0 0" }}>
+                        {processBlock.intro}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="asx-process-grid">
+                    {processBlock.steps.map((step, idx) => {
+                      const isSelected = activeStep === idx;
+                      return (
+                        <div
+                          key={idx}
+                          onClick={() => setActiveStep(idx)}
+                          className={"asx-step-card " + (isSelected ? "is-active" : "")}
+                          style={{ cursor: "pointer" }}
+                        >
+                          <div className="asx-step-header">
+                            <span className="asx-step-badge">{step.num}</span>
+                            <h3 className="asx-step-title">{step.title}</h3>
+                          </div>
+                          <p className="asx-step-desc">{step.desc || step.text}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {processBlock.cta && (
+                    <div style={{ marginTop: "36px", textAlign: "center" }}>
+                      <Link href={processBlock.cta.href || "/contact"} className="asx-btn-green">
+                        {processBlock.cta.label}
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </section>
+            );
+          }
+
+          if (block.type === "faq") {
+            const faqBlock = block as FaqBlock;
+            return (
+              <section key={bIdx} className="asx-section" style={{ background: "#ffffff", borderTop: "1px solid #e5eaee" }}>
+                <div className="asx-container-sm">
+                  <div className="asx-section-header-center" style={{ marginBottom: "36px" }}>
+                    <h2 style={{ fontSize: "clamp(18px, 1.8vw, 24px)", fontWeight: 800, color: "#001d28", margin: 0 }}>
+                      {faqBlock.title || "Frequently Asked Questions"}
+                    </h2>
+                  </div>
+
+                  <div className="asx-faq-list">
+                    {faqBlock.items?.map((faq, idx) => {
+                      const isOpen = openFaq === idx;
+                      return (
+                        <div key={idx} className="asx-faq-item">
+                          <button
+                            type="button"
+                            onClick={() => setOpenFaq(isOpen ? null : idx)}
+                            className="asx-faq-q"
+                          >
+                            <span>{faq.q}</span>
+                            <PlusCrossSvg isOpen={isOpen} size={18} />
+                          </button>
+
+                          {isOpen && (
+                            <div className="asx-faq-a">
+                              {faq.a}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </section>
+            );
+          }
+
+          return null;
+        })}
 
         {/* ========================================================================= */}
-        {/* 10. CLOSING CTA BANNER */}
+        {/* 4. CLOSING CTA BANNER */}
         {/* ========================================================================= */}
         <section style={{ padding: "64px 24px" }}>
           <div className="asx-container">
@@ -922,24 +1068,21 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                 )}
               </h2>
 
-              <p className="asx-cta-desc">
+              <p className="asx-cta-desc" style={{ whiteSpace: "pre-line" }}>
                 {data.closingDesc}
               </p>
 
-              <div style={{ display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap" }}>
-                <Link href={data.closingCtas?.[0]?.href || "/contact"} className="asx-btn-green" style={{ padding: "16px 36px", fontSize: "15px" }}>
-                  {data.closingCtas?.[0]?.label || ("Talk to Our " + data.crumb + " Team")}
-                </Link>
-
-                <Link
-                  href="https://calendly.com/qsaistudio/quickupp-ai-studio-30-min-strategy-call"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="asx-btn-outline"
-                  style={{ padding: "16px 32px", fontSize: "15px" }}
-                >
-                  Book 30 min strategy call
-                </Link>
+              <div style={{ display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
+                {data.closingCtas?.map((cta, idx) => (
+                  <Link
+                    key={idx}
+                    href={cta.href || "/contact"}
+                    className={idx === 0 ? "asx-btn-green" : "asx-btn-outline"}
+                    style={{ padding: "16px 36px", fontSize: "15px" }}
+                  >
+                    {cta.label}
+                  </Link>
+                ))}
               </div>
             </div>
           </div>

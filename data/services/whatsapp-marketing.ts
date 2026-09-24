@@ -1,11 +1,10 @@
 import type { ServicePageData } from "@/lib/servicePageTypes";
 
-export const data: ServicePageData = {
+const data: ServicePageData = {
   metaTitle: "WhatsApp Marketing Services | Quickupp Softech",
-  metaDescription:
-    "Reach customers directly through personalized WhatsApp conversations, campaigns and automated communication.",
-  crumb: "WhatsApp Marketing Services",
-  heroEyebrow: "WhatsApp Marketing Services",
+  metaDescription: "Connect. Engage. Convert With WhatsApp Marketing.",
+  crumb: "WhatsApp Marketing",
+  heroEyebrow: "WhatsApp Marketing",
   heroTitle: "Connect. Engage. Convert With WhatsApp Marketing",
   heroParagraphs: [
     "Reach customers directly through personalized WhatsApp conversations, campaigns and automated communication.",
@@ -37,17 +36,16 @@ export const data: ServicePageData = {
       type: "process",
       title: "Our WhatsApp Marketing Process",
       steps: [
-        { num: "01", title: "Strategy", desc: "Understand your audience and campaign objectives." },
-        { num: "02", title: "Audience Segmentation", desc: "Target relevant customer groups." },
-        { num: "03", title: "Campaign Creation", desc: "Develop engaging messages and offers." },
-        { num: "04", title: "Automation", desc: "Set up broadcasts, workflows and automated responses." },
-        { num: "05", title: "Optimize", desc: "Track engagement, leads and conversions." },
+        { num: "01", title: "01. Strategy", desc: "Understand your audience and campaign objectives." },
+        { num: "02", title: "02. Audience Segmentation", desc: "Target relevant customer groups." },
+        { num: "03", title: "03. Campaign Creation", desc: "Develop engaging messages and offers." },
+        { num: "04", title: "04. Automation", desc: "Set up broadcasts, workflows and automated responses." },
+        { num: "05", title: "05. Optimize", desc: "Track engagement, leads and conversions." },
       ],
     },
     {
       type: "whyChoose",
       title: "Why Choose Quickupp Softech?",
-      tagline: "Targeted WhatsApp Campaigns",
       bullets: [
         "Targeted WhatsApp Campaigns",
         "Personalized Customer Communication",
@@ -60,6 +58,7 @@ export const data: ServicePageData = {
     },
     {
       type: "industries",
+      title: "Industries We Serve",
       industries: [
         "Healthcare",
         "Home Services",
@@ -75,6 +74,7 @@ export const data: ServicePageData = {
     },
     {
       type: "faq",
+      title: "Frequently Asked Questions",
       items: [
         {
           q: "What is WhatsApp Marketing?",
@@ -92,8 +92,7 @@ export const data: ServicePageData = {
     },
   ],
   closingTitle: "Turn WhatsApp Into a Growth Channel",
-  closingDesc:
-    "Build stronger customer relationships and generate more opportunities with WhatsApp Marketing Services by Quickupp Softech.\n\nMarketing. AI. Technology. Built for Growth.",
+  closingDesc: "Build stronger customer relationships and generate more opportunities with WhatsApp Marketing Services by Quickupp Softech.\nMarketing. AI. Technology. Built for Growth.",
   closingCtas: [{ label: "Talk to Our WhatsApp Marketing Experts", href: "/contact" }],
 };
 

@@ -16,7 +16,6 @@ export const data: ServicePageData = {
     {
       type: "descPairs",
       title: "Complete Digital Growth Solutions for Interior Designers",
-      subtitle: "Premium Client Acquisition",
       desc: "End-to-end digital marketing and portfolio-led growth strategies built specifically for interior designers and design studios.",
       items: [
         {
@@ -82,8 +81,7 @@ export const data: ServicePageData = {
     {
       type: "list",
       title: "Who We Help",
-      subtitle: "Studios & Practices We Specialize In",
-      desc: "We work with diverse interior design businesses and creative studios:",
+      desc: "We work with:",
       items: [
         "Interior Design Studios",
         "Full-Home Interior Designers",
@@ -96,12 +94,10 @@ export const data: ServicePageData = {
         "Turnkey Interior Companies",
         "Premium Design Brands",
       ],
-      cta: { label: "Talk to our Interior Marketing Expert", href: "/contact" },
     },
     {
       type: "descPairs",
       title: "Showcase Your Work. Build Trust. Win Better Projects.",
-      subtitle: "Portfolio-Led Growth",
       items: [
         {
           title: "Portfolio-Led Marketing",
@@ -130,7 +126,7 @@ export const data: ServicePageData = {
       type: "ai",
       title: "Built Around Your Project Pipeline",
       intro:
-        "We measure marketing beyond clicks and impressions. Your marketing should contribute directly to building a stronger project pipeline.",
+        "We measure marketing beyond clicks and impressions.",
       bullets: [
         "Reach",
         "Qualified Leads",
@@ -140,12 +136,14 @@ export const data: ServicePageData = {
         "Projects",
         "Revenue",
       ],
-      desc: "We connect marketing performance directly to consultation bookings and signed design contracts.",
+      desc: "Your marketing should contribute directly to building a stronger project pipeline.",
       cta: { label: "Build a Project-Focused Marketing Plan", href: "/contact" },
     },
     {
       type: "process",
       title: "Our Interior Design Growth Process",
+      tagline: "Analyze → Strategize → Build → Launch → Optimize → Scale",
+      intro: "We evaluate your brand, portfolio, target market, competitors, website, advertising and lead journey before creating your growth strategy.",
       steps: [
         {
           num: "01",
@@ -178,12 +176,11 @@ export const data: ServicePageData = {
           desc: "Expand to high-ticket micro-markets, new residential complexes, and luxury project segments.",
         },
       ],
+      cta: { label: "Plan Your Interior Design Growth Roadmap", href: "/contact" },
     },
     {
       type: "whyChoose",
       title: "Why Choose Quickupp Softech?",
-      tagline: "Marketing, AI & Technology under one partner",
-      desc: "We combine premium aesthetic marketing with data-driven paid advertising and instant automated lead follow-up.",
       bullets: [
         "Marketing, AI & Technology under one partner",
         "Premium-brand focused marketing strategies",
@@ -196,7 +193,6 @@ export const data: ServicePageData = {
         "WhatsApp and CRM follow-up solutions",
         "Data-driven campaign optimization",
       ],
-      cta: { label: "Plan Your Interior Design Growth Roadmap", href: "/contact" },
     },
     {
       type: "ai",

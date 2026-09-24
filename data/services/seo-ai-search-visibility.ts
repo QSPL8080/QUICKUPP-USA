@@ -2,8 +2,7 @@ import type { ServicePageData } from "@/lib/servicePageTypes";
 
 const data: ServicePageData = {
   metaTitle: "SEO & AI Search Visibility | Quickupp Softech",
-  metaDescription:
-    "Be found on Google and discovered in AI search with Quickupp Softech's SEO, AEO and GEO services.",
+  metaDescription: "Be Found on Google. Be Discovered in AI Search. Grow Your Business.",
   crumb: "SEO & AI Search Visibility",
   heroEyebrow: "SEO & AI Search Visibility",
   heroTitle: "Be Found on Google. Be Discovered in AI Search. Grow Your Business.",
@@ -52,10 +51,15 @@ const data: ServicePageData = {
     {
       type: "descPairs",
       title: "AEO & GEO Services",
-      columns: 2,
       items: [
-        { title: "Answer Engine Optimization (AEO)", desc: "Optimize your content for question-based and conversational searches with structured, relevant and answer-focused content." },
-        { title: "Generative Engine Optimization (GEO)", desc: "Improve your brand's presence across AI-powered search experiences through entity optimization, topical authority, structured information and relevant content." },
+        {
+          title: "Answer Engine Optimization (AEO)",
+          desc: "Optimize your content for question-based and conversational searches with structured, relevant and answer-focused content.",
+        },
+        {
+          title: "Generative Engine Optimization (GEO)",
+          desc: "Improve your brand's presence across AI-powered search experiences through entity optimization, topical authority, structured information and relevant content.",
+        },
       ],
       cta: { label: "Explore AEO & GEO Services", href: "/contact" },
     },
@@ -109,10 +113,15 @@ const data: ServicePageData = {
       type: "descPairs",
       title: "National & Enterprise SEO",
       desc: "We build scalable SEO strategies for businesses targeting multiple locations, broader markets and competitive industries.",
-      columns: 2,
       items: [
-        { title: "National SEO", desc: "Nationwide keyword targeting, content strategy, technical SEO, authority building and optimization." },
-        { title: "Enterprise SEO", desc: "Large-scale technical SEO, programmatic SEO, website architecture, automation and performance monitoring." },
+        {
+          title: "National SEO",
+          desc: "Nationwide keyword targeting, content strategy, technical SEO, authority building and optimization.",
+        },
+        {
+          title: "Enterprise SEO",
+          desc: "Large-scale technical SEO, programmatic SEO, website architecture, automation and performance monitoring.",
+        },
       ],
       cta: { label: "Discuss Your SEO Strategy", href: "/contact" },
     },
@@ -120,16 +129,17 @@ const data: ServicePageData = {
       type: "process",
       title: "Our SEO Process",
       steps: [
-        { num: "01", title: "Discover", desc: "Understand your business and goals." },
-        { num: "02", title: "Audit", desc: "Analyze your website and search visibility." },
-        { num: "03", title: "Research", desc: "Identify keywords, intent and opportunities." },
-        { num: "04", title: "Strategize", desc: "Build your customized SEO plan." },
-        { num: "05", title: "Optimize", desc: "Improve technical SEO, content and website structure." },
-        { num: "06", title: "Measure & Scale", desc: "Track performance and continuously optimize." },
+        { num: "01", title: "01. Discover", desc: "Understand your business and goals." },
+        { num: "02", title: "02. Audit", desc: "Analyze your website and search visibility." },
+        { num: "03", title: "03. Research", desc: "Identify keywords, intent and opportunities." },
+        { num: "04", title: "04. Strategize", desc: "Build your customized SEO plan." },
+        { num: "05", title: "05. Optimize", desc: "Improve technical SEO, content and website structure." },
+        { num: "06", title: "06. Measure & Scale", desc: "Track performance and continuously optimize." },
       ],
     },
     {
       type: "whyChoose",
+      title: "Why Choose Quickupp Softech?",
       tagline: "Marketing. AI. Technology. Built for Search & Growth.",
       bullets: [
         "SEO + AI SEO Expertise",
@@ -143,6 +153,7 @@ const data: ServicePageData = {
     },
     {
       type: "industries",
+      title: "Industries We Serve",
       industries: [
         "Healthcare",
         "Home Services",
@@ -160,15 +171,36 @@ const data: ServicePageData = {
       type: "ai",
       title: "AI-Powered SEO",
       desc: "We use AI to support keyword research, content planning, competitor analysis, content optimization, SEO data analysis and AI search visibility—combined with human strategy and expertise.",
+      bullets: [
+        "Keyword Research",
+        "Content Planning",
+        "Competitor Analysis",
+        "Content Optimization",
+        "SEO Data Analysis",
+        "AI Search Visibility",
+      ],
       cta: { label: "Explore AI-Powered SEO", href: "/contact" },
     },
     {
       type: "faq",
+      title: "FAQs",
       items: [
-        { q: "What are SEO & AI Search Visibility Services?", a: "Services designed to improve visibility across traditional search engines and AI-powered search experiences." },
-        { q: "What is AEO?", a: "Answer Engine Optimization focuses on making content more useful and discoverable for answer-based searches." },
-        { q: "What is GEO?", a: "Generative Engine Optimization focuses on improving brand and content visibility within generative AI search experiences." },
-        { q: "Do you provide Local, Ecommerce and National SEO?", a: "Yes. We provide specialized SEO strategies based on your business, market and growth objectives." },
+        {
+          q: "What are SEO & AI Search Visibility Services?",
+          a: "Services designed to improve visibility across traditional search engines and AI-powered search experiences.",
+        },
+        {
+          q: "What is AEO?",
+          a: "Answer Engine Optimization focuses on making content more useful and discoverable for answer-based searches.",
+        },
+        {
+          q: "What is GEO?",
+          a: "Generative Engine Optimization focuses on improving brand and content visibility within generative AI search experiences.",
+        },
+        {
+          q: "Do you provide Local, Ecommerce and National SEO?",
+          a: "Yes. We provide specialized SEO strategies based on your business, market and growth objectives.",
+        },
       ],
     },
   ],

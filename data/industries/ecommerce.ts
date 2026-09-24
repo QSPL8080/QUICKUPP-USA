@@ -78,13 +78,12 @@ export const data: ServicePageData = {
         "Repeat Purchase",
       ],
       desc: "Every stage is optimized to help move shoppers closer to conversion.",
-      cta: { label: "Improve Your eCommerce Conversion Journey", href: "/contact" },
+      cta: { label: "Improve your eCommerce Conversion Journey", href: "/contact" },
     },
     {
       type: "list",
       title: "Who We Help",
-      subtitle: "Brands & Retailers We Partner With",
-      desc: "We scale online stores and consumer brands across diverse categories:",
+      desc: "We work with:",
       items: [
         "D2C Brands",
         "Online Retailers",
@@ -97,12 +96,10 @@ export const data: ServicePageData = {
         "Home & Lifestyle Brands",
         "B2B & B2C eCommerce Businesses",
       ],
-      cta: { label: "Talk to an eCommerce Growth Expert", href: "/contact" },
     },
     {
       type: "descPairs",
       title: "Build a Growth Engine for Your Online Store",
-      subtitle: "Sustainable Commerce Revenue",
       items: [
         {
           title: "Attract More Qualified Shoppers",
@@ -126,6 +123,7 @@ export const data: ServicePageData = {
     {
       type: "process",
       title: "Our eCommerce Growth Process",
+      intro: "We evaluate your products, audience, competitors, website, acquisition channels and customer journey before building your growth strategy.",
       steps: [
         {
           num: "01",
@@ -158,12 +156,12 @@ export const data: ServicePageData = {
           desc: "Expand profitable product lines, scale ad budgets, and increase customer lifetime value.",
         },
       ],
+      cta: { label: "Plan Your eCommerce Growth Roadmap", href: "/contact" },
     },
     {
       type: "whyChoose",
       title: "Why Choose Quickupp Softech?",
       tagline: "Marketing, AI & Technology under one partner",
-      desc: "We combine digital advertising, eCommerce development, and AI automation to create high-converting shopping experiences.",
       bullets: [
         "Marketing, AI & Technology under one partner",
         "Full-funnel eCommerce growth strategy",
@@ -175,7 +173,6 @@ export const data: ServicePageData = {
         "Data-driven optimization",
         "Scalable solutions for growing brands",
       ],
-      cta: { label: "Plan Your eCommerce Growth Roadmap", href: "/contact" },
     },
     {
       type: "ai",

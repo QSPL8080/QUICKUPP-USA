@@ -34,8 +34,10 @@ export interface ProcessBlock {
   title: string;
   tagline?: string;
   intro?: string;
+  desc?: string;
   steps: ProcessStep[];
   items?: string[];
+  cta?: { label: string; href: string };
 }
 
 export interface WhyChooseBlock {
@@ -51,13 +53,16 @@ export interface WhyChooseBlock {
 export interface IndustriesBlock {
   type: "industries";
   title?: string;
+  tagline?: string;
   intro?: string;
+  desc?: string;
   industries: string[];
 }
 
 export interface AiBlock {
   type: "ai";
   title: string;
+  tagline?: string;
   intro?: string;
   bullets?: string[];
   desc?: string;
@@ -67,7 +72,9 @@ export interface AiBlock {
 export interface FaqBlock {
   type: "faq";
   title?: string;
+  tagline?: string;
   intro?: string;
+  desc?: string;
   items: { q: string; a: string }[];
   faqs?: { q: string; a: string }[];
 }

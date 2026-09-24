@@ -83,8 +83,7 @@ export const data: ServicePageData = {
     {
       type: "list",
       title: "Who We Help",
-      subtitle: "Built for Technology Innovators",
-      desc: "We work with diverse technology companies across various stages of growth:",
+      desc: "We work with:",
       items: [
         "SaaS Companies",
         "IT Services Companies",
@@ -97,12 +96,10 @@ export const data: ServicePageData = {
         "Technology Startups",
         "Enterprise Technology Businesses",
       ],
-      cta: { label: "Talk to a Growth Expert", href: "/contact" },
     },
     {
       type: "descPairs",
       title: "Build Visibility. Generate Demand. Convert More Customers.",
-      subtitle: "Full-Funnel Execution",
       items: [
         {
           title: "SaaS SEO & AI Search Visibility",
@@ -134,6 +131,8 @@ export const data: ServicePageData = {
     {
       type: "process",
       title: "From Technology Provider to Category Leader",
+      tagline: "Our Growth Process",
+      intro: "Whether you're launching a SaaS product, entering a new market, or scaling an established technology business, we help connect marketing, AI and technology around your growth objectives.",
       steps: [
         {
           num: "01",
@@ -166,12 +165,12 @@ export const data: ServicePageData = {
           desc: "Expand successful campaigns, enter new markets, and scale pipeline with confidence.",
         },
       ],
+      cta: { label: "Plan Your Next Growth Stage", href: "/contact" },
     },
     {
       type: "whyChoose",
       title: "Why Choose Quickupp Softech?",
       tagline: "Marketing, AI & Technology under one partner",
-      desc: "Whether you're launching a SaaS product, entering a new market, or scaling an established technology business, we help connect marketing, AI and technology around your growth objectives.",
       bullets: [
         "Marketing, AI & Technology under one partner",
         "B2B and SaaS-focused growth strategies",
@@ -183,7 +182,6 @@ export const data: ServicePageData = {
         "Data-driven optimization and reporting",
         "Scalable solutions for startups and growing businesses",
       ],
-      cta: { label: "Plan Your Next Growth Stage", href: "/contact" },
     },
     {
       type: "ai",

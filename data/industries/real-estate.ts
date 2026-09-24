@@ -16,7 +16,6 @@ export const data: ServicePageData = {
     {
       type: "descPairs",
       title: "Complete Digital Marketing Solutions for Real Estate",
-      subtitle: "Property Acquisition Systems",
       desc: "End-to-end digital marketing and sales enablement strategies designed specifically for real estate developers and agencies.",
       items: [
         {
@@ -82,8 +81,7 @@ export const data: ServicePageData = {
     {
       type: "list",
       title: "Who We Help",
-      subtitle: "Developers, Brokers & Agencies",
-      desc: "We work with property developers, consultants, and real estate brands across all segments:",
+      desc: "We work with:",
       items: [
         "Real Estate Developers",
         "Residential Projects",
@@ -96,12 +94,10 @@ export const data: ServicePageData = {
         "Investment Property Businesses",
         "Real Estate Brands",
       ],
-      cta: { label: "Talk to a Real Estate Growth Expert", href: "/contact" },
     },
     {
       type: "descPairs",
       title: "Market Your Property Where Buyers Are Looking",
-      subtitle: "Segment-Specific Marketing",
       items: [
         {
           title: "Residential Real Estate",
@@ -124,8 +120,7 @@ export const data: ServicePageData = {
     {
       type: "ai",
       title: "Built Around Your Most Important Real Estate Metrics",
-      intro:
-        "We focus beyond impressions and clicks. Your marketing strategy should ultimately support your sales pipeline and revenue.",
+      intro: "We focus beyond impressions and clicks.",
       bullets: [
         "Reach",
         "Leads",
@@ -135,12 +130,14 @@ export const data: ServicePageData = {
         "Negotiations",
         "Bookings",
       ],
-      desc: "Where tracking and data are available, we optimize your spend toward actual sales milestones.",
+      desc: "Your marketing strategy should ultimately support your sales pipeline and revenue.",
       cta: { label: "Build a Sales-Focused Marketing Plan", href: "/contact" },
     },
     {
       type: "process",
       title: "Our Real Estate Growth Process",
+      tagline: "Analyze → Strategize → Build → Launch → Optimize → Scale",
+      intro: "We evaluate your project, location, pricing, audience, competition, sales process and current marketing performance before building the strategy.",
       steps: [
         {
           num: "01",
@@ -173,12 +170,11 @@ export const data: ServicePageData = {
           desc: "Scale budgets on winning channels, expand launch phases, and maximize inventory sales.",
         },
       ],
+      cta: { label: "Plan Your Real Estate Growth Roadmap", href: "/contact" },
     },
     {
       type: "whyChoose",
       title: "Why Choose Quickupp Softech?",
-      tagline: "Marketing, AI & Technology under one partner",
-      desc: "We combine hyper-local property targeting with high-converting digital assets and instant AI lead response.",
       bullets: [
         "Marketing, AI & Technology under one partner",
         "Lead-generation focused strategies",
@@ -191,7 +187,6 @@ export const data: ServicePageData = {
         "Data-driven campaign optimization",
         "Scalable solutions for developers and real estate businesses",
       ],
-      cta: { label: "Plan Your Real Estate Growth Roadmap", href: "/contact" },
     },
     {
       type: "ai",

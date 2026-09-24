@@ -17,9 +17,8 @@ export const data: ServicePageData = {
     {
       type: "list",
       title: "Stop Relying Only on Referrals",
-      subtitle: "Predictable Client Acquisition",
       tagline: "Your Expertise Deserves Better Visibility.",
-      desc: "Referrals are valuable, but your growth shouldn't depend entirely on them. A strong digital presence can help you:",
+      desc: "Referrals are valuable, but your growth shouldn't depend entirely on them.\nA strong digital presence can help you:",
       items: [
         "Generate more qualified enquiries",
         "Increase consultation bookings",
@@ -36,7 +35,7 @@ export const data: ServicePageData = {
       type: "ai",
       title: "Turn Expertise Into a Client Acquisition Engine",
       intro:
-        "Potential clients are searching for solutions, experts, consultants, and service providers every day. We connect the complete journey:",
+        "Potential clients are searching for solutions, experts, consultants, and service providers every day.\nWe connect the complete journey:",
       bullets: [
         "Search",
         "Website",
@@ -50,8 +49,6 @@ export const data: ServicePageData = {
     {
       type: "descPairs",
       title: "Our Professional Services Marketing Services",
-      subtitle: "End-to-End Solutions",
-      desc: "Comprehensive digital strategies built to elevate authority, capture high-intent demand, and convert consultations into retained clients.",
       items: [
         {
           title: "SEO & AI Search Visibility",
@@ -94,8 +91,6 @@ export const data: ServicePageData = {
     {
       type: "list",
       title: "Professional Services We Help Grow",
-      subtitle: "Practices & Sectors We Specialize In",
-      desc: "We build custom marketing and client acquisition systems for:",
       items: [
         "Legal Services",
         "Accounting & Tax Services",
@@ -110,13 +105,13 @@ export const data: ServicePageData = {
         "Engineering & Technical Consulting",
         "Other B2B Professional Services",
       ],
-      cta: { label: "Grow Your Professional Practice", href: "/contact" },
+      cta: { label: "Get Your Professional Services Growth Strategy", href: "/contact" },
     },
     {
       type: "ai",
       title: "Built to Generate Better Clients—Not Just More Traffic",
       intro:
-        "For professional services, lead quality matters more than lead volume. Our strategies focus on reaching prospects who are more likely to:",
+        "For professional services, lead quality matters more than lead volume.\nOur strategies focus on reaching prospects who are more likely to:",
       bullets: [
         "Need Your Service",
         "Match Your Ideal Client Profile",
@@ -128,9 +123,8 @@ export const data: ServicePageData = {
     {
       type: "list",
       title: "Build Authority Before the Sales Conversation",
-      subtitle: "Authority & Thought Leadership",
       tagline: "Become the Expert Prospects Find and Remember.",
-      desc: "Professional services are built on expertise and trust. We help position your brand through:",
+      desc: "Professional services are built on expertise and trust.\nWe help position your brand through:",
       items: [
         "Expert-led content",
         "Educational blogs",
@@ -185,7 +179,6 @@ export const data: ServicePageData = {
       type: "whyChoose",
       title: "Why Choose Quickupp Softech?",
       tagline: "Marketing. AI. Technology. Built for Growth.",
-      desc: "We help professional practices attract high-value clients with predictable digital systems and authority positioning.",
       bullets: [
         "Qualified Lead Generation",
         "Search & AI Visibility",
@@ -204,7 +197,7 @@ export const data: ServicePageData = {
       type: "ai",
       title: "AI-Powered Client Acquisition",
       intro:
-        "AI can help professional service firms improve efficiency while creating a better prospect experience. We provide:",
+        "AI can help professional service firms improve efficiency while creating a better prospect experience.\nWe provide:",
       bullets: [
         "AI Chatbots",
         "Lead Qualification",
@@ -218,6 +211,7 @@ export const data: ServicePageData = {
     },
     {
       type: "faq",
+      title: "FAQs",
       items: [
         {
           q: "How can digital marketing help professional service businesses?",
@@ -248,7 +242,7 @@ export const data: ServicePageData = {
   ],
   closingTitle: "Ready to Turn Your Expertise Into Growth?",
   closingDesc:
-    "Your next client is already searching for the right professional. Make sure they find you, trust you, and contact you. Build a stronger digital presence and generate more qualified client opportunities with Quickupp Softech. Marketing. AI. Technology. Built for Growth.",
+    "Your next client is already searching for the right professional.\nMake sure they find you, trust you, and contact you.\nBuild a stronger digital presence and generate more qualified client opportunities with Quickupp Softech.\nMarketing. AI. Technology. Built for Growth.",
   closingCtas: [
     { label: "Get More Qualified Leads", href: "/contact" },
     { label: "Talk to a Growth Expert", href: "/contact" },

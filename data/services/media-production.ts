@@ -2,7 +2,7 @@ import type { ServicePageData } from "@/lib/servicePageTypes";
 
 const data: ServicePageData = {
   metaTitle: "Media Production | Quickupp Softech",
-  metaDescription: "Professional Video Production & Reels for Your Brand with Quickupp Softech. Instagram Reels, promotional videos and product shoots.",
+  metaDescription: "Professional Video Production & Reels for Your Brand. Create engaging, professional and platform-ready videos that capture attention.",
   crumb: "Media Production",
   heroEyebrow: "Media Production",
   heroTitle: "Professional Video Production & Reels for Your Brand",
@@ -67,17 +67,18 @@ const data: ServicePageData = {
       type: "process",
       title: "Our Video Production Process",
       steps: [
-        { num: "01", title: "Concept", desc: "Understand your brand and create the video concept." },
-        { num: "02", title: "Planning", desc: "Finalize script, location, talent and shoot requirements." },
-        { num: "03", title: "Shoot", desc: "Professionally capture your video content." },
-        { num: "04", title: "Edit", desc: "Add editing, captions, graphics and required enhancements." },
-        { num: "05", title: "Deliver", desc: "Receive platform-ready videos for your marketing channels." },
+        { num: "01", title: "01. Concept", desc: "Understand your brand and create the video concept." },
+        { num: "02", title: "02. Planning", desc: "Finalize script, location, talent and shoot requirements." },
+        { num: "03", title: "03. Shoot", desc: "Professionally capture your video content." },
+        { num: "04", title: "04. Edit", desc: "Add editing, captions, graphics and required enhancements." },
+        { num: "05", title: "05. Deliver", desc: "Receive platform-ready videos for your marketing channels." },
       ],
     },
     {
       type: "whyChoose",
-      tagline: "Creative & Marketing-Focused Production",
+      title: "Why Choose Quickupp Softech?",
       bullets: [
+        "Creative & Marketing-Focused Production",
         "Professional Video Content",
         "Social Media-Ready Formats",
         "Short-Form Video Expertise",
@@ -88,6 +89,7 @@ const data: ServicePageData = {
     },
     {
       type: "industries",
+      title: "Industries We Serve",
       industries: [
         "Healthcare",
         "Home Services",
@@ -103,6 +105,7 @@ const data: ServicePageData = {
     },
     {
       type: "faq",
+      title: "Frequently Asked Questions",
       items: [
         {
           q: "Do you provide Instagram Reels Shoot Services?",
@@ -124,8 +127,7 @@ const data: ServicePageData = {
     },
   ],
   closingTitle: "Create Video Content That Gets Noticed",
-  closingDesc:
-    "From professional video production to engaging Reels, Quickupp Softech helps businesses turn ideas into high-quality visual content. Marketing. AI. Technology. Built for Growth.",
+  closingDesc: "From professional video production to engaging Reels, Quickupp Softech helps businesses turn ideas into high-quality visual content.\nMarketing. AI. Technology. Built for Growth.",
   closingCtas: [{ label: "Book a Video Shoot", href: "/contact" }],
 };
 

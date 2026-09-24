@@ -2,8 +2,7 @@ import type { ServicePageData } from "@/lib/servicePageTypes";
 
 const data: ServicePageData = {
   metaTitle: "Content Marketing | Quickupp Softech",
-  metaDescription:
-    "Content Marketing Services That Build Visibility, Authority & Growth with Quickupp Softech. Strategic SEO content, blogs, website copy, whitepapers and newsletters.",
+  metaDescription: "Content Marketing Services That Build Visibility, Authority & Growth.",
   crumb: "Content Marketing",
   heroEyebrow: "Content Marketing",
   heroTitle: "Content Marketing Services That Build Visibility, Authority & Growth",
@@ -94,7 +93,6 @@ const data: ServicePageData = {
       title: "Whitepaper & Press Release Writing",
       tagline: "Build Authority With High-Value Content",
       desc: "We create professional whitepapers and press releases for business communication, thought leadership, education and lead generation.",
-      columns: 2,
       items: [
         {
           title: "Whitepapers",
@@ -169,7 +167,8 @@ const data: ServicePageData = {
     {
       type: "ai",
       title: "AI-Powered Content Marketing",
-      intro: "We use AI to support:",
+      tagline: "Combine AI Efficiency With Human Expertise",
+      desc: "AI supports the workflow while strategy, creativity, editorial judgment and brand expertise remain human-led.",
       bullets: [
         "Topic & Keyword Research",
         "Content Ideation",
@@ -179,14 +178,12 @@ const data: ServicePageData = {
         "Content Repurposing",
         "Performance Analysis",
       ],
-      desc: "AI supports the workflow while strategy, creativity, editorial judgment and brand expertise remain human-led.",
     },
     {
       type: "descPairs",
       title: "Content Repurposing & Optimization",
       tagline: "Get More Value From Your Existing Content",
       desc: "We transform existing content into new formats and identify opportunities to improve its performance.",
-      columns: 2,
       items: [
         {
           title: "Repurposing",
@@ -202,16 +199,17 @@ const data: ServicePageData = {
       type: "process",
       title: "Our Content Marketing Process",
       steps: [
-        { num: "01", title: "Discover", desc: "Understand your business and audience." },
-        { num: "02", title: "Research", desc: "Analyze keywords, topics, intent and competitors." },
-        { num: "03", title: "Strategize", desc: "Build your customized content plan." },
-        { num: "04", title: "Create", desc: "Develop high-quality content assets." },
-        { num: "05", title: "Optimize", desc: "Improve SEO, relevance and conversions." },
-        { num: "06", title: "Measure", desc: "Track performance and continuously improve." },
+        { num: "01", title: "01. Discover", desc: "Understand your business and audience." },
+        { num: "02", title: "02. Research", desc: "Analyze keywords, topics, intent and competitors." },
+        { num: "03", title: "03. Strategize", desc: "Build your customized content plan." },
+        { num: "04", title: "04. Create", desc: "Develop high-quality content assets." },
+        { num: "05", title: "05. Optimize", desc: "Improve SEO, relevance and conversions." },
+        { num: "06", title: "06. Measure", desc: "Track performance and continuously improve." },
       ],
     },
     {
       type: "whyChoose",
+      title: "Why Choose Quickupp Softech?",
       tagline: "Marketing. AI. Technology. Built for Content-Driven Growth.",
       bullets: [
         "Strategy-First Approach",
@@ -227,6 +225,7 @@ const data: ServicePageData = {
     },
     {
       type: "industries",
+      title: "Industries We Serve",
       industries: [
         "Healthcare",
         "Home Services",
@@ -242,6 +241,7 @@ const data: ServicePageData = {
     },
     {
       type: "faq",
+      title: "FAQs",
       items: [
         {
           q: "What are Content Marketing Services?",
@@ -267,7 +267,7 @@ const data: ServicePageData = {
     },
   ],
   closingTitle: "Turn Content Into a Growth Asset",
-   closingDesc: "Create content that attracts, educates, builds authority and drives action.",
+  closingDesc: "Create content that attracts, educates, builds authority and drives action.",
   closingCtas: [{ label: "Get Your Content Marketing Strategy", href: "/contact" }],
 };
 

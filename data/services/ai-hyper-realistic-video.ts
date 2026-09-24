@@ -32,7 +32,6 @@ export const data: ServicePageData = {
     {
       type: "ai",
       title: "Perfect For",
-      intro: "Ideal for high-impact visual storytelling across channels:",
       bullets: [
         "Advertising",
         "Product Promotion",
@@ -48,7 +47,7 @@ export const data: ServicePageData = {
     {
       type: "list",
       title: "AI Hyper-Realistic Video Samples",
-      tagline:
+      desc:
         "Explore some of our AI-powered video creations and experience the possibilities of hyper-realistic visual production.",
       items: [
         "Video Sample 01",
@@ -60,7 +59,6 @@ export const data: ServicePageData = {
     {
       type: "whyChoose",
       title: "Why Choose Quickupp Softech?",
-      tagline: "High-Quality AI Visuals",
       bullets: [
         "High-Quality AI Visuals",
         "Realistic & Cinematic Content",
@@ -73,7 +71,7 @@ export const data: ServicePageData = {
   ],
   closingTitle: "Bring Your Ideas to Life",
   closingDesc:
-    "Create next-generation visual content with AI Hyper-Realistic Video Services by Quickupp Softech.\n^Marketing. AI. Technology. Built for Growth.",
+    "Create next-generation visual content with AI Hyper-Realistic Video Services by Quickupp Softech.\nMarketing. AI. Technology. Built for Growth.",
   closingCtas: [
     { label: "Get a Quote", href: "/contact" },
     { label: "Start Your AI Video", href: "/contact" },

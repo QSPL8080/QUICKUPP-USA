@@ -143,13 +143,13 @@ export default function Footer({ hideCta = false }: { hideCta?: boolean }) {
             <div className="qs-scalient-col">
               <h3 className="qs-scalient-col-title">Services</h3>
               <ul className="qs-scalient-links">
-                <li><Link href="/services/seo-ai-search-visibility">AI Search &amp; SEO</Link></li>
-                <li><Link href="/services/paid-marketing">Paid Ads &amp; Growth</Link></li>
-                <li><Link href="/services/social-media-marketing">Social Media Marketing</Link></li>
-                <li><Link href="/services/web-design-development">Web &amp; App Development</Link></li>
-                <li><Link href="/services/ai-avatar-video">AI Video Production</Link></li>
-                <li><Link href="/services/ai-automation-solutions">AI &amp; Automation</Link></li>
-                <li><Link href="/services/it-staff-augmentation">Staff Augmentation</Link></li>
+                <li><Link href="/services/ai-powered-digital-marketing-services/seo-ai-search-visibility">AI Search &amp; SEO</Link></li>
+                <li><Link href="/services/ai-powered-digital-marketing-services/paid-marketing">Paid Ads &amp; Growth</Link></li>
+                <li><Link href="/services/ai-powered-digital-marketing-services/social-media-marketing">Social Media Marketing</Link></li>
+                <li><Link href="/services/information-technology-services/web-design-development">Web &amp; App Development</Link></li>
+                <li><Link href="/services/ai-video-production/ai-avatar-video">AI Video Production</Link></li>
+                <li><Link href="/services/ai-automation-solutions/ai-automation-solutions">AI &amp; Automation</Link></li>
+                <li><Link href="/services/staff-augmentation/it-staff-augmentation">Staff Augmentation</Link></li>
                 <li><Link href="/services" style={{ color: "#38bdf8", fontWeight: 600 }}>All Services →</Link></li>
               </ul>
             </div>

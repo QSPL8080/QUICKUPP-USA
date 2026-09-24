@@ -36,7 +36,7 @@ export const data: ServicePageData = {
       type: "list",
       title: "Who We Help",
       subtitle: "Built for Education & Training Businesses",
-      desc: "We help education organizations strengthen their digital presence and acquire more students across:",
+      desc: "We help education organizations strengthen their digital presence and acquire more students.",
       items: [
         "Schools & Educational Institutions",
         "Colleges & Universities",
@@ -100,7 +100,7 @@ export const data: ServicePageData = {
       type: "ai",
       title: "Turn Student Searches Into Admissions",
       intro:
-        "Education marketing isn't simply about generating leads. Lead quality and follow-up matter. We build the journey around:",
+        "Education marketing isn't simply about generating leads. Lead quality and follow-up matter.",
       bullets: [
         "Search",
         "Discovery",
@@ -168,12 +168,12 @@ export const data: ServicePageData = {
           desc: "Expand successful programs, locations, audiences, and acquisition channels.",
         },
       ],
+      cta: { label: "Build Your Education Growth Plan", href: "/contact" },
     },
     {
       type: "whyChoose",
       title: "Why Choose Quickupp Softech?",
       tagline: "Marketing. AI. Technology. Built for Growth.",
-      desc: "We combine educational marketing expertise with modern AI automation to drive student enquiries, boost admissions, and build long-term institutional authority.",
       bullets: [
         "Education-Focused Digital Strategies",
         "Qualified Lead Generation",
@@ -192,7 +192,7 @@ export const data: ServicePageData = {
       type: "ai",
       title: "AI-Powered Education Marketing",
       intro:
-        "AI can help education businesses respond faster and manage student enquiries more efficiently. We provide:",
+        "AI can help education businesses respond faster and manage student enquiries more efficiently.",
       bullets: [
         "AI Chatbots",
         "Student Lead Qualification",

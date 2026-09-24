@@ -134,11 +134,11 @@ export default function Header() {
                     <div className="qs-mega-header-row">
                       <div className="qs-mega-header-left">
                         <span className="qs-mega-sparkle">✦</span>
-                        <span className="qs-mega-header-title">Our Capabilities &amp; Solutions</span>
+                        <span className="qs-mega-header-title">Services &amp; Capabilities</span>
                       </div>
                       <Link href="/services" className="qs-mega-view-all" onClick={handleLinkClick}>
                         <span>Explore All Services</span>
-                        <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                           <path d="M2.5 9.5L9.5 2.5M9.5 2.5H3.5M9.5 2.5V8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                       </Link>
@@ -156,7 +156,6 @@ export default function Header() {
                               className="qs-menu-link"
                               onClick={handleLinkClick}
                             >
-                              <span className="qs-menu-link-dot">•</span>
                               <span className="qs-menu-link-label">{item.label}</span>
                             </Link>
                           ))}
@@ -174,13 +173,14 @@ export default function Header() {
                               className="qs-menu-link"
                               onClick={handleLinkClick}
                             >
-                              <span className="qs-menu-link-dot">•</span>
-                              <span className="qs-menu-link-label">{item.label}</span>
+                              <span className="qs-menu-link-label">
+                                {item.label.replace("Hyper-Realistic", "Hyper Realistic")}
+                              </span>
                             </Link>
                           ))}
                         </div>
 
-                        <div className="qs-mega-col-subdivider">
+                        <div className="qs-mega-col-subdivider" style={{ marginTop: "14px" }}>
                           <div className="qs-mega-col-title">AI &amp; Automation Solutions</div>
                           <div className="qs-mega-col-links">
                             {serviceGroups[2]?.items.map((item) => (
@@ -190,7 +190,6 @@ export default function Header() {
                                 className="qs-menu-link"
                                 onClick={handleLinkClick}
                               >
-                                <span className="qs-menu-link-dot">•</span>
                                 <span className="qs-menu-link-label">{item.label}</span>
                               </Link>
                             ))}
@@ -209,14 +208,13 @@ export default function Header() {
                               className="qs-menu-link"
                               onClick={handleLinkClick}
                             >
-                              <span className="qs-menu-link-dot">•</span>
                               <span className="qs-menu-link-label">{item.label}</span>
                             </Link>
                           ))}
                         </div>
                       </div>
 
-                      {/* Col 4: Staff Augmentation + Action Box */}
+                      {/* Col 4: Staff Augmentation */}
                       <div className="qs-mega-col">
                         <div className="qs-mega-col-title">Staff Augmentation</div>
                         <div className="qs-mega-col-links">
@@ -227,26 +225,46 @@ export default function Header() {
                               className="qs-menu-link"
                               onClick={handleLinkClick}
                             >
-                              <span className="qs-menu-link-dot">•</span>
                               <span className="qs-menu-link-label">{item.label}</span>
                             </Link>
                           ))}
                         </div>
 
-                        <div className="qs-mega-promo-box">
-                          <div className="qs-promo-header">
-                            <span className="qs-promo-icon">⚡</span>
-                            <span className="qs-promo-tag">Unified Growth Engine</span>
+                        <div className="qs-mega-col-subdivider" style={{ marginTop: "14px" }}>
+                          <div className="qs-mega-col-title">Scale With Us</div>
+                          <div className="qs-mega-col-links">
+                            <Link
+                              href="/contact"
+                              className="qs-menu-link"
+                              onClick={handleLinkClick}
+                            >
+                              <span className="qs-menu-link-label" style={{ color: "#93c5fd", fontWeight: 600 }}>
+                                Talk to an Expert →
+                              </span>
+                            </Link>
+                            <Link
+                              href="/about/why-choose-us"
+                              className="qs-menu-link"
+                              onClick={handleLinkClick}
+                            >
+                              <span className="qs-menu-link-label">Why Choose Us</span>
+                            </Link>
                           </div>
-                          <div className="qs-promo-desc">Scale marketing, AI &amp; engineering with zero overhead.</div>
-                          <Link href="/contact" className="qs-promo-btn" onClick={handleLinkClick}>
-                            <span>Talk to an Expert</span>
-                            <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-                              <path d="M2.5 9.5L9.5 2.5M9.5 2.5H3.5M9.5 2.5V8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                          </Link>
                         </div>
                       </div>
+                    </div>
+
+                    {/* Sleek Bottom Bar */}
+                    <div className="qs-mega-footer-bar">
+                      <div className="qs-mega-footer-text">
+                        Enterprise-grade AI, video production, digital marketing and engineering.
+                      </div>
+                      <Link href="/contact" className="qs-mega-footer-cta" onClick={handleLinkClick}>
+                        <span>Talk to an Expert</span>
+                        <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                          <path d="M2.5 6H9.5M9.5 6L6.5 3M9.5 6L6.5 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </Link>
                     </div>
                   </div>
                 )}
@@ -284,8 +302,8 @@ export default function Header() {
                         <span className="qs-mega-header-title">Industries We Scale</span>
                       </div>
                       <Link href="/industries" className="qs-mega-view-all" onClick={handleLinkClick}>
-                        <span>Explore All</span>
-                        <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                        <span>Explore All Industries</span>
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                           <path d="M2.5 9.5L9.5 2.5M9.5 2.5H3.5M9.5 2.5V8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                       </Link>
@@ -298,10 +316,20 @@ export default function Header() {
                           className="qs-menu-link"
                           onClick={handleLinkClick}
                         >
-                          <span className="qs-menu-link-dot">•</span>
                           <span className="qs-menu-link-label">{item.label}</span>
                         </Link>
                       ))}
+                    </div>
+                    <div className="qs-mega-footer-bar">
+                      <div className="qs-mega-footer-text">
+                        Tailored compliance, workflows, and growth architecture for your sector.
+                      </div>
+                      <Link href="/case-studies" className="qs-mega-footer-cta" onClick={handleLinkClick}>
+                        <span>View Case Studies</span>
+                        <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                          <path d="M2.5 6H9.5M9.5 6L6.5 3M9.5 6L6.5 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </Link>
                     </div>
                   </div>
                 )}
@@ -309,7 +337,7 @@ export default function Header() {
 
               {/* 3. About Dropdown */}
               <li
-                className="qs-has-dropdown"
+                className="qs-has-dropdown qs-simple-parent"
                 onMouseEnter={() => handleMouseEnter("about")}
                 onMouseLeave={handleMouseLeave}
               >
@@ -341,7 +369,6 @@ export default function Header() {
                           className="qs-menu-link"
                           onClick={handleLinkClick}
                         >
-                          <span className="qs-menu-link-dot">•</span>
                           <span className="qs-menu-link-label">{item.label}</span>
                         </Link>
                       ))}
@@ -352,7 +379,7 @@ export default function Header() {
 
               {/* 4. Resources Dropdown */}
               <li
-                className="qs-has-dropdown"
+                className="qs-has-dropdown qs-simple-parent"
                 onMouseEnter={() => handleMouseEnter("resources")}
                 onMouseLeave={handleMouseLeave}
               >
@@ -384,7 +411,6 @@ export default function Header() {
                           className="qs-menu-link"
                           onClick={handleLinkClick}
                         >
-                          <span className="qs-menu-link-dot">•</span>
                           <span className="qs-menu-link-label">{item.label}</span>
                         </Link>
                       ))}
@@ -401,10 +427,6 @@ export default function Header() {
                   onClick={handleLinkClick}
                 >
                   <span>Careers</span>
-                  <span className="qs-nav-hiring-badge">
-                    <span className="qs-hiring-dot" />
-                    <span className="qs-hiring-text">Hiring</span>
-                  </span>
                 </Link>
               </li>
 
@@ -427,19 +449,19 @@ export default function Header() {
                 className="qs-new-cta-btn"
                 onClick={handleLinkClick}
               >
-                <span>Contact Now</span>
+                <span>Get More Info</span>
               </Link>
             </div>
           </nav>
 
-          {/* 7. Right Header Action Button (Desktop: Contact Now) */}
+          {/* 7. Right Header Action Button (Desktop: Get More Info) */}
           <div className="qs-header-right-col">
             <Link
               href="/contact"
               className="qs-new-cta-btn"
               onClick={handleLinkClick}
             >
-              <span>Contact Now</span>
+              <span>Get More Info</span>
             </Link>
 
             {/* Mobile Hamburger Toggle */}

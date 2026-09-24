@@ -1,7 +1,7 @@
 import type { ServicePageData } from "@/lib/servicePageTypes";
 
 export const data: ServicePageData = {
-  metaTitle: "AI UGC Video Production | Quickupp Softech",
+  metaTitle: "AI UGC Video | Quickupp Softech",
   metaDescription:
     "Create engaging, creator-style videos for your brand without the time and cost of traditional UGC production.",
   crumb: "AI UGC Video",
@@ -33,7 +33,6 @@ export const data: ServicePageData = {
     {
       type: "ai",
       title: "Perfect For",
-      intro: "Ideal for fast-paced growth and digital marketing:",
       bullets: [
         "eCommerce",
         "D2C Brands",
@@ -50,8 +49,7 @@ export const data: ServicePageData = {
     {
       type: "list",
       title: "AI UGC Video Samples",
-      tagline:
-        "See how AI-powered UGC can bring products and marketing messages to life.",
+      desc: "See how AI-powered UGC can bring products and marketing messages to life.",
       items: [
         "Video Sample 01",
         "Video Sample 02",
@@ -62,7 +60,6 @@ export const data: ServicePageData = {
     {
       type: "whyChoose",
       title: "Why Choose Quickupp Softech?",
-      tagline: "Fast AI Video Production",
       bullets: [
         "Fast AI Video Production",
         "Creator-Style Content",
@@ -76,7 +73,7 @@ export const data: ServicePageData = {
   ],
   closingTitle: "Create Your AI UGC Video",
   closingDesc:
-    "Turn your product or idea into engaging UGC-style video content with Quickupp Softech.\n^Marketing. AI. Technology. Built for Growth.",
+    "Turn your product or idea into engaging UGC-style video content with Quickupp Softech.\nMarketing. AI. Technology. Built for Growth.",
   closingCtas: [
     { label: "Get a Quote", href: "/contact" },
     { label: "Start Your Video", href: "/contact" },

@@ -1,10 +1,10 @@
 import type { ServicePageData } from "@/lib/servicePageTypes";
 
 const data: ServicePageData = {
-  metaTitle: "Online Reputation Management | Quickupp Softech",
-  metaDescription: "Build Trust. Protect Your Brand. Strengthen Your Online Reputation with Quickupp Softech's ORM Services.",
+  metaTitle: "Online Reputation Management (ORM) | Quickupp Softech",
+  metaDescription: "Build Trust. Protect Your Brand. Strengthen Your Online Reputation.",
   crumb: "Online Reputation Management",
-  heroEyebrow: "Online Reputation Management (ORM) Services",
+  heroEyebrow: "Online Reputation Management",
   heroTitle: "Build Trust. Protect Your Brand. Strengthen Your Online Reputation.",
   heroParagraphs: [
     "Your online reputation influences how customers perceive your business. Reviews, ratings, search results and customer feedback can directly impact trust, enquiries and sales.",
@@ -35,17 +35,18 @@ const data: ServicePageData = {
       type: "process",
       title: "Our ORM Process",
       steps: [
-        { num: "01", title: "Audit", desc: "Analyze your online reputation, reviews and brand mentions." },
-        { num: "02", title: "Monitor", desc: "Track reviews, ratings and customer feedback." },
-        { num: "03", title: "Improve", desc: "Implement strategies to strengthen positive brand perception." },
-        { num: "04", title: "Manage", desc: "Respond to reviews and maintain your online presence." },
-        { num: "05", title: "Report", desc: "Measure reputation growth and customer sentiment." },
+        { num: "01", title: "01. Audit", desc: "Analyze your online reputation, reviews and brand mentions." },
+        { num: "02", title: "02. Monitor", desc: "Track reviews, ratings and customer feedback." },
+        { num: "03", title: "03. Improve", desc: "Implement strategies to strengthen positive brand perception." },
+        { num: "04", title: "04. Manage", desc: "Respond to reviews and maintain your online presence." },
+        { num: "05", title: "05. Report", desc: "Measure reputation growth and customer sentiment." },
       ],
     },
     {
       type: "whyChoose",
-      tagline: "Reputation-Focused Strategy",
+      title: "Why Choose Quickupp Softech?",
       bullets: [
+        "Reputation-Focused Strategy",
         "Review & Rating Management",
         "Brand Monitoring",
         "Customer Trust Building",
@@ -55,6 +56,7 @@ const data: ServicePageData = {
     },
     {
       type: "industries",
+      title: "Industries We Serve",
       industries: [
         "Healthcare",
         "Home Services",
@@ -70,6 +72,7 @@ const data: ServicePageData = {
     },
     {
       type: "faq",
+      title: "Frequently Asked Questions",
       items: [
         {
           q: "What is Online Reputation Management?",
@@ -87,8 +90,7 @@ const data: ServicePageData = {
     },
   ],
   closingTitle: "Protect and Grow Your Brand Reputation",
-  closingDesc:
-    "Build trust, improve customer confidence and create a stronger online presence with Quickupp Softech's Online Reputation Management Services.",
+  closingDesc: "Build trust, improve customer confidence and create a stronger online presence with Quickupp Softech's Online Reputation Management Services.",
   closingCtas: [{ label: "Talk to Our ORM Experts", href: "/contact" }],
 };
 

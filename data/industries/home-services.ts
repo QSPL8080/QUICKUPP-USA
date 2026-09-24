@@ -17,9 +17,7 @@ export const data: ServicePageData = {
     {
       type: "list",
       title: "Stop Paying for Traffic. Start Generating Customers.",
-      subtitle: "Outcome-Driven Marketing",
-      tagline: "We focus on the business outcome—not vanity metrics.",
-      desc: "Getting website visitors isn't enough. Your marketing should help you:",
+      desc: "Getting website visitors isn't enough.\nYour marketing should help you:",
       items: [
         "Generate more qualified leads",
         "Increase calls and enquiries",
@@ -30,13 +28,14 @@ export const data: ServicePageData = {
         "Expand into new service areas",
         "Turn one-time customers into repeat customers",
       ],
+      tagline: "We focus on the business outcome—not vanity metrics.",
       cta: { label: "Build My Lead Generation Strategy", href: "/contact" },
     },
     {
       type: "ai",
       title: "Dominate Your Local Market",
       intro:
-        "When someone searches for “plumber near me,” “HVAC company near me,” “electrician near me,” or “home cleaning services,” your business needs to appear at the right moment. Our strategies help you build visibility across:",
+        "When someone searches for “plumber near me,” “HVAC company near me,” “electrician near me,” or “home cleaning services,” your business needs to appear at the right moment.\nOur strategies help you build visibility across:",
       bullets: [
         "Google Search",
         "Google Maps",
@@ -46,13 +45,11 @@ export const data: ServicePageData = {
         "Website",
         "Lead Follow-Up",
       ],
-      desc: "The goal is simple: Get Found → Get Contacted → Get Booked → Grow",
+      desc: "The goal is simple:\nGet Found → Get Contacted → Get Booked → Grow",
     },
     {
       type: "descPairs",
       title: "Our Home Services Marketing Services",
-      subtitle: "Complete Acquisition Services",
-      desc: "Full-funnel digital marketing and technology solutions built specifically for home service contractors and local businesses.",
       items: [
         {
           title: "Local SEO & Google Business Profile",
@@ -95,8 +92,6 @@ export const data: ServicePageData = {
     {
       type: "list",
       title: "Home Services We Help Grow",
-      subtitle: "Trades & Services We Specialize In",
-      desc: "We build tailored lead generation funnels and local growth strategies for:",
       items: [
         "Plumbing",
         "Electrical",
@@ -112,13 +107,11 @@ export const data: ServicePageData = {
         "Appliance Repair",
         "Home Maintenance",
       ],
-      cta: { label: "Grow Your Home Service Business", href: "/contact" },
+      cta: { label: "Get More Home Service Leads", href: "/contact" },
     },
     {
       type: "descPairs",
       title: "Turn Every Marketing Channel Into a Lead Engine",
-      subtitle: "Multi-Channel Lead Engine",
-      desc: "Every touchpoint is optimized to move local homeowners from search to booked appointments:",
       items: [
         {
           title: "Google Search",
@@ -150,7 +143,7 @@ export const data: ServicePageData = {
       type: "ai",
       title: "Built Around Your Most Important Metric: Booked Jobs",
       intro:
-        "We don't stop at impressions, clicks, or traffic. We help connect marketing activity to outcomes such as: Leads → Calls → Quotes → Appointments → Booked Jobs → Revenue.",
+        "We don't stop at impressions, clicks, or traffic.\nWe help connect marketing activity to outcomes such as:",
       bullets: [
         "Leads",
         "Calls",
@@ -162,36 +155,17 @@ export const data: ServicePageData = {
       desc: "Where tracking and data are available, we use performance insights to identify what's working and where your marketing budget can work harder.",
     },
     {
-      type: "descPairs",
+      type: "whyChoose",
       title: "Why Home Service Businesses Choose Quickupp Softech",
-      subtitle: "Why Choose Quickupp Softech",
-      desc: "Contractors and service companies partner with us for reliable, lead-focused digital growth.",
-      items: [
-        {
-          title: "Lead-Focused Strategy",
-          desc: "Every campaign starts with your business goals and customer acquisition targets.",
-        },
-        {
-          title: "Local Market Expertise",
-          desc: "We build strategies around your service areas, locations, competitors, and local search behavior.",
-        },
-        {
-          title: "Conversion-Focused Marketing",
-          desc: "Ads, landing pages, websites, and follow-ups are designed to encourage action.",
-        },
-        {
-          title: "Multi-Channel Growth",
-          desc: "SEO, Google Ads, Meta Ads, social media, content, websites, and AI work together.",
-        },
-        {
-          title: "Faster Lead Response",
-          desc: "AI-powered automation can help reduce delays between enquiry and follow-up.",
-        },
-        {
-          title: "Scalable Growth",
-          desc: "Start with your strongest services and locations, then scale what performs.",
-        },
+      bullets: [
+        "Lead-Focused Strategy: Every campaign starts with your business goals and customer acquisition targets.",
+        "Local Market Expertise: We build strategies around your service areas, locations, competitors, and local search behavior.",
+        "Conversion-Focused Marketing: Ads, landing pages, websites, and follow-ups are designed to encourage action.",
+        "Multi-Channel Growth: SEO, Google Ads, Meta Ads, social media, content, websites, and AI work together.",
+        "Faster Lead Response: AI-powered automation can help reduce delays between enquiry and follow-up.",
+        "Scalable Growth: Start with your strongest services and locations, then scale what performs.",
       ],
+      cta: { label: "Build My Lead Generation Strategy", href: "/contact" },
     },
     {
       type: "process",
@@ -261,9 +235,10 @@ export const data: ServicePageData = {
   ],
   closingTitle: "Ready for More Calls & Booked Jobs?",
   closingDesc:
-    "Your next customer is already searching. Make sure they find you. Build a stronger local presence, generate qualified enquiries, and turn more opportunities into booked jobs with Quickupp Softech. Marketing. AI. Technology. Built for Growth.",
+    "Your next customer is already searching.\nMake sure they find you.\nBuild a stronger local presence, generate qualified enquiries, and turn more opportunities into booked jobs with Quickupp Softech.\nMarketing. AI. Technology. Built for Growth.",
   closingCtas: [
     { label: "Get More Home Service Leads", href: "/contact" },
     { label: "Talk to a Growth Expert", href: "/contact" },
   ],
 };
+

@@ -3,14 +3,14 @@ import type { ServicePageData } from "@/lib/servicePageTypes";
 export const data: ServicePageData = {
   metaTitle: "Digital Twin & Clone Video | Quickupp Softech",
   metaDescription:
-    "Turn your identity, voice and presentation style into an AI-powered Digital Twin with Quickupp Softech.",
+    "Turn your identity, voice and presentation style into an AI-powered Digital Twin that can be used to create professional video content at scale.",
   crumb: "Digital Twin & Clone Video",
   heroEyebrow: "Digital Twin & Clone Video",
   heroTitle: "Create Your Digital Twin. Scale Your Video Presence.",
   heroParagraphs: [
     "Turn your identity, voice and presentation style into an AI-powered Digital Twin that can be used to create professional video content at scale.",
     "Quickupp Softech provides Digital Twin & Clone Video Services for founders, creators, professionals and businesses looking to produce personalized videos without recording every video manually.",
-    "From Digital Twin Setup and I Avatar Creation to Clone Video Production, we help you build a scalable AI video presence for marketing, sales, training and communication.",
+    "From Digital Twin Setup and AI Avatar Creation to Clone Video Production, we help you build a scalable AI video presence for marketing, sales, training and communication.",
   ],
   heroCta: { label: "Create Your Digital Twin", href: "/contact" },
   blocks: [
@@ -33,7 +33,6 @@ export const data: ServicePageData = {
     {
       type: "ai",
       title: "Perfect For",
-      intro: "Ideal for personal brands, executives, and growing teams:",
       bullets: [
         "Founders",
         "CEOs",
@@ -50,7 +49,7 @@ export const data: ServicePageData = {
     {
       type: "list",
       title: "Digital Twin Video Samples",
-      tagline:
+      desc:
         "Explore examples of AI-powered Digital Twin and Clone Videos created by Quickupp Softech.",
       items: [
         "Video Sample 01",
@@ -62,7 +61,6 @@ export const data: ServicePageData = {
     {
       type: "whyChoose",
       title: "Why Choose Quickupp Softech?",
-      tagline: "Personalized Digital Twin Creation",
       bullets: [
         "Personalized Digital Twin Creation",
         "Realistic AI Avatar Videos",
@@ -76,7 +74,7 @@ export const data: ServicePageData = {
   ],
   closingTitle: "Build Your Digital Twin",
   closingDesc:
-    "Turn your digital presence into a scalable content engine with Digital Twin & Clone Video Services by Quickupp Softech.\n^Marketing. AI. Technology. Built for Growth.",
+    "Turn your digital presence into a scalable content engine with Digital Twin & Clone Video Services by Quickupp Softech.\nMarketing. AI. Technology. Built for Growth.",
   closingCtas: [
     { label: "Get a Quote", href: "/contact" },
     { label: "Start Your Digital Twin", href: "/contact" },

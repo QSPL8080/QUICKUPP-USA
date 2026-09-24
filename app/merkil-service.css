@@ -1,0 +1,2230 @@
+/* ==========================================================================
+   MERKIL DESIGN SYSTEM - STRICTLY SCOPED UNDER .merkil-page-wrapper
+   Matches https://merkil.webflow.io/ and aligns with Quickupp About Typography
+   ========================================================================== */
+
+.merkil-page-wrapper {
+  --merkil-heading-font: var(--_font-family---heading-font, "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  --merkil-body-font: var(--_font-family---body-font, "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  --merkil-purple: #e4d3ff;
+  --merkil-pink: #f9dbff;
+  --merkil-yellow: #f5f7b8;
+  --merkil-bg: #ffffff;
+  --merkil-dark-gray: #50545a;
+  --merkil-light-gray: #9ca3af;
+  --merkil-heading-color: #0b0f17;
+  
+  background-color: #ffffff;
+  color: var(--merkil-heading-color);
+  font-family: var(--merkil-body-font);
+  overflow-x: clip;
+  position: relative;
+  width: 100%;
+}
+
+/* Base Typography matching About pages */
+.merkil-page-wrapper h1,
+.merkil-page-wrapper h2,
+.merkil-page-wrapper h3,
+.merkil-page-wrapper h4,
+.merkil-page-wrapper h5,
+.merkil-page-wrapper h6,
+.merkil-page-wrapper .home-hero-heading,
+.merkil-page-wrapper .section-heading,
+.merkil-page-wrapper .text-style-h2,
+.merkil-page-wrapper .text-style-h3,
+.merkil-page-wrapper .text-style-h4,
+.merkil-page-wrapper .text-style-h5,
+.merkil-page-wrapper .h2 {
+  font-family: var(--merkil-heading-font);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--merkil-heading-color);
+  margin: 0;
+}
+
+.merkil-page-wrapper .home-hero-heading,
+.merkil-page-wrapper .merkil-home-hero-heading {
+  font-size: clamp(30px, 3.6vw, 48px) !important;
+  line-height: 1.18 !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.03em !important;
+  color: #0b0f17 !important;
+  margin-top: 16px;
+  margin-bottom: 14px;
+}
+
+.merkil-page-wrapper .section-heading,
+.merkil-page-wrapper .merkil-section-heading {
+  font-size: clamp(22px, 2.4vw, 32px) !important;
+  line-height: 1.25 !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  color: #0b0f17 !important;
+  margin: 0 !important;
+}
+
+.merkil-page-wrapper .text-style-h2 {
+  font-size: clamp(20px, 2.2vw, 26px) !important;
+  line-height: 1.25 !important;
+  font-weight: 700 !important;
+}
+
+.merkil-page-wrapper .text-style-h3 {
+  font-size: clamp(15.5px, 1.3vw, 17.5px) !important;
+  line-height: 1.35 !important;
+  font-weight: 700 !important;
+  color: #0b0f17 !important;
+  margin-bottom: 6px;
+}
+
+.merkil-page-wrapper .text-style-h4 {
+  font-size: 15px !important;
+  line-height: 1.4 !important;
+  font-weight: 700 !important;
+}
+
+.merkil-page-wrapper .text-style-h5 {
+  font-size: 13.5px !important;
+  line-height: 1.4 !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+}
+
+.merkil-page-wrapper .text-light-gray {
+  color: var(--merkil-light-gray) !important;
+  font-weight: 400 !important;
+}
+
+.merkil-page-wrapper .text-dark-gray {
+  color: #50545a !important;
+}
+
+.merkil-page-wrapper .text-center {
+  text-align: center;
+}
+
+.merkil-page-wrapper .text-white {
+  color: #ffffff !important;
+}
+
+.merkil-page-wrapper .paragraph-01,
+.merkil-page-wrapper .hero-subtitle-wrap {
+  font-size: clamp(14px, 1.05vw, 15.5px);
+  line-height: 1.55;
+  color: #50545a;
+  max-width: 600px;
+}
+
+.merkil-page-wrapper .paragraph-02 {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #50545a;
+}
+
+.merkil-page-wrapper .black-text-70 {
+  color: rgba(11, 15, 23, 0.72);
+}
+
+/* Container */
+.merkil-page-wrapper .container,
+.merkil-page-wrapper .merkil-container {
+  max-width: 1280px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px;
+  padding-right: 24px;
+  box-sizing: border-box;
+}
+
+/* Badges */
+.merkil-page-wrapper .badge,
+.merkil-page-wrapper .merkil-badge,
+.merkil-page-wrapper .section-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 100px;
+  background-color: #f5f5f7;
+  border: 1px solid #e5e7eb;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #0b0f17;
+  width: fit-content;
+}
+
+.merkil-page-wrapper .badge.purple,
+.merkil-page-wrapper .merkil-badge.purple {
+  background-color: #e4d3ff;
+  border-color: #d8b4fe;
+}
+
+.merkil-page-wrapper .badge.pink,
+.merkil-page-wrapper .merkil-badge.pink {
+  background-color: #f9dbff;
+  border-color: #f0abfc;
+}
+
+.merkil-page-wrapper .badge.yellow,
+.merkil-page-wrapper .merkil-badge.yellow {
+  background-color: #f5f7b8;
+  border-color: #fde047;
+}
+
+.merkil-page-wrapper .badge.white,
+.merkil-page-wrapper .merkil-badge.white {
+  background-color: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.merkil-page-wrapper .badge-icon {
+  width: 15px;
+  height: 15px;
+}
+
+.merkil-page-wrapper .badge-dot,
+.merkil-page-wrapper .merkil-badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #10b981;
+}
+
+.merkil-page-wrapper .tagline {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Buttons & Sliding Interactions */
+.merkil-page-wrapper .cta-button,
+.merkil-page-wrapper .merkil-cta-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 26px;
+  border-radius: 100px;
+  background-color: #e4d3ff;
+  color: #000000;
+  text-decoration: none;
+  font-size: 14.5px;
+  font-weight: 700;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+}
+
+.merkil-page-wrapper .cta-button:hover,
+.merkil-page-wrapper .merkil-cta-button:hover {
+  background-color: #d8b4fe;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(228, 211, 255, 0.5);
+}
+
+.merkil-page-wrapper .cta-button-text-wrap {
+  position: relative;
+  overflow: hidden;
+  height: 20px;
+}
+
+.merkil-page-wrapper .cta-button-text-group {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.merkil-page-wrapper .cta-button:hover .cta-button-text-group {
+  transform: translateY(-20px);
+}
+
+.merkil-page-wrapper .button-01,
+.merkil-page-wrapper .merkil-button-01 {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 26px;
+  border-radius: 100px;
+  background-color: #f5f5f7;
+  color: #000000;
+  text-decoration: none;
+  font-size: 14.5px;
+  font-weight: 700;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.merkil-page-wrapper .button-01:hover,
+.merkil-page-wrapper .merkil-button-01:hover {
+  background-color: #e5e7eb;
+  transform: translateY(-2px);
+}
+
+.merkil-page-wrapper .button-01-arrow-wrap {
+  position: relative;
+  overflow: hidden;
+  width: 14px;
+  height: 14px;
+}
+
+.merkil-page-wrapper .button-01-arrow-group {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.merkil-page-wrapper .button-01:hover .button-01-arrow-group {
+  transform: translateY(-14px);
+}
+
+.merkil-page-wrapper .button-01-text-wrap {
+  position: relative;
+  overflow: hidden;
+  height: 20px;
+}
+
+.merkil-page-wrapper .button-01-text-group {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.merkil-page-wrapper .button-01:hover .button-01-text-group {
+  transform: translateY(-20px);
+}
+
+.merkil-page-wrapper .button-02 {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 26px;
+  border-radius: 100px;
+  background-color: #0b0f17;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 14.5px;
+  font-weight: 700;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.merkil-page-wrapper .button-02:hover {
+  background-color: #1f2937;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.merkil-page-wrapper .button-02-arrow-wrap {
+  position: relative;
+  overflow: hidden;
+  width: 14px;
+  height: 14px;
+}
+
+.merkil-page-wrapper .button-02-arrow-group {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.merkil-page-wrapper .button-02:hover .button-02-arrow-group {
+  transform: translateY(-14px);
+}
+
+.merkil-page-wrapper .button-02-text-wrap {
+  position: relative;
+  overflow: hidden;
+  height: 20px;
+}
+
+.merkil-page-wrapper .button-02-text-group {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.merkil-page-wrapper .button-02:hover .button-02-text-group {
+  transform: translateY(-20px);
+}
+
+.merkil-page-wrapper .button-03 {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0b0f17;
+  text-decoration: none;
+  position: relative;
+  padding-bottom: 4px;
+}
+
+.merkil-page-wrapper .button-underline {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  background-color: #0b0f17;
+  transition: transform 0.3s ease;
+}
+
+.merkil-page-wrapper .button-03:hover .button-underline {
+  transform: scaleX(0.7);
+}
+
+/* =========================================================================
+   1. HERO SECTION (Full bleed edge-to-edge right image)
+   ========================================================================= */
+.merkil-page-wrapper .hero,
+.merkil-page-wrapper .merkil-hero,
+.merkil-page-wrapper .merkil-hero-section {
+  padding: 32px 0 60px;
+  position: relative;
+  background-color: #ffffff;
+  overflow: hidden;
+  width: 100%;
+}
+
+.merkil-page-wrapper .merkil-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  width: 100%;
+  align-items: center;
+  gap: 40px;
+}
+
+.merkil-page-wrapper .merkil-hero-left {
+  display: flex;
+  justify-content: flex-end;
+  padding-left: clamp(24px, 5vw, 80px);
+  padding-right: 16px;
+  box-sizing: border-box;
+}
+
+.merkil-page-wrapper .merkil-hero-content {
+  max-width: 580px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.merkil-page-wrapper .merkil-hero-right {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.merkil-page-wrapper .merkil-hero-image-box {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 600px;
+  border-radius: 32px 0 0 32px;
+  overflow: hidden;
+  box-shadow: -12px 24px 60px rgba(11, 15, 23, 0.09);
+  background-color: #f3f4f6;
+}
+
+.merkil-page-wrapper .merkil-hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.merkil-page-wrapper .merkil-hero-image-box:hover .merkil-hero-img {
+  transform: scale(1.03);
+}
+
+.merkil-page-wrapper .hero-main-wrap,
+.merkil-page-wrapper .merkil-hero-main-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 48px;
+  min-height: 560px;
+  position: relative;
+}
+
+.merkil-page-wrapper .hero-content-wrap {
+  flex: 0 1 560px;
+  max-width: 560px;
+  width: 100%;
+  z-index: 2;
+}
+
+.merkil-page-wrapper .hero-button-wrap,
+.merkil-page-wrapper .merkil-hero-button-wrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.merkil-page-wrapper .hero-image-wrap,
+.merkil-page-wrapper .merkil-hero-image-wrap {
+  flex: 1 1 auto;
+  position: relative;
+  border-radius: 28px 0 0 28px;
+  overflow: hidden;
+  box-shadow: -10px 20px 48px rgba(11, 15, 23, 0.07);
+  width: calc(50vw + 60px);
+  max-width: 860px;
+  height: 580px;
+  margin-right: calc((100vw - 100%) / -2 - 24px);
+}
+
+.merkil-page-wrapper .hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  display: block;
+}
+
+.merkil-page-wrapper .hero-image-wrap:hover .hero-image {
+  transform: scale(1.03);
+}
+
+@media screen and (max-width: 991px) {
+  .merkil-page-wrapper .merkil-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+
+  .merkil-page-wrapper .merkil-hero-left {
+    padding-left: 24px;
+    padding-right: 24px;
+    justify-content: flex-start;
+  }
+
+  .merkil-page-wrapper .merkil-hero-right {
+    padding: 0 24px;
+  }
+
+  .merkil-page-wrapper .merkil-hero-image-box {
+    border-radius: 20px;
+    min-height: 380px;
+    height: 380px;
+  }
+
+  .merkil-page-wrapper .hero-main-wrap {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 36px;
+    min-height: auto;
+  }
+
+  .merkil-page-wrapper .hero-content-wrap {
+    max-width: 100%;
+  }
+
+  .merkil-page-wrapper .hero-image-wrap,
+  .merkil-page-wrapper .merkil-hero-image-wrap {
+    width: 100%;
+    max-width: 100%;
+    height: 380px;
+    margin-right: 0;
+    border-radius: 20px;
+  }
+}
+
+/* =========================================================================
+   2. BRANDS SECTION (.brands)
+   ========================================================================= */
+.merkil-page-wrapper .brands,
+.merkil-page-wrapper .merkil-brands {
+  padding: 36px 0 54px;
+  background-color: #ffffff;
+}
+
+.merkil-page-wrapper .brands-marquee,
+.merkil-page-wrapper .merkil-marquee-container {
+  overflow: hidden;
+  position: relative;
+  padding: 20px 0;
+  display: flex;
+}
+
+.merkil-page-wrapper .brands-list,
+.merkil-page-wrapper .merkil-marquee-track {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+  animation: merkil-marquee 35s linear infinite;
+  white-space: nowrap;
+}
+
+@keyframes merkil-marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.merkil-page-wrapper .brand-left-shadow {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 120px;
+  background: linear-gradient(to right, #ffffff, transparent);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.merkil-page-wrapper .brand-right-shadow {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 120px;
+  background: linear-gradient(to left, #ffffff, transparent);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* =========================================================================
+   3. SERVICES BENTO SECTION (.services)
+   ========================================================================= */
+.merkil-page-wrapper .services,
+.merkil-page-wrapper .merkil-services {
+  padding: 44px 0 52px;
+  background-color: #ffffff;
+}
+
+.merkil-page-wrapper .section-header-wrap,
+.merkil-page-wrapper .merkil-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 24px;
+  gap: 32px;
+}
+
+.merkil-page-wrapper .section-header-wrap.center {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 0;
+  margin-bottom: 24px;
+}
+
+.merkil-page-wrapper .section-header-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.merkil-page-wrapper .section-header-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  width: 100%;
+  max-width: 580px;
+}
+
+.merkil-page-wrapper .section-header-right {
+  width: 100%;
+  max-width: 360px;
+}
+
+.merkil-page-wrapper .section-badge-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.merkil-page-wrapper .section-header-content .section-badge-wrap {
+  justify-content: center;
+}
+
+.merkil-page-wrapper .section-heading-wrap {
+  position: relative;
+}
+
+.merkil-page-wrapper .section-heading-wrap.space {
+  margin-top: 18px;
+  margin-bottom: 0;
+}
+
+.merkil-page-wrapper .section-subtitle-wrap {
+  margin-top: 16px;
+  width: 100%;
+  max-width: 680px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.merkil-page-wrapper .services-main-wrap,
+.merkil-page-wrapper .merkil-services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.merkil-page-wrapper .services-card,
+.merkil-page-wrapper .merkil-services-card {
+  padding: 24px 22px;
+  border-radius: 20px;
+  background-color: #f5f0ff;
+  border: 1px solid #e9dcfc;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: auto;
+  box-shadow: 0 4px 16px rgba(11, 15, 23, 0.02);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.merkil-page-wrapper .services-card:hover,
+.merkil-page-wrapper .merkil-services-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(11, 15, 23, 0.06);
+}
+
+.merkil-page-wrapper .services-card._02,
+.merkil-page-wrapper .merkil-services-card.pink {
+  background-color: #fdf2ff;
+  border-color: #f5dcfc;
+}
+
+.merkil-page-wrapper .services-card._03,
+.merkil-page-wrapper .merkil-services-card.yellow {
+  background-color: #fcfde6;
+  border-color: #eef3aa;
+}
+
+.merkil-page-wrapper .services-icon,
+.merkil-page-wrapper .merkil-services-icon-box {
+  width: 32px;
+  height: 32px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.merkil-page-wrapper .services-tag-wrap,
+.merkil-page-wrapper .merkil-services-tags-wrap {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.merkil-page-wrapper .services-tag,
+.merkil-page-wrapper .merkil-services-tag {
+  padding: 4px 10px;
+  border-radius: 100px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #1e293b;
+}
+
+/* =========================================================================
+   4. ABOUT-01 SECTION (.about-01) - MERKIL STUDIO & STRATEGIC PILLARS
+   ========================================================================= */
+.merkil-page-wrapper .about-01,
+.merkil-page-wrapper .merkil-about-01 {
+  padding: 44px 0 52px;
+  background-color: #f8fafc;
+}
+
+.merkil-page-wrapper .about-01-header-wrap {
+  margin-bottom: 40px;
+}
+
+.merkil-page-wrapper .about-01-heading {
+  font-size: clamp(22px, 2.5vw, 34px) !important;
+  line-height: 1.25 !important;
+  font-weight: 700;
+  color: #0b0f17;
+  max-width: 1100px;
+  margin-top: 14px;
+}
+
+.merkil-page-wrapper .about-01-header-wrap .section-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #fdf5d3;
+  border: 1px solid #fef08a;
+  border-radius: 100px;
+  padding: 4px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #0b0f17;
+  margin-bottom: 12px;
+}
+
+.merkil-page-wrapper .about-01-header-wrap .badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #10b981;
+}
+
+.merkil-page-wrapper .about-01-main-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 48px;
+  margin-top: 40px;
+}
+
+.merkil-page-wrapper .about-01-left {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 36px;
+  width: 100%;
+  max-width: 740px;
+}
+
+.merkil-page-wrapper .about-01-video-wrap {
+  width: 210px;
+  height: 165px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.merkil-page-wrapper .about-01-video-wrap .image-wrap,
+.merkil-page-wrapper .about-01-video-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.merkil-page-wrapper .about-01-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: 460px;
+}
+
+.merkil-page-wrapper .about-01-text-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.merkil-page-wrapper .about-01-text-wrap .paragraph-02 {
+  font-size: 13.5px;
+  line-height: 22px;
+  color: #50545a;
+}
+
+.merkil-page-wrapper .about-01-button-wrap {
+  margin-top: 28px;
+}
+
+/* Black pill button for About / Know more */
+.merkil-page-wrapper .button-02 {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 26px;
+  border-radius: 100px;
+  background-color: #0b0f17;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 14px rgba(11, 15, 23, 0.15);
+  cursor: pointer;
+  border: none;
+}
+
+.merkil-page-wrapper .button-02:hover {
+  background-color: #1e293b;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(11, 15, 23, 0.25);
+}
+
+.merkil-page-wrapper .button-02-arrow-wrap {
+  position: relative;
+  overflow: hidden;
+  width: 12px;
+  height: 12px;
+}
+
+.merkil-page-wrapper .button-02-arrow-group {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.merkil-page-wrapper .button-02:hover .button-02-arrow-group {
+  transform: translateY(-12px);
+}
+
+.merkil-page-wrapper .about-01-right {
+  width: 100%;
+  max-width: 380px;
+  flex-shrink: 0;
+}
+
+.merkil-page-wrapper .about-01-image-wrap {
+  width: 100%;
+  height: 415px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+.merkil-page-wrapper .about-01-image-wrap .image-wrap,
+.merkil-page-wrapper .about-01-image-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+.merkil-page-wrapper .fit-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+/* =========================================================================
+   5. PROJECT-01 SECTION (.project-01) - MERKIL INTERACTIVE SHOWCASE
+   ========================================================================= */
+.merkil-page-wrapper .project-01,
+.merkil-page-wrapper .merkil-project-01 {
+  padding: 44px 0 52px;
+  background-color: #ffffff;
+}
+
+.merkil-page-wrapper .project-01-list-wrap {
+  position: relative;
+  margin-top: 40px;
+}
+
+.merkil-page-wrapper .project-01-list {
+  background-color: #ffffff;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 80px;
+  border-top: 1px solid rgba(0, 0, 0, 0.09);
+  box-shadow: 0 -20px 40px rgba(0, 0, 0, 0.06);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;
+}
+
+.merkil-page-wrapper .project-01-list._02 {
+  background-color: #f8fafc;
+}
+
+/* Stacking z-indexes so each card layers strictly ON TOP OF the previous one */
+.merkil-page-wrapper .project-01-list:nth-child(1) { z-index: 10; }
+.merkil-page-wrapper .project-01-list:nth-child(2) { z-index: 20; }
+.merkil-page-wrapper .project-01-list:nth-child(3) { z-index: 30; }
+.merkil-page-wrapper .project-01-list:nth-child(4) { z-index: 40; }
+.merkil-page-wrapper .project-01-list:nth-child(5) { z-index: 50; }
+.merkil-page-wrapper .project-01-list:nth-child(6) { z-index: 60; }
+.merkil-page-wrapper .project-01-list:nth-child(7) { z-index: 70; }
+.merkil-page-wrapper .project-01-list:nth-child(8) { z-index: 80; }
+
+.merkil-page-wrapper .project-01-link {
+  display: block;
+  width: 100%;
+  text-decoration: none;
+  color: inherit;
+}
+
+.merkil-page-wrapper .project-01-item {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(360px, 1.35fr);
+  gap: 40px;
+  padding: 24px 0;
+  align-items: flex-start;
+}
+
+.merkil-page-wrapper .project-01-left {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.merkil-page-wrapper .project-01-left .text-style-h4 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.02em;
+  flex-shrink: 0;
+}
+
+.merkil-page-wrapper .project-01-details {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 360px;
+}
+
+.merkil-page-wrapper .project-01-text-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.merkil-page-wrapper .project-01-text-wrap h3,
+.merkil-page-wrapper .project-01-text-wrap .text-style-h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0b0f17;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.merkil-page-wrapper .project-01-text-wrap .paragraph-02 {
+  font-size: 13.5px;
+  line-height: 20px;
+  color: #50545a;
+}
+
+.merkil-page-wrapper .button-03 {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0b0f17;
+  cursor: pointer;
+  padding-bottom: 4px;
+  width: fit-content;
+  margin-top: 6px;
+}
+
+.merkil-page-wrapper .button-03-arrow {
+  width: 12px;
+  height: 12px;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.merkil-page-wrapper .button-03:hover .button-03-arrow {
+  transform: translateX(4px);
+}
+
+.merkil-page-wrapper .button-underline {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1.5px;
+  background-color: #0b0f17;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.merkil-page-wrapper .button-03:hover .button-underline {
+  transform: scaleX(1);
+}
+
+.merkil-page-wrapper .project-01-right {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.merkil-page-wrapper .project-01-info-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.merkil-page-wrapper .project-01-tag-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.merkil-page-wrapper .project-01-tag {
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 4px 14px;
+  border-radius: 100px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #111827;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.merkil-page-wrapper .project-01-year {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #6b7280;
+}
+
+.merkil-page-wrapper .project-01-image-wrap {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 4px;
+}
+
+/* Card Animation & Hover State */
+.merkil-page-wrapper .project-01-thumbnail-wrap {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  height: 145px;
+  background-color: #f1f5f9;
+  cursor: pointer;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.merkil-page-wrapper .project-01-thumbnail-wrap .image-wrap {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 12px;
+  position: relative;
+}
+
+.merkil-page-wrapper .project-01-thumbnail-wrap .image-wrap img,
+.merkil-page-wrapper .project-01-thumbnail-wrap img.fit-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: scale(1);
+}
+
+.merkil-page-wrapper .project-01-thumbnail-wrap:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+  z-index: 2;
+}
+
+.merkil-page-wrapper .project-01-thumbnail-wrap:hover .image-wrap img,
+.merkil-page-wrapper .project-01-thumbnail-wrap:hover img.fit-cover {
+  transform: scale(1.1);
+}
+
+/* Floating Interactive Yellow Circle Arrow Badge */
+.merkil-page-wrapper .project-arrow.small {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background-color: #ebff54;
+  color: #0b0f17;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  pointer-events: none;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.22);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.merkil-page-wrapper .project-arrow.small svg,
+.merkil-page-wrapper .project-arrow.small img {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.merkil-page-wrapper .project-01-thumbnail-wrap:hover .project-arrow.small {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Sibling thumbnail cards dim slightly when one is hovered */
+.merkil-page-wrapper .project-01-image-wrap:hover .project-01-thumbnail-wrap:not(:hover) {
+  opacity: 0.65;
+  transform: scale(0.98);
+}
+
+
+/* =========================================================================
+   6. GROWTH SECTION (.growth) - CIRCULAR PERFORMANCE GRAPHIC ROTATION
+   ========================================================================= */
+.merkil-page-wrapper .growth,
+.merkil-page-wrapper .merkil-growth {
+  padding: 100px 0;
+  background-color: #ffffff;
+}
+
+.merkil-page-wrapper .growth-main-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 60px;
+  margin-top: 56px;
+}
+
+.merkil-page-wrapper .growth-circle-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+/* Continuous smooth rotation of the circular orbital graphic */
+.merkil-page-wrapper .growth-circle {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  animation: merkilSpinCircle 30s linear infinite;
+  transform-origin: center center;
+  will-change: transform;
+  display: block;
+}
+
+@keyframes merkilSpinCircle {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.merkil-page-wrapper .circle-text-wrap {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.merkil-page-wrapper .circle-text {
+  font-size: clamp(24px, 2.6vw, 34px);
+  font-weight: 700;
+  color: #0b0f17;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
+.merkil-page-wrapper .growth-list-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  max-width: 520px;
+}
+
+.merkil-page-wrapper .growth-list {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.merkil-page-wrapper .growth-icon-block {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background-color: #f8fafc;
+  border: 1px solid #eef0f4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.merkil-page-wrapper .growth-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.merkil-page-wrapper .growth-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  width: 100%;
+}
+
+.merkil-page-wrapper .growth-details._02 {
+  border-top: 1px solid #eef0f4;
+  border-bottom: 1px solid #eef0f4;
+  padding-top: 24px;
+  padding-bottom: 24px;
+}
+
+.merkil-page-wrapper .growth-badge-wrap {
+  background-color: #f5f0ff;
+  border: 1px solid #e9dcfc;
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #8b5cf6;
+}
+
+.merkil-page-wrapper .growth-badge-wrap._02 {
+  background-color: #fdf2ff;
+  border-color: #f5dcfc;
+  color: #d946ef;
+}
+
+.merkil-page-wrapper .growth-badge-wrap._03 {
+  background-color: #fcfde6;
+  border-color: #eef3aa;
+  color: #65a30d;
+}
+
+.merkil-page-wrapper .growth-text-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.merkil-page-wrapper .growth-text-wrap h3,
+.merkil-page-wrapper .growth-text-wrap .text-style-h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: #0b0f17;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.merkil-page-wrapper .growth-text-wrap .paragraph-02 {
+  font-size: 13px;
+  line-height: 19.5px;
+  color: #50545a;
+  margin: 0;
+}
+
+/* =========================================================================
+   7. FEEDBACK SECTION (.feedback)
+   ========================================================================= */
+.merkil-page-wrapper .feedback,
+.merkil-page-wrapper .merkil-feedback {
+  padding: 44px 0 52px;
+  background-color: #ffffff;
+}
+
+.merkil-page-wrapper .feedback-main-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  gap: 24px;
+  margin-top: 48px;
+  align-items: center;
+}
+
+.merkil-page-wrapper .feedback-item {
+  padding: 24px;
+  border-radius: 20px;
+  background-color: #f9f9fb;
+  border: 1px solid #eef0f4;
+  margin-bottom: 16px;
+}
+
+.merkil-page-wrapper .feedback-content-wrap {
+  padding: 36px 28px;
+  border-radius: 28px;
+  background-color: #e4d3ff;
+  text-align: center;
+}
+
+.merkil-page-wrapper .counter-main-wrap {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* =========================================================================
+   8. PRICING SECTION (.pricing-01)
+   ========================================================================= */
+.merkil-page-wrapper .pricing-01,
+.merkil-page-wrapper .merkil-pricing-01 {
+  padding: 44px 0 52px;
+  background-color: #ffffff;
+}
+
+.merkil-page-wrapper .pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.merkil-page-wrapper .pricing-card {
+  padding: 36px 28px;
+  border-radius: 24px;
+  background-color: #fcfcfd;
+  border: 1px solid #eef0f4;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.merkil-page-wrapper .pricing-amount {
+  font-size: 38px;
+  font-weight: 800;
+  margin: 14px 0 6px;
+  letter-spacing: -0.03em;
+  color: #0b0f17;
+}
+
+.merkil-page-wrapper .pricing-period {
+  font-size: 14.5px;
+  font-weight: 500;
+  color: #50545a;
+}
+
+.merkil-page-wrapper .pricing-divider {
+  height: 1px;
+  background-color: #eef0f4;
+  margin: 20px 0;
+}
+
+.merkil-page-wrapper .pricing-features {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* =========================================================================
+   9. FAQ SECTION (.faq)
+   ========================================================================= */
+.merkil-page-wrapper .faq,
+.merkil-page-wrapper .merkil-faq {
+  padding: 44px 0 52px;
+  background-color: #ffffff;
+}
+
+.merkil-page-wrapper .faq-main-wrap {
+  max-width: 860px;
+  margin: 48px auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.merkil-page-wrapper .faq-item {
+  padding: 22px 26px;
+  border-radius: 18px;
+  background-color: #f9f9fb;
+  border: 1px solid #eef0f4;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.merkil-page-wrapper .faq-item.is-open {
+  background-color: #ffffff;
+  border-color: #d8b4fe;
+  box-shadow: 0 8px 24px rgba(216, 180, 254, 0.15);
+}
+
+.merkil-page-wrapper .faq-question-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.merkil-page-wrapper .faq-arrow-block {
+  width: 24px;
+  height: 24px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.merkil-page-wrapper .faq-arrow-horizontal {
+  width: 14px;
+  height: 2px;
+  background-color: #0b0f17;
+}
+
+.merkil-page-wrapper .faq-arrow-vertical {
+  width: 2px;
+  height: 14px;
+  background-color: #0b0f17;
+  position: absolute;
+  transition: transform 0.25s ease;
+}
+
+.merkil-page-wrapper .faq-item.is-open .faq-arrow-vertical {
+  transform: rotate(90deg);
+  opacity: 0;
+}
+
+.merkil-page-wrapper .faq-answer {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #eef0f4;
+  font-size: 15px;
+  line-height: 24px;
+  color: #50545a;
+}
+
+/* =========================================================================
+   10. BLOG SECTION (.blog-01)
+   ========================================================================= */
+.merkil-page-wrapper .blog-01 {
+  padding: 44px 0 52px;
+  background-color: #ffffff;
+}
+
+.merkil-page-wrapper .blog-01-main-wrap {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 40px;
+}
+
+.merkil-page-wrapper .blog-01-card {
+  border-radius: 20px;
+  background-color: #f9f9fb;
+  border: 1px solid #eef0f4;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.merkil-page-wrapper .blog-01-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(11, 15, 23, 0.05);
+}
+
+.merkil-page-wrapper .blog-01-image-wrap {
+  aspect-ratio: 16/10;
+  overflow: hidden;
+}
+
+.merkil-page-wrapper .blog-01-details {
+  padding: 22px;
+}
+
+.merkil-page-wrapper .blog-01-tag {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #8b5cf6;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.merkil-page-wrapper .blog-01-title {
+  font-size: 17.5px;
+  line-height: 25px;
+  font-weight: 700;
+  color: #0b0f17;
+}
+
+/* =========================================================================
+   11. CTA SECTION (.cta)
+   ========================================================================= */
+.merkil-page-wrapper .cta,
+.merkil-page-wrapper .merkil-cta {
+  padding: 64px 0 100px;
+  background-color: #ffffff;
+}
+
+.merkil-page-wrapper .cta-wrap,
+.merkil-page-wrapper .merkil-cta-wrap {
+  padding: 64px 40px;
+  border-radius: 32px;
+  background-color: #e4d3ff;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.merkil-page-wrapper .cta-button-wrap {
+  margin-top: 14px;
+}
+
+/* =========================================================================
+   12. PURPOSE & VALUES SECTIONS (.merkil-purpose-section, .merkil-values-section)
+   ========================================================================= */
+.merkil-page-wrapper .merkil-purpose-section {
+  padding: 44px 0 52px;
+}
+
+.merkil-page-wrapper .merkil-purpose-wrap {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 48px;
+  margin-top: 40px;
+}
+
+.merkil-page-wrapper .merkil-purpose-image-box {
+  position: sticky;
+  top: 120px;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 16px 36px rgba(11, 15, 23, 0.06);
+}
+
+.merkil-page-wrapper .merkil-purpose-image-box img {
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  display: block;
+}
+
+.merkil-page-wrapper .merkil-purpose-floating-chip {
+  padding: 18px 22px;
+  background-color: #ffffff;
+  border-radius: 0 0 24px 24px;
+  border-top: 1px solid #eef0f4;
+}
+
+.merkil-page-wrapper .merkil-purpose-card {
+  display: flex;
+  gap: 18px;
+  padding: 24px;
+  background-color: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #eef0f4;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 16px rgba(11, 15, 23, 0.02);
+}
+
+.merkil-page-wrapper .merkil-purpose-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background-color: #e4d3ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 15px;
+  color: #0b0f17;
+  flex-shrink: 0;
+}
+
+.merkil-page-wrapper .merkil-purpose-icon-box.pink {
+  background-color: #f9dbff;
+}
+
+.merkil-page-wrapper .merkil-purpose-icon-box.yellow {
+  background-color: #f5f7b8;
+}
+
+.merkil-page-wrapper .merkil-values-section {
+  padding: 44px 0 52px;
+}
+
+.merkil-page-wrapper .merkil-values-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 40px;
+}
+
+.merkil-page-wrapper .merkil-values-card {
+  padding: 36px 28px;
+  border-radius: 24px;
+  background-color: #f9f9fb;
+  border: 1px solid #eef0f4;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 340px;
+}
+
+.merkil-page-wrapper .merkil-values-card.purple {
+  background-color: #e4d3ff;
+}
+
+.merkil-page-wrapper .merkil-values-card.pink {
+  background-color: #f9dbff;
+}
+
+.merkil-page-wrapper .merkil-values-card.yellow {
+  background-color: #f5f7b8;
+}
+
+.merkil-page-wrapper .merkil-values-icon-box {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(11, 15, 23, 0.04);
+}
+
+/* Hover Lift */
+.merkil-page-wrapper .merkil-hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(11, 15, 23, 0.04);
+  border-color: #d8b4fe !important;
+}
+
+/* =========================================================================
+   13. DUAL-ROW INFINITE MARQUEE CARDS LOOP (.merkil-marquee-section)
+   ========================================================================= */
+.merkil-page-wrapper .merkil-marquee-section {
+  padding: 44px 0 52px;
+  background-color: #ffffff;
+  overflow: hidden;
+  position: relative;
+}
+
+.merkil-page-wrapper .merkil-marquee-container {
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  margin-top: 48px;
+  padding: 12px 0;
+  mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 1) 5%, rgba(0, 0, 0, 1) 95%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 1) 5%, rgba(0, 0, 0, 1) 95%, transparent 100%);
+}
+
+.merkil-page-wrapper .merkil-marquee-row {
+  display: flex;
+  overflow: hidden;
+  user-select: none;
+  width: 100%;
+  padding: 8px 0;
+}
+
+.merkil-page-wrapper .merkil-marquee-track {
+  display: flex;
+  flex-shrink: 0;
+  align-items: stretch;
+  gap: 24px;
+  min-width: 100%;
+  will-change: transform;
+}
+
+.merkil-page-wrapper .merkil-marquee-track.scroll-left {
+  animation: merkilScrollLeft 70s linear infinite;
+}
+
+.merkil-page-wrapper .merkil-marquee-track.scroll-right {
+  animation: merkilScrollRight 70s linear infinite;
+}
+
+.merkil-page-wrapper .merkil-marquee-row:hover .merkil-marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes merkilScrollLeft {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes merkilScrollRight {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.merkil-page-wrapper .merkil-marquee-card {
+  width: 380px;
+  min-width: 380px;
+  max-width: 380px;
+  min-height: 195px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px 26px;
+  background-color: #f9f9fb;
+  border-radius: 20px;
+  border: 1px solid #eef0f4;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.02);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  white-space: normal !important;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.merkil-page-wrapper .merkil-marquee-card:hover {
+  background-color: #ffffff;
+  transform: translateY(-5px);
+  border-color: #d8b4fe !important;
+  box-shadow: 0 16px 36px rgba(11, 15, 23, 0.09);
+}
+
+.merkil-page-wrapper .merkil-marquee-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.merkil-page-wrapper .merkil-card-num-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+  color: #0b0f17;
+  flex-shrink: 0;
+}
+
+.merkil-page-wrapper .merkil-card-badge {
+  font-size: 12px;
+  font-weight: 700;
+  color: #8b5cf6;
+  background-color: #f5f0ff;
+  border: 1px solid #e9dcfc;
+  padding: 4px 12px;
+  border-radius: 100px;
+  flex-shrink: 0;
+}
+
+.merkil-page-wrapper .merkil-marquee-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  white-space: normal !important;
+}
+
+.merkil-page-wrapper .merkil-marquee-card-body h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0b0f17;
+  margin: 0;
+  line-height: 1.35;
+  white-space: normal !important;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.merkil-page-wrapper .merkil-marquee-card-body p {
+  font-size: 13px;
+  line-height: 20px;
+  color: #50545a;
+  margin: 0;
+  white-space: normal !important;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+/* =========================================================================
+   RESPONSIVE BREAKPOINTS (ALL UNDER .merkil-page-wrapper)
+   ========================================================================= */
+@media screen and (max-width: 991px) {
+  .merkil-page-wrapper .hero-main-wrap,
+  .merkil-page-wrapper .about-01-main-wrap,
+  .merkil-page-wrapper .growth-main-wrap,
+  .merkil-page-wrapper .merkil-purpose-wrap,
+  .merkil-page-wrapper .project-01-item {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .merkil-page-wrapper .services-main-wrap,
+  .merkil-page-wrapper .merkil-services-grid,
+  .merkil-page-wrapper .pricing-grid,
+  .merkil-page-wrapper .merkil-values-grid,
+  .merkil-page-wrapper .blog-01-main-wrap,
+  .merkil-page-wrapper .feedback-main-wrap {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .merkil-page-wrapper .section-header-wrap {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Staggered One-by-One Fade & Slide-In Animation */
+@keyframes merkilPointFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.merkil-page-wrapper .stagger-point {
+  opacity: 0;
+  animation: merkilPointFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Compact Marquee Card (1-SS) */
+.merkil-page-wrapper .merkil-marquee-card.compact {
+  min-width: 220px;
+  max-width: 300px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  border: 1px solid #edf0f5;
+  box-shadow: 0 2px 8px rgba(11, 15, 23, 0.03);
+}
+
+.merkil-page-wrapper .merkil-marquee-card.compact .merkil-marquee-card-header {
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.merkil-page-wrapper .merkil-marquee-card.compact h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0b0f17;
+  margin: 0;
+  line-height: 1.3;
+}
+
+/* Creative Content Grid (3-SS) */
+.merkil-page-wrapper .creative-content-card {
+  padding: 22px 20px;
+  border-radius: 18px;
+  background-color: #ffffff;
+  border: 1px solid #eef0f5;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 16px rgba(11, 15, 23, 0.02);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.merkil-page-wrapper .creative-content-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(11, 15, 23, 0.08);
+  border-color: #d8b4fe;
+}
+
+/* Why Choose Simple Grid (4-SS) */
+.merkil-page-wrapper .why-simple-card {
+  padding: 18px 20px;
+  border-radius: 14px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+  transition: all 0.25s ease;
+}
+
+.merkil-page-wrapper .why-simple-card:hover {
+  border-color: #10b981;
+  background-color: #f0fdf4;
+  transform: translateY(-2px);
+}
+
+/* AI Side-by-Side (5-SS) */
+.merkil-page-wrapper .ai-side-container {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 48px;
+  align-items: center;
+}
+
+@media screen and (max-width: 991px) {
+  .merkil-page-wrapper .ai-side-container {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
+/* ========================================================================= */
+/* COMPACT SIZING & SMOOTH STAGGERED POINT REVEALS */
+/* ========================================================================= */
+@keyframes merkilPointFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.merkil-page-wrapper .stagger-point {
+  opacity: 0;
+  animation: merkilPointFadeIn 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 1-SS: Compact Marquee Cards */
+.merkil-page-wrapper .merkil-marquee-card.compact {
+  min-width: 200px;
+  max-width: 260px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  border: 1px solid #edf0f5;
+  box-shadow: 0 2px 8px rgba(11, 15, 23, 0.03);
+}
+
+.merkil-page-wrapper .merkil-marquee-card.compact .merkil-marquee-card-header {
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.merkil-page-wrapper .merkil-marquee-card.compact h3 {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0b0f17;
+  margin: 0;
+  line-height: 1.3;
+}
+
+/* 2-SS: Compact Bento Cards */
+.merkil-page-wrapper .services-card.compact,
+.merkil-page-wrapper .merkil-bento-compact {
+  padding: 14px 18px !important;
+  border-radius: 16px !important;
+  min-height: auto !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.merkil-page-wrapper .services-card.compact .services-icon,
+.merkil-page-wrapper .merkil-bento-compact .services-icon {
+  width: 24px !important;
+  height: 24px !important;
+  margin-bottom: 8px !important;
+}
+
+.merkil-page-wrapper .services-card.compact h3,
+.merkil-page-wrapper .merkil-bento-compact h3 {
+  font-size: 14.5px !important;
+  font-weight: 700 !important;
+  color: #0b0f17 !important;
+  margin: 0 !important;
+  line-height: 1.3 !important;
+}
+
+/* 3-SS: Creative Content & Modern Feature Matrix */
+.merkil-page-wrapper .creative-content-card {
+  padding: 18px 20px;
+  border-radius: 16px;
+  background-color: #ffffff;
+  border: 1px solid #eef0f5;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 16px rgba(11, 15, 23, 0.02);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.merkil-page-wrapper .creative-content-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(11, 15, 23, 0.07);
+  border-color: #d8b4fe;
+}
+
+.merkil-page-wrapper .feature-matrix-card {
+  padding: 16px 20px;
+  border-radius: 14px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  transition: all 0.25s ease;
+}
+
+.merkil-page-wrapper .feature-matrix-card:hover {
+  border-color: #8b5cf6;
+  background-color: #faf8ff;
+  transform: translateY(-2px);
+}
+
+/* 3-SS & 4-SS: Why Choose Clean Benefit Grid */
+.merkil-page-wrapper .why-simple-card {
+  padding: 16px 20px;
+  border-radius: 14px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+  transition: all 0.25s ease;
+}
+
+.merkil-page-wrapper .why-simple-card:hover {
+  border-color: #10b981;
+  background-color: #f0fdf4;
+  transform: translateY(-2px);
+}
+
+/* 4-SS: Combined Industries & AI Engine Section */
+.merkil-page-wrapper .combined-industries-ai-section {
+  padding: 64px 0;
+  background-color: #fdfcff;
+  border-top: 1px solid #f1ecf9;
+}
+
+.merkil-page-wrapper .industries-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background-color: #ffffff;
+  border-radius: 100px;
+  border: 1px solid #e2e8f0;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0b0f17;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+}
+
+.merkil-page-wrapper .industries-chip:hover {
+  border-color: #8b5cf6;
+  background-color: #f9f5ff;
+  transform: translateY(-1px);
+}
+
+.merkil-page-wrapper .ai-side-container {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 44px;
+  align-items: center;
+}
+
+@media screen and (max-width: 991px) {
+  .merkil-page-wrapper .ai-side-container {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
+/* 5-SS: ROCK-SOLID CTA BUTTON HOVER ROLLS (Zero clipping or squeezing) */
+.merkil-page-wrapper .cta-button,
+.merkil-page-wrapper .merkil-cta-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 26px;
+  border-radius: 100px;
+  background-color: #e4d3ff;
+  color: #000000;
+  text-decoration: none;
+  font-size: 14.5px;
+  font-weight: 700;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.merkil-page-wrapper .cta-button:hover,
+.merkil-page-wrapper .merkil-cta-button:hover {
+  background-color: #d8b4fe;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(228, 211, 255, 0.5);
+}
+
+.merkil-page-wrapper .cta-button-text-wrap,
+.merkil-page-wrapper .button-01-text-wrap,
+.merkil-page-wrapper .button-02-text-wrap {
+  position: relative;
+  overflow: hidden;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.merkil-page-wrapper .cta-button-text-group,
+.merkil-page-wrapper .button-01-text-group,
+.merkil-page-wrapper .button-02-text-group {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.merkil-page-wrapper .button-01-text,
+.merkil-page-wrapper .cta-button .button-01-text,
+.merkil-page-wrapper .button-01 .button-01-text,
+.merkil-page-wrapper .button-02 .button-01-text {
+  height: 22px !important;
+  line-height: 22px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 14.5px !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.merkil-page-wrapper .cta-button:hover .cta-button-text-group,
+.merkil-page-wrapper .button-01:hover .button-01-text-group,
+.merkil-page-wrapper .button-02:hover .button-02-text-group {
+  transform: translateY(-22px) !important;
+}

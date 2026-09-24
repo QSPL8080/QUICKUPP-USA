@@ -48,7 +48,7 @@ export const data: ServicePageData = {
     {
       type: "list",
       title: "See Our AI Avatar Video Samples",
-      tagline:
+      desc:
         "Explore our latest AI Avatar Video creations and see how AI-powered video can transform your business communication.",
       items: [
         "Video Sample 01",
@@ -60,7 +60,6 @@ export const data: ServicePageData = {
     {
       type: "whyChoose",
       title: "Why Choose Quickupp Softech?",
-      tagline: "Realistic AI Avatars",
       bullets: [
         "Realistic AI Avatars",
         "Professional Video Production",
@@ -74,7 +73,7 @@ export const data: ServicePageData = {
   ],
   closingTitle: "Create Your AI Avatar Video",
   closingDesc:
-    "Ready to turn your script into an engaging AI-powered video?\n\nGuickupp Softech — Marketing. AI. Technology. Built for Growth.",
+    "Ready to turn your script into an engaging AI-powered video?\nQuickupp Softech — Marketing. AI. Technology. Built for Growth.",
   closingCtas: [
     { label: "Get a Quote", href: "/contact" },
     { label: "Start Your Video", href: "/contact" },

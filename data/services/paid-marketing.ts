@@ -2,8 +2,7 @@ import type { ServicePageData } from "@/lib/servicePageTypes";
 
 const data: ServicePageData = {
   metaTitle: "Paid Marketing | Quickupp Softech",
-  metaDescription:
-    "Paid Marketing Services That Turn Ad Spend Into Growth with Quickupp Softech. Multi-platform performance advertising across Google, Meta, LinkedIn, TikTok, YouTube and AI Ads.",
+  metaDescription: "Paid Marketing Services That Turn Ad Spend Into Growth. Reach the right audience, on the right platform, at the right time.",
   crumb: "Paid Marketing",
   heroEyebrow: "Paid Marketing",
   heroTitle: "Paid Marketing Services That Turn Ad Spend Into Growth",
@@ -136,7 +135,7 @@ const data: ServicePageData = {
       type: "list",
       title: "ChatGPT / AI Ads",
       tagline: "Prepare for the Future of AI Advertising",
-      desc: "We help businesses explore AI advertising and AI-driven customer discovery opportunities as the advertising landscape evolves.",
+      desc: "We help businesses explore AI advertising and AI-driven customer discovery opportunities as the advertising landscape evolves. AI advertising capabilities continue to evolve, so strategies are aligned with opportunities currently available across relevant platforms and markets.",
       items: [
         "AI Advertising Strategy",
         "AI Audience Research",
@@ -146,7 +145,6 @@ const data: ServicePageData = {
         "AI Competitor Analysis",
         "AI Campaign Insights",
       ],
-      note: "AI advertising capabilities continue to evolve, so strategies are aligned with opportunities currently available across relevant platforms and markets.",
     },
     {
       type: "list",
@@ -168,17 +166,18 @@ const data: ServicePageData = {
       type: "process",
       title: "Our Paid Marketing Process",
       steps: [
-        { num: "01", title: "Discover", desc: "Understand your business, audience and goals." },
-        { num: "02", title: "Research", desc: "Analyze market, competitors and opportunities." },
-        { num: "03", title: "Strategize", desc: "Select platforms, audiences and budgets." },
-        { num: "04", title: "Build", desc: "Create campaigns, creatives, tracking and targeting." },
-        { num: "05", title: "Launch", desc: "Launch with defined performance benchmarks." },
-        { num: "06", title: "Optimize", desc: "Test, analyze and improve performance." },
-        { num: "07", title: "Scale", desc: "Increase investment in proven opportunities." },
+        { num: "01", title: "01. Discover", desc: "Understand your business, audience and goals." },
+        { num: "02", title: "02. Research", desc: "Analyze market, competitors and opportunities." },
+        { num: "03", title: "03. Strategize", desc: "Select platforms, audiences and budgets." },
+        { num: "04", title: "04. Build", desc: "Create campaigns, creatives, tracking and targeting." },
+        { num: "05", title: "05. Launch", desc: "Launch with defined performance benchmarks." },
+        { num: "06", title: "06. Optimize", desc: "Test, analyze and improve performance." },
+        { num: "07", title: "07. Scale", desc: "Increase investment in proven opportunities." },
       ],
     },
     {
       type: "whyChoose",
+      title: "Why Choose Quickupp Softech?",
       tagline: "Marketing. AI. Technology. Built for Growth.",
       bullets: [
         "Multi-Platform Advertising",
@@ -195,7 +194,7 @@ const data: ServicePageData = {
     {
       type: "ai",
       title: "AI-Powered Paid Marketing",
-      intro: "We use AI to support:",
+      desc: "AI supports our workflow while human strategy and business expertise drive campaign decisions.",
       bullets: [
         "Audience Research",
         "Competitor Analysis",
@@ -206,23 +205,40 @@ const data: ServicePageData = {
         "Performance Insights",
         "Reporting & Data Analysis",
       ],
-      desc: "AI supports our workflow while human strategy and business expertise drive campaign decisions.",
     },
     {
       type: "descPairs",
       title: "Paid Marketing for Your Goals",
-      columns: 3,
       items: [
-        { title: "Generate More Leads", desc: "Reach relevant prospects and increase qualified enquiries." },
-        { title: "Increase Sales", desc: "Build campaigns focused on conversions and revenue." },
-        { title: "Build Brand Awareness", desc: "Reach relevant audiences and strengthen brand visibility." },
-        { title: "Scale Ecommerce", desc: "Drive product discovery, retargeting and online purchases." },
-        { title: "Grow B2B Opportunities", desc: "Reach decision-makers through professional audience targeting." },
-        { title: "Improve Customer Acquisition", desc: "Build a measurable and scalable paid media system." },
+        {
+          title: "Generate More Leads",
+          desc: "Reach relevant prospects and increase qualified enquiries.",
+        },
+        {
+          title: "Increase Sales",
+          desc: "Build campaigns focused on conversions and revenue.",
+        },
+        {
+          title: "Build Brand Awareness",
+          desc: "Reach relevant audiences and strengthen brand visibility.",
+        },
+        {
+          title: "Scale Ecommerce",
+          desc: "Drive product discovery, retargeting and online purchases.",
+        },
+        {
+          title: "Grow B2B Opportunities",
+          desc: "Reach decision-makers through professional audience targeting.",
+        },
+        {
+          title: "Improve Customer Acquisition",
+          desc: "Build a measurable and scalable paid media system.",
+        },
       ],
     },
     {
       type: "industries",
+      title: "Industries We Serve",
       industries: [
         "Healthcare",
         "Home Services",
@@ -238,19 +254,37 @@ const data: ServicePageData = {
     },
     {
       type: "faq",
+      title: "FAQs",
       items: [
-        { q: "What are Paid Marketing Services?", a: "Paid Marketing Services use advertising platforms to reach targeted audiences and generate traffic, leads, sales or brand awareness." },
-        { q: "Which platforms do you manage?", a: "Google, Meta, LinkedIn, TikTok, Snapchat, YouTube, emerging AI advertising opportunities and Influencer Marketing." },
-        { q: "Do you provide PPC Management?", a: "Yes. We provide PPC Advertising and campaign management across relevant paid advertising platforms." },
-        { q: "Can you manage multiple platforms?", a: "Yes. We can build multi-platform campaigns based on your audience, objectives and budget." },
-        { q: "How do you measure performance?", a: "We track relevant metrics such as CTR, CPC, CPL, CPA, conversions, conversion rate, ROAS and revenue." },
-        { q: "How much should I spend on advertising?", a: "Budget depends on your market, competition, customer value, goals and conversion economics. We recommend setting objectives first and then building the media budget." },
+        {
+          q: "What are Paid Marketing Services?",
+          a: "Paid Marketing Services use advertising platforms to reach targeted audiences and generate traffic, leads, sales or brand awareness.",
+        },
+        {
+          q: "Which platforms do you manage?",
+          a: "Google, Meta, LinkedIn, TikTok, Snapchat, YouTube, emerging AI advertising opportunities and Influencer Marketing.",
+        },
+        {
+          q: "Do you provide PPC Management?",
+          a: "Yes. We provide PPC Advertising and campaign management across relevant paid advertising platforms.",
+        },
+        {
+          q: "Can you manage multiple platforms?",
+          a: "Yes. We can build multi-platform campaigns based on your audience, objectives and budget.",
+        },
+        {
+          q: "How do you measure performance?",
+          a: "We track relevant metrics such as CTR, CPC, CPL, CPA, conversions, conversion rate, ROAS and revenue.",
+        },
+        {
+          q: "How much should I spend on advertising?",
+          a: "Budget depends on your market, competition, customer value, goals and conversion economics. We recommend setting objectives first and then building the media budget.",
+        },
       ],
     },
   ],
   closingTitle: "Turn Paid Advertising Into a Growth Engine",
-  closingDesc:
-    "Reach the right audience, drive meaningful action and build a scalable customer acquisition system with Paid Marketing, Performance Advertising, AI and data-driven optimization.",
+  closingDesc: "Reach the right audience, drive meaningful action and build a scalable customer acquisition system with Paid Marketing, Performance Advertising, AI and data-driven optimization.",
   closingCtas: [{ label: "Get a Free Paid Marketing Strategy", href: "/contact" }],
 };
 

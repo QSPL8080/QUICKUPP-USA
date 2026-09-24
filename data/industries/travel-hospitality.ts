@@ -16,7 +16,6 @@ export const data: ServicePageData = {
     {
       type: "descPairs",
       title: "Complete Digital Growth Solutions for Travel & Hospitality",
-      subtitle: "Full-Funnel Booking Engine",
       desc: "End-to-end digital marketing and experience-driven growth strategies designed for travel agencies, hotels, and tour operators.",
       items: [
         {
@@ -82,8 +81,7 @@ export const data: ServicePageData = {
     {
       type: "list",
       title: "Who We Help",
-      subtitle: "Hospitality & Tourism Partners",
-      desc: "We work with travel businesses across every category of hospitality and tourism:",
+      desc: "We work with:",
       items: [
         "Travel Agencies",
         "Tour Operators",
@@ -96,12 +94,10 @@ export const data: ServicePageData = {
         "Hospitality Brands",
         "Corporate Travel Businesses",
       ],
-      cta: { label: "Talk to our Travel Marketing Expert", href: "/contact" },
     },
     {
       type: "descPairs",
       title: "Promote Experiences. Build Trust. Drive Bookings.",
-      subtitle: "Experience-Driven Marketing",
       items: [
         {
           title: "Destination Marketing",
@@ -129,8 +125,7 @@ export const data: ServicePageData = {
     {
       type: "ai",
       title: "Built Around Your Most Important Metrics",
-      intro:
-        "We look beyond impressions and clicks. Your marketing should contribute to a stronger booking pipeline and revenue growth.",
+      intro: "We look beyond impressions and clicks.",
       bullets: [
         "Reach",
         "Website Visitors",
@@ -139,12 +134,14 @@ export const data: ServicePageData = {
         "Bookings",
         "Repeat Customers",
       ],
-      desc: "We align marketing performance with booked itineraries, direct guest reservations, and customer lifetime value.",
+      desc: "Your marketing should contribute to a stronger booking pipeline and revenue growth.",
       cta: { label: "Build a Booking-Focused Marketing Strategy", href: "/contact" },
     },
     {
       type: "process",
       title: "Our Travel & Hospitality Growth Process",
+      tagline: "Analyze → Strategize → Build → Launch → Optimize → Scale",
+      intro: "We evaluate your destinations, services, audience, competitors, website, booking journey and marketing performance to build a focused growth strategy.",
       steps: [
         {
           num: "01",
@@ -177,12 +174,11 @@ export const data: ServicePageData = {
           desc: "Expand to new destinations, high-value corporate travel segments, and international traveler markets.",
         },
       ],
+      cta: { label: "Plan Your Travel Business Growth Roadmap", href: "/contact" },
     },
     {
       type: "whyChoose",
       title: "Why Choose Quickupp Softech?",
-      tagline: "Marketing, AI & Technology under one partner",
-      desc: "We combine destination storytelling with performance advertising, conversion-focused websites, and automated guest nurturing.",
       bullets: [
         "Marketing, AI & Technology under one partner",
         "Travel and hospitality-focused growth strategies",
@@ -195,7 +191,6 @@ export const data: ServicePageData = {
         "WhatsApp and CRM follow-ups",
         "Data-driven campaign optimization",
       ],
-      cta: { label: "Plan Your Travel Business Growth Roadmap", href: "/contact" },
     },
     {
       type: "ai",

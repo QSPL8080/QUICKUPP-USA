@@ -16,8 +16,6 @@ export const data: ServicePageData = {
     {
       type: "descPairs",
       title: "Our Healthcare Marketing Services",
-      subtitle: "Comprehensive Marketing Solutions",
-      desc: "Tailored healthcare growth services designed to expand patient reach, enhance reputation, and streamline digital enquiries.",
       items: [
         {
           title: "Healthcare SEO",
@@ -57,7 +55,7 @@ export const data: ServicePageData = {
       type: "ai",
       title: "Healthcare Marketing That Goes Beyond Lead Generation",
       intro:
-        "Healthcare marketing requires more than running advertisements. Patients look for trust, expertise, accessibility, reviews, and credible information before choosing a provider. Our approach connects:",
+        "Healthcare marketing requires more than running advertisements. Patients look for trust, expertise, accessibility, reviews, and credible information before choosing a provider.\nOur approach connects:",
       bullets: [
         "Visibility",
         "Trust",
@@ -71,8 +69,6 @@ export const data: ServicePageData = {
     {
       type: "list",
       title: "Healthcare Businesses We Help",
-      subtitle: "Specialized Industry Focus",
-      desc: "We deliver tailored growth strategies for diverse healthcare segments:",
       items: [
         "Hospitals & Multi-Specialty Hospitals",
         "Clinics & Specialty Clinics",
@@ -120,8 +116,6 @@ export const data: ServicePageData = {
     {
       type: "whyChoose",
       title: "Why Choose Quickupp Softech?",
-      tagline: "Healthcare-Focused Marketing Expertise",
-      desc: "We combine healthcare domain insights with performance marketing, modern web technologies, and AI automation to deliver measurable patient acquisition and brand trust.",
       bullets: [
         "Healthcare-focused marketing expertise",
         "Integrated Marketing + AI + Technology approach",
@@ -139,7 +133,7 @@ export const data: ServicePageData = {
       type: "ai",
       title: "AI-Powered Healthcare Growth",
       intro:
-        "AI can help healthcare businesses improve how they attract, engage, qualify, and follow up with prospects. We implement AI-powered solutions for:",
+        "AI can help healthcare businesses improve how they attract, engage, qualify, and follow up with prospects.\nWe implement AI-powered solutions for:",
       bullets: [
         "AI Chatbots",
         "Lead Qualification",
@@ -153,6 +147,7 @@ export const data: ServicePageData = {
     },
     {
       type: "faq",
+      title: "Frequently Asked Questions",
       items: [
         {
           q: "How can digital marketing help a healthcare business?",
@@ -179,7 +174,7 @@ export const data: ServicePageData = {
   ],
   closingTitle: "Ready to Grow Your Healthcare Business?",
   closingDesc:
-    "Build stronger visibility, generate better enquiries, and create a more connected digital healthcare experience with Quickupp Softech. Marketing. AI. Technology. Built for Growth.",
+    "Build stronger visibility, generate better enquiries, and create a more connected digital healthcare experience with Quickupp Softech.\nMarketing. AI. Technology. Built for Growth.",
   closingCtas: [
     { label: "Talk to Our Healthcare Growth Team", href: "/contact" },
   ],
