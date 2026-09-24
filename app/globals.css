@@ -5693,16 +5693,47 @@ section.section-gap.padding-top-0 {
   margin: 0;
 }
 
-/* Compact Values Grid (reduces excessive whitespace & card height) */
+/* Compact Values Grid (Staggered Animation + Premium Deliverables Cards) */
 .sc-values-compact-section {
-  padding: 42px 0 46px;
+  padding: 60px 0 72px;
   background: #ffffff;
+  position: relative;
 }
 
 .sc-values-compact-header {
   text-align: center;
-  max-width: 620px;
-  margin: 0 auto 22px;
+  max-width: 680px;
+  margin: 0 auto 36px;
+}
+
+.sc-values-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  border-radius: 9999px;
+  background: #f1f5f9;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #475569;
+  margin-bottom: 14px;
+}
+
+.sc-values-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #6366f1;
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.6);
+  animation: scPulseDot 2s infinite ease-in-out;
+}
+
+@keyframes scPulseDot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.35); opacity: 0.65; }
 }
 
 .sc-values-compact-title {
@@ -5714,51 +5745,68 @@ section.section-gap.padding-top-0 {
 }
 
 .sc-values-compact-desc {
-  font-size: 14px;
+  font-size: 15px;
   color: #64748b;
-  line-height: 1.5;
-  margin: 0;
+  line-height: 1.6;
+  margin: 0 auto;
+  max-width: 580px;
 }
 
 .sc-values-compact-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  max-width: 980px;
+  gap: 16px;
+  max-width: 1040px;
   margin: 0 auto;
 }
 
-@media (max-width: 860px) {
+@media (max-width: 880px) {
   .sc-values-compact-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+@media (max-width: 540px) {
+  .sc-values-compact-grid {
+    grid-template-columns: 1fr;
     gap: 10px;
   }
 }
 
-@media (max-width: 520px) {
-  .sc-values-compact-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
+/* Card item with staggered reveal animation: points coming one by one */
 .sc-values-compact-card {
   background: #f8fafc;
   border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 12px;
-  padding: 13px 18px;
+  border-radius: 14px;
+  padding: 16px 20px;
   position: relative;
-  transition: all 0.2s ease;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
+  min-height: 96px;
+  opacity: 0;
+  transform: translateY(22px) scale(0.97);
+  transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.25s ease,
+              border-color 0.25s ease,
+              box-shadow 0.25s ease;
+  will-change: opacity, transform;
+}
+
+/* When the grid is in view, reveal each card sequentially */
+.sc-values-compact-grid.is-in-view .sc-values-compact-card {
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
 .sc-values-compact-card:hover {
   background: #ffffff;
-  transform: translateY(-2px);
+  transform: translateY(-4px);
   border-color: rgba(99, 102, 241, 0.35);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 12px 28px -6px rgba(99, 102, 241, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
 }
 
 .sc-values-compact-card::before {
@@ -5767,31 +5815,120 @@ section.section-gap.padding-top-0 {
   top: 0;
   left: 0;
   right: 0;
-  height: 2.5px;
-  background: linear-gradient(90deg, #38bdf8, #818cf8);
+  height: 3px;
+  background: linear-gradient(90deg, #6366f1, #38bdf8);
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.25s ease;
 }
 
 .sc-values-compact-card:hover::before {
   opacity: 1;
 }
 
+.sc-values-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
 .sc-values-compact-number {
   font-size: 11.5px;
   font-weight: 800;
+  color: #4f46e5;
+  background: rgba(99, 102, 241, 0.08);
+  padding: 2px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sc-values-compact-card:hover .sc-values-compact-number {
+  background: #6366f1;
+  color: #ffffff;
+}
+
+.sc-values-card-indicator {
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.sc-values-compact-card:hover .sc-values-card-indicator {
   color: #6366f1;
-  margin-bottom: 4px;
-  letter-spacing: 0.05em;
-  line-height: 1;
+  transform: translate(2px, -2px);
 }
 
 .sc-values-compact-title {
-  font-size: 14.5px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 700;
   color: #0f172a;
   margin: 0;
   line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sc-values-compact-card {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* Dedicated Why Choose Section for AI Video Production */
+.sc-why-choose-video-section {
+  padding: 72px 0 80px;
+  background: #f8fafc;
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.sc-why-choose-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+.sc-why-choose-card {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: all 0.25s ease;
+}
+
+.sc-why-choose-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(16, 185, 129, 0.35);
+  box-shadow: 0 8px 20px -4px rgba(16, 185, 129, 0.1);
+}
+
+.sc-why-choose-icon-box {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #ecfdf5;
+  border: 1px solid #d1fae5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sc-why-choose-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.4;
 }
 
 /* 5. Why We're Right Choice */

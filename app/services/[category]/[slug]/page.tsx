@@ -4,6 +4,7 @@ import MerkilMarketingServicePage from "@/components/MerkilMarketingServicePage"
 import AIVideoServicePage from "@/components/AIVideoServicePage";
 import RitovexServicePage from "@/components/RitovexServicePage";
 import ITLifecycleServicePage from "@/components/ITLifecycleServicePage";
+import CoporaServicePage from "@/components/CoporaServicePage";
 import {
   getAllCategorizedServiceParams,
   getServiceByCategoryAndSlug,
@@ -63,8 +64,14 @@ export default async function ServicePage({ params }: PageProps) {
     );
   }
 
-  if (match.service.template === "itlifecycle") {
-    return <ITLifecycleServicePage data={match.service.data} />;
+  if (match.service.template === "copora" || match.service.template === "itlifecycle") {
+    return (
+      <CoporaServicePage
+        data={match.service.data}
+        categoryLabel={match.category.categoryLabel}
+        categorySlug={match.category.categorySlug}
+      />
+    );
   }
 
   return <RitovexServicePage data={match.service.data} />;

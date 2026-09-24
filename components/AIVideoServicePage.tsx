@@ -12,6 +12,85 @@ interface Props {
   categorySlug?: string;
 }
 
+function StaggeredDeliverablesSection({
+  title,
+  desc,
+  items,
+}: {
+  title: string;
+  desc?: string;
+  items: string[];
+}) {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [isInView, setIsInView] = useState(false);
+
+  useEffect(() => {
+    if (!sectionRef.current) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsInView(true);
+            observer.disconnect();
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -30px 0px" }
+    );
+
+    observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section ref={sectionRef} className="sc-values-compact-section">
+      <div className="w-layout-blockcontainer container w-container">
+        <div className="sc-values-compact-header">
+          <div className="sc-values-badge">
+            <span className="sc-values-badge-dot" />
+            <span>FORMATS &amp; DELIVERABLES</span>
+          </div>
+          <h2 className="sc-section-title">{title}</h2>
+          <p className="sc-section-desc">
+            {desc ||
+              "From social-first viral content to enterprise-grade communications, explore the video formats we produce at scale."}
+          </p>
+        </div>
+
+        <div className={`sc-values-compact-grid ${isInView ? "is-in-view" : ""}`}>
+          {items.map((item, idx) => (
+            <div
+              key={idx}
+              className="sc-values-compact-card"
+              style={{
+                transitionDelay: isInView ? `${idx * 75}ms` : "0ms",
+              }}
+            >
+              <div className="sc-values-card-top">
+                <span className="sc-values-compact-number">
+                  {String(idx + 1).padStart(2, "0")}
+                </span>
+                <span className="sc-values-card-indicator" aria-hidden="true">
+                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+                    <path
+                      d="M4 12L12 4M12 4H6M12 4V10"
+                      stroke="currentColor"
+                      strokeWidth="1.75"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </span>
+              </div>
+              <h3 className="sc-values-compact-title">{item}</h3>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function AIVideoServicePage({
   data,
 }: Props) {
@@ -157,27 +236,53 @@ export default function AIVideoServicePage({
           }
 
           // -------------------------------------------------------------------
-          // BLOCK TYPE 1: LIST / FORMATS (Values 01-09 Style Grid)
+          // DEDICATED WHY CHOOSE SECTION (No repetition of sc-values grid)
           // -------------------------------------------------------------------
-          if (bIdx % 3 === 0) {
+          if (block.type === "whyChoose") {
             return (
-              <section key={bIdx} className="sc-values-compact-section">
+              <section key={bIdx} className="sc-why-choose-video-section">
                 <div className="w-layout-blockcontainer container w-container">
-                  <div className="sc-values-compact-header">
+                  <div className="sc-section-header" style={{ textAlign: "center", maxWidth: "680px", margin: "0 auto 36px" }}>
+                    <div className="sc-values-badge" style={{ marginBottom: "12px" }}>
+                      <span className="sc-values-badge-dot" style={{ backgroundColor: "#10b981" }} />
+                      <span>WHY QUICKUPP</span>
+                    </div>
                     <h2 className="sc-section-title">{blockTitle}</h2>
-                    {blockDesc && <p className="sc-section-desc">{blockDesc}</p>}
+                    <p className="sc-section-desc">
+                      Built for high performance, creative excellence, and measurable business growth.
+                    </p>
                   </div>
 
-                  <div className="sc-values-compact-grid">
-                    {items.map((item, idx) => (
-                      <div key={idx} className="sc-values-compact-card">
-                        <div className="sc-values-compact-number">{String(idx + 1).padStart(2, "0")}</div>
-                        <div className="sc-values-compact-title">{item}</div>
+                  <div className="sc-why-choose-cards-grid">
+                    {items.map((bullet, idx) => (
+                      <div key={idx} className="sc-why-choose-card">
+                        <div className="sc-why-choose-icon-box">
+                          <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                            <path d="M16.6666 5L7.49992 14.1667L3.33325 10" stroke="#10b981" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </div>
+                        <div className="sc-why-choose-card-text">
+                          <h3 className="sc-why-choose-card-title">{bullet}</h3>
+                        </div>
                       </div>
                     ))}
                   </div>
                 </div>
               </section>
+            );
+          }
+
+          // -------------------------------------------------------------------
+          // BLOCK TYPE 1: DELIVERABLES & FORMATS (Points Coming One by One)
+          // -------------------------------------------------------------------
+          if (bIdx === 0 || (block.type === "list" && !blockTitle?.toLowerCase().includes("sample"))) {
+            return (
+              <StaggeredDeliverablesSection
+                key={bIdx}
+                title={blockTitle}
+                desc={blockDesc}
+                items={items}
+              />
             );
           }
 

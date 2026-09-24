@@ -1,0 +1,997 @@
+/* =========================================================================
+   COPORA DESIGN SYSTEM & ABOUT PAGE STYLING
+   Reference: https://copora-wbs.webflow.io/about
+   ========================================================================= */
+
+.copora-page {
+  --color--black: #121512;
+  --color--white: #ffffff;
+  --color--gray-1: #2f2f2f;
+  --color--gray-2: #5a5a5a;
+  --color--gray-3: #969696;
+  --color--gray-4: #e5e5e5;
+  --color--gray-5: #f5f5f5;
+  --color--white-20: rgba(255, 255, 255, 0.2);
+  --color--white-50: rgba(255, 255, 255, 0.5);
+  --border-radius--sm: 0.25rem;
+  --border-radius--md: 0.5rem;
+  --border-radius--lg: 3.125rem;
+  --border-radius--button: 0.5rem;
+  --font-family--body: var(--font-inter, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  
+  font-family: var(--font-family--body);
+  color: var(--color--black);
+  background-color: var(--color--white);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Containers */
+.copora-page .container {
+  max-width: 1260px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  width: 100%;
+}
+
+.copora-page .container-medium {
+  max-width: 1260px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  width: 100%;
+}
+
+.copora-page .section-spacing {
+  padding-top: 6.875rem;
+  padding-bottom: 6.875rem;
+}
+
+@media (max-width: 991px) {
+  .copora-page .section-spacing {
+    padding-top: 4.5rem;
+    padding-bottom: 4.5rem;
+  }
+}
+
+@media (max-width: 479px) {
+  .copora-page .section-spacing {
+    padding-top: 3.5rem;
+    padding-bottom: 3.5rem;
+  }
+}
+
+/* Section titles */
+.copora-page .section-title {
+  margin-bottom: 3.75rem;
+}
+
+.copora-page .section-title.about-title-center {
+  text-align: center;
+  max-width: 820px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 3.5rem;
+}
+
+.copora-page .section-title.section-center-title {
+  text-align: center;
+  max-width: 760px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 3.5rem;
+}
+
+.copora-page .section-title h1 {
+  font-size: clamp(2.25rem, 4vw, 3.5rem);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: var(--color--black);
+  margin-bottom: 1.25rem;
+}
+
+.copora-page .section-title h2 {
+  font-size: clamp(1.85rem, 3.2vw, 3rem);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  color: var(--color--black);
+  margin-bottom: 1rem;
+}
+
+.copora-page .pre-section-title {
+  color: var(--color--gray-2);
+  margin-bottom: 0.625rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.copora-page .pre-section-title.white {
+  color: var(--color--white-50);
+}
+
+.copora-page .about-hero-description {
+  color: var(--color--gray-2);
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 1.125rem;
+  line-height: 1.6;
+}
+
+/* =========================================================================
+   1. HERO SECTION
+   ========================================================================= */
+.copora-page .hero-section {
+  padding-top: 4.5rem;
+  padding-bottom: 6.875rem;
+  background: #ffffff;
+}
+
+.copora-page .about-image-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.copora-page .about-inner-image {
+  border-radius: var(--border-radius--md);
+  overflow: hidden;
+  position: relative;
+  max-height: 520px;
+  width: 100%;
+}
+
+.copora-page .hero-inner-image {
+  border-radius: var(--border-radius--md);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.copora-page .grid-about-hero-image {
+  display: grid;
+  grid-template-columns: 0.7fr 1fr 0.7fr;
+  gap: 12px;
+}
+
+@media (max-width: 991px) {
+  .copora-page .grid-about-hero-image {
+    grid-template-columns: 1fr;
+  }
+}
+
+.copora-page .about-hero-image-item {
+  border-radius: var(--border-radius--md);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.75rem;
+  position: relative;
+  min-height: 220px;
+  overflow: hidden;
+}
+
+.copora-page .about-hero-image-item.one {
+  background-position: 50%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: relative;
+}
+
+.copora-page .about-hero-image-item.two {
+  background-color: var(--color--black);
+}
+
+.copora-page .about-hero-image-item.third {
+  background-color: var(--color--gray-5);
+  justify-content: flex-start;
+}
+
+.copora-page .about-hero-overlay {
+  z-index: 1;
+  border-radius: var(--border-radius--md);
+  background-color: rgba(18, 21, 18, 0.65);
+  position: absolute;
+  inset: 0%;
+}
+
+.copora-page .about-inner-text-wrap {
+  z-index: 2;
+  border-radius: var(--border-radius--sm);
+  background-color: var(--color--white-20);
+  margin-bottom: 0.625rem;
+  padding: 0.3rem 0.75rem;
+  position: relative;
+  backdrop-filter: blur(4px);
+}
+
+.copora-page .about-inner-text {
+  color: var(--color--white);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.copora-page .about-inner-title-wrap {
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.copora-page .about-inner-title {
+  color: var(--color--white);
+  font-size: 2.5rem;
+  font-weight: 600;
+  line-height: 1;
+  margin: 0;
+}
+
+.copora-page .about-detail-title {
+  color: var(--color--white);
+  font-size: 1.625rem;
+  font-weight: 500;
+  line-height: 1.25;
+  margin: 0 0 1.25rem;
+}
+
+.copora-page .about-text-span {
+  color: var(--color--gray-3);
+}
+
+.copora-page .about-inner-pre-title {
+  border-radius: var(--border-radius--md);
+  background-color: var(--color--white);
+  margin-bottom: 0.625rem;
+  padding: 0.3rem 0.75rem;
+  border: 1px solid var(--color--gray-4);
+}
+
+.copora-page .about-pre-title {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color--gray-1);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.copora-page .about-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.copora-page .about-info h3 {
+  font-size: 2.75rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--color--black);
+  margin: 0.5rem 0 0.25rem;
+}
+
+.copora-page .about-info p {
+  color: var(--color--gray-2);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* =========================================================================
+   2. OUR STORY SECTION
+   ========================================================================= */
+.copora-page .our-story-section {
+  background-color: var(--color--gray-5);
+}
+
+.copora-page .our-story-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 80px;
+  row-gap: 40px;
+  align-items: start;
+}
+
+@media (max-width: 991px) {
+  .copora-page .our-story-grid {
+    grid-template-columns: 1fr;
+    column-gap: 30px;
+    row-gap: 40px;
+  }
+}
+
+.copora-page .our-story-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.copora-page .story-description-one {
+  color: var(--color--gray-1);
+  font-size: 1.25rem;
+  line-height: 1.6;
+  margin: 0;
+  font-weight: 400;
+}
+
+.copora-page .story-description-two {
+  color: var(--color--gray-2);
+  font-size: 1rem;
+  line-height: 1.65;
+  margin: 0;
+}
+
+.copora-page .our-story-image-item {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.copora-page .grid-our-story-image {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 600px) {
+  .copora-page .grid-our-story-image {
+    grid-template-columns: 1fr;
+  }
+}
+
+.copora-page .our-story-image-wrap {
+  border-radius: var(--border-radius--md);
+  overflow: hidden;
+  height: 240px;
+}
+
+.copora-page .our-story-image {
+  border-radius: var(--border-radius--md);
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.copora-page .lightbox-link {
+  border-radius: var(--border-radius--md);
+  overflow: hidden;
+  position: relative;
+  height: 240px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.copora-page .lightbox-video-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.copora-page .lightbox-link:hover .lightbox-video-thumb {
+  transform: scale(1.05);
+}
+
+.copora-page .our-story-text {
+  z-index: 5;
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 500;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  padding: 8px 18px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.25s ease;
+}
+
+.copora-page .lightbox-link:hover .our-story-text {
+  background: rgba(0, 0, 0, 0.85);
+  transform: scale(1.05);
+}
+
+.copora-page .our-story-info-wrap {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.copora-page .signature {
+  height: 48px;
+  width: auto;
+  opacity: 0.85;
+}
+
+.copora-page .our-story-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.copora-page .our-story-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color--black);
+  margin: 0;
+}
+
+.copora-page .our-story-position {
+  font-size: 0.85rem;
+  color: var(--color--gray-2);
+}
+
+/* =========================================================================
+   3. MILESTONE SECTION (TIMELINE)
+   ========================================================================= */
+.copora-page .milestone-section {
+  background-color: var(--color--black);
+  color: #ffffff;
+}
+
+.copora-page .milestone-title-wrap {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 4rem;
+}
+
+.copora-page .milestone-title-wrap h2 {
+  color: #ffffff;
+  margin-bottom: 0.75rem;
+}
+
+.copora-page .milestone-description {
+  color: var(--color--gray-3);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.copora-page .milestone-detail-list {
+  position: relative;
+  width: 100%;
+}
+
+.copora-page .grid-milestone {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  place-items: center;
+}
+
+@media (max-width: 991px) {
+  .copora-page .grid-milestone {
+    grid-template-columns: repeat(3, 1fr);
+    row-gap: 36px;
+  }
+}
+
+@media (max-width: 600px) {
+  .copora-page .grid-milestone {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 28px;
+  }
+}
+
+.copora-page .milestone-item-one,
+.copora-page .milestone-item-two {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: 220px;
+}
+
+.copora-page .milestone-item-one {
+  justify-content: flex-start;
+}
+
+.copora-page .milestone-item-two {
+  justify-content: flex-end;
+}
+
+.copora-page .milestone-top-item-one {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  margin-bottom: auto;
+}
+
+.copora-page .milestone-top-item-two {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.copora-page .milestone-image {
+  height: 90px;
+  width: 10px;
+}
+
+.copora-page .milestone-image.rotate {
+  transform: rotate(180deg);
+}
+
+.copora-page .milestone-text {
+  font-size: 0.875rem;
+  color: #ffffff;
+  font-weight: 500;
+  max-width: 140px;
+  line-height: 1.4;
+}
+
+.copora-page .milestone-year-one,
+.copora-page .milestone-year-two {
+  border-radius: var(--border-radius--sm);
+  background-color: var(--color--gray-1);
+  padding: 0.35rem 1.1rem;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.copora-page .milestone-year-one {
+  margin-top: 14px;
+}
+
+.copora-page .milestone-year-two {
+  margin-bottom: 14px;
+}
+
+.copora-page .milestone-year-one .milestone-text,
+.copora-page .milestone-year-two .milestone-text {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #ffffff;
+}
+
+/* =========================================================================
+   4. OUR MISSION & VISION SECTION
+   ========================================================================= */
+.copora-page .our-mission-section {
+  background-color: #ffffff;
+}
+
+.copora-page .grid-our-mission {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 860px) {
+  .copora-page .grid-our-mission {
+    grid-template-columns: 1fr;
+  }
+}
+
+.copora-page .our-mission-item {
+  border: 1px solid var(--color--gray-4);
+  border-radius: var(--border-radius--md);
+  padding: 3rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  background-color: #ffffff;
+  justify-content: space-between;
+}
+
+.copora-page .our-mission-title {
+  font-size: clamp(1.75rem, 2.5vw, 2.25rem);
+  font-weight: 500;
+  color: var(--color--black);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.copora-page .our-vision-item {
+  border-radius: var(--border-radius--md);
+  background-color: #121512;
+  background-position: 50%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  padding: 3rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  color: #ffffff;
+  overflow: hidden;
+}
+
+.copora-page .our-vision-item::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(18, 21, 18, 0.92) 0%, rgba(18, 21, 18, 0.8) 100%);
+  z-index: 1;
+}
+
+.copora-page .our-vision-inner-item {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: 100%;
+}
+
+.copora-page .our-vision-inner-item .our-mission-title {
+  color: #ffffff;
+}
+
+.copora-page .our-vision-inner-item p {
+  color: var(--color--gray-4);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.copora-page .our-vision-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.copora-page .our-vision-list-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.copora-page .our-vision-list-item::before {
+  content: "?";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+/* =========================================================================
+   5. OUR TEAM / CAPABILITIES GRID
+   ========================================================================= */
+.copora-page .our-team-section {
+  padding-top: 6.875rem;
+  padding-bottom: 6.875rem;
+  background-color: #ffffff;
+}
+
+.copora-page .grid-team {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+@media (max-width: 991px) {
+  .copora-page .grid-team {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .copora-page .grid-team {
+    grid-template-columns: 1fr;
+  }
+}
+
+.copora-page .team-item {
+  border-radius: var(--border-radius--md);
+  border: 1px solid var(--color--gray-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  background: var(--color--gray-5);
+  transition: all 0.35s ease;
+  min-height: 380px;
+}
+
+.copora-page .team-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.08);
+}
+
+.copora-page .team-avatar-image {
+  border-radius: var(--border-radius--md);
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  min-height: 380px;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.copora-page .team-item:hover .team-avatar-image {
+  transform: scale(1.06);
+}
+
+.copora-page .team-info {
+  border-radius: var(--border-radius--sm);
+  background-color: var(--color--white);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0.875rem 1.125rem;
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  overflow: hidden;
+  text-align: center;
+}
+
+.copora-page .team-member-name {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--color--black);
+  margin: 0;
+}
+
+.copora-page .team-info .gray-text {
+  color: var(--color--gray-2);
+  font-size: 0.825rem;
+  margin-top: 2px;
+}
+
+.copora-page .team-social-media-item-wrap {
+  height: 0px;
+  overflow: hidden;
+  transition: height 0.35s ease, margin-top 0.35s ease;
+  margin-top: 0px;
+  width: 100%;
+}
+
+.copora-page .team-item:hover .team-social-media-item-wrap {
+  height: 32px;
+  margin-top: 8px;
+}
+
+.copora-page .team-social-media-item {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  transform: translateY(120%);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.copora-page .team-item:hover .team-social-media-item {
+  transform: translateY(0%);
+}
+
+.copora-page .team-badge-tag {
+  font-size: 0.75rem;
+  background: var(--color--black);
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.copora-page .team-badge-tag:hover {
+  opacity: 0.85;
+}
+
+/* =========================================================================
+   6. CTA SECTION
+   ========================================================================= */
+.copora-page .cta-section {
+  padding-bottom: 6.875rem;
+  background-color: #ffffff;
+}
+
+.copora-page .cta-item {
+  border-radius: var(--border-radius--md);
+  background-color: var(--color--gray-5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 4.5rem 3rem;
+  text-align: center;
+  gap: 2.25rem;
+}
+
+.copora-page .about-cta-title {
+  font-size: clamp(1.85rem, 3.2vw, 2.75rem);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  color: var(--color--black);
+  margin: 0 0 1rem;
+  max-width: 680px;
+}
+
+.copora-page .cta-description {
+  color: var(--color--gray-2);
+  font-size: 1.05rem;
+  max-width: 580px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* =========================================================================
+   7. COPORA SIGNATURE DUAL-TEXT BUTTON
+   ========================================================================= */
+.copora-page .button-link-hover {
+  border-radius: var(--border-radius--button);
+  background-color: var(--color--black);
+  color: var(--color--white);
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.1rem 2.25rem;
+  line-height: 1.3em;
+  text-decoration: none;
+  transition: all 0.35s ease;
+  position: relative;
+  overflow: hidden;
+  font-weight: 500;
+  font-size: 0.95rem;
+  border: 1px solid transparent;
+}
+
+.copora-page .button-link-hover:hover {
+  background-color: var(--color--gray-1);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.copora-page .button-link-hover.white {
+  background-color: var(--color--white);
+  color: var(--color--black);
+}
+
+.copora-page .button-link-hover.white:hover {
+  background-color: var(--color--gray-5);
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.15);
+}
+
+.copora-page .button-content {
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  height: 1.3em;
+}
+
+.copora-page .button-text-wrap.regular-text {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(0%);
+}
+
+.copora-page .button-text-wrap.hover-text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(140%);
+}
+
+.copora-page .button-link-hover:hover .button-text-wrap.regular-text {
+  transform: translateY(-140%);
+}
+
+.copora-page .button-link-hover:hover .button-text-wrap.hover-text {
+  transform: translateY(0%);
+}
+
+.copora-page .button-text {
+  font-family: inherit;
+  font-size: 0.95rem;
+  text-align: center;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* =========================================================================
+   8. FAQ SECTION (MINIMALIST COPORA STYLE)
+   ========================================================================= */
+.copora-page .copora-faq-section {
+  padding-bottom: 6.875rem;
+  background-color: #ffffff;
+}
+
+.copora-page .copora-faq-wrap {
+  max-width: 840px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.copora-page .copora-faq-item {
+  border: 1px solid var(--color--gray-4);
+  border-radius: var(--border-radius--md);
+  padding: 1.5rem 1.75rem;
+  background: #ffffff;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.copora-page .copora-faq-item:hover {
+  border-color: var(--color--black);
+}
+
+.copora-page .copora-faq-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.copora-page .copora-faq-question {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--color--black);
+  margin: 0;
+}
+
+.copora-page .copora-faq-icon {
+  font-size: 1.25rem;
+  transition: transform 0.3s ease;
+  color: var(--color--gray-2);
+}
+
+.copora-page .copora-faq-icon.open {
+  transform: rotate(45deg);
+}
+
+.copora-page .copora-faq-answer {
+  color: var(--color--gray-2);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--color--gray-4);
+}
+
+/* Scroll reveal helper */
+.copora-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.copora-reveal.is-in-view {
+  opacity: 1;
+  transform: translateY(0);
+}

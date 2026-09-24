@@ -40,7 +40,7 @@ export interface ServiceCategoryMeta {
     label: string;
     desc: string;
     icon: string;
-    template: "merkil" | "ritovex" | "itlifecycle" | "aivideo";
+    template: "merkil" | "ritovex" | "itlifecycle" | "aivideo" | "copora";
     data: ServicePageData;
   }[];
 }
@@ -195,7 +195,7 @@ export const serviceCategories: ServiceCategoryMeta[] = [
         label: "Web Design & Development",
         desc: "Custom, lightning-fast high-converting platforms.",
         icon: "🌐",
-        template: "itlifecycle",
+        template: "copora",
         data: webDesignDevelopment,
       },
       {
@@ -203,7 +203,7 @@ export const serviceCategories: ServiceCategoryMeta[] = [
         label: "Application Development",
         desc: "Scalable iOS, Android & cross-platform apps.",
         icon: "📱",
-        template: "itlifecycle",
+        template: "copora",
         data: applicationDevelopment,
       },
       {
@@ -211,7 +211,7 @@ export const serviceCategories: ServiceCategoryMeta[] = [
         label: "Product Engineering",
         desc: "Enterprise architecture & custom SaaS platforms.",
         icon: "⚙️",
-        template: "itlifecycle",
+        template: "copora",
         data: productEngineering,
       },
       {
@@ -219,7 +219,7 @@ export const serviceCategories: ServiceCategoryMeta[] = [
         label: "Quality Assurance & Testing",
         desc: "Rigorous automated testing & vulnerability audits.",
         icon: "🧪",
-        template: "itlifecycle",
+        template: "copora",
         data: qualityAssuranceTesting,
       },
       {
@@ -227,7 +227,7 @@ export const serviceCategories: ServiceCategoryMeta[] = [
         label: "UI/UX Design",
         desc: "Intuitive, high-retention digital interfaces.",
         icon: "🎨",
-        template: "itlifecycle",
+        template: "copora",
         data: uiUxDesign,
       },
     ],
