@@ -164,8 +164,8 @@ export default function AIVideoServicePage({
               <section key={bIdx} className="sc-values-compact-section">
                 <div className="w-layout-blockcontainer container w-container">
                   <div className="sc-values-compact-header">
-                    <h2 className="sc-values-compact-title">{blockTitle}</h2>
-                    {blockDesc && <p className="sc-values-compact-desc">{blockDesc}</p>}
+                    <h2 className="sc-section-title">{blockTitle}</h2>
+                    {blockDesc && <p className="sc-section-desc">{blockDesc}</p>}
                   </div>
 
                   <div className="sc-values-compact-grid">
