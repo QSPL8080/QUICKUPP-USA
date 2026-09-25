@@ -6,6 +6,7 @@ import WebflowReinit from "@/components/WebflowReinit";
 import LeadModal from "@/components/LeadModal";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://quickupp.com"),
   title: "Quickupp Softech | Marketing. AI. Technology. Built for Growth.",
   description:
     "Quickupp Softech is a full-service digital marketing, AI and technology agency helping businesses grow through social media, SEO, paid marketing, AI automation, web & app development and more.",
