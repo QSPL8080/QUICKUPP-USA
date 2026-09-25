@@ -23,6 +23,11 @@
 # misc
 .DS_Store
 *.pem
+*.tmp
+*.bak
+*next.config.*.ts
+*next.config.*.js
+*next.config.*.mjs
 
 # debug
 npm-debug.log*
