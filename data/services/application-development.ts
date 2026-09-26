@@ -3,7 +3,7 @@ import type { ServicePageData } from "@/lib/servicePageTypes";
 export const data: ServicePageData = {
   metaTitle: "Application Development | Quickupp Softech",
   metaDescription:
-    "Build powerful mobile applications that drive business growth. End-to-end iOS, Android, and cross-platform mobile application development services by Quickupp Softech.",
+    "Build powerful mobile applications that drive business growth. Professional Android, iOS, and Mobile App Development Services by Quickupp Softech.",
   crumb: "Application Development",
   heroEyebrow: "Application Development",
   heroTitle: "Build Powerful Mobile Applications That Drive Business Growth",
@@ -14,6 +14,10 @@ export const data: ServicePageData = {
     "Build Your App. Launch Your Idea. Grow Your Business.",
   ],
   heroCta: { label: "Get a Free App Development Consultation", href: "/contact" },
+  heroCtas: [
+    { label: "Get a Free App Development Consultation", href: "/contact" },
+    { label: "Start Your App Project", href: "/contact" },
+  ],
   blocks: [
     {
       type: "ai",
@@ -151,7 +155,7 @@ export const data: ServicePageData = {
       type: "ai",
       title: "Mobile Applications Built for Different Business Needs",
       intro:
-        "As an Application Development Company we build mobile solutions for a wide range of business requirements, including:",
+        "As a Application Development Company we can build mobile solutions for a wide range of business requirements, including:",
       bullets: [
         "Customer-facing mobile applications",
         "E-commerce applications",
@@ -169,6 +173,8 @@ export const data: ServicePageData = {
     },
     {
       type: "industries",
+      title: "Industries We Serve",
+      intro: "We provide Mobile App Development Services for businesses across:",
       industries: [
         "Healthcare",
         "Home Services",
@@ -202,6 +208,7 @@ export const data: ServicePageData = {
     },
     {
       type: "faq",
+      title: "Frequently Asked Questions",
       items: [
         {
           q: "How much does mobile app development cost?",
@@ -239,8 +246,8 @@ export const data: ServicePageData = {
     "Have an app idea? Need to modernize an existing application? Looking for a reliable team for ongoing mobile app support?\n\nQuickupp Softech can help you plan, develop, launch, and maintain your mobile application.\nLet's turn your application idea into a powerful digital product.",
   closingCtas: [
     { label: "Request an App Development Quote", href: "/contact" },
-    { label: "Start Your App Project", href: "/contact" },
   ],
 };
 
 export default data;
+

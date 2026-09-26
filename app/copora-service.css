@@ -4,50 +4,56 @@
    ========================================================================= */
 
 .copora-page {
-  --color--black: #121512;
+  --color--black: #0b0f17;
   --color--white: #ffffff;
   --color--gray-1: #2f2f2f;
-  --color--gray-2: #5a5a5a;
-  --color--gray-3: #969696;
-  --color--gray-4: #e5e5e5;
-  --color--gray-5: #f5f5f5;
+  --color--gray-2: #50545a;
+  --color--gray-3: #9ca3af;
+  --color--gray-4: #e5e7eb;
+  --color--gray-5: #f8fafc;
   --color--white-20: rgba(255, 255, 255, 0.2);
   --color--white-50: rgba(255, 255, 255, 0.5);
   --border-radius--sm: 0.25rem;
   --border-radius--md: 0.5rem;
   --border-radius--lg: 3.125rem;
   --border-radius--button: 0.5rem;
-  --font-family--body: var(--font-inter, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  --font-family--heading: var(--_font-family---heading-font, "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  --font-family--body: var(--_font-family---body-font, "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
   
   font-family: var(--font-family--body);
-  color: var(--color--black);
+  color: #0b0f17;
   background-color: var(--color--white);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Containers */
-.copora-page .container {
-  max-width: 1260px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-  width: 100%;
+/* Headings base typography (scoped strictly to section content, excluding footer) */
+.copora-page .section-title h1,
+.copora-page .section-title h2,
+.copora-page .copora-service-title,
+.copora-page .copora-desc-pair-title,
+.copora-page .about-cta-title,
+.copora-page .copora-faq-question {
+  font-family: var(--font-family--heading) !important;
+  color: #0b0f17;
 }
 
-.copora-page .container-medium {
-  max-width: 1260px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-  width: 100%;
+/* Containers */
+.copora-page .container,
+.copora-page .container-medium,
+.copora-page .w-container {
+  max-width: 1260px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: 1.5rem !important;
+  padding-right: 1.5rem !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .copora-page .section-spacing {
-  padding-top: 6.875rem;
-  padding-bottom: 6.875rem;
+  padding-top: 5rem;
+  padding-bottom: 5rem;
 }
 
 @media (max-width: 991px) {
@@ -66,15 +72,15 @@
 
 /* Section titles */
 .copora-page .section-title {
-  margin-bottom: 3.75rem;
+  margin-bottom: 3rem;
 }
 
 .copora-page .section-title.about-title-center {
   text-align: center;
-  max-width: 820px;
+  max-width: 860px;
   margin-left: auto;
   margin-right: auto;
-  margin-bottom: 3.5rem;
+  margin-bottom: 2rem;
 }
 
 .copora-page .section-title.section-center-title {
@@ -82,78 +88,158 @@
   max-width: 760px;
   margin-left: auto;
   margin-right: auto;
-  margin-bottom: 3.5rem;
+  margin-bottom: 2.5rem;
 }
 
+/* Hero Heading (H1) matching Merkil Social Media Marketing reference */
+.copora-page .hero-section h1,
+.copora-page .section-title.about-title-center h1,
 .copora-page .section-title h1 {
-  font-size: clamp(2.25rem, 4vw, 3.5rem);
-  font-weight: 500;
-  line-height: 1.15;
-  letter-spacing: -0.03em;
-  color: var(--color--black);
-  margin-bottom: 1.25rem;
+  font-family: var(--font-family--heading) !important;
+  font-size: clamp(30px, 3.6vw, 48px) !important;
+  line-height: 1.18 !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.03em !important;
+  color: #0b0f17 !important;
+  margin-top: 16px;
+  margin-bottom: 14px;
 }
 
-.copora-page .section-title h2 {
-  font-size: clamp(1.85rem, 3.2vw, 3rem);
-  font-weight: 500;
-  line-height: 1.2;
-  letter-spacing: -0.025em;
-  color: var(--color--black);
+/* All Section Headings (H2) matching Merkil Social Media Marketing reference */
+.copora-page .section-title h2,
+.copora-page .section-title.section-center-title h2,
+.copora-page .our-mission-title,
+.copora-page .copora-services-section h2,
+.copora-page .copora-why-section h2,
+.copora-page .copora-feature-matrix-section h2,
+.copora-page .copora-investment-section h2,
+.copora-page .copora-industries-section h2,
+.copora-page .copora-faq-section h2 {
+  font-family: var(--font-family--heading) !important;
+  font-size: clamp(22px, 2.4vw, 32px) !important;
+  line-height: 1.25 !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  color: #0b0f17 !important;
+  margin-bottom: 1rem;
+}
+
+.copora-page .copora-process-section h2,
+.copora-page .copora-process-section .section-title h2,
+.copora-page .copora-process-section .section-title.section-center-title h2,
+.copora-page .copora-process-section h2 span:not(.qs-gradient-text),
+.copora-page .copora-process-section .section-title h2 span:not(.qs-gradient-text) {
+  font-family: var(--font-family--heading) !important;
+  font-size: clamp(22px, 2.4vw, 32px) !important;
+  line-height: 1.25 !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  color: #ffffff !important;
   margin-bottom: 1rem;
 }
 
 .copora-page .pre-section-title {
-  color: var(--color--gray-2);
-  margin-bottom: 0.625rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.copora-page .pre-section-title.white {
-  color: var(--color--white-50);
+  margin-bottom: 0.85rem !important;
 }
 
 .copora-page .about-hero-description {
   color: var(--color--gray-2);
-  max-width: 640px;
+  max-width: 740px;
   margin-left: auto;
   margin-right: auto;
-  font-size: 1.125rem;
+  font-size: clamp(14px, 1.05vw, 15.5px);
   line-height: 1.6;
+  font-family: var(--font-family--body);
+}
+
+.copora-page .hero-paragraphs-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  max-width: 860px;
+  margin: 1.5rem auto 2.25rem;
+  text-align: center;
+}
+
+.copora-page .hero-lead-paragraph {
+  font-size: clamp(15px, 1.1vw, 17px) !important;
+  font-weight: 500;
+  color: #0b0f17 !important;
+  line-height: 1.6 !important;
+  margin: 0 auto;
+  max-width: 820px;
+  text-wrap: balance;
+  font-family: var(--font-family--body) !important;
+}
+
+.copora-page .hero-supporting-paragraphs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.copora-page .hero-sub-paragraph {
+  font-size: clamp(14px, 1.05vw, 15.5px) !important;
+  font-weight: 400;
+  color: #50545a !important;
+  line-height: 1.65 !important;
+  margin: 0 auto;
+  max-width: 840px;
+  text-wrap: balance;
+  font-family: var(--font-family--body) !important;
 }
 
 /* =========================================================================
    1. HERO SECTION
    ========================================================================= */
 .copora-page .hero-section {
-  padding-top: 4.5rem;
-  padding-bottom: 6.875rem;
+  padding-top: 130px;
+  padding-bottom: 4rem;
   background: #ffffff;
 }
 
+@media (max-width: 991px) {
+  .copora-page .hero-section {
+    padding-top: 110px;
+    padding-bottom: 3.5rem;
+  }
+}
+
+@media (max-width: 479px) {
+  .copora-page .hero-section {
+    padding-top: 90px;
+    padding-bottom: 2.5rem;
+  }
+}
+
 .copora-page .about-image-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-top: 2rem;
 }
 
 .copora-page .about-inner-image {
-  border-radius: var(--border-radius--md);
-  overflow: hidden;
-  position: relative;
-  max-height: 520px;
-  width: 100%;
+  border-radius: var(--border-radius--md) !important;
+  overflow: hidden !important;
+  position: relative !important;
+  width: 100% !important;
+  height: 520px !important;
+  max-height: 540px !important;
+  border: 1px solid var(--color--gray-4);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.06);
 }
 
 .copora-page .hero-inner-image {
-  border-radius: var(--border-radius--md);
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+  border-radius: var(--border-radius--md) !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  display: block !important;
 }
 
 .copora-page .grid-about-hero-image {
@@ -811,60 +897,89 @@
    6. CTA SECTION
    ========================================================================= */
 .copora-page .cta-section {
-  padding-bottom: 6.875rem;
+  padding-top: 3.5rem;
+  padding-bottom: 5rem;
   background-color: #ffffff;
+  display: flex !important;
+  justify-content: center !important;
+  width: 100% !important;
 }
 
 .copora-page .cta-item {
   border-radius: var(--border-radius--md);
   background-color: var(--color--gray-5);
+  border: 1px solid var(--color--gray-4);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 4.5rem 3rem;
+  padding: 3.5rem 2.5rem;
   text-align: center;
-  gap: 2.25rem;
+  gap: 1.75rem;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
 }
 
-.copora-page .about-cta-title {
-  font-size: clamp(1.85rem, 3.2vw, 2.75rem);
-  font-weight: 500;
-  line-height: 1.2;
-  letter-spacing: -0.025em;
-  color: var(--color--black);
+.copora-page .about-cta-title,
+.copora-page .cta-title-wrap h3 {
+  font-family: var(--font-family--heading) !important;
+  font-size: clamp(22px, 2.4vw, 32px) !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+  letter-spacing: -0.02em !important;
+  color: #0b0f17 !important;
   margin: 0 0 1rem;
   max-width: 680px;
 }
 
 .copora-page .cta-description {
-  color: var(--color--gray-2);
-  font-size: 1.05rem;
+  color: #50545a !important;
+  font-size: clamp(14px, 1.05vw, 15.5px) !important;
   max-width: 580px;
   margin: 0 auto;
   line-height: 1.6;
+  font-family: var(--font-family--body) !important;
 }
 
 /* =========================================================================
-   7. COPORA SIGNATURE DUAL-TEXT BUTTON
+   7. COPORA SIGNATURE DUAL-TEXT BUTTON & BUTTON WRAPPERS
    ========================================================================= */
+.copora-page .hero-buttons-wrap {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 16px !important;
+  flex-wrap: wrap !important;
+  margin-top: 1.75rem !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.copora-page .cta-item .hero-buttons-wrap {
+  justify-content: flex-start !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
 .copora-page .button-link-hover {
-  border-radius: var(--border-radius--button);
+  border-radius: 8px !important;
   background-color: var(--color--black);
   color: var(--color--white);
   cursor: pointer;
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  padding: 1.1rem 2.25rem;
+  padding: 12px 26px !important;
   line-height: 1.3em;
   text-decoration: none;
   transition: all 0.35s ease;
   position: relative;
   overflow: hidden;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.95rem;
-  border: 1px solid transparent;
+  border: 1.5px solid transparent;
 }
 
 .copora-page .button-link-hover:hover {
@@ -873,14 +988,48 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
+.copora-page .button-link-hover .button-text {
+  color: #ffffff !important;
+}
+
 .copora-page .button-link-hover.white {
-  background-color: var(--color--white);
+  background-color: transparent;
   color: var(--color--black);
+  border: 1.5px solid var(--color--black);
+}
+
+.copora-page .button-link-hover.white .button-text {
+  color: #121512 !important;
 }
 
 .copora-page .button-link-hover.white:hover {
-  background-color: var(--color--gray-5);
-  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.15);
+  background-color: var(--color--black);
+  border-color: var(--color--black);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.copora-page .button-link-hover.white:hover .button-text {
+  color: #ffffff !important;
+}
+
+.copora-page .button-link-hover.white-solid {
+  background-color: #ffffff;
+  color: #121512;
+  border: 1.5px solid #ffffff;
+}
+
+.copora-page .button-link-hover.white-solid .button-text {
+  color: #121512 !important;
+}
+
+.copora-page .button-link-hover.white-solid:hover {
+  background-color: transparent;
+  border-color: #ffffff;
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2);
+}
+
+.copora-page .button-link-hover.white-solid:hover .button-text {
+  color: #ffffff !important;
 }
 
 .copora-page .button-content {
@@ -918,7 +1067,7 @@
   font-family: inherit;
   font-size: 0.95rem;
   text-align: center;
-  font-weight: 500;
+  font-weight: 600;
   white-space: nowrap;
 }
 
@@ -926,7 +1075,8 @@
    8. FAQ SECTION (MINIMALIST COPORA STYLE)
    ========================================================================= */
 .copora-page .copora-faq-section {
-  padding-bottom: 6.875rem;
+  padding-top: 4.5rem;
+  padding-bottom: 5.5rem;
   background-color: #ffffff;
 }
 
@@ -959,10 +1109,12 @@
 }
 
 .copora-page .copora-faq-question {
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: var(--color--black);
+  font-family: var(--font-family--heading) !important;
+  font-size: clamp(15.5px, 1.2vw, 17.5px) !important;
+  font-weight: 700 !important;
+  color: #0b0f17 !important;
   margin: 0;
+  line-height: 1.35 !important;
 }
 
 .copora-page .copora-faq-icon {
@@ -995,3 +1147,652 @@
   opacity: 1;
   transform: translateY(0);
 }
+
+/* =========================================================================
+   9. CORE SERVICES GRID
+   ========================================================================= */
+.copora-page .copora-services-section {
+  padding-top: 4.5rem;
+  padding-bottom: 5rem;
+  background-color: var(--color--gray-5);
+}
+
+.copora-page .copora-services-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  align-items: stretch;
+}
+
+@media (max-width: 900px) {
+  .copora-page .copora-services-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.copora-page .copora-service-card {
+  background: var(--color--white);
+  border: 1px solid var(--color--gray-4);
+  border-radius: var(--border-radius--md);
+  padding: 2rem 2rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.copora-page .copora-service-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--color--black);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.07);
+}
+
+.copora-page .copora-card-body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.copora-page .copora-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 0.85rem;
+}
+
+.copora-page .copora-service-num {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--color--gray-3);
+  background: var(--color--gray-5);
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--color--gray-4);
+  flex-shrink: 0;
+}
+
+.copora-page .copora-service-title {
+  font-family: var(--font-family--heading) !important;
+  font-size: clamp(18px, 1.5vw, 22px) !important;
+  font-weight: 700 !important;
+  color: #0b0f17 !important;
+  margin: 0;
+  line-height: 1.3 !important;
+  letter-spacing: -0.02em !important;
+}
+
+.copora-page .copora-service-subtitle {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color--gray-1);
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.copora-page .copora-service-desc {
+  font-size: 0.925rem;
+  color: var(--color--gray-2);
+  line-height: 1.6;
+  margin-bottom: 1.25rem;
+}
+
+.copora-page .copora-service-intro-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color--gray-2);
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
+
+.copora-page .copora-bullets-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px 16px;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 540px) {
+  .copora-page .copora-bullets-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.copora-page .copora-bullet-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--color--gray-1);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.copora-page .copora-bullet-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color--black);
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+
+.copora-page .copora-service-note {
+  background: #f8fafc;
+  border-left: 3px solid var(--color--black);
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  color: var(--color--gray-2);
+  border-radius: 0 4px 4px 0;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.copora-page .copora-card-action {
+  margin-top: auto;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--color--gray-4);
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+}
+
+.copora-page .copora-card-action .button-link-hover {
+  display: inline-flex;
+  width: auto;
+  padding: 0.85rem 1.6rem !important;
+  font-size: 0.9rem !important;
+  border-radius: var(--border-radius--button) !important;
+}
+
+/* =========================================================================
+   10. WEB DEVELOPMENT PROCESS SECTION (OPTIMIZED COMPACT MARQUEE LOOP)
+   ========================================================================= */
+.copora-page .copora-process-section {
+  padding-top: 3.75rem;
+  padding-bottom: 3.75rem;
+  background-color: var(--color--black);
+  color: #ffffff;
+  overflow: hidden;
+}
+
+.copora-page .copora-process-section .section-title {
+  margin-bottom: 2rem;
+}
+
+.copora-page .copora-process-marquee-container {
+  overflow: hidden;
+  width: 100%;
+  position: relative;
+  padding: 0.5rem 0 1rem;
+  margin-bottom: 0;
+  mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+}
+
+.copora-page .copora-process-marquee-track {
+  display: flex;
+  gap: 20px;
+  width: max-content;
+  animation: copora-process-scroll-left 28s linear infinite;
+}
+
+.copora-page .copora-process-marquee-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes copora-process-scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.copora-page .copora-step-card {
+  background: #181c18;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--border-radius--md);
+  padding: 1.5rem 1.5rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 280px;
+  min-width: 280px;
+  max-width: 280px;
+  flex-shrink: 0;
+  transition: all 0.35s ease;
+  position: relative;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.copora-page .copora-step-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.35);
+  background: #202720;
+}
+
+.copora-page .copora-step-num {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: -0.02em;
+}
+
+.copora-page .copora-step-title {
+  font-family: var(--font-family--heading) !important;
+  font-size: 1.15rem;
+  font-weight: 700 !important;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.copora-page .copora-step-desc {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.copora-page .copora-process-cta {
+  text-align: center;
+}
+
+/* =========================================================================
+   11. WHY CHOOSE SECTION
+   ========================================================================= */
+.copora-page .copora-why-section {
+  padding-top: 4.5rem;
+  padding-bottom: 4.5rem;
+  background-color: #ffffff;
+}
+
+.copora-page .copora-tagline-badge {
+  display: inline-block;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: #6366f1 !important;
+  font-family: var(--font-family--heading) !important;
+  margin-bottom: 1.25rem !important;
+}
+
+.copora-page .copora-tagline-badge span:first-child {
+  display: none !important;
+}
+
+.copora-page .copora-why-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  gap: 32px;
+  align-items: stretch;
+}
+
+@media (max-width: 900px) {
+  .copora-page .copora-why-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.copora-page .copora-why-card-left {
+  border: 1px solid var(--color--gray-4);
+  border-radius: var(--border-radius--md);
+  padding: 2.5rem 2.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.5rem;
+  background: #ffffff;
+}
+
+.copora-page .copora-why-card-right {
+  background: #121512;
+  border-radius: var(--border-radius--md);
+  padding: 2.5rem 2.25rem;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.copora-page .copora-why-bullets {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 20px;
+}
+
+@media (max-width: 600px) {
+  .copora-page .copora-why-bullets {
+    grid-template-columns: 1fr;
+  }
+}
+
+.copora-page .copora-why-bullet-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.95rem;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.copora-page .copora-check-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+/* =========================================================================
+   12. INDUSTRIES WE SERVE
+   ========================================================================= */
+.copora-page .copora-industries-section {
+  padding-top: 4.5rem;
+  padding-bottom: 4.5rem;
+  background: var(--color--gray-5);
+  border-top: 1px solid var(--color--gray-4);
+  border-bottom: 1px solid var(--color--gray-4);
+}
+
+.copora-page .copora-industries-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.copora-page .copora-industry-pill {
+  background: #ffffff;
+  border: 1px solid var(--color--gray-4);
+  border-radius: var(--border-radius--md);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-decoration: none;
+  color: var(--color--black);
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.25s ease;
+}
+
+.copora-page .copora-industry-pill:hover {
+  border-color: var(--color--black);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.copora-page .copora-industry-arrow {
+  font-size: 14px;
+  color: var(--color--gray-3);
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.copora-page .copora-industry-pill:hover .copora-industry-arrow {
+  transform: translateX(3px);
+  color: var(--color--black);
+}
+
+/* =========================================================================
+   13. WHY CHOOSE DESC PAIRS GRID (6 CARDS)
+   ========================================================================= */
+.copora-page .copora-desc-pairs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 991px) {
+  .copora-page .copora-desc-pairs-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .copora-page .copora-desc-pairs-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.copora-page .copora-desc-pair-card {
+  background: #ffffff;
+  border: 1px solid var(--color--gray-4);
+  border-radius: var(--border-radius--md);
+  padding: 2.25rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.35s ease;
+  position: relative;
+}
+
+.copora-page .copora-desc-pair-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--color--black);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.06);
+}
+
+.copora-page .copora-desc-pair-num {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color--gray-3);
+  background: var(--color--gray-5);
+  border: 1px solid var(--color--gray-4);
+  padding: 4px 10px;
+  border-radius: 4px;
+  display: inline-block;
+  width: fit-content;
+}
+
+.copora-page .copora-desc-pair-title {
+  font-family: var(--font-family--heading) !important;
+  font-size: clamp(17px, 1.4vw, 20px) !important;
+  font-weight: 700 !important;
+  color: #0b0f17 !important;
+  margin: 0;
+  line-height: 1.35 !important;
+  letter-spacing: -0.02em !important;
+}
+
+.copora-page .copora-desc-pair-desc {
+  font-size: 0.925rem;
+  color: var(--color--gray-2);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* =========================================================================
+   14. BUSINESS NEEDS & FEATURE PILLS GRID
+   ========================================================================= */
+.copora-page .copora-feature-matrix-section {
+  padding-top: 4.5rem;
+  padding-bottom: 5rem;
+  background: #ffffff;
+}
+
+.copora-page .copora-feature-matrix-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 991px) {
+  .copora-page .copora-feature-matrix-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .copora-page .copora-feature-matrix-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.copora-page .copora-feature-matrix-card {
+  background: var(--color--gray-5);
+  border: 1px solid var(--color--gray-4);
+  border-radius: var(--border-radius--md);
+  padding: 1.5rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color--black);
+  transition: all 0.25s ease;
+}
+
+.copora-page .copora-feature-matrix-card:hover {
+  background: #ffffff;
+  border-color: var(--color--black);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.copora-page .copora-feature-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color--black);
+  flex-shrink: 0;
+}
+
+/* =========================================================================
+   15. INVESTMENT & BENEFIT HIGHLIGHT SECTION
+   ========================================================================= */
+.copora-page .copora-investment-section {
+  padding-top: 4.5rem;
+  padding-bottom: 5rem;
+  background: var(--color--gray-5);
+}
+
+.copora-page .copora-investment-box {
+  background: #ffffff;
+  border: 1px solid var(--color--gray-4);
+  border-radius: var(--border-radius--md);
+  padding: 3.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.copora-page .copora-investment-bullets {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px 24px;
+}
+
+@media (max-width: 768px) {
+  .copora-page .copora-investment-bullets {
+    grid-template-columns: 1fr;
+  }
+}
+
+.copora-page .copora-investment-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.95rem;
+  color: var(--color--black);
+  font-weight: 500;
+}
+
+.copora-page .copora-investment-check {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color--black);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.copora-page .copora-investment-footer {
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color--gray-4);
+  color: var(--color--gray-2);
+  font-size: 1.025rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+
+/* =========================================================================
+   FOOTER ISOLATION & VISIBILITY GUARANTEE
+   ========================================================================= */
+.copora-page .qs-scalient-footer,
+.qs-scalient-footer {
+  background-color: #080B11 !important;
+  color: #ffffff !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+.copora-page .qs-scalient-footer .qs-scalient-heading,
+.qs-scalient-footer .qs-scalient-heading {
+  color: #ffffff !important;
+  font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", sans-serif) !important;
+  font-size: clamp(28px, 3.2vw, 42px) !important;
+  font-weight: 700 !important;
+  line-height: 1.18 !important;
+  margin-bottom: 28px !important;
+}
+
+.copora-page .qs-scalient-footer .qs-scalient-col-title,
+.qs-scalient-footer .qs-scalient-col-title {
+  color: #ffffff !important;
+  font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", sans-serif) !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+
+.copora-page .qs-scalient-footer .qs-scalient-link,
+.qs-scalient-footer .qs-scalient-link {
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-family: var(--_font-family---body-font, "Plus Jakarta Sans", sans-serif) !important;
+}
+
+.copora-page .qs-scalient-footer .qs-scalient-link:hover,
+.qs-scalient-footer .qs-scalient-link:hover {
+  color: #ffffff !important;
+}
+
+.copora-page .qs-scalient-footer .qs-scalient-microcopy,
+.qs-scalient-footer .qs-scalient-microcopy {
+  color: #64748b !important;
+  font-size: 12.5px !important;
+}
+
+.copora-page .qs-scalient-footer .qs-scalient-input,
+.qs-scalient-footer .qs-scalient-input {
+  color: #ffffff !important;
+}
+
+.copora-page .qs-scalient-footer .qs-scalient-bottom-text,
+.qs-scalient-footer .qs-scalient-bottom-text {
+  color: #64748b !important;
+}
+
+

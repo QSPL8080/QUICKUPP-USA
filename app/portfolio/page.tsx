@@ -95,7 +95,7 @@ export default function PortfolioPage() {
                   margin: "0 0 18px 0",
                 }}
               >
-                Engineered for Performance. Built for Growth.
+                Engineered for Performance. <span className="qs-gradient-text">Built for Growth.</span>
               </h1>
               <p
                 style={{

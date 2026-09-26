@@ -33,6 +33,23 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 import MerkilCategoryHub from "@/components/MerkilCategoryHub";
 import AIVideoCategoryHub from "@/components/AIVideoCategoryHub";
 
+function renderGradientHeading(text?: string) {
+  if (!text) return null;
+  const words = text.split(" ");
+  if (words.length <= 2) {
+    return <span className="qs-gradient-text">{text}</span>;
+  }
+  const splitIndex = Math.ceil(words.length / 2);
+  const firstHalf = words.slice(0, splitIndex).join(" ");
+  const secondHalf = words.slice(splitIndex).join(" ");
+
+  return (
+    <>
+      {firstHalf} <span className="qs-gradient-text">{secondHalf}</span>
+    </>
+  );
+}
+
 export default async function ServiceCategoryPage({ params }: PageProps) {
   const { category: catSlug } = await params;
   const category = serviceCategories.find((c) => c.categorySlug === catSlug);
@@ -75,7 +92,7 @@ export default async function ServiceCategoryPage({ params }: PageProps) {
               </div>
 
               <h1 className="asx-hero-title" style={{ fontSize: "clamp(30px, 3.6vw, 48px)", fontWeight: 800, color: "#001d28", letterSpacing: "-0.025em", margin: "0 0 16px" }}>
-                {category.categoryLabel}
+                {renderGradientHeading(category.categoryLabel)}
               </h1>
 
               <p style={{ fontSize: "clamp(15px, 1.3vw, 17.5px)", color: "#2c436b", lineHeight: 1.6, margin: "0 auto" }}>

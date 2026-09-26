@@ -80,6 +80,24 @@ function LifecycleButton({
   );
 }
 
+// Helper to render headings with punchline in gradient text
+function renderGradientHeading(text?: string) {
+  if (!text) return null;
+  const words = text.split(" ");
+  if (words.length <= 2) {
+    return <span className="qs-gradient-text">{text}</span>;
+  }
+  const splitIndex = Math.ceil(words.length / 2);
+  const firstHalf = words.slice(0, splitIndex).join(" ");
+  const secondHalf = words.slice(splitIndex).join(" ");
+
+  return (
+    <>
+      {firstHalf} <span className="qs-gradient-text">{secondHalf}</span>
+    </>
+  );
+}
+
 export default function ITLifecycleServicePage({ data }: { data: ServicePageData }) {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -126,7 +144,7 @@ export default function ITLifecycleServicePage({ data }: { data: ServicePageData
               </div>
 
               {/* Large Editorial Headline */}
-              <h1 className="lc-hero-title">{data.heroTitle}</h1>
+              <h1 className="lc-hero-title">{renderGradientHeading(data.heroTitle)}</h1>
 
               {/* Lead Paragraphs */}
               <div className="lc-hero-lead-wrap">
@@ -212,7 +230,7 @@ export default function ITLifecycleServicePage({ data }: { data: ServicePageData
                 <span className="lc-badge-dot lc-dot-lime"></span>
                 <span>[Capabilities &amp; Solutions]</span>
               </div>
-              <h2 className="lc-section-title">Engineered For Performance &amp; Scalability</h2>
+              <h2 className="lc-section-title">Engineered For Performance &amp; <span className="qs-gradient-text">Scalability</span></h2>
               <p className="lc-section-sub">
                 Explore our full suite of technical capabilities, architectures, and development frameworks built around your business goals.
               </p>
@@ -285,7 +303,7 @@ export default function ITLifecycleServicePage({ data }: { data: ServicePageData
                   <span className="lc-badge-dot"></span>
                   <span>[{blk.subtitle ?? "Service Deliverables"}]</span>
                 </div>
-                <h2 className="lc-section-title">{blk.title}</h2>
+                <h2 className="lc-section-title">{renderGradientHeading(blk.title)}</h2>
                 {blk.desc && <p className="lc-section-sub">{blk.desc}</p>}
 
                 {blk.type === "list" && (
@@ -325,7 +343,7 @@ export default function ITLifecycleServicePage({ data }: { data: ServicePageData
                 <span className="lc-badge-dot lc-dot-lime"></span>
                 <span>[Our Methodology]</span>
               </div>
-              <h2 className="lc-section-title lc-text-white">{processBlock.title}</h2>
+              <h2 className="lc-section-title lc-text-white">{renderGradientHeading(processBlock.title)}</h2>
               <p className="lc-section-sub lc-text-dim">
                 A rigorous, transparent, and iterative approach from technical architecture to production deployment.
               </p>
@@ -357,7 +375,7 @@ export default function ITLifecycleServicePage({ data }: { data: ServicePageData
                   <span className="lc-badge-dot"></span>
                   <span>[Why Partner With Us]</span>
                 </div>
-                <h2 className="lc-section-title">{whyChooseBlock.title ?? "Built for Speed, Quality & Reliability"}</h2>
+                <h2 className="lc-section-title">{renderGradientHeading(whyChooseBlock.title ?? "Built for Speed, Quality & Reliability")}</h2>
                 <p className="lc-why-tagline">{whyChooseBlock.tagline}</p>
                 {whyChooseBlock.desc && <p className="lc-section-sub">{whyChooseBlock.desc}</p>}
 
@@ -399,7 +417,7 @@ export default function ITLifecycleServicePage({ data }: { data: ServicePageData
                 <span className="lc-badge-dot"></span>
                 <span>[Industry Domain Expertise]</span>
               </div>
-              <h2 className="lc-section-title">Built Across Modern Industries</h2>
+              <h2 className="lc-section-title">Built Across <span className="qs-gradient-text">Modern Industries</span></h2>
               <p className="lc-section-sub">
                 Our technology systems power operations across high-compliance and fast-growth verticals.
               </p>
@@ -431,7 +449,7 @@ export default function ITLifecycleServicePage({ data }: { data: ServicePageData
                   <span className="lc-badge-dot"></span>
                   <span>[Help &amp; Support]</span>
                 </div>
-                <h2 className="lc-faq-heading">Frequently Asked Questions</h2>
+                <h2 className="lc-faq-heading">Frequently Asked <span className="qs-gradient-text">Questions</span></h2>
                 <p className="lc-faq-intro">
                   Have questions about our technology stack, development timelines, or engagement models? We are here to help.
                 </p>
@@ -493,7 +511,7 @@ export default function ITLifecycleServicePage({ data }: { data: ServicePageData
               <span className="lc-badge-dot lc-dot-lime"></span>
               <span>[Ready To Build?]</span>
             </div>
-            <h2 className="lc-cta-title">{data.closingTitle || "Build Better Software. Scale With Technology."}</h2>
+            <h2 className="lc-cta-title">{renderGradientHeading(data.closingTitle || "Build Better Software. Scale With Technology.")}</h2>
             <p className="lc-cta-desc">
               {data.closingDesc || "Get in touch with Quickupp Softech today to discuss your project, architecture, and technology roadmap."}
             </p>

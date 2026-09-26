@@ -13,6 +13,32 @@ interface Props {
   categorySlug?: string;
 }
 
+// Helper to render headings with the second half or punchline in gradient text
+function renderGradientHeading(text?: string) {
+  if (!text) return null;
+  const words = text.trim().split(/\s+/);
+  if (words.length === 1) {
+    return <span className="qs-gradient-text">{words[0]}</span>;
+  }
+  if (words.length === 2) {
+    return (
+      <>
+        <span>{words[0]}</span> <span className="qs-gradient-text">{words[1]}</span>
+      </>
+    );
+  }
+  const splitPoint = Math.max(1, Math.floor(words.length * 0.55));
+  const firstPart = words.slice(0, splitPoint).join(" ");
+  const secondPart = words.slice(splitPoint).join(" ");
+
+  return (
+    <>
+      <span>{firstPart}</span>{" "}
+      <span className="qs-gradient-text">{secondPart}</span>
+    </>
+  );
+}
+
 // Copora Signature Dual-Text Roll-up Button
 function CoporaButton({
   href,
@@ -22,13 +48,19 @@ function CoporaButton({
 }: {
   href: string;
   label: string;
-  variant?: "black" | "white";
+  variant?: "black" | "white" | "white-solid";
   className?: string;
 }) {
   return (
     <Link
       href={href}
-      className={`button-link-hover ${variant === "white" ? "white" : ""} ${className}`}
+      className={`button-link-hover ${
+        variant === "white"
+          ? "white"
+          : variant === "white-solid"
+          ? "white-solid"
+          : ""
+      } ${className}`}
     >
       <div className="button-content">
         <div className="button-text-wrap regular-text">
@@ -43,21 +75,70 @@ function CoporaButton({
 }
 
 export default function CoporaServicePage({ data }: Props) {
-  const [activeFaq, setActiveFaq] = useState<number | null>(0);
-  const [videoModalOpen, setVideoModalOpen] = useState(false);
+  // All FAQ items hidden by default
+  const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Extract FAQ block and Capability blocks
+  // Extract blocks by type
   const faqBlock = data.blocks.find(
     (b): b is Extract<ServiceBlock, { type: "faq" }> => b.type === "faq"
   );
   const faqItems: { q: string; a: string }[] = faqBlock
-    ? (faqBlock.items || (faqBlock as any).faqs || [])
+    ? faqBlock.items || (faqBlock as any).faqs || []
     : [];
 
-  const capabilityBlocks = data.blocks.filter(
-    (b) => b.type !== "faq" && b.type !== "whyChoose"
+  const processBlock = data.blocks.find(
+    (b): b is Extract<ServiceBlock, { type: "process" }> => b.type === "process"
   );
+
+  const whyChooseBlock = data.blocks.find(
+    (b): b is Extract<ServiceBlock, { type: "whyChoose" }> =>
+      b.type === "whyChoose"
+  );
+
+  const descPairsBlock = data.blocks.find(
+    (b): b is Extract<ServiceBlock, { type: "descPairs" }> =>
+      b.type === "descPairs"
+  );
+
+  const industriesBlock = data.blocks.find(
+    (b): b is Extract<ServiceBlock, { type: "industries" }> =>
+      b.type === "industries"
+  );
+
+  // Primary service offering blocks (cards with cta buttons)
+  const serviceOfferingBlocks = data.blocks.filter((b) => {
+    if (
+      b.type === "faq" ||
+      b.type === "process" ||
+      b.type === "steps" ||
+      b.type === "whyChoose" ||
+      b.type === "descPairs" ||
+      b.type === "industries"
+    ) {
+      return false;
+    }
+    // Offerings have a CTA button
+    return (b as any).cta !== undefined;
+  });
+
+  // Additional capability / audience blocks (without CTA)
+  const businessNeedsBlock = data.blocks.find(
+    (b) =>
+      b.type === "ai" &&
+      (b as any).cta === undefined &&
+      !((b as any).title?.includes("Why Invest") ||
+        (b as any).title?.includes("Why Businesses Invest"))
+  ) as any;
+
+  // Investment / value justification block
+  const whyInvestBlock = data.blocks.find(
+    (b) =>
+      b.type === "ai" &&
+      (b as any).cta === undefined &&
+      ((b as any).title?.includes("Why Invest") ||
+        (b as any).title?.includes("Why Businesses Invest"))
+  ) as any;
 
   // Scroll reveal observer
   useEffect(() => {
@@ -78,67 +159,37 @@ export default function CoporaServicePage({ data }: Props) {
     return () => observer.disconnect();
   }, []);
 
+  // Context-specific landscape showcase image
   const heroImage =
-    "https://cdn.prod.website-files.com/682eb96f62a81d664ea524a9/68414b23e4a1780f6e00358a_2163272981e07765b1f7275f01ced92a_about-hero-image.jpg";
+    data.crumb === "Application Development"
+      ? "https://images.unsplash.com/photo-1551650975-87deedd944c3?auto=format&fit=crop&w=1800&q=85"
+      : data.crumb === "Product Engineering"
+      ? "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1800&q=85"
+      : data.crumb === "Quality Assurance & Testing"
+      ? "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1800&q=85"
+      : data.crumb === "UI/UX Design"
+      ? "https://images.unsplash.com/photo-1581291518655-9523c93269c4?auto=format&fit=crop&w=1800&q=85"
+      : "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1800&q=85";
 
-  const storyImages = [
-    "https://cdn.prod.website-files.com/682eb96f62a81d664ea524a9/684188924e3a84c43778e3c1_b53aa0a78d72079528a5e21eb4835b28_Professional%20Collaboration%20in%20a%20Modern%20Office.jpg",
-    "https://cdn.prod.website-files.com/682eb96f62a81d664ea524a9/684bda0d7c35d7c4062a70dc_background-video-poster-00001.jpg",
-  ];
-
-  const capabilityStockImages = [
-    "https://cdn.prod.website-files.com/682eb96f62a81d664ea524a9/68427e7dc02fae8530fc38b1_a50a739aea751346e4ab819ac09aaf79_team-member-01.jpg",
-    "https://cdn.prod.website-files.com/682eb96f62a81d664ea524a9/68427fba967104cf61ef5dbb_1b1c43bf59f83f149fbe791babf3ed39_team-member-02.webp",
-    "https://cdn.prod.website-files.com/682eb96f62a81d664ea524a9/68427ee584a1134b0e51b52c_bfef99deeced931eed3f0d901713fe99_team-member-03.jpg",
-    "https://cdn.prod.website-files.com/682eb96f62a81d664ea524a9/68427ee5934fa2c5608a1002_267ae3d2952c2c81065fb8f450bf3db0_team-member-04.jpg",
-    "https://cdn.prod.website-files.com/682eb96f62a81d664ea524a9/68427fba2a3b755e610b3637_0f8e743069b14e3767dbfc98d877b9bf_team-member-05.webp",
-  ];
-
-  const milestones = [
-    {
-      type: "top",
-      year: "2018",
-      title: "Founded with Purpose",
-      desc: "Architecting high-performance web systems",
-    },
-    {
-      type: "bottom",
-      year: "2020",
-      title: "Scaled Nationally",
-      desc: "Full-stack mobile & enterprise engineering",
-    },
-    {
-      type: "top",
-      year: "2022",
-      title: "200+ Products Delivered",
-      desc: "Robust cloud-native microservices",
-    },
-    {
-      type: "bottom",
-      year: "2023",
-      title: "Global Tech Partnerships",
-      desc: "Next.js, React, AWS & AI integrations",
-    },
-    {
-      type: "top",
-      year: "2024",
-      title: "Global Expansion",
-      desc: "Serving US and international high-growth brands",
-    },
-    {
-      type: "bottom",
-      year: "2026",
-      title: "Innovation at Scale",
-      desc: "Next-gen resilient platforms & zero-downtime SLA",
-    },
-  ];
+  const industryLinks: Record<string, string> = {
+    Healthcare: "/industries/healthcare",
+    "Home Services": "/industries/home-services",
+    "Professional Services": "/industries/professional-services",
+    Education: "/industries/education",
+    "IT & SaaS": "/industries/it-saas",
+    eCommerce: "/industries/ecommerce",
+    "Real Estate": "/industries/real-estate",
+    "Interior Design": "/industries/interior-design",
+    "Travel & Hospitality": "/industries/travel-hospitality",
+    Automotive: "/contact",
+  };
 
   return (
     <div className="copora-page" ref={containerRef}>
       <Header />
 
       {/* =========================================================================
-          1. HERO SECTION (Identical to Copora About Page Hero)
+          1. HERO SECTION (Strictly User Content)
           ========================================================================= */}
       <section className="hero-section">
         <div className="container-medium w-container">
@@ -146,14 +197,57 @@ export default function CoporaServicePage({ data }: Props) {
             {data.heroEyebrow && (
               <div className="pre-section-title">{data.heroEyebrow}</div>
             )}
-            <h1>{data.heroTitle}</h1>
+            <h1>{renderGradientHeading(data.heroTitle)}</h1>
+
             {data.heroParagraphs && data.heroParagraphs.length > 0 && (
-              <p className="about-hero-description">{data.heroParagraphs[0]}</p>
+              <div className="hero-paragraphs-container">
+                <p className="hero-lead-paragraph">
+                  {data.heroParagraphs[0]}
+                </p>
+
+                {data.heroParagraphs.length > 1 && (
+                  <div className="hero-supporting-paragraphs">
+                    {data.heroParagraphs.slice(1).map((para, idx) => (
+                      <p key={idx} className="hero-sub-paragraph">
+                        {para}
+                      </p>
+                    ))}
+                  </div>
+                )}
+              </div>
             )}
+
+            {/* Hero Action Buttons */}
+            <div className="hero-buttons-wrap">
+              {data.heroCtas && data.heroCtas.length > 0 ? (
+                <>
+                  <CoporaButton
+                    href={data.heroCtas[0].href}
+                    label={data.heroCtas[0].label}
+                    variant="black"
+                  />
+                  {data.heroCtas[1] && (
+                    <CoporaButton
+                      href={data.heroCtas[1].href}
+                      label={data.heroCtas[1].label}
+                      variant="white"
+                    />
+                  )}
+                </>
+              ) : data.heroCta ? (
+                <CoporaButton
+                  href={data.heroCta.href}
+                  label={data.heroCta.label}
+                  variant="black"
+                />
+              ) : null}
+            </div>
           </div>
 
-          <div className="about-image-wrap copora-reveal">
-            {/* Featured Hero Large Media */}
+          <div
+            className="about-image-wrap copora-reveal"
+            style={{ marginTop: "1.5rem" }}
+          >
             <div className="about-inner-image">
               <img
                 src={heroImage}
@@ -161,281 +255,350 @@ export default function CoporaServicePage({ data }: Props) {
                 className="hero-inner-image"
               />
             </div>
-
-            {/* 3-Item Overlapping Bottom Strip */}
-            <div className="grid-about-hero-image">
-              {/* Card 1: Visual Overlay + Stat */}
-              <div
-                className="about-hero-image-item one"
-                style={{
-                  backgroundImage:
-                    "url('https://cdn.prod.website-files.com/682eb96f62a81d664ea524a9/68315bab565ab296177dcfde_0b9db51c5595e0b0dd51bb5ad1701578_hero-image-03.jpg')",
-                }}
-              >
-                <div className="about-inner-text-wrap">
-                  <div className="about-inner-text">Enterprise Delivery</div>
-                </div>
-                <div className="about-inner-title-wrap">
-                  <h2 className="about-inner-title">260+</h2>
-                  <p className="text-white" style={{ color: "#ffffff", margin: 0, fontSize: "0.9rem" }}>
-                    Helping companies grow and perform better.
-                  </p>
-                </div>
-                <div className="about-hero-overlay" />
-              </div>
-
-              {/* Card 2: Black Card + Dual-text Button */}
-              <div className="about-hero-image-item two">
-                <h3 className="about-detail-title">
-                  24/7 support to keep your{" "}
-                  <span className="about-text-span">business moving forward</span>
-                </h3>
-                <CoporaButton
-                  href={data.heroCta?.href || "/contact"}
-                  label={data.heroCta?.label || "Get in touch"}
-                  variant="white"
-                />
-              </div>
-
-              {/* Card 3: Experience Stat Card */}
-              <div className="about-hero-image-item third">
-                <div className="about-inner-pre-title">
-                  <div className="about-pre-title">Years of experience</div>
-                </div>
-                <div className="about-info">
-                  <h3>10+</h3>
-                  <p>Years helping businesses thrive through technology</p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
 
       {/* =========================================================================
-          2. OUR STORY SECTION (Copora 2-Column Story with Video Lightbox)
+          2. CORE SERVICES GRID
           ========================================================================= */}
-      <section className="our-story-section section-spacing">
-        <div className="container w-container">
-          <div className="section-title copora-reveal">
-            <h2>Built on expertise, driven by results - Get to know our process</h2>
-          </div>
-
-          <div className="our-story-grid">
-            {/* Left Narrative Column */}
-            <div className="our-story-detail-item copora-reveal">
-              <p className="story-description-one">
-                {data.heroParagraphs && data.heroParagraphs.length > 1
-                  ? data.heroParagraphs[1]
-                  : "We did not start with a big boardroom - just a big idea: to make software development more human, strategic, and impact-driven."}
-              </p>
-              <p className="story-description-two">
-                {data.heroParagraphs && data.heroParagraphs.length > 2
-                  ? data.heroParagraphs[2]
-                  : "From helping early-stage ventures define their roadmap to guiding enterprises through modern digital transformation, our journey has always been about one thing - unlocking clarity and measurable scalability for every client."}
-              </p>
-              <div style={{ marginTop: "12px" }}>
-                <CoporaButton href="/contact" label="Discuss Your Architecture" />
-              </div>
+      {serviceOfferingBlocks.length > 0 && (
+        <section className="copora-services-section">
+          <div className="container w-container">
+            <div className="section-title section-center-title copora-reveal">
+              <div className="pre-section-title">OUR SERVICES &amp; EXPERTISE</div>
+              <h2>
+                {data.crumb
+                  ? renderGradientHeading(`Our ${data.crumb} Services`)
+                  : renderGradientHeading("Our Core Services")}
+              </h2>
+              {data.crumb === "Application Development" && (
+                <p style={{ color: "#5a5a5a", fontSize: "1.05rem", margin: "0 auto", maxWidth: "780px" }}>
+                  We offer complete mobile application development solutions for startups, SMBs, enterprises, and growing digital businesses.
+                </p>
+              )}
+              {data.crumb === "Product Engineering" && (
+                <p style={{ color: "#5a5a5a", fontSize: "1.05rem", margin: "0 auto", maxWidth: "780px" }}>
+                  We develop custom software solutions around your business processes, users, technology environment, and long-term growth objectives.
+                </p>
+              )}
             </div>
 
-            {/* Right Media + Signature Column */}
-            <div className="our-story-image-item copora-reveal">
-              <div className="grid-our-story-image">
-                <div className="our-story-image-wrap">
-                  <img
-                    src={storyImages[0]}
-                    alt="Engineering collaboration"
-                    className="our-story-image"
-                  />
-                </div>
-                <div
-                  className="lightbox-link"
-                  onClick={() => setVideoModalOpen(true)}
-                >
-                  <img
-                    src={storyImages[1]}
-                    alt="Video preview"
-                    className="lightbox-video-thumb"
-                  />
-                  <div className="about-hero-overlay" style={{ opacity: 0.4 }} />
-                  <div className="our-story-text">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                      <polygon points="5 3 19 12 5 21 5 3" />
-                    </svg>
-                    <span>Play reel</span>
+            <div className="copora-services-grid copora-reveal">
+              {serviceOfferingBlocks.map((block: any, idx: number) => {
+                const bTitle = block.title;
+                const bSubtitle = block.subtitle;
+                const bDesc = block.desc;
+                const bIntro = block.intro;
+                const bItems: any[] =
+                  block.items || block.bullets || block.cards || [];
+                const bNote = block.note;
+                const bCta = block.cta;
+                const stepNum = String(idx + 1).padStart(2, "0");
+
+                return (
+                  <div key={idx} className="copora-service-card">
+                    <div className="copora-card-body">
+                      <div className="copora-card-head">
+                        <h3 className="copora-service-title">{bTitle}</h3>
+                        <span className="copora-service-num">{stepNum}</span>
+                      </div>
+
+                      {bSubtitle && (
+                        <div className="copora-service-subtitle">{bSubtitle}</div>
+                      )}
+
+                      {bDesc && <p className="copora-service-desc">{bDesc}</p>}
+
+                      {bIntro && (
+                        <div className="copora-service-intro-label">{bIntro}</div>
+                      )}
+
+                      {bItems.length > 0 && (
+                        <div className="copora-bullets-grid">
+                          {bItems.map((item: any, iIdx: number) => {
+                            const itemText =
+                              typeof item === "string"
+                                ? item
+                                : item.title && item.desc
+                                ? `${item.title}: ${item.desc}`
+                                : item.title || item.text || item.desc || "";
+                            return (
+                              <div key={iIdx} className="copora-bullet-item">
+                                <span className="copora-bullet-dot" />
+                                <span>{itemText}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {bNote && <div className="copora-service-note">{bNote}</div>}
+                    </div>
+
+                    {bCta && (
+                      <div className="copora-card-action">
+                        <CoporaButton
+                          href={bCta.href || "/contact"}
+                          label={bCta.label}
+                        />
+                      </div>
+                    )}
                   </div>
-                </div>
-              </div>
-
-              {/* Signature Block */}
-              <div className="our-story-info-wrap">
-                <img
-                  src="/images/copora/story-signature.svg"
-                  alt="Leadership signature"
-                  className="signature"
-                />
-                <div className="our-story-info">
-                  <h3 className="our-story-name">Quickupp Architecture Team</h3>
-                  <div className="our-story-position">Engineering & Strategy Practice</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* =========================================================================
-          3. MILESTONE SECTION (Copora Alternating Timeline)
-          ========================================================================= */}
-      <section className="milestone-section section-spacing">
-        <div className="container w-container">
-          <div className="milestone-title-wrap copora-reveal">
-            <div className="pre-section-title white">What we offer</div>
-            <h2>Our journey of growth & impact</h2>
-            <p className="milestone-description">
-              From architectural discovery to global deployment and continuous optimization - here is how we deliver measurable impact.
-            </p>
-          </div>
-
-          <div className="milestone-detail-list copora-reveal">
-            <div className="grid-milestone">
-              {milestones.map((item: any, idx: number) => {
-                if (item.type === "top") {
-                  return (
-                    <div key={idx} className="milestone-item-one">
-                      <div className="milestone-top-item-one">
-                        <img
-                          src="/images/copora/milestone-image.svg"
-                          alt="Pin"
-                          className="milestone-image"
-                        />
-                        <div className="milestone-text">{item.title}</div>
-                      </div>
-                      <div className="milestone-year-one">
-                        <div className="milestone-text">{item.year}</div>
-                      </div>
-                    </div>
-                  );
-                } else {
-                  return (
-                    <div key={idx} className="milestone-item-two">
-                      <div className="milestone-year-two">
-                        <div className="milestone-text">{item.year}</div>
-                      </div>
-                      <div className="milestone-top-item-two">
-                        <img
-                          src="/images/copora/milestone-image.svg"
-                          alt="Pin"
-                          className="milestone-image rotate"
-                        />
-                        <div className="milestone-text">{item.title}</div>
-                      </div>
-                    </div>
-                  );
-                }
+                );
               })}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* =========================================================================
-          4. OUR MISSION & VISION SECTION (Copora 2-Column Cards)
+          3. WHY CHOOSE (DESC PAIRS OR SPLIT MATRIX)
           ========================================================================= */}
-      <section className="our-mission-section section-spacing">
-        <div className="container-medium w-container">
-          <div className="grid-our-mission">
-            {/* Left Mission Card */}
-            <div className="our-mission-item copora-reveal">
-              <h2 className="our-mission-title">Our Mission</h2>
-              <p style={{ color: "#121512", fontSize: "1.05rem", lineHeight: "1.65", margin: 0 }}>
-                To empower businesses through resilient engineering, high-converting digital products, and transparent technology partnerships. We build clean, scalable, and performance-obsessed platforms that directly accelerate revenue and operational efficiency.
-              </p>
-              <div style={{ paddingTop: "10px" }}>
-                <CoporaButton href="/contact" label="Partner With Us" />
-              </div>
-            </div>
-
-            {/* Right Vision Card with Textured Background */}
-            <div
-              className="our-vision-item copora-reveal"
-              style={{
-                backgroundImage:
-                  "url('https://cdn.prod.website-files.com/682eb96f62a81d664ea524a9/6842795ec9dea88362ffd4ef_e07247beda0932230ac19dd7ba7141e3_our-vision-bg-image.jpg')",
-              }}
-            >
-              <div className="our-vision-inner-item">
-                <h2 className="our-mission-title">Our Vision</h2>
-                <p>
-                  We aim to lead the way in reshaping how modern businesses build, scale, and maintain mission-critical software in a rapidly evolving technological landscape.
-                </p>
-                <ul className="our-vision-list">
-                  <li className="our-vision-list-item">Global Scalability & Cloud Elasticity</li>
-                  <li className="our-vision-list-item">Clean Architecture & Maintainable Codebases</li>
-                  <li className="our-vision-list-item">Measurable Business Impact & High ROI</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* =========================================================================
-          5. SPECIALIZED CAPABILITIES / PROBLEM SOLVERS GRID (Copora Team Cards Style)
-          ========================================================================= */}
-      <section className="our-team-section">
-        <div className="container w-container">
-          <div className="section-title section-center-title copora-reveal">
-            <div className="pre-section-title">Specialized Services</div>
-            <h2>Our team of problem solvers & capabilities</h2>
-            <p style={{ color: "#5a5a5a", fontSize: "1.05rem", margin: 0 }}>
-              Tailored technology modules designed to engineer fast, resilient, and enterprise-ready digital platforms.
-            </p>
-          </div>
-
-          <div className="grid-team copora-reveal">
-            {capabilityBlocks.map((block, idx) => {
-              const bTitle = (block as any).title || "Specialized Capability";
-              const bIntro = (block as any).intro || (block as any).desc || "High-performance software solutions tailored for scalable business impact.";
-              const imageSrc = capabilityStockImages[idx % capabilityStockImages.length];
-
-              return (
-                <div key={idx} className="team-item">
-                  <img
-                    src={imageSrc}
-                    alt={bTitle}
-                    className="team-avatar-image"
-                  />
-                  <div className="team-info">
-                    <h3 className="team-member-name">{bTitle}</h3>
-                    <div className="gray-text">
-                      {bIntro.length > 55 ? `${bIntro.substring(0, 52)}...` : bIntro}
-                    </div>
-                    <div className="team-social-media-item-wrap">
-                      <div className="team-social-media-item">
-                        <Link href="/contact" className="team-badge-tag">
-                          Get a Quote &rarr;
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* =========================================================================
-          6. INTERACTIVE FAQ ACCORDION (If Available)
-          ========================================================================= */}
-      {faqItems.length > 0 && (
-        <section className="copora-faq-section">
+      {descPairsBlock && (
+        <section className="copora-why-section" style={{ backgroundColor: "#ffffff" }}>
           <div className="container w-container">
             <div className="section-title section-center-title copora-reveal">
-              <div className="pre-section-title">Clarifications & Answers</div>
-              <h2>Frequently Asked Questions</h2>
+              <div className="pre-section-title">WHY QUICKUPP SOFTECH</div>
+              <h2>{renderGradientHeading(descPairsBlock.title || "Why Choose Quickupp Softech?")}</h2>
+              {descPairsBlock.desc && (
+                <p style={{ color: "#5a5a5a", fontSize: "1.05rem", margin: "0 auto", maxWidth: "680px" }}>
+                  {descPairsBlock.desc}
+                </p>
+              )}
+            </div>
+
+            <div className="copora-desc-pairs-grid copora-reveal">
+              {descPairsBlock.items.map((item, idx) => (
+                <div key={idx} className="copora-desc-pair-card">
+                  <span className="copora-desc-pair-num">
+                    {String(idx + 1).padStart(2, "0")}
+                  </span>
+                  <h3 className="copora-desc-pair-title">{item.title}</h3>
+                  <p className="copora-desc-pair-desc">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {whyChooseBlock && (
+        <section className="copora-why-section">
+          <div className="container-medium w-container">
+            <div className="copora-why-grid copora-reveal">
+              {/* Left Column Card */}
+              <div className="copora-why-card-left">
+                <div>
+                  {whyChooseBlock.tagline && (
+                    <div className="copora-tagline-badge">
+                      <span>✦</span>
+                      <span>{whyChooseBlock.tagline}</span>
+                    </div>
+                  )}
+                  <h2
+                    className="our-mission-title"
+                    style={{ marginBottom: "1.25rem" }}
+                  >
+                    {renderGradientHeading(whyChooseBlock.title || "Why Choose Quickupp Softech?")}
+                  </h2>
+                  <p
+                    style={{
+                      color: "#5a5a5a",
+                      fontSize: "1.05rem",
+                      lineHeight: "1.65",
+                      margin: 0,
+                    }}
+                  >
+                    {whyChooseBlock.desc}
+                  </p>
+                </div>
+              </div>
+
+              {/* Right Column Dark Matrix Card */}
+              <div className="copora-why-card-right">
+                <div className="copora-why-bullets">
+                  {whyChooseBlock.bullets.map((bullet, idx) => (
+                    <div key={idx} className="copora-why-bullet-item">
+                      <span className="copora-check-icon">✓</span>
+                      <span>{bullet}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* =========================================================================
+          4. PROCESS (CONTINUOUS RIGHT-TO-LEFT INFINITE LOOP)
+          ========================================================================= */}
+      {processBlock && (
+        <section className="copora-process-section">
+          <div className="container w-container">
+            <div className="section-title section-center-title copora-reveal">
+              <div className="pre-section-title white">OUR METHODOLOGY &amp; WORKFLOW</div>
+              <h2 style={{ color: "#ffffff" }}>{renderGradientHeading(processBlock.title)}</h2>
+              {processBlock.desc && (
+                <p
+                  style={{
+                    color: "rgba(255, 255, 255, 0.7)",
+                    fontSize: "1.05rem",
+                    margin: "0 auto",
+                    maxWidth: "680px",
+                  }}
+                >
+                  {processBlock.desc}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="copora-process-marquee-container">
+            <div className="copora-process-marquee-track">
+              {[...processBlock.steps, ...processBlock.steps].map((step, idx) => (
+                <div key={idx} className="copora-step-card">
+                  <div className="copora-step-num">{step.num}</div>
+                  <h3 className="copora-step-title">{step.title}</h3>
+                  <p className="copora-step-desc">{step.desc || step.text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {processBlock.cta && (
+            <div
+              className="container w-container"
+              style={{ marginTop: "1.75rem" }}
+            >
+              <div className="copora-process-cta copora-reveal">
+                <CoporaButton
+                  href={processBlock.cta.href || "/contact"}
+                  label={processBlock.cta.label}
+                  variant="white-solid"
+                />
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* =========================================================================
+          5. BUSINESS NEEDS FEATURE MATRIX
+          ========================================================================= */}
+      {businessNeedsBlock && (
+        <section className="copora-feature-matrix-section">
+          <div className="container w-container">
+            <div className="section-title section-center-title copora-reveal">
+              <div className="pre-section-title">STRATEGIC CAPABILITIES</div>
+              <h2>{renderGradientHeading(businessNeedsBlock.title)}</h2>
+              {businessNeedsBlock.intro && (
+                <p style={{ color: "#5a5a5a", fontSize: "1.05rem", margin: "0 auto", maxWidth: "720px" }}>
+                  {businessNeedsBlock.intro}
+                </p>
+              )}
+            </div>
+
+            <div className="copora-feature-matrix-grid copora-reveal">
+              {businessNeedsBlock.bullets?.map((item: string, idx: number) => (
+                <div key={idx} className="copora-feature-matrix-card">
+                  <span className="copora-feature-dot" />
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* =========================================================================
+          6. WHY BUSINESSES INVEST SECTION
+          ========================================================================= */}
+      {whyInvestBlock && (
+        <section className="copora-investment-section">
+          <div className="container w-container">
+            <div className="section-title section-center-title copora-reveal">
+              <div className="pre-section-title">BUSINESS VALUE &amp; ROI</div>
+              <h2>{renderGradientHeading(whyInvestBlock.title)}</h2>
+              {whyInvestBlock.intro && (
+                <p style={{ color: "#5a5a5a", fontSize: "1.05rem", margin: "0 auto", maxWidth: "680px" }}>
+                  {whyInvestBlock.intro}
+                </p>
+              )}
+            </div>
+
+            <div className="copora-investment-box copora-reveal">
+              <div className="copora-investment-bullets">
+                {whyInvestBlock.bullets?.map((bullet: string, idx: number) => (
+                  <div key={idx} className="copora-investment-item">
+                    <span className="copora-investment-check">✓</span>
+                    <span>{bullet}</span>
+                  </div>
+                ))}
+              </div>
+
+              {whyInvestBlock.desc && (
+                <p className="copora-investment-footer">
+                  {whyInvestBlock.desc}
+                </p>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* =========================================================================
+          7. INDUSTRIES WE SERVE
+          ========================================================================= */}
+      {industriesBlock && (
+        <section className="copora-industries-section">
+          <div className="container w-container">
+            <div className="section-title section-center-title copora-reveal">
+              <div className="pre-section-title">SECTOR EXPERTISE</div>
+              <h2>{renderGradientHeading(industriesBlock.title || "Industries We Serve")}</h2>
+              {industriesBlock.intro && (
+                <p
+                  style={{
+                    color: "#5a5a5a",
+                    fontSize: "1.05rem",
+                    margin: "0 auto",
+                    maxWidth: "680px",
+                  }}
+                >
+                  {industriesBlock.intro}
+                </p>
+              )}
+            </div>
+
+            <div className="copora-industries-grid copora-reveal">
+              {industriesBlock.industries.map((ind, idx) => {
+                const linkHref = industryLinks[ind] || "/contact";
+                return (
+                  <Link
+                    key={idx}
+                    href={linkHref}
+                    className="copora-industry-pill"
+                  >
+                    <span>{ind}</span>
+                    <span className="copora-industry-arrow">→</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* =========================================================================
+          8. FREQUENTLY ASKED QUESTIONS (DEFAULT ALL CLOSED)
+          ========================================================================= */}
+      {faqItems.length > 0 && (
+        <section className="copora-faq-section" style={{ paddingTop: "5rem" }}>
+          <div className="container w-container">
+            <div className="section-title section-center-title copora-reveal">
+              <div className="pre-section-title">FREQUENTLY ASKED QUESTIONS</div>
+              <h2>{renderGradientHeading(faqBlock?.title || "Frequently Asked Questions")}</h2>
             </div>
 
             <div className="copora-faq-wrap copora-reveal">
@@ -449,7 +612,9 @@ export default function CoporaServicePage({ data }: Props) {
                   >
                     <div className="copora-faq-header">
                       <h4 className="copora-faq-question">{item.q}</h4>
-                      <span className={`copora-faq-icon ${isOpen ? "open" : ""}`}>
+                      <span
+                        className={`copora-faq-icon ${isOpen ? "open" : ""}`}
+                      >
                         +
                       </span>
                     </div>
@@ -467,95 +632,57 @@ export default function CoporaServicePage({ data }: Props) {
       )}
 
       {/* =========================================================================
-          7. SIGNATURE CTA BANNER (Copora About CTA)
+          9. CLOSING CTA BANNER
           ========================================================================= */}
       <section className="cta-section section-spacing">
         <div className="container-medium w-container">
           <div className="cta-item copora-reveal">
             <div className="cta-title-wrap">
               <h3 className="about-cta-title">
-                {data.closingTitle || "Let’s build something that moves your business forward"}
+                {renderGradientHeading(
+                  data.closingTitle ||
+                    "Build a Website That Works for Your Business"
+                )}
               </h3>
-              <p className="cta-description">
-                {data.closingDesc ||
-                  "From initial code audit to full-stack delivery and ongoing cloud optimization, our team is ready to scale your digital presence."}
-              </p>
+              {data.closingDesc && (
+                <div
+                  className="cta-description"
+                  style={{ whiteSpace: "pre-line" }}
+                >
+                  {data.closingDesc}
+                </div>
+              )}
             </div>
-            <div>
-              <CoporaButton
-                href="/contact"
-                label={
-                  data.closingCtas && data.closingCtas.length > 0
-                    ? data.closingCtas[0].label
-                    : "Get started now"
-                }
-              />
+            <div className="hero-buttons-wrap">
+              {data.closingCtas && data.closingCtas.length > 0 ? (
+                <>
+                  <CoporaButton
+                    href={data.closingCtas[0].href}
+                    label={data.closingCtas[0].label}
+                    variant="black"
+                  />
+                  {data.closingCtas[1] && (
+                    <CoporaButton
+                      href={data.closingCtas[1].href}
+                      label={data.closingCtas[1].label}
+                      variant="white"
+                    />
+                  )}
+                </>
+              ) : (
+                <CoporaButton
+                  href="/contact"
+                  label="Get a Free Consultation"
+                />
+              )}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Video Lightbox Modal */}
-      {videoModalOpen && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.85)",
-            zIndex: 9999,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "20px",
-          }}
-          onClick={() => setVideoModalOpen(false)}
-        >
-          <div
-            style={{
-              position: "relative",
-              width: "100%",
-              maxWidth: "860px",
-              aspectRatio: "16/9",
-              background: "#000",
-              borderRadius: "12px",
-              overflow: "hidden",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setVideoModalOpen(false)}
-              style={{
-                position: "absolute",
-                top: "16px",
-                right: "16px",
-                background: "rgba(255, 255, 255, 0.2)",
-                color: "#fff",
-                border: "none",
-                borderRadius: "50%",
-                width: "36px",
-                height: "36px",
-                cursor: "pointer",
-                fontSize: "18px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                zIndex: 10,
-              }}
-            >
-              &#10005;
-            </button>
-            <iframe
-              src="https://www.youtube.com/embed/r507nu6MqFk?autoplay=1"
-              title="Architecture & Engineering Showcase"
-              style={{ width: "100%", height: "100%", border: "none" }}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          </div>
-        </div>
-      )}
-
       <Footer />
     </div>
   );
 }
+
+

@@ -89,7 +89,7 @@ export default function BlogPage() {
             </div>
             <h2 className="res-section-title">
               A quiet place to learn and{" "}
-              <span className="res-heading-accent">reflect</span>
+              <span className="qs-gradient-text">reflect</span>
             </h2>
           </div>
 

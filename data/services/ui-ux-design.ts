@@ -1,23 +1,29 @@
 import type { ServicePageData } from "@/lib/servicePageTypes";
 
 export const data: ServicePageData = {
-  metaTitle: "UI/UX Design | Quickupp Softech",
+  metaTitle: "UI/UX Design Services | Quickupp Softech",
   metaDescription:
     "Create modern, intuitive, responsive, and conversion-focused digital experiences with professional UI/UX Design Services by Quickupp Softech.",
   crumb: "UI/UX Design",
   heroEyebrow: "UI/UX Design Services",
-  heroTitle: "Create Better Digital Experiences With Intuitive UI/UX Design",
+  heroTitle: "Create Intuitive, Modern & Engaging Digital Experiences",
   heroParagraphs: [
-    "At Quickupp Softech, we create digital experiences that are intuitive, functional, and aligned with business objectives.",
-    "From website and mobile app design to SaaS platforms, wireframing, and interactive prototyping, we combine aesthetics and usability to help your products stand out.",
+    "At Quickupp Softech, we provide end-to-end UI/UX Design Services to help businesses turn ideas, user journeys, and complex requirements into intuitive and high-converting digital products.",
+    "From website and mobile app design to SaaS platforms, wireframing, and interactive prototyping, we combine aesthetics, usability, and product strategy to deliver measurable business value.",
   ],
   heroCta: { label: "Request a Design Quote", href: "/contact" },
+  heroCtas: [
+    { label: "Request a Design Quote", href: "/contact" },
+    { label: "Discuss Your Design Project", href: "/contact" },
+  ],
   blocks: [
     {
       type: "ai",
       title: "Website UI/UX Design",
-      intro:
-        "Create modern, responsive, and user-friendly websites with our Website UI/UX Design Services. We design websites that balance visual appeal, usability, navigation, accessibility, and conversion objectives. We design:",
+      subtitle:
+        "Create modern, responsive, and user-friendly websites with our Website UI/UX Design Services.",
+      desc: "We design websites that balance visual appeal, usability, navigation, accessibility, and conversion objectives.",
+      intro: "We design:",
       bullets: [
         "Business Websites",
         "Corporate Websites",
@@ -32,8 +38,10 @@ export const data: ServicePageData = {
     {
       type: "ai",
       title: "Mobile App UI/UX Design",
-      intro:
-        "Deliver seamless mobile experiences with our Mobile App UI/UX Design Services for Android and iOS applications. We focus on intuitive navigation, clear interfaces, mobile usability, and consistent design systems. Our mobile app design includes:",
+      subtitle:
+        "Deliver seamless mobile experiences with our Mobile App UI/UX Design Services for Android and iOS applications.",
+      desc: "We focus on intuitive navigation, clear interfaces, mobile usability, and consistent design systems.",
+      intro: "Our mobile app design includes:",
       bullets: [
         "User Flow Design",
         "App Interface Design",
@@ -48,8 +56,10 @@ export const data: ServicePageData = {
     {
       type: "ai",
       title: "SaaS Product UI/UX Design",
-      intro:
-        "Create intuitive and scalable interfaces for SaaS platforms with our SaaS Product UI/UX Design Services. We design dashboards, user portals, workflows, and product interfaces that simplify complex functionality and improve product usability. SaaS design can include:",
+      subtitle:
+        "Create intuitive and scalable interfaces for SaaS platforms with our SaaS Product UI/UX Design Services.",
+      desc: "We design dashboards, user portals, workflows, and product interfaces that simplify complex functionality and improve product usability.",
+      intro: "SaaS design can include:",
       bullets: [
         "SaaS Dashboard Design",
         "Product Interface Design",
@@ -64,8 +74,10 @@ export const data: ServicePageData = {
     {
       type: "ai",
       title: "Wireframing & Prototyping",
-      intro:
-        "Transform ideas into clear product structures before development with professional Wireframing & Prototyping Services. We create low- and high-fidelity wireframes and interactive prototypes to visualize user journeys, functionality, and screen interactions. Our process includes:",
+      subtitle:
+        "Transform ideas into clear product structures before development with professional Wireframing & Prototyping Services.",
+      desc: "We create low- and high-fidelity wireframes and interactive prototypes to visualize user journeys, functionality, and screen interactions.",
+      intro: "Our process includes:",
       bullets: [
         "Information Architecture",
         "User Flows",
@@ -115,7 +127,6 @@ export const data: ServicePageData = {
     {
       type: "whyChoose",
       title: "Why Choose Quickupp Softech?",
-      tagline: "User-Centered Design",
       desc: "We don't design interfaces simply to look good—we create digital experiences that are intuitive, functional, and aligned with business objectives.",
       bullets: [
         "User-Centered Design",
@@ -130,6 +141,8 @@ export const data: ServicePageData = {
     },
     {
       type: "industries",
+      title: "Industries We Serve",
+      intro: "Our UI/UX Design Company works with businesses across:",
       industries: [
         "Healthcare",
         "Home Services",
@@ -145,6 +158,7 @@ export const data: ServicePageData = {
     },
     {
       type: "faq",
+      title: "Frequently Asked Questions",
       items: [
         {
           q: "What is UI/UX Design?",
@@ -174,6 +188,7 @@ export const data: ServicePageData = {
     "Have a website, mobile app, or SaaS product that needs a better user experience?\n\nQuickupp Softech helps businesses turn ideas and complex requirements into intuitive digital experiences.",
   closingCtas: [
     { label: "Request a Design Quote", href: "/contact" },
+    { label: "Discuss Your Design Project", href: "/contact" },
   ],
 };
 

@@ -62,6 +62,7 @@ export interface IndustriesBlock {
 export interface AiBlock {
   type: "ai";
   title: string;
+  subtitle?: string;
   tagline?: string;
   intro?: string;
   bullets?: string[];
@@ -112,6 +113,7 @@ export interface ServicePageData {
   heroTitle: string;
   heroParagraphs: string[];
   heroCta: { label: string; href: string };
+  heroCtas?: { label: string; href: string }[];
   blocks: ServiceBlock[];
   closingTitle: string;
   closingDesc: string;

@@ -105,7 +105,7 @@ export default function ProjectsInteractive() {
                       <div className="subtitle-head white-text">Our projects</div>
                     </div>
                     <div className="heading-title-animation">
-                      <h2 className="heading-title big white-text">Latest work</h2>
+                      <h2 className="heading-title big white-text">Latest <span className="qs-gradient-text">work</span></h2>
                     </div>
                   </div>
                 </div>

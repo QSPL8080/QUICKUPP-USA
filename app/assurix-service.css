@@ -69,33 +69,31 @@
 }
 
 .asx-tag-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(124, 58, 237, 0.08);
-  border: 1px solid rgba(124, 58, 237, 0.2);
-  color: #7c3aed;
-  padding: 6px 14px;
-  border-radius: 9999px;
-  font-size: 13px;
-  font-weight: 600;
-  margin-bottom: 16px;
+  display: inline-block !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #6366f1 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  margin-bottom: 16px !important;
 }
 
 .asx-tag-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background-color: #7c3aed;
-  box-shadow: 0 0 8px rgba(124, 58, 237, 0.6);
+  display: none !important;
 }
 
 .asx-hero-title {
-  font-size: 46px;
-  line-height: 1.14;
-  font-weight: 800;
+  font-size: clamp(30px, 3.6vw, 48px) !important;
+  line-height: 1.18 !important;
+  font-weight: 800 !important;
   color: #001d28;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.03em !important;
   margin: 0 0 18px 0;
 }
 

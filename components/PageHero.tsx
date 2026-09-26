@@ -1,5 +1,31 @@
 import Link from "next/link";
 
+function renderGradientHeading(text?: string) {
+  if (!text) return null;
+  const words = text.split(" ");
+  if (words.length === 1) {
+    return <span className="qs-gradient-text">{text}</span>;
+  }
+  if (words.length === 2) {
+    return (
+      <>
+        <span>{words[0]}</span>{" "}
+        <span className="qs-gradient-text">{words[1]}</span>
+      </>
+    );
+  }
+  const splitPoint = Math.max(1, Math.floor(words.length * 0.55));
+  const firstPart = words.slice(0, splitPoint).join(" ");
+  const secondPart = words.slice(splitPoint).join(" ");
+
+  return (
+    <>
+      <span>{firstPart}</span>{" "}
+      <span className="qs-gradient-text">{secondPart}</span>
+    </>
+  );
+}
+
 export default function PageHero({
   title,
   description,
@@ -16,7 +42,7 @@ export default function PageHero({
       <div className="w-layout-blockcontainer container-large w-container">
         <div className="breadcrumb-wrap">
           <div className="breadcrumb-title-animation">
-            <h1 className="breadcrumb-heading-title">{title}</h1>
+            <h1 className="breadcrumb-heading-title">{renderGradientHeading(title)}</h1>
           </div>
         </div>
         <div className="breadcrumb-bottom-content">

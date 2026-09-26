@@ -125,6 +125,23 @@ const caseStudiesList = [
   },
 ];
 
+function renderGradientHeading(text?: string) {
+  if (!text) return null;
+  const words = text.split(" ");
+  if (words.length <= 2) {
+    return <span className="qs-gradient-text">{text}</span>;
+  }
+  const splitIndex = Math.ceil(words.length / 2);
+  const firstHalf = words.slice(0, splitIndex).join(" ");
+  const secondHalf = words.slice(splitIndex).join(" ");
+
+  return (
+    <>
+      {firstHalf} <span className="qs-gradient-text">{secondHalf}</span>
+    </>
+  );
+}
+
 export default function CaseStudiesPage() {
   const [selectedCategory, setSelectedCategory] = useState("All Case Studies");
 
@@ -155,7 +172,7 @@ export default function CaseStudiesPage() {
                   margin: "0 0 18px 0",
                 }}
               >
-                Proven Impact. Quantifiable Growth.
+                Proven Impact. <span className="qs-gradient-text">Quantifiable Growth.</span>
               </h1>
               <p
                 style={{
@@ -223,7 +240,7 @@ export default function CaseStudiesPage() {
                 </div>
 
                 <h2 className="res-featured-title" style={{ fontSize: "clamp(26px, 3.2vw, 38px)" }}>
-                  {featuredStudy.title}
+                  {renderGradientHeading(featuredStudy.title)}
                 </h2>
 
                 <p className="res-featured-desc">

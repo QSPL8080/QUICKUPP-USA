@@ -59,7 +59,7 @@ export default function ResourcesPage() {
             </div>
             <h1 className="res-section-title">
               A quiet place to learn and{" "}
-              <span className="res-heading-accent">scale</span>
+              <span className="qs-gradient-text">scale</span>
             </h1>
             <p
               style={{
@@ -114,7 +114,7 @@ export default function ResourcesPage() {
               LATEST ARTICLES
             </div>
             <h2 className="res-section-title">
-              Featured Insights &amp; <span className="res-heading-accent">Playbooks</span>
+              Featured Insights &amp; <span className="qs-gradient-text">Playbooks</span>
             </h2>
           </div>
 

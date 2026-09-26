@@ -44,7 +44,7 @@ export default function Home() {
                       </div>
                       <div className="overflow-hidden">
                         <h1 className="hero-one-title">
-                          Marketing That Delivers ROI.
+                          Marketing That <span className="qs-gradient-text">Delivers ROI.</span>
                         </h1>
                       </div>
                     </div>
@@ -144,7 +144,7 @@ export default function Home() {
                       </div>
                       <div className="overflow-hidden">
                         <h1 className="hero-one-title">
-                          Marketing built for results.
+                          Marketing Built for <span className="qs-gradient-text">Results.</span>
                         </h1>
                       </div>
                     </div>
@@ -339,8 +339,7 @@ export default function Home() {
                 </div>
                 <div className="heading-title-animation">
                   <h2 className="heading-title">
-                    Our agency provides a comprehensive suite of marketing
-                    growth.
+                    Our agency provides a comprehensive suite of <span className="qs-gradient-text">marketing growth.</span>
                   </h2>
                 </div>
               </div>
@@ -499,8 +498,7 @@ export default function Home() {
               <div className="heading-subtitle">
                 <div className="heading-title-animation">
                   <h2 className="heading-title service-heading">
-                    We follow a clear strategy of investing in high potential
-                    digital opportunities and growth.
+                    We follow a clear strategy of investing in <span className="qs-gradient-text">high-potential digital growth.</span>
                   </h2>
                 </div>
               </div>
@@ -649,8 +647,8 @@ export default function Home() {
               </div>
               <div className="heading-title-animation">
                 <h2 className="heading-title">
-                  Our agency is dedicated to boosting your brand&apos;s reach,
-                  generating quality leads
+                  Our agency is dedicated to boosting your brand&apos;s reach,{" "}
+                  <span className="qs-gradient-text">generating quality leads.</span>
                 </h2>
               </div>
             </div>
@@ -909,7 +907,9 @@ export default function Home() {
                     <div className="subtitle-head">Marketing professional</div>
                   </div>
                   <div className="heading-title-animation">
-                    <h2 className="heading-title team-heading">Skilled Team</h2>
+                    <h2 className="heading-title team-heading">
+                      Skilled <span className="qs-gradient-text">Team</span>
+                    </h2>
                   </div>
                 </div>
                 <div

@@ -92,8 +92,11 @@
 }
 
 .merkil-page-wrapper .text-light-gray {
-  color: var(--merkil-light-gray) !important;
-  font-weight: 400 !important;
+  background: linear-gradient(135deg, #00d2ff 0%, #6366f1 50%, #a855f7 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  display: inline !important;
+  font-weight: 700 !important;
 }
 
 .merkil-page-wrapper .text-dark-gray {
@@ -138,65 +141,53 @@
   box-sizing: border-box;
 }
 
-/* Badges */
+/* Badges (Topic/Eyebrow representation without background) */
 .merkil-page-wrapper .badge,
 .merkil-page-wrapper .merkil-badge,
 .merkil-page-wrapper .section-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
-  border-radius: 100px;
-  background-color: #f5f5f7;
-  border: 1px solid #e5e7eb;
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #0b0f17;
+  display: inline-block !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+  color: #6366f1 !important;
   width: fit-content;
+  margin-bottom: 12px !important;
 }
 
 .merkil-page-wrapper .badge.purple,
-.merkil-page-wrapper .merkil-badge.purple {
-  background-color: #e4d3ff;
-  border-color: #d8b4fe;
-}
-
+.merkil-page-wrapper .merkil-badge.purple,
 .merkil-page-wrapper .badge.pink,
-.merkil-page-wrapper .merkil-badge.pink {
-  background-color: #f9dbff;
-  border-color: #f0abfc;
-}
-
+.merkil-page-wrapper .merkil-badge.pink,
 .merkil-page-wrapper .badge.yellow,
-.merkil-page-wrapper .merkil-badge.yellow {
-  background-color: #f5f7b8;
-  border-color: #fde047;
-}
-
+.merkil-page-wrapper .merkil-badge.yellow,
 .merkil-page-wrapper .badge.white,
 .merkil-page-wrapper .merkil-badge.white {
-  background-color: #ffffff;
-  border-color: rgba(0, 0, 0, 0.08);
+  background-color: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
 }
 
-.merkil-page-wrapper .badge-icon {
-  width: 15px;
-  height: 15px;
-}
-
+.merkil-page-wrapper .badge-icon,
 .merkil-page-wrapper .badge-dot,
 .merkil-page-wrapper .merkil-badge-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background-color: #10b981;
+  display: none !important;
 }
 
-.merkil-page-wrapper .tagline {
-  font-size: 12px;
-  font-weight: 700;
+.merkil-page-wrapper .tagline,
+.merkil-page-wrapper .merkil-tagline {
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: #6366f1 !important;
+  font-family: var(--merkil-heading-font) !important;
 }
 
 /* Buttons & Sliding Interactions */
@@ -218,6 +209,13 @@
   cursor: pointer;
 }
 
+.merkil-page-wrapper .call {
+  width: 15px !important;
+  height: 15px !important;
+  display: block !important;
+  flex-shrink: 0 !important;
+}
+
 .merkil-page-wrapper .cta-button:hover,
 .merkil-page-wrapper .merkil-cta-button:hover {
   background-color: #d8b4fe;
@@ -226,131 +224,150 @@
 }
 
 .merkil-page-wrapper .cta-button-text-wrap {
-  position: relative;
-  overflow: hidden;
-  height: 20px;
+  position: relative !important;
+  overflow: hidden !important;
+  height: 20px !important;
+  display: block !important;
 }
 
 .merkil-page-wrapper .cta-button-text-group {
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .merkil-page-wrapper .cta-button:hover .cta-button-text-group {
-  transform: translateY(-20px);
+  transform: translateY(-20px) !important;
 }
 
 .merkil-page-wrapper .button-01,
 .merkil-page-wrapper .merkil-button-01 {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 13px 26px;
-  border-radius: 100px;
-  background-color: #f5f5f7;
-  color: #000000;
-  text-decoration: none;
-  font-size: 14.5px;
-  font-weight: 700;
-  overflow: hidden;
-  border: 1px solid #e5e7eb;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  cursor: pointer;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  padding: 12px 26px !important;
+  border-radius: 100px !important;
+  background-color: #f5f5f7 !important;
+  color: #000000 !important;
+  text-decoration: none !important;
+  font-size: 14.5px !important;
+  font-weight: 700 !important;
+  overflow: hidden !important;
+  border: 1px solid #e5e7eb !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  cursor: pointer !important;
+  box-sizing: border-box !important;
 }
 
 .merkil-page-wrapper .button-01:hover,
 .merkil-page-wrapper .merkil-button-01:hover {
-  background-color: #e5e7eb;
-  transform: translateY(-2px);
+  background-color: #e5e7eb !important;
+  transform: translateY(-2px) !important;
 }
 
 .merkil-page-wrapper .button-01-arrow-wrap {
-  position: relative;
-  overflow: hidden;
-  width: 14px;
-  height: 14px;
+  position: relative !important;
+  overflow: hidden !important;
+  width: 14px !important;
+  height: 14px !important;
+  display: block !important;
+  flex-shrink: 0 !important;
 }
 
 .merkil-page-wrapper .button-01-arrow-group {
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex !important;
+  flex-direction: column !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .merkil-page-wrapper .button-01:hover .button-01-arrow-group {
-  transform: translateY(-14px);
+  transform: translateY(-14px) !important;
 }
 
 .merkil-page-wrapper .button-01-text-wrap {
-  position: relative;
-  overflow: hidden;
-  height: 20px;
+  position: relative !important;
+  overflow: hidden !important;
+  height: 20px !important;
+  display: block !important;
 }
 
 .merkil-page-wrapper .button-01-text-group {
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .merkil-page-wrapper .button-01:hover .button-01-text-group {
-  transform: translateY(-20px);
+  transform: translateY(-20px) !important;
 }
 
 .merkil-page-wrapper .button-02 {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 13px 26px;
-  border-radius: 100px;
-  background-color: #0b0f17;
-  color: #ffffff;
-  text-decoration: none;
-  font-size: 14.5px;
-  font-weight: 700;
-  overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  cursor: pointer;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  padding: 12px 26px !important;
+  border-radius: 100px !important;
+  background-color: #0b0f17 !important;
+  color: #ffffff !important;
+  text-decoration: none !important;
+  font-size: 14.5px !important;
+  font-weight: 700 !important;
+  overflow: hidden !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  cursor: pointer !important;
+  border: 1px solid #0b0f17 !important;
+  box-sizing: border-box !important;
 }
 
 .merkil-page-wrapper .button-02:hover {
-  background-color: #1f2937;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  background-color: #1f2937 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
 }
 
 .merkil-page-wrapper .button-02-arrow-wrap {
-  position: relative;
-  overflow: hidden;
-  width: 14px;
-  height: 14px;
+  position: relative !important;
+  overflow: hidden !important;
+  width: 14px !important;
+  height: 14px !important;
+  display: block !important;
+  flex-shrink: 0 !important;
 }
 
 .merkil-page-wrapper .button-02-arrow-group {
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex !important;
+  flex-direction: column !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .merkil-page-wrapper .button-02:hover .button-02-arrow-group {
-  transform: translateY(-14px);
+  transform: translateY(-14px) !important;
 }
 
 .merkil-page-wrapper .button-02-text-wrap {
-  position: relative;
-  overflow: hidden;
-  height: 20px;
+  position: relative !important;
+  overflow: hidden !important;
+  height: 20px !important;
+  display: block !important;
 }
 
 .merkil-page-wrapper .button-02-text-group {
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .merkil-page-wrapper .button-02:hover .button-02-text-group {
-  transform: translateY(-20px);
+  transform: translateY(-20px) !important;
 }
 
 .merkil-page-wrapper .button-03 {
@@ -684,32 +701,29 @@
 .merkil-page-wrapper .merkil-services-card {
   padding: 24px 22px;
   border-radius: 20px;
-  background-color: #f5f0ff;
-  border: 1px solid #e9dcfc;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   min-height: auto;
   box-shadow: 0 4px 16px rgba(11, 15, 23, 0.02);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .merkil-page-wrapper .services-card:hover,
 .merkil-page-wrapper .merkil-services-card:hover {
   transform: translateY(-4px);
+  border-color: rgba(99, 102, 241, 0.3);
   box-shadow: 0 12px 28px rgba(11, 15, 23, 0.06);
 }
 
 .merkil-page-wrapper .services-card._02,
-.merkil-page-wrapper .merkil-services-card.pink {
-  background-color: #fdf2ff;
-  border-color: #f5dcfc;
-}
-
+.merkil-page-wrapper .merkil-services-card.pink,
 .merkil-page-wrapper .services-card._03,
 .merkil-page-wrapper .merkil-services-card.yellow {
-  background-color: #fcfde6;
-  border-color: #eef3aa;
+  background-color: #ffffff;
+  border-color: #e2e8f0;
 }
 
 .merkil-page-wrapper .services-icon,
@@ -1638,22 +1652,22 @@
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background-color: #e4d3ff;
+  background-color: #f1f5f9;
+  border: 1px solid #e2e8f0;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
   font-size: 15px;
-  color: #0b0f17;
+  color: #0f172a;
   flex-shrink: 0;
 }
 
-.merkil-page-wrapper .merkil-purpose-icon-box.pink {
-  background-color: #f9dbff;
-}
-
+.merkil-page-wrapper .merkil-purpose-icon-box.pink,
 .merkil-page-wrapper .merkil-purpose-icon-box.yellow {
-  background-color: #f5f7b8;
+  background-color: #f1f5f9;
+  border-color: #e2e8f0;
+  color: #0f172a;
 }
 
 .merkil-page-wrapper .merkil-values-section {
@@ -1670,24 +1684,20 @@
 .merkil-page-wrapper .merkil-values-card {
   padding: 36px 28px;
   border-radius: 24px;
-  background-color: #f9f9fb;
-  border: 1px solid #eef0f4;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   min-height: 340px;
+  box-shadow: 0 4px 16px rgba(11, 15, 23, 0.02);
 }
 
-.merkil-page-wrapper .merkil-values-card.purple {
-  background-color: #e4d3ff;
-}
-
-.merkil-page-wrapper .merkil-values-card.pink {
-  background-color: #f9dbff;
-}
-
+.merkil-page-wrapper .merkil-values-card.purple,
+.merkil-page-wrapper .merkil-values-card.pink,
 .merkil-page-wrapper .merkil-values-card.yellow {
-  background-color: #f5f7b8;
+  background-color: #ffffff;
+  border-color: #e2e8f0;
 }
 
 .merkil-page-wrapper .merkil-values-icon-box {
@@ -2192,30 +2202,30 @@
 .merkil-page-wrapper .cta-button-text-wrap,
 .merkil-page-wrapper .button-01-text-wrap,
 .merkil-page-wrapper .button-02-text-wrap {
-  position: relative;
-  overflow: hidden;
-  height: 22px;
-  display: inline-flex;
-  align-items: center;
+  position: relative !important;
+  overflow: hidden !important;
+  height: 20px !important;
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .merkil-page-wrapper .cta-button-text-group,
 .merkil-page-wrapper .button-01-text-group,
 .merkil-page-wrapper .button-02-text-group {
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .merkil-page-wrapper .button-01-text,
 .merkil-page-wrapper .cta-button .button-01-text,
 .merkil-page-wrapper .button-01 .button-01-text,
 .merkil-page-wrapper .button-02 .button-01-text {
-  height: 22px !important;
-  line-height: 22px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+  height: 20px !important;
+  line-height: 20px !important;
+  display: block !important;
   font-size: 14.5px !important;
   font-weight: 700 !important;
   white-space: nowrap !important;
@@ -2226,5 +2236,5 @@
 .merkil-page-wrapper .cta-button:hover .cta-button-text-group,
 .merkil-page-wrapper .button-01:hover .button-01-text-group,
 .merkil-page-wrapper .button-02:hover .button-02-text-group {
-  transform: translateY(-22px) !important;
+  transform: translateY(-20px) !important;
 }

@@ -13,6 +13,10 @@ export const data: ServicePageData = {
     "From web and mobile applications to custom software and enterprise platforms, we help ensure your digital products perform as expected.",
   ],
   heroCta: { label: "Get a Free Testing Consultation", href: "/contact" },
+  heroCtas: [
+    { label: "Get a Free Testing Consultation", href: "/contact" },
+    { label: "Talk to Our Experts", href: "/contact" },
+  ],
   blocks: [
     {
       type: "ai",
@@ -26,6 +30,7 @@ export const data: ServicePageData = {
         "Regression Testing",
         "User Acceptance Testing",
       ],
+      cta: { label: "Explore Functional Testing", href: "/contact" },
     },
     {
       type: "ai",
@@ -39,6 +44,7 @@ export const data: ServicePageData = {
         "UI & Usability Testing",
         "Mobile Performance Testing",
       ],
+      cta: { label: "Explore Mobile App Testing", href: "/contact" },
     },
     {
       type: "ai",
@@ -52,6 +58,7 @@ export const data: ServicePageData = {
         "Compatibility Testing",
         "Responsive Testing",
       ],
+      cta: { label: "Explore Web App Testing", href: "/contact" },
     },
     {
       type: "ai",
@@ -65,6 +72,7 @@ export const data: ServicePageData = {
         "Response-Time Testing",
         "Performance Monitoring",
       ],
+      cta: { label: "Explore Performance Testing", href: "/contact" },
     },
     {
       type: "ai",
@@ -78,6 +86,7 @@ export const data: ServicePageData = {
         "Authorization Testing",
         "API Security Testing",
       ],
+      cta: { label: "Explore Security Testing", href: "/contact" },
     },
     {
       type: "ai",
@@ -91,6 +100,7 @@ export const data: ServicePageData = {
         "Automated Functional Testing",
         "Continuous Testing Support",
       ],
+      cta: { label: "Explore Automation Testing", href: "/contact" },
     },
     {
       type: "process",
@@ -131,7 +141,6 @@ export const data: ServicePageData = {
     {
       type: "whyChoose",
       title: "Why Choose Quickupp Softech?",
-      tagline: "Business-focused QA approach",
       desc: "We work alongside development teams to identify issues early and help deliver better software experiences.",
       bullets: [
         "Business-focused QA approach",
@@ -146,6 +155,8 @@ export const data: ServicePageData = {
     },
     {
       type: "industries",
+      title: "Industries We Serve",
+      intro: "Our Software Testing Company supports businesses across:",
       industries: [
         "Healthcare",
         "Home Services",
@@ -161,6 +172,7 @@ export const data: ServicePageData = {
     },
     {
       type: "faq",
+      title: "Frequently Asked Questions",
       items: [
         {
           q: "What is Quality Assurance & Testing?",

@@ -19,7 +19,7 @@ export default function MerkilCategoryHub({ category }: MerkilCategoryHubProps) 
     <div className="merkil-page-wrapper">
       <Header />
 
-      <main style={{ paddingTop: "80px" }}>
+      <main style={{ paddingTop: "135px" }}>
         {/* ========================================================================= */}
         {/* 1. HERO SECTION (Full-Bleed Right Edge to Edge Matching Reference) */}
         {/* ========================================================================= */}

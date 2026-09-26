@@ -374,12 +374,39 @@ export default function CareerPage() {
       <Header />
 
       {/* =========================================================================
-          1. MANIFESTO & BIG CONTINUOUS PHOTO GALLERY STRIP (Centered & Scroll Highlight)
+          1. HERO HEADER & MANIFESTO PHOTO STRIP
           ========================================================================= */}
-      <section className="sc-manifesto-section">
+      <section className="sc-manifesto-section" style={{ paddingTop: "145px" }}>
         <div className="w-layout-blockcontainer container w-container">
-          <div className="sc-manifesto-center-wrap">
-            <span className="sc-manifesto-badge">2026 • GLOBAL TEAM &amp; ENGINEERING CULTURE</span>
+          <div className="sc-manifesto-center-wrap" style={{ maxWidth: "880px", margin: "0 auto 48px", textAlign: "center" }}>
+            <div className="sc-badge" style={{ margin: "0 auto 18px" }}>
+              <span className="sc-badge-dot" />
+              <span>CAREERS AT QUICKUPP SOFTECH</span>
+            </div>
+            <h1 style={{ fontSize: "clamp(34px, 4.4vw, 56px)", fontWeight: 800, color: "#0b0f17", letterSpacing: "-0.03em", lineHeight: 1.15, margin: "0 0 18px" }}>
+              Build the Future of <span className="qs-gradient-text">AI, Tech &amp; Growth.</span>
+            </h1>
+            <p style={{ fontSize: "clamp(16px, 1.3vw, 19px)", color: "#475569", lineHeight: 1.65, maxWidth: "740px", margin: "0 auto 28px" }}>
+              Join a distributed collective of engineers, growth strategists, and AI researchers architecting high-converting digital products.
+            </p>
+            <div style={{ display: "flex", justifyContent: "center", gap: "14px", flexWrap: "wrap" }}>
+              <a href="#open-roles" className="sc-apply-role-btn" style={{ padding: "12px 28px", fontSize: "14px" }}>
+                <span>Explore Open Roles</span>
+                <svg width="14" height="14" viewBox="0 0 18 18" fill="none">
+                  <path d="M3.75 9L14.25 9M14.25 9L9 3.75M14.25 9L9 14.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </a>
+              <a href="#our-values" className="sc-view-details-btn" style={{ padding: "12px 24px", fontSize: "14px" }}>
+                <span>Our Principles</span>
+              </a>
+            </div>
+          </div>
+
+          <div className="sc-manifesto-center-wrap" style={{ margin: "60px auto 44px" }}>
+            <div className="sc-badge" style={{ margin: "0 auto 20px" }}>
+              <span className="sc-badge-dot" />
+              <span>2026 • GLOBAL TEAM &amp; ENGINEERING CULTURE</span>
+            </div>
             <h2 ref={manifestoRef} className="sc-manifesto-text-center">
               {manifestoWords.map((word, idx) => {
                 const wordThreshold = (idx + 0.3) / manifestoWords.length;
@@ -419,7 +446,7 @@ export default function CareerPage() {
               <span className="sc-badge-dot" />
               <span>Our Principles</span>
             </div>
-            <h2 className="sc-section-title">The Values of Our Culture</h2>
+            <h2 className="sc-section-title">The Values of <span className="qs-gradient-text">Our Culture</span></h2>
             <p className="sc-section-desc">
               We fuel bold ideas with sharp strategy, data-backed execution, and relentless commitment to craft.
             </p>
@@ -447,7 +474,7 @@ export default function CareerPage() {
               <span className="sc-badge-dot" />
               <span>Why Quickupp</span>
             </div>
-            <h2 className="sc-section-title">Why We’re the Right Choice</h2>
+            <h2 className="sc-section-title">Why We’re the <span className="qs-gradient-text">Right Choice</span></h2>
             <p className="sc-section-desc">
               A workplace engineered for high autonomy, technical mastery, and rapid career acceleration.
             </p>
@@ -507,7 +534,7 @@ export default function CareerPage() {
               <span className="sc-badge-dot" />
               <span>Current Openings ({openRolesData.length})</span>
             </div>
-            <h2 className="sc-section-title">Find Your Next Role</h2>
+            <h2 className="sc-section-title">Find Your <span className="qs-gradient-text">Next Role</span></h2>
             <p className="sc-section-desc">
               Explore our current engineering, AI, marketing, and design opportunities.
             </p>
@@ -615,7 +642,7 @@ export default function CareerPage() {
               <span className="sc-badge-dot" />
               <span>Team Voices</span>
             </div>
-            <h2 className="sc-section-title">Hear from Our Global Team</h2>
+            <h2 className="sc-section-title">Hear from Our <span className="qs-gradient-text">Global Team</span></h2>
             <p className="sc-section-desc">
               Discover what developers, growth marketers, and designers say about life at Quickupp.
             </p>

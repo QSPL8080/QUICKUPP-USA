@@ -100,35 +100,39 @@
   object-fit: cover;
 }
 
-/* Subtitle Pill Badge matching Contact Page */
+/* Subtitle Topic Eyebrow */
 .mx-subtitle-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 14px;
-  border-radius: 100px;
-  background: rgba(15, 23, 42, 0.04);
-  border: 1px solid rgba(15, 23, 42, 0.09);
-  color: #0f172a;
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
-  transition: transform 0.3s ease, border-color 0.3s ease;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 6px 14px !important;
+  border-radius: 100px !important;
+  background: rgba(15, 23, 42, 0.04) !important;
+  background-color: rgba(15, 23, 42, 0.04) !important;
+  border: 1px solid rgba(15, 23, 42, 0.09) !important;
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  margin-bottom: 14px !important;
+  font-family: var(--mx-heading-font, "Plus Jakarta Sans", sans-serif) !important;
   position: relative;
   z-index: 2;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+  width: fit-content !important;
 }
 
 .mx-badge-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #00d2ff, #8b5cf6, #ec4899);
-  box-shadow: 0 0 8px rgba(139, 92, 246, 0.6);
-  display: inline-block;
-  flex-shrink: 0;
+  display: inline-block !important;
+  width: 7px !important;
+  height: 7px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #00d2ff 0%, #7c3aed 50%, #ec4899 100%) !important;
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.6) !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
 }
 
 /* Center Rating Capsule Badge (Optional Variant) */
@@ -185,12 +189,12 @@
   letter-spacing: 1px;
 }
 
-/* Hero Headline matching Contact Page (.su-hero-title) */
+/* Hero Headline matching Contact Page (.su-hero-title) & reference */
 .mx-hero-title {
-  font-size: clamp(28px, 3.4vw, 44px);
-  font-weight: 800;
-  line-height: 1.18;
-  letter-spacing: -0.03em;
+  font-size: clamp(30px, 3.6vw, 48px) !important;
+  font-weight: 800 !important;
+  line-height: 1.18 !important;
+  letter-spacing: -0.03em !important;
   color: #0b0f17;
   max-width: 860px;
   margin: 0 auto 16px;
@@ -381,30 +385,34 @@
 }
 
 .mx-sub-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 14px;
-  border-radius: 100px;
-  background: rgba(15, 23, 42, 0.04);
-  border: 1px solid rgba(15, 23, 42, 0.09);
-  color: #0f172a;
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  margin-bottom: 14px;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 6px 14px !important;
+  border-radius: 100px !important;
+  background: rgba(15, 23, 42, 0.04) !important;
+  background-color: rgba(15, 23, 42, 0.04) !important;
+  border: 1px solid rgba(15, 23, 42, 0.09) !important;
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  margin-bottom: 14px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+  width: fit-content !important;
 }
 
 .mx-sub-badge::before {
-  content: "";
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #00d2ff, #8b5cf6, #ec4899);
-  box-shadow: 0 0 8px rgba(139, 92, 246, 0.6);
-  flex-shrink: 0;
+  content: "" !important;
+  display: inline-block !important;
+  width: 7px !important;
+  height: 7px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #00d2ff 0%, #7c3aed 50%, #ec4899 100%) !important;
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.6) !important;
+  flex-shrink: 0 !important;
 }
 
 .mx-gradient-text {

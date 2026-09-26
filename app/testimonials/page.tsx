@@ -94,7 +94,7 @@ export default function TestimonialsPage() {
                   margin: "0 0 18px 0",
                 }}
               >
-                Real Partnerships. Measurable Growth Outcomes.
+                Real Partnerships. <span className="qs-gradient-text">Measurable Growth Outcomes.</span>
               </h1>
               <p
                 style={{

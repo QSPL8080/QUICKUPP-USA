@@ -417,7 +417,8 @@
   margin: 0 0 16px;
 }
 
-.lc-text-white {
+.lc-text-white,
+.lc-text-white span:not(.qs-gradient-text) {
   color: #ffffff !important;
 }
 

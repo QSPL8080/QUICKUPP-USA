@@ -139,38 +139,30 @@
   justify-content: flex-start;
 }
 
-.section-subtitle-single {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 18px;
-  border-radius: 100px;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-}
-
+.section-subtitle-single,
 .section-subtitle-single.gray-bg {
-  background: rgba(246, 246, 249, 0.12);
-  border: 1px solid rgba(246, 246, 249, 0.18);
-  backdrop-filter: blur(8px);
+  display: inline-block !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  margin-bottom: 12px !important;
 }
 
 .section-subtitle-icon {
-  width: 14px;
-  height: 14px;
+  display: none !important;
 }
 
-.section-subtitle {
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #141414;
-}
-
+.section-subtitle,
 .section-subtitle.white {
-  color: #ffffff;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: #6366f1 !important;
+  font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", sans-serif) !important;
 }
 
 /* Section Titles */
@@ -181,10 +173,10 @@
 }
 
 .section-title {
-  font-size: clamp(34px, 4.4vw, 56px);
-  font-weight: 800;
-  line-height: 1.15;
-  letter-spacing: -0.025em;
+  font-size: clamp(22px, 2.4vw, 32px) !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+  letter-spacing: -0.02em !important;
   color: #141414;
   margin: 0 0 16px 0;
 }
@@ -227,10 +219,10 @@
 }
 
 .inner-banner-title {
-  font-size: clamp(40px, 5.2vw, 68px);
-  font-weight: 800;
-  line-height: 1.12;
-  letter-spacing: -0.03em;
+  font-size: clamp(30px, 3.6vw, 48px) !important;
+  font-weight: 800 !important;
+  line-height: 1.18 !important;
+  letter-spacing: -0.03em !important;
   color: #141414;
   margin: 0 0 18px 0;
 }
@@ -931,11 +923,11 @@
 }
 
 .cta-title {
-  font-size: clamp(36px, 4.6vw, 60px);
-  font-weight: 800;
-  line-height: 1.15;
+  font-size: clamp(22px, 2.4vw, 32px) !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
   color: #ffffff;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.02em !important;
   margin: 0;
 }
 

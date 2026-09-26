@@ -59,7 +59,7 @@ export default function ResourceCtaBanner({
             </div>
 
             <h2 className="res-cta-heading">
-              {title} <span className="res-heading-accent">{titleAccent}</span>
+              {title} <span className="qs-gradient-text">{titleAccent}</span>
             </h2>
 
             <div className="res-cta-btn-group">

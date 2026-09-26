@@ -103,7 +103,7 @@ export default function RitovexServicesListing() {
             </div>
 
             <div className="inner-banner-typography">
-              <h1 className="inner-banner-title">Creative Solutions</h1>
+              <h1 className="inner-banner-title">Creative <span className="qs-gradient-text">Solutions</span></h1>
               <p className="inner-banner-description">
                 We deliver innovative, tailor-made strategies that solve problems, spark ideas, and bring your vision to life—efficiently and effectively.
               </p>
@@ -163,7 +163,7 @@ export default function RitovexServicesListing() {
                 <div className="section-subtitle white">Services</div>
               </div>
             </div>
-            <h2 className="section-title white">Your Needs, Our Expertise</h2>
+            <h2 className="section-title white">Your Needs, Our <span className="qs-gradient-text">Expertise</span></h2>
             <p className="section-description white-color services">
               Your Vision, Our Expertise – Together, we bring ideas to life with tailored solutions that deliver real results. Let’s build something amazing.
             </p>
@@ -279,7 +279,7 @@ export default function RitovexServicesListing() {
                 <div className="section-subtitle">CMS Technology</div>
               </div>
             </div>
-            <h2 className="section-title cms-technology-tools">Tools We Use to Build Great Products</h2>
+            <h2 className="section-title cms-technology-tools">Tools We Use to <span className="qs-gradient-text">Build Great Products</span></h2>
             <p className="section-description cms-technology-description">
               We use modern, reliable technologies to craft fast, user-friendly digital experiences. Our stack is built for performance, scalability, and smooth development.
             </p>
@@ -334,7 +334,7 @@ export default function RitovexServicesListing() {
                   </div>
                 </div>
                 <div className="benefit-section-title-description">
-                  <h2 className="section-title white">Why Choose Our Services</h2>
+                  <h2 className="section-title white">Why Choose Our <span className="qs-gradient-text">Services</span></h2>
                   <p className="section-description white-color benefit-description">
                     Get high-quality results, faster delivery, and tailored solutions that grow with your business. We focus on value, efficiency, and long-term success for every project.
                   </p>
@@ -402,7 +402,7 @@ export default function RitovexServicesListing() {
                 <div className="section-subtitle">FAQS</div>
               </div>
             </div>
-            <h2 className="section-title">Frequently Asked Questions</h2>
+            <h2 className="section-title">Frequently Asked <span className="qs-gradient-text">Questions</span></h2>
             <p className="section-description cms-technology-description">
               Find answers to common questions about our working process, technology stack, and project execution.
             </p>
@@ -481,7 +481,7 @@ export default function RitovexServicesListing() {
                   <div className="section-subtitle">Testimonial</div>
                 </div>
               </div>
-              <h2 className="section-title">What Our Clients are Saying</h2>
+              <h2 className="section-title">What Our Clients <span className="qs-gradient-text">are Saying</span></h2>
               <p className="section-description about-us">
                 Hear directly from our clients about their experiences and the results we've delivered.
               </p>
@@ -533,7 +533,7 @@ export default function RitovexServicesListing() {
               <div className="cta-typography">
                 <div className="cta-title-wrapper">
                   <h6 className="cta-subtitle">Have a project in mind? Just let us know!</h6>
-                  <h2 className="cta-title">Let’s Start Talk</h2>
+                  <h2 className="cta-title">Let’s <span className="qs-gradient-text">Start Talk</span></h2>
                 </div>
                 <div className="cta-button-wrapper">
                   <Link href="/contact" className="primary-button">

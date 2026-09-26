@@ -747,14 +747,15 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
               <section key={bIdx} className="asx-section" style={{ borderTop: "1px solid #e5eaee" }}>
                 <div className="asx-container">
                   <div className="asx-section-header-center" style={{ maxWidth: "860px", marginBottom: "36px" }}>
+                    {listBlock.tagline && (
+                      <div className="asx-tag-pill" style={{ margin: "0 auto 12px" }}>
+                        <span className="asx-tag-dot" />
+                        <span>{listBlock.tagline}</span>
+                      </div>
+                    )}
                     <h2 style={{ fontSize: "clamp(18px, 1.8vw, 24px)", fontWeight: 800, color: "#001d28", margin: "0 0 10px" }}>
                       {renderGradientTitle(listBlock.title)}
                     </h2>
-                    {listBlock.tagline && (
-                      <p style={{ fontSize: "15px", fontWeight: 600, color: "#7c3aed", margin: "0 0 8px" }}>
-                        {listBlock.tagline}
-                      </p>
-                    )}
                     {listBlock.desc && (
                       <p style={{ fontSize: "15.5px", color: "#2c436b", lineHeight: 1.6, margin: 0 }}>
                         {listBlock.desc}
@@ -878,7 +879,8 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                   <div className="asx-valprop-grid">
                     <div>
                       {whyChooseBlock.tagline && (
-                        <div className="asx-tag-pill" style={{ background: "#ffffff", borderColor: "#dce3e4", color: "#001d28" }}>
+                        <div className="asx-tag-pill" style={{ marginBottom: "14px" }}>
+                          <span className="asx-tag-dot" />
                           <span>{whyChooseBlock.tagline}</span>
                         </div>
                       )}
@@ -963,14 +965,15 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
               <section key={bIdx} className="asx-section" style={{ borderTop: "1px solid #e5eaee" }}>
                 <div className="asx-container">
                   <div className="asx-section-header-center" style={{ marginBottom: "36px" }}>
+                    {processBlock.tagline && (
+                      <div className="asx-tag-pill" style={{ margin: "0 auto 12px" }}>
+                        <span className="asx-tag-dot" />
+                        <span>{processBlock.tagline}</span>
+                      </div>
+                    )}
                     <h2 style={{ fontSize: "clamp(18px, 1.8vw, 24px)", fontWeight: 800, color: "#001d28", margin: 0 }}>
                       {renderGradientTitle(processBlock.title)}
                     </h2>
-                    {processBlock.tagline && (
-                      <p style={{ fontSize: "15px", color: "#2c436b", margin: "10px 0 0" }}>
-                        {processBlock.tagline}
-                      </p>
-                    )}
                     {processBlock.intro && (
                       <p style={{ fontSize: "15px", color: "#2c436b", margin: "10px 0 0" }}>
                         {processBlock.intro}

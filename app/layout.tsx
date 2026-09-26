@@ -45,24 +45,27 @@ export default function RootLayout({
         <link rel="stylesheet" href="/css/mindix-about.css" />
         <link rel="preload" as="image" href="/images/slider-01-01.jpg" fetchPriority="high" />
         <Script
+          id="webfont-script"
           src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"
           strategy="lazyOnload"
         />
-        <Script id="webfont-load" strategy="lazyOnload">{`
-          if (window.WebFont) {
-            WebFont.load({
-              google: {
-                families: ["DM Sans:300,400,500,600,700","Plus Jakarta Sans:300,400,500,600,700"]
-              }
-            });
-          }
-        `}</Script>
-        <Script id="w-mod-js" strategy="beforeInteractive">{`
-          !function(o,c){var n=c.documentElement,t=" w-mod-";n.className+=t+"js",("ontouchstart"in o||o.DocumentTouch&&c instanceof DocumentTouch)&&(n.className+=t+"touch")}(window,document);
-        `}</Script>
-        <Script id="wf-page-ids" strategy="beforeInteractive">{`
-          (function(){var h=document.documentElement;h.setAttribute("data-wf-site","6944f1597ac277b25076ccab");if(location.pathname==="/"){h.setAttribute("data-wf-page","6944f1597ac277b25076cc8e");}})();
-        `}</Script>
+        <Script
+          id="webfont-load"
+          strategy="lazyOnload"
+          dangerouslySetInnerHTML={{
+            __html: `if (window.WebFont) { WebFont.load({ google: { families: ["DM Sans:300,400,500,600,700","Plus Jakarta Sans:300,400,500,600,700"] } }); }`,
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `!function(o,c){var n=c.documentElement,t=" w-mod-";n.className+=t+"js",("ontouchstart"in o||o.DocumentTouch&&c instanceof DocumentTouch)&&(n.className+=t+"touch")}(window,document);`,
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var h=document.documentElement;h.setAttribute("data-wf-site","6944f1597ac277b25076ccab");if(location.pathname==="/"){h.setAttribute("data-wf-page","6944f1597ac277b25076cc8e");}})();`,
+          }}
+        />
         <Script src="/js/jquery.js" strategy="beforeInteractive" />
       </head>
       <body>

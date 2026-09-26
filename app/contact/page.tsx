@@ -51,7 +51,7 @@ export default function ContactPage() {
               <span>Digital Marketing, SEO &amp; AI Solutions</span>
             </div>
             <h1 className="su-hero-title">
-              Get In Touch For Any <span className="su-hero-title-accent">Questions Or Ideas</span>
+              Get In Touch For Any <span className="qs-gradient-text">Questions Or Ideas</span>
             </h1>
             <p className="su-hero-desc">
               Where smart strategy, data, and execution come together to deliver measurable business success.

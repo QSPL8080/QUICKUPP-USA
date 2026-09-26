@@ -12,6 +12,32 @@ interface Props {
   categorySlug?: string;
 }
 
+// Helper to render headings with the second half or punchline in gradient text
+function renderGradientHeading(text?: string) {
+  if (!text) return null;
+  const words = text.trim().split(/\s+/);
+  if (words.length === 1) {
+    return <span className="qs-gradient-text">{words[0]}</span>;
+  }
+  if (words.length === 2) {
+    return (
+      <>
+        <span>{words[0]}</span> <span className="qs-gradient-text">{words[1]}</span>
+      </>
+    );
+  }
+  const splitPoint = Math.max(1, Math.floor(words.length * 0.55));
+  const firstPart = words.slice(0, splitPoint).join(" ");
+  const secondPart = words.slice(splitPoint).join(" ");
+
+  return (
+    <>
+      <span>{firstPart}</span>{" "}
+      <span className="qs-gradient-text">{secondPart}</span>
+    </>
+  );
+}
+
 function StaggeredDeliverablesSection({
   title,
   desc,
@@ -50,7 +76,7 @@ function StaggeredDeliverablesSection({
             <span className="sc-values-badge-dot" />
             <span>FORMATS &amp; DELIVERABLES</span>
           </div>
-          <h2 className="sc-section-title">{title}</h2>
+          <h2 className="sc-section-title">{renderGradientHeading(title)}</h2>
           <p className="sc-section-desc">
             {desc ||
               "From social-first viral content to enterprise-grade communications, explore the video formats we produce at scale."}
@@ -165,8 +191,8 @@ export default function AIVideoServicePage({
                 {data.heroEyebrow}
               </span>
             )}
-            <h1 className="sc-hero-title" style={{ fontSize: "clamp(28px, 3.4vw, 44px)", fontWeight: 800, color: "#0b0f17", margin: "0 0 16px" }}>
-              {data.heroTitle}
+            <h1 className="sc-hero-title" style={{ fontSize: "clamp(30px, 3.6vw, 48px)", fontWeight: 800, color: "#0b0f17", margin: "0 0 16px" }}>
+              {renderGradientHeading(data.heroTitle)}
             </h1>
             {manifestoWords.length > 0 && (
               <h2 ref={manifestoRef} className="sc-manifesto-text-center" style={{ marginTop: "16px" }}>
@@ -247,7 +273,7 @@ export default function AIVideoServicePage({
                       <span className="sc-values-badge-dot" style={{ backgroundColor: "#10b981" }} />
                       <span>WHY QUICKUPP</span>
                     </div>
-                    <h2 className="sc-section-title">{blockTitle}</h2>
+                    <h2 className="sc-section-title">{renderGradientHeading(blockTitle)}</h2>
                     <p className="sc-section-desc">
                       Built for high performance, creative excellence, and measurable business growth.
                     </p>
@@ -290,18 +316,10 @@ export default function AIVideoServicePage({
           // BLOCK TYPE 2: AI / USE CASES (Split Showcase Layout)
           // -------------------------------------------------------------------
           if (bIdx % 3 === 1) {
+            const headerDesc = (block as any).desc || (block as any).intro;
             return (
               <section key={bIdx} className="sc-choice-section" style={{ backgroundColor: "#f8fafc" }}>
                 <div className="w-layout-blockcontainer container w-container">
-                  <div className="sc-section-header">
-                    <h2 className="sc-section-title">{blockTitle}</h2>
-                    {(block as any).intro && (
-                      <p className="sc-section-desc" style={{ fontWeight: 600, color: "#1e293b", margin: "8px 0 0" }}>
-                        {(block as any).intro}
-                      </p>
-                    )}
-                  </div>
-
                   <div className="sc-choice-grid">
                     {/* Left Visual */}
                     <div className="sc-choice-left-visual">
@@ -310,25 +328,36 @@ export default function AIVideoServicePage({
                         alt={blockTitle}
                         className="sc-choice-left-img"
                       />
+                      <div className="sc-choice-badge-overlay">
+                        <div className="sc-choice-badge-title">Enterprise Video Engine</div>
+                        <p className="sc-choice-badge-sub">High-converting video assets engineered for scale &amp; retention.</p>
+                      </div>
                     </div>
 
-                    {/* Right Grid */}
-                    <div className="sc-choice-cards-grid">
-                      {items.map((item, idx) => (
-                        <div key={idx} className="sc-choice-item-card">
-                          <div className="sc-choice-item-title">✦ {item}</div>
-                        </div>
-                      ))}
+                    {/* Right Column Content */}
+                    <div className="sc-choice-right-content" style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                      <h2 className="sc-section-title" style={{ textAlign: "left", margin: "0 0 24px 0", fontSize: "clamp(26px, 3.2vw, 38px)", fontWeight: 800, color: "#0b0f17", lineHeight: 1.25 }}>
+                        {renderGradientHeading(blockTitle)}
+                      </h2>
+                      <div className="sc-choice-cards-grid">
+                        {items.map((item, idx) => (
+                          <div key={idx} className="sc-choice-item-card">
+                            <div className="sc-choice-card-icon-wrap">
+                              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                                <path d="M8 3V13M3 8H13" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"/>
+                              </svg>
+                            </div>
+                            <span className="sc-choice-item-title">{item}</span>
+                          </div>
+                        ))}
+                      </div>
+                      {headerDesc && (
+                        <p className="sc-section-desc" style={{ textAlign: "left", margin: "20px 0 0", color: "#475569", fontSize: "15px", lineHeight: "1.6" }}>
+                          {headerDesc}
+                        </p>
+                      )}
                     </div>
                   </div>
-
-                  {(block as any).desc && (
-                    <div style={{ maxWidth: "800px", margin: "32px auto 0", textAlign: "center" }}>
-                      <p className="sc-section-desc" style={{ margin: 0, color: "#475569", fontSize: "16px", lineHeight: "1.6" }}>
-                        {(block as any).desc}
-                      </p>
-                    </div>
-                  )}
                 </div>
               </section>
             );
@@ -340,8 +369,14 @@ export default function AIVideoServicePage({
           return (
             <section key={bIdx} className="sc-roles-section" style={{ backgroundColor: "#ffffff" }}>
               <div className="w-layout-blockcontainer container w-container">
-                <div className="sc-section-header">
-                  <h2 className="sc-section-title">{blockTitle}</h2>
+                <div className="sc-section-header" style={{ textAlign: "center", maxWidth: "680px", margin: "0 auto 36px" }}>
+                  <div className="sc-values-badge" style={{ marginBottom: "12px", display: "inline-flex" }}>
+                    <span className="sc-values-badge-dot" style={{ backgroundColor: "#a855f7" }} />
+                    <span>PRODUCTION SHOWCASE</span>
+                  </div>
+                  <h2 className="sc-section-title" style={{ fontSize: "clamp(26px, 3.2vw, 40px)", fontWeight: 800, color: "#0b0f17", margin: "0 0 14px", lineHeight: 1.25 }}>
+                    {renderGradientHeading(blockTitle)}
+                  </h2>
                   {blockDesc && <p className="sc-section-desc">{blockDesc}</p>}
                 </div>
 
@@ -377,7 +412,7 @@ export default function AIVideoServicePage({
         <div className="w-layout-blockcontainer container w-container">
           <div className="su-cinematic-content">
             <h2 className="su-cinematic-heading">
-              {data.closingTitle}
+              {renderGradientHeading(data.closingTitle)}
             </h2>
             {data.closingDesc && (
               <div style={{ maxWidth: "680px", margin: "0 auto 28px", color: "rgba(255, 255, 255, 0.9)", fontSize: "16px", lineHeight: "1.6" }}>

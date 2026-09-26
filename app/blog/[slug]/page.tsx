@@ -27,6 +27,23 @@ export async function generateMetadata({
   };
 }
 
+function renderGradientHeading(text?: string) {
+  if (!text) return null;
+  const words = text.split(" ");
+  if (words.length <= 2) {
+    return <span className="qs-gradient-text">{text}</span>;
+  }
+  const splitIndex = Math.ceil(words.length / 2);
+  const firstHalf = words.slice(0, splitIndex).join(" ");
+  const secondHalf = words.slice(splitIndex).join(" ");
+
+  return (
+    <>
+      {firstHalf} <span className="qs-gradient-text">{secondHalf}</span>
+    </>
+  );
+}
+
 export default async function SingleBlogPage({
   params,
 }: {
@@ -80,7 +97,7 @@ export default async function SingleBlogPage({
               letterSpacing: "-0.02em",
             }}
           >
-            {post.title}
+            {renderGradientHeading(post.title)}
           </h1>
 
           <p

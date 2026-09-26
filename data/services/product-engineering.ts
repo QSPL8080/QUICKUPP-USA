@@ -14,6 +14,10 @@ export const data: ServicePageData = {
     "Build Better Software. Automate Operations. Scale With Technology.",
   ],
   heroCta: { label: "Discuss Your Software Project", href: "/contact" },
+  heroCtas: [
+    { label: "Discuss Your Software Project", href: "/contact" },
+    { label: "Get a Free Consultation", href: "/contact" },
+  ],
   blocks: [
     {
       type: "ai",
@@ -241,6 +245,7 @@ export const data: ServicePageData = {
     {
       type: "process",
       title: "From Business Idea to Production-Ready Product",
+      desc: "Our Product Engineering Company takes a structured approach to software development—from understanding your business problem to designing, developing, launching, and continuously improving your product.",
       steps: [
         {
           num: "01",
@@ -313,7 +318,7 @@ export const data: ServicePageData = {
       type: "ai",
       title: "Who We Build Software For",
       intro:
-        "Our Custom Software Development Services support businesses at different stages of digital transformation:",
+        "Our Custom Software Development Services support businesses at different stages of digital transformation.",
       bullets: [
         "Startups building their first MVP",
         "SMBs replacing manual processes",
@@ -327,6 +332,8 @@ export const data: ServicePageData = {
     },
     {
       type: "industries",
+      title: "Industries We Serve",
+      intro: "We provide Product Engineering Services for businesses across:",
       industries: [
         "Healthcare",
         "Home Services",
@@ -344,7 +351,7 @@ export const data: ServicePageData = {
       type: "ai",
       title: "Why Invest in Custom Business Software?",
       intro:
-        "Off-the-shelf software may not always match the way your business operates. Custom software can help you create technology around your specific processes and requirements. With the right solution, businesses can:",
+        "Off-the-shelf software may not always match the way your business operates. Custom software can help you create technology around your specific processes and requirements.\n\nWith the right solution, businesses can:",
       bullets: [
         "Reduce manual processes",
         "Improve operational efficiency",
@@ -361,6 +368,7 @@ export const data: ServicePageData = {
     },
     {
       type: "faq",
+      title: "Frequently Asked Questions",
       items: [
         {
           q: "What is Product Engineering?",
@@ -402,8 +410,8 @@ export const data: ServicePageData = {
     "Have a software idea? Need to automate your business? Looking to build an ERP, CRM, SaaS product, enterprise application, or AI-powered platform?\n\nQuickupp Softech helps businesses transform ideas and operational challenges into scalable software products.\nLet's engineer a solution built around your business.",
   closingCtas: [
     { label: "Request a Software Development Quote", href: "/contact" },
-    { label: "Get a Free Consultation", href: "/contact" },
   ],
 };
 
 export default data;
+

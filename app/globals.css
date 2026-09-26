@@ -24,10 +24,29 @@
   --qs-pink: #ec4899 !important;
 }
 
-/* Global body styling */
+/* Global gradient text system (Ref: /about/why-choose-us) */
+.qs-gradient-text,
+.mx-gradient-text,
+.asx-gradient-text,
+.gradient-text,
+.text-gradient {
+  background: linear-gradient(135deg, #00d2ff 0%, #6366f1 50%, #a855f7 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  display: inline !important;
+}
+
+/* Global body and html styling */
+html {
+  background-color: #0b0d11;
+}
+
 body {
   background-color: #f8fafc;
   color: #0f172a;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
 }
 /* Global styles - imported from Webflow */
 /* The main CSS is loaded via <link> tag in layout.tsx from /css/mercket.webflow.shared.3eb5ac14d.min.css */
@@ -43,25 +62,41 @@ h1, h2, h3, h4, h5, h6,
   letter-spacing: -0.02em;
 }
 
-/* Fluid responsive headings across all service & inner pages */
-.breadcrumb-heading-title {
-  font-size: clamp(36px, 4.8vw, 56px) !important;
-  line-height: 1.15 !important;
+/* Fluid responsive headings across all service, home & inner pages (Ref: /services/information-technology-services/web-design-development) */
+.hero-one-title,
+.home-hero-heading,
+.breadcrumb-heading-title,
+.qs-main-title,
+.su-hero-title,
+.asx-hero-title,
+.mx-hero-title,
+.inner-banner-title,
+.sc-hero-title,
+.hero-title,
+h1 {
+  font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif) !important;
+  font-size: clamp(30px, 3.6vw, 48px) !important;
+  line-height: 1.18 !important;
   font-weight: 800 !important;
-  letter-spacing: -0.025em !important;
+  letter-spacing: -0.03em !important;
 }
 
-.qs-main-title {
-  font-size: clamp(36px, 4.6vw, 54px) !important;
-  line-height: 1.15 !important;
-  font-weight: 800 !important;
-  letter-spacing: -0.025em !important;
-}
-
-.heading-title {
-  font-size: clamp(28px, 3.4vw, 42px) !important;
-  line-height: 1.2 !important;
-  font-weight: 800 !important;
+.heading-title,
+.section-title,
+.section-heading,
+.home-section-title,
+.service-heading,
+.team-heading,
+.asx-section-title,
+.mx-section-title,
+.res-section-title,
+.sc-section-title,
+.our-mission-title,
+h2 {
+  font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif) !important;
+  font-size: clamp(22px, 2.4vw, 32px) !important;
+  line-height: 1.25 !important;
+  font-weight: 700 !important;
   letter-spacing: -0.02em !important;
 }
 
@@ -1333,8 +1368,8 @@ h1, h2, h3, h4, h5, h6,
   color: #ffffff !important;
   font-weight: 800 !important;
   letter-spacing: -0.03em !important;
-  font-size: clamp(44px, 5.5vw, 76px) !important;
-  line-height: 1.1 !important;
+  font-size: clamp(30px, 3.6vw, 48px) !important;
+  line-height: 1.18 !important;
   display: block !important;
   text-shadow: 0 4px 24px rgba(0, 0, 0, 0.6) !important;
 }
@@ -1684,8 +1719,8 @@ a.button-link[data-wf--button--variant="white-bg"] .button-arrow,
   color: #ffffff !important;
   font-weight: 800 !important;
   letter-spacing: -0.03em !important;
-  font-size: clamp(44px, 5.5vw, 76px) !important;
-  line-height: 1.1 !important;
+  font-size: clamp(30px, 3.6vw, 48px) !important;
+  line-height: 1.18 !important;
 }
 
 .hero-one-title-small {
@@ -3326,7 +3361,10 @@ section.section-gap.padding-top-0 {
   z-index: 2;
   overflow: hidden;
   padding-top: 80px;
-  padding-bottom: 20px;
+  padding-bottom: 36px;
+  margin-top: auto;
+  margin-bottom: 0 !important;
+  width: 100%;
   font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif);
 }
 
@@ -3652,7 +3690,8 @@ section.section-gap.padding-top-0 {
   pointer-events: none;
   user-select: none;
   margin-top: 24px;
-  margin-bottom: -15px;
+  margin-bottom: 0px;
+  padding-bottom: 8px;
 }
 
 .qs-scalient-watermark-text {
@@ -4831,33 +4870,27 @@ section.section-gap.padding-top-0 {
 }
 
 .su-subtitle-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 14px;
-  border-radius: 100px;
-  background: rgba(15, 23, 42, 0.04);
-  border: 1px solid rgba(15, 23, 42, 0.09);
-  color: #0f172a;
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  margin-bottom: 14px;
+  display: inline-block;
+  padding: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #6366f1 !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  margin-bottom: 14px !important;
+  font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", sans-serif) !important;
 }
 
 .su-badge-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #00d2ff, #8b5cf6, #ec4899);
-  box-shadow: 0 0 8px rgba(139, 92, 246, 0.6);
-  display: inline-block;
-  flex-shrink: 0;
+  display: none !important;
 }
 
 .su-contact-hero-wrap .su-hero-title {
-  font-size: clamp(26px, 3.2vw, 42px) !important;
+  font-size: clamp(30px, 3.6vw, 48px) !important;
   font-weight: 800 !important;
   color: #0b0f17 !important;
   line-height: 1.18 !important;
@@ -5328,29 +5361,23 @@ section.section-gap.padding-top-0 {
 }
 
 .sc-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 14px;
-  border-radius: 100px;
-  background: rgba(15, 23, 42, 0.04);
-  border: 1px solid rgba(15, 23, 42, 0.09);
-  color: #0f172a;
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  margin-bottom: 14px;
+  display: inline-block;
+  padding: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #6366f1 !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  margin-bottom: 14px !important;
+  font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", sans-serif) !important;
 }
 
 .sc-badge-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #00d2ff, #8b5cf6, #ec4899);
-  box-shadow: 0 0 8px rgba(139, 92, 246, 0.6);
-  display: inline-block;
-  flex-shrink: 0;
+  display: none !important;
 }
 
 .sc-hero-title {
@@ -5940,14 +5967,14 @@ section.section-gap.padding-top-0 {
 .sc-choice-grid {
   display: grid;
   grid-template-columns: 1fr 1.2fr;
-  gap: 48px;
-  align-items: center;
+  gap: 40px;
+  align-items: stretch;
 }
 
 @media (max-width: 991px) {
   .sc-choice-grid {
     grid-template-columns: 1fr;
-    gap: 36px;
+    gap: 32px;
   }
 }
 
@@ -5955,6 +5982,7 @@ section.section-gap.padding-top-0 {
   position: relative;
   border-radius: 20px;
   overflow: hidden;
+  min-height: 380px;
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(15, 23, 42, 0.08);
 }
@@ -5962,21 +5990,21 @@ section.section-gap.padding-top-0 {
 .sc-choice-left-img {
   width: 100%;
   height: 100%;
-  max-height: 480px;
+  min-height: 380px;
   object-fit: cover;
   display: block;
 }
 
 .sc-choice-badge-overlay {
   position: absolute;
-  bottom: 24px;
-  left: 24px;
-  right: 24px;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
   background: rgba(15, 23, 42, 0.85);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 14px;
-  padding: 16px 20px;
+  padding: 14px 18px;
   color: #ffffff;
 }
 
@@ -5995,7 +6023,8 @@ section.section-gap.padding-top-0 {
 .sc-choice-cards-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: 14px;
+  align-content: center;
 }
 
 @media (max-width: 600px) {
@@ -6006,24 +6035,48 @@ section.section-gap.padding-top-0 {
 
 .sc-choice-item-card {
   background: #ffffff;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 16px;
-  padding: 22px 20px;
-  transition: all 0.25s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
 }
 
 .sc-choice-item-card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(99, 102, 241, 0.3);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 10px 24px rgba(99, 102, 241, 0.08);
+}
+
+.sc-choice-card-icon-wrap {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(99, 102, 241, 0.08);
+  color: #6366f1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.sc-choice-item-card:hover .sc-choice-card-icon-wrap {
+  background: linear-gradient(135deg, #00d2ff 0%, #6366f1 50%, #a855f7 100%);
+  color: #ffffff;
 }
 
 .sc-choice-item-title {
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 700;
   color: #0f172a;
-  margin-bottom: 6px;
+  margin: 0;
+  line-height: 1.3;
 }
 
 .sc-choice-item-desc {
@@ -6527,10 +6580,10 @@ section.section-gap.padding-top-0 {
 }
 
 .su-hero-title {
-  font-size: clamp(32px, 4.4vw, 54px) !important;
+  font-size: clamp(30px, 3.6vw, 48px) !important;
   font-weight: 800 !important;
-  line-height: 1.22 !important;
-  letter-spacing: -0.025em !important;
+  line-height: 1.18 !important;
+  letter-spacing: -0.03em !important;
   color: #0f172a !important;
   margin: 0 auto 24px auto !important;
   max-width: 920px !important;
@@ -8061,25 +8114,26 @@ section.section-gap.padding-top-0 {
   padding: 0 24px;
 }
 
-/* Section Tag with Glowing Dot */
+/* Section Tag (Consistent #6366f1 Pure Text Topic Eyebrow) */
 .res-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 11.5px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #0284c7;
-  margin-bottom: 12px;
+  display: inline-block !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  color: #6366f1 !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", sans-serif) !important;
+  margin-bottom: 12px !important;
 }
 
 .res-tag-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #0284c7;
-  box-shadow: 0 0 8px #0284c7;
+  display: none !important;
 }
 
 /* Featured Article Split Hero */
@@ -8192,7 +8246,10 @@ section.section-gap.padding-top-0 {
 }
 
 .res-heading-accent {
-  color: #7c3aed;
+  background: linear-gradient(135deg, #00d2ff 0%, #6366f1 50%, #a855f7 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  display: inline !important;
 }
 
 /* Category Filter Bar */
@@ -8905,3 +8962,197 @@ section.section-gap.padding-top-0 {
 .assurix-arrow-link:hover svg {
   transform: translate(2px, 2px);
 }
+
+/* =========================================================================
+   UNIVERSAL SITE-WIDE SECTION TOPIC BADGE SYSTEM
+   Standard Reference: Image 4 / (/about/why-choose-us)
+   Pill container, glowing gradient radiant dot, uppercase dark typography
+   across EVERY section of EVERY page site-wide.
+   ========================================================================= */
+
+/* Ensure all page wrappers have generous breathing room below the floating header */
+.res-page-wrap,
+.asx-page > main,
+.sc-career-page > main,
+.merkil-page-wrapper > main,
+.copora-page .hero-section,
+.mx-about-page .mx-hero-section {
+  padding-top: 130px !important;
+}
+
+/* 1. Universal Topic Badge Container (Pill Style) */
+.mx-sub-badge,
+.mx-subtitle-badge,
+.sc-values-badge,
+.sc-manifesto-badge,
+.sc-badge,
+.sc-dept-badge,
+.sc-hero-badge,
+.lc-badge,
+.pre-section-title,
+.copora-tagline-badge,
+.section-badge,
+.section-badge-wrap .section-badge,
+.merkil-page-wrapper .badge,
+.merkil-page-wrapper .section-badge,
+.section-subtitle-single,
+.blog-badge,
+.case-study-badge,
+.faq-badge,
+.section-tag,
+.topic-eyebrow,
+.hero-eyebrow,
+.res-tag,
+.asx-tag-pill,
+.asx-media-badge,
+.asx-badge,
+.su-badge,
+.su-subtitle-badge,
+.rx-badge,
+.rx-service-badge,
+.rx-tagline,
+.ind-badge,
+.qs-topic-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 6px 14px !important;
+  border-radius: 100px !important;
+  background: rgba(15, 23, 42, 0.04) !important;
+  background-color: rgba(15, 23, 42, 0.04) !important;
+  border: 1px solid rgba(15, 23, 42, 0.09) !important;
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", sans-serif) !important;
+  margin-bottom: 14px !important;
+  line-height: 1.3 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+  width: fit-content !important;
+  max-width: max-content !important;
+  transition: all 0.2s ease !important;
+  text-decoration: none !important;
+}
+
+/* 2. Universal Glowing Radiant Dot (Built-in elements) */
+.mx-badge-dot,
+.sc-values-badge-dot,
+.sc-badge-dot,
+.lc-badge-dot,
+.asx-tag-dot,
+.su-badge-dot,
+.badge-dot,
+.res-tag-dot,
+.subtitle-left-icon,
+.copora-tagline-badge span:first-child {
+  display: inline-block !important;
+  width: 7px !important;
+  height: 7px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #00d2ff 0%, #7c3aed 50%, #ec4899 100%) !important;
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.6) !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+}
+
+/* Hide SVG icon inside subtitle-left-icon or section-subtitle-icon to keep clean glowing dot */
+.section-subtitle-icon,
+.subtitle-left-icon svg,
+.badge-icon {
+  display: none !important;
+}
+
+/* 3. Automatic Glowing Radiant Dot for badges without internal dot element (ONLY top-level badge containers) */
+.pre-section-title:not(:has(.badge-dot)):not(:has(span.mx-badge-dot))::before,
+.copora-tagline-badge:not(:has(span))::before,
+.merkil-page-wrapper .badge:not(:has(.badge-dot))::before,
+.merkil-page-wrapper .section-badge:not(:has(.badge-dot))::before,
+.section-subtitle-single:not(:has(.section-subtitle-icon)):not(:has(.badge-dot))::before,
+.blog-badge:not(:has(.badge-dot))::before,
+.case-study-badge:not(:has(.badge-dot))::before,
+.faq-badge:not(:has(.badge-dot))::before,
+.section-tag:not(:has(.badge-dot))::before,
+.topic-eyebrow:not(:has(.badge-dot))::before,
+.hero-eyebrow:not(:has(.badge-dot))::before,
+.sc-manifesto-badge:not(:has(.sc-badge-dot))::before,
+.asx-media-badge:not(:has(.asx-tag-dot))::before,
+.mx-sub-badge:not(:has(.mx-badge-dot))::before,
+.mx-subtitle-badge:not(:has(.mx-badge-dot))::before,
+.res-tag:not(:has(.res-tag-dot))::before,
+.section-badge:not(:has(.badge-dot))::before {
+  content: "" !important;
+  display: inline-block !important;
+  width: 7px !important;
+  height: 7px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #00d2ff 0%, #7c3aed 50%, #ec4899 100%) !important;
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.6) !important;
+  flex-shrink: 0 !important;
+  margin-right: 2px !important;
+}
+
+/* Prevent any inner text elements from creating duplicate dots */
+.merkil-page-wrapper .tagline::before,
+.merkil-page-wrapper .merkil-tagline::before,
+.section-subtitle::before,
+.subtitle-head::before {
+  content: none !important;
+  display: none !important;
+}
+
+/* 4. Text inside badges stays sharp, single line, and consistent */
+.merkil-page-wrapper .tagline,
+.merkil-page-wrapper .merkil-tagline,
+.section-subtitle,
+.subtitle-head,
+.merkil-page-wrapper .section-badge span,
+.lc-badge span,
+.sc-values-badge span,
+.mx-sub-badge span,
+.mx-subtitle-badge span,
+.res-tag span,
+.blog-badge span,
+.case-study-badge span,
+.faq-badge span,
+.section-tag span,
+.topic-eyebrow span,
+.hero-eyebrow span {
+  display: inline !important;
+  color: inherit !important;
+  -webkit-text-fill-color: initial !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  letter-spacing: inherit !important;
+  text-transform: inherit !important;
+}
+
+/* 5. Dark Section Variations */
+.lc-bg-dark .lc-badge,
+.lc-badge-lime,
+.lc-badge.lc-badge-dark,
+.copora-process-section .pre-section-title,
+.pre-section-title.white,
+.dark-section .mx-sub-badge,
+.dark-section .section-badge,
+.dark-section .badge,
+.su-cinematic-cta-section .badge,
+.gray-bg.section-subtitle-single,
+.white.section-subtitle {
+  background: rgba(255, 255, 255, 0.08) !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+

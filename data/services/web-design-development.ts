@@ -13,6 +13,10 @@ export const data: ServicePageData = {
     "From WordPress and Shopify development to custom websites, ecommerce platforms, React.js, Next.js, PHP development and landing pages, we build digital experiences around your business goals.",
   ],
   heroCta: { label: "Get a Free Website Consultation", href: "/contact" },
+  heroCtas: [
+    { label: "Get a Free Website Consultation", href: "/contact" },
+    { label: "Start Your Website Project", href: "/contact" },
+  ],
   blocks: [
     {
       type: "ai",
@@ -141,6 +145,7 @@ export const data: ServicePageData = {
     {
       type: "process",
       title: "Our Web Development Process",
+      cta: { label: "Start Your Web Development Project", href: "/contact" },
       steps: [
         { num: "01", title: "Discovery", desc: "We understand your business, audience, goals and technical requirements." },
         { num: "02", title: "Planning", desc: "We define the website structure, features, technology and development roadmap." },
@@ -169,6 +174,8 @@ export const data: ServicePageData = {
     },
     {
       type: "industries",
+      title: "Industries We Serve",
+      intro: "We build websites for businesses across various industries:",
       industries: [
         "Healthcare",
         "Home Services",

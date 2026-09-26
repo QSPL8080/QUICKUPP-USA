@@ -24,7 +24,7 @@ interface MerkilMarketingServicePageProps {
   categorySlug?: string;
 }
 
-// Helper to render headings with the second half or last words in light gray text
+// Helper to render headings with the second half or punchline in gradient text
 function renderMerkilHeading(text: string) {
   if (!text) return null;
   const words = text.split(" ");
@@ -38,7 +38,7 @@ function renderMerkilHeading(text: string) {
   return (
     <>
       <span>{firstHalf}</span>{" "}
-      <span className="text-light-gray">{secondHalf}</span>
+      <span className="qs-gradient-text">{secondHalf}</span>
     </>
   );
 }
@@ -93,7 +93,7 @@ export default function MerkilMarketingServicePage({
     <div className="merkil-page-wrapper">
       <Header />
 
-      <main style={{ paddingTop: "80px" }}>
+      <main style={{ paddingTop: "135px" }}>
         {/* ========================================================================= */}
         {/* SECTION 1: HERO SECTION (Full-Bleed Right Edge-to-Edge) */}
         {/* ========================================================================= */}
@@ -102,13 +102,7 @@ export default function MerkilMarketingServicePage({
             <div className="merkil-hero-left">
               <div className="merkil-hero-content" style={{ gap: "18px" }}>
                 {/* Eyebrow Badge */}
-                <div className="badge yellow">
-                  <img
-                    src="https://cdn.prod.website-files.com/688d31d885372b14ca5e3d8b/6890bee0bc046268f9b1496c_magic-wand.svg"
-                    loading="lazy"
-                    alt="Badge Icon"
-                    className="badge-icon"
-                  />
+                <div className="badge">
                   <div className="tagline">{data.heroEyebrow || data.crumb || "Digital Marketing"}</div>
                 </div>
 
@@ -349,26 +343,23 @@ export default function MerkilMarketingServicePage({
                       </div>
 
                       <div className="merkil-purpose-right" style={{ gap: "16px" }}>
-                        {items.map((st, idx) => {
-                          const iconColors = ["", "pink", "yellow"];
-                          return (
-                            <div key={idx} className="merkil-purpose-card" style={{ padding: "18px 22px", borderRadius: "16px" }}>
-                              <div className={`merkil-purpose-icon-box ${iconColors[idx % 3]}`} style={{ width: "38px", height: "38px", fontSize: "14px" }}>
-                                {String(idx + 1).padStart(2, "0")}
-                              </div>
-                              <div className="merkil-purpose-details">
-                                <h3 style={{ fontSize: "17px", fontWeight: 700, color: "#0b0f17", marginBottom: "4px" }}>
-                                  {st.title}
-                                </h3>
-                                {st.desc && (
-                                  <p className="text-dark-gray" style={{ fontSize: "14px", lineHeight: "22px", margin: 0 }}>
-                                    {st.desc}
-                                  </p>
-                                )}
-                              </div>
+                        {items.map((st, idx) => (
+                          <div key={idx} className="merkil-purpose-card" style={{ padding: "18px 22px", borderRadius: "16px" }}>
+                            <div className="merkil-purpose-icon-box" style={{ width: "38px", height: "38px", fontSize: "14px", backgroundColor: "#f1f5f9", border: "1px solid #e2e8f0", color: "#0f172a" }}>
+                              {String(idx + 1).padStart(2, "0")}
                             </div>
-                          );
-                        })}
+                            <div className="merkil-purpose-details">
+                              <h3 style={{ fontSize: "17px", fontWeight: 700, color: "#0b0f17", marginBottom: "4px" }}>
+                                {st.title}
+                              </h3>
+                              {st.desc && (
+                                <p className="text-dark-gray" style={{ fontSize: "14px", lineHeight: "22px", margin: 0 }}>
+                                  {st.desc}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -445,17 +436,18 @@ export default function MerkilMarketingServicePage({
                                 width: "32px",
                                 height: "32px",
                                 borderRadius: "10px",
-                                backgroundColor: "#f5f0ff",
+                                backgroundColor: "#f1f5f9",
+                                border: "1px solid #e2e8f0",
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                color: "#8b5cf6",
-                                fontWeight: 800,
-                                fontSize: "13px",
+                                color: "#0f172a",
                                 flexShrink: 0,
                               }}
                             >
-                              ✦
+                              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                                <path d="M8 2V14M2 8H14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                              </svg>
                             </div>
                             <div style={{ fontSize: "15px", fontWeight: 700, color: "#0b0f17", lineHeight: "22px" }}>
                               {bullet}
@@ -515,17 +507,18 @@ export default function MerkilMarketingServicePage({
                               width: "28px",
                               height: "28px",
                               borderRadius: "8px",
-                              backgroundColor: "#e6f9ed",
+                              backgroundColor: "#f1f5f9",
+                              border: "1px solid #e2e8f0",
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
-                              color: "#10b981",
-                              fontWeight: 800,
-                              fontSize: "14px",
+                              color: "#0f172a",
                               flexShrink: 0,
                             }}
                           >
-                            ✓
+                            <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+                              <path d="M13.5 4.5L6.5 11.5L3 8" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
                           </div>
                           <div>
                             <h3 style={{ fontSize: "15px", fontWeight: 700, color: "#0b0f17", margin: 0, lineHeight: "1.35" }}>
@@ -637,16 +630,18 @@ export default function MerkilMarketingServicePage({
                               <div
                                 className="merkil-card-num-box"
                                 style={{
-                                  backgroundColor: (idx % track1.length) % 3 === 0 ? "#f5f0ff" : (idx % track1.length) % 3 === 1 ? "#fdf2ff" : "#fcfde6",
-                                  border: `1px solid ${(idx % track1.length) % 3 === 0 ? "#e9dcfc" : (idx % track1.length) % 3 === 1 ? "#f5dcfc" : "#eef3aa"}`,
+                                  backgroundColor: "#f1f5f9",
+                                  border: "1px solid #e2e8f0",
+                                  color: "#0f172a",
                                   width: "24px",
                                   height: "24px",
                                   fontSize: "11px",
+                                  fontWeight: 700,
                                 }}
                               >
                                 {String((idx % track1.length) + 1).padStart(2, "0")}
                               </div>
-                              <span className="merkil-card-badge" style={{ fontSize: "10.5px" }}>✦ Core</span>
+                              <span className="merkil-card-badge" style={{ fontSize: "10.5px", background: "rgba(15, 23, 42, 0.05)", border: "1px solid rgba(15, 23, 42, 0.08)", color: "#0f172a" }}>✦ Core</span>
                             </div>
                             <div className="merkil-marquee-card-body">
                               <h3>{item.title}</h3>
@@ -666,16 +661,18 @@ export default function MerkilMarketingServicePage({
                               <div
                                 className="merkil-card-num-box"
                                 style={{
-                                  backgroundColor: (idx % track2.length) % 3 === 1 ? "#f5f0ff" : (idx % track2.length) % 3 === 2 ? "#fdf2ff" : "#fcfde6",
-                                  border: `1px solid ${(idx % track2.length) % 3 === 1 ? "#e9dcfc" : (idx % track2.length) % 3 === 2 ? "#f5dcfc" : "#eef3aa"}`,
+                                  backgroundColor: "#f1f5f9",
+                                  border: "1px solid #e2e8f0",
+                                  color: "#0f172a",
                                   width: "24px",
                                   height: "24px",
                                   fontSize: "11px",
+                                  fontWeight: 700,
                                 }}
                               >
                                 {String(((idx % track2.length) + 1) + track1.length).padStart(2, "0")}
                               </div>
-                              <span className="merkil-card-badge" style={{ fontSize: "10.5px" }}>✦ Module</span>
+                              <span className="merkil-card-badge" style={{ fontSize: "10.5px", background: "rgba(15, 23, 42, 0.05)", border: "1px solid rgba(15, 23, 42, 0.08)", color: "#0f172a" }}>✦ Module</span>
                             </div>
                             <div className="merkil-marquee-card-body">
                               <h3>{item.title}</h3>
@@ -751,33 +748,54 @@ export default function MerkilMarketingServicePage({
                       </div>
 
                       <div className="services-main-wrap" style={{ marginTop: "24px", gap: "18px" }}>
-                        {items.map((item, idx) => {
-                          const mod = idx % 3 === 0 ? "" : idx % 3 === 1 ? "_02" : "_03";
-                          const icons = [
-                            "https://cdn.prod.website-files.com/688d31d885372b14ca5e3d8b/6890df3745eb863957876bc0_Pen.svg",
-                            "https://cdn.prod.website-files.com/688d31d885372b14ca5e3d8b/6890df37694b8b03c5806646_File.svg",
-                            "https://cdn.prod.website-files.com/688d31d885372b14ca5e3d8b/6890df1c52aea5653b4d88fc_Seo.svg",
-                          ];
-                          return (
-                            <div key={idx} className={`services-card ${mod}`} style={{ padding: "24px 22px", borderRadius: "18px" }}>
-                              <div>
-                                <img src={icons[idx % 3]} loading="lazy" alt="" className="services-icon" style={{ width: "30px", height: "30px", marginBottom: "16px" }} />
-                                <div className="services-details">
-                                  <div className="services-text-wrap">
-                                    <h3 style={{ fontSize: "17px", fontWeight: 700, color: "#0b0f17", marginBottom: item.desc ? "6px" : "0" }}>
-                                      {item.title}
-                                    </h3>
-                                    {item.desc && (
-                                      <p style={{ fontSize: "13.5px", lineHeight: "22px", color: "rgba(11, 15, 23, 0.75)", margin: 0 }}>
-                                        {item.desc}
-                                      </p>
-                                    )}
-                                  </div>
+                        {items.map((item, idx) => (
+                          <div key={idx} className="services-card" style={{ padding: "24px 22px", borderRadius: "18px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0" }}>
+                            <div>
+                              <div style={{ width: "36px", height: "36px", borderRadius: "10px", backgroundColor: "#f1f5f9", border: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "16px", color: "#0f172a" }}>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  {idx % 4 === 0 && (
+                                    <>
+                                      <path d="M12 20h9" />
+                                      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                                    </>
+                                  )}
+                                  {idx % 4 === 1 && (
+                                    <>
+                                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                      <polyline points="14 2 14 8 20 8" />
+                                      <line x1="16" y1="13" x2="8" y2="13" />
+                                      <line x1="16" y1="17" x2="8" y2="17" />
+                                    </>
+                                  )}
+                                  {idx % 4 === 2 && (
+                                    <>
+                                      <circle cx="11" cy="11" r="8" />
+                                      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                                      <path d="M11 8v6M8 11h6" />
+                                    </>
+                                  )}
+                                  {idx % 4 === 3 && (
+                                    <>
+                                      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                                    </>
+                                  )}
+                                </svg>
+                              </div>
+                              <div className="services-details">
+                                <div className="services-text-wrap">
+                                  <h3 style={{ fontSize: "17px", fontWeight: 700, color: "#0b0f17", marginBottom: item.desc ? "6px" : "0" }}>
+                                    {item.title}
+                                  </h3>
+                                  {item.desc && (
+                                    <p style={{ fontSize: "13.5px", lineHeight: "22px", color: "rgba(11, 15, 23, 0.75)", margin: 0 }}>
+                                      {item.desc}
+                                    </p>
+                                  )}
                                 </div>
                               </div>
                             </div>
-                          );
-                        })}
+                          </div>
+                        ))}
                       </div>
 
                       {blockCta && (
@@ -942,7 +960,6 @@ export default function MerkilMarketingServicePage({
             // ===================================================================
             // 3-SS: CREATIVE CONTENT 3D MEDIA BENTO GRID (Cycle 3 - Content Creation)
             // ===================================================================
-            const creativeIcons = ["📹", "🎨", "📱", "📊", "⚡", "✍️", "📅", "🚀"];
             return (
               <section key={bIdx} className="merkil-creative-content-section" style={{ backgroundColor: "#fdfdfd", padding: "64px 0", borderTop: "1px solid #f0f0f3" }}>
                 <div className="container">
@@ -951,7 +968,6 @@ export default function MerkilMarketingServicePage({
                       {blockTagline && (
                         <div className="section-badge-wrap">
                           <div className="section-badge w-variant-base">
-                            <div className="badge-dot" style={{ backgroundColor: "#ec4899" }} />
                             <div className="tagline">{blockTagline}</div>
                           </div>
                         </div>
@@ -981,22 +997,61 @@ export default function MerkilMarketingServicePage({
                       <div key={idx} className="creative-content-card">
                         <div
                           style={{
-                            width: "44px",
-                            height: "44px",
-                            borderRadius: "14px",
-                            backgroundColor: idx % 3 === 0 ? "#fdf2ff" : idx % 3 === 1 ? "#f5f0ff" : "#fcfde6",
-                            border: `1px solid ${idx % 3 === 0 ? "#f5dcfc" : idx % 3 === 1 ? "#e9dcfc" : "#eef3aa"}`,
+                            width: "40px",
+                            height: "40px",
+                            borderRadius: "12px",
+                            backgroundColor: "#f1f5f9",
+                            border: "1px solid #e2e8f0",
+                            color: "#0f172a",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            fontSize: "20px",
                             flexShrink: 0,
                           }}
                         >
-                          {creativeIcons[idx % creativeIcons.length]}
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            {idx % 6 === 0 && (
+                              <>
+                                <polygon points="23 7 16 12 23 17 23 7" />
+                                <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                              </>
+                            )}
+                            {idx % 6 === 1 && (
+                              <>
+                                <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+                                <line x1="12" y1="18" x2="12.01" y2="18" />
+                              </>
+                            )}
+                            {idx % 6 === 2 && (
+                              <>
+                                <line x1="18" y1="20" x2="18" y2="10" />
+                                <line x1="12" y1="20" x2="12" y2="4" />
+                                <line x1="6" y1="20" x2="6" y2="14" />
+                              </>
+                            )}
+                            {idx % 6 === 3 && (
+                              <>
+                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                              </>
+                            )}
+                            {idx % 6 === 4 && (
+                              <>
+                                <path d="M12 20h9" />
+                                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                              </>
+                            )}
+                            {idx % 6 === 5 && (
+                              <>
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                <line x1="16" y1="2" x2="16" y2="6" />
+                                <line x1="8" y1="2" x2="8" y2="6" />
+                                <line x1="3" y1="10" x2="21" y2="10" />
+                              </>
+                            )}
+                          </svg>
                         </div>
                         <div>
-                          <div style={{ fontSize: "11px", fontWeight: 800, color: "#8b5cf6", letterSpacing: "0.04em", textTransform: "uppercase", marginBottom: "2px" }}>
+                          <div style={{ fontSize: "11px", fontWeight: 700, color: "#6366f1", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "2px" }}>
                             Format {String(idx + 1).padStart(2, "0")}
                           </div>
                           <h3 style={{ fontSize: "15.5px", fontWeight: 700, color: "#0b0f17", margin: 0, lineHeight: "1.3" }}>

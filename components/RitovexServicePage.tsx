@@ -40,6 +40,25 @@ const testimonials = [
   },
 ];
 
+// Helper to render headings with the second half or punchline in gradient text
+function renderGradientHeading(text?: string) {
+  if (!text) return null;
+  const words = text.split(" ");
+  if (words.length <= 2) {
+    return <span>{text}</span>;
+  }
+  const splitPoint = Math.max(1, Math.floor(words.length * 0.55));
+  const firstPart = words.slice(0, splitPoint).join(" ");
+  const secondPart = words.slice(splitPoint).join(" ");
+
+  return (
+    <>
+      <span>{firstPart}</span>{" "}
+      <span className="qs-gradient-text">{secondPart}</span>
+    </>
+  );
+}
+
 export default function RitovexServicePage({ data }: { data: ServicePageData }) {
   const [openServiceIdx, setOpenServiceIdx] = useState<number | null>(0);
   const [hoveredServiceIdx, setHoveredServiceIdx] = useState<number | null>(null);
@@ -109,7 +128,9 @@ export default function RitovexServicePage({ data }: { data: ServicePageData }) 
             </div>
 
             <div className="inner-banner-typography">
-              <h1 className="inner-banner-title">{data.heroTitle}</h1>
+              <h1 className="inner-banner-title">
+                {renderGradientHeading(data.heroTitle)}
+              </h1>
               {data.heroParagraphs && data.heroParagraphs.length > 0 && (
                 <div className="inner-banner-description">
                   {data.heroParagraphs.map((p, idx) => (
@@ -176,7 +197,7 @@ export default function RitovexServicePage({ data }: { data: ServicePageData }) 
                   <div className="section-subtitle white">Capabilities</div>
                 </div>
               </div>
-              <h2 className="section-title white">{primaryListBlock.title}</h2>
+              <h2 className="section-title white">{renderGradientHeading(primaryListBlock.title)}</h2>
               {primaryListBlock.intro && (
                 <p className="section-description white-color services">{primaryListBlock.intro}</p>
               )}
@@ -265,7 +286,7 @@ export default function RitovexServicePage({ data }: { data: ServicePageData }) 
                       <div className="section-subtitle">Features &amp; Tech</div>
                     </div>
                   </div>
-                  <h2 className="section-title cms-technology-tools">{block.title}</h2>
+                  <h2 className="section-title cms-technology-tools">{renderGradientHeading(block.title)}</h2>
                   {block.intro && (
                     <p className="section-description cms-technology-description">{block.intro}</p>
                   )}
@@ -325,7 +346,7 @@ export default function RitovexServicePage({ data }: { data: ServicePageData }) 
                   </div>
                   <div className="benefit-section-title-description">
                     <h2 className="section-title white">
-                      {secondaryListBlocks[0]?.title || stepBlocks[0]?.title || "Why Choose Our Services"}
+                      {renderGradientHeading(secondaryListBlocks[0]?.title || stepBlocks[0]?.title || "Why Choose Our Services")}
                     </h2>
                     <p className="section-description white-color benefit-description">
                       {secondaryListBlocks[0]?.intro ||
@@ -391,7 +412,7 @@ export default function RitovexServicePage({ data }: { data: ServicePageData }) 
                 <div className="section-subtitle">FAQS</div>
               </div>
             </div>
-            <h2 className="section-title">Frequently Asked Questions</h2>
+            <h2 className="section-title">Frequently Asked <span className="qs-gradient-text">Questions</span></h2>
             <p className="section-description cms-technology-description">
               Find answers to common questions about our working process, technology stack, and service execution.
             </p>
@@ -470,7 +491,7 @@ export default function RitovexServicePage({ data }: { data: ServicePageData }) 
                   <div className="section-subtitle">Testimonial</div>
                 </div>
               </div>
-              <h2 className="section-title">What Our Clients are Saying</h2>
+              <h2 className="section-title">What Our Clients <span className="qs-gradient-text">are Saying</span></h2>
               <p className="section-description about-us">
                 Hear directly from our clients about their experiences and the results we've delivered.
               </p>
@@ -522,7 +543,7 @@ export default function RitovexServicePage({ data }: { data: ServicePageData }) 
               <div className="cta-typography">
                 <div className="cta-title-wrapper">
                   <h6 className="cta-subtitle">Have a project in mind? Just let us know!</h6>
-                  <h2 className="cta-title">Let’s Start Talk</h2>
+                  <h2 className="cta-title">Let’s <span className="qs-gradient-text">Start Talk</span></h2>
                 </div>
                 <div className="cta-button-wrapper">
                   <Link href="/contact" className="primary-button">
