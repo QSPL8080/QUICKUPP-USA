@@ -28,7 +28,7 @@
   color: var(--mx-text-heading) !important;
   font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
   min-height: 100vh;
-  padding-top: clamp(100px, 9vw, 136px);
+  padding-top: clamp(88px, 7vw, 108px);
   padding-bottom: 60px;
   overflow-x: clip;
   position: relative;
@@ -50,14 +50,14 @@
    1. HERO SECTION (Editorial Light Container with Ambient Wave Lines)
    ========================================================================== */
 .mx-hero-section {
-  padding: 16px 0 40px;
+  padding: 0 0 36px;
 }
 
 .mx-hero-card {
   background: #ffffff;
   color: var(--mx-text-heading);
   border-radius: 32px;
-  padding: 72px 48px 80px;
+  padding: 48px 40px 56px;
   position: relative;
   overflow: hidden;
   border: 1px solid var(--mx-border);
@@ -75,7 +75,7 @@
   border: none;
   border-radius: 0;
   box-shadow: none;
-  padding: 24px 0 44px;
+  padding: 16px 0 36px;
   position: relative;
   overflow: visible;
   display: flex;

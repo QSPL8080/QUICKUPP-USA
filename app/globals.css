@@ -8970,14 +8970,21 @@ section.section-gap.padding-top-0 {
    across EVERY section of EVERY page site-wide.
    ========================================================================= */
 
-/* Ensure all page wrappers have generous breathing room below the floating header */
+/* Ensure all page wrappers have proper breathing room below the floating header */
 .res-page-wrap,
 .asx-page > main,
 .sc-career-page > main,
 .merkil-page-wrapper > main,
-.copora-page .hero-section,
+.copora-page .hero-section {
+  padding-top: 115px !important;
+}
+
+.mx-about-page {
+  padding-top: 96px !important;
+}
+
 .mx-about-page .mx-hero-section {
-  padding-top: 130px !important;
+  padding-top: 0 !important;
 }
 
 /* 1. Universal Topic Badge Container (Pill Style) */
