@@ -493,30 +493,53 @@ export default function CareerPage() {
             {/* Right 4-Card Feature Grid */}
             <div className="sc-choice-cards-grid">
               <div className="sc-choice-item-card">
+                <div className="sc-choice-card-icon-wrap">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                    <polyline points="17 6 23 6 23 12" />
+                  </svg>
+                </div>
                 <div className="sc-choice-item-title">Proven Impact &amp; Results</div>
                 <p className="sc-choice-item-desc">
-                  We eliminate corporate fluff, focusing 100% on high-ROI marketing &amp; resilient software.
+                  We eliminate corporate fluff, focusing 100% on high-ROI marketing, AI solutions &amp; resilient software.
                 </p>
               </div>
 
               <div className="sc-choice-item-card">
+                <div className="sc-choice-card-icon-wrap">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                  </svg>
+                </div>
                 <div className="sc-choice-item-title">100% Remote Flexibility</div>
                 <p className="sc-choice-item-desc">
-                  Work from anywhere in the world on high-impact projects with flexible working hours.
+                  Work from anywhere in the world on high-impact projects with flexible, asynchronous workflows.
                 </p>
               </div>
 
               <div className="sc-choice-item-card">
+                <div className="sc-choice-card-icon-wrap">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+                  </svg>
+                </div>
                 <div className="sc-choice-item-title">Cutting-Edge AI Stack</div>
                 <p className="sc-choice-item-desc">
-                  Full access to OpenAI, Claude 3.5, Cursor, and high-performance cloud compute.
+                  Full access to OpenAI, Claude 3.5, Cursor, and high-performance cloud infrastructure.
                 </p>
               </div>
 
               <div className="sc-choice-item-card">
+                <div className="sc-choice-card-icon-wrap">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 15l-2 5l9-13h-7l2-5l-9 13h7z" />
+                  </svg>
+                </div>
                 <div className="sc-choice-item-title">Rapid Career Growth</div>
                 <p className="sc-choice-item-desc">
-                  Fast-track promotions, performance profit shares, and direct founder mentorship.
+                  Fast-track promotions, performance profit shares, and direct leadership mentorship.
                 </p>
               </div>
             </div>
