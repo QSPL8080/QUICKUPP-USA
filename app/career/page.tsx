@@ -376,7 +376,7 @@ export default function CareerPage() {
       {/* =========================================================================
           1. HERO HEADER & MANIFESTO PHOTO STRIP
           ========================================================================= */}
-      <section className="sc-manifesto-section" style={{ paddingTop: "145px" }}>
+      <section className="sc-manifesto-section">
         <div className="w-layout-blockcontainer container w-container">
           <div className="sc-manifesto-center-wrap" style={{ maxWidth: "820px", margin: "0 auto 44px", textAlign: "center" }}>
             <div className="sc-badge" style={{ margin: "0 auto 16px" }}>
