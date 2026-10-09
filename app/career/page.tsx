@@ -378,15 +378,15 @@ export default function CareerPage() {
           ========================================================================= */}
       <section className="sc-manifesto-section" style={{ paddingTop: "145px" }}>
         <div className="w-layout-blockcontainer container w-container">
-          <div className="sc-manifesto-center-wrap" style={{ maxWidth: "880px", margin: "0 auto 48px", textAlign: "center" }}>
-            <div className="sc-badge" style={{ margin: "0 auto 18px" }}>
+          <div className="sc-manifesto-center-wrap" style={{ maxWidth: "820px", margin: "0 auto 44px", textAlign: "center" }}>
+            <div className="sc-badge" style={{ margin: "0 auto 16px" }}>
               <span className="sc-badge-dot" />
               <span>CAREERS AT QUICKUPP SOFTECH</span>
             </div>
-            <h1 style={{ fontSize: "clamp(34px, 4.4vw, 56px)", fontWeight: 800, color: "#0b0f17", letterSpacing: "-0.03em", lineHeight: 1.15, margin: "0 0 18px" }}>
+            <h1 style={{ fontSize: "clamp(26px, 3.2vw, 40px)", fontWeight: 800, color: "#0b0f17", letterSpacing: "-0.025em", lineHeight: 1.2, margin: "0 0 16px" }}>
               Build the Future of <span className="qs-gradient-text">AI, Tech &amp; Growth.</span>
             </h1>
-            <p style={{ fontSize: "clamp(16px, 1.3vw, 19px)", color: "#475569", lineHeight: 1.65, maxWidth: "740px", margin: "0 auto 28px" }}>
+            <p style={{ fontSize: "15px", color: "#64748b", lineHeight: 1.6, maxWidth: "640px", margin: "0 auto 28px" }}>
               Join a distributed collective of engineers, growth strategists, and AI researchers architecting high-converting digital products.
             </p>
             <div style={{ display: "flex", justifyContent: "center", gap: "14px", flexWrap: "wrap" }}>
