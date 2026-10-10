@@ -91,7 +91,7 @@ export default async function ServiceCategoryPage({ params }: PageProps) {
                 <span>Featured Capabilities</span>
               </div>
 
-              <h1 className="asx-hero-title" style={{ fontSize: "clamp(30px, 3.6vw, 48px)", fontWeight: 800, color: "#001d28", letterSpacing: "-0.025em", margin: "0 0 16px" }}>
+              <h1 className="asx-hero-title" style={{ margin: "0 0 16px" }}>
                 {renderGradientHeading(category.categoryLabel)}
               </h1>
 

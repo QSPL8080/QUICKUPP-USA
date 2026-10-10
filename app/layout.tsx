@@ -36,12 +36,10 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=Plus+Jakarta+Sans:ital,wght@0,300..700;1,300..700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=Instrument+Serif:ital@0;1&family=Inter:ital,opsz,wght@0,14..32,300..800;1,14..32,300..800&family=JetBrains+Mono:wght@400;500;600;700&family=Lexend:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..800;1,400..800&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap"
           rel="stylesheet"
         />
         <link rel="stylesheet" href="/css/mercket.webflow.shared.3eb5ac14d.min.css" />
-        <link rel="stylesheet" href="/css/scaleforge-perfect.css" />
-        <link rel="stylesheet" href="/css/mindix-about.css" />
         <link rel="preload" as="image" href="/images/slider-01-01.jpg" fetchPriority="high" />
         <Script
           id="webfont-script"
@@ -52,7 +50,7 @@ export default function RootLayout({
           id="webfont-load"
           strategy="lazyOnload"
           dangerouslySetInnerHTML={{
-            __html: `if (window.WebFont) { WebFont.load({ google: { families: ["DM Sans:300,400,500,600,700","Plus Jakarta Sans:300,400,500,600,700"] } }); }`,
+            __html: `if (window.WebFont) { WebFont.load({ google: { families: ["Instrument Serif:400,400i","Inter:300,400,500,600,700","Plus Jakarta Sans:300,400,500,600,700,800","JetBrains Mono:400,500,600,700","Lexend:400,500,600,700"] } }); }`,
           }}
         />
         <script

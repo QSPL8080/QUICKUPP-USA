@@ -174,9 +174,10 @@
 }
 
 .section-title {
-  font-size: clamp(22px, 2.4vw, 32px) !important;
+  font-family: var(--font-heading, 'Plus Jakarta Sans', sans-serif) !important;
+  font-size: clamp(23px, 2.4vw, 34px) !important;
   font-weight: 700 !important;
-  line-height: 1.25 !important;
+  line-height: 1.22 !important;
   letter-spacing: -0.02em !important;
   color: #141414;
   margin: 0 0 16px 0;
@@ -220,10 +221,11 @@
 }
 
 .inner-banner-title {
+  font-family: var(--font-heading, 'Plus Jakarta Sans', sans-serif) !important;
   font-size: clamp(30px, 3.6vw, 48px) !important;
-  font-weight: 800 !important;
-  line-height: 1.18 !important;
-  letter-spacing: -0.03em !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.025em !important;
   color: #141414;
   margin: 0 0 18px 0;
 }

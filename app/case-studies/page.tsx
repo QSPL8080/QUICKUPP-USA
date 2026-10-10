@@ -164,11 +164,6 @@ export default function CaseStudiesPage() {
               </div>
               <h1
                 style={{
-                  fontSize: "clamp(34px, 4.4vw, 54px)",
-                  fontWeight: 800,
-                  letterSpacing: "-0.03em",
-                  color: "#0f172a",
-                  lineHeight: 1.15,
                   margin: "0 0 18px 0",
                 }}
               >

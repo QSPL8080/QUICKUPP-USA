@@ -191,7 +191,7 @@ export default function AIVideoServicePage({
                 {data.heroEyebrow}
               </span>
             )}
-            <h1 className="sc-hero-title" style={{ fontSize: "clamp(30px, 3.6vw, 48px)", fontWeight: 800, color: "#0b0f17", margin: "0 0 16px" }}>
+            <h1 className="sc-hero-title" style={{ margin: "0 0 16px" }}>
               {renderGradientHeading(data.heroTitle)}
             </h1>
             {manifestoWords.length > 0 && (
@@ -336,7 +336,7 @@ export default function AIVideoServicePage({
 
                     {/* Right Column Content */}
                     <div className="sc-choice-right-content" style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
-                      <h2 className="sc-section-title" style={{ textAlign: "left", margin: "0 0 24px 0", fontSize: "clamp(26px, 3.2vw, 38px)", fontWeight: 800, color: "#0b0f17", lineHeight: 1.25 }}>
+                      <h2 className="sc-section-title" style={{ textAlign: "left", margin: "0 0 20px 0" }}>
                         {renderGradientHeading(blockTitle)}
                       </h2>
                       <div className="sc-choice-cards-grid">
@@ -374,7 +374,7 @@ export default function AIVideoServicePage({
                     <span className="sc-values-badge-dot" style={{ backgroundColor: "#a855f7" }} />
                     <span>PRODUCTION SHOWCASE</span>
                   </div>
-                  <h2 className="sc-section-title" style={{ fontSize: "clamp(26px, 3.2vw, 40px)", fontWeight: 800, color: "#0b0f17", margin: "0 0 14px", lineHeight: 1.25 }}>
+                  <h2 className="sc-section-title" style={{ margin: "0 0 14px" }}>
                     {renderGradientHeading(blockTitle)}
                   </h2>
                   {blockDesc && <p className="sc-section-desc">{blockDesc}</p>}

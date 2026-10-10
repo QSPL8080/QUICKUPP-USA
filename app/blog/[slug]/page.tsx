@@ -89,12 +89,7 @@ export default async function SingleBlogPage({
 
           <h1
             style={{
-              fontSize: "clamp(30px, 3.8vw, 46px)",
-              fontWeight: 800,
-              lineHeight: 1.2,
-              color: "#0f172a",
               margin: "12px 0 20px 0",
-              letterSpacing: "-0.02em",
             }}
           >
             {renderGradientHeading(post.title)}

@@ -335,7 +335,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
   const [showReplay, setShowReplay] = useState(false);
-  const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [activeStep, setActiveStep] = useState<number>(0);
 
   useEffect(() => {
@@ -559,16 +559,16 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
               <section key={bIdx} id={bIdx === 0 || bIdx === 2 ? "services-section" : undefined} className="asx-section" style={{ borderTop: "1px solid #e5eaee" }}>
                 <div className="asx-container">
                   <div className="asx-section-header-center" style={{ maxWidth: "1050px", marginBottom: descPairsBlock.desc ? "20px" : "36px" }}>
-                    <h2 className="asx-one-line-heading" style={{ fontSize: "clamp(18px, 1.8vw, 24px)", fontWeight: 800, color: "#001d28", margin: "0", letterSpacing: "-0.02em" }}>
+                    <h2 className="asx-section-title" style={{ margin: "0 0 12px 0" }}>
                       {renderGradientTitle(descPairsBlock.title || ("Our " + data.crumb + " Marketing Services"))}
                     </h2>
                     {descPairsBlock.subtitle && (
-                      <p style={{ fontSize: "14px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "#7c3aed", margin: "8px 0 0" }}>
+                      <p style={{ fontSize: "13px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "#7c3aed", margin: "8px 0 0" }}>
                         {descPairsBlock.subtitle}
                       </p>
                     )}
                     {descPairsBlock.desc && (
-                      <p style={{ fontSize: "15px", color: "#2c436b", margin: "10px auto 0", maxWidth: "680px" }}>
+                      <p style={{ fontSize: "16px", color: "#475467", lineHeight: 1.68, margin: "12px auto 0", maxWidth: "720px" }}>
                         {descPairsBlock.desc}
                       </p>
                     )}
@@ -753,11 +753,11 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                         <span>{listBlock.tagline}</span>
                       </div>
                     )}
-                    <h2 style={{ fontSize: "clamp(18px, 1.8vw, 24px)", fontWeight: 800, color: "#001d28", margin: "0 0 10px" }}>
+                    <h2 className="asx-section-title" style={{ margin: "0 0 12px 0" }}>
                       {renderGradientTitle(listBlock.title)}
                     </h2>
                     {listBlock.desc && (
-                      <p style={{ fontSize: "15.5px", color: "#2c436b", lineHeight: 1.6, margin: 0 }}>
+                      <p style={{ fontSize: "16px", color: "#475467", lineHeight: 1.68, margin: "12px auto 0", maxWidth: "720px" }}>
                         {listBlock.desc}
                       </p>
                     )}
@@ -823,11 +823,11 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
               <section key={bIdx} className="asx-section" style={{ borderTop: "1px solid #e5eaee" }}>
                 <div className="asx-container">
                   <div className="asx-section-header-center" style={{ maxWidth: "860px" }}>
-                    <h2 style={{ fontSize: "clamp(18px, 1.8vw, 24px)", fontWeight: 800, color: "#001d28", margin: "0 0 14px" }}>
+                    <h2 className="asx-section-title" style={{ margin: "0 0 14px 0" }}>
                       {renderGradientTitle(aiBlock.title)}
                     </h2>
                     {aiBlock.intro && (
-                      <p className="asx-section-intro" style={{ fontSize: "16px", color: "#2c436b", lineHeight: 1.65, whiteSpace: "pre-line", margin: 0 }}>
+                      <p className="asx-section-intro" style={{ fontSize: "16px", color: "#475467", lineHeight: 1.68, whiteSpace: "pre-line", margin: "14px auto 0", maxWidth: "720px" }}>
                         {aiBlock.intro}
                       </p>
                     )}
@@ -848,7 +848,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
 
                   {aiBlock.desc && (
                     <div className="asx-ecosystem-footer">
-                      <p style={{ margin: 0, fontSize: "15px", fontWeight: 600, color: "#001d28" }}>
+                      <p style={{ margin: 0, fontSize: "15px", fontWeight: 500, color: "#1e293b", lineHeight: 1.6 }}>
                         {aiBlock.desc}
                       </p>
                     </div>
@@ -971,11 +971,11 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                         <span>{processBlock.tagline}</span>
                       </div>
                     )}
-                    <h2 style={{ fontSize: "clamp(18px, 1.8vw, 24px)", fontWeight: 800, color: "#001d28", margin: 0 }}>
+                    <h2 className="asx-section-title" style={{ margin: "0 0 12px 0" }}>
                       {renderGradientTitle(processBlock.title)}
                     </h2>
                     {processBlock.intro && (
-                      <p style={{ fontSize: "15px", color: "#2c436b", margin: "10px 0 0" }}>
+                      <p style={{ fontSize: "16px", color: "#475467", lineHeight: 1.68, margin: "10px auto 0", maxWidth: "720px" }}>
                         {processBlock.intro}
                       </p>
                     )}
@@ -1019,7 +1019,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
               <section key={bIdx} className="asx-section" style={{ background: "#ffffff", borderTop: "1px solid #e5eaee" }}>
                 <div className="asx-container-sm">
                   <div className="asx-section-header-center" style={{ marginBottom: "36px" }}>
-                    <h2 style={{ fontSize: "clamp(18px, 1.8vw, 24px)", fontWeight: 800, color: "#001d28", margin: 0 }}>
+                    <h2 className="asx-section-title" style={{ margin: 0 }}>
                       {faqBlock.title || "Frequently Asked Questions"}
                     </h2>
                   </div>
@@ -1028,7 +1028,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                     {faqBlock.items?.map((faq, idx) => {
                       const isOpen = openFaq === idx;
                       return (
-                        <div key={idx} className="asx-faq-item">
+                        <div key={idx} className={`asx-faq-item ${isOpen ? "is-open" : ""}`}>
                           <button
                             type="button"
                             onClick={() => setOpenFaq(isOpen ? null : idx)}

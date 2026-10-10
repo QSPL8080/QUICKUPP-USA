@@ -3,7 +3,7 @@
 /* ========================================================================= */
 
 .asx-page {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-family: var(--font-body, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif) !important;
   background-color: #f4f5f5 !important;
   color: #001d28 !important;
   min-height: 100vh;
@@ -89,11 +89,12 @@
 }
 
 .asx-hero-title {
+  font-family: var(--font-heading, 'Plus Jakarta Sans', sans-serif) !important;
   font-size: clamp(30px, 3.6vw, 48px) !important;
-  line-height: 1.18 !important;
-  font-weight: 800 !important;
+  line-height: 1.2 !important;
+  font-weight: 700 !important;
   color: #001d28;
-  letter-spacing: -0.03em !important;
+  letter-spacing: -0.025em !important;
   margin: 0 0 18px 0;
 }
 
@@ -941,9 +942,10 @@
 }
 
 .asx-outline-title {
-  font-size: 17px;
-  font-weight: 700;
-  color: #001d28;
+  font-family: var(--font-heading);
+  font-size: 17px !important;
+  font-weight: 600 !important;
+  color: #0b0f17 !important;
   margin: 0 0 8px;
 }
 
@@ -1035,7 +1037,8 @@
   border-radius: 10px;
   background: rgba(124, 58, 237, 0.08);
   color: #7c3aed;
-  font-weight: 800;
+  font-family: var(--font-heading);
+  font-weight: 700;
   font-size: 13px;
   display: inline-flex;
   align-items: center;
@@ -1050,9 +1053,10 @@
 }
 
 .asx-ecosystem-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #001d28;
+  font-family: var(--font-heading);
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: #0b0f17 !important;
   margin: 0;
   line-height: 1.35;
 }
@@ -1161,41 +1165,60 @@
 }
 
 .asx-faq-item {
-  background: #f4f5f5;
-  border: 1px solid #dce3e4;
-  border-radius: 18px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
   overflow: hidden;
   transition: all 0.25s ease;
 }
 
+.asx-faq-item:hover,
+.asx-faq-item.is-open {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05);
+}
+
 .asx-faq-q {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 18px 22px;
-  text-align: left;
-  background: none;
-  border: none;
-  font-family: inherit;
-  font-size: 16px;
-  font-weight: 700;
-  color: #001d28;
-  cursor: pointer;
-  transition: color 0.2s ease;
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  padding: 18px 24px !important;
+  text-align: left !important;
+  background: none !important;
+  border: none !important;
+  font-family: var(--font-heading) !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: #0b0f17 !important;
+  cursor: pointer !important;
+  transition: color 0.2s ease !important;
+}
+
+.asx-faq-q > span {
+  flex: 1 1 auto !important;
+  text-align: left !important;
+}
+
+.asx-faq-q > svg {
+  flex-shrink: 0 !important;
+  margin-left: auto !important;
 }
 
 .asx-faq-q:hover {
-  color: #7c3aed;
+  color: #7c3aed !important;
 }
 
 .asx-faq-a {
-  padding: 0 22px 18px;
-  font-size: 14px;
-  line-height: 1.65;
-  color: #2c436b;
-  border-top: 1px solid #e5eaee;
-  padding-top: 14px;
+  padding: 0 24px 20px;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.68;
+  color: #475467;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 16px;
 }
 
 /* Dark CTA Banner */
@@ -1551,11 +1574,11 @@
 .asx-who-title {
   font-size: clamp(22px, 2.4vw, 32px);
   line-height: 1.25;
-  font-weight: 800;
+  font-weight: 700;
   color: #001d28;
   letter-spacing: -0.025em;
   margin: 0 0 20px;
-  font-family: 'Lexend', sans-serif;
+  font-family: var(--font-heading, 'Plus Jakarta Sans', sans-serif);
 }
 
 .asx-who-subtitle {
@@ -1563,7 +1586,7 @@
   font-weight: 700;
   color: #1e3a5f;
   margin: 0 0 16px;
-  font-family: 'Lexend', sans-serif;
+  font-family: var(--font-heading, 'Plus Jakarta Sans', sans-serif);
 }
 
 .asx-who-bullets {
@@ -1582,7 +1605,7 @@
   font-size: 14.5px;
   color: #2c436b;
   line-height: 1.55;
-  font-family: 'Lexend', sans-serif;
+  font-family: var(--font-body, 'Inter', sans-serif);
 }
 
 .asx-who-bullet-dot {
@@ -1615,7 +1638,7 @@
   font-size: 14.5px;
   font-weight: 600;
   color: #001d28;
-  font-family: 'Lexend', sans-serif;
+  font-family: var(--font-body, 'Inter', sans-serif);
 }
 
 .asx-who-check-item svg {
@@ -1628,7 +1651,7 @@
   background-color: #001d28 !important;
   color: #ffffff !important;
   padding: 15px 36px;
-  border-radius: 10px;
+  border-radius: 8px !important;
   font-weight: 700;
   font-size: 14.5px;
   text-decoration: none !important;
@@ -1640,7 +1663,7 @@
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
   border: none;
-  font-family: 'Lexend', sans-serif;
+  font-family: var(--font-heading, 'Plus Jakarta Sans', sans-serif);
 }
 
 .asx-btn-dark:hover {
@@ -1777,11 +1800,11 @@
 .asx-who-title {
   font-size: 42px;
   line-height: 1.14;
-  font-weight: 800;
+  font-weight: 700;
   color: #001d28;
   letter-spacing: -0.035em;
   margin: 0 0 18px;
-  font-family: 'Lexend', sans-serif;
+  font-family: var(--font-heading, 'Plus Jakarta Sans', sans-serif);
 }
 
 .asx-who-subtitle {
@@ -1789,7 +1812,7 @@
   font-weight: 700;
   color: #1e3a5f;
   margin: 0 0 16px;
-  font-family: 'Lexend', sans-serif;
+  font-family: var(--font-heading, 'Plus Jakarta Sans', sans-serif);
 }
 
 .asx-who-bullets {
@@ -1808,7 +1831,7 @@
   font-size: 14.5px;
   color: #2c436b;
   line-height: 1.55;
-  font-family: 'Lexend', sans-serif;
+  font-family: var(--font-body, 'Inter', sans-serif);
 }
 
 .asx-who-bullet-dot {
@@ -1841,7 +1864,7 @@
   font-size: 14.5px;
   font-weight: 600;
   color: #001d28;
-  font-family: 'Lexend', sans-serif;
+  font-family: var(--font-body, 'Inter', sans-serif);
 }
 
 .asx-who-check-item svg {
@@ -1854,7 +1877,7 @@
   background-color: #001d28 !important;
   color: #ffffff !important;
   padding: 14px 34px;
-  border-radius: 12px;
+  border-radius: 8px !important;
   font-weight: 700;
   font-size: 14.5px;
   text-decoration: none !important;
@@ -1866,7 +1889,7 @@
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
   border: none;
-  font-family: 'Lexend', sans-serif;
+  font-family: var(--font-heading, 'Plus Jakarta Sans', sans-serif);
 }
 
 .asx-btn-dark:hover {

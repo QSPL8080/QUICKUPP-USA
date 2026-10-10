@@ -17,8 +17,9 @@
   --border-radius--md: 0.5rem;
   --border-radius--lg: 3.125rem;
   --border-radius--button: 0.5rem;
-  --font-family--heading: var(--_font-family---heading-font, "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
-  --font-family--body: var(--_font-family---body-font, "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  --font-family--display: var(--font-heading, 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  --font-family--heading: var(--font-heading, 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  --font-family--body: var(--font-body, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
   
   font-family: var(--font-family--body);
   color: #0b0f17;
@@ -29,10 +30,18 @@
 
 /* Headings base typography (scoped strictly to section content, excluding footer) */
 .copora-page .section-title h1,
+.copora-page h1,
 .copora-page .section-title h2,
+.copora-page h2,
+.copora-page .about-cta-title {
+  font-family: var(--font-family--heading) !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.025em !important;
+  color: #0b0f17;
+}
+
 .copora-page .copora-service-title,
 .copora-page .copora-desc-pair-title,
-.copora-page .about-cta-title,
 .copora-page .copora-faq-question {
   font-family: var(--font-family--heading) !important;
   color: #0b0f17;
@@ -98,7 +107,7 @@
   font-family: var(--font-family--heading) !important;
   font-size: clamp(30px, 3.6vw, 48px) !important;
   line-height: 1.18 !important;
-  font-weight: 800 !important;
+  font-weight: 700 !important;
   letter-spacing: -0.03em !important;
   color: #0b0f17 !important;
   margin-top: 16px;

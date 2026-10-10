@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
 @import "./lifecycle-service.css";
 @import "./ritovex-service.css";
 @import "./css/mindix-about.css";
@@ -57,18 +56,240 @@ body {
 /* Global styles - imported from Webflow */
 /* The main CSS is loaded via <link> tag in layout.tsx from /css/mercket.webflow.shared.3eb5ac14d.min.css */
 
-/* ===== SITE-WIDE TYPOGRAPHY SYSTEM (Plus Jakarta Sans) ===== */
-html, body, button, input, select, textarea {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+/* ===== 4-TIER EDITORIAL AGENCY TYPOGRAPHY SYSTEM ===== */
+/* ===== MASTER UNIFIED TYPOGRAPHY SYSTEM (Plus Jakarta Sans Bold Headings + Inter Body) ===== */
+:root {
+  --font-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: var(--font-heading);
+  --font-subheading: var(--font-heading);
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
+
+  /* Webflow & Nested CSS Variable Overrides */
+  --_font-family---heading-font: var(--font-heading);
+  --_font-family---body-font: var(--font-body);
+  --font-family--heading: var(--font-heading);
+  --font-family--body: var(--font-body);
+  --mx-heading-font: var(--font-heading);
+  --merkil-heading-font: var(--font-heading);
+  --merkil-display-font: var(--font-heading);
+  --merkil-body-font: var(--font-body);
 }
 
-h1, h2, h3, h4, h5, h6,
-.heading-title, .title, .hero-title, .section-title, .ms-hero-title, .ms-section-title, .lc-hero-title, .lc-section-title, .rx-hero-title, .rx-section-title {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-  letter-spacing: -0.02em;
+/* 1. Page Wrappers & Default Body Copy (Inter) */
+html,
+body,
+p,
+li,
+input,
+textarea,
+select,
+.paragraph,
+.text-style-paragraph,
+.section-description,
+.hero-one-desc,
+.inner-banner-description,
+.asx-hero-desc,
+.mx-hero-subtitle,
+.sc-hero-desc,
+.su-hero-desc,
+.lc-hero-desc,
+.copora-body-text,
+.merkil-page-wrapper,
+.copora-page,
+.assurix-service-page,
+.lc-page-wrapper,
+.mx-about-page,
+.qs-trendy-page,
+.qs-contact-page,
+.su-contact-page,
+.sc-career-page,
+.su-ind-page-wrapper,
+.res-page-wrap,
+.qs-scalient-footer,
+.merkil-page-wrapper p,
+.merkil-page-wrapper li,
+.copora-page p,
+.copora-page li,
+.asx-who-bullet-item,
+.asx-who-check-item,
+.res-card-desc,
+.res-page-wrap p,
+.asx-card-desc,
+.asx-story-desc,
+.asx-outline-desc,
+.asx-valprop-desc,
+.mx-story-text,
+.mx-team-bio,
+.cs-card-excerpt {
+  font-family: var(--font-body) !important;
 }
 
-/* Fluid responsive headings across all service, home & inner pages (Ref: /services/information-technology-services/web-design-development) */
+p,
+.paragraph,
+.text-style-paragraph,
+.section-description,
+.copora-body-text,
+.merkil-page-wrapper p,
+.copora-page p {
+  font-family: var(--font-body) !important;
+  font-size: 16px !important;
+  line-height: 1.68 !important;
+  font-weight: 400 !important;
+}
+
+/* 2. Interactive Controls, Buttons, Navigation & Badges (Plus Jakarta Sans) */
+button,
+.btn,
+.su-flip-button,
+.button,
+.button-link,
+a.button-link,
+.cta-button,
+.button-01,
+.button-02,
+.asx-btn-green,
+.asx-btn-dark,
+.asx-btn-outline,
+.mx-btn-lime,
+.mx-btn-outline-white,
+.lc-btn-primary,
+.lc-btn-outline,
+.sc-apply-role-btn,
+.sc-view-details-btn,
+.su-submit-btn,
+.res-btn-dark,
+.res-btn-outline,
+.nav-link,
+.header,
+.su-nav-link,
+label,
+.form-label,
+.su-badge,
+.sc-badge,
+.asx-badge,
+.lc-badge,
+.section-badge,
+.res-tag,
+.su-subtitle-badge,
+.su-cinematic-sub,
+.subtitle-head,
+.badge,
+.tag {
+  font-family: var(--font-heading) !important;
+}
+
+/* 2B. Eyebrow Badges & Subheading Category Tags (Unified Plus Jakarta Sans 700) */
+.subtitle-head,
+.section-badge,
+.su-badge,
+.sc-badge,
+.asx-badge,
+.lc-badge,
+.res-tag,
+.su-subtitle-badge,
+.su-cinematic-sub,
+.merkil-page-wrapper .badge,
+.copora-page .badge,
+.tag {
+  font-family: var(--font-heading) !important;
+  font-weight: 700 !important;
+  font-size: 12px !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+}
+
+/* 2C. MASTER BUTTON SYSTEM - EQUAL & MATCHED ACROSS ALL PAGES (Border Radius 8px & Weight 700) */
+button:not(.sc-modal-close-btn):not(.splide__arrow):not(.w-slider-arrow):not(.menu-button):not(.asx-faq-q),
+.btn,
+.button,
+.w-button,
+.button-link,
+a.button-link,
+.su-flip-button,
+.cta-button,
+.button-01,
+.button-02,
+.asx-btn-green,
+.asx-btn-dark,
+.asx-btn-outline,
+.mx-btn-lime,
+.mx-btn-outline-white,
+.lc-btn-primary,
+.lc-btn-outline,
+.sc-apply-role-btn,
+.sc-view-details-btn,
+.su-submit-btn,
+.res-btn-dark,
+.res-btn-outline,
+.res-card-btn,
+.qs-btn {
+  font-family: var(--font-heading) !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  letter-spacing: 0.01em !important;
+  border-radius: 8px !important;
+  text-decoration: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* Primary Dark Buttons Across All Pages */
+.button,
+.w-button,
+.button-link,
+a.button-link,
+a.button-link[data-wf--button--variant="secondary-bg"],
+a.button-link[data-wf--button--variant="global-bg"],
+.su-flip-button,
+.cta-button,
+.asx-btn-dark,
+.asx-btn-green,
+.mx-btn-lime,
+.lc-btn-primary,
+.sc-apply-role-btn,
+.su-submit-btn,
+.res-btn-dark {
+  background-color: #0b0f17 !important;
+  color: #ffffff !important;
+  border: 1px solid #0b0f17 !important;
+  box-shadow: 0 2px 8px rgba(11, 15, 23, 0.15) !important;
+}
+
+.button:hover,
+.w-button:hover,
+.button-link:hover,
+a.button-link:hover,
+a.button-link[data-wf--button--variant="secondary-bg"]:hover,
+a.button-link[data-wf--button--variant="global-bg"]:hover,
+.su-flip-button:hover,
+.cta-button:hover,
+.asx-btn-dark:hover,
+.asx-btn-green:hover,
+.mx-btn-lime:hover,
+.lc-btn-primary:hover,
+.sc-apply-role-btn:hover,
+.su-submit-btn:hover,
+.res-btn-dark:hover {
+  background-color: #1e293b !important;
+  border-color: #1e293b !important;
+  color: #ffffff !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 18px rgba(11, 15, 23, 0.25) !important;
+}
+
+/* Secondary / Outline Buttons Across All Pages */
+.asx-btn-outline,
+.mx-btn-outline-white,
+.lc-btn-outline,
+.sc-view-details-btn,
+.res-btn-outline {
+  border-radius: 8px !important;
+}
+
+/* 3. Hero Titles Across All Pages (Unified Plus Jakarta Sans - Bold 700) */
 .hero-one-title,
 .home-hero-heading,
 .breadcrumb-heading-title,
@@ -78,39 +299,117 @@ h1, h2, h3, h4, h5, h6,
 .inner-banner-title,
 .sc-hero-title,
 .hero-title,
+.su-hero-title,
+.su-cinematic-heading,
+.lc-hero-title,
+.ms-hero-title,
+.display-title,
+.res-page-wrap h1,
+.merkil-page-wrapper h1,
+.copora-page h1,
+.copora-page .section-title h1,
 h1 {
-  font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif) !important;
-  font-size: clamp(26px, 3vw, 40px) !important;
+  font-family: var(--font-heading) !important;
+  font-size: clamp(30px, 3.6vw, 48px) !important;
   line-height: 1.2 !important;
-  font-weight: 800 !important;
+  font-weight: 700 !important;
   letter-spacing: -0.025em !important;
 }
 
+/* 4. Section Headings Across All Pages (Unified Plus Jakarta Sans - Bold 700) */
 .heading-title,
 .section-title,
 .section-heading,
 .home-section-title,
+.qs-section-heading,
 .service-heading,
 .team-heading,
 .asx-section-title,
+.asx-valprop-title,
+.asx-story-title,
+.asx-cta-title,
+.asx-media-title,
+.asx-who-title,
+.asx-one-line-heading,
 .mx-section-title,
 .res-section-title,
 .sc-section-title,
 .our-mission-title,
+.ms-section-title,
+.lc-section-title,
+.rx-section-title,
+.res-featured-title,
+.res-cta-heading,
+.about-cta-title,
+.cta-title,
+.qs-closing-title,
+.res-page-wrap h2,
+.merkil-page-wrapper h2,
+.copora-page h2,
 h2 {
-  font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif) !important;
-  font-size: clamp(22px, 2.4vw, 32px) !important;
-  line-height: 1.25 !important;
+  font-family: var(--font-heading) !important;
+  font-size: clamp(22px, 2.4vw, 34px) !important;
+  line-height: 1.22 !important;
   font-weight: 700 !important;
   letter-spacing: -0.02em !important;
 }
 
-.qs-hero-body-text p,
-.paragraph,
-.text-style-paragraph {
-  font-size: 16.5px !important;
-  line-height: 1.7 !important;
-  color: #475467 !important;
+/* 5. Subheadings, Card Titles, Dialog Headers & FAQs (Plus Jakarta Sans - Semi-Bold 600) */
+h3,
+h4,
+h5,
+h6,
+.title,
+.service-card-title,
+.asx-card-title,
+.asx-outline-title,
+.asx-ecosystem-title,
+.asx-sup-title,
+.asx-sp-title,
+.card-title,
+.benefit-card-title,
+.faq-card-title,
+.res-card-title,
+.res-hub-card-title,
+.cs-card-title,
+.copora-service-title,
+.copora-desc-pair-title,
+.copora-faq-question,
+.qs-faq-q-text,
+.qs-ai-heading,
+.qs-mega-col-title,
+.asx-who-subtitle,
+.res-page-wrap h3,
+.res-page-wrap h4,
+.merkil-page-wrapper h3,
+.merkil-page-wrapper h4,
+.text-style-h3,
+.text-style-h4 {
+  font-family: var(--font-heading) !important;
+  font-weight: 600 !important;
+  line-height: 1.32 !important;
+  letter-spacing: -0.015em !important;
+}
+
+/* 6. Technical Monospace (JetBrains Mono) for Metrics, Counters & Data */
+.counter-number,
+.stat-value,
+.sc-stat-number,
+.roi-number,
+.step-number,
+.process-count,
+.asx-process-step,
+.tech-tag,
+.su-badge-tag,
+.cs-metric-val,
+.counter-style-five-number,
+.counter-one-icon,
+.qs-p-step-badge,
+.qs-platform-badge-num,
+.qs-list-count-badge,
+code,
+pre {
+  font-family: var(--font-mono) !important;
 }
 
 /* Reset any Next.js defaults that might conflict */
@@ -201,14 +500,14 @@ h2 {
   margin-bottom: 20px;
 }
 .qs-main-title {
-  font-size: clamp(26px, 3vw, 38px);
-  line-height: 1.2;
+  font-size: clamp(30px, 3.6vw, 48px) !important;
+  line-height: 1.2 !important;
   margin-top: 0;
   margin-bottom: 20px;
   color: var(--heading-color, #18171c);
-  font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", sans-serif);
-  font-weight: 800;
-  letter-spacing: -0.025em;
+  font-family: var(--font-heading) !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.025em !important;
 }
 .qs-hero-body-text {
   display: flex;
@@ -253,14 +552,14 @@ h2 {
 }
 
 .qs-section-heading {
-  font-size: clamp(22px, 2.4vw, 30px);
-  line-height: 1.25;
+  font-size: clamp(26px, 2.8vw, 38px);
+  line-height: 1.18;
   margin-top: 10px;
   margin-bottom: 14px;
   color: var(--heading-color, #18171c);
-  font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", sans-serif);
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-family: var(--font-display) !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.015em;
 }
 .qs-section-desc {
   color: var(--body-text-color, #475467);
@@ -1419,9 +1718,10 @@ h2 {
 }
 
 .hero-one-title {
+  font-family: var(--font-heading) !important;
   color: #ffffff !important;
-  font-weight: 800 !important;
-  letter-spacing: -0.03em !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.025em !important;
   font-size: clamp(30px, 3.6vw, 48px) !important;
   line-height: 1.18 !important;
   display: block !important;
@@ -1774,9 +2074,10 @@ a.button-link[data-wf--button--variant="white-bg"] .button-arrow,
 
 /* HERO SLIDER TYPOGRAPHY - BOLD & CRISP WHITE */
 .hero-one-title {
+  font-family: var(--font-heading) !important;
   color: #ffffff !important;
   font-weight: 800 !important;
-  letter-spacing: -0.03em !important;
+  letter-spacing: -0.025em !important;
   font-size: clamp(30px, 3.6vw, 48px) !important;
   line-height: 1.18 !important;
 }
@@ -1950,9 +2251,9 @@ a.button-link[data-wf--button--variant="white-bg"] .button-arrow,
 
 .single-stat-num,
 .counter-style-five-number {
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
-  font-size: clamp(40px, 4.8vw, 62px) !important;
-  font-weight: 800 !important;
+  font-family: var(--font-mono) !important;
+  font-size: clamp(38px, 4.5vw, 58px) !important;
+  font-weight: 700 !important;
   color: #ffffff !important;
   line-height: 1 !important;
   letter-spacing: -0.025em !important;
@@ -1960,9 +2261,9 @@ a.button-link[data-wf--button--variant="white-bg"] .button-arrow,
 
 .single-stat-unit,
 .counter-one-icon {
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
-  font-size: clamp(30px, 3.6vw, 46px) !important;
-  font-weight: 800 !important;
+  font-family: var(--font-mono) !important;
+  font-size: clamp(28px, 3.4vw, 42px) !important;
+  font-weight: 700 !important;
   color: #00d2ff !important;
   line-height: 1 !important;
 }
@@ -2733,13 +3034,13 @@ a.button-link[data-wf--button--variant="white-bg"] .button-arrow,
   transform: none !important;
 }
 .breadcrumb-heading-title {
-  font-size: clamp(32px, 4.5vw, 52px) !important;
-  font-weight: 800 !important;
-  line-height: 1.15 !important;
+  font-family: var(--font-heading) !important;
+  font-size: clamp(30px, 4vw, 48px) !important;
+  font-weight: 700 !important;
+  line-height: 1.18 !important;
   color: #ffffff !important;
   margin: 0 !important;
-  font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", sans-serif);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em !important;
 }
 .breadcrumb-bottom-content {
   display: flex;
@@ -3423,7 +3724,7 @@ section.section-gap.padding-top-0 {
   margin-top: auto;
   margin-bottom: 0 !important;
   width: 100%;
-  font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif);
+  font-family: var(--font-body) !important;
 }
 
 .qs-scalient-container {
@@ -3854,7 +4155,7 @@ section.section-gap.padding-top-0 {
 .qs-contact-page {
   background-color: #f8fafc;
   color: #0f172a;
-  font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif);
+  font-family: var(--font-body) !important;
   overflow-x: hidden;
   position: relative;
   min-height: 100vh;
@@ -4929,7 +5230,7 @@ section.section-gap.padding-top-0 {
   color: #161515;
   min-height: 100vh;
   position: relative;
-  font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif);
+  font-family: var(--font-body) !important;
 }
 
 /* 1. HERO & INQUIRY FORM SECTION (Clean Light Surface, z-index 2 over fixed CTA background) */
@@ -4975,13 +5276,14 @@ section.section-gap.padding-top-0 {
 }
 
 .su-contact-hero-wrap .su-hero-title {
-  font-size: clamp(23px, 2.3vw, 32px) !important;
-  font-weight: 750 !important;
+  font-family: var(--font-heading) !important;
+  font-size: clamp(30px, 3.6vw, 48px) !important;
+  font-weight: 700 !important;
   color: #0b0f17 !important;
-  line-height: 1.25 !important;
-  letter-spacing: -0.02em !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.025em !important;
   margin: 0 auto 12px auto !important;
-  max-width: 580px;
+  max-width: 860px;
 }
 
 .su-contact-hero-wrap .su-hero-title-accent {
@@ -5243,6 +5545,7 @@ section.section-gap.padding-top-0 {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif) !important;
   font-size: 12px !important;
   font-weight: 700 !important;
   text-transform: uppercase !important;
@@ -5262,19 +5565,22 @@ section.section-gap.padding-top-0 {
 }
 
 .su-cinematic-heading {
-  font-size: clamp(26px, 3.6vw, 44px) !important;
-  font-weight: 800 !important;
-  line-height: 1.18 !important;
-  color: #ffffff !important;
-  margin: 0 0 28px 0 !important;
+  font-family: var(--font-heading) !important;
+  font-size: clamp(30px, 3.6vw, 48px) !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
   letter-spacing: -0.025em !important;
+  color: #ffffff !important;
+  margin: 0 0 24px 0 !important;
+  text-align: center;
   text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
 }
 
 .su-cinematic-heading-accent {
-  background: linear-gradient(135deg, #ffffff 40%, #c084fc 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  background: linear-gradient(135deg, #00d2ff 0%, #6366f1 50%, #a855f7 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  display: inline !important;
 }
 
 .su-cinematic-action-wrap {
@@ -5434,7 +5740,7 @@ section.section-gap.padding-top-0 {
 .sc-career-page {
   background-color: #f8fafc;
   color: #0f172a;
-  font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif);
+  font-family: var(--font-body) !important;
   overflow-x: hidden;
   position: relative;
 }
@@ -5480,9 +5786,9 @@ section.section-gap.padding-top-0 {
 }
 
 .sc-hero-title {
-  font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif) !important;
-  font-size: clamp(26px, 3vw, 40px) !important;
-  font-weight: 800 !important;
+  font-family: var(--font-heading) !important;
+  font-size: clamp(30px, 3.6vw, 48px) !important;
+  font-weight: 700 !important;
   color: #0b0f17 !important;
   line-height: 1.2 !important;
   letter-spacing: -0.025em !important;
@@ -6309,6 +6615,253 @@ section.section-gap.padding-top-0 {
   box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
 }
 
+/* =========================================================================
+   AI VIDEO SERVICE SUBPAGES (Deliverables, Choice Grid, Why Choose Cards)
+   ========================================================================= */
+.sc-values-compact-section {
+  padding: clamp(60px, 7vw, 90px) 0;
+  background: #ffffff;
+  border-top: 1px solid rgba(15, 23, 42, 0.05);
+}
+
+.sc-values-compact-header {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto clamp(36px, 4vw, 52px);
+}
+
+.sc-values-compact-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+@media (max-width: 991px) {
+  .sc-values-compact-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .sc-values-compact-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.sc-values-compact-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 140px;
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.sc-values-compact-grid.is-in-view .sc-values-compact-card {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.sc-values-compact-card:hover {
+  transform: translateY(-4px);
+  border-color: #6366f1;
+  box-shadow: 0 14px 28px -4px rgba(99, 102, 241, 0.12);
+}
+
+.sc-values-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 14px;
+}
+
+.sc-values-compact-number {
+  font-family: var(--font-mono, monospace);
+  font-size: 13px;
+  font-weight: 700;
+  color: #6366f1;
+  background: rgba(99, 102, 241, 0.08);
+  padding: 3px 9px;
+  border-radius: 6px;
+  letter-spacing: 0.05em;
+}
+
+.sc-values-card-indicator {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #94a3b8;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+}
+
+.sc-values-compact-card:hover .sc-values-card-indicator {
+  background: #6366f1;
+  color: #ffffff;
+  border-color: #6366f1;
+  transform: translate(2px, -2px);
+}
+
+.sc-values-compact-title {
+  font-family: var(--font-heading) !important;
+  font-size: 17px !important;
+  font-weight: 600 !important;
+  color: #0b0f17 !important;
+  margin: 0 !important;
+  line-height: 1.35 !important;
+  letter-spacing: -0.015em !important;
+}
+
+/* AI / Perfect For Split Grid Cards */
+.sc-choice-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 4px;
+}
+
+@media (max-width: 600px) {
+  .sc-choice-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+.sc-choice-item-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+  transition: all 0.22s ease;
+}
+
+.sc-choice-item-card:hover {
+  transform: translateY(-2px);
+  border-color: #7c3aed;
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.08);
+}
+
+.sc-choice-card-icon-wrap {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: rgba(124, 58, 237, 0.08);
+  color: #7c3aed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.sc-choice-item-card:hover .sc-choice-card-icon-wrap {
+  background: #7c3aed;
+  color: #ffffff;
+}
+
+.sc-choice-item-title {
+  font-family: var(--font-heading) !important;
+  font-size: 14.5px !important;
+  font-weight: 600 !important;
+  color: #0b0f17 !important;
+  margin: 0 !important;
+}
+
+/* Dedicated Why Choose Video Section */
+.sc-why-choose-video-section {
+  padding: clamp(60px, 7vw, 90px) 0;
+  background: #ffffff;
+  border-top: 1px solid rgba(15, 23, 42, 0.05);
+}
+
+.sc-why-choose-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  max-width: 1060px;
+  margin: 0 auto;
+}
+
+@media (max-width: 991px) {
+  .sc-why-choose-cards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .sc-why-choose-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.sc-why-choose-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: all 0.25s ease;
+}
+
+.sc-why-choose-card:hover {
+  background: #ffffff;
+  transform: translateY(-2px);
+  border-color: #10b981;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.08);
+}
+
+.sc-why-choose-icon-box {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: rgba(16, 185, 129, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.25s ease;
+}
+
+.sc-why-choose-card:hover .sc-why-choose-icon-box {
+  background: #10b981;
+}
+
+.sc-why-choose-card:hover .sc-why-choose-icon-box svg path {
+  stroke: #ffffff;
+}
+
+.sc-why-choose-card-title {
+  font-family: var(--font-heading) !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: #0b0f17 !important;
+  margin: 0 !important;
+  line-height: 1.35 !important;
+}
+
 /* 7. Employee Testimonials */
 .sc-testimonials-section {
   padding: 80px 0;
@@ -6495,7 +7048,7 @@ section.section-gap.padding-top-0 {
 .su-ind-page-wrapper {
   background-color: #f8fafc;
   color: #0f172a;
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-body) !important;
   overflow-x: hidden;
   position: relative;
   min-height: 100vh;
@@ -8122,7 +8675,7 @@ section.section-gap.padding-top-0 {
   padding-top: clamp(100px, 9vw, 136px);
   position: relative;
   z-index: 1;
-  font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  font-family: var(--font-body) !important;
 }
 
 .res-page-wrap h1,
@@ -8136,9 +8689,12 @@ section.section-gap.padding-top-0 {
 .res-card-title,
 .res-hub-card-title,
 .res-cta-heading,
-.cs-card-title,
+.cs-card-title {
+  font-family: var(--font-subheading) !important;
+}
+
 .cs-metric-val {
-  font-family: var(--_font-family---heading-font, "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif) !important;
+  font-family: var(--font-mono) !important;
 }
 
 .res-container {
@@ -8906,7 +9462,7 @@ section.section-gap.padding-top-0 {
 /* ========================================================================= */
 .font-lexend,
 .assurix-page {
-  font-family: "Lexend", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-family: var(--font-body) !important;
 }
 
 .assurix-page h1,
@@ -8914,9 +9470,9 @@ section.section-gap.padding-top-0 {
 .assurix-page h3,
 .assurix-page h4,
 .assurix-page h5 {
-  font-family: "Lexend", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-family: var(--font-heading) !important;
   color: #001d28;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.025em;
 }
 
 .asx-gradient-text {
