@@ -117,56 +117,62 @@
 }
 
 .lc-btn-primary {
-  background: linear-gradient(135deg, #00d2ff 0%, #7c3aed 50%, #ec4899 100%);
+  background: #0b0f17;
   color: #ffffff !important;
-  border: 1px solid #7c3aed;
-  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.3);
+  border: 1px solid #0b0f17;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(11, 15, 23, 0.15);
 }
 
 .lc-btn-primary:hover {
-  background-color: #ffffff;
-  color: #102b32;
-  border-color: #ffffff;
-  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.3);
-  transform: translateY(-2px);
+  background-color: #1e293b;
+  color: #ffffff !important;
+  border-color: #1e293b;
+  box-shadow: 0 6px 18px rgba(11, 15, 23, 0.25);
+  transform: translateY(-1px);
 }
 
 .lc-btn-secondary {
-  background-color: rgba(255, 255, 255, 0.08);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  background-color: #ffffff;
+  color: #0f172a !important;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
 }
 
 .lc-btn-secondary:hover {
-  background-color: rgba(255, 255, 255, 0.16);
-  color: #ffffff;
-  transform: translateY(-2px);
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+  color: #0b0f17 !important;
+  transform: translateY(-1px);
 }
 
 .lc-btn-dark {
-  background-color: #102b32;
-  color: #ffffff;
-  border: 1px solid #102b32;
+  background-color: #0b0f17;
+  color: #ffffff !important;
+  border: 1px solid #0b0f17;
+  border-radius: 8px;
 }
 
 .lc-btn-dark:hover {
-  background-color: #183e47;
-  color: #7c3aed;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(16, 43, 50, 0.2);
+  background-color: #1e293b;
+  color: #ffffff !important;
+  border-color: #1e293b;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(11, 15, 23, 0.25);
 }
 
 .lc-btn-outline {
-  background-color: transparent;
-  color: #102b32;
-  border: 1px solid rgba(16, 43, 50, 0.18);
+  background-color: #ffffff;
+  color: #0f172a !important;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
 }
 
 .lc-btn-outline:hover {
-  background-color: #102b32;
-  color: #ffffff;
-  border-color: #102b32;
-  transform: translateY(-2px);
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+  color: #0b0f17 !important;
+  transform: translateY(-1px);
 }
 
 /* ===== 1. HERO SECTION ===== */

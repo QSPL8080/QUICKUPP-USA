@@ -45,10 +45,10 @@
 
 .merkil-page-wrapper .home-hero-heading,
 .merkil-page-wrapper .merkil-home-hero-heading {
-  font-size: clamp(30px, 3.6vw, 48px) !important;
-  line-height: 1.18 !important;
+  font-size: clamp(26px, 3vw, 40px) !important;
+  line-height: 1.2 !important;
   font-weight: 800 !important;
-  letter-spacing: -0.03em !important;
+  letter-spacing: -0.025em !important;
   color: #0b0f17 !important;
   margin-top: 16px;
   margin-bottom: 14px;
@@ -196,17 +196,18 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 13px 26px;
-  border-radius: 100px;
-  background-color: #e4d3ff;
-  color: #000000;
+  padding: 12px 24px;
+  border-radius: 8px !important;
+  background-color: #0b0f17 !important;
+  color: #ffffff !important;
   text-decoration: none;
-  font-size: 14.5px;
+  font-size: 14px;
   font-weight: 700;
   overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid #0b0f17 !important;
   cursor: pointer;
+  box-shadow: 0 2px 8px rgba(11, 15, 23, 0.15) !important;
 }
 
 .merkil-page-wrapper .call {
@@ -214,13 +215,15 @@
   height: 15px !important;
   display: block !important;
   flex-shrink: 0 !important;
+  filter: brightness(0) invert(1) !important;
 }
 
 .merkil-page-wrapper .cta-button:hover,
 .merkil-page-wrapper .merkil-cta-button:hover {
-  background-color: #d8b4fe;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(228, 211, 255, 0.5);
+  background-color: #1e293b !important;
+  border-color: #1e293b !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(11, 15, 23, 0.25) !important;
 }
 
 .merkil-page-wrapper .cta-button-text-wrap {
@@ -235,6 +238,7 @@
   margin: 0 !important;
   padding: 0 !important;
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  color: #ffffff !important;
 }
 
 .merkil-page-wrapper .cta-button:hover .cta-button-text-group {
@@ -247,24 +251,27 @@
   align-items: center !important;
   justify-content: center !important;
   gap: 10px !important;
-  padding: 12px 26px !important;
-  border-radius: 100px !important;
-  background-color: #f5f5f7 !important;
-  color: #000000 !important;
+  padding: 12px 24px !important;
+  border-radius: 8px !important;
+  background-color: #ffffff !important;
+  color: #0f172a !important;
   text-decoration: none !important;
-  font-size: 14.5px !important;
-  font-weight: 700 !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
   overflow: hidden !important;
-  border: 1px solid #e5e7eb !important;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  border: 1px solid #e2e8f0 !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
   cursor: pointer !important;
   box-sizing: border-box !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
 }
 
 .merkil-page-wrapper .button-01:hover,
 .merkil-page-wrapper .merkil-button-01:hover {
-  background-color: #e5e7eb !important;
-  transform: translateY(-2px) !important;
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0b0f17 !important;
+  transform: translateY(-1px) !important;
 }
 
 .merkil-page-wrapper .button-01-arrow-wrap {
@@ -311,18 +318,19 @@
   align-items: center !important;
   justify-content: center !important;
   gap: 10px !important;
-  padding: 12px 26px !important;
-  border-radius: 100px !important;
+  padding: 12px 24px !important;
+  border-radius: 8px !important;
   background-color: #0b0f17 !important;
   color: #ffffff !important;
   text-decoration: none !important;
-  font-size: 14.5px !important;
+  font-size: 14px !important;
   font-weight: 700 !important;
   overflow: hidden !important;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
   cursor: pointer !important;
   border: 1px solid #0b0f17 !important;
   box-sizing: border-box !important;
+  box-shadow: 0 2px 8px rgba(11, 15, 23, 0.15) !important;
 }
 
 .merkil-page-wrapper .button-02:hover {
@@ -857,22 +865,22 @@
   margin-top: 28px;
 }
 
-/* Black pill button for About / Know more */
+/* Black rectangular button for About / Know more */
 .merkil-page-wrapper .button-02 {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 26px;
-  border-radius: 100px;
+  padding: 12px 24px;
+  border-radius: 8px !important;
   background-color: #0b0f17;
   color: #ffffff;
   text-decoration: none;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 14px rgba(11, 15, 23, 0.15);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(11, 15, 23, 0.15);
   cursor: pointer;
-  border: none;
+  border: 1px solid #0b0f17;
 }
 
 .merkil-page-wrapper .button-02:hover {

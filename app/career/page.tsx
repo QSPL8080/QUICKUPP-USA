@@ -378,18 +378,18 @@ export default function CareerPage() {
           ========================================================================= */}
       <section className="sc-manifesto-section">
         <div className="w-layout-blockcontainer container w-container">
-          <div className="sc-manifesto-center-wrap" style={{ maxWidth: "820px", margin: "0 auto 44px", textAlign: "center" }}>
-            <div className="sc-badge" style={{ margin: "0 auto 16px" }}>
+          <div className="sc-manifesto-center-wrap" style={{ maxWidth: "820px", margin: "0 auto 40px", textAlign: "center" }}>
+            <div className="sc-badge">
               <span className="sc-badge-dot" />
               <span>CAREERS AT QUICKUPP SOFTECH</span>
             </div>
-            <h1 style={{ fontSize: "clamp(26px, 3.2vw, 40px)", fontWeight: 800, color: "#0b0f17", letterSpacing: "-0.025em", lineHeight: 1.2, margin: "0 0 16px" }}>
+            <h1 className="sc-hero-title">
               Build the Future of <span className="qs-gradient-text">AI, Tech &amp; Growth.</span>
             </h1>
-            <p style={{ fontSize: "15px", color: "#64748b", lineHeight: 1.6, maxWidth: "640px", margin: "0 auto 28px" }}>
+            <p className="sc-hero-desc">
               Join a distributed collective of engineers, growth strategists, and AI researchers architecting high-converting digital products.
             </p>
-            <div style={{ display: "flex", justifyContent: "center", gap: "14px", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", justifyContent: "center", gap: "14px", flexWrap: "wrap", marginTop: "24px" }}>
               <a href="#open-roles" className="sc-apply-role-btn" style={{ padding: "12px 28px", fontSize: "14px" }}>
                 <span>Explore Open Roles</span>
                 <svg width="14" height="14" viewBox="0 0 18 18" fill="none">
@@ -402,8 +402,8 @@ export default function CareerPage() {
             </div>
           </div>
 
-          <div className="sc-manifesto-center-wrap" style={{ margin: "60px auto 44px" }}>
-            <div className="sc-badge" style={{ margin: "0 auto 20px" }}>
+          <div className="sc-manifesto-center-wrap" style={{ margin: "56px auto 40px" }}>
+            <div className="sc-badge">
               <span className="sc-badge-dot" />
               <span>2026 • GLOBAL TEAM &amp; ENGINEERING CULTURE</span>
             </div>

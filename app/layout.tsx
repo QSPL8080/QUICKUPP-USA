@@ -3,7 +3,6 @@ import Script from "next/script";
 import "./globals.css";
 import "./assurix-service.css";
 import WebflowReinit from "@/components/WebflowReinit";
-import LeadModal from "@/components/LeadModal";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://quickupp.com"),
@@ -70,7 +69,6 @@ export default function RootLayout({
       </head>
       <body>
         {children}
-        {/* <LeadModal /> */}
         {/* Exactly the script set the Mercket reference home page loads. The extra
             bundles from other template pages were re-initialising Webflow and
             crashing it ("t is not a function"), which froze every animation. */}
