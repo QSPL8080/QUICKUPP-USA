@@ -298,8 +298,17 @@ function getImagesForIndustry(crumb: string) {
   );
 }
 
-function renderGradientTitle(title: string) {
-  if (!title) return null;
+function cleanDash(text: string): string {
+  if (!text) return "";
+  return text
+    .replace(/[—–]/g, " - ")
+    .replace(/-{2,}/g, "-")
+    .replace(/\s+-\s+/g, " - ");
+}
+
+function renderGradientTitle(rawTitle: string) {
+  if (!rawTitle) return null;
+  const title = cleanDash(rawTitle);
   const dotParts = title.split(". ").filter(Boolean);
   if (dotParts.length >= 2) {
     const splitIndex = Math.ceil(dotParts.length / 2);
@@ -325,6 +334,153 @@ function renderGradientTitle(title: string) {
     );
   }
   return title;
+}
+
+function formatArrowSteps(text: string) {
+  if (!text.includes("→")) return text;
+  const segments = text.split("→");
+  return (
+    <span style={{ display: "inline-flex", flexWrap: "wrap", alignItems: "center", justifyContent: "center", gap: "10px" }}>
+      {segments.map((seg, sIdx) => (
+        <React.Fragment key={sIdx}>
+          <span style={{ fontWeight: 700, color: "#0b0f17", fontSize: "16px" }}>
+            {seg.trim()}
+          </span>
+          {sIdx < segments.length - 1 && (
+            <span style={{ color: "#7c3aed", fontWeight: 700, fontSize: "18px" }}>
+              →
+            </span>
+          )}
+        </React.Fragment>
+      ))}
+    </span>
+  );
+}
+
+function renderCleanParagraphs(
+  text: string,
+  baseClassName: string = "asx-section-desc",
+  customStyle?: React.CSSProperties
+) {
+  if (!text) return null;
+  const cleaned = cleanDash(text);
+  const parts = cleaned.split("\n").map((p) => p.trim()).filter(Boolean);
+
+  if (parts.length <= 1) {
+    const isArrow = cleaned.includes("→");
+    return (
+      <p className={baseClassName} style={customStyle}>
+        {isArrow ? formatArrowSteps(cleaned) : cleaned}
+      </p>
+    );
+  }
+
+  const isEcosystem = baseClassName.includes("ecosystem");
+
+  if (isEcosystem) {
+    return (
+      <div
+        className="asx-ecosystem-oneline-wrap"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "10px",
+          margin: "0 auto",
+          width: "100%",
+          textAlign: "center",
+        }}
+      >
+        {parts.map((part, idx) => {
+          const isLeadIn = part.endsWith(":");
+          const isArrow = part.includes("→");
+          return (
+            <p
+              key={idx}
+              className={baseClassName}
+              style={{
+                margin: 0,
+                display: isArrow ? "inline-flex" : "block",
+                alignItems: "center",
+                justifyContent: "center",
+                textAlign: "center",
+                ...(isLeadIn
+                  ? {
+                      fontWeight: 700,
+                      color: "#7c3aed",
+                      fontSize: "14px",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.06em",
+                    }
+                  : isArrow
+                  ? {
+                      fontWeight: 700,
+                      color: "#0b0f17",
+                      fontSize: "16px",
+                      flexWrap: "wrap",
+                    }
+                  : {
+                      fontSize: "15px",
+                      color: "#475569",
+                      maxWidth: "780px",
+                    }),
+              }}
+            >
+              {isArrow ? formatArrowSteps(part) : part}
+            </p>
+          );
+        })}
+      </div>
+    );
+  }
+
+  const isCta = baseClassName.includes("cta");
+
+  return (
+    <div
+      className="asx-multiline-wrap"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: isCta ? "8px" : "10px",
+        margin: customStyle?.margin || (baseClassName.includes("asx-section") ? "12px auto 0" : (isCta ? "0 auto 28px" : "0 auto")),
+        width: "100%",
+        maxWidth: isCta ? "760px" : "840px",
+      }}
+    >
+      {parts.map((part, idx) => {
+        const isLeadIn = part.endsWith(":");
+        const isArrow = part.includes("→");
+        return (
+          <p
+            key={idx}
+            className={baseClassName}
+            style={{
+              ...customStyle,
+              margin: 0,
+              ...(isLeadIn
+                ? {
+                    fontWeight: 700,
+                    color: "#1e293b",
+                    fontSize: "15px",
+                    marginTop: idx > 0 ? "4px" : "0",
+                  }
+                : isArrow
+                ? {
+                    fontWeight: 700,
+                    color: "#0b0f17",
+                    fontSize: "16.5px",
+                  }
+                : {}),
+            }}
+          >
+            {isArrow ? formatArrowSteps(part) : part}
+          </p>
+        );
+      })}
+    </div>
+  );
 }
 
 export default function IndustryDetailPage({ data }: { data: ServicePageData }) {
@@ -421,11 +577,15 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                   {renderGradientTitle(data.heroTitle)}
                 </h1>
 
-                {data.heroParagraphs && data.heroParagraphs.map((p, idx) => (
-                  <p key={idx} className="asx-hero-desc" style={idx > 0 ? { marginTop: "-16px" } : {}}>
-                    {p}
-                  </p>
-                ))}
+                {data.heroParagraphs && (
+                  <div className="asx-hero-paragraphs">
+                    {data.heroParagraphs.map((p, idx) => (
+                      <p key={idx} className="asx-hero-desc">
+                        {cleanDash(p)}
+                      </p>
+                    ))}
+                  </div>
+                )}
 
                 <div className="asx-hero-btns">
                   <Link
@@ -542,7 +702,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
 
               <div className="asx-media-bottom">
                 <div className="asx-media-tagline">Quickupp Softech Strategy</div>
-                <h3 className="asx-media-title">{data.heroTitle}</h3>
+                <h3 className="asx-media-title">{data.crumb + " Growth & Scale"}</h3>
               </div>
             </div>
           </div>
@@ -564,14 +724,12 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                     </h2>
                     {descPairsBlock.subtitle && (
                       <p style={{ fontSize: "13px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "#7c3aed", margin: "8px 0 0" }}>
-                        {descPairsBlock.subtitle}
+                        {cleanDash(descPairsBlock.subtitle)}
                       </p>
                     )}
-                    {descPairsBlock.desc && (
-                      <p style={{ fontSize: "16px", color: "#475467", lineHeight: 1.68, margin: "12px auto 0", maxWidth: "720px" }}>
-                        {descPairsBlock.desc}
-                      </p>
-                    )}
+                    {descPairsBlock.desc &&
+                      renderCleanParagraphs(descPairsBlock.desc, "asx-section-desc")
+                    }
                   </div>
 
                   {isMarquee ? (
@@ -584,8 +742,8 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                               <div className="asx-icon-box">
                                 <SparkleSvg size={20} />
                               </div>
-                              <h3 className="asx-outline-title">{item.title}</h3>
-                              <p className="asx-outline-desc">{item.desc}</p>
+                              <h3 className="asx-outline-title">{cleanDash(item.title)}</h3>
+                              <p className="asx-outline-desc">{cleanDash(item.desc)}</p>
                             </div>
 
                             <div style={{ marginTop: "20px", paddingTop: "12px", borderTop: "1px solid #f1f5f9" }}>
@@ -604,8 +762,8 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                               <div className="asx-icon-box">
                                 <SparkleSvg size={20} />
                               </div>
-                              <h3 className="asx-outline-title">{item.title}</h3>
-                              <p className="asx-outline-desc">{item.desc}</p>
+                              <h3 className="asx-outline-title">{cleanDash(item.title)}</h3>
+                              <p className="asx-outline-desc">{cleanDash(item.desc)}</p>
                             </div>
 
                             <div style={{ marginTop: "20px", paddingTop: "12px", borderTop: "1px solid #f1f5f9" }}>
@@ -639,10 +797,10 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                               <SparkleSvg size={20} />
                             </div>
                             <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#001d28", margin: "0 0 10px", lineHeight: 1.3 }}>
-                              {item.title}
+                              {cleanDash(item.title)}
                             </h3>
-                            <p style={{ fontSize: "14.5px", color: "#2c436b", lineHeight: 1.6, margin: 0 }}>
-                              {item.desc}
+                            <p className="asx-outline-desc" style={{ marginTop: "8px" }}>
+                              {cleanDash(item.desc)}
                             </p>
                           </div>
 
@@ -697,21 +855,19 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
 
                         {listBlock.subtitle && (
                           <div className="asx-who-subtitle">
-                            {listBlock.subtitle}
+                            {cleanDash(listBlock.subtitle)}
                           </div>
                         )}
 
-                        {listBlock.desc && (
-                          <p style={{ fontSize: "15px", color: "#2c436b", margin: "0 0 20px" }}>
-                            {listBlock.desc}
-                          </p>
-                        )}
+                        {listBlock.desc &&
+                          renderCleanParagraphs(listBlock.desc, "asx-section-desc", { margin: "0 0 20px", textAlign: "left" })
+                        }
 
                         <ul className="asx-who-bullets" style={{ marginTop: "20px" }}>
                           {listBlock.items.slice(0, listBlock.items.length > 2 ? listBlock.items.length - 2 : listBlock.items.length).map((item, idx) => (
                             <li key={idx} className="asx-who-bullet-item">
                               <span className="asx-who-bullet-dot" />
-                              <span>{item}</span>
+                              <span>{cleanDash(item)}</span>
                             </li>
                           ))}
                         </ul>
@@ -723,7 +879,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                               {listBlock.items.slice(listBlock.items.length - 2).map((item, idx) => (
                                 <div key={idx} className="asx-who-check-item">
                                   <CheckSvg size={16} />
-                                  <span>{item}</span>
+                                  <span>{cleanDash(item)}</span>
                                 </div>
                               ))}
                             </div>
@@ -750,17 +906,15 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                     {listBlock.tagline && (
                       <div className="asx-tag-pill" style={{ margin: "0 auto 12px" }}>
                         <span className="asx-tag-dot" />
-                        <span>{listBlock.tagline}</span>
+                        <span>{cleanDash(listBlock.tagline)}</span>
                       </div>
                     )}
                     <h2 className="asx-section-title" style={{ margin: "0 0 12px 0" }}>
                       {renderGradientTitle(listBlock.title)}
                     </h2>
-                    {listBlock.desc && (
-                      <p style={{ fontSize: "16px", color: "#475467", lineHeight: 1.68, margin: "12px auto 0", maxWidth: "720px" }}>
-                        {listBlock.desc}
-                      </p>
-                    )}
+                    {listBlock.desc &&
+                      renderCleanParagraphs(listBlock.desc, "asx-section-desc")
+                    }
                   </div>
 
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "16px" }}>
@@ -798,7 +952,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                             {icon}
                           </div>
                           <span style={{ fontSize: "15px", fontWeight: 600, color: "#001d28", lineHeight: 1.35 }}>
-                            {item}
+                            {cleanDash(item)}
                           </span>
                         </div>
                       );
@@ -826,11 +980,9 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                     <h2 className="asx-section-title" style={{ margin: "0 0 14px 0" }}>
                       {renderGradientTitle(aiBlock.title)}
                     </h2>
-                    {aiBlock.intro && (
-                      <p className="asx-section-intro" style={{ fontSize: "16px", color: "#475467", lineHeight: 1.68, whiteSpace: "pre-line", margin: "14px auto 0", maxWidth: "720px" }}>
-                        {aiBlock.intro}
-                      </p>
-                    )}
+                    {aiBlock.intro &&
+                      renderCleanParagraphs(aiBlock.intro, "asx-section-intro")
+                    }
                   </div>
 
                   {aiBlock.bullets && aiBlock.bullets.length > 0 && (
@@ -840,7 +992,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                           <span className="asx-ecosystem-badge">
                             {"0" + (idx + 1)}
                           </span>
-                          <h3 className="asx-ecosystem-title">{pillar}</h3>
+                          <h3 className="asx-ecosystem-title">{cleanDash(pillar)}</h3>
                         </div>
                       ))}
                     </div>
@@ -848,9 +1000,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
 
                   {aiBlock.desc && (
                     <div className="asx-ecosystem-footer">
-                      <p style={{ margin: 0, fontSize: "15px", fontWeight: 500, color: "#1e293b", lineHeight: 1.6 }}>
-                        {aiBlock.desc}
-                      </p>
+                      {renderCleanParagraphs(aiBlock.desc, "asx-ecosystem-desc", { textAlign: "center", margin: 0 })}
                     </div>
                   )}
 
@@ -881,7 +1031,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                       {whyChooseBlock.tagline && (
                         <div className="asx-tag-pill" style={{ marginBottom: "14px" }}>
                           <span className="asx-tag-dot" />
-                          <span>{whyChooseBlock.tagline}</span>
+                          <span>{cleanDash(whyChooseBlock.tagline)}</span>
                         </div>
                       )}
 
@@ -889,23 +1039,40 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                         {renderGradientTitle(whyChooseBlock.title || "Why Choose Quickupp Softech?")}
                       </h2>
 
-                      {whyChooseBlock.desc && (
-                        <p className="asx-valprop-desc">
-                          {whyChooseBlock.desc}
-                        </p>
-                      )}
+                      {whyChooseBlock.desc &&
+                        renderCleanParagraphs(whyChooseBlock.desc, "asx-valprop-desc", { textAlign: "left", margin: "0 0 28px 0" })
+                      }
 
                       <div className="asx-valprop-list" style={{ display: "grid", gridTemplateColumns: "1fr", gap: "14px" }}>
-                        {whyChooseBlock.bullets.map((bullet, idx) => (
-                          <div key={idx} className="asx-valprop-item" style={{ marginBottom: 0 }}>
-                            <div className="asx-valprop-check">
-                              <CheckSvg size={14} />
+                        {whyChooseBlock.bullets.map((bullet, idx) => {
+                          const cleaned = cleanDash(bullet);
+                          const colonIdx = cleaned.indexOf(":");
+                          const hasColon = colonIdx !== -1 && colonIdx < 45;
+                          const title = hasColon ? cleaned.slice(0, colonIdx) : cleaned;
+                          const desc = hasColon ? cleaned.slice(colonIdx + 1).trim() : null;
+
+                          return (
+                            <div key={idx} className="asx-valprop-item" style={{ marginBottom: 0, alignItems: "flex-start" }}>
+                              <div className="asx-valprop-check" style={{ marginTop: "3px" }}>
+                                <CheckSvg size={14} />
+                              </div>
+                              <div style={{ flex: 1 }}>
+                                {desc ? (
+                                  <p style={{ fontSize: "15px", lineHeight: 1.62, color: "#475467", margin: 0 }}>
+                                    <strong style={{ fontWeight: 700, color: "#001d28" }}>
+                                      {title}:{" "}
+                                    </strong>
+                                    <span>{desc}</span>
+                                  </p>
+                                ) : (
+                                  <h4 className="asx-valprop-item-title" style={{ fontSize: "15.5px", fontWeight: 600, color: "#001d28", margin: 0 }}>
+                                    {title}
+                                  </h4>
+                                )}
+                              </div>
                             </div>
-                            <div>
-                              <h4 className="asx-valprop-item-title" style={{ fontSize: "15.5px", fontWeight: 600, color: "#001d28" }}>{bullet}</h4>
-                            </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
 
                       {whyChooseBlock.cta && (
@@ -961,45 +1128,49 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
 
           if (block.type === "process") {
             const processBlock = block as ProcessBlock;
+            const hasSteps = Array.isArray(processBlock.steps) && processBlock.steps.length > 0;
             return (
               <section key={bIdx} className="asx-section" style={{ borderTop: "1px solid #e5eaee" }}>
                 <div className="asx-container">
-                  <div className="asx-section-header-center" style={{ marginBottom: "36px" }}>
+                  <div className="asx-section-header-center" style={{ marginBottom: hasSteps ? "36px" : "0", maxWidth: "860px" }}>
                     {processBlock.tagline && (
                       <div className="asx-tag-pill" style={{ margin: "0 auto 12px" }}>
                         <span className="asx-tag-dot" />
-                        <span>{processBlock.tagline}</span>
+                        <span>{cleanDash(processBlock.tagline)}</span>
                       </div>
                     )}
                     <h2 className="asx-section-title" style={{ margin: "0 0 12px 0" }}>
                       {renderGradientTitle(processBlock.title)}
                     </h2>
-                    {processBlock.intro && (
-                      <p style={{ fontSize: "16px", color: "#475467", lineHeight: 1.68, margin: "10px auto 0", maxWidth: "720px" }}>
-                        {processBlock.intro}
-                      </p>
-                    )}
+                    {processBlock.intro &&
+                      renderCleanParagraphs(processBlock.intro, "asx-section-desc")
+                    }
+                    {processBlock.desc &&
+                      renderCleanParagraphs(processBlock.desc, "asx-section-desc", { marginTop: processBlock.intro ? "12px" : "0" })
+                    }
                   </div>
 
-                  <div className="asx-process-grid">
-                    {processBlock.steps.map((step, idx) => {
-                      const isSelected = activeStep === idx;
-                      return (
-                        <div
-                          key={idx}
-                          onClick={() => setActiveStep(idx)}
-                          className={"asx-step-card " + (isSelected ? "is-active" : "")}
-                          style={{ cursor: "pointer" }}
-                        >
-                          <div className="asx-step-header">
-                            <span className="asx-step-badge">{step.num}</span>
-                            <h3 className="asx-step-title">{step.title}</h3>
+                  {hasSteps && (
+                    <div className="asx-process-grid">
+                      {processBlock.steps!.map((step, idx) => {
+                        const isSelected = activeStep === idx;
+                        return (
+                          <div
+                            key={idx}
+                            onClick={() => setActiveStep(idx)}
+                            className={"asx-step-card " + (isSelected ? "is-active" : "")}
+                            style={{ cursor: "pointer" }}
+                          >
+                            <div className="asx-step-header">
+                              <span className="asx-step-badge">{step.num}</span>
+                              <h3 className="asx-step-title">{cleanDash(step.title)}</h3>
+                            </div>
+                            <p className="asx-step-desc">{cleanDash(step.desc || step.text || "")}</p>
                           </div>
-                          <p className="asx-step-desc">{step.desc || step.text}</p>
-                        </div>
-                      );
-                    })}
-                  </div>
+                        );
+                      })}
+                    </div>
+                  )}
 
                   {processBlock.cta && (
                     <div style={{ marginTop: "36px", textAlign: "center" }}>
@@ -1034,13 +1205,13 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                             onClick={() => setOpenFaq(isOpen ? null : idx)}
                             className="asx-faq-q"
                           >
-                            <span>{faq.q}</span>
+                            <span>{cleanDash(faq.q)}</span>
                             <PlusCrossSvg isOpen={isOpen} size={18} />
                           </button>
 
                           {isOpen && (
                             <div className="asx-faq-a">
-                              {faq.a}
+                              {cleanDash(faq.a)}
                             </div>
                           )}
                         </div>
@@ -1071,19 +1242,34 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                 )}
               </h2>
 
-              <p className="asx-cta-desc" style={{ whiteSpace: "pre-line" }}>
-                {data.closingDesc}
-              </p>
+              {renderCleanParagraphs(data.closingDesc || "", "asx-cta-desc")}
 
-              <div style={{ display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
+              <div
+                className="asx-cta-actions"
+                style={{
+                  display: "flex",
+                  gap: "16px",
+                  justifyContent: "center",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  marginTop: "36px",
+                }}
+              >
                 {data.closingCtas?.map((cta, idx) => (
                   <Link
                     key={idx}
                     href={cta.href || "/contact"}
-                    className={idx === 0 ? "asx-btn-green" : "asx-btn-outline"}
-                    style={{ padding: "16px 36px", fontSize: "15px" }}
+                    className={idx === 0 ? "mx-btn-lime" : "mx-btn-outline-white"}
                   >
-                    {cta.label}
+                    <span>{cta.label}</span>
+                    {idx === 0 && (
+                      <div className="mx-btn-icon-circle">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M5 12h14"></path>
+                          <path d="M12 5l7 7-7 7"></path>
+                        </svg>
+                      </div>
+                    )}
                   </Link>
                 ))}
               </div>

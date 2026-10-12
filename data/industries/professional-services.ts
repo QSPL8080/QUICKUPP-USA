@@ -109,7 +109,7 @@ export const data: ServicePageData = {
     },
     {
       type: "ai",
-      title: "Built to Generate Better Clients—Not Just More Traffic",
+      title: "Built to Generate Better Clients - Not Just More Traffic",
       intro:
         "For professional services, lead quality matters more than lead volume.\nOur strategies focus on reaching prospects who are more likely to:",
       bullets: [

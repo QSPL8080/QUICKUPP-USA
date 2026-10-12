@@ -8,7 +8,7 @@ export const data: ServicePageData = {
   heroEyebrow: "Home Services",
   heroTitle: "More Calls. More Qualified Leads. More Booked Jobs.",
   heroParagraphs: [
-    "Your customers are already searching for home services. The question is—are they finding your business or your competitors?",
+    "Your customers are already searching for home services. The question is - are they finding your business or your competitors?",
     "Quickupp Softech helps home service companies turn local searches, paid ads, social media, and website traffic into real customer enquiries and booked jobs.",
     "We combine Local SEO, Google Ads, Meta Ads, conversion-focused websites, lead generation, and AI automation to build a customer acquisition system designed for growth.",
   ],
@@ -28,7 +28,7 @@ export const data: ServicePageData = {
         "Expand into new service areas",
         "Turn one-time customers into repeat customers",
       ],
-      tagline: "We focus on the business outcome—not vanity metrics.",
+      tagline: "We focus on the business outcome - not vanity metrics.",
       cta: { label: "Build My Lead Generation Strategy", href: "/contact" },
     },
     {

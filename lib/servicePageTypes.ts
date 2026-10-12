@@ -35,7 +35,7 @@ export interface ProcessBlock {
   tagline?: string;
   intro?: string;
   desc?: string;
-  steps: ProcessStep[];
+  steps?: ProcessStep[];
   items?: string[];
   cta?: { label: string; href: string };
 }

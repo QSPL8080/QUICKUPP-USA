@@ -16,7 +16,6 @@ export const data: ServicePageData = {
     {
       type: "descPairs",
       title: "Complete Digital Growth Solutions for Interior Designers",
-      desc: "End-to-end digital marketing and portfolio-led growth strategies built specifically for interior designers and design studios.",
       items: [
         {
           title: "Interior Design SEO & AI Search Visibility",
@@ -64,18 +63,8 @@ export const data: ServicePageData = {
       type: "ai",
       title: "Stop Chasing Enquiries. Start Attracting the Right Clients.",
       intro:
-        "Not every enquiry is the right enquiry. Our strategies help you attract prospects who are more aligned with your location, project scope, design requirements and investment level. The Client Journey:",
-      bullets: [
-        "Search",
-        "Discover",
-        "Explore Portfolio",
-        "Enquire",
-        "Consultation",
-        "Site Visit",
-        "Proposal",
-        "Project",
-      ],
-      desc: "We optimize each stage to help turn online interest into genuine project opportunities.",
+        "Not every enquiry is the right enquiry.\nOur strategies help you attract prospects who are more aligned with your location, project scope, design requirements and investment level.",
+      desc: "The Client Journey\nSearch → Discover → Explore Portfolio → Enquire → Consultation → Site Visit → Proposal → Project\nWe optimize each stage to help turn online interest into genuine project opportunities.",
       cta: { label: "Improve Your Lead Quality", href: "/contact" },
     },
     {
@@ -125,57 +114,16 @@ export const data: ServicePageData = {
     {
       type: "ai",
       title: "Built Around Your Project Pipeline",
-      intro:
-        "We measure marketing beyond clicks and impressions.",
-      bullets: [
-        "Reach",
-        "Qualified Leads",
-        "Consultations",
-        "Site Visits",
-        "Proposals",
-        "Projects",
-        "Revenue",
-      ],
-      desc: "Your marketing should contribute directly to building a stronger project pipeline.",
+      intro: "We measure marketing beyond clicks and impressions.",
+      desc: "Reach → Qualified Leads → Consultations → Site Visits → Proposals → Projects → Revenue\nYour marketing should contribute directly to building a stronger project pipeline.",
       cta: { label: "Build a Project-Focused Marketing Plan", href: "/contact" },
     },
     {
       type: "process",
       title: "Our Interior Design Growth Process",
-      tagline: "Analyze → Strategize → Build → Launch → Optimize → Scale",
-      intro: "We evaluate your brand, portfolio, target market, competitors, website, advertising and lead journey before creating your growth strategy.",
-      steps: [
-        {
-          num: "01",
-          title: "Analyze",
-          desc: "Evaluate your brand, portfolio, target market, competitors, website, advertising and lead journey.",
-        },
-        {
-          num: "02",
-          title: "Strategize",
-          desc: "Formulate premium positioning, high-intent ad campaigns, and local SEO architecture.",
-        },
-        {
-          num: "03",
-          title: "Build",
-          desc: "Develop portfolio-rich landing pages, creative reels, case studies, and automated follow-up funnels.",
-        },
-        {
-          num: "04",
-          title: "Launch",
-          desc: "Deploy hyper-local Google Ads, Meta Ads, and visual content across Instagram and YouTube.",
-        },
-        {
-          num: "05",
-          title: "Optimize",
-          desc: "Analyze cost per consultation, lead qualification filters, and proposal closure rates.",
-        },
-        {
-          num: "06",
-          title: "Scale",
-          desc: "Expand to high-ticket micro-markets, new residential complexes, and luxury project segments.",
-        },
-      ],
+      intro: "Analyze → Strategize → Build → Launch → Optimize → Scale",
+      desc:
+        "We evaluate your brand, portfolio, target market, competitors, website, advertising and lead journey before creating your growth strategy.",
       cta: { label: "Plan Your Interior Design Growth Roadmap", href: "/contact" },
     },
     {
@@ -198,7 +146,7 @@ export const data: ServicePageData = {
       type: "ai",
       title: "AI-Powered Growth for Interior Design Businesses",
       intro:
-        "AI can help your team respond faster, qualify enquiries and automate repetitive marketing and sales processes. We can help implement:",
+        "AI can help your team respond faster, qualify enquiries and automate repetitive marketing and sales processes.\nWe can help implement:",
       bullets: [
         "AI Lead Qualification",
         "AI Chatbots & Agents",
@@ -213,6 +161,7 @@ export const data: ServicePageData = {
     },
     {
       type: "faq",
+      title: "Frequently Asked Questions",
       items: [
         {
           q: "How can digital marketing help my interior design business?",

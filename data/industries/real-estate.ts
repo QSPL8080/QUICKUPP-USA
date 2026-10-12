@@ -16,7 +16,6 @@ export const data: ServicePageData = {
     {
       type: "descPairs",
       title: "Complete Digital Marketing Solutions for Real Estate",
-      desc: "End-to-end digital marketing and sales enablement strategies designed specifically for real estate developers and agencies.",
       items: [
         {
           title: "Real Estate SEO & AI Search Visibility",
@@ -65,18 +64,8 @@ export const data: ServicePageData = {
       type: "ai",
       title: "Turn Property Searches Into Site Visits",
       intro:
-        "A successful real estate campaign is not about generating the highest number of leads. It is about generating relevant buyers who can move toward a site visit and purchase. Our growth journey:",
-      bullets: [
-        "Property Search",
-        "Project Discovery",
-        "Enquiry",
-        "Lead Qualification",
-        "Follow-Up",
-        "Site Visit",
-        "Negotiation",
-        "Booking",
-      ],
-      desc: "We optimize each stage to help your sales team convert more opportunities.",
+        "A successful real estate campaign is not about generating the highest number of leads. It is about generating relevant buyers who can move toward a site visit and purchase.",
+      desc: "Our growth journey:\nProperty Search → Project Discovery → Enquiry → Lead Qualification → Follow-Up → Site Visit → Negotiation → Booking\nWe optimize each stage to help your sales team convert more opportunities.",
     },
     {
       type: "list",
@@ -121,55 +110,15 @@ export const data: ServicePageData = {
       type: "ai",
       title: "Built Around Your Most Important Real Estate Metrics",
       intro: "We focus beyond impressions and clicks.",
-      bullets: [
-        "Reach",
-        "Leads",
-        "Qualified Leads",
-        "Calls",
-        "Site Visits",
-        "Negotiations",
-        "Bookings",
-      ],
-      desc: "Your marketing strategy should ultimately support your sales pipeline and revenue.",
+      desc: "Reach → Leads → Qualified Leads → Calls → Site Visits → Negotiations → Bookings\nYour marketing strategy should ultimately support your sales pipeline and revenue.",
       cta: { label: "Build a Sales-Focused Marketing Plan", href: "/contact" },
     },
     {
       type: "process",
       title: "Our Real Estate Growth Process",
-      tagline: "Analyze → Strategize → Build → Launch → Optimize → Scale",
-      intro: "We evaluate your project, location, pricing, audience, competition, sales process and current marketing performance before building the strategy.",
-      steps: [
-        {
-          num: "01",
-          title: "Analyze",
-          desc: "Evaluate your project, location, pricing, audience, competition, sales process and current marketing performance.",
-        },
-        {
-          num: "02",
-          title: "Strategize",
-          desc: "Formulate positioning, campaign channels, buyer personas, and qualification workflows.",
-        },
-        {
-          num: "03",
-          title: "Build",
-          desc: "Develop conversion-focused landing pages, creatives, ad sets, and automated follow-up funnels.",
-        },
-        {
-          num: "04",
-          title: "Launch",
-          desc: "Deploy targeted campaigns across Google, Meta, YouTube, and local search channels.",
-        },
-        {
-          num: "05",
-          title: "Optimize",
-          desc: "Refine buyer targeting, ad creatives, lead quality scoring, and cost per site visit.",
-        },
-        {
-          num: "06",
-          title: "Scale",
-          desc: "Scale budgets on winning channels, expand launch phases, and maximize inventory sales.",
-        },
-      ],
+      intro: "Analyze → Strategize → Build → Launch → Optimize → Scale",
+      desc:
+        "We evaluate your project, location, pricing, audience, competition, sales process and current marketing performance before building the strategy.",
       cta: { label: "Plan Your Real Estate Growth Roadmap", href: "/contact" },
     },
     {
@@ -192,7 +141,7 @@ export const data: ServicePageData = {
       type: "ai",
       title: "AI-Powered Real Estate Marketing",
       intro:
-        "AI can help real estate businesses respond faster, qualify prospects and automate repetitive sales processes. We can help implement:",
+        "AI can help real estate businesses respond faster, qualify prospects and automate repetitive sales processes.\nWe can help implement:",
       bullets: [
         "AI Lead Qualification",
         "AI Chatbots & Agents",
@@ -207,6 +156,7 @@ export const data: ServicePageData = {
     },
     {
       type: "faq",
+      title: "Frequently Asked Questions",
       items: [
         {
           q: "How can digital marketing help my real estate business?",

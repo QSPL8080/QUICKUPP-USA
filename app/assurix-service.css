@@ -9,6 +9,41 @@
   min-height: 100vh;
   width: 100%;
   overflow-x: clip;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.asx-page p {
+  text-wrap: pretty;
+}
+
+.asx-section-desc,
+.asx-section-intro {
+  font-size: 16px;
+  color: #475467;
+  line-height: 1.75;
+  margin: 12px auto 0;
+  max-width: 840px;
+  text-align: center;
+  text-wrap: pretty;
+}
+
+.asx-ecosystem-desc {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: #1e293b;
+  line-height: 1.7;
+  text-align: center;
+  text-wrap: pretty;
+}
+
+.asx-multiline-wrap {
+  width: 100%;
+  max-width: 840px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .asx-page *,
@@ -105,12 +140,22 @@
   display: inline !important;
 }
 
+.asx-hero-paragraphs {
+  margin: 0 0 28px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .asx-hero-desc {
-  font-size: 17px;
-  line-height: 1.65;
+  font-size: clamp(15px, 1.1vw, 16.5px);
+  line-height: 1.75;
   color: #2c436b;
-  max-width: 540px;
-  margin: 0 0 32px 0;
+  max-width: 580px;
+  margin: 0;
+  text-align: left;
+  text-wrap: pretty;
+  letter-spacing: -0.005em;
 }
 
 .asx-hero-btns {
@@ -521,9 +566,11 @@
 
 .asx-valprop-desc {
   font-size: 16px;
-  line-height: 1.65;
+  line-height: 1.75;
   color: #2c436b;
-  margin-bottom: 32px;
+  margin-bottom: 28px;
+  text-align: left;
+  text-wrap: pretty;
 }
 
 .asx-valprop-list {
@@ -950,10 +997,12 @@
 }
 
 .asx-outline-desc {
-  font-size: 13px;
-  line-height: 1.55;
+  font-size: 13.5px;
+  line-height: 1.62;
   color: #2c436b;
   margin: 0;
+  text-align: left;
+  text-wrap: pretty;
 }
 
 /* Who We Serve Pill Grid */
@@ -1062,13 +1111,50 @@
 }
 
 .asx-ecosystem-footer {
-  margin-top: 28px;
-  padding: 18px 28px;
-  background: linear-gradient(135deg, rgba(124, 58, 237, 0.04) 0%, rgba(0, 210, 255, 0.04) 100%);
-  border: 1px solid rgba(124, 58, 237, 0.15);
+  margin-top: 32px;
+  padding: 22px 32px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 16px;
-  text-align: center;
-  box-shadow: 0 2px 10px rgba(0, 29, 40, 0.02);
+  text-align: center !important;
+  box-shadow: 0 4px 20px -2px rgba(124, 58, 237, 0.08);
+  position: relative;
+  overflow: hidden;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+}
+
+.asx-ecosystem-footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #00d2ff 0%, #7c3aed 50%, #ec4899 100%);
+}
+
+.asx-ecosystem-oneline-wrap {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-wrap: wrap !important;
+  gap: 12px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 auto !important;
+  text-align: center !important;
+}
+
+.asx-ecosystem-oneline-wrap p {
+  margin: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
 }
 
 /* ========================================================================= */
@@ -1151,9 +1237,11 @@
 
 .asx-step-desc {
   font-size: 14.5px;
-  line-height: 1.6;
+  line-height: 1.68;
   color: #475569;
   margin: 0;
+  text-align: left;
+  text-wrap: pretty;
 }
 
 
@@ -1215,71 +1303,153 @@
   padding: 0 24px 20px;
   font-family: var(--font-sans);
   font-size: 15px;
-  line-height: 1.68;
+  line-height: 1.72;
   color: #475467;
   border-top: 1px solid #f1f5f9;
   padding-top: 16px;
+  text-align: left;
+  text-wrap: pretty;
 }
 
-/* Dark CTA Banner */
+/* CTA Banner - Styled in Quickupp Code Shade */
 .asx-cta-box {
-  background-color: #001d28;
-  border: 1px solid #002f42;
-  border-radius: 40px;
-  padding: 64px 36px;
-  text-align: center;
-  color: #ffffff;
-  box-shadow: 0 24px 60px -12px rgba(0, 29, 40, 0.4);
+  background: linear-gradient(135deg, #f0fdf4 0%, #f8fafc 40%, #eef2ff 100%) !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 28px !important;
+  padding: 64px 36px !important;
+  text-align: center !important;
+  color: #0b0f17 !important;
+  box-shadow: 0 16px 36px -8px rgba(15, 23, 42, 0.05) !important;
+  position: relative;
+  overflow: hidden;
 }
 
 .asx-cta-title {
-  font-size: clamp(18px, 1.8vw, 24px);
-  line-height: 1.25;
-  font-weight: 800;
-  color: #ffffff;
-  margin: 0 0 16px;
-}
-
-.asx-cta-title span {
-  color: #34d399;
+  font-size: clamp(22px, 2.4vw, 34px) !important;
+  line-height: 1.25 !important;
+  font-weight: 800 !important;
+  color: #0b0f17 !important;
+  margin: 0 0 16px !important;
+  letter-spacing: -0.02em !important;
 }
 
 .asx-cta-desc {
-  font-size: 16px;
-  line-height: 1.6;
-  color: #bfc8cc;
-  max-width: 600px;
-  margin: 0 auto 32px;
+  font-size: 16px !important;
+  line-height: 1.7 !important;
+  color: #475467 !important;
+  max-width: 740px !important;
+  margin: 0 auto !important;
+  text-align: center !important;
+  text-wrap: pretty !important;
 }
 
-.asx-cta-box .asx-btn-green {
-  background: #10b981 !important;
+.asx-cta-box .asx-multiline-wrap {
+  margin: 0 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  width: 100% !important;
+  max-width: 740px !important;
+}
+
+.asx-cta-box .asx-multiline-wrap p {
+  margin: 0 auto !important;
+}
+
+.asx-cta-actions {
+  display: flex !important;
+  gap: 16px !important;
+  justify-content: center !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  margin-top: 36px !important;
+}
+
+/* Primary Button in CTA Box (Quickupp Solid Black Button with 8px radius) */
+.asx-cta-box .mx-btn-lime,
+.asx-cta-box a.mx-btn-lime,
+.asx-cta-box .asx-btn-green,
+.asx-cta-box a.asx-btn-green {
+  background-color: #0b0f17 !important;
+  background: #0b0f17 !important;
   color: #ffffff !important;
-  box-shadow: none !important;
-  font-weight: 700;
-  border-radius: 12px;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  padding: 13px 26px !important;
+  border-radius: 8px !important;
+  border: 1px solid #0b0f17 !important;
+  box-shadow: 0 4px 12px rgba(11, 15, 23, 0.2) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  text-decoration: none !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  cursor: pointer !important;
 }
 
-.asx-cta-box .asx-btn-green:hover {
-  background: #059669 !important;
-  transform: translateY(-2px);
-  box-shadow: none !important;
-}
-
-.asx-cta-box .asx-btn-outline {
-  background: rgba(255, 255, 255, 0.08) !important;
-  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+.asx-cta-box .mx-btn-lime:hover,
+.asx-cta-box a.mx-btn-lime:hover,
+.asx-cta-box .asx-btn-green:hover,
+.asx-cta-box a.asx-btn-green:hover {
+  background-color: #1e293b !important;
+  background: #1e293b !important;
+  border-color: #1e293b !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 8px 20px rgba(11, 15, 23, 0.3) !important;
   color: #ffffff !important;
-  box-shadow: none !important;
-  font-weight: 700;
-  border-radius: 12px;
 }
 
-.asx-cta-box .asx-btn-outline:hover {
-  background: rgba(255, 255, 255, 0.16) !important;
-  border-color: rgba(255, 255, 255, 0.4) !important;
-  transform: translateY(-2px);
-  box-shadow: none !important;
+.asx-cta-box .mx-btn-icon-circle {
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: transform 0.25s ease !important;
+  flex-shrink: 0 !important;
+}
+
+.asx-cta-box .mx-btn-lime:hover .mx-btn-icon-circle,
+.asx-cta-box .asx-btn-green:hover .mx-btn-icon-circle {
+  transform: translateX(3px) !important;
+}
+
+/* Secondary Button in CTA Box (Quickupp Solid White Card Button with 8px radius) */
+.asx-cta-box .mx-btn-outline-white,
+.asx-cta-box a.mx-btn-outline-white,
+.asx-cta-box .asx-btn-outline,
+.asx-cta-box a.asx-btn-outline {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  padding: 13px 26px !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  text-decoration: none !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+}
+
+.asx-cta-box .mx-btn-outline-white:hover,
+.asx-cta-box a.mx-btn-outline-white:hover,
+.asx-cta-box .asx-btn-outline:hover,
+.asx-cta-box a.asx-btn-outline:hover {
+  background-color: #f8fafc !important;
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0b0f17 !important;
+  transform: translateY(-1px) !important;
 }
 
 /* Hub Directory Grid */
@@ -1393,6 +1563,20 @@
   .asx-serve-grid,
   .asx-process-grid {
     grid-template-columns: 1fr;
+  }
+  .asx-hero-paragraphs {
+    margin-bottom: 24px;
+    gap: 10px;
+  }
+  .asx-hero-desc {
+    font-size: 15px;
+    line-height: 1.68;
+  }
+  .asx-section-desc,
+  .asx-section-intro {
+    font-size: 15px;
+    line-height: 1.68;
+    margin-top: 10px;
   }
   .asx-hero-title,
   .asx-valprop-title {

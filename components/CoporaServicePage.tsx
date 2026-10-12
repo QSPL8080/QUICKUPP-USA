@@ -457,7 +457,7 @@ export default function CoporaServicePage({ data }: Props) {
 
           <div className="copora-process-marquee-container">
             <div className="copora-process-marquee-track">
-              {[...processBlock.steps, ...processBlock.steps].map((step, idx) => (
+              {[...(processBlock.steps || []), ...(processBlock.steps || [])].map((step, idx) => (
                 <div key={idx} className="copora-step-card">
                   <div className="copora-step-num">{step.num}</div>
                   <h3 className="copora-step-title">{step.title}</h3>

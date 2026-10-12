@@ -350,7 +350,7 @@ export default function ITLifecycleServicePage({ data }: { data: ServicePageData
             </div>
 
             <div className="lc-process-flow">
-              {processBlock.steps.map((step, sIdx) => (
+              {(processBlock.steps || []).map((step, sIdx) => (
                 <div key={sIdx} className="lc-step-card lc-reveal lc-reveal-up">
                   <div className="lc-step-header">
                     <span className="lc-step-badge">{step.num}</span>

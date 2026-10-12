@@ -16,7 +16,6 @@ export const data: ServicePageData = {
     {
       type: "descPairs",
       title: "Complete Digital Growth Solutions for Travel & Hospitality",
-      desc: "End-to-end digital marketing and experience-driven growth strategies designed for travel agencies, hotels, and tour operators.",
       items: [
         {
           title: "Travel SEO & AI Search Visibility",
@@ -64,19 +63,9 @@ export const data: ServicePageData = {
       type: "ai",
       title: "Turn Travel Searches Into Bookings",
       intro:
-        "Your customers may search for destinations, compare packages, check reviews and explore experiences before making a decision. We help create a connected customer journey:",
-      bullets: [
-        "Search",
-        "Discover",
-        "Explore",
-        "Enquire",
-        "Compare",
-        "Book",
-        "Experience",
-        "Review",
-        "Return",
-      ],
-      desc: "Our strategies focus on turning online attention into qualified enquiries and bookings.",
+        "Your customers may search for destinations, compare packages, check reviews and explore experiences before making a decision.",
+      desc:
+        "We help create a connected customer journey:\nSearch → Discover → Explore → Enquire → Compare → Book → Experience → Review → Return\nOur strategies focus on turning online attention into qualified enquiries and bookings.",
     },
     {
       type: "list",
@@ -126,54 +115,16 @@ export const data: ServicePageData = {
       type: "ai",
       title: "Built Around Your Most Important Metrics",
       intro: "We look beyond impressions and clicks.",
-      bullets: [
-        "Reach",
-        "Website Visitors",
-        "Enquiries",
-        "Qualified Travelers",
-        "Bookings",
-        "Repeat Customers",
-      ],
-      desc: "Your marketing should contribute to a stronger booking pipeline and revenue growth.",
+      desc:
+        "Reach → Website Visitors → Enquiries → Qualified Travelers → Bookings → Repeat Customers\nYour marketing should contribute to a stronger booking pipeline and revenue growth.",
       cta: { label: "Build a Booking-Focused Marketing Strategy", href: "/contact" },
     },
     {
       type: "process",
       title: "Our Travel & Hospitality Growth Process",
-      tagline: "Analyze → Strategize → Build → Launch → Optimize → Scale",
-      intro: "We evaluate your destinations, services, audience, competitors, website, booking journey and marketing performance to build a focused growth strategy.",
-      steps: [
-        {
-          num: "01",
-          title: "Analyze",
-          desc: "Evaluate your destinations, services, audience, competitors, website, booking journey and marketing performance.",
-        },
-        {
-          num: "02",
-          title: "Strategize",
-          desc: "Formulate seasonal campaign plans, high-intent travel audiences, and direct booking funnels.",
-        },
-        {
-          num: "03",
-          title: "Build",
-          desc: "Create destination landing pages, tour package brochures, automated WhatsApp flows, and video assets.",
-        },
-        {
-          num: "04",
-          title: "Launch",
-          desc: "Deploy targeted Google Ads, Meta Ads, YouTube video ads, and seasonal holiday promotions.",
-        },
-        {
-          num: "05",
-          title: "Optimize",
-          desc: "Continuously optimize cost per booking, inquiry qualification filters, and lead follow-up speeds.",
-        },
-        {
-          num: "06",
-          title: "Scale",
-          desc: "Expand to new destinations, high-value corporate travel segments, and international traveler markets.",
-        },
-      ],
+      intro: "Analyze → Strategize → Build → Launch → Optimize → Scale",
+      desc:
+        "We evaluate your destinations, services, audience, competitors, website, booking journey and marketing performance to build a focused growth strategy.",
       cta: { label: "Plan Your Travel Business Growth Roadmap", href: "/contact" },
     },
     {

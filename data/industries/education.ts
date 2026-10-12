@@ -17,9 +17,7 @@ export const data: ServicePageData = {
     {
       type: "list",
       title: "Stop Losing Students to Competitors",
-      subtitle: "Admissions & Enrolment Growth",
-      tagline: "Get Seen. Build Trust. Get More Enrolments.",
-      desc: "A strong educational offering is not enough if your institution isn't visible when students are searching. We help you:",
+      desc: "A strong educational offering is not enough if your institution isn't visible when students are searching.\nWe help you:",
       items: [
         "Generate more qualified student enquiries",
         "Increase admissions and enrolments",
@@ -30,6 +28,7 @@ export const data: ServicePageData = {
         "Reduce dependence on traditional admissions channels",
         "Improve lead follow-up and conversion",
       ],
+      tagline: "Get Seen. Build Trust. Get More Enrolments.",
       cta: { label: "Generate More Qualified Student Leads", href: "/contact" },
     },
     {
@@ -49,12 +48,10 @@ export const data: ServicePageData = {
         "Corporate Training Providers",
         "Certification & Course Providers",
       ],
-      cta: { label: "Get Your Education Growth Strategy", href: "/contact" },
     },
     {
       type: "descPairs",
       title: "How Quickupp Helps Education Businesses Grow",
-      subtitle: "Connected Student Acquisition System",
       desc: "We combine Marketing, AI, and Technology to create a connected student acquisition system.",
       items: [
         {
@@ -101,23 +98,12 @@ export const data: ServicePageData = {
       title: "Turn Student Searches Into Admissions",
       intro:
         "Education marketing isn't simply about generating leads. Lead quality and follow-up matter.",
-      bullets: [
-        "Search",
-        "Discovery",
-        "Course Interest",
-        "Enquiry",
-        "Counselling",
-        "Application",
-        "Admission",
-      ],
-      desc: "Our strategies are designed to create a stronger path from digital discovery to enrolment.",
+      desc: "We build the journey around:\nSearch → Discovery → Course Interest → Enquiry → Counselling → Application → Admission\nOur strategies are designed to create a stronger path from digital discovery to enrolment.",
       cta: { label: "Build Your Student Acquisition Strategy", href: "/contact" },
     },
     {
       type: "list",
       title: "Promote What Makes Your Institution Different",
-      subtitle: "Highlight Your Institutional Strengths",
-      tagline: "Turn Your Strengths Into Reasons to Choose You.",
       desc: "Students compare multiple options before making decisions. We help communicate your:",
       items: [
         "Courses & Programs",
@@ -131,6 +117,7 @@ export const data: ServicePageData = {
         "Learning Experience",
         "Key Differentiators",
       ],
+      tagline: "Turn Your Strengths Into Reasons to Choose You.",
       cta: { label: "Strengthen Your Institution’s Digital Presence", href: "/contact" },
     },
     {
@@ -186,13 +173,12 @@ export const data: ServicePageData = {
         "Data-Driven Optimization",
         "Transparent Reporting",
       ],
-      cta: { label: "Schedule a Growth Consultation", href: "/contact" },
     },
     {
       type: "ai",
       title: "AI-Powered Education Marketing",
       intro:
-        "AI can help education businesses respond faster and manage student enquiries more efficiently.",
+        "AI can help education businesses respond faster and manage student enquiries more efficiently.\nWe provide:",
       bullets: [
         "AI Chatbots",
         "Student Lead Qualification",
@@ -237,7 +223,7 @@ export const data: ServicePageData = {
   ],
   closingTitle: "Ready to Grow Your Student Enrolments?",
   closingDesc:
-    "Your next student is already searching for the right course or institution. Make sure they find you, trust you, and choose you. Build stronger visibility, generate qualified student enquiries, and turn more prospects into enrolments with Quickupp Softech. Marketing. AI. Technology. Built for Growth.",
+    "Your next student is already searching for the right course or institution.\nMake sure they find you, trust you, and choose you.\nBuild stronger visibility, generate qualified student enquiries, and turn more prospects into enrolments with Quickupp Softech.\nMarketing. AI. Technology. Built for Growth.",
   closingCtas: [
     { label: "Schedule a Growth Consultation", href: "/contact" },
   ],
