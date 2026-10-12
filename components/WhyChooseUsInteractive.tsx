@@ -87,7 +87,7 @@ export default function WhyChooseUsInteractive() {
       num: "01",
       category: "strategy",
       title: "Marketing + AI + Technology Under One Roof",
-      desc: "Most businesses work with different partners for marketing, technology and automation. Quickupp brings these capabilities together—from digital marketing and AI solutions to websites, applications, automation and custom software. Our integrated approach helps different parts of your business work toward the same growth objectives.",
+      desc: "Most businesses work with different partners for marketing, technology and automation. Quickupp brings these capabilities together - from digital marketing and AI solutions to websites, applications, automation and custom software. Our integrated approach helps different parts of your business work toward the same growth objectives.",
       subtext: "One partner. Multiple capabilities. One connected growth strategy.",
       tag: "Unified Ecosystem",
     },
@@ -95,7 +95,7 @@ export default function WhyChooseUsInteractive() {
       num: "02",
       category: "strategy",
       title: "Proven Experience Across Industries",
-      desc: "Different industries require different growth strategies. Our experience spans healthcare, real estate, interiors, education, travel, professional services, D2C and technology. We've worked with businesses at different stages—from establishing their digital presence to scaling customer acquisition and technology infrastructure.",
+      desc: "Different industries require different growth strategies. Our experience spans healthcare, real estate, interiors, education, travel, professional services, D2C and technology. We've worked with businesses at different stages - from establishing their digital presence to scaling customer acquisition and technology infrastructure.",
       subtext: "We bring cross-industry experience while keeping every solution specific to your business.",
       tag: "Cross-Industry Scale",
     },
@@ -123,7 +123,7 @@ export default function WhyChooseUsInteractive() {
         "Scalable digital infrastructure",
         "New opportunities for growth",
       ],
-      subtext: "We focus on creating business value—not simply delivering tasks.",
+      subtext: "We focus on creating business value - not simply delivering tasks.",
       tag: "Measurable Impact",
     },
     {
@@ -154,7 +154,7 @@ export default function WhyChooseUsInteractive() {
       num: "08",
       category: "scale",
       title: "Built for Growth & Scale",
-      desc: "We don't just think about what your business needs today. We consider what you'll need tomorrow. Our solutions are designed with scalability in mind—from marketing systems and automation workflows to websites, applications, software and digital platforms. As your business grows, your systems should grow with it.",
+      desc: "We don't just think about what your business needs today. We consider what you'll need tomorrow. Our solutions are designed with scalability in mind - from marketing systems and automation workflows to websites, applications, software and digital platforms. As your business grows, your systems should grow with it.",
       subtext: "We build with your next stage in mind.",
       tag: "Future-Ready Architecture",
     },
@@ -250,9 +250,17 @@ export default function WhyChooseUsInteractive() {
               <h1 className="mx-hero-title">
                 More Than a Service Provider. <span className="mx-gradient-text">Your Growth Partner.</span>
               </h1>
-              <p className="mx-hero-subtitle">
-                Choosing the right partner for business growth is about more than finding someone who can deliver a service. You need a team that understands your business goals, customers, market and the challenges between where you are today and where you want to be. At Quickupp Softech, we bring Marketing, AI and Technology together to help businesses build, improve and scale. We don&apos;t believe in selling disconnected services. We believe in solving business problems and building solutions that create measurable impact.
-              </p>
+              <div className="mx-hero-statements-wrap">
+                <p className="mx-hero-statement-lead">
+                  Choosing the right partner for business growth is about more than finding someone who can deliver a service. You need a team that understands your business goals, customers, market and the challenges between where you are today and where you want to be.
+                </p>
+                <p className="mx-hero-statement-sub">
+                  At Quickupp Softech, we bring Marketing, AI and Technology together to help businesses build, improve and scale.
+                </p>
+                <p className="mx-hero-statement-highlight">
+                  We don&apos;t believe in selling disconnected services. We believe in solving business problems and building solutions that create measurable impact.
+                </p>
+              </div>
 
               {/* Hero Action Button */}
               <Link href="/contact" className="mx-btn-lime">
@@ -293,7 +301,7 @@ export default function WhyChooseUsInteractive() {
                   Experience That Goes <span className="mx-gradient-text">Beyond the Pitch.</span>
                 </h2>
                 <p className="mx-tab-paragraph" style={{ marginBottom: "20px" }}>
-                  We believe trust should be earned through experience, execution and results. Over the years, Quickupp Softech has worked with businesses across industries, markets and growth stages—helping them strengthen their digital presence, generate opportunities and build better systems.
+                  We believe trust should be earned through experience, execution and results. Over the years, Quickupp Softech has worked with businesses across industries, markets and growth stages - helping them strengthen their digital presence, generate opportunities and build better systems.
                 </p>
 
                 <div style={{ marginTop: "24px", padding: "16px 20px", background: "rgba(124, 58, 237, 0.06)", borderLeft: "3px solid var(--mx-primary)", borderRadius: "8px" }}>
@@ -447,7 +455,7 @@ export default function WhyChooseUsInteractive() {
                     }}
                   >
                     <span>Strategy &amp; Foundation</span>
-                    <span style={{ fontSize: "12px", opacity: 0.7 }}>01–03</span>
+                    <span style={{ fontSize: "12px", opacity: 0.7 }}>01-03</span>
                   </button>
 
                   <button
@@ -471,7 +479,7 @@ export default function WhyChooseUsInteractive() {
                     }}
                   >
                     <span>Execution &amp; Practical AI</span>
-                    <span style={{ fontSize: "12px", opacity: 0.7 }}>04–06</span>
+                    <span style={{ fontSize: "12px", opacity: 0.7 }}>04-06</span>
                   </button>
 
                   <button
@@ -495,7 +503,7 @@ export default function WhyChooseUsInteractive() {
                     }}
                   >
                     <span>Scalability &amp; Trust</span>
-                    <span style={{ fontSize: "12px", opacity: 0.7 }}>07–10</span>
+                    <span style={{ fontSize: "12px", opacity: 0.7 }}>07-10</span>
                   </button>
                 </div>
 
@@ -687,7 +695,7 @@ export default function WhyChooseUsInteractive() {
                 From Growing Businesses to <span className="mx-gradient-text">Ambitious Brands.</span>
               </h2>
               <p className="mx-tab-paragraph" style={{ maxWidth: "780px", margin: "0 auto 16px" }}>
-                Our work is built around long-term partnerships, measurable objectives and continuous improvement. 200+ projects. 120+ global clients. One commitment—to help businesses grow smarter.
+                Our work is built around long-term partnerships, measurable objectives and continuous improvement. 200+ projects. 120+ global clients. One commitment - to help businesses grow smarter.
               </p>
               <p style={{ fontSize: "15px", fontWeight: 700, color: "var(--mx-primary)", margin: 0 }}>
                 We measure our success not only by what we deliver, but by the value we create for the businesses we work with.
@@ -713,7 +721,7 @@ export default function WhyChooseUsInteractive() {
                   Your business doesn&apos;t need more disconnected solutions. It needs the right strategy, the right technology and the right partner to bring it all together. Let&apos;s understand where your business is today, identify where the biggest opportunities lie and create a clear path toward what&apos;s next.
                 </p>
                 <p style={{ fontSize: "14.5px", color: "var(--mx-primary)", fontWeight: 600, margin: "0 0 8px 0" }}>
-                  Marketing. AI. Technology. • One Partner for Your Growth.
+                  Marketing. AI. Technology. - One Partner for Your Growth.
                 </p>
                 <p style={{ fontSize: "14.5px", color: "var(--mx-text-body)", margin: 0 }}>
                   <strong style={{ color: "var(--mx-text-heading)" }}>Let&apos;s Build Your Growth Story.</strong>

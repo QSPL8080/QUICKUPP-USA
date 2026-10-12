@@ -25,7 +25,7 @@ export default function WhyBusinessesChooseUsInteractive() {
       num: "02",
       category: "strategy",
       title: "Business-First Thinking",
-      desc: "We take the time to understand what actually matters to your business before recommending a solution. Whether the objective is customer acquisition, digital transformation, automation or market expansion, our work starts with the business problem—not the service.",
+      desc: "We take the time to understand what actually matters to your business before recommending a solution. Whether the objective is customer acquisition, digital transformation, automation or market expansion, our work starts with the business problem - not the service.",
       tag: "Strategic Problem Solving",
       subtext: null,
       ctaText: null,
@@ -106,7 +106,7 @@ export default function WhyBusinessesChooseUsInteractive() {
       num: "08",
       category: "scale",
       title: "Built With Scalability in Mind",
-      desc: "Your requirements today may not be the same six months from now. We consider future needs when developing marketing systems, websites, applications, automation and technology solutions—so what we build can evolve with your business.",
+      desc: "Your requirements today may not be the same six months from now. We consider future needs when developing marketing systems, websites, applications, automation and technology solutions - so what we build can evolve with your business.",
       tag: "Future-Proof Architecture",
       subtext: null,
       ctaText: null,
@@ -140,28 +140,28 @@ export default function WhyBusinessesChooseUsInteractive() {
 
   const differenceItems = [
     {
-      step: "01 • DEMAND",
+      step: "01 - DEMAND",
       title: "Demand Generation",
       desc: "A marketing campaign can generate demand.",
       tag: "Acquisition Engine",
       insight: "Targeted campaigns and performance marketing create continuous inbound interest.",
     },
     {
-      step: "02 • CONVERSION",
+      step: "02 - CONVERSION",
       title: "Conversion Engine",
       desc: "A website can convert it.",
       tag: "Experience & UI/UX",
       insight: "Fast, frictionless digital experiences turn qualified traffic into paying customers.",
     },
     {
-      step: "03 • AUTOMATION",
+      step: "03 - AUTOMATION",
       title: "AI Automation",
       desc: "AI can automate what happens next.",
       tag: "Intelligent Workflows",
       insight: "Automated qualification, routing, CRM sync, and response loops work 24/7.",
     },
     {
-      step: "04 • SCALE",
+      step: "04 - SCALE",
       title: "Scalable Technology",
       desc: "Technology can help the entire system scale.",
       tag: "Robust Architecture",
@@ -182,7 +182,7 @@ export default function WhyBusinessesChooseUsInteractive() {
         "Technical architecture & legacy workflow bottleneck assessment",
       ],
       telemetry: {
-        timeline: "Phase 01 • Discovery",
+        timeline: "Phase 01 - Discovery",
         lead: "Strategic Growth Lead",
         goal: "Zero Assumptions & Total Alignment",
       },
@@ -199,7 +199,7 @@ export default function WhyBusinessesChooseUsInteractive() {
         "KPI benchmarks, ROI targets & measurement framework",
       ],
       telemetry: {
-        timeline: "Phase 02 • Planning",
+        timeline: "Phase 02 - Planning",
         lead: "Lead Solutions Architect",
         goal: "Clear Roadmaps & Defined Timelines",
       },
@@ -216,7 +216,7 @@ export default function WhyBusinessesChooseUsInteractive() {
         "Rigorous cross-browser QA testing & performance benchmarking",
       ],
       telemetry: {
-        timeline: "Phase 03 • Implementation",
+        timeline: "Phase 03 - Implementation",
         lead: "Engineering & Marketing Squad",
         goal: "Velocity with Production Excellence",
       },
@@ -233,7 +233,7 @@ export default function WhyBusinessesChooseUsInteractive() {
         "Data-driven bottleneck detection & user behavioral insights",
       ],
       telemetry: {
-        timeline: "Phase 04 • Performance",
+        timeline: "Phase 04 - Performance",
         lead: "Data & Performance Specialist",
         goal: "Measurable Business Outcomes",
       },
@@ -250,7 +250,7 @@ export default function WhyBusinessesChooseUsInteractive() {
         "Ongoing feature development aligned with market growth",
       ],
       telemetry: {
-        timeline: "Phase 05 • Optimization",
+        timeline: "Phase 05 - Optimization",
         lead: "Dedicated Growth Partner Team",
         goal: "Long-Term Compounding Advantage",
       },
@@ -281,15 +281,6 @@ export default function WhyBusinessesChooseUsInteractive() {
         <section className="mx-hero-section">
           <div className="mx-container">
             <div className="mx-hero-seamless">
-              {/* Subtle Ambient Glow */}
-              <div className="mx-hero-bg-waves" aria-hidden="true">
-                <svg viewBox="0 0 1200 600" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M0 300C300 100 600 500 900 300C1050 200 1150 250 1200 300V600H0V300Z" fill="rgba(124, 58, 237, 0.02)" />
-                  <path d="M0 400C250 250 500 550 800 350C1000 220 1100 320 1200 380" stroke="rgba(0, 210, 255, 0.3)" strokeWidth="2" strokeDasharray="8 8" />
-                  <path d="M0 200C350 450 700 150 1050 380C1120 420 1180 400 1200 390" stroke="rgba(124, 58, 237, 0.18)" strokeWidth="1.5" />
-                </svg>
-              </div>
-
               {/* Top Center Subtitle Badge */}
               <div className="mx-subtitle-badge">
                 <span className="mx-badge-dot" />
@@ -300,9 +291,14 @@ export default function WhyBusinessesChooseUsInteractive() {
               <h1 className="mx-hero-title">
                 Built Around Your Business. <span className="mx-gradient-text">Focused on What Comes Next.</span>
               </h1>
-              <p className="mx-hero-subtitle">
-                Choosing a growth partner is about more than technical expertise. You need a team that understands your objectives, connects the right capabilities and takes responsibility for execution. Quickupp Softech combines Marketing, AI and Technology to help businesses solve challenges, create opportunities and build for the future.
-              </p>
+              <div className="mx-hero-statements-wrap">
+                <p className="mx-hero-statement-lead">
+                  Choosing a growth partner is about more than technical expertise. You need a team that understands your objectives, connects the right capabilities and takes responsibility for execution.
+                </p>
+                <p className="mx-hero-statement-highlight">
+                  Quickupp Softech combines Marketing, AI and Technology to help businesses solve challenges, create opportunities and build for the future.
+                </p>
+              </div>
 
               {/* Hero Action Button */}
               <Link href="/contact" className="mx-btn-lime">
@@ -390,7 +386,7 @@ export default function WhyBusinessesChooseUsInteractive() {
                     }}
                   >
                     <span>Strategy &amp; Solutions</span>
-                    <span style={{ fontSize: "12px", opacity: 0.7 }}>01–03</span>
+                    <span style={{ fontSize: "12px", opacity: 0.7 }}>01-03</span>
                   </button>
 
                   <button
@@ -414,7 +410,7 @@ export default function WhyBusinessesChooseUsInteractive() {
                     }}
                   >
                     <span>Execution &amp; Practical AI</span>
-                    <span style={{ fontSize: "12px", opacity: 0.7 }}>04–06</span>
+                    <span style={{ fontSize: "12px", opacity: 0.7 }}>04-06</span>
                   </button>
 
                   <button
@@ -438,7 +434,7 @@ export default function WhyBusinessesChooseUsInteractive() {
                     }}
                   >
                     <span>Industry &amp; Global Scale</span>
-                    <span style={{ fontSize: "12px", opacity: 0.7 }}>07–10</span>
+                    <span style={{ fontSize: "12px", opacity: 0.7 }}>07-10</span>
                   </button>
                 </div>
 
@@ -595,7 +591,7 @@ export default function WhyBusinessesChooseUsInteractive() {
                 <div className="mx-synergy-insight-box">
                   <div className="mx-synergy-left">
                     <div className="mx-synergy-label">
-                      CONNECTED IMPACT • STAGE {differenceItems[activeDiffIdx].step}
+                      CONNECTED IMPACT - STAGE {differenceItems[activeDiffIdx].step}
                     </div>
                     <p className="mx-synergy-text">
                       {differenceItems[activeDiffIdx].insight}
@@ -724,24 +720,17 @@ export default function WhyBusinessesChooseUsInteractive() {
                 );
               })()}
 
-              {/* Bottom 5 Mini Scrubber Cards */}
-              <div className="mx-process-mini-grid">
-                {howWeWorkPhases.map((phase, idx) => {
-                  const isActive = activeWorkStep === idx;
-                  return (
-                    <div
-                      key={phase.step}
-                      onClick={() => setActiveWorkStep(idx)}
-                      className={`mx-process-mini-card ${isActive ? "active" : ""}`}
-                    >
-                      <div className="mx-process-mini-num">STEP {phase.step}</div>
-                      <div className="mx-process-mini-title">{phase.title}</div>
-                      <p style={{ fontSize: "12.5px", color: "var(--mx-text-body)", margin: "6px 0 0 0", lineHeight: "1.4" }}>
-                        {phase.desc}
-                      </p>
-                    </div>
-                  );
-                })}
+              {/* Section CTA Action */}
+              <div style={{ textAlign: "center", marginTop: "32px" }}>
+                <Link href="/contact" className="mx-btn-lime">
+                  <span>Discuss Your Execution Plan</span>
+                  <div className="mx-btn-icon-circle">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14"></path>
+                      <path d="M12 5l7 7-7 7"></path>
+                    </svg>
+                  </div>
+                </Link>
               </div>
             </div>
           </div>

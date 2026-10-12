@@ -9569,11 +9569,17 @@ section.section-gap.padding-top-0 {
 }
 
 .mx-about-page {
-  padding-top: 96px !important;
+  padding-top: clamp(118px, 8.5vw, 138px) !important;
 }
 
 .mx-about-page .mx-hero-section {
   padding-top: 0 !important;
+}
+
+@media (max-width: 768px) {
+  .mx-about-page {
+    padding-top: 108px !important;
+  }
 }
 
 /* 1. Universal Topic Badge Container (Pill Style) */

@@ -124,15 +124,6 @@ export default function WhoWeAreInteractive() {
         <section className="mx-hero-section">
           <div className="mx-container">
             <div className="mx-hero-seamless">
-              {/* Background Wave Graphic */}
-              <div className="mx-hero-bg-waves" aria-hidden="true">
-                <svg viewBox="0 0 1200 600" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M0 300C300 100 600 500 900 300C1050 200 1150 250 1200 300V600H0V300Z" fill="rgba(124, 58, 237, 0.02)" />
-                  <path d="M0 400C250 250 500 550 800 350C1000 220 1100 320 1200 380" stroke="rgba(0, 210, 255, 0.3)" strokeWidth="2" strokeDasharray="8 8" />
-                  <path d="M0 200C350 450 700 150 1050 380C1120 420 1180 400 1200 390" stroke="rgba(124, 58, 237, 0.18)" strokeWidth="1.5" />
-                </svg>
-              </div>
-
               {/* Top Center Subtitle Badge matching Contact page */}
               <div className="mx-subtitle-badge">
                 <span className="mx-badge-dot" />
@@ -143,9 +134,20 @@ export default function WhoWeAreInteractive() {
               <h1 className="mx-hero-title">
                 Marketing. AI. Technology. <span className="mx-gradient-text">Built for Growth.</span>
               </h1>
-              <p className="mx-hero-subtitle">
-                Quickupp Softech is a full-service Marketing, AI &amp; Technology company helping ambitious businesses grow, scale and stay ahead in an increasingly digital world. We bring together the power of digital marketing, artificial intelligence and technology to help businesses attract the right customers, build stronger brands, improve operations and create meaningful digital experiences. From performance marketing and SEO to AI automation, AI-powered search visibility, websites, mobile applications and custom software, we combine strategy, creativity, technology and execution to solve real business challenges. We don&apos;t just deliver services. We build solutions designed around your growth.
-              </p>
+              <div className="mx-hero-statements-wrap">
+                <p className="mx-hero-statement-lead">
+                  Quickupp Softech is a full-service Marketing, AI &amp; Technology company helping ambitious businesses grow, scale and stay ahead in an increasingly digital world.
+                </p>
+                <p className="mx-hero-statement-sub">
+                  We bring together the power of digital marketing, artificial intelligence and technology to help businesses attract the right customers, build stronger brands, improve operations and create meaningful digital experiences.
+                </p>
+                <p className="mx-hero-statement-sub">
+                  From performance marketing and SEO to AI automation, AI-powered search visibility, websites, mobile applications and custom software, we combine strategy, creativity, technology and execution to solve real business challenges.
+                </p>
+                <p className="mx-hero-statement-highlight">
+                  We don&apos;t just deliver services. We build solutions designed around your growth.
+                </p>
+              </div>
 
               {/* Hero Action Button */}
               <Link href="/services" className="mx-btn-lime">
@@ -185,9 +187,17 @@ export default function WhoWeAreInteractive() {
                 <h2 className="mx-section-heading">
                   Three Capabilities. <span className="mx-gradient-text">One Growth Partner.</span>
                 </h2>
-                <p className="mx-tab-paragraph" style={{ marginBottom: "20px" }}>
-                  The way businesses grow is changing faster than ever. Today, customers discover brands through search engines, social media, AI platforms and digital experiences. At the same time, businesses are adopting automation and intelligent technologies to work faster, operate more efficiently and deliver better customer experiences. We bring these capabilities together under one roof.
-                </p>
+                <div style={{ marginBottom: "20px" }}>
+                  <p className="mx-tab-paragraph" style={{ marginBottom: "10px", color: "#334155" }}>
+                    The way businesses grow is changing faster than ever. Today, customers discover brands through search engines, social media, AI platforms and digital experiences.
+                  </p>
+                  <p className="mx-tab-paragraph" style={{ marginBottom: "12px", color: "#64748b" }}>
+                    At the same time, businesses are adopting automation and intelligent technologies to work faster, operate more efficiently and deliver better customer experiences.
+                  </p>
+                  <p style={{ fontSize: "14.5px", fontWeight: 700, color: "var(--mx-primary)", margin: 0 }}>
+                    We bring these capabilities together under one roof.
+                  </p>
+                </div>
 
                 {/* Switchable Pill Tabs */}
                 <div className="mx-tabs-bar">
@@ -387,9 +397,9 @@ export default function WhoWeAreInteractive() {
           <div className="mx-container">
             <div style={{ background: "#ffffff", border: "1px solid var(--mx-border)", borderRadius: "28px", padding: "54px 44px", boxShadow: "0 10px 30px -8px rgba(15, 23, 42, 0.06)" }}>
               <div style={{ maxWidth: "880px", margin: "0 auto", textAlign: "center" }}>
-                <span className="mx-sub-badge">BUILT AROUND YOUR BUSINESS. FOCUSED ON YOUR GROWTH.</span>
+                <span className="mx-sub-badge">BUILT AROUND YOUR BUSINESS</span>
                 <h2 className="mx-section-heading" style={{ marginBottom: "20px" }}>
-                  Every Business Is Different. <span className="mx-gradient-text">Focused on Your Growth.</span>
+                  Focused on <span className="mx-gradient-text">Your Growth.</span>
                 </h2>
                 <p className="mx-tab-paragraph" style={{ marginBottom: "16px" }}>
                   Every business is different. That&apos;s why we don&apos;t believe in a one-size-fits-all approach.
@@ -493,22 +503,22 @@ export default function WhoWeAreInteractive() {
             <div className="mx-cta-card">
               <div className="mx-cta-content">
                 <span className="mx-sub-badge">
-                  ONE PARTNER. THREE CAPABILITIES. UNLIMITED POSSIBILITIES.
+                  READY TO BUILD WHAT&apos;S NEXT?
                 </span>
                 <h2 className="mx-cta-title">
-                  Ready to Build What&apos;s Next?
+                  Let&apos;s Turn Your Growth Goals <span className="mx-gradient-text">Into Action.</span>
                 </h2>
-                <p style={{ fontSize: "17px", fontWeight: 700, color: "var(--mx-text-heading)", margin: "0 0 10px 0" }}>
-                  Let&apos;s Turn Your Growth Goals Into Action.
-                </p>
                 <p className="mx-cta-desc" style={{ marginBottom: "16px" }}>
                   Your next stage of growth shouldn&apos;t be limited by disconnected agencies, outdated processes or technology that doesn&apos;t keep up with your ambitions. Whether you need to generate more customers, strengthen your digital presence, automate your business with AI, or build technology that helps you scale, Quickupp Softech brings the strategy, expertise and execution to make it happen.
                 </p>
+                <p style={{ fontSize: "13.5px", fontWeight: 800, letterSpacing: "0.06em", color: "var(--mx-text-heading)", textTransform: "uppercase", margin: "0 0 8px 0" }}>
+                  ONE PARTNER. THREE CAPABILITIES. UNLIMITED POSSIBILITIES.
+                </p>
                 <p style={{ fontSize: "14.5px", color: "var(--mx-primary)", fontWeight: 600, margin: "0 0 8px 0" }}>
-                  Marketing to attract. • AI to accelerate. • Technology to scale.
+                  Marketing to attract. - AI to accelerate. - Technology to scale.
                 </p>
                 <p style={{ fontSize: "14.5px", color: "var(--mx-text-body)", margin: 0 }}>
-                  Let&apos;s understand your business, identify the opportunities and build a growth strategy designed around your goals. Your growth starts with a conversation. <strong style={{ color: "var(--mx-text-heading)" }}>LET&apos;S BUILD YOUR GROWTH STORY.</strong>
+                  Let&apos;s understand your business, identify the opportunities and build a growth strategy designed around your goals. Your growth starts with a conversation. <strong style={{ color: "var(--mx-text-heading)", display: "block", marginTop: "8px" }}>LET&apos;S BUILD YOUR GROWTH STORY.</strong>
                 </p>
               </div>
               <div className="mx-cta-actions">

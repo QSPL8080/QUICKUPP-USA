@@ -115,7 +115,7 @@ export default function OurApproachInteractive() {
       num: "03",
       stepName: "BUILD",
       title: "Bring the Strategy to Life.",
-      desc: "Our teams execute across Marketing, AI and Technology—from performance marketing and SEO to AI automation, websites, applications and custom software.",
+      desc: "Our teams execute across Marketing, AI and Technology - from performance marketing and SEO to AI automation, websites, applications and custom software.",
       quote: "One strategy. One connected execution.",
       tag: "End-to-End Execution",
       deliverable: "Full-Stack Implementation & Integration",
@@ -194,13 +194,15 @@ export default function OurApproachInteractive() {
                 Understand. Strategize. Build. <span className="mx-gradient-text">Optimize. Grow.</span>
               </h1>
 
-              {/* Hero Paragraphs */}
-              <p className="mx-hero-subtitle" style={{ maxWidth: "880px", marginBottom: "8px" }}>
-                At Quickupp Softech, we don&apos;t believe in one-size-fits-all solutions. We first understand your business, identify the right opportunities and bring together Marketing, AI and Technology to build solutions aligned with your goals.
-              </p>
-              <p className="mx-hero-subtitle" style={{ maxWidth: "880px", fontSize: "16px", fontWeight: "600", color: "var(--mx-primary)", marginBottom: "28px" }}>
-                We don&apos;t start with what we can sell. We start with what your business needs.
-              </p>
+              {/* Hero Statements */}
+              <div className="mx-hero-statements-wrap">
+                <p className="mx-hero-statement-lead">
+                  At Quickupp Softech, we don&apos;t believe in one-size-fits-all solutions. We first understand your business, identify the right opportunities and bring together Marketing, AI and Technology to build solutions aligned with your goals.
+                </p>
+                <p className="mx-hero-statement-highlight">
+                  We don&apos;t start with what we can sell. We start with what your business needs.
+                </p>
+              </div>
 
               {/* Hero Action Button */}
               <Link href="/contact" className="mx-btn-lime">
@@ -215,36 +217,36 @@ export default function OurApproachInteractive() {
 
               {/* Experience at a Glance Counter Strip */}
               <div ref={statsRef} className="mx-metrics-strip" style={{ width: "100%", marginTop: "44px" }}>
-                <div className="mx-metric-card">
-                  <div className="mx-metric-num-row">
-                    <span className="mx-metric-big-num">{clientsCount}+</span>
-                    <span className="mx-metric-sup">/ Global</span>
+                <div className="mx-metric-card" style={{ textAlign: "left", alignItems: "flex-start" }}>
+                  <div className="mx-metric-num-row" style={{ gap: "5px", marginBottom: "4px" }}>
+                    <span className="mx-metric-big-num" style={{ fontSize: "clamp(26px, 2.4vw, 34px)" }}>{clientsCount}+</span>
+                    <span className="mx-metric-sup" style={{ fontSize: "13px" }}>/ Clients</span>
                   </div>
-                  <div className="mx-metric-label">Global Clients</div>
+                  <div className="mx-metric-label" style={{ fontSize: "13.5px", fontWeight: "600" }}>Global Partnerships</div>
                 </div>
 
-                <div className="mx-metric-card">
-                  <div className="mx-metric-num-row">
-                    <span className="mx-metric-big-num">{projectsCount}+</span>
-                    <span className="mx-metric-sup">/ Shipped</span>
+                <div className="mx-metric-card" style={{ textAlign: "left", alignItems: "flex-start" }}>
+                  <div className="mx-metric-num-row" style={{ gap: "5px", marginBottom: "4px" }}>
+                    <span className="mx-metric-big-num" style={{ fontSize: "clamp(26px, 2.4vw, 34px)" }}>{projectsCount}+</span>
+                    <span className="mx-metric-sup" style={{ fontSize: "13px" }}>/ Projects</span>
                   </div>
-                  <div className="mx-metric-label">Projects</div>
+                  <div className="mx-metric-label" style={{ fontSize: "13.5px", fontWeight: "600" }}>Successfully Shipped</div>
                 </div>
 
-                <div className="mx-metric-card">
-                  <div className="mx-metric-num-row">
-                    <span className="mx-metric-big-num">{professionalsCount}+</span>
-                    <span className="mx-metric-sup">/ Experts</span>
+                <div className="mx-metric-card" style={{ textAlign: "left", alignItems: "flex-start" }}>
+                  <div className="mx-metric-num-row" style={{ gap: "5px", marginBottom: "4px" }}>
+                    <span className="mx-metric-big-num" style={{ fontSize: "clamp(26px, 2.4vw, 34px)" }}>{professionalsCount}+</span>
+                    <span className="mx-metric-sup" style={{ fontSize: "13px" }}>/ Experts</span>
                   </div>
-                  <div className="mx-metric-label">Professionals</div>
+                  <div className="mx-metric-label" style={{ fontSize: "13.5px", fontWeight: "600" }}>Dedicated Specialists</div>
                 </div>
 
-                <div className="mx-metric-card">
-                  <div className="mx-metric-num-row">
-                    <span className="mx-metric-big-num">{satisfactionCount}%</span>
-                    <span className="mx-metric-sup">/ Rating</span>
+                <div className="mx-metric-card" style={{ textAlign: "left", alignItems: "flex-start" }}>
+                  <div className="mx-metric-num-row" style={{ gap: "5px", marginBottom: "4px" }}>
+                    <span className="mx-metric-big-num" style={{ fontSize: "clamp(26px, 2.4vw, 34px)" }}>{satisfactionCount}%</span>
+                    <span className="mx-metric-sup" style={{ fontSize: "13px" }}>/ Rating</span>
                   </div>
-                  <div className="mx-metric-label">Client Satisfaction</div>
+                  <div className="mx-metric-label" style={{ fontSize: "13.5px", fontWeight: "600" }}>Client Satisfaction</div>
                 </div>
               </div>
             </div>
@@ -346,22 +348,8 @@ export default function OurApproachInteractive() {
                   </div>
                 </div>
 
-                {/* Bottom 5 Mini Cards */}
-                <div className="mx-process-mini-grid">
-                  {workSteps.map((s, idx) => (
-                    <div
-                      key={idx}
-                      onClick={() => setActiveStep(idx)}
-                      className={`mx-process-mini-card ${activeStep === idx ? "active" : ""}`}
-                    >
-                      <div className="mx-process-mini-num">{s.num}. {s.stepName}</div>
-                      <h4 className="mx-process-mini-title">{s.title}</h4>
-                    </div>
-                  ))}
-                </div>
-
                 {/* Section CTA */}
-                <div style={{ textAlign: "center", marginTop: "16px" }}>
+                <div style={{ textAlign: "center", marginTop: "32px" }}>
                   <Link href="/contact" className="mx-btn-lime">
                     <span>Build Your Growth Roadmap</span>
                     <div className="mx-btn-icon-circle">
@@ -419,7 +407,7 @@ export default function OurApproachInteractive() {
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                       <span className="mx-goal-check">✓</span>
-                      <span>And everything can work toward one business objective—growth.</span>
+                      <span>And everything can work toward one business objective - growth.</span>
                     </div>
                   </div>
                 </div>
