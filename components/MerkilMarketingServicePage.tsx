@@ -101,6 +101,21 @@ export default function MerkilMarketingServicePage({
           <div className="merkil-hero-grid">
             <div className="merkil-hero-left">
               <div className="merkil-hero-content" style={{ gap: "18px" }}>
+                {/* Breadcrumb Navigation */}
+                <div className="asx-breadcrumb" style={{ marginBottom: "0px" }}>
+                  <Link href="/">Home</Link>
+                  <span>/</span>
+                  <Link href="/services">Services</Link>
+                  <span>/</span>
+                  {categorySlug && categoryLabel ? (
+                    <>
+                      <Link href={`/services/${categorySlug}`}>{categoryLabel}</Link>
+                      <span>/</span>
+                    </>
+                  ) : null}
+                  <span className="asx-breadcrumb-current">{data.crumb}</span>
+                </div>
+
                 {/* Eyebrow Badge */}
                 <div className="badge">
                   <div className="tagline">{data.heroEyebrow || data.crumb || "Digital Marketing"}</div>

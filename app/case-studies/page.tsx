@@ -157,6 +157,14 @@ export default function CaseStudiesPage() {
         {/* Editorial Hero Header */}
         <section style={{ paddingTop: "40px", paddingBottom: "32px" }}>
           <div className="res-container">
+            <div className="asx-breadcrumb" style={{ marginBottom: "20px" }}>
+              <Link href="/">Home</Link>
+              <span>/</span>
+              <Link href="/resources">Resources</Link>
+              <span>/</span>
+              <span className="asx-breadcrumb-current">Case Studies</span>
+            </div>
+
             <div style={{ maxWidth: "860px" }}>
               <div className="res-tag">
                 <span className="res-tag-dot" />

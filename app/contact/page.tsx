@@ -44,6 +44,13 @@ export default function ContactPage() {
           ========================================================================= */}
       <section className="su-contact-hero-section">
         <div className="w-layout-blockcontainer container w-container">
+          {/* Breadcrumb Navigation */}
+          <div className="asx-breadcrumb" style={{ justifyContent: "center", marginBottom: "20px" }}>
+            <Link href="/">Home</Link>
+            <span>/</span>
+            <span className="asx-breadcrumb-current">Contact</span>
+          </div>
+
           {/* Top Hero Typography */}
           <div className="su-contact-hero-wrap">
             <div className="su-subtitle-badge">

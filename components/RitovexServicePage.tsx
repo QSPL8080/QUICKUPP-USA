@@ -59,7 +59,15 @@ function renderGradientHeading(text?: string) {
   );
 }
 
-export default function RitovexServicePage({ data }: { data: ServicePageData }) {
+export default function RitovexServicePage({
+  data,
+  categoryLabel,
+  categorySlug,
+}: {
+  data: ServicePageData;
+  categoryLabel?: string;
+  categorySlug?: string;
+}) {
   const [openServiceIdx, setOpenServiceIdx] = useState<number | null>(0);
   const [hoveredServiceIdx, setHoveredServiceIdx] = useState<number | null>(null);
   const [openFaqIdx, setOpenFaqIdx] = useState<number | null>(0);
@@ -113,6 +121,21 @@ export default function RitovexServicePage({ data }: { data: ServicePageData }) 
           ========================================================================== */}
       <section className="section inner-banner">
         <div className="container">
+          {/* Breadcrumb Navigation */}
+          <div className="asx-breadcrumb" style={{ justifyContent: "center", marginBottom: "20px" }}>
+            <Link href="/">Home</Link>
+            <span>/</span>
+            <Link href="/services">Services</Link>
+            <span>/</span>
+            {categorySlug && categoryLabel ? (
+              <>
+                <Link href={`/services/${categorySlug}`}>{categoryLabel}</Link>
+                <span>/</span>
+              </>
+            ) : null}
+            <span className="asx-breadcrumb-current">{data.crumb}</span>
+          </div>
+
           <div className="inner-banner-content">
             <div className="section-subtitle-wrap">
               <div className="section-subtitle-single">

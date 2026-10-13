@@ -67,18 +67,21 @@
 /* Breadcrumb */
 .asx-breadcrumb {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   font-size: 13px;
   font-weight: 500;
   color: #6c7c88;
   margin-bottom: 24px;
+  line-height: 1.5;
 }
 
 .asx-breadcrumb a {
   color: #6c7c88;
   text-decoration: none;
   transition: color 0.2s ease;
+  white-space: nowrap;
 }
 
 .asx-breadcrumb a:hover {

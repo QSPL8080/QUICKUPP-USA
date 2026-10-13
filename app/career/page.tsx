@@ -378,6 +378,13 @@ export default function CareerPage() {
           ========================================================================= */}
       <section className="sc-manifesto-section">
         <div className="w-layout-blockcontainer container w-container">
+          {/* Breadcrumb Navigation */}
+          <div className="asx-breadcrumb" style={{ justifyContent: "center", marginBottom: "24px" }}>
+            <Link href="/">Home</Link>
+            <span>/</span>
+            <span className="asx-breadcrumb-current">Careers</span>
+          </div>
+
           <div className="sc-manifesto-center-wrap" style={{ maxWidth: "820px", margin: "0 auto 40px", textAlign: "center" }}>
             <div className="sc-badge">
               <span className="sc-badge-dot" />

@@ -34,6 +34,14 @@ export default function BlogPage() {
       {/* 1. Featured Article Split Hero (Reference Screenshot 1) */}
       <section className="res-featured-hero">
         <div className="res-container">
+          <div className="asx-breadcrumb" style={{ marginBottom: "24px" }}>
+            <Link href="/">Home</Link>
+            <span>/</span>
+            <Link href="/resources">Resources</Link>
+            <span>/</span>
+            <span className="asx-breadcrumb-current">Blogs</span>
+          </div>
+
           <div className="res-featured-grid">
             <Link
               href={`/blog/${featuredPost.slug}`}

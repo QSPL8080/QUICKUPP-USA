@@ -77,7 +77,7 @@ export default async function ServiceCategoryPage({ params }: PageProps) {
         <section className="asx-hero-section">
           <div className="asx-container">
             {/* Breadcrumb Navigation */}
-            <div className="asx-breadcrumb">
+            <div className="asx-breadcrumb" style={{ justifyContent: "center", marginBottom: "20px" }}>
               <Link href="/">Home</Link>
               <span>/</span>
               <Link href="/services">Services</Link>

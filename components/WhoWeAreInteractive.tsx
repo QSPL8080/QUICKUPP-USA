@@ -2,10 +2,12 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export default function WhoWeAreInteractive() {
+  const pathname = usePathname();
   const [activeTab, setActiveTab] = useState<"marketing" | "ai" | "technology">("marketing");
   const [clientsCount, setClientsCount] = useState<number>(0);
   const [expertsCount, setExpertsCount] = useState<number>(0);
@@ -123,6 +125,21 @@ export default function WhoWeAreInteractive() {
             ========================================================================= */}
         <section className="mx-hero-section">
           <div className="mx-container">
+            {/* Breadcrumb Navigation */}
+            <div className="asx-breadcrumb" style={{ justifyContent: "center", marginBottom: "24px" }}>
+              <Link href="/">Home</Link>
+              <span>/</span>
+              {pathname === "/about" ? (
+                <span className="asx-breadcrumb-current">About Us</span>
+              ) : (
+                <>
+                  <Link href="/about">About</Link>
+                  <span>/</span>
+                  <span className="asx-breadcrumb-current">Who We Are</span>
+                </>
+              )}
+            </div>
+
             <div className="mx-hero-seamless">
               {/* Top Center Subtitle Badge matching Contact page */}
               <div className="mx-subtitle-badge">

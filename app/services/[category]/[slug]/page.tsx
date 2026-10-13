@@ -74,5 +74,11 @@ export default async function ServicePage({ params }: PageProps) {
     );
   }
 
-  return <RitovexServicePage data={match.service.data} />;
+  return (
+    <RitovexServicePage
+      data={match.service.data}
+      categoryLabel={match.category.categoryLabel}
+      categorySlug={match.category.categorySlug}
+    />
+  );
 }

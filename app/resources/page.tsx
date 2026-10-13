@@ -52,6 +52,12 @@ export default function ResourcesPage() {
       {/* Hero Header */}
       <section style={{ padding: "50px 0 40px" }}>
         <div className="res-container">
+          <div className="asx-breadcrumb" style={{ marginBottom: "20px" }}>
+            <Link href="/">Home</Link>
+            <span>/</span>
+            <span className="asx-breadcrumb-current">Resources</span>
+          </div>
+
           <div className="res-section-head" style={{ maxWidth: "800px" }}>
             <div className="res-tag">
               <span className="res-tag-dot"></span>

@@ -80,6 +80,14 @@ export default function PortfolioPage() {
         {/* Editorial Header */}
         <section style={{ paddingTop: "40px", paddingBottom: "36px" }}>
           <div className="res-container">
+            <div className="asx-breadcrumb" style={{ marginBottom: "20px" }}>
+              <Link href="/">Home</Link>
+              <span>/</span>
+              <Link href="/resources">Resources</Link>
+              <span>/</span>
+              <span className="asx-breadcrumb-current">Portfolio</span>
+            </div>
+
             <div style={{ maxWidth: "860px" }}>
               <div className="res-tag">
                 <span className="res-tag-dot" />

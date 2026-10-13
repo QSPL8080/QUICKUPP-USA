@@ -74,7 +74,11 @@ function CoporaButton({
   );
 }
 
-export default function CoporaServicePage({ data }: Props) {
+export default function CoporaServicePage({
+  data,
+  categoryLabel,
+  categorySlug,
+}: Props) {
   // All FAQ items hidden by default
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -193,6 +197,21 @@ export default function CoporaServicePage({ data }: Props) {
           ========================================================================= */}
       <section className="hero-section">
         <div className="container-medium w-container">
+          {/* Breadcrumb Navigation */}
+          <div className="asx-breadcrumb" style={{ justifyContent: "center", marginBottom: "20px" }}>
+            <Link href="/">Home</Link>
+            <span>/</span>
+            <Link href="/services">Services</Link>
+            <span>/</span>
+            {categorySlug && categoryLabel ? (
+              <>
+                <Link href={`/services/${categorySlug}`}>{categoryLabel}</Link>
+                <span>/</span>
+              </>
+            ) : null}
+            <span className="asx-breadcrumb-current">{data.crumb}</span>
+          </div>
+
           <div className="section-title about-title-center copora-reveal">
             {data.heroEyebrow && (
               <div className="pre-section-title">{data.heroEyebrow}</div>

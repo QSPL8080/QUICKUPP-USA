@@ -119,6 +119,8 @@ function StaggeredDeliverablesSection({
 
 export default function AIVideoServicePage({
   data,
+  categoryLabel,
+  categorySlug,
 }: Props) {
   // Scroll highlight animation for Manifesto / Hero Subtitle
   const manifestoRef = useRef<HTMLHeadingElement>(null);
@@ -185,6 +187,21 @@ export default function AIVideoServicePage({
           ========================================================================= */}
       <section className="sc-manifesto-section">
         <div className="w-layout-blockcontainer container w-container">
+          {/* Breadcrumb Navigation */}
+          <div className="asx-breadcrumb" style={{ justifyContent: "center", marginBottom: "20px" }}>
+            <Link href="/">Home</Link>
+            <span>/</span>
+            <Link href="/services">Services</Link>
+            <span>/</span>
+            {categorySlug && categoryLabel ? (
+              <>
+                <Link href={`/services/${categorySlug}`}>{categoryLabel}</Link>
+                <span>/</span>
+              </>
+            ) : null}
+            <span className="asx-breadcrumb-current">{data.crumb}</span>
+          </div>
+
           <div className="sc-manifesto-center-wrap">
             {data.heroEyebrow && (
               <span className="sc-manifesto-badge">

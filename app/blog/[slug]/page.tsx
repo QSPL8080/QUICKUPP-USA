@@ -65,6 +65,16 @@ export default async function SingleBlogPage({
       {/* Article Header & Meta */}
       <section style={{ padding: "48px 0 32px" }}>
         <div className="res-container" style={{ maxWidth: "1060px" }}>
+          <div className="asx-breadcrumb" style={{ marginBottom: "20px" }}>
+            <Link href="/">Home</Link>
+            <span>/</span>
+            <Link href="/resources">Resources</Link>
+            <span>/</span>
+            <Link href="/blog">Blogs</Link>
+            <span>/</span>
+            <span className="asx-breadcrumb-current">{post.title}</span>
+          </div>
+
           <div style={{ marginBottom: "20px" }}>
             <Link
               href="/blog"

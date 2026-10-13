@@ -280,6 +280,15 @@ export default function WhyBusinessesChooseUsInteractive() {
             ========================================================================= */}
         <section className="mx-hero-section">
           <div className="mx-container">
+            {/* Breadcrumb Navigation */}
+            <div className="asx-breadcrumb" style={{ justifyContent: "center", marginBottom: "24px" }}>
+              <Link href="/">Home</Link>
+              <span>/</span>
+              <Link href="/about">About</Link>
+              <span>/</span>
+              <span className="asx-breadcrumb-current">Why Businesses Choose Us</span>
+            </div>
+
             <div className="mx-hero-seamless">
               {/* Top Center Subtitle Badge */}
               <div className="mx-subtitle-badge">

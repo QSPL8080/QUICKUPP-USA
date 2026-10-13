@@ -27,6 +27,15 @@ export default function MerkilCategoryHub({ category }: MerkilCategoryHubProps) 
           <div className="merkil-hero-grid">
             <div className="merkil-hero-left">
               <div className="merkil-hero-content">
+                {/* Breadcrumb Navigation */}
+                <div className="asx-breadcrumb" style={{ marginBottom: "0px" }}>
+                  <Link href="/">Home</Link>
+                  <span>/</span>
+                  <Link href="/services">Services</Link>
+                  <span>/</span>
+                  <span className="asx-breadcrumb-current">{category.categoryLabel}</span>
+                </div>
+
                 <div className="badge yellow">
                   <img
                     src="https://cdn.prod.website-files.com/688d31d885372b14ca5e3d8b/6890bee0bc046268f9b1496c_magic-wand.svg"

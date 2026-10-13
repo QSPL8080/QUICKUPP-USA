@@ -275,6 +275,15 @@ export default function AIVideoCategoryHub({ category }: Props) {
       {/* 1. MANIFESTO & CONTINUOUS PHOTO/VIDEO GALLERY STRIP */}
       <section className="sc-manifesto-section">
         <div className="w-layout-blockcontainer container w-container">
+          {/* Breadcrumb Navigation */}
+          <div className="asx-breadcrumb" style={{ justifyContent: "center", marginBottom: "24px" }}>
+            <Link href="/">Home</Link>
+            <span>/</span>
+            <Link href="/services">Services</Link>
+            <span>/</span>
+            <span className="asx-breadcrumb-current">{category.categoryLabel}</span>
+          </div>
+
           <div className="sc-manifesto-center-wrap">
             <span className="sc-manifesto-badge">2026 • STUDIO-GRADE AI VIDEO PRODUCTION &amp; SYNTHESIS</span>
             <h2 ref={manifestoRef} className="sc-manifesto-text-center">

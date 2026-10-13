@@ -133,19 +133,28 @@ export default function IndustriesOverviewHub() {
       <Header />
 
       <main style={{ paddingTop: "100px", paddingBottom: "80px" }}>
-        <section style={{ backgroundColor: "#f4f5f5", padding: "64px 0", borderBottom: "1px solid #e5eaee" }}>
-          <div className="asx-container" style={{ textAlign: "center" }}>
-            <div className="asx-tag-pill" style={{ marginBottom: "16px" }}>
-              <span className="asx-tag-dot" />
-              <span>Full-Stack Industry Solutions</span>
+        <section style={{ backgroundColor: "#f4f5f5", padding: "48px 0 64px", borderBottom: "1px solid #e5eaee" }}>
+          <div className="asx-container">
+            {/* Breadcrumb Navigation */}
+            <div className="asx-breadcrumb" style={{ marginBottom: "24px" }}>
+              <Link href="/">Home</Link>
+              <span>/</span>
+              <span className="asx-breadcrumb-current">Industries</span>
             </div>
 
-            <h1 className="asx-hero-title" style={{ margin: "0 0 16px" }}>
-              Industries We Scale with <span className="asx-gradient-text">Marketing &amp; AI</span>
-            </h1>
-            <p style={{ fontSize: "16px", color: "#2c436b", maxWidth: "600px", margin: "0 auto" }}>
-              Select your industry below to explore tailored growth strategies, proven conversion funnels, and automated AI systems.
-            </p>
+            <div style={{ textAlign: "center" }}>
+              <div className="asx-tag-pill" style={{ marginBottom: "16px" }}>
+                <span className="asx-tag-dot" />
+                <span>Full-Stack Industry Solutions</span>
+              </div>
+
+              <h1 className="asx-hero-title" style={{ margin: "0 0 16px" }}>
+                Industries We Scale with <span className="asx-gradient-text">Marketing &amp; AI</span>
+              </h1>
+              <p style={{ fontSize: "16px", color: "#2c436b", maxWidth: "600px", margin: "0 auto" }}>
+                Select your industry below to explore tailored growth strategies, proven conversion funnels, and automated AI systems.
+              </p>
+            </div>
           </div>
         </section>
 
