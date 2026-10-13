@@ -131,40 +131,10 @@ export const data: ServicePageData = {
     {
       type: "process",
       title: "From Technology Provider to Category Leader",
-      tagline: "Our Growth Process",
-      intro: "Whether you're launching a SaaS product, entering a new market, or scaling an established technology business, we help connect marketing, AI and technology around your growth objectives.",
-      steps: [
-        {
-          num: "01",
-          title: "Analyze",
-          desc: "Understand your product, target accounts, market category, competitors, and growth objectives.",
-        },
-        {
-          num: "02",
-          title: "Strategize",
-          desc: "Create a customized demand-generation and technology strategy aligned with your sales funnel.",
-        },
-        {
-          num: "03",
-          title: "Build",
-          desc: "Develop high-converting landing pages, product messaging, ad campaigns, and automation pipelines.",
-        },
-        {
-          num: "04",
-          title: "Launch",
-          desc: "Activate multi-channel campaigns across search, LinkedIn, Meta, and partner channels.",
-        },
-        {
-          num: "05",
-          title: "Optimize",
-          desc: "Continuously analyze CAC, pipeline velocity, trial-to-paid conversions, and campaign ROI.",
-        },
-        {
-          num: "06",
-          title: "Scale",
-          desc: "Expand successful campaigns, enter new markets, and scale pipeline with confidence.",
-        },
-      ],
+      intro:
+        "Whether you're launching a SaaS product, entering a new market, or scaling an established technology business, we help connect marketing, AI and technology around your growth objectives.",
+      desc:
+        "Our Growth Process\nAnalyze → Strategize → Build → Launch → Optimize → Scale\nWe align every initiative with your audience, business model, sales funnel and growth goals.",
       cta: { label: "Plan Your Next Growth Stage", href: "/contact" },
     },
     {

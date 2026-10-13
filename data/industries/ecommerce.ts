@@ -123,39 +123,9 @@ export const data: ServicePageData = {
     {
       type: "process",
       title: "Our eCommerce Growth Process",
-      intro: "We evaluate your products, audience, competitors, website, acquisition channels and customer journey before building your growth strategy.",
-      steps: [
-        {
-          num: "01",
-          title: "Analyze",
-          desc: "Evaluate your products, audience, competitors, website, acquisition channels and customer journey.",
-        },
-        {
-          num: "02",
-          title: "Strategize",
-          desc: "Formulate full-funnel acquisition, retention, and conversion architecture tailored to your catalog.",
-        },
-        {
-          num: "03",
-          title: "Build",
-          desc: "Implement store enhancements, tracking, ad campaigns, email flows, and creative assets.",
-        },
-        {
-          num: "04",
-          title: "Launch",
-          desc: "Deploy paid advertising, organic SEO, and automated multi-channel messaging.",
-        },
-        {
-          num: "05",
-          title: "Optimize",
-          desc: "Continuously test landing pages, bids, cart recovery funnels, and creative variants.",
-        },
-        {
-          num: "06",
-          title: "Scale",
-          desc: "Expand profitable product lines, scale ad budgets, and increase customer lifetime value.",
-        },
-      ],
+      intro: "Analyze → Strategize → Build → Launch → Optimize → Scale",
+      desc:
+        "We evaluate your products, audience, competitors, website, acquisition channels and customer journey before building your growth strategy.",
       cta: { label: "Plan Your eCommerce Growth Roadmap", href: "/contact" },
     },
     {

@@ -393,7 +393,7 @@ function renderCleanParagraphs(
         }}
       >
         {parts.map((part, idx) => {
-          const isLeadIn = part.endsWith(":");
+          const isLeadIn = part.endsWith(":") || part.toLowerCase() === "our growth process";
           const isArrow = part.includes("→");
           return (
             <p
@@ -450,7 +450,7 @@ function renderCleanParagraphs(
       }}
     >
       {parts.map((part, idx) => {
-        const isLeadIn = part.endsWith(":");
+        const isLeadIn = part.endsWith(":") || part.toLowerCase() === "our growth process";
         const isArrow = part.includes("→");
         return (
           <p
