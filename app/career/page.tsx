@@ -385,12 +385,12 @@ export default function CareerPage() {
             <span className="asx-breadcrumb-current">Careers</span>
           </div>
 
-          <div className="sc-manifesto-center-wrap" style={{ maxWidth: "820px", margin: "0 auto 40px", textAlign: "center" }}>
+          <div className="sc-manifesto-center-wrap" style={{ maxWidth: "1040px", margin: "0 auto 40px", textAlign: "center" }}>
             <div className="sc-badge">
               <span className="sc-badge-dot" />
               <span>CAREERS AT QUICKUPP SOFTECH</span>
             </div>
-            <h1 className="sc-hero-title">
+            <h1 className="sc-hero-title" style={{ textAlign: "center", width: "100%", margin: "0 auto 16px" }}>
               Build the Future of <span className="qs-gradient-text">AI, Tech &amp; Growth.</span>
             </h1>
             <p className="sc-hero-desc">

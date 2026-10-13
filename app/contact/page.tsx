@@ -52,12 +52,12 @@ export default function ContactPage() {
           </div>
 
           {/* Top Hero Typography */}
-          <div className="su-contact-hero-wrap">
+          <div className="su-contact-hero-wrap" style={{ maxWidth: "1040px", margin: "0 auto 36px", textAlign: "center", width: "100%" }}>
             <div className="su-subtitle-badge">
               <span className="su-badge-dot" />
               <span>Digital Marketing, SEO &amp; AI Solutions</span>
             </div>
-            <h1 className="su-hero-title">
+            <h1 className="su-hero-title" style={{ textAlign: "center", width: "100%", margin: "0 auto 12px" }}>
               Get In Touch For Any <span className="qs-gradient-text">Questions Or Ideas</span>
             </h1>
             <p className="su-hero-desc">
