@@ -31,7 +31,7 @@ export default function MerkilCategoryHub({ category }: MerkilCategoryHubProps) 
                 <div className="asx-breadcrumb" style={{ marginBottom: "0px" }}>
                   <Link href="/">Home</Link>
                   <span>/</span>
-                  <Link href="/services">Services</Link>
+                  <span>Services</span>
                   <span>/</span>
                   <span className="asx-breadcrumb-current">{category.categoryLabel}</span>
                 </div>

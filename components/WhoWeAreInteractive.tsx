@@ -167,7 +167,7 @@ export default function WhoWeAreInteractive() {
               </div>
 
               {/* Hero Action Button */}
-              <Link href="/services" className="mx-btn-lime">
+              <Link href="/services/ai-powered-digital-marketing-services" className="mx-btn-lime">
                 <span>Explore All Services</span>
                 <div className="mx-btn-icon-circle">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

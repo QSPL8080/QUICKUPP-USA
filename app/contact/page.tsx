@@ -304,7 +304,7 @@ export default function ContactPage() {
       {/* =========================================================================
           2. CINEMATIC CONSULTATION CTA TRANSITION SECTION (SaleUnion Parallax Curtain Reveal)
           ========================================================================= */}
-      <section className="su-cinematic-cta-section">
+      <section className="su-cinematic-cta-section su-cta-contact">
         <div className="su-cinematic-bg-media" />
         <div className="su-cinematic-dark-overlay" />
         <div className="w-layout-blockcontainer container w-container">

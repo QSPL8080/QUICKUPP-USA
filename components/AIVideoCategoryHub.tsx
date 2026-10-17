@@ -279,7 +279,7 @@ export default function AIVideoCategoryHub({ category }: Props) {
           <div className="asx-breadcrumb" style={{ justifyContent: "center", marginBottom: "24px" }}>
             <Link href="/">Home</Link>
             <span>/</span>
-            <Link href="/services">Services</Link>
+            <span>Services</span>
             <span>/</span>
             <span className="asx-breadcrumb-current">{category.categoryLabel}</span>
           </div>

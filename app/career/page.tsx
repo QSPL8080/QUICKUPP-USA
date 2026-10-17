@@ -240,15 +240,16 @@ const cultureValues = [
   },
 ];
 
+// Team, culture & everyday-work photos for the careers gallery strip
 const teamPhotos = [
-  "/images/home-two-about.jpg",
+  "/images/contact-tech-discussion.jpg",
+  "/images/contact-strategy-consultation.jpg",
   "/images/home1-about-01.jpg",
-  "/images/team-img-01.jpg",
-  "/images/team-img-02.jpg",
-  "/images/team-img-03.jpg",
-  "/images/team-img-04.jpg",
-  "/images/team-img-05.jpg",
-  "/images/team-img-06.jpg",
+  "/images/contact-consultancy-meeting.jpg",
+  "/images/contact-client-meeting-table.jpg",
+  "/images/project-01.jpg",
+  "/images/contact-team-conference.jpg",
+  "/images/blog-img-04.jpg",
 ];
 
 const testimonialsData = [
@@ -414,7 +415,17 @@ export default function CareerPage() {
               <span className="sc-badge-dot" />
               <span>2026 • GLOBAL TEAM &amp; ENGINEERING CULTURE</span>
             </div>
-            <h2 ref={manifestoRef} className="sc-manifesto-text-center">
+            <h2
+              ref={manifestoRef}
+              className="sc-manifesto-text-center"
+              style={{
+                fontSize: "clamp(15px, 1.5vw, 19.5px)",
+                fontWeight: 550,
+                lineHeight: 1.65,
+                maxWidth: "780px",
+                margin: "0 auto",
+              }}
+            >
               {manifestoWords.map((word, idx) => {
                 const wordThreshold = (idx + 0.3) / manifestoWords.length;
                 const isRevealed = manifestoProgress >= wordThreshold;
@@ -490,7 +501,7 @@ export default function CareerPage() {
           <div className="sc-choice-grid">
             {/* Left Visual Card */}
             <div className="sc-choice-left-visual">
-              <img src="/images/home1-about-01.jpg" alt="Quickupp Team" className="sc-choice-left-img" />
+              <img src="/images/contact-team-collaboration.jpg" alt="Quickupp engineers collaborating" className="sc-choice-left-img" />
               <div className="sc-choice-badge-overlay">
                 <div className="sc-choice-badge-title">Empowered Global Builders</div>
                 <p className="sc-choice-badge-sub">Collaborating across 12+ timezones with async freedom.</p>
@@ -712,7 +723,7 @@ export default function CareerPage() {
       {/* =========================================================================
           8. CINEMATIC PARALLAX REVEAL TRANSITION CTA BANNER
           ========================================================================= */}
-      <section className="su-cinematic-cta-section">
+      <section className="su-cinematic-cta-section su-cta-career">
         <div className="su-cinematic-bg-media" />
         <div className="su-cinematic-dark-overlay" />
         <div className="w-layout-blockcontainer container w-container">

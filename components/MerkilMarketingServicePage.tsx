@@ -105,7 +105,7 @@ export default function MerkilMarketingServicePage({
                 <div className="asx-breadcrumb" style={{ marginBottom: "0px" }}>
                   <Link href="/">Home</Link>
                   <span>/</span>
-                  <Link href="/services">Services</Link>
+                  <span>Services</span>
                   <span>/</span>
                   {categorySlug && categoryLabel ? (
                     <>

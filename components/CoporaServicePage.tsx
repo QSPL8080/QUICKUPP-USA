@@ -201,7 +201,7 @@ export default function CoporaServicePage({
           <div className="asx-breadcrumb" style={{ justifyContent: "center", marginBottom: "20px" }}>
             <Link href="/">Home</Link>
             <span>/</span>
-            <Link href="/services">Services</Link>
+            <span>Services</span>
             <span>/</span>
             {categorySlug && categoryLabel ? (
               <>

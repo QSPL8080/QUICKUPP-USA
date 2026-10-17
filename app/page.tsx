@@ -510,35 +510,35 @@ export default function Home() {
                 <div role="list" className="service-one-list w-dyn-items">
                   {[
                     {
-                      href: "/services",
+                      href: "/services/ai-powered-digital-marketing-services",
                       title: "Digital Marketing",
                       num: "{01}",
                       img: "service-img-01",
                       desc: "To become the most trusted partner for brands seeking digital transformation, brand reputation, and revenue growth.",
                     },
                     {
-                      href: "/services",
+                      href: "/services/ai-powered-digital-marketing-services/paid-marketing",
                       title: "Advertising Services",
                       num: "{02}",
                       img: "service-img-02",
                       desc: "Targeted ad campaigns are created and managed across digital platforms to boost visibility, engagement.",
                     },
                     {
-                      href: "/services",
+                      href: "/services/ai-powered-digital-marketing-services/paid-marketing",
                       title: "Performance Marketing",
                       num: "{03}",
                       img: "service-img-03",
                       desc: "Driven by data and analytics, campaigns are continuously optimized to deliver measurable results, improved efficiency.",
                     },
                     {
-                      href: "/services",
+                      href: "/services/ai-powered-digital-marketing-services/b2b-lead-generation",
                       title: "Lead Generation",
                       num: "{04}",
                       img: "service-img-04",
                       desc: "Qualified leads are captured through strategic funnels, paid media, and content designed to support business growth.",
                     },
                     {
-                      href: "/services",
+                      href: "/services/ai-powered-digital-marketing-services/social-media-marketing",
                       title: "Social Management",
                       num: "{05}",
                       img: "service-img-05",
@@ -603,7 +603,7 @@ export default function Home() {
                 className="button-wrap service-style-one-button"
               >
                 <a
-                  href="/services"
+                  href="/services/ai-powered-digital-marketing-services"
                   data-wf--button--variant="secondary-bg"
                   data-w-id="8932a183-40ec-c216-e8b4-670b55f18dc8"
                   className="button-link w-inline-block"

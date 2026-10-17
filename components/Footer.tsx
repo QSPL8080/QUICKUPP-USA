@@ -1,21 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 
 export default function Footer({ hideCta = false }: { hideCta?: boolean }) {
   const year = new Date().getFullYear();
-  const [email, setEmail] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
-
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email.trim()) {
-      setSubscribed(true);
-      setTimeout(() => setSubscribed(false), 4000);
-      setEmail("");
-    }
-  };
 
   const socialLinks = [
     {
@@ -75,7 +64,7 @@ export default function Footer({ hideCta = false }: { hideCta?: boolean }) {
       <div className="w-layout-blockcontainer container w-container qs-scalient-container">
         {/* Main Grid: Newsletter Left + Columns Right */}
         <div className="qs-scalient-main-grid">
-          {/* Left Column: Brand Logo + Headline + Newsletter + Quick Contact */}
+          {/* Left Column: Brand Logo + Brand Statement + Quick Contact */}
           <div className="qs-scalient-left-col">
             <Link href="/" className="qs-scalient-logo-link" aria-label="Quickupp Softech Home">
               <img
@@ -85,29 +74,11 @@ export default function Footer({ hideCta = false }: { hideCta?: boolean }) {
               />
             </Link>
 
-            <h2 className="qs-scalient-heading">
-              Sign up for our newsletter today.
-            </h2>
-
-            <form onSubmit={handleSubscribe} className="qs-scalient-newsletter-box">
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Your email"
-                className="qs-scalient-input"
-              />
-              <button type="submit" className="qs-scalient-sub-btn">
-                {subscribed ? "Subscribed ✓" : "Subscribe"}
-              </button>
-            </form>
-
-            <p className="qs-scalient-microcopy">
-              No spam, Just valued update.
+            <p className="qs-scalient-desc" style={{ color: "#94a3b8", fontSize: "14.5px", lineHeight: "1.65", margin: "0 0 24px 0", maxWidth: "360px" }}>
+              Accelerating ambitious businesses with Marketing, AI, and Technology. Engineered for scalable, high-converting digital growth.
             </p>
 
-            <div className="qs-scalient-contact-snippet">
+            <div className="qs-scalient-contact-snippet" style={{ marginTop: "0" }}>
               <div className="qs-scalient-contact-chip">
                 <span className="qs-scalient-chip-dot"></span>
                 <span className="qs-scalient-chip-label">Inquiries:</span>
@@ -153,7 +124,6 @@ export default function Footer({ hideCta = false }: { hideCta?: boolean }) {
                 <li><Link href="/services/ai-video-production/ai-avatar-video">AI Video Production</Link></li>
                 <li><Link href="/services/ai-automation-solutions/ai-automation-solutions">AI &amp; Automation</Link></li>
                 <li><Link href="/services/staff-augmentation/it-staff-augmentation">Staff Augmentation</Link></li>
-                <li><Link href="/services" style={{ color: "#38bdf8", fontWeight: 600 }}>All Services →</Link></li>
               </ul>
             </div>
 

@@ -5529,6 +5529,15 @@ section.section-gap.padding-top-0 {
   will-change: transform;
 }
 
+/* Page-specific background photos for the cinematic CTA banner */
+.su-cta-contact .su-cinematic-bg-media {
+  background-image: url("/images/contact-handshake-consultation.jpg");
+}
+
+.su-cta-career .su-cinematic-bg-media {
+  background-image: url("/images/contact-client-deal.jpg");
+}
+
 .su-cinematic-dark-overlay {
   position: absolute;
   top: 0;
@@ -5974,12 +5983,13 @@ section.section-gap.padding-top-0 {
 }
 
 .sc-manifesto-text-center {
-  font-size: clamp(19px, 2.3vw, 29px);
-  font-weight: 600;
-  line-height: 1.52;
-  letter-spacing: -0.02em;
-  text-align: center;
-  margin: 0 auto;
+  font-size: clamp(15px, 1.5vw, 19.5px) !important;
+  font-weight: 550 !important;
+  line-height: 1.65 !important;
+  letter-spacing: -0.015em !important;
+  text-align: center !important;
+  max-width: 780px !important;
+  margin: 0 auto !important;
 }
 
 .sc-scroll-word {

@@ -19,7 +19,7 @@ export default function WhyBusinessesChooseUsInteractive() {
       subtext: "Marketing. AI. Technology. Built for Growth.",
       tag: "Unified Capabilities",
       ctaText: "Explore Our Capabilities",
-      ctaHref: "/services",
+      ctaHref: "/services/ai-powered-digital-marketing-services",
     },
     {
       num: "02",
@@ -59,7 +59,7 @@ export default function WhyBusinessesChooseUsInteractive() {
       tag: "Applied Intelligence",
       subtext: null,
       ctaText: "Explore AI Solutions",
-      ctaHref: "/services",
+      ctaHref: "/services/ai-automation-solutions",
     },
     {
       num: "06",

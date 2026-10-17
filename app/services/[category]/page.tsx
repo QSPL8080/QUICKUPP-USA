@@ -80,7 +80,7 @@ export default async function ServiceCategoryPage({ params }: PageProps) {
             <div className="asx-breadcrumb" style={{ justifyContent: "center", marginBottom: "20px" }}>
               <Link href="/">Home</Link>
               <span>/</span>
-              <Link href="/services">Services</Link>
+              <span>Services</span>
               <span>/</span>
               <span className="asx-breadcrumb-current">{category.categoryLabel}</span>
             </div>
@@ -153,8 +153,8 @@ export default async function ServiceCategoryPage({ params }: PageProps) {
                 <Link href="/contact" className="asx-btn-green">
                   Get More Info
                 </Link>
-                <Link href="/services" className="asx-btn-outline" style={{ borderColor: "rgba(255,255,255,0.3)", color: "#ffffff" }}>
-                  View All Services
+                <Link href="/contact" className="asx-btn-outline" style={{ borderColor: "rgba(255,255,255,0.3)", color: "#ffffff" }}>
+                  Schedule Consultation
                 </Link>
               </div>
             </div>

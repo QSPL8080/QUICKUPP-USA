@@ -425,7 +425,7 @@ export default function OurApproachInteractive() {
                   We don&apos;t just deliver three services. We connect three capabilities into one growth system.
                 </p>
 
-                <Link href="/services" className="mx-btn-lime">
+                <Link href="/services/ai-powered-digital-marketing-services" className="mx-btn-lime">
                   <span>Explore Our Capabilities</span>
                   <div className="mx-btn-icon-circle">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -574,7 +574,7 @@ export default function OurApproachInteractive() {
                 <div style={{ fontSize: "16px", fontWeight: "800", color: "var(--mx-text-heading)" }}>
                   Marketing attracts. AI accelerates. Technology scales.
                 </div>
-                <Link href="/services" className="mx-btn-lime">
+                <Link href="/services/ai-powered-digital-marketing-services" className="mx-btn-lime">
                   <span>Find the Right Solution</span>
                   <div className="mx-btn-icon-circle">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

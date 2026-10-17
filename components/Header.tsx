@@ -136,12 +136,6 @@ export default function Header() {
                         <span className="qs-mega-sparkle">✦</span>
                         <span className="qs-mega-header-title">Services &amp; Capabilities</span>
                       </div>
-                      <Link href="/services" className="qs-mega-view-all" onClick={handleLinkClick}>
-                        <span>Explore All Services</span>
-                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                          <path d="M2.5 9.5L9.5 2.5M9.5 2.5H3.5M9.5 2.5V8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      </Link>
                     </div>
 
                     <div className="qs-services-grid-4col">
