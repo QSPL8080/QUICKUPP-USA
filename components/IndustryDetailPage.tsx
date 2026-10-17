@@ -216,17 +216,32 @@ function getCategoryIcon(name: string) {
   return <CheckSvg size={14} />;
 }
 
-// Industry imagery mapping for high-resolution Assurix-style imagery
-const industryImages: Record<
-  string,
-  { hero: string; story: string; arch: string; circle: string; video: string }
-> = {
+export interface IndustryMedia {
+  hero: string;
+  story: string;
+  arch: string;
+  circle: string;
+  video: string;
+  ecosystemBg: string;
+  channelsBg: string;
+  pipelineBg: string;
+  processBg: string;
+  aiBg: string;
+}
+
+// Industry imagery mapping for high-resolution Assurix-style imagery (Strictly Zero Duplicates - 81 Distinct Images)
+const industryImages: Record<string, IndustryMedia> = {
   Healthcare: {
     hero: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=1600&q=80",
     story: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=1000&q=80",
     arch: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=800&q=80",
     circle: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=600&q=80",
     video: "/video/Portfolio 1.mp4",
+    ecosystemBg: "https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1600&q=80",
+    channelsBg: "https://images.unsplash.com/photo-1538108149393-fbbd81895907?auto=format&fit=crop&w=1600&q=80",
+    pipelineBg: "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=1600&q=80",
+    processBg: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=1600&q=80",
+    aiBg: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1600&q=80",
   },
   Education: {
     hero: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1600&q=80",
@@ -234,6 +249,11 @@ const industryImages: Record<
     arch: "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=800&q=80",
     circle: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80",
     video: "/video/Portfolio 2.mp4",
+    ecosystemBg: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1600&q=80",
+    channelsBg: "https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&w=1600&q=80",
+    pipelineBg: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80",
+    processBg: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1600&q=80",
+    aiBg: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1600&q=80",
   },
   "Real Estate": {
     hero: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1600&q=80",
@@ -241,6 +261,11 @@ const industryImages: Record<
     arch: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
     circle: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80",
     video: "/video/Portfolio 1.mp4",
+    ecosystemBg: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1600&q=80",
+    channelsBg: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1600&q=80",
+    pipelineBg: "https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?auto=format&fit=crop&w=1600&q=80",
+    processBg: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1600&q=80",
+    aiBg: "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=1600&q=80",
   },
   "Home Services": {
     hero: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1600&q=80",
@@ -248,34 +273,59 @@ const industryImages: Record<
     arch: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80",
     circle: "https://images.unsplash.com/photo-1581579438747-1dc8d17bbce4?auto=format&fit=crop&w=600&q=80",
     video: "/video/Portfolio 2.mp4",
+    ecosystemBg: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1600&q=80",
+    channelsBg: "https://images.unsplash.com/photo-1505798577917-a65157d3320a?auto=format&fit=crop&w=1600&q=80",
+    pipelineBg: "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?auto=format&fit=crop&w=1600&q=80",
+    processBg: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1600&q=80",
+    aiBg: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1600&q=80",
   },
   "IT & SaaS": {
     hero: "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1600&q=80",
     story: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1000&q=80",
-    arch: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80",
+    arch: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80",
     circle: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=80",
     video: "/video/Portfolio 1.mp4",
+    ecosystemBg: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1600&q=80",
+    channelsBg: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1600&q=80",
+    pipelineBg: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1600&q=80",
+    processBg: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1600&q=80",
+    aiBg: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1600&q=80",
   },
   "Interior Design": {
     hero: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1600&q=80",
     story: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1000&q=80",
     arch: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=800&q=80",
-    circle: "https://images.unsplash.com/photo-1581291518655-9523c93269c3?auto=format&fit=crop&w=600&q=80",
+    circle: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80",
     video: "/video/Portfolio 2.mp4",
+    ecosystemBg: "https://images.unsplash.com/photo-1618219908412-a29a1bb7b86e?auto=format&fit=crop&w=1600&q=80",
+    channelsBg: "https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&w=1600&q=80",
+    pipelineBg: "https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=1600&q=80",
+    processBg: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1600&q=80",
+    aiBg: "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1600&q=80",
   },
   "Professional Services": {
     hero: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1600&q=80",
     story: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1000&q=80",
-    arch: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80",
+    arch: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80",
     circle: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=600&q=80",
     video: "/video/Portfolio 1.mp4",
+    ecosystemBg: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1600&q=80",
+    channelsBg: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=1600&q=80",
+    pipelineBg: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=1600&q=80",
+    processBg: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1600&q=80",
+    aiBg: "https://images.unsplash.com/photo-1551836022-4c4c79ecde51?auto=format&fit=crop&w=1600&q=80",
   },
   eCommerce: {
     hero: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80",
     story: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=1000&q=80",
     arch: "https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?auto=format&fit=crop&w=800&q=80",
-    circle: "https://images.unsplash.com/photo-1556742049-0a67e55722c3?auto=format&fit=crop&w=600&q=80",
+    circle: "https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&w=600&q=80",
     video: "/video/Portfolio 1.mp4",
+    ecosystemBg: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1600&q=80",
+    channelsBg: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=1600&q=80",
+    pipelineBg: "https://images.unsplash.com/photo-1556740758-90de374c12ad?auto=format&fit=crop&w=1600&q=80",
+    processBg: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&w=1600&q=80",
+    aiBg: "https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=1600&q=80",
   },
   "Travel & Hospitality": {
     hero: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1600&q=80",
@@ -283,10 +333,15 @@ const industryImages: Record<
     arch: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?auto=format&fit=crop&w=800&q=80",
     circle: "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=600&q=80",
     video: "/video/Portfolio 2.mp4",
+    ecosystemBg: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+    channelsBg: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1600&q=80",
+    pipelineBg: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1600&q=80",
+    processBg: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1600&q=80",
+    aiBg: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1600&q=80",
   },
 };
 
-function getImagesForIndustry(crumb: string) {
+function getImagesForIndustry(crumb: string): IndustryMedia {
   return (
     industryImages[crumb] || {
       hero: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=1600&q=80",
@@ -294,6 +349,9 @@ function getImagesForIndustry(crumb: string) {
       arch: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=800&q=80",
       circle: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=600&q=80",
       video: "/video/Portfolio 1.mp4",
+      ecosystemBg: "https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1600&q=80",
+      processBg: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=1600&q=80",
+      aiBg: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1600&q=80",
     }
   );
 }
@@ -485,66 +543,14 @@ function renderCleanParagraphs(
 
 export default function IndustryDetailPage({ data }: { data: ServicePageData }) {
   const images = getImagesForIndustry(data.crumb);
-  const videoRef = useRef<HTMLVideoElement>(null);
   const valPropRef = useRef<HTMLDivElement>(null);
-  const [valPropVisible, setValPropVisible] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [isMuted, setIsMuted] = useState(true);
-  const [showReplay, setShowReplay] = useState(false);
+  const [valPropVisible, setValPropVisible] = useState(true);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [activeStep, setActiveStep] = useState<number>(0);
 
   useEffect(() => {
-    const vid = videoRef.current;
-    if (vid) {
-      vid.muted = true;
-      vid.play().catch(() => setIsPlaying(false));
-    }
+    setValPropVisible(true);
   }, [data.crumb]);
-
-  useEffect(() => {
-    const el = valPropRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setValPropVisible(true);
-        }
-      },
-      { threshold: 0.2 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [data.crumb]);
-
-  const togglePlay = () => {
-    const vid = videoRef.current;
-    if (!vid) return;
-    if (vid.paused || vid.ended) {
-      vid.play();
-      setIsPlaying(true);
-      setShowReplay(false);
-    } else {
-      vid.pause();
-      setIsPlaying(false);
-    }
-  };
-
-  const toggleMute = () => {
-    const vid = videoRef.current;
-    if (!vid) return;
-    vid.muted = !vid.muted;
-    setIsMuted(vid.muted);
-  };
-
-  const handleReplay = () => {
-    const vid = videoRef.current;
-    if (!vid) return;
-    vid.currentTime = 0;
-    vid.play();
-    setIsPlaying(true);
-    setShowReplay(false);
-  };
 
   return (
     <div className="asx-page">
@@ -645,14 +651,11 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
         {/* ========================================================================= */}
         <section className="asx-media-wrap">
           <div className="asx-media-box">
-            <video
-              ref={videoRef}
-              src={images.video}
-              poster={images.hero}
-              playsInline
-              loop
-              muted={isMuted}
-              onEnded={() => setShowReplay(true)}
+            <img
+              src={images.hero}
+              alt={data.crumb + " Strategy"}
+              className="asx-media-hero-img"
+              loading="eager"
             />
 
             <div className="asx-media-overlay">
@@ -661,44 +664,18 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                   {"✦ " + (data.heroEyebrow || data.crumb) + " Growth"}
                 </span>
 
-                <div className="asx-media-controls">
-                  <button
-                    type="button"
-                    onClick={toggleMute}
-                    aria-label="Toggle mute"
-                    className="asx-ctrl-btn"
-                  >
-                    {isMuted ? (
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
-                    ) : (
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={togglePlay}
-                    aria-label="Toggle play"
-                    className="asx-ctrl-btn"
-                  >
-                    {isPlaying ? (
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-                    ) : (
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {showReplay && (
-                <button
-                  type="button"
-                  onClick={handleReplay}
-                  className="asx-replay-btn"
+                <span
+                  className="asx-media-badge"
+                  style={{
+                    background: "rgba(124, 58, 237, 0.85)",
+                    color: "#ffffff",
+                    borderColor: "rgba(255, 255, 255, 0.3)",
+                    fontWeight: 700,
+                  }}
                 >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-                  <span>Watch Again</span>
-                </button>
-              )}
+                  Verified Industry Strategy
+                </span>
+              </div>
 
               <div className="asx-media-bottom">
                 <div className="asx-media-tagline">Quickupp Softech Strategy</div>
@@ -715,9 +692,22 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
           if (block.type === "descPairs") {
             const descPairsBlock = block as DescPairsBlock;
             const isMarquee = descPairsBlock.items.length >= 8;
+            const isHomeServicesChannels = data.crumb === "Home Services" && (descPairsBlock.title?.includes("Turn Every Marketing Channel") ?? false);
+            const showChannelsWatermark = !isMarquee && !isHomeServicesChannels;
             return (
-              <section key={bIdx} id={bIdx === 0 || bIdx === 2 ? "services-section" : undefined} className="asx-section" style={{ borderTop: "1px solid #e5eaee" }}>
-                <div className="asx-container">
+              <section
+                key={bIdx}
+                id={bIdx === 0 || bIdx === 2 ? "services-section" : undefined}
+                className={"asx-section" + (showChannelsWatermark ? " asx-watermark-section" : "")}
+                style={{ borderTop: "1px solid #e5eaee" }}
+              >
+                {showChannelsWatermark && (
+                  <div className="asx-section-bg-watermark" aria-hidden="true">
+                    <img src={images.channelsBg} alt="" loading="lazy" />
+                    <div className="asx-section-bg-overlay" />
+                  </div>
+                )}
+                <div className="asx-container" style={{ position: "relative", zIndex: 1 }}>
                   <div className="asx-section-header-center" style={{ maxWidth: "1050px", marginBottom: descPairsBlock.desc ? "20px" : "36px" }}>
                     <h2 className="asx-section-title" style={{ margin: "0 0 12px 0" }}>
                       {renderGradientTitle(descPairsBlock.title || ("Our " + data.crumb + " Marketing Services"))}
@@ -781,6 +771,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                       {descPairsBlock.items.map((item, idx) => (
                         <div
                           key={idx}
+                          className="asx-channel-card"
                           style={{
                             background: "#ffffff",
                             border: "1px solid #e2e8f0",
@@ -829,76 +820,6 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
 
           if (block.type === "list") {
             const listBlock = block as ListBlock;
-            const isSplitCollage = bIdx === 0 || (listBlock.subtitle && listBlock.items.length <= 10 && listBlock.items[0]?.length > 25);
-
-            if (isSplitCollage) {
-              return (
-                <section key={bIdx} className="asx-who-split-section" style={{ borderTop: "1px solid #e5eaee" }}>
-                  <div className="asx-container">
-                    <div className="asx-who-split-grid">
-                      <div className="asx-collage-wrap">
-                        <div className="asx-collage-tall-box">
-                          <img src={images.story} alt={data.crumb + " practice"} loading="lazy" />
-                        </div>
-                        <div className="asx-collage-circle-box">
-                          <img src={images.circle} alt={data.crumb + " segment"} loading="lazy" />
-                        </div>
-                        <div className="asx-collage-dome-box">
-                          <img src={images.arch} alt={data.crumb + " growth"} loading="lazy" />
-                        </div>
-                      </div>
-
-                      <div className="asx-who-content">
-                        <h2 className="asx-who-title">
-                          {renderGradientTitle(listBlock.title || (data.crumb + " Businesses We Help"))}
-                        </h2>
-
-                        {listBlock.subtitle && (
-                          <div className="asx-who-subtitle">
-                            {cleanDash(listBlock.subtitle)}
-                          </div>
-                        )}
-
-                        {listBlock.desc &&
-                          renderCleanParagraphs(listBlock.desc, "asx-section-desc", { margin: "0 0 20px", textAlign: "left" })
-                        }
-
-                        <ul className="asx-who-bullets" style={{ marginTop: "20px" }}>
-                          {listBlock.items.slice(0, listBlock.items.length > 2 ? listBlock.items.length - 2 : listBlock.items.length).map((item, idx) => (
-                            <li key={idx} className="asx-who-bullet-item">
-                              <span className="asx-who-bullet-dot" />
-                              <span>{cleanDash(item)}</span>
-                            </li>
-                          ))}
-                        </ul>
-
-                        {listBlock.items.length > 2 && (
-                          <>
-                            <hr className="asx-who-divider" />
-                            <div className="asx-who-checks">
-                              {listBlock.items.slice(listBlock.items.length - 2).map((item, idx) => (
-                                <div key={idx} className="asx-who-check-item">
-                                  <CheckSvg size={16} />
-                                  <span>{cleanDash(item)}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </>
-                        )}
-
-                        <div style={{ marginTop: "24px" }}>
-                          <Link href={listBlock.cta?.href || "/contact"} className="asx-btn-dark">
-                            {listBlock.cta?.label || "Get Industry Strategy"}
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </section>
-              );
-            }
-
-            // Clean, Proper, Elegant Grid Layout for List Blocks
             return (
               <section key={bIdx} className="asx-section" style={{ borderTop: "1px solid #e5eaee" }}>
                 <div className="asx-container">
@@ -910,62 +831,84 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                       </div>
                     )}
                     <h2 className="asx-section-title" style={{ margin: "0 0 12px 0" }}>
-                      {renderGradientTitle(listBlock.title)}
+                      {renderGradientTitle(listBlock.title || (data.crumb + " Businesses We Help"))}
                     </h2>
                     {listBlock.desc &&
                       renderCleanParagraphs(listBlock.desc, "asx-section-desc")
                     }
                   </div>
 
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "16px" }}>
-                    {listBlock.items.map((item, idx) => {
-                      const icon = getCategoryIcon(item);
-                      return (
-                        <div
-                          key={idx}
-                          className="asx-simple-card-item"
-                          style={{
-                            background: "#ffffff",
-                            border: "1px solid #e2e8f0",
-                            borderRadius: "14px",
-                            padding: "18px 22px",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "14px",
-                            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.02)",
-                            transition: "all 0.2s ease",
-                          }}
-                        >
-                          <div
-                            style={{
-                              width: "38px",
-                              height: "38px",
-                              borderRadius: "10px",
-                              background: "rgba(124, 58, 237, 0.08)",
-                              color: "#7c3aed",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              flexShrink: 0,
-                            }}
-                          >
-                            {icon}
-                          </div>
-                          <span style={{ fontSize: "15px", fontWeight: 600, color: "#001d28", lineHeight: 1.35 }}>
-                            {cleanDash(item)}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {listBlock.cta && (
-                    <div style={{ marginTop: "36px", textAlign: "center" }}>
-                      <Link href={listBlock.cta.href || "/contact"} className="asx-btn-green">
-                        {listBlock.cta.label}
-                      </Link>
+                  <div className="asx-who-showcase-grid">
+                    <div className="asx-who-visual-box">
+                      <img
+                        src={images.story}
+                        alt={data.crumb + " Practice & Businesses"}
+                        className="asx-who-visual-img"
+                        loading="lazy"
+                      />
+                      <div className="asx-who-visual-overlay" />
+                      <div className="asx-who-visual-badge">
+                        <SparkleSvg size={14} />
+                        <span>{data.crumb + " Growth Ready"}</span>
+                      </div>
+                      <div className="asx-who-visual-caption">
+                        <h4>{"Tailored " + data.crumb + " Architecture"}</h4>
+                        <p>Specialized workflows, custom funnels, and compliant digital marketing built for your exact domain.</p>
+                      </div>
                     </div>
-                  )}
+
+                    <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "14px" }}>
+                        {listBlock.items.map((item, idx) => {
+                          const icon = getCategoryIcon(item);
+                          return (
+                            <div
+                              key={idx}
+                              className="asx-simple-card-item"
+                              style={{
+                                background: "#ffffff",
+                                border: "1px solid #e2e8f0",
+                                borderRadius: "14px",
+                                padding: "16px 18px",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "12px",
+                                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.02)",
+                                transition: "all 0.2s ease",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  width: "36px",
+                                  height: "36px",
+                                  borderRadius: "10px",
+                                  background: "rgba(124, 58, 237, 0.08)",
+                                  color: "#7c3aed",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  flexShrink: 0,
+                                }}
+                              >
+                                {icon}
+                              </div>
+                              <span style={{ fontSize: "14.5px", fontWeight: 600, color: "#001d28", lineHeight: 1.35 }}>
+                                {cleanDash(item)}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {listBlock.cta && (
+                        <div style={{ marginTop: "28px" }}>
+                          <Link href={listBlock.cta.href || "/contact"} className="asx-btn-green">
+                            {listBlock.cta.label}
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </section>
             );
@@ -973,9 +916,24 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
 
           if (block.type === "ai") {
             const aiBlock = block as AiBlock;
+            const titleLower = aiBlock.title.toLowerCase();
+            const isAiAutomation = titleLower.includes("ai-powered") || titleLower.includes("client acquisition");
+            const isPipeline = titleLower.includes("built") || titleLower.includes("pipeline") || titleLower.includes("metric");
+            const showWatermark = isAiAutomation || !isPipeline;
+            const bgImage = isAiAutomation ? images.aiBg : images.ecosystemBg;
             return (
-              <section key={bIdx} className="asx-section" style={{ borderTop: "1px solid #e5eaee" }}>
-                <div className="asx-container">
+              <section
+                key={bIdx}
+                className={"asx-section" + (showWatermark ? " asx-watermark-section" : "")}
+                style={{ borderTop: "1px solid #e5eaee" }}
+              >
+                {showWatermark && (
+                  <div className="asx-section-bg-watermark" aria-hidden="true">
+                    <img src={bgImage} alt="" loading="lazy" />
+                    <div className="asx-section-bg-overlay" />
+                  </div>
+                )}
+                <div className="asx-container" style={{ position: "relative", zIndex: 1 }}>
                   <div className="asx-section-header-center" style={{ maxWidth: "860px" }}>
                     <h2 className="asx-section-title" style={{ margin: "0 0 14px 0" }}>
                       {renderGradientTitle(aiBlock.title)}
@@ -1130,8 +1088,18 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
             const processBlock = block as ProcessBlock;
             const hasSteps = Array.isArray(processBlock.steps) && processBlock.steps.length > 0;
             return (
-              <section key={bIdx} className="asx-section" style={{ borderTop: "1px solid #e5eaee" }}>
-                <div className="asx-container">
+              <section
+                key={bIdx}
+                className={"asx-section" + (hasSteps ? " asx-watermark-section" : "")}
+                style={{ borderTop: "1px solid #e5eaee" }}
+              >
+                {hasSteps && (
+                  <div className="asx-section-bg-watermark" aria-hidden="true">
+                    <img src={images.processBg} alt="" loading="lazy" />
+                    <div className="asx-section-bg-overlay" />
+                  </div>
+                )}
+                <div className="asx-container" style={{ position: "relative", zIndex: 1 }}>
                   <div className="asx-section-header-center" style={{ marginBottom: hasSteps ? "36px" : "0", maxWidth: "860px" }}>
                     {processBlock.tagline && (
                       <div className="asx-tag-pill" style={{ margin: "0 auto 12px" }}>
