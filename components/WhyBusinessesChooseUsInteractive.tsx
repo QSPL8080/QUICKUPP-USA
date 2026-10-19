@@ -271,15 +271,22 @@ export default function WhyBusinessesChooseUsInteractive() {
   };
 
   return (
-    <div className="mx-about-page">
+    <>
       <Header />
-
-      <main>
+      <main className="mx-about-page">
         {/* =========================================================================
             1. HERO SECTION (WHY BUSINESSES CHOOSE US)
             ========================================================================= */}
-        <section className="mx-hero-section">
-          <div className="mx-container">
+        <section className="mx-hero-section mx-hero-watermark">
+          <div
+            className="mx-hero-watermark-bg"
+            style={{
+              backgroundImage:
+                "url('https://images.unsplash.com/photo-1497215842964-222b430dc094?auto=format&fit=crop&w=1920&q=80')",
+            }}
+          />
+          <div className="mx-hero-watermark-overlay" />
+          <div className="mx-container" style={{ position: "relative", zIndex: 1 }}>
             {/* Breadcrumb Navigation */}
             <div className="asx-breadcrumb" style={{ justifyContent: "center", marginBottom: "24px" }}>
               <Link href="/">Home</Link>
@@ -549,8 +556,16 @@ export default function WhyBusinessesChooseUsInteractive() {
         {/* =========================================================================
             3. THE QUICKUPP DIFFERENCE (We Connect the Pieces)
             ========================================================================= */}
-        <section className="mx-partnership-section">
-          <div className="mx-container">
+        <section className="mx-partnership-section mx-watermark-section">
+          <div
+            className="mx-watermark-bg"
+            style={{
+              backgroundImage:
+                "url('https://images.unsplash.com/photo-1517502884422-41eaead166d4?auto=format&fit=crop&w=1920&q=80')",
+            }}
+          />
+          <div className="mx-watermark-overlay" />
+          <div className="mx-container" style={{ position: "relative", zIndex: 2 }}>
             <div className="mx-partnership-box">
               <div className="mx-partnership-header">
                 <span className="mx-partnership-sub">THE QUICKUPP DIFFERENCE</span>
@@ -748,8 +763,16 @@ export default function WhyBusinessesChooseUsInteractive() {
         {/* =========================================================================
             5. BUILT FOR BUSINESSES THAT WANT TO MOVE FORWARD (CTA Box)
             ========================================================================= */}
-        <section className="mx-cta-section">
-          <div className="mx-container">
+        <section className="mx-cta-section mx-watermark-section">
+          <div
+            className="mx-watermark-bg"
+            style={{
+              backgroundImage:
+                "url('https://images.unsplash.com/photo-1568992687947-868a62a9f521?auto=format&fit=crop&w=1920&q=80')",
+            }}
+          />
+          <div className="mx-watermark-overlay" />
+          <div className="mx-container" style={{ position: "relative", zIndex: 2 }}>
             <div className="mx-cta-card">
               <div className="mx-cta-content">
                 <span className="mx-sub-badge">BUILT FOR BUSINESSES THAT WANT TO MOVE FORWARD</span>
@@ -784,6 +807,6 @@ export default function WhyBusinessesChooseUsInteractive() {
       </main>
 
       <Footer />
-    </div>
+    </>
   );
 }

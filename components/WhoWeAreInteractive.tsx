@@ -78,28 +78,28 @@ export default function WhoWeAreInteractive() {
       name: "Alex Rivera",
       role: "Lead Full-Stack Architect",
       desc: "Architects scalable Next.js systems, high-throughput microservices, and secure cloud pipelines for enterprise clients.",
-      img: "/images/team-img-01.jpg",
+      img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=600&q=80",
       socials: { linkedin: "https://linkedin.com", twitter: "https://x.com", github: "https://github.com" },
     },
     {
       name: "Priya Sharma",
       role: "Senior AI Solutions Specialist",
       desc: "Designs intelligent multi-agent workflows, autonomous RAG pipelines, and conversational WhatsApp business engines.",
-      img: "/images/team-img-02.jpg",
+      img: "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?auto=format&fit=crop&w=600&q=80",
       socials: { linkedin: "https://linkedin.com", twitter: "https://x.com", github: "https://github.com" },
     },
     {
       name: "Marcus Chen",
       role: "Principal Product Designer",
       desc: "Crafts high-converting UX design systems, interactive component libraries, and award-winning digital experiences.",
-      img: "/images/team-img-03.jpg",
+      img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80",
       socials: { linkedin: "https://linkedin.com", twitter: "https://x.com", github: "https://github.com" },
     },
     {
       name: "David Vance",
       role: "Performance Marketing Lead",
       desc: "Manages data-driven acquisition across Google, Meta, and LinkedIn with strict CAC benchmarks and ROAS scaling.",
-      img: "/images/team-img-04.jpg",
+      img: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=600&q=80",
       socials: { linkedin: "https://linkedin.com", twitter: "https://x.com", github: "https://github.com" },
     },
   ];
@@ -123,8 +123,16 @@ export default function WhoWeAreInteractive() {
         {/* =========================================================================
             1. HERO SECTION (WHO WE ARE)
             ========================================================================= */}
-        <section className="mx-hero-section">
-          <div className="mx-container">
+        <section className="mx-hero-section mx-hero-watermark">
+          <div
+            className="mx-hero-watermark-bg"
+            style={{
+              backgroundImage:
+                "url('https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1920&q=80')",
+            }}
+          />
+          <div className="mx-hero-watermark-overlay" />
+          <div className="mx-container" style={{ position: "relative", zIndex: 1 }}>
             {/* Breadcrumb Navigation */}
             <div className="asx-breadcrumb" style={{ justifyContent: "center", marginBottom: "24px" }}>
               <Link href="/">Home</Link>
@@ -271,14 +279,14 @@ export default function WhoWeAreInteractive() {
               <div className="mx-photo-stack">
                 <div className="mx-photo-img-wrap img-back">
                   <img
-                    src="/images/home-two-about.jpg"
+                    src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=80"
                     alt="Quickupp Engineering Culture"
                     className="mx-photo-img"
                   />
                 </div>
                 <div className="mx-photo-img-wrap img-front">
                   <img
-                    src="/images/home1-about-01.jpg"
+                    src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=800&q=80"
                     alt="Quickupp Strategy Collaboration"
                     className="mx-photo-img"
                   />
@@ -410,9 +418,26 @@ export default function WhoWeAreInteractive() {
         {/* =========================================================================
             4. BUILT AROUND YOUR BUSINESS. FOCUSED ON YOUR GROWTH.
             ========================================================================= */}
-        <section className="mx-tab-section" style={{ paddingTop: "20px" }}>
-          <div className="mx-container">
-            <div style={{ background: "#ffffff", border: "1px solid var(--mx-border)", borderRadius: "28px", padding: "54px 44px", boxShadow: "0 10px 30px -8px rgba(15, 23, 42, 0.06)" }}>
+        <section className="mx-watermark-section" style={{ padding: "50px 0" }}>
+          <div
+            className="mx-watermark-bg"
+            style={{
+              backgroundImage:
+                "url('https://images.unsplash.com/photo-1497366412874-3415097a27e7?auto=format&fit=crop&w=1920&q=80')",
+            }}
+          />
+          <div className="mx-watermark-overlay" />
+          <div className="mx-container" style={{ position: "relative", zIndex: 2 }}>
+            <div
+              className="mx-tab-section-card"
+              style={{
+                background: "#ffffff",
+                border: "1px solid var(--mx-border)",
+                borderRadius: "28px",
+                padding: "54px 44px",
+                boxShadow: "0 10px 30px -8px rgba(15, 23, 42, 0.06)",
+              }}
+            >
               <div style={{ maxWidth: "880px", margin: "0 auto", textAlign: "center" }}>
                 <span className="mx-sub-badge">BUILT AROUND YOUR BUSINESS</span>
                 <h2 className="mx-section-heading" style={{ marginBottom: "20px" }}>
@@ -515,8 +540,16 @@ export default function WhoWeAreInteractive() {
         {/* =========================================================================
             6. READY TO BUILD WHAT'S NEXT? (Bottom CTA Banner)
             ========================================================================= */}
-        <section className="mx-cta-section">
-          <div className="mx-container">
+        <section className="mx-cta-section mx-watermark-section">
+          <div
+            className="mx-watermark-bg"
+            style={{
+              backgroundImage:
+                "url('https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=1920&q=80')",
+            }}
+          />
+          <div className="mx-watermark-overlay" />
+          <div className="mx-container" style={{ position: "relative", zIndex: 2 }}>
             <div className="mx-cta-card">
               <div className="mx-cta-content">
                 <span className="mx-sub-badge">

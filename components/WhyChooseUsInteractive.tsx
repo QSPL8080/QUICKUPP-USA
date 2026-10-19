@@ -324,14 +324,14 @@ export default function WhyChooseUsInteractive() {
               <div ref={photoRef} className={`mx-photo-stack ${photoVisible ? "is-inview" : ""}`}>
                 <div className="mx-photo-img-wrap img-back">
                   <img
-                    src="/images/home-two-about.jpg"
+                    src="https://images.unsplash.com/photo-1504384764586-bb4cdc1707b0?auto=format&fit=crop&w=800&q=80"
                     alt="Quickupp Engineering Culture"
                     className="mx-photo-img"
                   />
                 </div>
                 <div className="mx-photo-img-wrap img-front">
                   <img
-                    src="/images/home1-about-01.jpg"
+                    src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=800&q=80"
                     alt="Quickupp Strategy Collaboration"
                     className="mx-photo-img"
                   />
@@ -634,8 +634,16 @@ export default function WhyChooseUsInteractive() {
         {/* =========================================================================
             5. OUR APPROACH (Understand. Strategize. Build. Grow.)
             ========================================================================= */}
-        <section className="mx-tab-section">
-          <div className="mx-container">
+        <section className="mx-watermark-section" style={{ padding: "70px 0" }}>
+          <div
+            className="mx-watermark-bg"
+            style={{
+              backgroundImage:
+                "url('https://images.unsplash.com/photo-1570126618953-d437176e8c79?auto=format&fit=crop&w=1920&q=80')",
+            }}
+          />
+          <div className="mx-watermark-overlay" />
+          <div className="mx-container" style={{ position: "relative", zIndex: 2 }}>
             <div style={{ textAlign: "center", maxWidth: "800px", margin: "0 auto 36px" }}>
               <span className="mx-sub-badge">OUR APPROACH</span>
               <h2 className="mx-section-heading" style={{ marginBottom: "12px" }}>
@@ -657,7 +665,7 @@ export default function WhyChooseUsInteractive() {
                       border: "1px solid var(--mx-border)",
                       borderRadius: "18px",
                       padding: "24px 20px",
-                      boxShadow: "0 4px 16px -2px rgba(15, 23, 42, 0.04)",
+                      boxShadow: "0 8px 24px -4px rgba(15, 23, 42, 0.08)",
                       display: "flex",
                       flexDirection: "column",
                       justifyContent: "space-between",
@@ -698,7 +706,16 @@ export default function WhyChooseUsInteractive() {
             ========================================================================= */}
         <section className="mx-tab-section" style={{ paddingTop: "20px" }}>
           <div className="mx-container">
-            <div style={{ background: "#ffffff", border: "1px solid var(--mx-border)", borderRadius: "28px", padding: "50px 40px", textAlign: "center", boxShadow: "0 10px 30px -8px rgba(15, 23, 42, 0.05)" }}>
+            <div
+              style={{
+                background: "#ffffff",
+                border: "1px solid var(--mx-border)",
+                borderRadius: "28px",
+                padding: "50px 40px",
+                textAlign: "center",
+                boxShadow: "0 10px 30px -8px rgba(15, 23, 42, 0.05)",
+              }}
+            >
               <span className="mx-sub-badge">TRUSTED BY BUSINESSES. BUILT FOR AMBITION.</span>
               <h2 className="mx-section-heading" style={{ marginBottom: "16px" }}>
                 From Growing Businesses to <span className="mx-gradient-text">Ambitious Brands.</span>
@@ -716,8 +733,16 @@ export default function WhyChooseUsInteractive() {
         {/* =========================================================================
             7. READY TO GROW DIFFERENTLY? (Bottom CTA Banner)
             ========================================================================= */}
-        <section className="mx-cta-section">
-          <div className="mx-container">
+        <section className="mx-cta-section mx-watermark-section">
+          <div
+            className="mx-watermark-bg"
+            style={{
+              backgroundImage:
+                "url('https://images.unsplash.com/photo-1531497865144-0464ef8fb9a9?auto=format&fit=crop&w=1920&q=80')",
+            }}
+          />
+          <div className="mx-watermark-overlay" />
+          <div className="mx-container" style={{ position: "relative", zIndex: 2 }}>
             <div className="mx-cta-card">
               <div className="mx-cta-content">
                 <span className="mx-sub-badge">

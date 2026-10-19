@@ -38,7 +38,7 @@
 /* Global body and html styling */
 html {
   background-color: #0b0d11;
-  overflow-x: hidden;
+  overflow-x: clip;
   width: 100%;
   -webkit-text-size-adjust: 100%;
 }
@@ -49,7 +49,7 @@ body {
   min-height: 100vh;
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
+  overflow-x: clip;
   width: 100%;
   position: relative;
 }
@@ -9595,16 +9595,59 @@ section.section-gap.padding-top-0 {
 }
 
 .mx-about-page {
-  padding-top: clamp(118px, 8.5vw, 138px) !important;
+  padding-top: 82px !important;
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 .mx-about-page .mx-hero-section {
-  padding-top: 0 !important;
+  padding-top: 52px !important;
+  padding-bottom: 36px !important;
 }
 
-@media (max-width: 768px) {
+.mx-about-page .mx-cta-section {
+  margin-bottom: 0 !important;
+  padding-bottom: 50px !important;
+}
+
+.mx-about-page + .qs-scalient-footer,
+.asx-page .qs-scalient-footer,
+.asx-page + .qs-scalient-footer {
+  margin-top: 0 !important;
+}
+
+.asx-page {
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.asx-page > main {
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.asx-closing-cta-section {
+  padding: 40px 24px 50px !important;
+  margin-bottom: 0 !important;
+}
+
+.mx-cta-section .mx-watermark-overlay {
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.45) 0%, rgba(248, 250, 252, 0.22) 35%, rgba(248, 250, 252, 0.12) 75%, transparent 100%) !important;
+}
+
+@media (max-width: 991px) {
   .mx-about-page {
-    padding-top: 108px !important;
+    padding-top: 72px !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  .mx-about-page .mx-hero-section {
+    padding-top: 36px !important;
+    padding-bottom: 28px !important;
+  }
+  .mx-about-page .mx-cta-section {
+    margin-bottom: 0 !important;
+    padding-bottom: 40px !important;
   }
 }
 

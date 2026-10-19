@@ -1197,7 +1197,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
         {/* ========================================================================= */}
         {/* 4. CLOSING CTA BANNER */}
         {/* ========================================================================= */}
-        <section style={{ padding: "64px 24px" }}>
+        <section className="asx-closing-cta-section" style={{ padding: "40px 24px 50px", marginBottom: 0 }}>
           <div className="asx-container">
             <div className="asx-cta-box">
               <h2 className="asx-cta-title">

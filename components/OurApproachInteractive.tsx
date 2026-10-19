@@ -265,8 +265,16 @@ export default function OurApproachInteractive() {
         {/* =========================================================================
             2. HOW WE WORK (5 Steps Interactive Showcase)
             ========================================================================= */}
-        <section className="mx-partnership-section">
-          <div className="mx-container">
+        <section className="mx-partnership-section mx-watermark-section">
+          <div
+            className="mx-watermark-bg"
+            style={{
+              backgroundImage:
+                "url('https://images.unsplash.com/photo-1541746972996-4e0b0f43e02a?auto=format&fit=crop&w=1920&q=80')",
+            }}
+          />
+          <div className="mx-watermark-overlay" />
+          <div className="mx-container" style={{ position: "relative", zIndex: 2 }}>
             <div className="mx-partnership-box">
               <div className="mx-partnership-header">
                 <span className="mx-partnership-sub">HOW WE WORK</span>
@@ -440,14 +448,14 @@ export default function OurApproachInteractive() {
               <div className="mx-photo-stack">
                 <div className="mx-photo-img-wrap img-back">
                   <img
-                    src="/images/home-two-about.jpg"
+                    src="https://images.unsplash.com/photo-1531545514256-b1400bc00f31?auto=format&fit=crop&w=800&q=80"
                     alt="Quickupp Unified Growth Pod"
                     className="mx-photo-img"
                   />
                 </div>
                 <div className="mx-photo-img-wrap img-front">
                   <img
-                    src="/images/home1-about-01.jpg"
+                    src="https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=800&q=80"
                     alt="Quickupp Connected Strategy"
                     className="mx-photo-img"
                   />
@@ -460,8 +468,16 @@ export default function OurApproachInteractive() {
         {/* =========================================================================
             4. ONE APPROACH. THREE CAPABILITIES.
             ========================================================================= */}
-        <section className="mx-lime-section">
-          <div className="mx-container">
+        <section className="mx-lime-section mx-watermark-section">
+          <div
+            className="mx-watermark-bg"
+            style={{
+              backgroundImage:
+                "url('https://images.unsplash.com/photo-1487958449943-2429e8be8625?auto=format&fit=crop&w=1920&q=80')",
+            }}
+          />
+          <div className="mx-watermark-overlay" />
+          <div className="mx-container" style={{ position: "relative", zIndex: 2 }}>
             <div className="mx-lime-box">
               <div className="mx-lime-header">
                 <span className="mx-lime-sub">CORE CAPABILITIES</span>
@@ -593,13 +609,16 @@ export default function OurApproachInteractive() {
             ========================================================================= */}
         <section className="mx-tab-section" style={{ padding: "40px 0 60px" }}>
           <div className="mx-container">
-            <div style={{
-              background: "#ffffff",
-              border: "1px solid var(--mx-border)",
-              borderRadius: "32px",
-              padding: "56px 48px",
-              boxShadow: "0 16px 36px -8px rgba(15, 23, 42, 0.05)"
-            }}>
+            <div
+              className="mx-tab-section-card"
+              style={{
+                background: "#ffffff",
+                border: "1px solid var(--mx-border)",
+                borderRadius: "32px",
+                padding: "56px 48px",
+                boxShadow: "0 16px 36px -8px rgba(15, 23, 42, 0.05)",
+              }}
+            >
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "48px", alignItems: "center" }}>
                 {/* Left: Built Around Your Business */}
                 <div>
@@ -687,8 +706,16 @@ export default function OurApproachInteractive() {
         {/* =========================================================================
             6. READY TO BUILD WHAT'S NEXT? (CTA Section)
             ========================================================================= */}
-        <section className="mx-cta-section">
-          <div className="mx-container">
+        <section className="mx-cta-section mx-watermark-section">
+          <div
+            className="mx-watermark-bg"
+            style={{
+              backgroundImage:
+                "url('https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1920&q=80')",
+            }}
+          />
+          <div className="mx-watermark-overlay" />
+          <div className="mx-container" style={{ position: "relative", zIndex: 2 }}>
             <div className="mx-cta-card">
               <div className="mx-cta-content">
                 <span className="mx-sub-badge">READY TO BUILD WHAT&apos;S NEXT?</span>
