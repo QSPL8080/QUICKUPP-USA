@@ -54,10 +54,10 @@
   background-size: cover !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
-  opacity: 0.48 !important; /* Balanced transparency: clear visibility without darkness */
+  opacity: 0.32 !important; /* Soft, transparent watermark */
   pointer-events: none;
   z-index: 0;
-  filter: saturate(1.1) contrast(1.02) brightness(1.05) !important;
+  filter: saturate(1.08) contrast(1.02) brightness(1.10) !important;
   transform: scale(1.02);
 }
 
@@ -102,10 +102,10 @@
   background-size: cover !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
-  opacity: 0.44 !important; /* Balanced presence: luminous, bright, and legible */
+  opacity: 0.30 !important; /* Soft, transparent hero watermark */
   pointer-events: none;
   z-index: 0;
-  filter: saturate(1.1) contrast(1.02) brightness(1.05) !important;
+  filter: saturate(1.08) contrast(1.02) brightness(1.10) !important;
   transform: scale(1.02);
 }
 

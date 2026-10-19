@@ -9631,6 +9631,11 @@ section.section-gap.padding-top-0 {
   margin-bottom: 0 !important;
 }
 
+.asx-section-bg-watermark img {
+  opacity: 0.32 !important;
+  filter: saturate(1.08) contrast(1.02) brightness(1.10) !important;
+}
+
 .mx-cta-section .mx-watermark-overlay {
   background: linear-gradient(180deg, rgba(248, 250, 252, 0.45) 0%, rgba(248, 250, 252, 0.22) 35%, rgba(248, 250, 252, 0.12) 75%, transparent 100%) !important;
 }

@@ -917,7 +917,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
           if (block.type === "ai") {
             const aiBlock = block as AiBlock;
             const titleLower = aiBlock.title.toLowerCase();
-            const isAiAutomation = titleLower.includes("ai-powered") || titleLower.includes("client acquisition");
+            const isAiAutomation = titleLower.includes("ai-powered");
             const isPipeline = titleLower.includes("built") || titleLower.includes("pipeline") || titleLower.includes("metric");
             const showWatermark = isAiAutomation || !isPipeline;
             const bgImage = isAiAutomation ? images.aiBg : images.ecosystemBg;

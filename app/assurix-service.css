@@ -310,7 +310,7 @@
 .asx-media-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.1) 40%, rgba(0, 0, 0, 0.8) 100%);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.32) 0%, rgba(0, 0, 0, 0.08) 40%, rgba(0, 0, 0, 0.62) 100%);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -2125,7 +2125,7 @@
   position: relative !important;
   overflow: hidden !important;
   isolation: isolate !important;
-  background-color: #f1f5f9 !important;
+  background-color: #f8fafc !important;
 }
 
 .asx-section-bg-watermark {
@@ -2143,8 +2143,8 @@
   height: 100%;
   object-fit: cover;
   object-position: center;
-  opacity: 0.48 !important; /* Balanced transparency: clear visibility without darkness */
-  filter: saturate(1.1) contrast(1.02) brightness(1.05) !important;
+  opacity: 0.32 !important; /* More transparent: soft, subtle watermark that is never dark */
+  filter: saturate(1.08) contrast(1.02) brightness(1.10) !important;
   transform: scale(1.02);
   transition: opacity 0.3s ease;
 }
@@ -2233,6 +2233,7 @@
   object-fit: cover;
   object-position: center;
   display: block;
+  filter: brightness(1.06) contrast(1.02);
 }
 
 /* ========================================================================= */
