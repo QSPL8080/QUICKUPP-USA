@@ -5538,6 +5538,10 @@ section.section-gap.padding-top-0 {
   background-image: url("/images/contact-client-deal.jpg");
 }
 
+.sc-career-page .su-cinematic-bg-media {
+  filter: contrast(106%) brightness(0.60);
+}
+
 .su-cinematic-dark-overlay {
   position: absolute;
   top: 0;

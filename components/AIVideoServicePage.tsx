@@ -117,6 +117,73 @@ function StaggeredDeliverablesSection({
   );
 }
 
+interface SubpageMedia {
+  showcase: string;
+  showcaseBadgeTitle: string;
+  showcaseBadgeSub: string;
+  gallery: string[];
+  ctaBg: string;
+}
+
+const aiVideoSubpageMedia: Record<string, SubpageMedia> = {
+  "AI Avatar Video": {
+    showcase: "https://images.unsplash.com/photo-1573497491765-dccce02b29df?auto=format&fit=crop&w=1200&q=80",
+    showcaseBadgeTitle: "Lifelike Multilingual AI Presenters",
+    showcaseBadgeSub: "Studio-grade digital humans delivering scripts in 140+ languages.",
+    gallery: [
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=800&q=80",
+    ],
+    ctaBg: "https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=1600&q=80",
+  },
+  "AI UGC Video": {
+    showcase: "https://images.unsplash.com/photo-1616469829941-c7200edec809?auto=format&fit=crop&w=1200&q=80",
+    showcaseBadgeTitle: "High-Converting AI UGC Creators",
+    showcaseBadgeSub: "Organic, TikTok-first creator hooks engineered for viral ROAS.",
+    gallery: [
+      "https://images.unsplash.com/photo-1598550476439-6847785fcea6?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1616469829581-73993eb86b02?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1607746882042-944635dfe10e?auto=format&fit=crop&w=800&q=80",
+    ],
+    ctaBg: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=1600&q=80",
+  },
+  "AI Hyper-Realistic Video": {
+    showcase: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=1200&q=80",
+    showcaseBadgeTitle: "Cinematic Hyper-Realistic Synthesis",
+    showcaseBadgeSub: "Hollywood-grade visual storytelling with photorealistic VFX rendering.",
+    gallery: [
+      "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80",
+    ],
+    ctaBg: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&q=80",
+  },
+  "Digital Twin & Clone Video": {
+    showcase: "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&w=1200&q=80",
+    showcaseBadgeTitle: "Biometrically Accurate Digital Twins",
+    showcaseBadgeSub: "Scale your executive presence and voice without manual recording.",
+    gallery: [
+      "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1589903308904-1010c2294adc?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=800&q=80",
+    ],
+    ctaBg: "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=1600&q=80",
+  },
+};
+
 export default function AIVideoServicePage({
   data,
   categoryLabel,
@@ -169,14 +236,8 @@ export default function AIVideoServicePage({
     };
   }, []);
 
-  const videoGallerySamples = [
-    "https://images.unsplash.com/photo-1536240478700-b869070f9279?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1518133910546-b6c2fb7d79e3?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1576828831022-ae4189f50078?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80",
-  ];
+  const activeMedia = aiVideoSubpageMedia[data.crumb] || aiVideoSubpageMedia["AI Avatar Video"];
+  const videoGallerySamples = activeMedia.gallery;
 
   return (
     <div className="sc-career-page">
@@ -341,13 +402,14 @@ export default function AIVideoServicePage({
                     {/* Left Visual */}
                     <div className="sc-choice-left-visual">
                       <img
-                        src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=800&q=80"
+                        src={activeMedia.showcase}
                         alt={blockTitle}
                         className="sc-choice-left-img"
+                        loading="lazy"
                       />
                       <div className="sc-choice-badge-overlay">
-                        <div className="sc-choice-badge-title">Enterprise Video Engine</div>
-                        <p className="sc-choice-badge-sub">High-converting video assets engineered for scale &amp; retention.</p>
+                        <div className="sc-choice-badge-title">{activeMedia.showcaseBadgeTitle}</div>
+                        <p className="sc-choice-badge-sub">{activeMedia.showcaseBadgeSub}</p>
                       </div>
                     </div>
 
@@ -424,7 +486,10 @@ export default function AIVideoServicePage({
           3. CINEMATIC PARALLAX REVEAL CTA BANNER
           ========================================================================= */}
       <section className="su-cinematic-cta-section">
-        <div className="su-cinematic-bg-media" />
+        <div
+          className="su-cinematic-bg-media"
+          style={{ backgroundImage: `url("${activeMedia.ctaBg}")` }}
+        />
         <div className="su-cinematic-dark-overlay" />
         <div className="w-layout-blockcontainer container w-container">
           <div className="su-cinematic-content">
