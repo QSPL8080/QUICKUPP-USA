@@ -127,7 +127,7 @@ interface SubpageMedia {
 
 const aiVideoSubpageMedia: Record<string, SubpageMedia> = {
   "AI Avatar Video": {
-    showcase: "https://images.unsplash.com/photo-1573497491765-dccce02b29df?auto=format&fit=crop&w=1200&q=80",
+    showcase: "https://images.unsplash.com/photo-1573497019236-17f8177b81e8?auto=format&fit=crop&w=1200&q=80",
     showcaseBadgeTitle: "Lifelike Multilingual AI Presenters",
     showcaseBadgeSub: "Studio-grade digital humans delivering scripts in 140+ languages.",
     gallery: [

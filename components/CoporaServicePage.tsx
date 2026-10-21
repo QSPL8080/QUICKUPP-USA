@@ -198,7 +198,7 @@ export default function CoporaServicePage({
       <section className="hero-section">
         <div className="container-medium w-container">
           {/* Breadcrumb Navigation */}
-          <div className="asx-breadcrumb" style={{ justifyContent: "center", marginBottom: "20px" }}>
+          <div className="asx-breadcrumb" style={{ justifyContent: "center", alignSelf: "stretch", width: "100%", textAlign: "center", marginBottom: "20px" }}>
             <Link href="/">Home</Link>
             <span>/</span>
             <span>Services</span>
