@@ -5,15 +5,16 @@
    solid violet accent. Type sizes follow the site-wide scale.
    ========================================================================== */
 .mks-page {
-  --mks-ink: #0e0e13;
-  --mks-body: #4a4f5c;
-  --mks-muted: #6b7180;
-  --mks-line: #e4e4eb;
-  --mks-tint: #f6f6f9;
-  --mks-accent: #5b3df5;
-  --mks-accent-dark: #4527e0;
-  --mks-accent-soft: #efebff;
-  --mks-night: #0f0f17;
+  --mks-ink: #0b0f17;
+  --mks-body: #4b5563;
+  --mks-muted: #64748b;
+  --mks-line: #e6e8ef;
+  --mks-tint: #f6f7fb;
+  --mks-accent: #6366f1;
+  --mks-grad: linear-gradient(135deg, #00d2ff 0%, #6366f1 50%, #a855f7 100%);
+  --mks-accent-dark: #4f46e5;
+  --mks-accent-soft: #f5f5ff;
+  --mks-night: #0b0f17;
   --mks-h1: clamp(32px, 3.6vw, 52px);
   --mks-h2: clamp(27px, 2.6vw, 40px);
   --mks-h3: clamp(16.5px, 1.25vw, 18.5px);
@@ -89,10 +90,12 @@
 
 .mks-tagline {
   margin: 12px 0 0;
-  font-size: clamp(15.5px, 1.15vw, 17px);
+  font-size: 13px;
   font-weight: 700;
-  line-height: 1.45;
-  color: var(--mks-accent);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.5;
+  color: #6366f1;
 }
 
 .mks-eyebrow {
@@ -111,7 +114,7 @@
   content: "";
   width: 28px;
   height: 2px;
-  background: var(--mks-accent);
+  background: var(--mks-grad);
 }
 
 /* ---- Layout helpers ------------------------------------------------------ */
@@ -159,14 +162,18 @@
   justify-content: center;
   gap: 10px;
   min-height: 50px;
-  padding: 12px 22px;
-  border-radius: 8px;
+  padding: 12px 24px;
+  border-radius: 12px;
   font-size: 15px;
   font-weight: 700;
   text-decoration: none;
   text-align: center;
-  border: 1.5px solid transparent;
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  border: 1px solid transparent;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.mks-btn:hover {
+  transform: translateY(-2px);
 }
 
 .mks-btn svg {
@@ -177,44 +184,49 @@
   transform: translateX(3px);
 }
 
+/* Site primary button */
 .mks-btn-accent {
-  background: var(--mks-accent);
+  background: #0b0f17;
   color: #ffffff;
+  box-shadow: 0 10px 24px -10px rgba(11, 15, 23, 0.55);
 }
 
 .mks-btn-accent:hover {
-  background: var(--mks-accent-dark);
   color: #ffffff;
+  box-shadow: 0 16px 30px -12px rgba(11, 15, 23, 0.6);
 }
 
+/* On dark sections */
 .mks-btn-light {
   background: #ffffff;
-  color: var(--mks-ink);
+  color: #0b0f17;
+  box-shadow: 0 10px 24px -12px rgba(0, 0, 0, 0.5);
 }
 
 .mks-btn-light:hover {
-  background: var(--mks-accent-soft);
-  color: var(--mks-ink);
+  color: #0b0f17;
 }
 
 .mks-btn-outline {
-  border-color: var(--mks-ink);
-  color: var(--mks-ink);
+  background: #ffffff;
+  border-color: var(--mks-line);
+  color: #0b0f17;
 }
 
 .mks-btn-outline:hover {
-  background: var(--mks-ink);
-  color: #ffffff;
+  color: #0b0f17;
+  border-color: rgba(99, 102, 241, 0.45);
 }
 
 .mks-btn-outline-light {
-  border-color: rgba(255, 255, 255, 0.6);
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.06);
   color: #ffffff;
 }
 
 .mks-btn-outline-light:hover {
-  background: #ffffff;
-  color: var(--mks-ink);
+  border-color: rgba(255, 255, 255, 0.7);
+  color: #ffffff;
 }
 
 /* ---- Hero ---------------------------------------------------------------- */
@@ -340,7 +352,7 @@
   height: 8px;
   margin-top: 8px;
   flex-shrink: 0;
-  background: var(--mks-accent);
+  background: var(--mks-grad);
 }
 
 /* ---- Detail sections ----------------------------------------------------- */
@@ -406,7 +418,7 @@
   width: 16px;
   height: 2px;
   flex-shrink: 0;
-  background: var(--mks-accent);
+  background: var(--mks-grad);
 }
 
 .mks-note {
@@ -473,7 +485,7 @@
   left: 0;
   width: 44px;
   height: 2px;
-  background: var(--mks-accent);
+  background: var(--mks-grad);
 }
 
 .mks-step-num {
@@ -497,7 +509,7 @@
 }
 
 .mks-ink .mks-tagline {
-  color: #a99bff;
+  color: #a5b4fc;
 }
 
 .mks-ink .mks-text {
@@ -526,7 +538,7 @@
 .mks-why svg {
   flex-shrink: 0;
   margin-top: 2px;
-  color: #a99bff;
+  color: #a5b4fc;
 }
 
 .mks-why-desc {
@@ -600,7 +612,7 @@
   height: 8px;
   flex-shrink: 0;
   border-radius: 50%;
-  background: var(--mks-accent);
+  background: var(--mks-grad);
 }
 
 /* ---- FAQ ----------------------------------------------------------------- */
@@ -690,7 +702,11 @@
 
 /* ---- Closing band -------------------------------------------------------- */
 .mks-closing {
-  background: var(--mks-accent);
+  position: relative;
+  background:
+    radial-gradient(ellipse at 0% 0%, rgba(0, 210, 255, 0.2), transparent 50%),
+    radial-gradient(ellipse at 100% 100%, rgba(168, 85, 247, 0.26), transparent 50%),
+    #0b0f17;
   color: #ffffff;
   padding: clamp(56px, 6vw, 88px) 0;
 }
@@ -717,7 +733,7 @@
 .mks-closing-tagline {
   margin: 0;
   font-weight: 700 !important;
-  color: #ffffff !important;
+  color: #a5b4fc !important;
 }
 
 .mks-closing-actions {

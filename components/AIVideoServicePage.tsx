@@ -9,8 +9,8 @@ import type { AiBlock, ListBlock, ServiceBlock, ServicePageData, WhyChooseBlock 
 
 /*
  * AI Video Production service pages (AI Avatar, AI UGC, AI Hyper-Realistic,
- * Digital Twin & Clone). Own cinematic dark design with the continuous video
- * reel under the hero. Every word comes from the page's data file, in its
+ * Digital Twin & Clone). Own cinematic design (site gradient, fonts and buttons) with the
+ * continuous video reel under the hero. Every word comes from the page's data file, in its
  * original order — the template adds no labels, badges or copy.
  */
 
@@ -78,6 +78,19 @@ const aiVideoSubpageMedia: Record<string, SubpageMedia> = {
   },
 };
 
+/** Puts the last ~45% of a heading in the brand gradient (site-wide style). */
+function GradientHeading({ text }: { text: string }) {
+  const words = text.trim().split(/\s+/);
+  if (words.length < 3) return <span className="qs-gradient-text">{text}</span>;
+  const split = Math.max(1, Math.floor(words.length * 0.55));
+  return (
+    <>
+      {words.slice(0, split).join(" ")}{" "}
+      <span className="qs-gradient-text">{words.slice(split).join(" ")}</span>
+    </>
+  );
+}
+
 const ArrowIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d="M5 12h14" />
@@ -104,10 +117,10 @@ export default function AIVideoServicePage({ data, categoryLabel, categorySlug }
     if (block.type === "list" && isSampleList(block as ListBlock)) {
       const b = block as ListBlock;
       return (
-        <section key={index} className="avs-section">
+        <section key={index} className="avs-section avs-dark">
           <div className="avs-container">
             <div className="avs-head">
-              <h2 className="avs-h2">{b.title}</h2>
+              <h2 className="avs-h2"><GradientHeading text={b.title} /></h2>
               {b.tagline && <p className="avs-tagline">{b.tagline}</p>}
               {b.desc && <p className="avs-text">{b.desc}</p>}
               {b.intro && <p className="avs-text">{b.intro}</p>}
@@ -145,7 +158,7 @@ export default function AIVideoServicePage({ data, categoryLabel, categorySlug }
         <section key={index} className="avs-section">
           <div className="avs-container">
             <div className="avs-head">
-              <h2 className="avs-h2">{b.title}</h2>
+              <h2 className="avs-h2"><GradientHeading text={b.title} /></h2>
               {b.tagline && <p className="avs-tagline">{b.tagline}</p>}
               {b.desc && <p className="avs-text">{b.desc}</p>}
               {b.intro && <p className="avs-text">{b.intro}</p>}
@@ -191,7 +204,7 @@ export default function AIVideoServicePage({ data, categoryLabel, categorySlug }
               <span className="avs-rec" />
             </div>
             <div className="avs-split-body">
-              <h2 className="avs-h2">{b.title}</h2>
+              <h2 className="avs-h2"><GradientHeading text={b.title} /></h2>
               {b.tagline && <p className="avs-tagline">{b.tagline}</p>}
               {b.intro && <p className="avs-text">{b.intro}</p>}
               <ul className="avs-tags">
@@ -220,7 +233,11 @@ export default function AIVideoServicePage({ data, categoryLabel, categorySlug }
         <section key={index} className="avs-section avs-raised">
           <div className="avs-container avs-why">
             <div className="avs-why-head">
-              <h2 className="avs-h2">{b.title}</h2>
+              {b.title && (
+                <h2 className="avs-h2">
+                  <GradientHeading text={b.title} />
+                </h2>
+              )}
               {b.tagline && <p className="avs-tagline">{b.tagline}</p>}
               {b.intro && <p className="avs-text">{b.intro}</p>}
               {b.desc && <p className="avs-text">{b.desc}</p>}
@@ -257,7 +274,7 @@ export default function AIVideoServicePage({ data, categoryLabel, categorySlug }
 
       <main>
         {/* Hero + continuous video reel */}
-        <section className="avs-hero">
+        <section className="avs-hero avs-dark">
           <div className="avs-hero-glow" aria-hidden="true" />
           <div className="avs-container avs-hero-inner">
             <nav className="avs-breadcrumb" aria-label="Breadcrumb">
@@ -275,7 +292,9 @@ export default function AIVideoServicePage({ data, categoryLabel, categorySlug }
             </nav>
 
             {data.heroEyebrow && <p className="avs-eyebrow">{data.heroEyebrow}</p>}
-            <h1 className="avs-h1">{data.heroTitle}</h1>
+            <h1 className="avs-h1">
+              <GradientHeading text={data.heroTitle} />
+            </h1>
             {lead && <p className="avs-lead">{lead}</p>}
             {restParas.map((p, i) => (
               <p key={i} className="avs-text avs-hero-text">
@@ -316,10 +335,10 @@ export default function AIVideoServicePage({ data, categoryLabel, categorySlug }
         {data.blocks.map((block, i) => renderBlock(block, i))}
 
         {/* Closing */}
-        <section className="avs-closing">
+        <section className="avs-closing avs-dark">
           <div className="avs-closing-bg" aria-hidden="true" style={{ backgroundImage: `url("${media.ctaBg}")` }} />
           <div className="avs-container avs-closing-inner">
-            {data.closingTitle && <h2 className="avs-h2 avs-closing-title">{data.closingTitle}</h2>}
+            {data.closingTitle && <h2 className="avs-h2 avs-closing-title"><GradientHeading text={data.closingTitle} /></h2>}
             {(data.closingDesc || "")
               .split(/\n+/)
               .filter(Boolean)

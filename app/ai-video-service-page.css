@@ -1,27 +1,47 @@
 /* ==========================================================================
    AI VIDEO PRODUCTION SERVICE PAGES — scoped under .avs-page
    (AI Avatar, AI UGC, AI Hyper-Realistic, Digital Twin & Clone)
-   Cinematic dark style with a coral accent and a continuous video reel.
+   Cinematic style (site gradient, fonts and buttons) with a continuous video reel.
    Type sizes follow the site-wide scale.
    ========================================================================== */
 .avs-page {
-  --avs-bg: #08080c;
-  --avs-raised: #0f0f15;
-  --avs-card: #14141c;
-  --avs-line: rgba(255, 255, 255, 0.1);
-  --avs-text: rgba(236, 238, 245, 0.78);
-  --avs-white: #f7f7fb;
-  --avs-accent: #ff5a3c;
-  --avs-accent-dark: #ec4426;
+  /* Light (default) */
+  --avs-bg: #ffffff;
+  --avs-raised: #f6f7fb;
+  --avs-card: #ffffff;
+  --avs-card-hover: #f8f8ff;
+  --avs-line: #e6e8ef;
+  --avs-text: #4b5563;
+  --avs-ink: #0b0f17;
+  --avs-chip-bg: #ffffff;
+  --avs-chip-line: #e2e8f0;
+  --avs-accent: #6366f1;
+  --avs-grad: linear-gradient(135deg, #00d2ff 0%, #6366f1 50%, #a855f7 100%);
+  --avs-accent-dark: #4f46e5;
   --avs-h1: clamp(32px, 3.6vw, 52px);
   --avs-h2: clamp(27px, 2.6vw, 40px);
   --avs-h3: clamp(16.5px, 1.25vw, 18.5px);
   --avs-section-y: clamp(64px, 7vw, 104px);
   background: var(--avs-bg);
-  color: var(--avs-white);
+  color: var(--avs-ink);
   font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   overflow-x: clip;
+}
+
+/* Dark sections: hero + reel, video samples, closing */
+.avs-dark {
+  --avs-bg: #08080c;
+  --avs-raised: #0f0f15;
+  --avs-card: #14141c;
+  --avs-card-hover: #181822;
+  --avs-line: rgba(255, 255, 255, 0.1);
+  --avs-text: rgba(236, 238, 245, 0.78);
+  --avs-ink: #f7f7fb;
+  --avs-chip-bg: rgba(255, 255, 255, 0.04);
+  --avs-chip-line: rgba(255, 255, 255, 0.18);
+  background: var(--avs-bg);
+  color: var(--avs-ink);
 }
 
 .avs-page *,
@@ -48,7 +68,7 @@
 .avs-h1,
 .avs-h2 {
   font-family: inherit;
-  color: var(--avs-white);
+  color: var(--avs-ink);
   margin: 0;
 }
 
@@ -74,9 +94,15 @@
 
 .avs-tagline {
   margin: 0;
-  font-size: clamp(15.5px, 1.15vw, 17px);
+  font-size: 13px;
   font-weight: 700;
-  color: var(--avs-accent);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6366f1;
+}
+
+.avs-dark .avs-tagline {
+  color: #a5b4fc;
 }
 
 .avs-eyebrow {
@@ -92,7 +118,7 @@
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--avs-white);
+  color: var(--avs-ink);
 }
 
 .avs-eyebrow::before {
@@ -100,16 +126,16 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--avs-accent);
-  box-shadow: 0 0 0 4px rgba(255, 90, 60, 0.18);
+  background: var(--avs-grad);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.18);
 }
 
 .avs-note {
   margin: 0;
   padding: 16px 20px;
   border-radius: 12px;
-  background: rgba(255, 90, 60, 0.08);
-  border: 1px solid rgba(255, 90, 60, 0.22);
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.22);
   color: var(--avs-text) !important;
 }
 
@@ -160,14 +186,18 @@
   justify-content: center;
   gap: 10px;
   min-height: 50px;
-  padding: 12px 26px;
-  border-radius: 100px;
+  padding: 12px 24px;
+  border-radius: 12px;
   font-size: 15px;
   font-weight: 700;
   text-decoration: none;
   text-align: center;
   border: 1px solid transparent;
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.avs-btn:hover {
+  transform: translateY(-2px);
 }
 
 .avs-btn svg {
@@ -178,24 +208,37 @@
   transform: translateX(3px);
 }
 
+/* Site primary button (light sections) */
 .avs-btn-accent {
-  background: var(--avs-accent);
+  background: #0b0f17;
   color: #ffffff;
+  box-shadow: 0 10px 24px -10px rgba(11, 15, 23, 0.55);
 }
 
 .avs-btn-accent:hover {
-  background: var(--avs-accent-dark);
   color: #ffffff;
+  box-shadow: 0 16px 30px -12px rgba(11, 15, 23, 0.6);
+}
+
+/* On dark sections the primary button is white */
+.avs-dark .avs-btn-accent {
+  background: #ffffff;
+  color: #0b0f17;
+  box-shadow: 0 10px 24px -12px rgba(0, 0, 0, 0.5);
+}
+
+.avs-dark .avs-btn-accent:hover {
+  color: #0b0f17;
 }
 
 .avs-btn-ghost {
-  border-color: rgba(255, 255, 255, 0.28);
-  color: var(--avs-white);
-  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .avs-btn-ghost:hover {
-  border-color: rgba(255, 255, 255, 0.6);
+  border-color: rgba(255, 255, 255, 0.7);
   color: #ffffff;
 }
 
@@ -211,8 +254,8 @@
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse at 50% -10%, rgba(255, 90, 60, 0.22), transparent 55%),
-    radial-gradient(ellipse at 100% 60%, rgba(99, 102, 241, 0.12), transparent 50%);
+    radial-gradient(ellipse at 20% -10%, rgba(0, 210, 255, 0.18), transparent 50%),
+    radial-gradient(ellipse at 85% 0%, rgba(168, 85, 247, 0.22), transparent 50%);
 }
 
 .avs-hero-inner {
@@ -253,10 +296,10 @@
 .avs-page p.avs-lead:not(#_) {
   max-width: 760px;
   margin: 0;
-  font-size: clamp(16.5px, 1.3vw, 19px) !important;
-  font-weight: 600 !important;
-  line-height: 1.6 !important;
-  color: var(--avs-white);
+  font-size: clamp(16px, 1.2vw, 18px) !important;
+  font-weight: 500 !important;
+  line-height: 1.7 !important;
+  color: var(--avs-ink);
 }
 
 .avs-hero-text {
@@ -373,13 +416,17 @@
   font-weight: 700;
   line-height: 1.35;
   letter-spacing: -0.01em;
-  color: var(--avs-white);
+  color: var(--avs-ink);
   transition: border-color 0.25s ease, background-color 0.25s ease;
 }
 
+.avs-page:not(.avs-dark) .avs-formats li {
+  box-shadow: 0 10px 26px -20px rgba(15, 23, 42, 0.35);
+}
+
 .avs-formats li:hover {
-  border-color: rgba(255, 90, 60, 0.55);
-  background: #181822;
+  border-color: rgba(99, 102, 241, 0.55);
+  background: var(--avs-card-hover);
 }
 
 .avs-format-icon {
@@ -389,7 +436,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 90, 60, 0.14);
+  background: rgba(99, 102, 241, 0.14);
   color: var(--avs-accent);
 }
 
@@ -410,7 +457,7 @@
   border-radius: 8px;
   overflow: hidden;
   aspect-ratio: 4 / 4.4;
-  background: #16161e;
+  background: #eef0f6;
 }
 
 .avs-viewfinder-frame img {
@@ -464,8 +511,8 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: var(--avs-accent);
-  box-shadow: 0 0 0 5px rgba(255, 90, 60, 0.25);
+  background: var(--avs-grad);
+  box-shadow: 0 0 0 5px rgba(99, 102, 241, 0.25);
 }
 
 .avs-split-body {
@@ -484,11 +531,11 @@
 .avs-tags li {
   padding: 11px 18px;
   border-radius: 100px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--avs-chip-line);
+  background: var(--avs-chip-bg);
   font-size: 15px;
   font-weight: 700;
-  color: var(--avs-white);
+  color: var(--avs-ink);
 }
 
 /* ---- Video samples ------------------------------------------------------- */
@@ -539,16 +586,16 @@
   align-items: center;
   justify-content: center;
   transform: translate(-50%, -50%);
-  background: var(--avs-accent);
+  background: var(--avs-grad);
   color: #ffffff;
-  box-shadow: 0 0 0 10px rgba(255, 90, 60, 0.2);
+  box-shadow: 0 0 0 10px rgba(99, 102, 241, 0.2);
 }
 
 .avs-sample-label {
   font-size: var(--avs-h3);
   font-weight: 700;
   letter-spacing: -0.01em;
-  color: var(--avs-white);
+  color: var(--avs-ink);
 }
 
 /* ---- Why choose ---------------------------------------------------------- */
@@ -583,7 +630,7 @@
   font-weight: 700;
   line-height: 1.35;
   letter-spacing: -0.01em;
-  color: var(--avs-white);
+  color: var(--avs-ink);
 }
 
 .avs-why-list svg {
@@ -613,7 +660,8 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse at 50% 100%, rgba(255, 90, 60, 0.25), transparent 60%),
+    radial-gradient(ellipse at 15% 100%, rgba(0, 210, 255, 0.18), transparent 55%),
+    radial-gradient(ellipse at 85% 100%, rgba(168, 85, 247, 0.24), transparent 55%),
     linear-gradient(180deg, rgba(8, 8, 12, 0.92) 0%, rgba(8, 8, 12, 0.75) 50%, rgba(8, 8, 12, 0.92) 100%);
 }
 

@@ -52,6 +52,19 @@ const photoSets: Record<string, PhotoSet> = {
 
 const fallbackPhotos = photoSets["Social Media Marketing"];
 
+/** Puts the last ~45% of a heading in the brand gradient (site-wide style). */
+function GradientHeading({ text }: { text: string }) {
+  const words = text.trim().split(/\s+/);
+  if (words.length < 3) return <span className="qs-gradient-text">{text}</span>;
+  const split = Math.max(1, Math.floor(words.length * 0.55));
+  return (
+    <>
+      {words.slice(0, split).join(" ")}{" "}
+      <span className="qs-gradient-text">{words.slice(split).join(" ")}</span>
+    </>
+  );
+}
+
 function ArrowIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -111,7 +124,7 @@ export default function MerkilMarketingServicePage({
   const headRow = (title?: string, tagline?: string, lines: string[] = [], dark = false) => (
     <div className={`mks-headrow${lines.length === 0 ? " is-single" : ""}`}>
       <div>
-        {title && <h2 className={`mks-h2${dark ? " is-light" : ""}`}>{title}</h2>}
+        {title && <h2 className={`mks-h2${dark ? " is-light" : ""}`}><GradientHeading text={title} /></h2>}
         {tagline && !sameText(tagline, title) && <p className="mks-tagline">{tagline}</p>}
       </div>
       {lines.length > 0 && (
@@ -162,7 +175,7 @@ export default function MerkilMarketingServicePage({
           <div className="mks-container mks-detail-grid">
             <div className="mks-detail-head">
               <div className="mks-sticky">
-                <h2 className="mks-h2">{b.title}</h2>
+                <h2 className="mks-h2"><GradientHeading text={b.title} /></h2>
                 {(b.tagline || b.subtitle) && !sameText(b.tagline || b.subtitle, b.title) && (
                   <p className="mks-tagline">{b.tagline || b.subtitle}</p>
                 )}
@@ -285,7 +298,7 @@ export default function MerkilMarketingServicePage({
               <img src={photos.ai} alt="" loading="lazy" />
             </div>
             <div className="mks-ai-body">
-              <h2 className="mks-h2">{b.title}</h2>
+              <h2 className="mks-h2"><GradientHeading text={b.title} /></h2>
               {(b.tagline || b.subtitle) && !sameText(b.tagline || b.subtitle, b.title) && (
                 <p className="mks-tagline">{b.tagline || b.subtitle}</p>
               )}
@@ -327,7 +340,7 @@ export default function MerkilMarketingServicePage({
         <section key={index} className="mks-section mks-tint">
           <div className="mks-container mks-faq-grid">
             <div className="mks-faq-head">
-              {b.title && <h2 className="mks-h2">{b.title}</h2>}
+              {b.title && <h2 className="mks-h2"><GradientHeading text={b.title} /></h2>}
               {b.tagline && !sameText(b.tagline, b.title) && <p className="mks-tagline">{b.tagline}</p>}
               {textLines(b).map((l, i) => (
                 <p key={i} className="mks-text">
@@ -391,7 +404,9 @@ export default function MerkilMarketingServicePage({
             </nav>
 
             {data.heroEyebrow && <p className="mks-eyebrow">{data.heroEyebrow}</p>}
-            <h1 className="mks-h1">{data.heroTitle}</h1>
+            <h1 className="mks-h1">
+              <GradientHeading text={data.heroTitle} />
+            </h1>
             <div className="mks-hero-copy">
               {data.heroParagraphs.map((p, i) => (
                 <p key={i} className="mks-hero-text">
@@ -402,7 +417,7 @@ export default function MerkilMarketingServicePage({
             {heroCtas.length > 0 && (
               <div className="mks-actions">
                 {heroCtas.map((cta, i) => (
-                  <Button key={`${cta.label}-${i}`} href={cta.href} label={cta.label} variant={i === 0 ? "accent" : "outline-light"} />
+                  <Button key={`${cta.label}-${i}`} href={cta.href} label={cta.label} variant={i === 0 ? "light" : "outline-light"} />
                 ))}
               </div>
             )}
@@ -415,7 +430,7 @@ export default function MerkilMarketingServicePage({
         <section className="mks-closing">
           <div className="mks-container mks-closing-grid">
             <div>
-              {data.closingTitle && <h2 className="mks-h2 is-light">{data.closingTitle}</h2>}
+              {data.closingTitle && <h2 className="mks-h2 is-light"><GradientHeading text={data.closingTitle} /></h2>}
               {(data.closingDesc || "")
                 .split(/\n+/)
                 .filter(Boolean)
