@@ -38,7 +38,8 @@ const data: ServicePageData = {
       type: "list",
       title: "Content Marketing Strategy",
       tagline: "Turn Business Goals Into a Content Strategy",
-      desc: "We build content strategies based on your audience, search intent, competitors, customer journey and business objectives. Our strategy includes:",
+      desc: "We build content strategies based on your audience, search intent, competitors, customer journey and business objectives.",
+      intro: "Our strategy includes:",
       items: [
         "Audience Research",
         "Keyword & Topic Research",
@@ -95,11 +96,11 @@ const data: ServicePageData = {
       desc: "We create professional whitepapers and press releases for business communication, thought leadership, education and lead generation.",
       items: [
         {
-          title: "Whitepapers",
+          title: "Whitepapers:",
           desc: "Research, industry reports, technical content, B2B content and thought leadership.",
         },
         {
-          title: "Press Releases",
+          title: "Press Releases:",
           desc: "Company announcements, launches, partnerships, milestones, events and corporate news.",
         },
       ],
@@ -168,7 +169,7 @@ const data: ServicePageData = {
       type: "ai",
       title: "AI-Powered Content Marketing",
       tagline: "Combine AI Efficiency With Human Expertise",
-      desc: "AI supports the workflow while strategy, creativity, editorial judgment and brand expertise remain human-led.",
+      intro: "We use AI to support:",
       bullets: [
         "Topic & Keyword Research",
         "Content Ideation",
@@ -178,6 +179,7 @@ const data: ServicePageData = {
         "Content Repurposing",
         "Performance Analysis",
       ],
+      desc: "AI supports the workflow while strategy, creativity, editorial judgment and brand expertise remain human-led.",
     },
     {
       type: "descPairs",
@@ -186,11 +188,11 @@ const data: ServicePageData = {
       desc: "We transform existing content into new formats and identify opportunities to improve its performance.",
       items: [
         {
-          title: "Repurposing",
+          title: "Repurposing:",
           desc: "Blogs → Social Content | Whitepapers → Blog Series | Research → Infographics | Webinars → Articles",
         },
         {
-          title: "Optimization",
+          title: "Optimization:",
           desc: "Content Audits | Keyword Optimization | Search Intent | Internal Linking | Content Refreshes | Conversion Optimization",
         },
       ],
@@ -199,12 +201,12 @@ const data: ServicePageData = {
       type: "process",
       title: "Our Content Marketing Process",
       steps: [
-        { num: "01", title: "01. Discover", desc: "Understand your business and audience." },
-        { num: "02", title: "02. Research", desc: "Analyze keywords, topics, intent and competitors." },
-        { num: "03", title: "03. Strategize", desc: "Build your customized content plan." },
-        { num: "04", title: "04. Create", desc: "Develop high-quality content assets." },
-        { num: "05", title: "05. Optimize", desc: "Improve SEO, relevance and conversions." },
-        { num: "06", title: "06. Measure", desc: "Track performance and continuously improve." },
+        { num: "01", title: "Discover", desc: "Understand your business and audience." },
+        { num: "02", title: "Research", desc: "Analyze keywords, topics, intent and competitors." },
+        { num: "03", title: "Strategize", desc: "Build your customized content plan." },
+        { num: "04", title: "Create", desc: "Develop high-quality content assets." },
+        { num: "05", title: "Optimize", desc: "Improve SEO, relevance and conversions." },
+        { num: "06", title: "Measure", desc: "Track performance and continuously improve." },
       ],
     },
     {

@@ -85,6 +85,7 @@ export const data: ServicePageData = {
         { num: "06", title: "Test & Optimize", desc: "We test workflows, improve performance and ensure the system works as intended." },
         { num: "07", title: "Launch & Support", desc: "We deploy the solution and provide ongoing optimization and support." },
       ],
+      cta: { label: "Automate Your Business Process", href: "/contact" },
     },
     {
       type: "whyChoose",
@@ -104,6 +105,8 @@ export const data: ServicePageData = {
     },
     {
       type: "industries",
+      title: "Industries We Serve",
+      intro: "Our AI Automation Services can be customized for:",
       industries: [
         "Healthcare",
         "Home Services",
@@ -119,6 +122,7 @@ export const data: ServicePageData = {
     },
     {
       type: "faq",
+      title: "Frequently Asked Questions",
       items: [
         {
           q: "What are AI Automation Solutions?",
@@ -145,11 +149,16 @@ export const data: ServicePageData = {
   ],
   closingTitle: "Ready to Automate Your Business?",
   closingDesc:
-    "Stop spending valuable time on repetitive processes.\nLet Quickupp Softech design intelligent AI automation that helps your team work smarter, respond faster and scale more efficiently.\n\nBuild Your AI-Powered Business\nQuickupp Softech — Marketing. AI. Technology. Built for Growth.",
+    "Stop spending valuable time on repetitive processes.\nLet Quickupp Softech design intelligent AI automation that helps your team work smarter, respond faster and scale more efficiently.",
+  closingTagline: "Build Your AI-Powered Business",
   closingCtas: [
     { label: "Get a Free AI Automation Consultation", href: "/contact" },
     { label: "Talk to Our AI Experts", href: "/contact" },
   ],
+  closingSignature: {
+    name: "Quickupp Softech",
+    line: "Marketing. AI. Technology. Built for Growth.",
+  },
 };
 
 export default data;

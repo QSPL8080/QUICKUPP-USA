@@ -40,7 +40,7 @@ export interface ServiceCategoryMeta {
     label: string;
     desc: string;
     icon: string;
-    template: "merkil" | "ritovex" | "itlifecycle" | "aivideo" | "copora";
+    template: "merkil" | "ritovex" | "itlifecycle" | "aivideo" | "copora" | "aiautomation" | "staffaug";
     data: ServicePageData;
   }[];
 }
@@ -179,7 +179,7 @@ export const serviceCategories: ServiceCategoryMeta[] = [
         label: "AI & Automation Solutions",
         desc: "Automate workflows, CRM sync & enterprise intelligence.",
         icon: "⚡",
-        template: "ritovex",
+        template: "aiautomation",
         data: aiAutomationSolutions,
       },
     ],
@@ -243,7 +243,7 @@ export const serviceCategories: ServiceCategoryMeta[] = [
         label: "Marketing & Design Staff Augmentation",
         desc: "Top 1% vetted growth marketers & designers.",
         icon: "🎨",
-        template: "ritovex",
+        template: "staffaug",
         data: marketingDesignStaffAugmentation,
       },
       {
@@ -251,7 +251,7 @@ export const serviceCategories: ServiceCategoryMeta[] = [
         label: "IT Staff Augmentation",
         desc: "Dedicated senior software engineers & AI devs.",
         icon: "💻",
-        template: "ritovex",
+        template: "staffaug",
         data: itStaffAugmentation,
       },
     ],

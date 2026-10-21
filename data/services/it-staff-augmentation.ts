@@ -13,12 +13,17 @@ export const data: ServicePageData = {
     "Add the Right IT Talent. Build Faster. Scale Smarter.",
   ],
   heroCta: { label: "Build Your IT Team", href: "/contact" },
+  heroCtas: [
+    { label: "Build Your IT Team", href: "/contact" },
+    { label: "Talk to Our Experts", href: "/contact" },
+  ],
+  resourcesTitle: "Our IT Staff Augmentation Services",
+  resourcesIntro: "Access skilled technology professionals across key development and IT functions.",
+  resourcesCta: { label: "Find Your IT Resources", href: "/contact" },
   blocks: [
     {
       type: "ai",
       title: "Software Development Resources",
-      intro:
-        "Access skilled technology professionals across key development and IT functions:",
       bullets: [
         "Frontend Developers",
         "Backend Developers",
@@ -33,8 +38,6 @@ export const data: ServicePageData = {
     {
       type: "ai",
       title: "Technology & Engineering Resources",
-      intro:
-        "Extend your engineering capabilities with specialized technical talent:",
       bullets: [
         "Software Engineers",
         "QA & Testing Professionals",
@@ -45,12 +48,10 @@ export const data: ServicePageData = {
         "Technical Project Managers",
         "Business Analysts",
       ],
-      cta: { label: "Find Your IT Resources", href: "/contact" },
     },
     {
       type: "whyChoose",
       title: "Why Choose Quickupp Softech?",
-      tagline: "Skilled IT Professionals",
       desc: "Our professionals can work as an extension of your existing team while following your tools, development practices, communication processes, and project requirements.",
       bullets: [
         "Skilled IT Professionals",
@@ -117,6 +118,7 @@ export const data: ServicePageData = {
     },
     {
       type: "faq",
+      title: "Frequently Asked Questions",
       items: [
         {
           q: "What is IT Staff Augmentation?",
@@ -142,7 +144,6 @@ export const data: ServicePageData = {
     "Need additional developers? Looking for specialized IT expertise? Want to scale your technology team faster?\n\nQuickupp Softech provides flexible IT Staff Augmentation Services to help businesses access the technical talent they need, when they need it.",
   closingCtas: [
     { label: "Request IT Staff Augmentation", href: "/contact" },
-    { label: "Talk to Our Experts", href: "/contact" },
   ],
 };
 

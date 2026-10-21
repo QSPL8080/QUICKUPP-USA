@@ -135,7 +135,8 @@ const data: ServicePageData = {
       type: "list",
       title: "ChatGPT / AI Ads",
       tagline: "Prepare for the Future of AI Advertising",
-      desc: "We help businesses explore AI advertising and AI-driven customer discovery opportunities as the advertising landscape evolves. AI advertising capabilities continue to evolve, so strategies are aligned with opportunities currently available across relevant platforms and markets.",
+      desc: "We help businesses explore AI advertising and AI-driven customer discovery opportunities as the advertising landscape evolves.",
+      note: "AI advertising capabilities continue to evolve, so strategies are aligned with opportunities currently available across relevant platforms and markets.",
       items: [
         "AI Advertising Strategy",
         "AI Audience Research",
@@ -166,13 +167,13 @@ const data: ServicePageData = {
       type: "process",
       title: "Our Paid Marketing Process",
       steps: [
-        { num: "01", title: "01. Discover", desc: "Understand your business, audience and goals." },
-        { num: "02", title: "02. Research", desc: "Analyze market, competitors and opportunities." },
-        { num: "03", title: "03. Strategize", desc: "Select platforms, audiences and budgets." },
-        { num: "04", title: "04. Build", desc: "Create campaigns, creatives, tracking and targeting." },
-        { num: "05", title: "05. Launch", desc: "Launch with defined performance benchmarks." },
-        { num: "06", title: "06. Optimize", desc: "Test, analyze and improve performance." },
-        { num: "07", title: "07. Scale", desc: "Increase investment in proven opportunities." },
+        { num: "01", title: "Discover", desc: "Understand your business, audience and goals." },
+        { num: "02", title: "Research", desc: "Analyze market, competitors and opportunities." },
+        { num: "03", title: "Strategize", desc: "Select platforms, audiences and budgets." },
+        { num: "04", title: "Build", desc: "Create campaigns, creatives, tracking and targeting." },
+        { num: "05", title: "Launch", desc: "Launch with defined performance benchmarks." },
+        { num: "06", title: "Optimize", desc: "Test, analyze and improve performance." },
+        { num: "07", title: "Scale", desc: "Increase investment in proven opportunities." },
       ],
     },
     {
@@ -194,6 +195,7 @@ const data: ServicePageData = {
     {
       type: "ai",
       title: "AI-Powered Paid Marketing",
+      intro: "We use AI to support:",
       desc: "AI supports our workflow while human strategy and business expertise drive campaign decisions.",
       bullets: [
         "Audience Research",

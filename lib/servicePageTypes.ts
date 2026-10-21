@@ -114,8 +114,17 @@ export interface ServicePageData {
   heroParagraphs: string[];
   heroCta: { label: string; href: string };
   heroCtas?: { label: string; href: string }[];
+  /** Optional heading + intro shown above the resource panels (staff augmentation) */
+  resourcesTitle?: string;
+  resourcesIntro?: string;
+  /** Optional button shown below all resource panels */
+  resourcesCta?: { label: string; href: string };
   blocks: ServiceBlock[];
   closingTitle: string;
   closingDesc: string;
   closingCtas: { label: string; href: string }[];
+  /** Optional short line shown above the closing buttons */
+  closingTagline?: string;
+  /** Optional brand sign-off shown under the closing buttons */
+  closingSignature?: { name: string; line: string };
 }

@@ -13,6 +13,12 @@ export const data: ServicePageData = {
     "Add the Right Talent. Scale Faster. Execute Better.",
   ],
   heroCta: { label: "Build Your Extended Team", href: "/contact" },
+  heroCtas: [
+    { label: "Build Your Extended Team", href: "/contact" },
+    { label: "Talk to Our Experts", href: "/contact" },
+  ],
+  resourcesTitle: "Our Marketing & Design Staff Augmentation Services",
+  resourcesIntro: "Get access to flexible professionals across key marketing and creative functions.",
   blocks: [
     {
       type: "ai",
@@ -49,7 +55,6 @@ export const data: ServicePageData = {
     {
       type: "whyChoose",
       title: "Why Choose Quickupp Softech?",
-      tagline: "Flexible Team Scaling",
       desc: "We work as an extension of your existing team while adapting to your tools, processes, communication style, and project requirements.",
       bullets: [
         "Flexible Team Scaling",
@@ -110,6 +115,7 @@ export const data: ServicePageData = {
     },
     {
       type: "faq",
+      title: "Frequently Asked Questions",
       items: [
         {
           q: "What is Marketing & Design Staff Augmentation?",
@@ -135,7 +141,6 @@ export const data: ServicePageData = {
     "Need more marketing capacity? Looking for experienced design professionals? Want to scale your team without increasing permanent hiring overhead?\n\nQuickupp Softech provides flexible Marketing & Design Staff Augmentation Services to help businesses execute faster and scale efficiently.",
   closingCtas: [
     { label: "Request Staff Augmentation", href: "/contact" },
-    { label: "Talk to Our Experts", href: "/contact" },
   ],
 };
 

@@ -1,0 +1,668 @@
+/* ==========================================================================
+   AI & AUTOMATION SOLUTIONS SERVICE PAGE — scoped under .aia-page
+   ========================================================================== */
+.aia-page {
+  --aia-ink: #0b0f17;
+  --aia-body: #4b5563;
+  --aia-muted: #64748b;
+  --aia-line: #e6e8ef;
+  --aia-soft: #f6f7fb;
+  --aia-grad: linear-gradient(135deg, #00d2ff 0%, #6366f1 50%, #a855f7 100%);
+  --aia-h1: clamp(32px, 3.6vw, 52px);
+  --aia-h2: clamp(27px, 2.6vw, 40px);
+  --aia-h3: clamp(16.5px, 1.25vw, 18.5px);
+  --aia-lead: clamp(16px, 1.2vw, 18px);
+  --aia-body-size: clamp(15px, 1.05vw, 16px);
+  --aia-section-y: clamp(64px, 7vw, 104px);
+  background: #ffffff;
+  color: var(--aia-ink);
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+.aia-page *,
+.aia-page *::before,
+.aia-page *::after {
+  box-sizing: border-box;
+}
+
+.aia-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+}
+
+/* ---- Type ---------------------------------------------------------------- */
+.aia-h1,
+.aia-h2,
+.aia-h3 {
+  font-family: inherit;
+  color: var(--aia-ink);
+  margin: 0;
+}
+
+.aia-h1 {
+  font-size: var(--aia-h1);
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+}
+
+.aia-h2 {
+  font-size: var(--aia-h2);
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.aia-h3 {
+  font-size: var(--aia-h3);
+  line-height: 1.35;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.aia-gradient {
+  background: var(--aia-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.aia-lead {
+  font-size: var(--aia-lead);
+  line-height: 1.7;
+  color: #334155;
+  margin: 0;
+  font-weight: 500;
+}
+
+.aia-text {
+  font-size: var(--aia-body-size);
+  line-height: 1.7;
+  color: var(--aia-body);
+  margin: 0;
+}
+
+.aia-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 100px;
+  background: rgba(15, 23, 42, 0.04);
+  border: 1px solid rgba(15, 23, 42, 0.09);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #0f172a;
+}
+
+.aia-pill::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--aia-grad);
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.55);
+}
+
+.aia-tagline {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6366f1;
+}
+
+/* ---- Layout helpers ------------------------------------------------------ */
+.aia-section {
+  padding: var(--aia-section-y) 0;
+  position: relative;
+}
+
+.aia-soft {
+  background: var(--aia-soft);
+}
+
+.aia-head {
+  text-align: center;
+  max-width: 760px;
+  margin: 0 auto clamp(36px, 4vw, 56px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.aia-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 32px;
+}
+
+.aia-center {
+  justify-content: center;
+  margin-top: clamp(36px, 4vw, 52px);
+}
+
+/* ---- Buttons ------------------------------------------------------------- */
+.aia-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 50px;
+  padding: 12px 14px 12px 24px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  text-align: center;
+}
+
+.aia-btn:hover {
+  transform: translateY(-2px);
+}
+
+.aia-btn-dark {
+  background: #0b0f17;
+  color: #ffffff;
+  box-shadow: 0 10px 24px -10px rgba(11, 15, 23, 0.55);
+}
+
+.aia-btn-dark:hover {
+  box-shadow: 0 16px 30px -12px rgba(11, 15, 23, 0.6);
+}
+
+.aia-btn-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.aia-btn-light {
+  background: #ffffff;
+  color: #0b0f17;
+  border: 1px solid var(--aia-line);
+  padding: 12px 24px;
+}
+
+/* ---- Transparent photo backgrounds --------------------------------------- */
+.aia-has-bg {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.aia-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.aia-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.6;
+  transform: scale(1.04);
+}
+
+.aia-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 10% 0%, rgba(0, 210, 255, 0.14), transparent 55%),
+    radial-gradient(ellipse at 92% 100%, rgba(168, 85, 247, 0.16), transparent 55%),
+    linear-gradient(180deg, rgba(248, 250, 252, 0.86) 0%, rgba(248, 250, 252, 0.5) 40%, rgba(248, 250, 252, 0.5) 60%, rgba(248, 250, 252, 0.88) 100%);
+}
+
+/* ---- Hero ---------------------------------------------------------------- */
+.aia-hero {
+  padding: clamp(120px, 12vw, 160px) 0 clamp(64px, 7vw, 100px);
+  background: #f8fafc;
+}
+
+.aia-hero-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 18px;
+}
+
+.aia-breadcrumb {
+  justify-content: center;
+  width: 100%;
+  margin: 0 0 14px !important;
+}
+
+.aia-hero .aia-h1 {
+  max-width: 920px;
+}
+
+.aia-hero-copy {
+  max-width: 780px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.aia-hero .aia-actions {
+  justify-content: center;
+  margin-top: 12px;
+}
+
+/* ---- Services grid ------------------------------------------------------- */
+.aia-service-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.aia-service-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 28px 26px;
+  border-radius: 20px;
+  background: #ffffff;
+  border: 1px solid var(--aia-line);
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.aia-service-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(99, 102, 241, 0.3);
+  box-shadow: 0 18px 36px -18px rgba(79, 70, 229, 0.35);
+}
+
+.aia-icon-tile {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #4f46e5;
+  background: linear-gradient(135deg, rgba(0, 210, 255, 0.12), rgba(168, 85, 247, 0.14));
+  border: 1px solid rgba(99, 102, 241, 0.16);
+  margin-bottom: 6px;
+}
+
+/* ---- Business growth (dark) --------------------------------------------- */
+.aia-dark {
+  background: #070b16;
+}
+
+.aia-dark .aia-bg img {
+  opacity: 0.75;
+}
+
+.aia-dark .aia-bg::after {
+  background:
+    radial-gradient(ellipse at 88% 10%, rgba(0, 210, 255, 0.22), transparent 55%),
+    radial-gradient(ellipse at 8% 95%, rgba(168, 85, 247, 0.28), transparent 55%),
+    linear-gradient(115deg, rgba(7, 11, 22, 0.88) 0%, rgba(12, 18, 36, 0.66) 50%, rgba(30, 27, 75, 0.5) 100%);
+}
+
+.aia-dark .aia-h2 {
+  color: #ffffff;
+}
+
+.aia-dark .aia-lead {
+  color: rgba(226, 232, 240, 0.85);
+}
+
+.aia-growth {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: clamp(32px, 5vw, 72px);
+  align-items: center;
+}
+
+.aia-growth-head {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.aia-check-grid,
+.aia-why-grid,
+.aia-chips,
+.aia-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.aia-check-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.aia-check-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 18px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.aia-check {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #ffffff;
+  background: var(--aia-grad);
+}
+
+/* ---- Process ------------------------------------------------------------- */
+.aia-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.aia-step {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px 22px;
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid var(--aia-line);
+  position: relative;
+}
+
+.aia-step:nth-child(5) {
+  grid-column-start: 1;
+}
+
+.aia-step-num {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  background: var(--aia-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.aia-step .aia-h3 {
+  margin-bottom: 6px;
+}
+
+/* ---- Why choose ---------------------------------------------------------- */
+.aia-why-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.aia-why-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid var(--aia-line);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--aia-ink);
+  line-height: 1.35;
+}
+
+.aia-statement {
+  max-width: 760px;
+  margin: clamp(32px, 4vw, 48px) auto 0;
+  text-align: center;
+  font-size: clamp(18px, 1.6vw, 22px);
+  line-height: 1.5;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--aia-ink);
+}
+
+/* ---- Industries ---------------------------------------------------------- */
+.aia-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.aia-chip {
+  padding: 12px 22px;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid var(--aia-line);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--aia-ink);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* ---- FAQ ----------------------------------------------------------------- */
+.aia-faq-wrap {
+  max-width: 880px;
+}
+
+.aia-faq {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.aia-faq-item {
+  border-radius: 16px;
+  border: 1px solid var(--aia-line);
+  background: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.aia-faq-item.is-open {
+  border-color: rgba(99, 102, 241, 0.3);
+  box-shadow: 0 12px 28px -18px rgba(79, 70, 229, 0.35);
+}
+
+.aia-faq-q {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 22px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  font-size: var(--aia-h3);
+  font-weight: 700;
+  color: var(--aia-ink);
+}
+
+.aia-faq-sign {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.aia-faq-sign::before,
+.aia-faq-sign::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  width: 14px;
+  height: 2px;
+  border-radius: 2px;
+  background: #0b0f17;
+  transition: transform 0.2s ease;
+}
+
+.aia-faq-sign::after {
+  transform: rotate(90deg);
+}
+
+.aia-faq-item.is-open .aia-faq-sign::after {
+  transform: rotate(0deg);
+}
+
+.aia-faq-a {
+  margin: 0;
+  padding: 0 22px 22px;
+  font-size: var(--aia-body-size);
+  line-height: 1.7;
+  color: var(--aia-body);
+}
+
+/* ---- Closing CTA --------------------------------------------------------- */
+.aia-closing-section {
+  padding-top: 0;
+}
+
+.aia-closing {
+  border-radius: 32px;
+  padding: clamp(48px, 6vw, 84px) clamp(24px, 5vw, 64px);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  background: #ede4ff;
+  border: 1px solid rgba(139, 92, 246, 0.18);
+}
+
+.aia-closing .aia-bg::after {
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.55), transparent 60%),
+    linear-gradient(180deg, rgba(237, 228, 255, 0.72) 0%, rgba(237, 228, 255, 0.55) 50%, rgba(224, 231, 255, 0.8) 100%);
+}
+
+.aia-closing .aia-h2 {
+  margin-bottom: 6px;
+}
+
+.aia-closing .aia-lead,
+.aia-closing .aia-text {
+  max-width: 720px;
+}
+
+.aia-closing-tagline {
+  margin: 10px 0 0;
+  font-size: var(--aia-h3);
+  font-weight: 800;
+  color: var(--aia-ink);
+}
+
+.aia-closing .aia-actions {
+  margin-top: 18px;
+}
+
+.aia-signature {
+  margin-top: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 14px;
+  color: var(--aia-muted);
+}
+
+.aia-signature strong {
+  font-size: 15px;
+  color: var(--aia-ink);
+}
+
+/* ---- Responsive ---------------------------------------------------------- */
+@media (max-width: 1100px) {
+  .aia-steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .aia-step:nth-child(5) {
+    grid-column-start: auto;
+  }
+  .aia-why-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 991px) {
+  .aia-service-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .aia-growth {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .aia-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .aia-container {
+    padding: 0 16px;
+  }
+  .aia-service-grid,
+  .aia-check-grid,
+  .aia-steps,
+  .aia-why-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .aia-actions .aia-btn {
+    width: 100%;
+  }
+  .aia-closing {
+    border-radius: 22px;
+  }
+}
+
+/* The site-wide button rule in globals.css styles every <button> with
+   !important; the :not(#_) adds enough specificity for the FAQ toggles. */
+.aia-page button.aia-faq-q:not(#_) {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  width: 100%;
+  font-size: var(--aia-h3) !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em !important;
+  border-radius: 16px !important;
+  text-align: left;
+}
