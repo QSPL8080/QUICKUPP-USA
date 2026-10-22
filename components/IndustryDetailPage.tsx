@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import IndustryMotion from "@/components/IndustryMotion";
 import type {
   ServicePageData,
   DescPairsBlock,
@@ -1246,6 +1247,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
         </section>
       </main>
 
+      <IndustryMotion seed={(data.crumb || "").length} />
       <Footer />
     </div>
   );
