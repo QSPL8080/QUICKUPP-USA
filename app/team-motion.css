@@ -1,0 +1,204 @@
+/* ==========================================================================
+   STAFF AUGMENTATION SUBPAGES — scroll-in motion (components/TeamMotion.tsx)
+   Motion only: elements return to their normal styles once revealed.
+   ========================================================================== */
+.sm-pending {
+  opacity: 0;
+}
+
+.sm-in {
+  animation-duration: 0.9s;
+  animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+  animation-fill-mode: both;
+  animation-delay: var(--sm-delay, 0s);
+}
+
+/* Headings: drop into place from above behind a top-down mask */
+.sm-descend,
+.sm-descend-lg {
+  animation-name: sm-descend;
+  animation-duration: 1s;
+}
+
+.sm-descend-lg {
+  animation-duration: 1.25s;
+}
+
+@keyframes sm-descend {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -0.45em, 0);
+    clip-path: inset(-20% -5% 100% -5%);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(-20% -5% -25% -5%);
+  }
+}
+
+/* Hero pieces / middle of rows: quiet materialise */
+.sm-materialize {
+  animation-name: sm-materialize;
+  animation-duration: 0.8s;
+}
+
+@keyframes sm-materialize {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Text: a clean fade in place */
+.sm-fade {
+  animation-name: sm-fade;
+  animation-duration: 0.9s;
+  animation-timing-function: ease-out;
+}
+
+@keyframes sm-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Images: rise up behind a bottom-up curtain */
+.sm-curtain {
+  animation-name: sm-curtain;
+  animation-duration: 1.2s;
+  animation-timing-function: cubic-bezier(0.65, 0, 0.25, 1);
+}
+
+@keyframes sm-curtain {
+  from {
+    opacity: 0.4;
+    clip-path: inset(100% 0 0 0);
+    transform: translate3d(0, 24px, 0);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transform: none;
+  }
+}
+
+/* Side-by-side rows: open out from the seam between the two halves */
+.sm-seam-l {
+  animation-name: sm-seam-l;
+  animation-duration: 1s;
+}
+
+.sm-seam-r {
+  animation-name: sm-seam-r;
+  animation-duration: 1s;
+}
+
+@keyframes sm-seam-l {
+  from {
+    opacity: 0;
+    transform: translate3d(28px, 0, 0) scale(0.96);
+    transform-origin: 100% 50%;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    transform-origin: 100% 50%;
+  }
+}
+
+@keyframes sm-seam-r {
+  from {
+    opacity: 0;
+    transform: translate3d(-28px, 0, 0) scale(0.96);
+    transform-origin: 0% 50%;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    transform-origin: 0% 50%;
+  }
+}
+
+/* Cards: alternate cards meet from above and below */
+.sm-meet-t {
+  animation-name: sm-meet-t;
+}
+
+.sm-meet-b {
+  animation-name: sm-meet-b;
+}
+
+@keyframes sm-meet-t {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -30px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes sm-meet-b {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 30px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Cards: grow up from their base */
+.sm-grow {
+  animation-name: sm-grow;
+}
+
+@keyframes sm-grow {
+  from {
+    opacity: 0;
+    transform: scaleY(0.82);
+    transform-origin: 50% 100%;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    transform-origin: 50% 100%;
+  }
+}
+
+/* Cards: ease down from a slight zoom */
+.sm-zoom-out {
+  animation-name: sm-zoom-out;
+  animation-duration: 1s;
+}
+
+@keyframes sm-zoom-out {
+  from {
+    opacity: 0;
+    transform: scale(1.07);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sm-pending {
+    opacity: 1;
+  }
+
+  .sm-in {
+    animation: none !important;
+  }
+}

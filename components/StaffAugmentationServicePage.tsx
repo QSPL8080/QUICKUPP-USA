@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import TeamMotion from "@/components/TeamMotion";
 import "@/app/staff-augmentation-service.css";
 import type {
   AiBlock,
@@ -448,6 +449,7 @@ export default function StaffAugmentationServicePage({
         </section>
       </main>
 
+      <TeamMotion />
       <Footer />
     </div>
   );

@@ -23,6 +23,8 @@ export interface MotionPreset {
   items: string[];
   /** Elements matching this selector are left alone (e.g. ones with their own scroll effect) */
   skip?: string;
+  /** In the hero, animate the pieces inside side-by-side columns one by one */
+  heroDeep?: boolean;
   /** Delay between cards in a group (seconds) */
   stagger: number;
   /** Delay between steps of the hero timeline (seconds) */
@@ -146,6 +148,10 @@ export function setupScrollMotion(root: HTMLElement, preset: MotionPreset, seed 
         }
         if (isMedia(child) && rect.height < 1100) {
           add(child, preset.media);
+          continue;
+        }
+        if (isHero && preset.heroDeep && isSplitRow(child)) {
+          walk(child, depth + 1);
           continue;
         }
         if (!blocked.has(child) && depth <= 4 && isSplitRow(child)) {
