@@ -58,7 +58,6 @@ QUICKUPP-USA/
 │   ├── privacy-policy/                 # GDPR / CCPA privacy policy
 │   ├── services/                       # Service categories & sub-services
 │   │   ├── ai-automation-solutions/    # Autonomous AI agents & RAG workflows
-│   │   ├── ai-video-production/        # Avatar, UGC & AI video generation
 │   │   ├── information-technology-services/ # Custom software, apps & web systems
 │   │   ├── marketing-design-staff-augmentation/ # Dedicated remote tech & design talent
 │   │   ├── marketing-services/         # Performance marketing, SEO & AEO/GEO

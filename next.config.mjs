@@ -16,11 +16,13 @@ const nextConfig = {
       { source: "/services/sms-marketing", destination: "/services/ai-powered-digital-marketing-services/sms-marketing", permanent: true },
       { source: "/services/whatsapp-marketing", destination: "/services/ai-powered-digital-marketing-services/whatsapp-marketing", permanent: true },
 
-      // AI Video Production
-      { source: "/services/ai-avatar-video", destination: "/services/ai-video-production/ai-avatar-video", permanent: true },
-      { source: "/services/ai-ugc-video", destination: "/services/ai-video-production/ai-ugc-video", permanent: true },
-      { source: "/services/ai-hyper-realistic-video", destination: "/services/ai-video-production/ai-hyper-realistic-video", permanent: true },
-      { source: "/services/digital-twin-clone-video", destination: "/services/ai-video-production/digital-twin-clone-video", permanent: true },
+      // AI Video Production lives on Quickupp AI Studio — old URLs go there
+      { source: "/services/ai-video-production", destination: "https://quickuppaistudio.us/", permanent: false },
+      { source: "/services/ai-video-production/:path*", destination: "https://quickuppaistudio.us/", permanent: false },
+      { source: "/services/ai-avatar-video", destination: "https://quickuppaistudio.us/", permanent: false },
+      { source: "/services/ai-ugc-video", destination: "https://quickuppaistudio.us/", permanent: false },
+      { source: "/services/ai-hyper-realistic-video", destination: "https://quickuppaistudio.us/", permanent: false },
+      { source: "/services/digital-twin-clone-video", destination: "https://quickuppaistudio.us/", permanent: false },
 
       // Information Technology Services
       { source: "/services/web-design-development", destination: "/services/information-technology-services/web-design-development", permanent: true },

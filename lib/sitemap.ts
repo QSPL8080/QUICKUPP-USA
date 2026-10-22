@@ -4,6 +4,8 @@ export interface NavItem {
   desc?: string;
   icon?: string;
   built?: boolean;
+  /** Opens another website in a new tab */
+  external?: boolean;
 }
 
 export interface NavGroup {
@@ -29,10 +31,7 @@ export const serviceGroups: NavGroup[] = [
   {
     label: "AI Video Production",
     items: [
-      { label: "AI Avatar Video", href: "/services/ai-video-production/ai-avatar-video", desc: "Lifelike multilingual AI presenters in minutes.", icon: "👤", built: true },
-      { label: "AI UGC Video", href: "/services/ai-video-production/ai-ugc-video", desc: "Authentic user-generated style videos at scale.", icon: "🤳", built: true },
-      { label: "AI Hyper-Realistic Video", href: "/services/ai-video-production/ai-hyper-realistic-video", desc: "Cinematic quality AI visuals for campaigns.", icon: "🎥", built: true },
-      { label: "Digital Twin & Clone Video", href: "/services/ai-video-production/digital-twin-clone-video", desc: "Scale your executive presence with custom clones.", icon: "👥", built: true },
+      { label: "AI Video Production", href: "https://quickuppaistudio.us/", built: true, external: true },
     ],
   },
   {

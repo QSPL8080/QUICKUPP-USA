@@ -11,12 +11,6 @@ import emailMarketing from "@/data/services/email-marketing";
 import smsMarketing from "@/data/services/sms-marketing";
 import whatsappMarketing from "@/data/services/whatsapp-marketing";
 
-// AI Video Production
-import aiAvatarVideo from "@/data/services/ai-avatar-video";
-import aiUgcVideo from "@/data/services/ai-ugc-video";
-import aiHyperRealisticVideo from "@/data/services/ai-hyper-realistic-video";
-import digitalTwinCloneVideo from "@/data/services/digital-twin-clone-video";
-
 // AI & Automation Solutions
 import aiAutomationSolutions from "@/data/services/ai-automation-solutions";
 
@@ -40,7 +34,7 @@ export interface ServiceCategoryMeta {
     label: string;
     desc: string;
     icon: string;
-    template: "merkil" | "ritovex" | "itlifecycle" | "aivideo" | "copora" | "aiautomation" | "staffaug";
+    template: "merkil" | "ritovex" | "itlifecycle" | "copora" | "aiautomation" | "staffaug";
     data: ServicePageData;
   }[];
 }
@@ -125,46 +119,6 @@ export const serviceCategories: ServiceCategoryMeta[] = [
         icon: "📲",
         template: "merkil",
         data: whatsappMarketing,
-      },
-    ],
-  },
-  {
-    categorySlug: "ai-video-production",
-    categoryLabel: "AI Video Production",
-    categoryDesc:
-      "Generate studio-grade, hyper-realistic, and multilingual video content with cutting-edge AI avatars, clones, and synthesis.",
-    services: [
-      {
-        slug: "ai-avatar-video",
-        label: "AI Avatar Video",
-        desc: "Lifelike multilingual AI presenters in minutes.",
-        icon: "👤",
-        template: "aivideo",
-        data: aiAvatarVideo,
-      },
-      {
-        slug: "ai-ugc-video",
-        label: "AI UGC Video",
-        desc: "Authentic user-generated style videos at scale.",
-        icon: "🤳",
-        template: "aivideo",
-        data: aiUgcVideo,
-      },
-      {
-        slug: "ai-hyper-realistic-video",
-        label: "AI Hyper-Realistic Video",
-        desc: "Cinematic quality AI visuals for campaigns.",
-        icon: "🎥",
-        template: "aivideo",
-        data: aiHyperRealisticVideo,
-      },
-      {
-        slug: "digital-twin-clone-video",
-        label: "Digital Twin & Clone Video",
-        desc: "Scale your executive presence with custom clones.",
-        icon: "👥",
-        template: "aivideo",
-        data: digitalTwinCloneVideo,
       },
     ],
   },

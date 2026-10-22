@@ -2,8 +2,6 @@
 @import "./ritovex-service.css";
 @import "./css/mindix-about.css";
 
-
-
 :root {
   --primary-color: #0f172a !important;
   --heading-color: #0f172a !important;
@@ -2720,8 +2718,6 @@ a.button-link[data-wf--button--variant="white-bg"] .button-arrow,
   pointer-events: auto !important;
 }
 
-
-
 /* ==========================================================================
    TEAM SECTION
    ========================================================================== */
@@ -3115,7 +3111,6 @@ section.section-gap.padding-top-0 {
     padding-top: 36px !important;
   }
 }
-
 
 /* ==========================================================================
    QUICKUPP FLOATING CAPSULE HEADER & NAVBAR (MATCHING REFERENCE UI)
@@ -3705,8 +3700,6 @@ section.section-gap.padding-top-0 {
   }
 }
 
-
-
 /* ==========================================================================
    QUICKUPP RADIANT GRADIENT FOOTER
    ========================================================================== */
@@ -4130,7 +4123,6 @@ section.section-gap.padding-top-0 {
   transform: translateY(-2px);
   box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
 }
-
 
 /* ==========================================================================
    QUICKUPP ULTRA-TRENDY COMPACT CAREER & CONTACT DESIGN SYSTEM
@@ -5776,8 +5768,7 @@ section.section-gap.padding-top-0 {
   text-align: center;
 }
 
-.sc-badge,
-.sc-manifesto-badge {
+.sc-badge {
   display: inline-flex !important;
   align-items: center !important;
   gap: 8px !important;
@@ -5842,66 +5833,6 @@ section.section-gap.padding-top-0 {
 }
 
 /* 4-Card Perks Grid */
-.sc-perks-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-top: 10px;
-}
-
-@media (max-width: 1024px) {
-  .sc-perks-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 600px) {
-  .sc-perks-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.sc-perk-card {
-  background: #ffffff;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 16px;
-  padding: 22px 20px;
-  text-align: left;
-  transition: all 0.25s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
-}
-
-.sc-perk-card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(99, 102, 241, 0.3);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.05);
-}
-
-.sc-perk-icon-wrap {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: rgba(56, 189, 248, 0.08);
-  color: #0284c7;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 12px;
-}
-
-.sc-perk-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: #0f172a;
-  margin-bottom: 6px;
-}
-
-.sc-perk-desc {
-  font-size: 13px;
-  color: #64748b;
-  line-height: 1.45;
-  margin: 0;
-}
 
 /* 2. Trusted by Leading Brands (Marquee) */
 .sc-trusted-section {
@@ -5974,16 +5905,6 @@ section.section-gap.padding-top-0 {
   .sc-manifesto-center-wrap {
     margin-bottom: 32px;
   }
-}
-
-.sc-manifesto-badge {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #6366f1;
-  margin-bottom: 20px;
-  display: inline-block;
 }
 
 .sc-manifesto-text-center {
@@ -6648,165 +6569,8 @@ section.section-gap.padding-top-0 {
 /* =========================================================================
    AI VIDEO SERVICE SUBPAGES (Deliverables, Choice Grid, Why Choose Cards)
    ========================================================================= */
-.sc-values-compact-section {
-  padding: clamp(60px, 7vw, 90px) 0;
-  background: #ffffff;
-  border-top: 1px solid rgba(15, 23, 42, 0.05);
-}
-
-.sc-values-compact-header {
-  text-align: center;
-  max-width: 720px;
-  margin: 0 auto clamp(36px, 4vw, 52px);
-}
-
-.sc-values-compact-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
-}
-
-@media (max-width: 991px) {
-  .sc-values-compact-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
-  }
-}
-
-@media (max-width: 640px) {
-  .sc-values-compact-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-}
-
-.sc-values-compact-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: 140px;
-  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
-  position: relative;
-  overflow: hidden;
-  opacity: 0;
-  transform: translateY(20px);
-}
-
-.sc-values-compact-grid.is-in-view .sc-values-compact-card {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.sc-values-compact-card:hover {
-  transform: translateY(-4px);
-  border-color: #6366f1;
-  box-shadow: 0 14px 28px -4px rgba(99, 102, 241, 0.12);
-}
-
-.sc-values-card-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  margin-bottom: 14px;
-}
-
-.sc-values-compact-number {
-  font-family: var(--font-mono, monospace);
-  font-size: 13px;
-  font-weight: 700;
-  color: #6366f1;
-  background: rgba(99, 102, 241, 0.08);
-  padding: 3px 9px;
-  border-radius: 6px;
-  letter-spacing: 0.05em;
-}
-
-.sc-values-card-indicator {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  color: #94a3b8;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.25s ease;
-}
-
-.sc-values-compact-card:hover .sc-values-card-indicator {
-  background: #6366f1;
-  color: #ffffff;
-  border-color: #6366f1;
-  transform: translate(2px, -2px);
-}
-
-.sc-values-compact-title {
-  font-family: var(--font-heading) !important;
-  font-size: 17px !important;
-  font-weight: 600 !important;
-  color: #0b0f17 !important;
-  margin: 0 !important;
-  line-height: 1.35 !important;
-  letter-spacing: -0.015em !important;
-}
 
 /* AI / Perfect For Split Grid Cards */
-.sc-choice-cards-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 4px;
-}
-
-@media (max-width: 600px) {
-  .sc-choice-cards-grid {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-}
-
-.sc-choice-item-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 12px 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
-  transition: all 0.22s ease;
-}
-
-.sc-choice-item-card:hover {
-  transform: translateY(-2px);
-  border-color: #7c3aed;
-  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.08);
-}
-
-.sc-choice-card-icon-wrap {
-  width: 26px;
-  height: 26px;
-  border-radius: 7px;
-  background: rgba(124, 58, 237, 0.08);
-  color: #7c3aed;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: all 0.2s ease;
-}
-
-.sc-choice-item-card:hover .sc-choice-card-icon-wrap {
-  background: #7c3aed;
-  color: #ffffff;
-}
 
 .sc-choice-item-title {
   font-family: var(--font-heading) !important;
@@ -6817,80 +6581,6 @@ section.section-gap.padding-top-0 {
 }
 
 /* Dedicated Why Choose Video Section */
-.sc-why-choose-video-section {
-  padding: clamp(60px, 7vw, 90px) 0;
-  background: #ffffff;
-  border-top: 1px solid rgba(15, 23, 42, 0.05);
-}
-
-.sc-why-choose-cards-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-  max-width: 1060px;
-  margin: 0 auto;
-}
-
-@media (max-width: 991px) {
-  .sc-why-choose-cards-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px;
-  }
-}
-
-@media (max-width: 640px) {
-  .sc-why-choose-cards-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-}
-
-.sc-why-choose-card {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  padding: 16px 20px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  transition: all 0.25s ease;
-}
-
-.sc-why-choose-card:hover {
-  background: #ffffff;
-  transform: translateY(-2px);
-  border-color: #10b981;
-  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.08);
-}
-
-.sc-why-choose-icon-box {
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-  background: rgba(16, 185, 129, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: all 0.25s ease;
-}
-
-.sc-why-choose-card:hover .sc-why-choose-icon-box {
-  background: #10b981;
-}
-
-.sc-why-choose-card:hover .sc-why-choose-icon-box svg path {
-  stroke: #ffffff;
-}
-
-.sc-why-choose-card-title {
-  font-family: var(--font-heading) !important;
-  font-size: 15px !important;
-  font-weight: 600 !important;
-  color: #0b0f17 !important;
-  margin: 0 !important;
-  line-height: 1.35 !important;
-}
 
 /* 7. Employee Testimonials */
 .sc-testimonials-section {
@@ -9663,8 +9353,6 @@ section.section-gap.padding-top-0 {
 /* 1. Universal Topic Badge Container (Pill Style) */
 .mx-sub-badge,
 .mx-subtitle-badge,
-.sc-values-badge,
-.sc-manifesto-badge,
 .sc-badge,
 .sc-dept-badge,
 .sc-hero-badge,
@@ -9720,7 +9408,6 @@ section.section-gap.padding-top-0 {
 
 /* 2. Universal Glowing Radiant Dot (Built-in elements) */
 .mx-badge-dot,
-.sc-values-badge-dot,
 .sc-badge-dot,
 .lc-badge-dot,
 .asx-tag-dot,
@@ -9759,7 +9446,6 @@ section.section-gap.padding-top-0 {
 .section-tag:not(:has(.badge-dot))::before,
 .topic-eyebrow:not(:has(.badge-dot))::before,
 .hero-eyebrow:not(:has(.badge-dot))::before,
-.sc-manifesto-badge:not(:has(.sc-badge-dot))::before,
 .asx-media-badge:not(:has(.asx-tag-dot))::before,
 .mx-sub-badge:not(:has(.mx-badge-dot))::before,
 .mx-subtitle-badge:not(:has(.mx-badge-dot))::before,
@@ -9792,7 +9478,6 @@ section.section-gap.padding-top-0 {
 .subtitle-head,
 .merkil-page-wrapper .section-badge span,
 .lc-badge span,
-.sc-values-badge span,
 .mx-sub-badge span,
 .mx-subtitle-badge span,
 .res-tag span,
@@ -9994,4 +9679,16 @@ a.secondary-button,
 }
 
 
+/* Mega menu: "AI Video Production" column title links to Quickupp AI Studio */
+.qs-mega-col-title.qs-mega-col-title-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
 
+.qs-mega-col-title.qs-mega-col-title-link:hover {
+  color: #6366f1 !important;
+}

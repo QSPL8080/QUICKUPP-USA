@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import MerkilMarketingServicePage from "@/components/MerkilMarketingServicePage";
-import AIVideoServicePage from "@/components/AIVideoServicePage";
 import RitovexServicePage from "@/components/RitovexServicePage";
 import ITLifecycleServicePage from "@/components/ITLifecycleServicePage";
 import CoporaServicePage from "@/components/CoporaServicePage";
@@ -49,16 +48,6 @@ export default async function ServicePage({ params }: PageProps) {
   if (match.service.template === "merkil") {
     return (
       <MerkilMarketingServicePage
-        data={match.service.data}
-        categoryLabel={match.category.categoryLabel}
-        categorySlug={match.category.categorySlug}
-      />
-    );
-  }
-
-  if (match.service.template === "aivideo") {
-    return (
-      <AIVideoServicePage
         data={match.service.data}
         categoryLabel={match.category.categoryLabel}
         categorySlug={match.category.categorySlug}

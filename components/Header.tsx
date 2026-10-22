@@ -158,21 +158,18 @@ export default function Header() {
 
                       {/* Col 2: AI Video Production & AI & Automation Solutions */}
                       <div className="qs-mega-col">
-                        <div className="qs-mega-col-title">AI Video Production</div>
-                        <div className="qs-mega-col-links">
-                          {serviceGroups[1]?.items.map((item) => (
-                            <Link
-                              key={item.href}
-                              href={item.href}
-                              className="qs-menu-link"
-                              onClick={handleLinkClick}
-                            >
-                              <span className="qs-menu-link-label">
-                                {item.label.replace("Hyper-Realistic", "Hyper Realistic")}
-                              </span>
-                            </Link>
-                          ))}
-                        </div>
+                        <a
+                          href={serviceGroups[1]?.items[0]?.href || "https://quickuppaistudio.us/"}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="qs-mega-col-title qs-mega-col-title-link"
+                          onClick={handleLinkClick}
+                        >
+                          AI Video Production
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <path d="M7 17L17 7M8 7h9v9" />
+                          </svg>
+                        </a>
 
                         <div className="qs-mega-col-subdivider" style={{ marginTop: "14px" }}>
                           <div className="qs-mega-col-title">AI &amp; Automation Solutions</div>

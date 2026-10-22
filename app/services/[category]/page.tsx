@@ -31,7 +31,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 import MerkilCategoryHub from "@/components/MerkilCategoryHub";
-import AIVideoCategoryHub from "@/components/AIVideoCategoryHub";
 
 function renderGradientHeading(text?: string) {
   if (!text) return null;
@@ -60,10 +59,6 @@ export default async function ServiceCategoryPage({ params }: PageProps) {
 
   if (category.categorySlug === "ai-powered-digital-marketing-services") {
     return <MerkilCategoryHub category={category} />;
-  }
-
-  if (category.categorySlug === "ai-video-production") {
-    return <AIVideoCategoryHub category={category} />;
   }
 
   return (
