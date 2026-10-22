@@ -18,8 +18,11 @@ export interface MotionPreset {
   splitFirst: string;
   splitMiddle: string;
   splitLast: string;
-  /** Card-group effects, rotated per group. "wave" alternates wave-l / wave-r. */
+  /** Card-group effects, rotated per group. "wave" alternates wave-l / wave-r;
+   *  "a|b" alternates a / b card by card. */
   items: string[];
+  /** Elements matching this selector are left alone (e.g. ones with their own scroll effect) */
+  skip?: string;
   /** Delay between cards in a group (seconds) */
   stagger: number;
   /** Delay between steps of the hero timeline (seconds) */
@@ -56,7 +59,7 @@ const isMedia = (el: Element) =>
   el.matches("img, picture, video") ||
   /(^|[\s_-])(img|image|photo|visual|media|thumb)([\s_-]|$)/i.test(el.getAttribute("class") || "");
 
-const isTextBlock = (el: Element) => el.matches("p, a, button, ul, ol, blockquote, h3, h4, h5, h6, span, label, form");
+const isTextBlock = (el: Element) => el.matches("p, a, button, ul, ol, blockquote, h3, h4, h5, h6, span, label");
 
 type Target = { el: HTMLElement; anim: string; delay: number };
 
@@ -81,7 +84,12 @@ export function setupScrollMotion(root: HTMLElement, preset: MotionPreset, seed 
 
   const itemAnim = (groupIndex: number, i: number) => {
     const a = preset.items[groupIndex % preset.items.length];
-    return a === "wave" ? (i % 2 === 0 ? "wave-l" : "wave-r") : a;
+    if (a === "wave") return i % 2 === 0 ? "wave-l" : "wave-r";
+    if (a.includes("|")) {
+      const parts = a.split("|");
+      return parts[i % parts.length];
+    }
+    return a;
   };
 
   const targets: Target[] = [];
@@ -107,6 +115,7 @@ export function setupScrollMotion(root: HTMLElement, preset: MotionPreset, seed 
           walk(child, depth + 1);
           continue;
         }
+        if (preset.skip && child.matches(preset.skip)) continue;
         // Self-animating elements (marquees, loops) are never touched
         if (cs.animationName && cs.animationName !== "none") continue;
         // Clipped or scrolling strips (marquees, carousels): reveal the strip
@@ -156,7 +165,7 @@ export function setupScrollMotion(root: HTMLElement, preset: MotionPreset, seed 
     };
 
     walk(section, 0);
-    if (isHero) list.forEach((t, i) => (t.delay = 0.1 + i * preset.heroStep));
+    if (isHero) list.forEach((t, i) => (t.delay = 0.1 + Math.min(i, 10) * preset.heroStep));
     targets.push(...list);
   });
 

@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import CompanyMotion from "@/components/CompanyMotion";
 import Link from "next/link";
 
 export default function ContactPage() {
@@ -335,6 +336,7 @@ export default function ContactPage() {
         </div>
       </section>
 
+      <CompanyMotion seed={0} />
       <Footer hideCta={true} />
     </div>
   );

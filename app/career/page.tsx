@@ -3,6 +3,7 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import CompanyMotion from "@/components/CompanyMotion";
 import Link from "next/link";
 
 interface Role {
@@ -971,6 +972,7 @@ export default function CareerPage() {
         </div>
       )}
 
+      <CompanyMotion seed={2} />
       <Footer hideCta={true} />
     </div>
   );
