@@ -1,0 +1,235 @@
+/* ==========================================================================
+   SITE TYPE SCALE — every page except the home page
+   One professional scale for headings, subheadings, body and small text,
+   applied across all inner pages. Scoped with :has() so the home page
+   (the only page with .hero-one-section) is never touched. Header and
+   footer are shared with the home page, so they are left out too.
+   Fonts stay the site's: Plus Jakarta Sans (headings, labels) + Inter (body).
+
+   Scale (desktop → mobile)
+     H1  48 → 32   700  lh 1.12  -0.03em
+     H2  34 → 26   700  lh 1.2   -0.022em
+     H3  19 → 17   600  lh 1.35  -0.012em
+     H4  16        600  lh 1.4
+     Subheading (eyebrow) 12  700  uppercase  +0.1em
+     Lead 18  lh 1.65   Body 16  400  lh 1.7   Small 14  lh 1.55
+   ========================================================================== */
+:root {
+  --qs-t-h1: clamp(32px, 3.35vw, 48px);
+  --qs-t-h2: clamp(26px, 2.4vw, 34px);
+  --qs-t-h3-lg: clamp(21px, 1.75vw, 26px);
+  --qs-t-h3: clamp(17px, 1.32vw, 19px);
+  --qs-t-h4: 16px;
+  --qs-t-eyebrow: 12px;
+  --qs-t-body: 16px;
+  --qs-t-small: 14px;
+  --qs-t-btn: 15px;
+}
+
+/* ---- H1 -------------------------------------------------------------------- */
+:root:not(:has(.hero-one-section)) h1:not(header *):not(footer *):not(#_):not(#__) {
+  font-family: var(--font-heading) !important;
+  font-size: var(--qs-t-h1) !important;
+  line-height: 1.12 !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.03em !important;
+}
+
+/* ---- H2 (and H3s that are styled as section titles) ------------------------ */
+:root:not(:has(.hero-one-section))
+  :is(h2, h3.asx-media-title, h3.about-cta-title, h3.sxa-h2):not(header *):not(footer *):not(.sc-manifesto-text-center):not(.asx-outline-title):not(.su-inquiry-title):not(#_):not(#__) {
+  font-family: var(--font-heading) !important;
+  font-size: var(--qs-t-h2) !important;
+  line-height: 1.2 !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.022em !important;
+}
+
+/* ---- Large H3 (stage titles, side CTA titles) ------------------------------ */
+:root:not(:has(.hero-one-section)) :is(.mx-process-stage-title, h3.qs-t-lg, .mks-words > li):not(header *):not(footer *):not(#_):not(#__) {
+  font-family: var(--font-heading) !important;
+  font-size: var(--qs-t-h3-lg) !important;
+  line-height: 1.25 !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+}
+
+/* ---- H3 (card, step and list titles) --------------------------------------- */
+:root:not(:has(.hero-one-section))
+  :is(h3, h2.asx-outline-title, h2.su-inquiry-title, dt.mks-h3):not(header *):not(footer *):not(.asx-media-title):not(.about-cta-title):not(.sxa-h2):not(.mx-process-stage-title):not(.qs-t-lg):not(#_):not(#__) {
+  font-family: var(--font-heading) !important;
+  font-size: var(--qs-t-h3) !important;
+  line-height: 1.35 !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.012em !important;
+}
+
+/* ---- H4 / H5 / H6 ---------------------------------------------------------- */
+:root:not(:has(.hero-one-section)) :is(h4, h5, h6):not(header *):not(footer *):not(#_):not(#__) {
+  font-family: var(--font-heading) !important;
+  font-size: var(--qs-t-h4) !important;
+  line-height: 1.4 !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+}
+
+/* ---- FAQ questions (same size everywhere) ---------------------------------- */
+:root:not(:has(.hero-one-section))
+  :is([class*="faq-q"], [class*="faq-text"], [class*="faq-question"], .qs-faq-q-text):not(header *):not(footer *):not(#_):not(#__) {
+  font-family: var(--font-heading) !important;
+  font-size: 17px !important;
+  line-height: 1.4 !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+}
+
+/* ---- Subheadings / eyebrows / taglines ------------------------------------- */
+:root:not(:has(.hero-one-section))
+  :is(
+    .tagline,
+    .pre-section-title,
+    .mks-tagline,
+    .mks-eyebrow,
+    .ytv-tagline,
+    .ytv-pill,
+    .aix-eyebrow,
+    .aix-tagline,
+    .sxa-pill,
+    .sxa-roster-title,
+    .sxa-eyebrow,
+    .sxa-tagline,
+    .asx-badge,
+    .asx-media-badge,
+    .asx-media-tagline,
+    .asx-section-label,
+    .mx-sub-badge,
+    .mx-partnership-sub,
+    .mx-lime-sub,
+    .su-subtitle-badge,
+    .su-cinematic-sub,
+    .sc-badge,
+    .section-badge,
+    .subtitle-head,
+    .res-tag,
+    .res-card-pill,
+    .blog-01-tag,
+    .sc-dept-badge,
+    .mx-process-stage-pill,
+    .asx-tag-pill,
+    .mx-subtitle-badge,
+    p[style*="uppercase"]
+  ):not(header *):not(footer *):not(#_):not(#__),
+:root:not(:has(.hero-one-section))
+  :is(.asx-badge, .asx-tag-pill, .mx-sub-badge, .mx-subtitle-badge, .su-subtitle-badge, .sc-badge, .section-badge, .sxa-pill, .ytv-pill) > span:not([class*="dot"]):not(svg):not(#_):not(#__) {
+  font-family: var(--font-heading) !important;
+  font-size: var(--qs-t-eyebrow) !important;
+  line-height: 1.4 !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+}
+
+/* ---- Body text ------------------------------------------------------------- */
+:root:not(:has(.hero-one-section))
+  :where(p, li, dd):where(:not(header *):not(footer *):not([class*="faq"]):not([class*="tagline"]):not([class*="eyebrow"]):not([class*="statement"]):not([class*="quote"]):not([class*="lead"]):not([class*="hero-desc"]):not([class*="hero-text"]):not(.pre-section-title):not([style*="uppercase"]):not(.mks-words > li):not(.sc-manifesto-text-center):not(.sc-manifesto-text-center *)):not(#_):not(#__) {
+  font-family: var(--font-body) !important;
+  font-size: var(--qs-t-body) !important;
+  line-height: 1.7 !important;
+}
+
+/* Lead / hero intro paragraphs: one step up from body */
+:root:not(:has(.hero-one-section))
+  :is(p[class*="lead"], p[class*="hero-desc"], p[class*="hero-text"], .hero-lead-paragraph, .mx-hero-statement-lead):not(header *):not(footer *):not(#_):not(#__) {
+  font-family: var(--font-body) !important;
+  font-size: 18px !important;
+  line-height: 1.65 !important;
+}
+
+/* Small print: notes, captions, form notes, card meta */
+:root:not(:has(.hero-one-section))
+  :is([class*="-note"], [class*="caption"], [class*="form-note"], .res-card-meta, .ytv-note, .mks-note):not(header *):not(footer *):not(#_):not(#__) {
+  font-size: var(--qs-t-small) !important;
+  line-height: 1.55 !important;
+}
+
+/* Form field labels */
+:root:not(:has(.hero-one-section)) :is(label, .su-field-label, .ytv-field > span):not(header *):not(footer *):not(#_):not(#__) {
+  font-family: var(--font-heading) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em !important;
+}
+
+/* ---- Buttons: one size and weight everywhere ------------------------------- */
+:root:not(:has(.hero-one-section)) [data-qs-btn]:not(#_):not(#__),
+:root:not(:has(.hero-one-section)) [data-qs-btn] :is(span:not([class]), [class*="text"]):not(#_):not(#__) {
+  font-family: var(--font-heading) !important;
+  font-size: var(--qs-t-btn) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+}
+
+/* Black buttons on light backgrounds */
+:root:not(:has(.hero-one-section)) [data-qs-btn="primary"][data-qs-tone="light"]:not(#_):not(#__) {
+  background: #0b0f17 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  border-color: #0b0f17 !important;
+}
+
+:root:not(:has(.hero-one-section)) [data-qs-btn="primary"][data-qs-tone="light"]:hover:not(#_):not(#__) {
+  background: #1f2937 !important;
+  border-color: #1f2937 !important;
+  color: #ffffff !important;
+}
+
+/* Secondary on light: white with a quiet border */
+:root:not(:has(.hero-one-section)) [data-qs-btn="secondary"][data-qs-tone="light"]:not(#_):not(#__) {
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #0b0f17 !important;
+  border: 1px solid #d0d5dd !important;
+}
+
+:root:not(:has(.hero-one-section)) [data-qs-btn="secondary"][data-qs-tone="light"]:hover:not(#_):not(#__) {
+  border-color: #0b0f17 !important;
+  color: #0b0f17 !important;
+}
+
+/* White buttons on dark backgrounds */
+:root:not(:has(.hero-one-section)) [data-qs-btn="primary"][data-qs-tone="dark"]:not(#_):not(#__) {
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #0b0f17 !important;
+  border-color: #ffffff !important;
+}
+
+:root:not(:has(.hero-one-section)) [data-qs-btn="primary"][data-qs-tone="dark"]:hover:not(#_):not(#__) {
+  background: #e5e7eb !important;
+  border-color: #e5e7eb !important;
+  color: #0b0f17 !important;
+}
+
+/* Secondary on dark: white outline */
+:root:not(:has(.hero-one-section)) [data-qs-btn="secondary"][data-qs-tone="dark"]:not(#_):not(#__) {
+  background: transparent !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.55) !important;
+}
+
+:root:not(:has(.hero-one-section)) [data-qs-btn="secondary"][data-qs-tone="dark"]:hover:not(#_):not(#__) {
+  border-color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+/* Text inside buttons follows the button colour (beats gradient/coloured spans) */
+:root:not(:has(.hero-one-section)) [data-qs-btn] :is(span:not([class]), [class*="text"]):not(#_):not(#__) {
+  color: inherit !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+:root:not(:has(.hero-one-section)) [data-qs-btn] svg:not(#_):not(#__) {
+  color: inherit;
+}

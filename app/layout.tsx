@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import "./assurix-service.css";
+import "./site-type.css";
 import WebflowReinit from "@/components/WebflowReinit";
+import ButtonTone from "@/components/ButtonTone";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://quickupp.com"),
@@ -75,6 +77,7 @@ export default function RootLayout({
         <Script src="/js/webflow.schunk.c62231c40fdafb09.js" strategy="afterInteractive" />
         <Script src="/js/webflow-script.js" strategy="afterInteractive" />
         <WebflowReinit />
+        <ButtonTone />
       </body>
     </html>
   );

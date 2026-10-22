@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import FlowMotion from "@/components/FlowMotion";
 import "@/app/ai-automation-service.css";
 import type {
   AiBlock,
@@ -379,6 +380,7 @@ export default function AIAutomationServicePage({
         </section>
       </main>
 
+      <FlowMotion />
       <Footer />
     </div>
   );

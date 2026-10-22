@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import EditorialMotion from "@/components/EditorialMotion";
 import "@/app/marketing-service-page.css";
 import type {
   ServicePageData,
@@ -451,6 +452,7 @@ export default function MerkilMarketingServicePage({
         </section>
       </main>
 
+      <EditorialMotion />
       <Footer />
     </div>
   );

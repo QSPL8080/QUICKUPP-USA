@@ -1,0 +1,174 @@
+/* ==========================================================================
+   AI-POWERED DIGITAL MARKETING SUBPAGES — scroll-in motion
+   (components/EditorialMotion.tsx). Motion only: elements return to their
+   normal styles once revealed.
+   ========================================================================== */
+.em-pending {
+  opacity: 0;
+}
+
+.em-in {
+  animation-duration: 0.95s;
+  animation-timing-function: cubic-bezier(0.3, 0.9, 0.3, 1);
+  animation-fill-mode: both;
+  animation-delay: var(--em-delay, 0s);
+}
+
+/* Headings: uncovered by a slanted diagonal edge moving left to right */
+.em-slant,
+.em-slant-lg,
+.em-slant-sm {
+  animation-name: em-slant;
+  animation-duration: 1.05s;
+  animation-timing-function: cubic-bezier(0.6, 0, 0.2, 1);
+}
+
+.em-slant-lg {
+  animation-duration: 1.3s;
+}
+
+.em-slant-sm {
+  animation-duration: 0.95s;
+}
+
+@keyframes em-slant {
+  from {
+    opacity: 0.2;
+    transform: translate3d(-14px, 0, 0);
+    clip-path: polygon(-5% -20%, -5% -20%, -35% 125%, -5% 125%);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    clip-path: polygon(-5% -20%, 135% -20%, 105% 125%, -5% 125%);
+  }
+}
+
+/* Hero pieces / middle of rows: a light press into place */
+.em-press {
+  animation-name: em-press;
+  animation-duration: 0.75s;
+}
+
+@keyframes em-press {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0) scale(1.015);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Text: gentle lift */
+.em-lift {
+  animation-name: em-lift;
+  animation-duration: 0.85s;
+}
+
+@keyframes em-lift {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0.7em, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Photos: unveil from right to left with a slow settle */
+.em-unveil {
+  animation-name: em-unveil;
+  animation-duration: 1.35s;
+  animation-timing-function: cubic-bezier(0.7, 0, 0.2, 1);
+}
+
+@keyframes em-unveil {
+  from {
+    opacity: 0.6;
+    clip-path: inset(0 0 0 100%);
+    transform: translate3d(24px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transform: none;
+  }
+}
+
+/* Side-by-side columns: draw in from their outer edges */
+.em-edge-l {
+  animation-name: em-edge-l;
+}
+
+.em-edge-r {
+  animation-name: em-edge-r;
+}
+
+@keyframes em-edge-l {
+  from {
+    opacity: 0;
+    transform: translate3d(-36px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes em-edge-r {
+  from {
+    opacity: 0;
+    transform: translate3d(36px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Cards: soft pop */
+.em-pop-soft {
+  animation-name: em-pop-soft;
+  animation-duration: 0.8s;
+}
+
+@keyframes em-pop-soft {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Cards: slow drift up */
+.em-drift-up {
+  animation-name: em-drift-up;
+  animation-duration: 1.1s;
+}
+
+@keyframes em-drift-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 40px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .em-pending {
+    opacity: 1;
+  }
+
+  .em-in {
+    animation: none !important;
+  }
+}
