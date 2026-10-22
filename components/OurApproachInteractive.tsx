@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import AboutMotion from "@/components/AboutMotion";
 
 export default function OurApproachInteractive() {
   const [clientsCount, setClientsCount] = useState<number>(0);
@@ -747,6 +748,7 @@ export default function OurApproachInteractive() {
           </div>
         </section>
       </main>
+      <AboutMotion seed={1} />
       <Footer />
     </>
   );

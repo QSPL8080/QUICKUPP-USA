@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import AboutMotion from "@/components/AboutMotion";
 
 export default function WhyChooseUsInteractive() {
   const [prosCount, setProsCount] = useState<number>(0);
@@ -779,6 +780,7 @@ export default function WhyChooseUsInteractive() {
           </div>
         </section>
       </main>
+      <AboutMotion seed={2} />
       <Footer />
     </>
   );

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import AboutMotion from "@/components/AboutMotion";
 
 export default function WhoWeAreInteractive() {
   const pathname = usePathname();
@@ -589,6 +590,7 @@ export default function WhoWeAreInteractive() {
           </div>
         </section>
       </main>
+      <AboutMotion seed={0} />
       <Footer />
     </>
   );

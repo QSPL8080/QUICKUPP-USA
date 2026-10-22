@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import AboutMotion from "@/components/AboutMotion";
 
 export default function WhyBusinessesChooseUsInteractive() {
   const [filterCategory, setFilterCategory] = useState<"all" | "strategy" | "execution" | "scale">("all");
@@ -806,6 +807,7 @@ export default function WhyBusinessesChooseUsInteractive() {
         </section>
       </main>
 
+      <AboutMotion seed={4} />
       <Footer />
     </>
   );
