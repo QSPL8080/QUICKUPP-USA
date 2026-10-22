@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import TechMotion from "@/components/TechMotion";
 import type { ServicePageData, ServiceBlock } from "@/lib/servicePageTypes";
 import "@/app/copora-service.css";
 
@@ -143,25 +144,6 @@ export default function CoporaServicePage({
       ((b as any).title?.includes("Why Invest") ||
         (b as any).title?.includes("Why Businesses Invest"))
   ) as any;
-
-  // Scroll reveal observer
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-in-view");
-          }
-        });
-      },
-      { threshold: 0.1, rootMargin: "0px 0px -40px 0px" }
-    );
-
-    const elements = containerRef.current?.querySelectorAll(".copora-reveal");
-    elements?.forEach((el) => observer.observe(el));
-
-    return () => observer.disconnect();
-  }, []);
 
   // Context-specific landscape showcase image
   const heroImage =
@@ -699,6 +681,7 @@ export default function CoporaServicePage({
         </div>
       </section>
 
+      <TechMotion seed={data.crumb.length} />
       <Footer />
     </div>
   );

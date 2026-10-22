@@ -1145,17 +1145,7 @@
   border-top: 1px solid var(--color--gray-4);
 }
 
-/* Scroll reveal helper */
-.copora-reveal {
-  opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.copora-reveal.is-in-view {
-  opacity: 1;
-  transform: translateY(0);
-}
+/* Scroll-in motion now comes from components/TechMotion.tsx */
 
 /* =========================================================================
    9. CORE SERVICES GRID

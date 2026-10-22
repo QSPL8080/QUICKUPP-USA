@@ -61,7 +61,7 @@ const isMedia = (el: Element) =>
 
 const isTextBlock = (el: Element) => el.matches("p, a, button, ul, ol, blockquote, h3, h4, h5, h6, span, label");
 
-type Target = { el: HTMLElement; anim: string; delay: number };
+type Target = { el: HTMLElement; anim: string; delay: number; group?: number };
 
 export function setupScrollMotion(root: HTMLElement, preset: MotionPreset, seed = 0): () => void {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return () => {};
@@ -99,9 +99,12 @@ export function setupScrollMotion(root: HTMLElement, preset: MotionPreset, seed 
     const isHero = sIdx === 0;
     const list: Target[] = [];
 
-    const add = (el: HTMLElement, anim: string, delay = 0) => {
+    const add = (el: HTMLElement, anim: string, delay = 0, group?: number) => {
       if (list.length >= MAX_TARGETS_PER_SECTION || blocked.has(el)) return;
-      list.push({ el, anim, delay });
+      // Never take over an element that already runs its own animation
+      const an = getComputedStyle(el).animationName;
+      if (an && an !== "none") return;
+      list.push({ el, anim, delay, group });
     };
 
     const walk = (el: HTMLElement, depth: number) => {
@@ -137,7 +140,7 @@ export function setupScrollMotion(root: HTMLElement, preset: MotionPreset, seed 
           const kids = (Array.from(child.children) as HTMLElement[]).filter((k) => k.getBoundingClientRect().height > 4);
           kids.slice(0, 16).forEach((k, i) => {
             if (blocked.has(k)) walk(k, depth + 1);
-            else add(k, isHero ? preset.hero : itemAnim(g, i), Math.min(i, 10) * preset.stagger);
+            else add(k, isHero ? preset.hero : itemAnim(g, i), Math.min(i, 10) * preset.stagger, g);
           });
           continue;
         }
@@ -165,7 +168,16 @@ export function setupScrollMotion(root: HTMLElement, preset: MotionPreset, seed 
     };
 
     walk(section, 0);
-    if (isHero) list.forEach((t, i) => (t.delay = 0.1 + Math.min(i, 10) * preset.heroStep));
+    // Hero timeline: one step per element; a group's items share a step and stagger within it
+    if (isHero) {
+      let step = -1;
+      let prevGroup: number | undefined;
+      list.forEach((t) => {
+        if (t.group === undefined || t.group !== prevGroup) step++;
+        prevGroup = t.group;
+        t.delay = 0.1 + Math.min(step, 10) * preset.heroStep + (t.group !== undefined ? t.delay * 0.5 : 0);
+      });
+    }
     targets.push(...list);
   });
 

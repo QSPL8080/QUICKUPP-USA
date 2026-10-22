@@ -1,0 +1,265 @@
+/* ==========================================================================
+   IT SERVICES SUBPAGES — scroll-in motion (see components/TechMotion.tsx)
+   Motion only: elements return to their normal styles once revealed.
+   ========================================================================== */
+.tm-pending {
+  opacity: 0;
+}
+
+.tm-in {
+  animation-duration: 0.9s;
+  animation-timing-function: cubic-bezier(0.2, 0.9, 0.25, 1);
+  animation-fill-mode: both;
+  animation-delay: var(--tm-delay, 0s);
+}
+
+/* Headings: each word rises from behind a mask, one after another */
+.tm-w {
+  display: inline-block;
+  clip-path: inset(-0.08em -0.06em -0.22em -0.06em);
+}
+
+.tm-wi {
+  display: inline-block;
+}
+
+.tm-words .tm-wi {
+  opacity: 0;
+  transform: translate3d(0, 105%, 0);
+}
+
+.tm-words-in .tm-wi {
+  animation: tm-word-up 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--tm-lead, 0s) + var(--tm-wd, 0s));
+}
+
+.tm-wg {
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  background-repeat: no-repeat;
+}
+
+@keyframes tm-word-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 105%, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Hero pieces / middle of rows: terminal-style stepped reveal */
+.tm-boot {
+  animation-name: tm-boot;
+  animation-duration: 0.7s;
+  animation-timing-function: steps(7, end);
+}
+
+@keyframes tm-boot {
+  from {
+    opacity: 0.3;
+    clip-path: inset(-10% 100% -10% 0);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(-10% -2% -10% 0);
+  }
+}
+
+/* Text: scanner line passes from top to bottom */
+.tm-scan {
+  animation-name: tm-scan;
+  animation-duration: 1s;
+  animation-timing-function: cubic-bezier(0.45, 0, 0.2, 1);
+}
+
+@keyframes tm-scan {
+  from {
+    opacity: 0.15;
+    clip-path: inset(0 -4% 100% -4%);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 -4% -4% -4%);
+  }
+}
+
+/* Images: smooth fade up with a gentle settle */
+.tm-settle {
+  animation-name: tm-settle;
+  animation-duration: 1.2s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes tm-settle {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 40px, 0) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Split rows: slide in on a skew */
+.tm-skew-l {
+  animation-name: tm-skew-l;
+  animation-duration: 1s;
+}
+
+.tm-skew-r {
+  animation-name: tm-skew-r;
+  animation-duration: 1s;
+}
+
+@keyframes tm-skew-l {
+  from {
+    opacity: 0;
+    transform: translate3d(-60px, 0, 0) skewX(8deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes tm-skew-r {
+  from {
+    opacity: 0;
+    transform: translate3d(60px, 0, 0) skewX(-8deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Cards: unfold like a door from the left edge */
+.tm-fold {
+  animation-name: tm-fold;
+  animation-duration: 1s;
+}
+
+@keyframes tm-fold {
+  from {
+    opacity: 0;
+    transform: perspective(1100px) rotateY(-80deg);
+    transform-origin: 0% 50%;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    transform-origin: 0% 50%;
+  }
+}
+
+/* Cards: step up like loading blocks */
+.tm-blocks {
+  animation-name: tm-blocks;
+  animation-duration: 0.6s;
+  animation-timing-function: steps(4, end);
+}
+
+@keyframes tm-blocks {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 36px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Cards: skate in at an angle */
+.tm-skate {
+  animation-name: tm-skate;
+}
+
+@keyframes tm-skate {
+  from {
+    opacity: 0;
+    transform: translate3d(70px, 20px, 0) skewX(-12deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Industries grid: tiles ripple out from the centre with a soft focus ring */
+.tm-ind > * {
+  opacity: 0;
+}
+
+.tm-ind-in > * {
+  animation: tm-ind-tile 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--tm-d, 0s);
+}
+
+.tm-ind-in > * > :last-child {
+  animation: tm-ind-arrow 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--tm-d, 0s) + 0.35s);
+}
+
+@keyframes tm-ind-tile {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+    border-color: rgba(99, 102, 241, 0.55);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+  }
+  60% {
+    opacity: 1;
+    border-color: rgba(99, 102, 241, 0.35);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.06);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes tm-ind-arrow {
+  from {
+    opacity: 0;
+    transform: translate3d(-10px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tm-pending {
+    opacity: 1;
+  }
+
+  .tm-in {
+    animation: none !important;
+  }
+
+  .tm-words .tm-wi {
+    opacity: 1;
+    transform: none;
+  }
+
+  .tm-words-in .tm-wi {
+    animation: none !important;
+  }
+
+  .tm-ind > * {
+    opacity: 1;
+  }
+
+  .tm-ind-in > *,
+  .tm-ind-in > * > :last-child {
+    animation: none !important;
+  }
+}
