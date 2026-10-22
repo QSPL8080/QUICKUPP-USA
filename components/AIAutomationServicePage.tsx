@@ -14,6 +14,7 @@ import type {
   ServicePageData,
   WhyChooseBlock,
 } from "@/lib/servicePageTypes";
+import LucideIcon, { type LucideIconName } from "@/components/LucideIcon";
 
 /*
  * AI & Automation Solutions service page.
@@ -36,83 +37,30 @@ function GradientHeading({ text }: { text: string }) {
   );
 }
 
-function Svg({ children, size = 22, stroke = 1.8 }: { children: React.ReactNode; size?: number; stroke?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      {children}
-    </svg>
-  );
-}
+const ArrowIcon = () => <LucideIcon name="arrow-right" size={16} strokeWidth={2.2} />;
 
-const ArrowIcon = () => (
-  <Svg size={16} stroke={2.2}>
-    <path d="M5 12h14" />
-    <path d="M13 6l6 6-6 6" />
-  </Svg>
-);
+const CheckIcon = ({ size = 14 }: { size?: number }) => <LucideIcon name="check" size={size} strokeWidth={2.8} />;
 
-const CheckIcon = ({ size = 14 }: { size?: number }) => (
-  <Svg size={size} stroke={2.6}>
-    <path d="M20 6L9 17l-5-5" />
-  </Svg>
-);
-
-/* Line icons, one per service card in content order */
-const icons = {
-  chat: <path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.8-.9L3 20l1.1-4.2A8.4 8.4 0 1 1 21 11.5z" />,
-  bot: (
-    <>
-      <rect x="5" y="8" width="14" height="11" rx="3" />
-      <path d="M12 4v4M9 13h.01M15 13h.01M9.5 16.5h5" />
-    </>
-  ),
-  flow: (
-    <>
-      <circle cx="6" cy="6" r="2.5" />
-      <circle cx="18" cy="18" r="2.5" />
-      <path d="M8.5 6H14a4 4 0 0 1 4 4v5.5M6 8.5V14a4 4 0 0 0 4 4h5.5" />
-    </>
-  ),
-  crm: (
-    <>
-      <circle cx="9" cy="8" r="3.5" />
-      <path d="M2.5 20a6.5 6.5 0 0 1 13 0M17 11l2 2 3.5-4" />
-    </>
-  ),
-  funnel: <path d="M3 4h18l-7 8.5V19l-4 2v-8.5z" />,
-  support: (
-    <>
-      <path d="M4 14v-2a8 8 0 0 1 16 0v2" />
-      <rect x="2.5" y="14" width="4.5" height="6" rx="1.5" />
-      <rect x="17" y="14" width="4.5" height="6" rx="1.5" />
-    </>
-  ),
-  doc: (
-    <>
-      <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
-      <path d="M14 3v5h5M9 13h6M9 17h4" />
-    </>
-  ),
-  api: <path d="M8 7l-5 5 5 5M16 7l5 5-5 5M13.5 4l-3 16" />,
-  spark: <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z" />,
-  mail: (
-    <>
-      <rect x="3" y="5" width="18" height="14" rx="2" />
-      <path d="M3 7l9 6 9-6" />
-    </>
-  ),
-  chart: <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />,
-};
-
-const serviceIcons = [icons.chat, icons.bot, icons.flow, icons.crm, icons.funnel, icons.support, icons.doc, icons.api, icons.spark];
+/* One icon per service card, in content order */
+const serviceIcons: LucideIconName[] = [
+  "message-circle",
+  "bot",
+  "workflow",
+  "user-round-check",
+  "filter",
+  "headset",
+  "file-text",
+  "plug-zap",
+  "sparkles",
+];
 
 /* Hero workflow diagram: icon nodes around a central AI node (decorative) */
-const nodes = [
-  { x: 16, y: 18, icon: icons.chat },
-  { x: 84, y: 16, icon: icons.crm },
-  { x: 92, y: 58, icon: icons.mail },
-  { x: 12, y: 70, icon: icons.doc },
-  { x: 62, y: 90, icon: icons.chart },
+const nodes: { x: number; y: number; icon: LucideIconName }[] = [
+  { x: 16, y: 18, icon: "message-circle" },
+  { x: 84, y: 16, icon: "users" },
+  { x: 92, y: 58, icon: "mail" },
+  { x: 12, y: 70, icon: "file-text" },
+  { x: 62, y: 90, icon: "chart-column" },
 ];
 
 function WorkflowDiagram() {
@@ -140,11 +88,11 @@ function WorkflowDiagram() {
         })}
       </svg>
       <div className="aix-node aix-node-core" style={{ left: "50%", top: "50%" }}>
-        <Svg size={34}>{icons.bot}</Svg>
+        <LucideIcon name="bot" size={36} strokeWidth={1.8} />
       </div>
       {nodes.map((n, i) => (
         <div key={i} className="aix-node" style={{ left: `${n.x}%`, top: `${n.y}%` }}>
-          <Svg size={22}>{n.icon}</Svg>
+          <LucideIcon name={n.icon} size={22} />
         </div>
       ))}
       {/* Decorative status card: skeleton lines + toggle, no text */}
@@ -244,7 +192,7 @@ export default function AIAutomationServicePage({
                 {services.items.map((item, i) => (
                   <li key={item.title} className="aix-service">
                     <span className="aix-service-icon">
-                      <Svg size={24}>{serviceIcons[i % serviceIcons.length]}</Svg>
+                      <LucideIcon name={serviceIcons[i % serviceIcons.length]} size={24} strokeWidth={1.9} />
                     </span>
                     <h3 className="aix-h3">{item.title}</h3>
                     <p className="aix-text">{item.desc}</p>

@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import "@/app/youtube-promotion-page.css";
 import type { YouTubePromotionContent } from "@/data/services/youtube-video-promotion";
+import LucideIcon, { type LucideIconName } from "@/components/LucideIcon";
 
 /*
  * YouTube Video Promotion page.
@@ -42,52 +43,13 @@ export function YouTubeIcon({ size = 24 }: { size?: number }) {
   );
 }
 
-function Svg({ children, size = 22, stroke = 1.9 }: { children: React.ReactNode; size?: number; stroke?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      {children}
-    </svg>
-  );
-}
+const ArrowIcon = () => <LucideIcon name="arrow-right" size={16} strokeWidth={2.2} />;
 
-const ArrowIcon = () => (
-  <Svg size={16} stroke={2.2}>
-    <path d="M5 12h14" />
-    <path d="M13 6l6 6-6 6" />
-  </Svg>
-);
+const CheckIcon = ({ size = 14 }: { size?: number }) => <LucideIcon name="check" size={size} strokeWidth={2.8} />;
 
-const CheckIcon = ({ size = 14 }: { size?: number }) => (
-  <Svg size={size} stroke={2.6}>
-    <path d="M20 6L9 17l-5-5" />
-  </Svg>
-);
-
-const reachIcons = [
-  <><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5" /><circle cx="12" cy="12" r="1" /></>,
-  <><circle cx="9" cy="8" r="3.5" /><path d="M2.5 20a6.5 6.5 0 0 1 13 0" /><circle cx="17" cy="9" r="2.5" /><path d="M16 14.2a5 5 0 0 1 5.5 4.8" /></>,
-  <><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></>,
-  <><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></>,
-  <><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6" /></>,
-];
-
-const whyIcons = [
-  <><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5" /><circle cx="12" cy="12" r="1" /></>,
-  <><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M3 9h18M8 14h3M8 17h6" /></>,
-  <><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z" /><path d="M9 12l2 2 4-4" /></>,
-  <><path d="M3 17l6-6 4 4 8-8" /><path d="M15 7h6v6" /></>,
-  <><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5M9 13h6M9 17h4" /></>,
-  <><path d="M4 14v-2a8 8 0 0 1 16 0v2" /><rect x="2.5" y="14" width="4.5" height="6" rx="1.5" /><rect x="17" y="14" width="4.5" height="6" rx="1.5" /></>,
-];
-
-const audienceIcons = [
-  <><rect x="2.5" y="5" width="19" height="14" rx="4" /><path d="M10 9.5v5l4.5-2.5z" /></>,
-  <><path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" /></>,
-  <><rect x="4" y="3" width="16" height="18" rx="1.5" /><path d="M9 7h.01M15 7h.01M9 11h.01M15 11h.01M10 21v-4h4v4" /></>,
-  <><rect x="9" y="2" width="6" height="12" rx="3" /><path d="M5 10a7 7 0 0 0 14 0M12 17v4M8 21h8" /></>,
-  <><path d="M12 3l2.4 4.9 5.4.8-3.9 3.8.9 5.4L12 15.4 7.2 17.9l.9-5.4L4.2 8.7l5.4-.8z" /></>,
-  <><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z" /><circle cx="12" cy="9.5" r="2.5" /></>,
-];
+const reachIcons: LucideIconName[] = ["target", "users", "eye", "chart-column", "sliders-horizontal"];
+const whyIcons: LucideIconName[] = ["target", "briefcase", "shield-check", "trending-up", "file-text", "headset"];
+const audienceIcons: LucideIconName[] = ["video", "music", "building-2", "mic", "sparkles", "map-pin"];
 
 /* Small decorative previews for each YouTube placement (no text) */
 function PlacementPreview({ index }: { index: number }) {
@@ -134,10 +96,7 @@ function PlacementPreview({ index }: { index: number }) {
   return (
     <div className="ytp-prev ytp-prev-search" aria-hidden="true">
       <div className="ytp-search-bar">
-        <Svg size={14} stroke={2.2}>
-          <circle cx="11" cy="11" r="7" />
-          <path d="M21 21l-4.35-4.35" />
-        </Svg>
+        <LucideIcon name="search" size={14} strokeWidth={2.2} />
         <span />
       </div>
       <div className="ytp-feed-row is-ad">
@@ -246,20 +205,11 @@ export default function YouTubePromotionPage({ content }: { content: YouTubeProm
                     <span />
                   </span>
                   <span className="ytp-player-controls">
-                    <Svg size={16} stroke={2.2}>
-                      <path d="M7 5v14l11-7z" />
-                    </Svg>
-                    <Svg size={16} stroke={2}>
-                      <path d="M11 5L6 9H2v6h4l5 4V5zM15.5 8.5a5 5 0 0 1 0 7" />
-                    </Svg>
+                    <LucideIcon name="play" size={16} strokeWidth={2.2} />
+                    <LucideIcon name="volume-2" size={16} />
                     <span className="ytp-player-spacer" />
-                    <Svg size={16} stroke={2}>
-                      <circle cx="12" cy="12" r="3" />
-                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-                    </Svg>
-                    <Svg size={16} stroke={2}>
-                      <path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3" />
-                    </Svg>
+                    <LucideIcon name="settings" size={16} />
+                    <LucideIcon name="maximize" size={16} />
                   </span>
                 </div>
                 <div className="ytp-player-up">
@@ -298,7 +248,7 @@ export default function YouTubePromotionPage({ content }: { content: YouTubeProm
               {c.reach.points.map((p, i) => (
                 <li key={p}>
                   <span className="ytp-icon-tile">
-                    <Svg size={20}>{reachIcons[i % reachIcons.length]}</Svg>
+                    <LucideIcon name={reachIcons[i % reachIcons.length]} size={20} />
                   </span>
                   <span>{p}</span>
                 </li>
@@ -367,7 +317,7 @@ export default function YouTubePromotionPage({ content }: { content: YouTubeProm
               {c.why.items.map((it, i) => (
                 <li key={it.title}>
                   <span className="ytp-icon-tile">
-                    <Svg size={20}>{whyIcons[i % whyIcons.length]}</Svg>
+                    <LucideIcon name={whyIcons[i % whyIcons.length]} size={20} />
                   </span>
                   <h3 className="ytp-h3">{it.title}</h3>
                   <p className="ytp-text">{it.desc}</p>
@@ -389,7 +339,7 @@ export default function YouTubePromotionPage({ content }: { content: YouTubeProm
               {c.audience.items.map((it, i) => (
                 <li key={it.title}>
                   <span className="ytp-avatar">
-                    <Svg size={22}>{audienceIcons[i % audienceIcons.length]}</Svg>
+                    <LucideIcon name={audienceIcons[i % audienceIcons.length]} size={22} />
                   </span>
                   <div>
                     <h3 className="ytp-h3">{it.title}</h3>

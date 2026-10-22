@@ -12,6 +12,7 @@ import type {
   ServicePageData,
   WhyChooseBlock,
 } from "@/lib/servicePageTypes";
+import LucideIcon, { type LucideIconName } from "@/components/LucideIcon";
 
 /*
  * Staff Augmentation service pages (Marketing & Design / IT).
@@ -63,41 +64,24 @@ function GradientHeading({ text }: { text: string }) {
   );
 }
 
-function Svg({ children, size = 20, stroke = 1.9 }: { children: React.ReactNode; size?: number; stroke?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      {children}
-    </svg>
-  );
-}
+const ArrowIcon = () => <LucideIcon name="arrow-right" size={16} strokeWidth={2.2} />;
 
-const ArrowIcon = () => (
-  <Svg size={16} stroke={2.2}>
-    <path d="M5 12h14" />
-    <path d="M13 6l6 6-6 6" />
-  </Svg>
-);
-
-const CheckIcon = () => (
-  <Svg size={13} stroke={2.8}>
-    <path d="M20 6L9 17l-5-5" />
-  </Svg>
-);
+const CheckIcon = () => <LucideIcon name="check" size={13} strokeWidth={2.8} />;
 
 /* Icons for the "Who Can Benefit?" cards, matched on keywords */
-function audienceIcon(label: string) {
+function audienceIcon(label: string): LucideIconName {
   const l = label.toLowerCase();
-  if (l.includes("startup")) return <path d="M5 15c-1.5 1.5-2 5-2 5s3.5-.5 5-2M14.5 4.5c3-1.5 5.5-1.5 5.5-1.5s0 2.5-1.5 5.5L12 15l-3-3zM9 12l-3-1 2.5-3H12M12 15l1 3 3-2.5V12" />;
-  if (l.includes("smb")) return <><path d="M3 21h18M5 21V8l7-4 7 4v13" /><path d="M9 21v-5h6v5M9 11h.01M15 11h.01" /></>;
-  if (l.includes("saas")) return <path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 8.5a4.75 4.75 0 0 1-1 9.5z" />;
-  if (l.includes("e-commerce") || l.includes("ecommerce")) return <><path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6.2" /><circle cx="10" cy="20" r="1" /><circle cx="17" cy="20" r="1" /></>;
-  if (l.includes("software")) return <path d="M8 7l-5 5 5 5M16 7l5 5-5 5M13.5 4l-3 16" />;
-  if (l.includes("technology")) return <><rect x="6" y="6" width="12" height="12" rx="2" /><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4" /></>;
-  if (l.includes("enterprise")) return <><rect x="4" y="3" width="16" height="18" rx="1.5" /><path d="M9 7h.01M15 7h.01M9 11h.01M15 11h.01M9 15h.01M15 15h.01" /></>;
-  if (l.includes("agenc")) return <path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1zM15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" />;
-  if (l.includes("global")) return <><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" /></>;
-  if (l.includes("in-house") || l.includes("team")) return <><circle cx="9" cy="8" r="3.5" /><path d="M2.5 20a6.5 6.5 0 0 1 13 0" /><circle cx="17" cy="9" r="2.5" /><path d="M16 14.2a5 5 0 0 1 5.5 4.8" /></>;
-  return <path d="M12 3l2.4 4.9 5.4.8-3.9 3.8.9 5.4L12 15.4 7.2 17.9l.9-5.4L4.2 8.7l5.4-.8z" />;
+  if (l.includes("startup")) return "rocket";
+  if (l.includes("smb")) return "store";
+  if (l.includes("saas")) return "cloud";
+  if (l.includes("e-commerce") || l.includes("ecommerce")) return "shopping-cart";
+  if (l.includes("software")) return "code-xml";
+  if (l.includes("technology")) return "cpu";
+  if (l.includes("enterprise")) return "building-2";
+  if (l.includes("agenc")) return "megaphone";
+  if (l.includes("global")) return "globe";
+  if (l.includes("in-house") || l.includes("team")) return "users";
+  return "star";
 }
 
 function PrimaryButton({ href, label, light = false }: { href: string; label: string; light?: boolean }) {
@@ -365,7 +349,7 @@ export default function StaffAugmentationServicePage({
                 {(audience.bullets || []).map((b) => (
                   <li key={b} className="sxa-audience-card">
                     <span className="sxa-audience-icon">
-                      <Svg size={22}>{audienceIcon(b)}</Svg>
+                      <LucideIcon name={audienceIcon(b)} size={22} />
                     </span>
                     <span className="sxa-audience-label">{b}</span>
                   </li>

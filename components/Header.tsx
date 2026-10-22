@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { serviceGroups, industryItems, aboutItems, resourceItems } from "@/lib/sitemap";
+import "@/app/header-mega.css";
+import LucideIcon from "@/components/LucideIcon";
 
 export default function Header() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -138,65 +140,69 @@ export default function Header() {
                       </div>
                     </div>
 
-                    <div className="qs-services-grid-4col">
+                    <div className="qs-services-grid-4col qsm-grid">
                       {/* Col 1: AI-Powered Digital Marketing Services */}
-                      <div className="qs-mega-col">
-                        <div className="qs-mega-col-title">AI-Powered Digital Marketing Services</div>
-                        <div className="qs-mega-col-links">
+                      <div className="qs-mega-col qsm-group qsm-group-wide">
+                        <div className="qsm-group-head">
+                          <span className="qsm-icon" aria-hidden="true">
+                              <LucideIcon name="megaphone" size={18} />
+                            </span>
+                          <div className="qs-mega-col-title qsm-title">AI-Powered Digital Marketing Services</div>
+                        </div>
+                        <div className="qs-mega-col-links qsm-links qsm-links-2col">
                           {serviceGroups[0]?.items.map((item) => (
-                            <Link
-                              key={item.href}
-                              href={item.href}
-                              className="qs-menu-link"
-                              onClick={handleLinkClick}
-                            >
+                            <Link key={item.href} href={item.href} className="qs-menu-link qsm-link" onClick={handleLinkClick}>
                               <span className="qs-menu-link-label">{item.label}</span>
+                              <span className="qsm-arrow" aria-hidden="true"><LucideIcon name="arrow-right" size={14} strokeWidth={2.2} /></span>
                             </Link>
                           ))}
                         </div>
                       </div>
 
                       {/* Col 2: YouTube Video Promotion, AI Video Production & AI & Automation Solutions */}
-                      <div className="qs-mega-col">
-                        <Link
-                          href="/services/youtube-video-promotion"
-                          className="qs-mega-col-title qs-mega-col-title-link"
-                          onClick={handleLinkClick}
-                        >
-                          <svg width="18" height="13" viewBox="0 3.5 24 17" aria-hidden="true">
-                            <path d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z" fill="#ffffff" />
-                            <path
-                              fill="#ff0000"
-                              d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"
-                            />
-                          </svg>
-                          YouTube Video Promotion
+                      <div className="qs-mega-col qsm-stack">
+                        <Link href="/services/youtube-video-promotion" className="qsm-feature qsm-feature-yt" onClick={handleLinkClick}>
+                          <span className="qsm-feature-icon" aria-hidden="true">
+                            <svg width="26" height="19" viewBox="0 3.5 24 17">
+                              <path d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z" fill="#ffffff" />
+                              <path
+                                fill="#ff0000"
+                                d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"
+                              />
+                            </svg>
+                          </span>
+                          <span className="qsm-feature-label">YouTube Video Promotion</span>
+                          <span className="qsm-feature-arrow" aria-hidden="true"><LucideIcon name="arrow-right" size={14} strokeWidth={2.2} /></span>
                         </Link>
 
                         <a
                           href={serviceGroups[1]?.items[0]?.href || "https://quickuppaistudio.us/"}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="qs-mega-col-title qs-mega-col-title-link"
+                          className="qsm-feature qsm-feature-ai"
                           onClick={handleLinkClick}
                         >
-                          AI Video Production
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                            <path d="M7 17L17 7M8 7h9v9" />
-                          </svg>
+                          <span className="qsm-feature-icon" aria-hidden="true">
+                            <LucideIcon name="clapperboard" size={20} />
+                          </span>
+                          <span className="qsm-feature-label">AI Video Production</span>
+                          <span className="qsm-feature-arrow" aria-hidden="true">
+                            <LucideIcon name="arrow-up-right" size={14} strokeWidth={2.4} />
+                          </span>
                         </a>
 
-                        <div className="qs-mega-col-subdivider" style={{ marginTop: "14px" }}>
-                          <div className="qs-mega-col-title">AI &amp; Automation Solutions</div>
-                          <div className="qs-mega-col-links">
+                        <div className="qsm-group qsm-group-compact">
+                          <div className="qsm-group-head">
+                            <span className="qsm-icon" aria-hidden="true">
+                              <LucideIcon name="bot" size={18} />
+                            </span>
+                            <div className="qs-mega-col-title qsm-title">AI &amp; Automation Solutions</div>
+                          </div>
+                          <div className="qs-mega-col-links qsm-links">
                             {serviceGroups[2]?.items.map((item) => (
-                              <Link
-                                key={item.href}
-                                href={item.href}
-                                className="qs-menu-link"
-                                onClick={handleLinkClick}
-                              >
+                              <Link key={item.href} href={item.href} className="qs-menu-link qsm-link" onClick={handleLinkClick}>
                                 <span className="qs-menu-link-label">{item.label}</span>
+                                <span className="qsm-arrow" aria-hidden="true"><LucideIcon name="arrow-right" size={14} strokeWidth={2.2} /></span>
                               </Link>
                             ))}
                           </div>
@@ -204,56 +210,56 @@ export default function Header() {
                       </div>
 
                       {/* Col 3: Information Technology Services */}
-                      <div className="qs-mega-col">
-                        <div className="qs-mega-col-title">Information Technology Services</div>
-                        <div className="qs-mega-col-links">
+                      <div className="qs-mega-col qsm-group">
+                        <div className="qsm-group-head">
+                          <span className="qsm-icon" aria-hidden="true">
+                              <LucideIcon name="code-xml" size={18} />
+                            </span>
+                          <div className="qs-mega-col-title qsm-title">Information Technology Services</div>
+                        </div>
+                        <div className="qs-mega-col-links qsm-links">
                           {serviceGroups[3]?.items.map((item) => (
-                            <Link
-                              key={item.href}
-                              href={item.href}
-                              className="qs-menu-link"
-                              onClick={handleLinkClick}
-                            >
+                            <Link key={item.href} href={item.href} className="qs-menu-link qsm-link" onClick={handleLinkClick}>
                               <span className="qs-menu-link-label">{item.label}</span>
+                              <span className="qsm-arrow" aria-hidden="true"><LucideIcon name="arrow-right" size={14} strokeWidth={2.2} /></span>
                             </Link>
                           ))}
                         </div>
                       </div>
 
-                      {/* Col 4: Staff Augmentation */}
-                      <div className="qs-mega-col">
-                        <div className="qs-mega-col-title">Staff Augmentation</div>
-                        <div className="qs-mega-col-links">
-                          {serviceGroups[4]?.items.map((item) => (
-                            <Link
-                              key={item.href}
-                              href={item.href}
-                              className="qs-menu-link"
-                              onClick={handleLinkClick}
-                            >
-                              <span className="qs-menu-link-label">{item.label}</span>
-                            </Link>
-                          ))}
+                      {/* Col 4: Staff Augmentation + Scale With Us */}
+                      <div className="qs-mega-col qsm-stack">
+                        <div className="qsm-group">
+                          <div className="qsm-group-head">
+                            <span className="qsm-icon" aria-hidden="true">
+                              <LucideIcon name="users" size={18} />
+                            </span>
+                            <div className="qs-mega-col-title qsm-title">Staff Augmentation</div>
+                          </div>
+                          <div className="qs-mega-col-links qsm-links">
+                            {serviceGroups[4]?.items.map((item) => (
+                              <Link key={item.href} href={item.href} className="qs-menu-link qsm-link" onClick={handleLinkClick}>
+                                <span className="qs-menu-link-label">{item.label}</span>
+                                <span className="qsm-arrow" aria-hidden="true"><LucideIcon name="arrow-right" size={14} strokeWidth={2.2} /></span>
+                              </Link>
+                            ))}
+                          </div>
                         </div>
 
-                        <div className="qs-mega-col-subdivider" style={{ marginTop: "14px" }}>
-                          <div className="qs-mega-col-title">Scale With Us</div>
-                          <div className="qs-mega-col-links">
-                            <Link
-                              href="/contact"
-                              className="qs-menu-link"
-                              onClick={handleLinkClick}
-                            >
-                              <span className="qs-menu-link-label" style={{ color: "#93c5fd", fontWeight: 600 }}>
-                                Talk to an Expert →
-                              </span>
+                        <div className="qsm-group qsm-group-scale">
+                          <div className="qsm-group-head">
+                            <span className="qsm-icon" aria-hidden="true">
+                              <LucideIcon name="trending-up" size={18} />
+                            </span>
+                            <div className="qs-mega-col-title qsm-title">Scale With Us</div>
+                          </div>
+                          <div className="qs-mega-col-links qsm-links">
+                            <Link href="/contact" className="qs-menu-link qsm-link qsm-link-accent" onClick={handleLinkClick}>
+                              <span className="qs-menu-link-label">Talk to an Expert →</span>
                             </Link>
-                            <Link
-                              href="/about/why-choose-us"
-                              className="qs-menu-link"
-                              onClick={handleLinkClick}
-                            >
+                            <Link href="/about/why-choose-us" className="qs-menu-link qsm-link" onClick={handleLinkClick}>
                               <span className="qs-menu-link-label">Why Choose Us</span>
+                              <span className="qsm-arrow" aria-hidden="true"><LucideIcon name="arrow-right" size={14} strokeWidth={2.2} /></span>
                             </Link>
                           </div>
                         </div>
