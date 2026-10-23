@@ -25,6 +25,8 @@ const INDUSTRY_PRESET: MotionPreset = {
   items: ["wave", "swing", "drop", "depth", "diag"],
   stagger: 0.07,
   heroStep: 0.11,
+  // Rising step columns run their own grow-in
+  skip: ".inx-steps",
 };
 
 export default function IndustryMotion({ seed = 0 }: { seed?: number }) {

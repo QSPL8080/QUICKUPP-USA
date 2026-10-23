@@ -1,0 +1,152 @@
+/* ==========================================================================
+   LOCATION PAGES — scroll-in motion (components/LocationMotion.tsx)
+   Motion only: elements return to their normal styles once revealed.
+   ========================================================================== */
+.lm-pending {
+  opacity: 0;
+}
+
+.lm-in {
+  animation-duration: 0.9s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
+  animation-delay: var(--lm-delay, 0s);
+}
+
+/* Headings: stand up from the baseline */
+.lm-standup,
+.lm-standup-lg {
+  animation-name: lm-standup;
+  animation-duration: 0.95s;
+}
+
+.lm-standup-lg {
+  animation-duration: 1.2s;
+}
+
+@keyframes lm-standup {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0) scaleY(0.6);
+    transform-origin: 50% 100%;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    transform-origin: 50% 100%;
+  }
+}
+
+/* Text and hero pieces: slow rise */
+.lm-rise {
+  animation-name: lm-rise;
+  animation-duration: 1s;
+}
+
+@keyframes lm-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 22px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Side-by-side columns: turn in toward the centre */
+.lm-turn-l {
+  animation-name: lm-turn-l;
+  animation-duration: 1.05s;
+}
+
+.lm-turn-r {
+  animation-name: lm-turn-r;
+  animation-duration: 1.05s;
+}
+
+@keyframes lm-turn-l {
+  from {
+    opacity: 0;
+    transform: perspective(1200px) translate3d(0, 34px, 0) rotateY(7deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes lm-turn-r {
+  from {
+    opacity: 0;
+    transform: perspective(1200px) translate3d(0, 34px, 0) rotateY(-7deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Cards: drop in like a map pin */
+.lm-pin {
+  animation-name: lm-pin;
+  animation-duration: 0.85s;
+  animation-timing-function: cubic-bezier(0.3, 1.45, 0.55, 1);
+}
+
+@keyframes lm-pin {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -26px, 0) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Cards: glide up */
+.lm-glide {
+  animation-name: lm-glide;
+  animation-duration: 1s;
+}
+
+@keyframes lm-glide {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 44px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Cards: tilt in from the right */
+.lm-tilt {
+  animation-name: lm-tilt;
+  animation-duration: 0.95s;
+}
+
+@keyframes lm-tilt {
+  from {
+    opacity: 0;
+    transform: translate3d(26px, 22px, 0) rotate(2.5deg);
+    transform-origin: 100% 100%;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    transform-origin: 100% 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lm-pending {
+    opacity: 1;
+  }
+
+  .lm-in {
+    animation: none !important;
+  }
+}
