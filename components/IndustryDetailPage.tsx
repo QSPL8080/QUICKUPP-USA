@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useState } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -475,50 +475,20 @@ function ServicesBlock({ block, id }: { block: DescPairsBlock; id?: string }) {
   );
 }
 
-/* ---- Connected bullets: rising columns that grow in when seen -------------- */
-function StepBars({ items }: { items: string[] }) {
-  const ref = useRef<HTMLOListElement>(null);
-  const [seen, setSeen] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setSeen(true);
-      return;
-    }
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          setSeen(true);
-          io.disconnect();
-        }
-      },
-      { threshold: 0.3 }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
+/* ---- Connected bullets: one joined band ------------------------------------ */
+function Band({ items }: { items: string[] }) {
   const n = items.length;
   return (
-    <ol
-      ref={ref}
-      className={`inx-steps${seen ? " is-seen" : ""}`}
-      style={{ "--inx-n": n } as React.CSSProperties}
-    >
-      {items.map((t, i) => {
-        const level = n > 1 ? i / (n - 1) : 1;
-        return (
-          <li
-            key={i}
-            className={i === n - 1 ? "is-peak" : undefined}
-            style={{ "--inx-h": `${Math.round(42 + level * 58)}%`, "--inx-i": i, "--inx-l": level.toFixed(3) } as React.CSSProperties}
-          >
-            <span className="inx-steps-bar">
-              <span className="inx-steps-text">{t}</span>
-            </span>
-          </li>
-        );
-      })}
+    <ol className="inx-band" style={{ "--inx-n": n } as React.CSSProperties}>
+      {items.map((t, i) => (
+        <li
+          key={i}
+          className={i === n - 1 ? "is-last" : undefined}
+          style={{ "--inx-l": (n > 1 ? i / (n - 1) : 1).toFixed(3) } as React.CSSProperties}
+        >
+          <span className="inx-band-text">{t}</span>
+        </li>
+      ))}
     </ol>
   );
 }
@@ -553,7 +523,7 @@ function AiSection({ block, soft }: { block: AiBlock; soft: boolean }) {
           <TextFlow text={block.intro} />
         </div>
         {chain ? (
-          <StepBars items={bullets.map((b) => cleanDash(b))} />
+          <Band items={bullets.map((b) => cleanDash(b))} />
         ) : (
           <ul className="inx-matrix">
             {bullets.map((b, i) => (

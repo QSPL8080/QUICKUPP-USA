@@ -1,0 +1,500 @@
+"use client";
+
+import React, { useId, useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import AboutMotion from "@/components/AboutMotion";
+import "@/app/about-folio.css";
+import { ABOUT_NAV, type AboutCta, type AboutPageData, type AboutSection, type AboutTitle } from "@/data/about/pages";
+
+/*
+ * About subpages — "abx-" folio design, used only here.
+ * Content comes from data/about/pages.ts; the layout adds no copy of its own.
+ */
+
+function Arrow({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M5 12h14" />
+      <path d="M12 5l7 7-7 7" />
+    </svg>
+  );
+}
+
+function Check({ size = 13 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
+}
+
+function Title({ t }: { t: AboutTitle }) {
+  return t.accent ? (
+    <>
+      {t.text} <span className="qs-gradient-text">{t.accent}</span>
+    </>
+  ) : (
+    <>{t.text}</>
+  );
+}
+
+function Eyebrow({ text, light }: { text?: string; light?: boolean }) {
+  if (!text) return null;
+  return <p className={`abx-eyebrow${light ? " abx-eyebrow-light" : ""}`}>{text}</p>;
+}
+
+function Btn({ cta, variant = "dark" }: { cta?: AboutCta; variant?: "dark" | "outline" | "white" | "ghost" }) {
+  if (!cta) return null;
+  return (
+    <Link href={cta.href} className={`abx-btn abx-btn-${variant}`}>
+      <span>{cta.label}</span>
+      {(variant === "dark" || variant === "white") && <Arrow />}
+    </Link>
+  );
+}
+
+function Quote({ text }: { text?: string }) {
+  const id = useId().replace(/:/g, "");
+  if (!text) return null;
+  return (
+    <blockquote className="abx-quote">
+      <svg className="abx-quote-mark" viewBox="0 0 34 26" aria-hidden="true">
+        <defs>
+          <linearGradient id={`q${id}`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#00d2ff" />
+            <stop offset="0.5" stopColor="#6366f1" />
+            <stop offset="1" stopColor="#a855f7" />
+          </linearGradient>
+        </defs>
+        <path
+          fill={`url(#q${id})`}
+          d="M0 26V15.6C0 6.9 4.2 1.7 12.6 0l1.6 3.4C9.7 5 7.5 7.9 7.3 12h6.2v14H0zm19.8 0V15.6C19.8 6.9 24 1.7 32.4 0L34 3.4c-4.5 1.6-6.7 4.5-6.9 8.6h6.2v14H19.8z"
+        />
+      </svg>
+      <p className="abx-quote-text">{text}</p>
+    </blockquote>
+  );
+}
+
+function Checks({ items, cols = 1 }: { items?: string[]; cols?: 1 | 2 }) {
+  if (!items?.length) return null;
+  return (
+    <ul className={`abx-checks${cols === 2 ? " abx-checks-2" : ""}`}>
+      {items.map((it, i) => (
+        <li key={i}>
+          <span className="abx-check" aria-hidden="true">
+            <Check />
+          </span>
+          <span>{it}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function Diptych({ images }: { images: [string, string] }) {
+  return (
+    <div className="abx-diptych" aria-hidden="true">
+      <div className="abx-diptych-a">
+        <img src={images[0]} alt="" loading="lazy" />
+      </div>
+      <div className="abx-diptych-b">
+        <img src={images[1]} alt="" loading="lazy" />
+      </div>
+    </div>
+  );
+}
+
+/* ---- Sections --------------------------------------------------------------- */
+
+function Statement({ s }: { s: Extract<AboutSection, { kind: "statement" }> }) {
+  const side = s.images ? "images" : s.aside ? "aside" : null;
+  const body = (
+    <div className="abx-statement-body">
+      <Eyebrow text={s.eyebrow} />
+      <h2>
+        <Title t={s.title} />
+      </h2>
+      {s.paras.map((p, i) => (
+        <p key={i} className={i === 0 && !side ? "abx-lead" : "abx-text"}>
+          {p}
+        </p>
+      ))}
+      <Checks items={s.list} />
+      <Quote text={s.highlight} />
+      {s.cta && (
+        <div className="abx-actions">
+          <Btn cta={s.cta} />
+        </div>
+      )}
+    </div>
+  );
+  if (!side) {
+    return (
+      <section className="abx-sec">
+        <div className="abx-container abx-folio">{body}</div>
+      </section>
+    );
+  }
+  return (
+    <section className="abx-sec">
+      <div className="abx-container abx-split">
+        {body}
+        {side === "images" && <Diptych images={s.images!} />}
+        {side === "aside" && (
+          <aside className="abx-aside">
+            <p className="abx-aside-label">{s.aside!.label}</p>
+            <ol className="abx-aside-list">
+              {s.aside!.items.map((it, i) => (
+                <li key={i}>{it}</li>
+              ))}
+            </ol>
+            {s.aside!.after && <p className="abx-aside-after">{s.aside!.after}</p>}
+          </aside>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function Panels({ s }: { s: Extract<AboutSection, { kind: "panels" }> }) {
+  const [active, setActive] = useState(0);
+  const hasHeadText = !!(s.paras?.length || s.highlight);
+  return (
+    <section className="abx-sec abx-soft">
+      <div className="abx-container">
+        <div className={`abx-head${hasHeadText ? " abx-head-split" : ""}`}>
+          <div className="abx-head-main">
+            <Eyebrow text={s.eyebrow} />
+            <h2>
+              <Title t={s.title} />
+            </h2>
+          </div>
+          {hasHeadText && (
+            <div className="abx-head-side">
+              {s.paras?.map((p, i) => (
+                <p key={i} className="abx-text">
+                  {p}
+                </p>
+              ))}
+              {s.highlight && <p className="abx-strong">{s.highlight}</p>}
+            </div>
+          )}
+        </div>
+        <div className="abx-panels">
+          {s.panels.map((p, i) => (
+            <article
+              key={i}
+              className={`abx-panel${active === i ? " is-active" : ""}`}
+              onMouseEnter={() => setActive(i)}
+              onFocus={() => setActive(i)}
+              onClick={() => setActive(i)}
+              tabIndex={0}
+            >
+              <span className="abx-panel-glow" aria-hidden="true" />
+              <p className="abx-panel-label">{p.label}</p>
+              <div className="abx-panel-body">
+                {p.title && <h3>{p.title}</h3>}
+                <p className="abx-panel-text">{p.text}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+        {(s.note || s.cta) && (
+          <div className="abx-panels-foot">
+            {s.note && <p className="abx-note">{s.note}</p>}
+            <Btn cta={s.cta} />
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function Goals({ s }: { s: Extract<AboutSection, { kind: "goals" }> }) {
+  return (
+    <section className="abx-sec">
+      <div className="abx-container">
+        <div className="abx-head abx-head-split">
+          <div className="abx-head-main">
+            <Eyebrow text={s.eyebrow} />
+            <h2>
+              <Title t={s.title} />
+            </h2>
+          </div>
+          <div className="abx-head-side">
+            {s.paras.map((p, i) => (
+              <p key={i} className="abx-text">
+                {p}
+              </p>
+            ))}
+          </div>
+        </div>
+        {s.listIntro && <p className="abx-cue">{s.listIntro}</p>}
+        <ul className="abx-tiles">
+          {s.items.map((it, i) => (
+            <li key={i}>
+              <span className="abx-check" aria-hidden="true">
+                <Check />
+              </span>
+              <span className="abx-tile-text">{it}</span>
+            </li>
+          ))}
+        </ul>
+        {s.after && <p className="abx-after">{s.after}</p>}
+      </div>
+    </section>
+  );
+}
+
+function Route({ s, soft }: { s: Extract<AboutSection, { kind: "route" }>; soft: boolean }) {
+  const n = s.steps.length;
+  const plain = s.steps.every((st) => !st.text && !st.label);
+  return (
+    <section className={`abx-sec${soft ? " abx-soft" : ""}`}>
+      <div className="abx-container">
+        <div className="abx-head abx-head-center">
+          <Eyebrow text={s.eyebrow} />
+          <h2>
+            <Title t={s.title} />
+          </h2>
+          {s.intro && <p className="abx-text">{s.intro}</p>}
+        </div>
+        <ol className={`abx-route${plain ? " abx-route-plain" : ""}`} style={{ "--abx-n": n } as React.CSSProperties}>
+          {s.steps.map((st, i) => (
+            <li key={i} className={i % 2 === 0 ? "is-up" : "is-down"}>
+              <div className="abx-route-card">
+                {st.label && <p className="abx-route-label">{st.label}</p>}
+                <h3>{st.title}</h3>
+                {st.text && <p className="abx-text">{st.text}</p>}
+                {st.quote && <p className="abx-route-quote">{st.quote}</p>}
+              </div>
+              <span className="abx-route-rail" aria-hidden="true">
+                <span className="abx-route-node" />
+              </span>
+            </li>
+          ))}
+        </ol>
+        {s.after && <p className="abx-after">{s.after}</p>}
+        {s.cta && (
+          <div className="abx-actions abx-actions-center">
+            <Btn cta={s.cta} />
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function IndexViewer({ s }: { s: Extract<AboutSection, { kind: "index" }> }) {
+  const [active, setActive] = useState(0);
+  return (
+    <section className="abx-sec abx-soft">
+      <div className="abx-container">
+        <div className="abx-head">
+          <Eyebrow text={s.eyebrow} />
+          <h2>
+            <Title t={s.title} />
+          </h2>
+        </div>
+        <div className="abx-index">
+          <div className="abx-index-nav" role="tablist" aria-orientation="vertical">
+            {s.items.map((it, i) => (
+              <button
+                key={i}
+                type="button"
+                role="tab"
+                aria-selected={active === i}
+                className={`abx-index-tab${active === i ? " is-active" : ""}`}
+                onClick={() => setActive(i)}
+                onMouseEnter={() => setActive(i)}
+              >
+                <span className="abx-index-tab-text">{it.title}</span>
+                <span className="abx-index-tab-arrow" aria-hidden="true">
+                  <Arrow size={15} />
+                </span>
+              </button>
+            ))}
+          </div>
+          <div className="abx-index-stage">
+            {s.items.map((it, i) => (
+              <article key={i} className={`abx-index-panel${active === i ? " is-active" : ""}`} role="tabpanel">
+                <h3 className="abx-index-title qs-t-lg">{it.title}</h3>
+                <p className="abx-text">{it.desc}</p>
+                <Checks items={it.list} cols={2} />
+                {it.sub && <p className="abx-index-sub">{it.sub}</p>}
+                {it.cta && (
+                  <Link href={it.cta.href} className="abx-link">
+                    <span>{it.cta.label}</span>
+                    <Arrow size={15} />
+                  </Link>
+                )}
+              </article>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Proof({ s }: { s: Extract<AboutSection, { kind: "proof" }> }) {
+  return (
+    <section className="abx-sec">
+      <div className="abx-container">
+        <div className="abx-split">
+          <div className="abx-statement-body">
+            <Eyebrow text={s.eyebrow} />
+            <h2>
+              <Title t={s.title} />
+            </h2>
+            {s.paras.map((p, i) => (
+              <p key={i} className="abx-text">
+                {p}
+              </p>
+            ))}
+            <Quote text={s.note} />
+          </div>
+          {s.images && <Diptych images={s.images} />}
+        </div>
+        <dl className="abx-stats">
+          {s.stats.map((st, i) => (
+            <div key={i} className="abx-stat">
+              <dt className="abx-stat-value">{st.value}</dt>
+              <dd className="abx-stat-caption">{st.label}</dd>
+            </div>
+          ))}
+        </dl>
+        {s.cta && (
+          <div className="abx-actions abx-actions-center">
+            <Btn cta={s.cta} />
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+/* ---- Page --------------------------------------------------------------------- */
+export default function AboutPage({ data }: { data: AboutPageData }) {
+  const pathname = usePathname();
+  const isRoot = pathname === "/about";
+  const { hero, closing } = data;
+  let lastSoft = false;
+
+  return (
+    <div className="abx-page">
+      <Header />
+      <main>
+        <section className="abx-hero">
+          <div className="abx-hero-bg" aria-hidden="true" />
+          <div className="abx-container">
+            <div className="abx-hero-top">
+              <nav className="abx-crumbs" aria-label="Breadcrumb">
+                <Link href="/">Home</Link>
+                <span aria-hidden="true">/</span>
+                {isRoot ? (
+                  <span className="abx-crumb-now">About Us</span>
+                ) : (
+                  <>
+                    <Link href="/about">About</Link>
+                    <span aria-hidden="true">/</span>
+                    <span className="abx-crumb-now">{data.crumb}</span>
+                  </>
+                )}
+              </nav>
+              <nav className="abx-subnav" aria-label="About">
+                {ABOUT_NAV.map((n) => {
+                  const on = pathname === n.href || (isRoot && n.href === "/about/who-we-are");
+                  return (
+                    <Link key={n.href} href={n.href} className={`abx-subnav-link${on ? " is-on" : ""}`} aria-current={on ? "page" : undefined}>
+                      {n.label}
+                    </Link>
+                  );
+                })}
+              </nav>
+            </div>
+
+            <Eyebrow text={hero.eyebrow} />
+            <h1 className="abx-hero-title">
+              <Title t={hero.title} />
+            </h1>
+
+            <div className="abx-hero-cols">
+              <div className="abx-hero-left">
+                <p className="abx-lead">{hero.lead}</p>
+                {hero.cta && (
+                  <div className="abx-actions">
+                    <Btn cta={hero.cta} />
+                  </div>
+                )}
+              </div>
+              <div className="abx-hero-right">
+                {hero.paras?.map((p, i) => (
+                  <p key={i} className="abx-text">
+                    {p}
+                  </p>
+                ))}
+                <Quote text={hero.highlight} />
+              </div>
+            </div>
+
+            <div className="abx-slats" aria-hidden="true">
+              {[0, 1, 2, 3].map((i) => (
+                <span key={i} className="abx-slat" style={{ backgroundImage: `url('${hero.image}')`, "--abx-s": i } as React.CSSProperties} />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {data.sections.map((s, i) => {
+          const soft = s.kind === "panels" || s.kind === "index" || (s.kind === "route" && !lastSoft);
+          lastSoft = soft;
+          if (s.kind === "statement") return <Statement key={i} s={s} />;
+          if (s.kind === "panels") return <Panels key={i} s={s} />;
+          if (s.kind === "goals") return <Goals key={i} s={s} />;
+          if (s.kind === "index") return <IndexViewer key={i} s={s} />;
+          if (s.kind === "proof") return <Proof key={i} s={s} />;
+          if (s.kind === "route") return <Route key={i} s={s} soft={soft} />;
+          return null;
+        })}
+
+        <section className="abx-close-sec">
+          <div className="abx-container">
+            <div className={`abx-close${closing.lines?.length ? "" : " abx-close-solo"}`}>
+              <span className="abx-close-grid" aria-hidden="true" />
+              <div className="abx-close-main">
+                <Eyebrow text={closing.eyebrow} light />
+                <h2>
+                  <Title t={closing.title} />
+                </h2>
+                {closing.paras.map((p, i) => (
+                  <p key={i} className="abx-close-text">
+                    {p}
+                  </p>
+                ))}
+                <div className="abx-actions">
+                  {closing.ctas.map((c, i) => (
+                    <Btn key={i} cta={c} variant={i === 0 ? "white" : "ghost"} />
+                  ))}
+                </div>
+              </div>
+              {closing.lines?.length ? (
+                <ul className="abx-close-lines">
+                  {closing.lines.map((l, i) => (
+                    <li key={i}>{l}</li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
+          </div>
+        </section>
+      </main>
+      <AboutMotion seed={(data.crumb || "").length % 6} />
+      <Footer />
+    </div>
+  );
+}
