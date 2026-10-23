@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FlowMotion from "@/components/FlowMotion";
-import "@/app/ai-automation-service.css";
+import "@/app/ai-automation-console.css";
 import type {
   AiBlock,
   DescPairsBlock,
@@ -18,31 +18,28 @@ import type {
 import LucideIcon, { type LucideIconName } from "@/components/LucideIcon";
 
 /*
- * AI & Automation Solutions service page.
- * Own "automation workflow" design on a dot grid (site gradient, fonts, buttons), an icon-only
- * workflow diagram in the hero, toggle-style benefits and a pipeline process.
- * Every word comes from data/services/ai-automation-solutions.ts — the
- * template adds no labels, badges, numbers or placeholder copy.
+ * AI & Automation Solutions service page — "acx-" console design, used only
+ * here: centred hero over an automation console (tasks flow into an AI chip
+ * and come out done), service modules, a dark capability matrix, a two-column
+ * step sheet, check grid, industry boxes, FAQ and a sign-off closing panel.
+ * Every word comes from data/services/ai-automation-solutions.ts.
  */
 
-/** Puts the last ~45% of a heading in the brand gradient (site-wide style). */
-function GradientHeading({ text }: { text: string }) {
+function Grad({ text }: { text: string }) {
   const words = text.trim().split(/\s+/);
   if (words.length < 3) return <span className="qs-gradient-text">{text}</span>;
   const split = Math.max(1, Math.floor(words.length * 0.55));
   return (
     <>
-      {words.slice(0, split).join(" ")}{" "}
-      <span className="qs-gradient-text">{words.slice(split).join(" ")}</span>
+      {words.slice(0, split).join(" ")} <span className="qs-gradient-text">{words.slice(split).join(" ")}</span>
     </>
   );
 }
 
-const ArrowIcon = () => <LucideIcon name="arrow-right" size={16} strokeWidth={2.2} />;
+const Arrow = () => <LucideIcon name="arrow-right" size={16} strokeWidth={2.2} />;
+const Check = ({ size = 13 }: { size?: number }) => <LucideIcon name="check" size={size} strokeWidth={2.8} />;
 
-const CheckIcon = ({ size = 14 }: { size?: number }) => <LucideIcon name="check" size={size} strokeWidth={2.8} />;
-
-/* One icon per service card, in content order */
+/* One icon per service module, in content order */
 const serviceIcons: LucideIconName[] = [
   "message-circle",
   "bot",
@@ -55,62 +52,48 @@ const serviceIcons: LucideIconName[] = [
   "sparkles",
 ];
 
-/* Hero workflow diagram: icon nodes around a central AI node (decorative) */
-const nodes: { x: number; y: number; icon: LucideIconName }[] = [
-  { x: 16, y: 18, icon: "message-circle" },
-  { x: 84, y: 16, icon: "users" },
-  { x: 92, y: 58, icon: "mail" },
-  { x: 12, y: 70, icon: "file-text" },
-  { x: 62, y: 90, icon: "chart-column" },
-];
+/* Console: task icons travel into the AI chip and leave as completed ticks */
+const laneIcons: LucideIconName[] = ["mail", "file-text", "message-circle", "users", "chart-column"];
 
-function WorkflowDiagram() {
+function AutomationConsole() {
   return (
-    <div className="aix-diagram" aria-hidden="true">
-      <svg className="aix-diagram-lines" viewBox="0 0 100 100">
-        <defs>
-          <linearGradient id="aix-line" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor="#00d2ff" />
-            <stop offset="0.5" stopColor="#6366f1" />
-            <stop offset="1" stopColor="#a855f7" />
-          </linearGradient>
-        </defs>
-        {nodes.map((n, i) => {
-          const d = `M50 50 Q ${(50 + n.x) / 2 + (i % 2 ? 10 : -10)} ${(50 + n.y) / 2 + (i % 2 ? -8 : 8)} ${n.x} ${n.y}`;
-          return (
-            <g key={i}>
-              <path d={d} className="aix-line-base" />
-              <path d={d} className="aix-line-flow" style={{ animationDelay: `${i * 0.6}s` }} />
-              <circle r="1.3" className="aix-pulse">
-                <animateMotion dur={`${3 + i * 0.4}s`} repeatCount="indefinite" path={d} begin={`${i * 0.5}s`} />
-              </circle>
-            </g>
-          );
-        })}
-      </svg>
-      <div className="aix-node aix-node-core" style={{ left: "50%", top: "50%" }}>
-        <LucideIcon name="bot" size={36} strokeWidth={1.8} />
+    <div className="acx-console" aria-hidden="true">
+      <div className="acx-console-bar">
+        <span />
+        <span />
+        <span />
       </div>
-      {nodes.map((n, i) => (
-        <div key={i} className="aix-node" style={{ left: `${n.x}%`, top: `${n.y}%` }}>
-          <LucideIcon name={n.icon} size={22} />
+      <div className="acx-console-body">
+        <div className="acx-lane acx-lane-in">
+          {laneIcons.map((ic, i) => (
+            <span key={ic} className="acx-task" style={{ "--acx-i": i } as React.CSSProperties}>
+              <LucideIcon name={ic} size={18} />
+            </span>
+          ))}
         </div>
-      ))}
-      {/* Decorative status card: skeleton lines + toggle, no text */}
-      <div className="aix-float-card">
-        <span className="aix-skel w70" />
-        <span className="aix-skel w45" />
-        <span className="aix-mini-toggle" />
+        <div className="acx-chip">
+          <span className="acx-chip-ring" />
+          <LucideIcon name="cpu" size={34} strokeWidth={1.7} />
+        </div>
+        <div className="acx-lane acx-lane-out">
+          {laneIcons.map((ic, i) => (
+            <span key={ic} className="acx-done" style={{ "--acx-i": i } as React.CSSProperties}>
+              <Check size={14} />
+            </span>
+          ))}
+        </div>
+        <span className="acx-track acx-track-in" />
+        <span className="acx-track acx-track-out" />
       </div>
     </div>
   );
 }
 
-function PrimaryButton({ href, label }: { href: string; label: string }) {
+function Btn({ href, label, variant = "dark" }: { href?: string; label: string; variant?: "dark" | "outline" }) {
   return (
-    <Link href={href || "/contact"} className="aix-btn aix-btn-primary">
+    <Link href={href || "/contact"} className={`acx-btn acx-btn-${variant}`}>
       <span>{label}</span>
-      <ArrowIcon />
+      {variant === "dark" && <Arrow />}
     </Link>
   );
 }
@@ -133,171 +116,209 @@ export default function AIAutomationServicePage({
   const industries = data.blocks.find((b): b is IndustriesBlock => b.type === "industries");
   const faq = data.blocks.find((b): b is FaqBlock => b.type === "faq");
   const faqItems = faq ? faq.items || faq.faqs || [] : [];
+  const steps = processBlock?.steps || [];
+  const half = Math.ceil(steps.length / 2);
   const [heroLead, ...heroRest] = data.heroParagraphs || [];
 
   return (
-    <div className="aix-page">
+    <div className="acx-page">
       <Header />
 
       <main>
-        {/* 1. Hero */}
-        <section className="aix-hero">
-          <div className="aix-container">
-            <nav className="aix-breadcrumb" aria-label="Breadcrumb">
+        {/* Hero */}
+        <section className="acx-hero">
+          <div className="acx-hero-bg" aria-hidden="true" />
+          <div className="acx-container">
+            <nav className="acx-crumbs" aria-label="Breadcrumb">
               <Link href="/">Home</Link>
-              <span>/</span>
+              <span aria-hidden="true">/</span>
               <span>Services</span>
-              <span>/</span>
+              <span aria-hidden="true">/</span>
               {categorySlug && categoryLabel && categoryLabel !== data.crumb ? (
                 <>
                   <Link href={`/services/${categorySlug}`}>{categoryLabel}</Link>
-                  <span>/</span>
+                  <span aria-hidden="true">/</span>
                 </>
               ) : null}
-              <span className="aix-breadcrumb-current">{data.crumb}</span>
+              <span className="acx-crumb-now">{data.crumb}</span>
             </nav>
 
-            <div className="aix-hero-grid">
-              <div className="aix-hero-copy">
-                {data.heroEyebrow && <p className="aix-eyebrow">{data.heroEyebrow}</p>}
-                <h1 className="aix-h1">
-                  <GradientHeading text={data.heroTitle} />
-                </h1>
-                {heroLead && <p className="aix-lead">{heroLead}</p>}
+            <div className="acx-hero-copy">
+              <h1>
+                <Grad text={data.heroTitle} />
+              </h1>
+              {heroLead && <p className="acx-lead">{heroLead}</p>}
+            </div>
+            {heroRest.length > 0 && (
+              <div className={`acx-hero-cols${heroRest.length === 1 ? " is-single" : ""}`}>
                 {heroRest.map((p, i) => (
-                  <p key={i} className="aix-text">
+                  <p key={i} className="acx-text">
                     {p}
                   </p>
                 ))}
-                {data.heroCta && (
-                  <div className="aix-actions">
-                    <PrimaryButton href={data.heroCta.href} label={data.heroCta.label} />
-                  </div>
-                )}
               </div>
-              <WorkflowDiagram />
-            </div>
+            )}
+            {data.heroCta && (
+              <div className="acx-actions acx-actions-center">
+                <Btn href={data.heroCta.href} label={data.heroCta.label} />
+              </div>
+            )}
+            <AutomationConsole />
           </div>
         </section>
 
-        {/* 2. Our AI Automation Services */}
+        {/* Services: modules */}
         {services && (
-          <section className="aix-section">
-            <div className="aix-container">
-              <div className="aix-head">
-                <h2 className="aix-h2">
-                  <GradientHeading text={services.title || ""} />
-                </h2>
+          <section className="acx-sec">
+            <div className="acx-container">
+              <div className="acx-head">
+                {services.title && (
+                  <h2>
+                    <Grad text={services.title} />
+                  </h2>
+                )}
+                {services.desc && <p className="acx-text">{services.desc}</p>}
               </div>
-              <ul className="aix-services">
+              <ul className="acx-modules">
                 {services.items.map((item, i) => (
-                  <li key={item.title} className="aix-service">
-                    <span className="aix-service-icon">
-                      <LucideIcon name={serviceIcons[i % serviceIcons.length]} size={24} strokeWidth={1.9} />
-                    </span>
-                    <h3 className="aix-h3">{item.title}</h3>
-                    <p className="aix-text">{item.desc}</p>
+                  <li key={item.title} className="acx-module">
+                    <div className="acx-module-top">
+                      <span className="acx-module-icon" aria-hidden="true">
+                        <LucideIcon name={serviceIcons[i % serviceIcons.length]} size={22} strokeWidth={1.9} />
+                      </span>
+                      <span className="acx-module-status" aria-hidden="true" />
+                    </div>
+                    <h3>{item.title}</h3>
+                    <p className="acx-text">{item.desc}</p>
                   </li>
                 ))}
               </ul>
               {services.cta && (
-                <div className="aix-actions aix-center">
-                  <PrimaryButton href={services.cta.href} label={services.cta.label} />
+                <div className="acx-actions acx-actions-center">
+                  <Btn href={services.cta.href} label={services.cta.label} />
                 </div>
               )}
             </div>
           </section>
         )}
 
-        {/* 3. AI Automation for Business Growth */}
+        {/* Growth: dark capability matrix */}
         {growth && (
-          <section className="aix-section aix-navy">
-            <div className="aix-container aix-growth">
-              <div className="aix-growth-head">
-                <h2 className="aix-h2">
-                  <GradientHeading text={growth.title || ""} />
-                </h2>
-                {growth.intro && <p className="aix-lead">{growth.intro}</p>}
+          <section className="acx-sec acx-sec-tight">
+            <div className="acx-container">
+              <div className="acx-matrix-panel">
+                <span className="acx-matrix-grid" aria-hidden="true" />
+                <div className="acx-matrix-head">
+                  <h2>
+                    <Grad text={growth.title} />
+                  </h2>
+                  {growth.intro && <p className="acx-matrix-intro">{growth.intro}</p>}
+                </div>
+                <ul className="acx-matrix">
+                  {(growth.bullets || []).map((b) => (
+                    <li key={b}>
+                      <span className="acx-matrix-check" aria-hidden="true">
+                        <Check />
+                      </span>
+                      <span>{b}</span>
+                    </li>
+                  ))}
+                </ul>
+                {growth.desc && <p className="acx-matrix-intro">{growth.desc}</p>}
+                {growth.cta && (
+                  <div className="acx-actions">
+                    <Link href={growth.cta.href || "/contact"} className="acx-btn acx-btn-white">
+                      <span>{growth.cta.label}</span>
+                      <Arrow />
+                    </Link>
+                  </div>
+                )}
               </div>
-              <ul className="aix-toggles">
-                {(growth.bullets || []).map((b) => (
-                  <li key={b}>
-                    <span>{b}</span>
-                    <span className="aix-toggle" aria-hidden="true">
-                      <span />
-                    </span>
-                  </li>
-                ))}
-              </ul>
             </div>
           </section>
         )}
 
-        {/* 4. Our AI Automation Process */}
+        {/* Process: two-column step sheet */}
         {processBlock && (
-          <section className="aix-section">
-            <div className="aix-container">
-              <div className="aix-head">
-                <h2 className="aix-h2">
-                  <GradientHeading text={processBlock.title || ""} />
+          <section className="acx-sec acx-soft">
+            <div className="acx-container">
+              <div className="acx-head">
+                <h2>
+                  <Grad text={processBlock.title} />
                 </h2>
+                {processBlock.intro && <p className="acx-text">{processBlock.intro}</p>}
+                {processBlock.desc && <p className="acx-text">{processBlock.desc}</p>}
               </div>
-              <ol className="aix-pipeline">
-                {(processBlock.steps || []).map((st, i) => (
-                  <li key={st.num} className={i % 2 === 0 ? "is-left" : "is-right"}>
-                    <span className="aix-pipe-node">{st.num}</span>
-                    <div className="aix-pipe-card">
-                      <h3 className="aix-h3">{st.title}</h3>
-                      <p className="aix-text">{st.desc || st.text}</p>
-                    </div>
-                  </li>
+              <div className="acx-sheet">
+                {[steps.slice(0, half), steps.slice(half)].map((col, c) => (
+                  <ol key={c} className="acx-sheet-col">
+                    {col.map((st) => (
+                      <li key={st.num + st.title} className="acx-sheet-row">
+                        <span className="acx-sheet-num">{st.num}</span>
+                        <div className="acx-sheet-body">
+                          <h3>{st.title}</h3>
+                          <p className="acx-text">{st.desc || st.text}</p>
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
                 ))}
-              </ol>
+              </div>
               {processBlock.cta && (
-                <div className="aix-actions aix-center">
-                  <PrimaryButton href={processBlock.cta.href} label={processBlock.cta.label} />
+                <div className="acx-actions acx-actions-center">
+                  <Btn href={processBlock.cta.href} label={processBlock.cta.label} />
                 </div>
               )}
             </div>
           </section>
         )}
 
-        {/* 5. Why Choose Quickupp Softech? */}
+        {/* Why choose */}
         {why && (
-          <section className="aix-section aix-mint">
-            <div className="aix-container">
-              <div className="aix-head">
-                <h2 className="aix-h2">
-                  <GradientHeading text={why.title || ""} />
-                </h2>
-                {why.tagline && <p className="aix-tagline">{why.tagline}</p>}
+          <section className="acx-sec">
+            <div className="acx-container acx-why">
+              <div className="acx-why-copy">
+                {why.tagline && <p className="acx-kicker">{why.tagline}</p>}
+                {why.title && (
+                  <h2>
+                    <Grad text={why.title} />
+                  </h2>
+                )}
+                {why.intro && <p className="acx-text">{why.intro}</p>}
+                {why.desc && <p className="acx-statement">{why.desc}</p>}
+                {why.cta && (
+                  <div className="acx-actions">
+                    <Btn href={why.cta.href} label={why.cta.label} />
+                  </div>
+                )}
               </div>
-              <ul className="aix-why">
+              <ul className="acx-checks">
                 {why.bullets.map((b) => (
                   <li key={b}>
-                    <span className="aix-check">
-                      <CheckIcon />
+                    <span className="acx-check" aria-hidden="true">
+                      <Check />
                     </span>
                     <span>{b}</span>
                   </li>
                 ))}
               </ul>
-              {why.desc && <p className="aix-statement">{why.desc}</p>}
             </div>
           </section>
         )}
 
-        {/* 6. Industries We Serve */}
+        {/* Industries */}
         {industries && (
-          <section className="aix-section">
-            <div className="aix-container">
-              <div className="aix-head">
-                <h2 className="aix-h2">
-                  <GradientHeading text={industries.title || ""} />
-                </h2>
-                {industries.intro && <p className="aix-lead">{industries.intro}</p>}
+          <section className="acx-sec acx-soft">
+            <div className="acx-container">
+              <div className="acx-head acx-head-center">
+                {industries.title && (
+                  <h2>
+                    <Grad text={industries.title} />
+                  </h2>
+                )}
+                {industries.intro && <p className="acx-text">{industries.intro}</p>}
               </div>
-              <ul className="aix-chips">
+              <ul className="acx-boxes">
                 {industries.industries.map((ind) => (
                   <li key={ind}>{ind}</li>
                 ))}
@@ -306,66 +327,62 @@ export default function AIAutomationServicePage({
           </section>
         )}
 
-        {/* 7. Frequently Asked Questions */}
+        {/* FAQ */}
         {faqItems.length > 0 && (
-          <section className="aix-section aix-soft">
-            <div className="aix-container aix-faq-solo">
-              <div className="aix-faq">
-                {faqItems.map((f, i) => {
-                  const open = openFaq === i;
-                  return (
-                    <div key={f.q} className={`aix-faq-item${open ? " is-open" : ""}`}>
-                      <button
-                        type="button"
-                        className="aix-faq-q"
-                        aria-expanded={open}
-                        onClick={() => setOpenFaq(open ? null : i)}
-                      >
-                        <span className="aix-faq-text">{f.q}</span>
-                        <span className="aix-faq-sign" aria-hidden="true" />
-                      </button>
-                      {open && <p className="aix-faq-a">{f.a}</p>}
+          <section className="acx-sec">
+            <div className="acx-container acx-faq">
+              {faqItems.map((f, i) => {
+                const open = openFaq === i;
+                return (
+                  <div key={f.q} className={`acx-faq-item${open ? " is-open" : ""}`}>
+                    <button type="button" className="acx-faq-q" aria-expanded={open} onClick={() => setOpenFaq(open ? null : i)}>
+                      <span className="acx-faq-text">{f.q}</span>
+                      <span className="acx-faq-sign" aria-hidden="true" />
+                    </button>
+                    <div className="acx-faq-a">
+                      <div>
+                        <p className="acx-text">{f.a}</p>
+                      </div>
                     </div>
-                  );
-                })}
-              </div>
+                  </div>
+                );
+              })}
             </div>
           </section>
         )}
 
-        {/* 8. Closing */}
-        <section className="aix-closing-section">
-          <div className="aix-container">
-            <div className="aix-closing">
-              <div className="aix-closing-grid" aria-hidden="true" />
-              {data.closingTitle && <h2 className="aix-h2">
-                  <GradientHeading text={data.closingTitle} />
-                </h2>}
-              {data.closingDesc
-                .split("\n")
-                .filter(Boolean)
-                .map((line, i) => (
-                  <p key={i} className="aix-closing-text">
-                    {line}
-                  </p>
-                ))}
-              {data.closingTagline && <p className="aix-closing-tagline">{data.closingTagline}</p>}
-              <div className="aix-actions aix-center">
-                {data.closingCtas.map((cta, i) =>
-                  i === 0 ? (
-                    <Link key={cta.label} href={cta.href || "/contact"} className="aix-btn aix-btn-white">
-                      <span>{cta.label}</span>
-                      <ArrowIcon />
-                    </Link>
-                  ) : (
-                    <Link key={cta.label} href={cta.href || "/contact"} className="aix-btn aix-btn-ghost">
-                      {cta.label}
-                    </Link>
-                  )
+        {/* Closing */}
+        <section className="acx-close-sec">
+          <div className="acx-container">
+            <div className="acx-close">
+              <div className="acx-close-copy">
+                {data.closingTagline && <p className="acx-kicker">{data.closingTagline}</p>}
+                {data.closingTitle && (
+                  <h2>
+                    <Grad text={data.closingTitle} />
+                  </h2>
+                )}
+                {(data.closingDesc || "")
+                  .split("\n")
+                  .filter(Boolean)
+                  .map((line, i) => (
+                    <p key={i} className="acx-text">
+                      {line}
+                    </p>
+                  ))}
+                {data.closingCtas?.length > 0 && (
+                  <div className="acx-actions">
+                    {data.closingCtas.map((cta, i) => (
+                      <Btn key={cta.label} href={cta.href} label={cta.label} variant={i === 0 ? "dark" : "outline"} />
+                    ))}
+                  </div>
                 )}
               </div>
               {data.closingSignature && (
-                <div className="aix-signature">
+                <div className="acx-sign">
+                  <span className="acx-sign-chip" aria-hidden="true">
+                    <LucideIcon name="cpu" size={26} strokeWidth={1.8} />
+                  </span>
                   <strong>{data.closingSignature.name}</strong>
                   <span>{data.closingSignature.line}</span>
                 </div>
