@@ -18,10 +18,10 @@ import type {
 import LucideIcon, { type LucideIconName } from "@/components/LucideIcon";
 
 /*
- * AI & Automation Solutions service page — "acx-" console design, used only
- * here: centred hero over an automation console (tasks flow into an AI chip
- * and come out done), service modules, a dark capability matrix, a two-column
- * step sheet, check grid, industry boxes, FAQ and a sign-off closing panel.
+ * AI & Automation Solutions service page — "acx-" design, used only here:
+ * split hero with a photo and floating icon chips, invert-on-hover service
+ * modules, a dark capability matrix, gradient-numbered step cards, a photo +
+ * icon grid for why choose, icon industry tiles, FAQ and a sign-off panel.
  * Every word comes from data/services/ai-automation-solutions.ts.
  */
 
@@ -52,42 +52,28 @@ const serviceIcons: LucideIconName[] = [
   "sparkles",
 ];
 
-/* Console: task icons travel into the AI chip and leave as completed ticks */
-const laneIcons: LucideIconName[] = ["mail", "file-text", "message-circle", "users", "chart-column"];
+/* Hero photo with floating icon chips (decorative) */
+const floatIcons: { icon: LucideIconName; cls: string }[] = [
+  { icon: "bot", cls: "acx-float-a" },
+  { icon: "workflow", cls: "acx-float-b" },
+  { icon: "mail", cls: "acx-float-c" },
+  { icon: "chart-column", cls: "acx-float-d" },
+];
 
-function AutomationConsole() {
-  return (
-    <div className="acx-console" aria-hidden="true">
-      <div className="acx-console-bar">
-        <span />
-        <span />
-        <span />
-      </div>
-      <div className="acx-console-body">
-        <div className="acx-lane acx-lane-in">
-          {laneIcons.map((ic, i) => (
-            <span key={ic} className="acx-task" style={{ "--acx-i": i } as React.CSSProperties}>
-              <LucideIcon name={ic} size={18} />
-            </span>
-          ))}
-        </div>
-        <div className="acx-chip">
-          <span className="acx-chip-ring" />
-          <LucideIcon name="cpu" size={34} strokeWidth={1.7} />
-        </div>
-        <div className="acx-lane acx-lane-out">
-          {laneIcons.map((ic, i) => (
-            <span key={ic} className="acx-done" style={{ "--acx-i": i } as React.CSSProperties}>
-              <Check size={14} />
-            </span>
-          ))}
-        </div>
-        <span className="acx-track acx-track-in" />
-        <span className="acx-track acx-track-out" />
-      </div>
-    </div>
-  );
-}
+/* One icon per "why choose" point and per industry, in content order */
+const whyIcons: LucideIconName[] = ["sparkles", "target", "plug-zap", "workflow", "layers", "code-xml", "rocket", "settings"];
+const industryIcons: Record<string, LucideIconName> = {
+  Healthcare: "heart-pulse",
+  "Home Services": "house",
+  "Professional Services": "briefcase",
+  Education: "graduation-cap",
+  "IT & SaaS": "cloud",
+  eCommerce: "shopping-cart",
+  "Real Estate": "building",
+  "Interior Design": "sofa",
+  "Travel & Hospitality": "plane",
+  Automotive: "settings",
+};
 
 function Btn({ href, label, variant = "dark" }: { href?: string; label: string; variant?: "dark" | "outline" }) {
   return (
@@ -117,7 +103,6 @@ export default function AIAutomationServicePage({
   const faq = data.blocks.find((b): b is FaqBlock => b.type === "faq");
   const faqItems = faq ? faq.items || faq.faqs || [] : [];
   const steps = processBlock?.steps || [];
-  const half = Math.ceil(steps.length / 2);
   const [heroLead, ...heroRest] = data.heroParagraphs || [];
 
   return (
@@ -143,27 +128,38 @@ export default function AIAutomationServicePage({
               <span className="acx-crumb-now">{data.crumb}</span>
             </nav>
 
-            <div className="acx-hero-copy">
-              <h1>
-                <Grad text={data.heroTitle} />
-              </h1>
-              {heroLead && <p className="acx-lead">{heroLead}</p>}
-            </div>
-            {heroRest.length > 0 && (
-              <div className={`acx-hero-cols${heroRest.length === 1 ? " is-single" : ""}`}>
+            <div className="acx-hero-grid">
+              <div className="acx-hero-copy">
+                <h1>
+                  <Grad text={data.heroTitle} />
+                </h1>
+                {heroLead && <p className="acx-lead">{heroLead}</p>}
                 {heroRest.map((p, i) => (
                   <p key={i} className="acx-text">
                     {p}
                   </p>
                 ))}
+                {data.heroCta && (
+                  <div className="acx-actions">
+                    <Btn href={data.heroCta.href} label={data.heroCta.label} />
+                  </div>
+                )}
               </div>
-            )}
-            {data.heroCta && (
-              <div className="acx-actions acx-actions-center">
-                <Btn href={data.heroCta.href} label={data.heroCta.label} />
+              <div className="acx-hero-visual" aria-hidden="true">
+                <div className="acx-hero-photo">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/images/contact-tech-discussion.jpg" alt="" />
+                </div>
+                <span className="acx-hero-chip">
+                  <LucideIcon name="cpu" size={30} strokeWidth={1.7} />
+                </span>
+                {floatIcons.map((f) => (
+                  <span key={f.icon} className={`acx-float ${f.cls}`}>
+                    <LucideIcon name={f.icon} size={20} />
+                  </span>
+                ))}
               </div>
-            )}
-            <AutomationConsole />
+            </div>
           </div>
         </section>
 
@@ -182,12 +178,9 @@ export default function AIAutomationServicePage({
               <ul className="acx-modules">
                 {services.items.map((item, i) => (
                   <li key={item.title} className="acx-module">
-                    <div className="acx-module-top">
-                      <span className="acx-module-icon" aria-hidden="true">
-                        <LucideIcon name={serviceIcons[i % serviceIcons.length]} size={22} strokeWidth={1.9} />
-                      </span>
-                      <span className="acx-module-status" aria-hidden="true" />
-                    </div>
+                    <span className="acx-module-icon" aria-hidden="true">
+                      <LucideIcon name={serviceIcons[i % serviceIcons.length]} size={22} strokeWidth={1.9} />
+                    </span>
                     <h3>{item.title}</h3>
                     <p className="acx-text">{item.desc}</p>
                   </li>
@@ -238,37 +231,33 @@ export default function AIAutomationServicePage({
           </section>
         )}
 
-        {/* Process: two-column step sheet */}
+        {/* Process: heading column + vertical stepper */}
         {processBlock && (
           <section className="acx-sec acx-soft">
-            <div className="acx-container">
-              <div className="acx-head">
+            <div className="acx-container acx-proc">
+              <div className="acx-proc-side">
                 <h2>
                   <Grad text={processBlock.title} />
                 </h2>
                 {processBlock.intro && <p className="acx-text">{processBlock.intro}</p>}
                 {processBlock.desc && <p className="acx-text">{processBlock.desc}</p>}
+                {processBlock.cta && (
+                  <div className="acx-actions">
+                    <Btn href={processBlock.cta.href} label={processBlock.cta.label} />
+                  </div>
+                )}
               </div>
-              <div className="acx-sheet">
-                {[steps.slice(0, half), steps.slice(half)].map((col, c) => (
-                  <ol key={c} className="acx-sheet-col">
-                    {col.map((st) => (
-                      <li key={st.num + st.title} className="acx-sheet-row">
-                        <span className="acx-sheet-num">{st.num}</span>
-                        <div className="acx-sheet-body">
-                          <h3>{st.title}</h3>
-                          <p className="acx-text">{st.desc || st.text}</p>
-                        </div>
-                      </li>
-                    ))}
-                  </ol>
+              <ol className="acx-stepper">
+                {steps.map((st) => (
+                  <li key={st.num + st.title} className="acx-stepper-row">
+                    <span className="acx-stepper-node">{st.num}</span>
+                    <div className="acx-stepper-body">
+                      <h3>{st.title}</h3>
+                      <p className="acx-text">{st.desc || st.text}</p>
+                    </div>
+                  </li>
                 ))}
-              </div>
-              {processBlock.cta && (
-                <div className="acx-actions acx-actions-center">
-                  <Btn href={processBlock.cta.href} label={processBlock.cta.label} />
-                </div>
-              )}
+              </ol>
             </div>
           </section>
         )}
@@ -278,6 +267,10 @@ export default function AIAutomationServicePage({
           <section className="acx-sec">
             <div className="acx-container acx-why">
               <div className="acx-why-copy">
+                <div className="acx-why-photo" aria-hidden="true">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/images/contact-team-collaboration.jpg" alt="" loading="lazy" />
+                </div>
                 {why.tagline && <p className="acx-kicker">{why.tagline}</p>}
                 {why.title && (
                   <h2>
@@ -293,10 +286,10 @@ export default function AIAutomationServicePage({
                 )}
               </div>
               <ul className="acx-checks">
-                {why.bullets.map((b) => (
+                {why.bullets.map((b, i) => (
                   <li key={b}>
-                    <span className="acx-check" aria-hidden="true">
-                      <Check />
+                    <span className="acx-check-icon" aria-hidden="true">
+                      <LucideIcon name={whyIcons[i % whyIcons.length]} size={20} strokeWidth={1.9} />
                     </span>
                     <span>{b}</span>
                   </li>
@@ -320,7 +313,12 @@ export default function AIAutomationServicePage({
               </div>
               <ul className="acx-boxes">
                 {industries.industries.map((ind) => (
-                  <li key={ind}>{ind}</li>
+                  <li key={ind}>
+                    <span className="acx-box-icon" aria-hidden="true">
+                      <LucideIcon name={industryIcons[ind] || "sparkles"} size={22} strokeWidth={1.8} />
+                    </span>
+                    <span>{ind}</span>
+                  </li>
                 ))}
               </ul>
             </div>
