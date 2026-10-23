@@ -23,6 +23,8 @@ const ABOUT_PRESET: MotionPreset = {
   items: ["tilt", "flip", "rise", "pop", "zoom", "glide"],
   stagger: 0.08,
   heroStep: 0.09,
+  // The scroll-driven index plays its own reveal on every point
+  skip: ".abx-index-stage",
 };
 
 export default function AboutMotion({ seed = 0 }: { seed?: number }) {

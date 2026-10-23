@@ -744,113 +744,63 @@
   color: var(--abx-ink);
 }
 
-/* ---- Zig-zag route -------------------------------------------------------------------- */
-.abx-route {
-  display: grid;
-  grid-template-columns: repeat(var(--abx-n), minmax(0, 1fr));
-  grid-template-rows: auto 36px auto;
-  column-gap: 16px;
-}
-
-.abx-route li {
-  display: grid;
-  grid-row: 1 / 4;
-  grid-template-rows: subgrid;
-  position: relative;
-}
-
-.abx-route-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 22px 20px;
-  border-radius: 18px;
+/* ---- Steps: a ruled list of rows -------------------------------------------------------- */
+.abx-steps {
+  max-width: 1080px;
+  margin: 0 auto;
+  border-radius: 22px;
   background: #ffffff;
   border: 1px solid var(--abx-line);
-  transition:
-    border-color 0.3s ease,
-    box-shadow 0.3s ease;
+  overflow: hidden;
 }
 
-.abx-route li:hover .abx-route-card {
-  border-color: #c7cbe0;
-  box-shadow: 0 22px 44px -34px rgba(15, 23, 42, 0.45);
-}
-
-.abx-route li.is-up .abx-route-card {
-  grid-row: 1;
-  align-self: end;
-}
-
-.abx-route li.is-down .abx-route-card {
-  grid-row: 3;
-  align-self: start;
-}
-
-/* Stem from card to the line */
-.abx-route-card::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  width: 1px;
-  height: 18px;
-  background: #c7cbe0;
-}
-
-.abx-route li.is-up .abx-route-card::after {
-  top: 100%;
-}
-
-.abx-route li.is-down .abx-route-card::after {
-  bottom: 100%;
-}
-
-/* The line and its nodes */
-.abx-route-rail {
-  grid-row: 2;
+.abx-step {
   position: relative;
-  align-self: center;
-  height: 14px;
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.4fr);
+  gap: 12px clamp(24px, 4vw, 56px);
+  align-items: start;
+  padding: 26px clamp(22px, 3vw, 36px);
+  transition: background-color 0.3s ease;
 }
 
-.abx-route-rail::before {
+.has-quote .abx-step {
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.3fr) minmax(0, 0.85fr);
+}
+
+.abx-step + .abx-step {
+  border-top: 1px solid #eef0f6;
+}
+
+/* Gradient marker that grows on the left edge on hover */
+.abx-step::before {
   content: "";
   position: absolute;
-  top: 6px;
-  left: -8px;
-  right: -8px;
-  height: 2px;
-  background: var(--abx-grad);
-  opacity: 0.55;
-}
-
-.abx-route li:first-child .abx-route-rail::before {
-  left: 50%;
-}
-
-.abx-route li:last-child .abx-route-rail::before {
-  right: 50%;
-}
-
-.abx-route-node {
-  position: absolute;
+  left: 0;
   top: 0;
-  left: 50%;
-  width: 14px;
-  height: 14px;
-  margin-left: -7px;
-  border-radius: 999px;
-  background: #ffffff;
-  border: 2px solid var(--abx-ink);
-  z-index: 1;
+  bottom: 0;
+  width: 3px;
+  background: var(--abx-grad);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.abx-route li:last-child .abx-route-node {
-  background: var(--abx-ink);
+.abx-step:hover {
+  background: #fbfbfe;
 }
 
-.abx-route-label {
+.abx-step:hover::before {
+  transform: scaleY(1);
+}
+
+.abx-step-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.abx-step-label {
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -858,22 +808,34 @@
   color: #6366f1;
 }
 
-.abx-route-quote {
-  margin-top: 4px;
-  padding-top: 10px;
-  border-top: 1px dashed #dfe2ec;
-  font-family: var(--font-body, Inter, sans-serif);
-  font-size: 14px;
+.abx-page p.abx-step-quote:not(#_) {
+  padding-left: 16px;
+  border-left: 2px solid var(--abx-line);
+  font-family: var(--font-body, Inter, sans-serif) !important;
+  font-size: 15px !important;
   font-style: italic;
   font-weight: 500;
-  line-height: 1.5;
+  line-height: 1.55 !important;
   color: var(--abx-ink);
 }
 
-.abx-route-plain .abx-route-card {
-  justify-content: center;
-  min-height: 120px;
-  text-align: center;
+/* Steps that are single sentences: two per row */
+.abx-steps-plain {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.abx-steps-plain .abx-step {
+  grid-template-columns: minmax(0, 1fr);
+  border-top: 1px solid #eef0f6;
+}
+
+.abx-steps-plain .abx-step:nth-child(-n + 2) {
+  border-top: 0;
+}
+
+.abx-steps-plain .abx-step:nth-child(odd) {
+  border-right: 1px solid #eef0f6;
 }
 
 /* ---- Index viewer ---------------------------------------------------------------------- */
@@ -960,8 +922,54 @@
 }
 
 .abx-index-stage {
+  position: relative;
+}
+
+/* Scroll-driven index: tall track with a pinned block */
+.abx-index-sec {
+  padding-top: clamp(40px, 5vw, 72px);
+  padding-bottom: clamp(40px, 5vw, 72px);
+}
+
+.abx-index-scroll {
+  position: relative;
+}
+
+.abx-index-spacer {
+  height: var(--abx-index-len);
+}
+
+.abx-index-pin {
   position: sticky;
-  top: 110px;
+  top: 96px;
+  padding-top: clamp(12px, 2vw, 28px);
+}
+
+.abx-index-pin .abx-head {
+  margin-bottom: clamp(20px, 2.6vw, 32px);
+}
+
+.abx-index-nav {
+  position: relative;
+}
+
+.abx-index-progress {
+  position: absolute;
+  top: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--abx-grad);
+  transform-origin: left;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 1;
+}
+
+@media (max-height: 820px) and (min-width: 992px) {
+  .abx-page button.abx-index-tab:not(#_) {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
 }
 
 .abx-index-panel {
@@ -977,13 +985,51 @@
 
 .abx-index-panel.is-active {
   display: flex;
-  animation: abx-panel-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: abx-panel-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Each time a point is shown, its contents rise in one after another */
+.abx-index-panel.is-active > * {
+  animation: abx-panel-item 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.abx-index-panel.is-active > :nth-child(1) {
+  animation-delay: 0.05s;
+}
+
+.abx-index-panel.is-active > :nth-child(2) {
+  animation-delay: 0.12s;
+}
+
+.abx-index-panel.is-active > :nth-child(3) {
+  animation-delay: 0.19s;
+}
+
+.abx-index-panel.is-active > :nth-child(4) {
+  animation-delay: 0.26s;
+}
+
+.abx-index-panel.is-active > :nth-child(5) {
+  animation-delay: 0.33s;
+}
+
+@keyframes abx-panel-item {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(0 0 -20% 0);
+  }
 }
 
 @keyframes abx-panel-in {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(12px) scale(0.985);
   }
   to {
     opacity: 1;
@@ -1144,53 +1190,34 @@
     max-width: 560px;
   }
 
-  /* Route: vertical line on the left */
-  .abx-page .abx-route {
+  /* Steps: stack the parts of each row */
+  .abx-step,
+  .has-quote .abx-step {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: none;
-    row-gap: 14px;
-    padding-left: 30px;
-    position: relative;
   }
 
-  .abx-route::before {
-    content: "";
-    position: absolute;
-    left: 6px;
-    top: 24px;
-    bottom: 24px;
-    width: 2px;
-    background: var(--abx-grad);
-    opacity: 0.55;
+  .abx-steps-plain {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .abx-route li {
-    display: block;
-    grid-row: auto;
+  .abx-steps-plain .abx-step:nth-child(2) {
+    border-top: 1px solid #eef0f6;
   }
 
-  .abx-route-rail::before,
-  .abx-route-card::after {
+  .abx-steps-plain .abx-step:nth-child(odd) {
+    border-right: 0;
+  }
+
+  /* Index: every item shown in turn, no pinning */
+  .abx-index-spacer {
     display: none;
   }
 
-  .abx-route li {
-    position: relative;
+  .abx-index-pin {
+    position: static;
+    padding-top: 0;
   }
 
-  .abx-route-rail {
-    position: absolute;
-    left: -30px;
-    top: 24px;
-    width: 14px;
-  }
-
-  .abx-route-plain .abx-route-card {
-    min-height: 0;
-    text-align: left;
-  }
-
-  /* Index: every item shown in turn */
   .abx-index-nav {
     display: none;
   }
@@ -1207,7 +1234,8 @@
     animation: none;
   }
 
-  .abx-index-panel.is-active {
+  .abx-index-panel.is-active,
+  .abx-index-panel.is-active > * {
     animation: none;
   }
 
@@ -1284,7 +1312,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .abx-slat,
-  .abx-index-panel.is-active {
+  .abx-index-panel.is-active,
+  .abx-index-panel.is-active > * {
     animation: none !important;
   }
 }

@@ -309,12 +309,7 @@ export default function AIAutomationServicePage({
         {/* 7. Frequently Asked Questions */}
         {faqItems.length > 0 && (
           <section className="aix-section aix-soft">
-            <div className="aix-container aix-faq-grid">
-              <div className="aix-faq-head">{faq?.title && (
-                <h2 className="aix-h2">
-                  <GradientHeading text={faq.title} />
-                </h2>
-              )}</div>
+            <div className="aix-container aix-faq-solo">
               <div className="aix-faq">
                 {faqItems.map((f, i) => {
                   const open = openFaq === i;

@@ -595,12 +595,7 @@ export default function YouTubePromotionPage({ content }: { content: YouTubeProm
 
         {/* 10. FAQ */}
         <section className="ytv-section ytv-soft">
-          <div className="ytv-container ytv-faq-wrap">
-            <div className="ytv-faq-head">
-              <h2 className="ytv-h2">
-                <GradientHeading text={c.faq.title} />
-              </h2>
-            </div>
+          <div className="ytv-container ytv-faq-solo">
             <div className="ytv-faq">
               {c.faq.items.map((f, i) => {
                 const open = openFaq === i;

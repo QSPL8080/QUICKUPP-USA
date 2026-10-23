@@ -2305,3 +2305,8 @@ html:has(.ytv-page) {
     transition: none;
   }
 }
+
+/* FAQ without a heading: a single centred column */
+.ytv-faq-solo {
+  max-width: 900px;
+}

@@ -1,0 +1,807 @@
+/* ==========================================================================
+   AI-POWERED DIGITAL MARKETING SUBPAGES — "mkx-" studio design (only here)
+   Framed hero photo, services index, campaign cards with chips, poster
+   cards, numbered process flow, check list panel, industry chips, FAQ
+   accordion and a gradient-edged closing card.
+   Site fonts, type scale, heading gradient and black/white buttons.
+   ========================================================================== */
+.mkx-page {
+  --mkx-ink: #0b0f17;
+  --mkx-body: #475569;
+  --mkx-muted: #64748b;
+  --mkx-line: #e6e8ef;
+  --mkx-soft: #f6f7fb;
+  --mkx-indigo: #4f46e5;
+  --mkx-grad: linear-gradient(135deg, #00d2ff 0%, #6366f1 50%, #a855f7 100%);
+  --mkx-y: clamp(64px, 7vw, 104px);
+  background: #ffffff;
+  color: var(--mkx-ink);
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
+  overflow-x: clip;
+}
+
+.mkx-page *,
+.mkx-page *::before,
+.mkx-page *::after {
+  box-sizing: border-box;
+}
+
+.mkx-page ul,
+.mkx-page ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mkx-page h1,
+.mkx-page h2,
+.mkx-page h3,
+.mkx-page p {
+  margin: 0;
+}
+
+.mkx-page h1,
+.mkx-page h2,
+.mkx-page h3 {
+  color: var(--mkx-ink);
+}
+
+.mkx-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+}
+
+.mkx-text {
+  color: var(--mkx-body);
+}
+
+.mkx-page p.mkx-lead:not(#_) {
+  font-size: 18px !important;
+  line-height: 1.65 !important;
+  color: #334155;
+}
+
+.mkx-page p.mkx-kicker:not(#_):not(#__) {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #eef2ff;
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif) !important;
+  font-size: 12px !important;
+  font-weight: 700;
+  line-height: 1.3 !important;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mkx-indigo);
+}
+
+.mkx-page p.mkx-remark:not(#_) {
+  font-weight: 600;
+  color: var(--mkx-ink);
+}
+
+/* ---- Sections ------------------------------------------------------------------ */
+.mkx-sec {
+  position: relative;
+  padding: var(--mkx-y) 0;
+}
+
+.mkx-soft {
+  background: var(--mkx-soft);
+}
+
+.mkx-head {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 820px;
+  margin-bottom: clamp(30px, 4vw, 48px);
+}
+
+.mkx-head-center {
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.mkx-head-center .mkx-kicker {
+  align-self: center !important;
+}
+
+/* ---- Buttons ---------------------------------------------------------------------- */
+.mkx-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.mkx-actions-center {
+  justify-content: center;
+}
+
+.mkx-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 50px;
+  padding: 0 24px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  text-align: center;
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.mkx-btn:hover {
+  transform: translateY(-2px);
+}
+
+.mkx-btn svg {
+  transition: transform 0.25s ease;
+}
+
+.mkx-btn:hover svg {
+  transform: translateX(3px);
+}
+
+.mkx-btn-dark {
+  background: var(--mkx-ink);
+  border-color: var(--mkx-ink);
+  color: #ffffff;
+}
+
+.mkx-btn-outline {
+  background: #ffffff;
+  border-color: #d0d5dd;
+  color: var(--mkx-ink);
+}
+
+/* ---- Hero ------------------------------------------------------------------------- */
+.mkx-hero {
+  position: relative;
+  padding: clamp(118px, 10.5vw, 146px) 0 var(--mkx-y);
+  overflow: hidden;
+}
+
+.mkx-hero-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 78% 42%, rgba(168, 85, 247, 0.12), transparent 32%),
+    radial-gradient(circle at 92% 80%, rgba(0, 210, 255, 0.12), transparent 30%),
+    radial-gradient(rgba(15, 23, 42, 0.08) 1px, transparent 1px) 0 0 / 22px 22px;
+  -webkit-mask-image: linear-gradient(180deg, #000 30%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 30%, transparent 100%);
+}
+
+.mkx-crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: clamp(28px, 3.5vw, 44px);
+  font-family: var(--font-body, Inter, sans-serif);
+  font-size: 14px;
+  color: var(--mkx-muted);
+}
+
+.mkx-crumbs a {
+  color: var(--mkx-muted);
+  text-decoration: none;
+}
+
+.mkx-crumbs a:hover {
+  color: var(--mkx-ink);
+}
+
+.mkx-crumbs > span[aria-hidden] {
+  color: #cbd5e1;
+}
+
+.mkx-crumb-now {
+  color: var(--mkx-ink);
+  font-weight: 600;
+}
+
+.mkx-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+  gap: clamp(36px, 6vw, 96px);
+  align-items: center;
+}
+
+.mkx-hero-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.mkx-hero-copy h1 {
+  margin-bottom: 4px;
+}
+
+.mkx-hero-copy .mkx-actions {
+  margin-top: 12px;
+}
+
+/* Hero photo */
+.mkx-hero-photo {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #e8ebf5;
+  box-shadow: 0 40px 80px -56px rgba(15, 23, 42, 0.55);
+}
+
+.mkx-hero-photo::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 1;
+  height: 4px;
+  background: var(--mkx-grad);
+}
+
+.mkx-hero-photo img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 4.6;
+  object-fit: cover;
+}
+
+/* ---- Services index ----------------------------------------------------------------- */
+.mkx-index {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: 28px;
+  border-top: 1px solid var(--mkx-line);
+}
+
+.mkx-index li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 2px;
+  border-bottom: 1px solid var(--mkx-line);
+  font-weight: 600;
+  color: var(--mkx-ink);
+}
+
+/* ---- Campaign cards ----------------------------------------------------------------- */
+.mkx-sec-card {
+  padding: clamp(14px, 1.6vw, 20px) 0;
+}
+
+.mkx-sec:not(.mkx-sec-card) + .mkx-sec-card {
+  padding-top: var(--mkx-y);
+}
+
+.mkx-sec-card + .mkx-sec:not(.mkx-sec-card) {
+  margin-top: calc(var(--mkx-y) - 20px);
+}
+
+.mkx-campaign {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: clamp(28px, 4.5vw, 64px);
+  align-items: center;
+  padding: clamp(28px, 4vw, 52px);
+  border-radius: 28px;
+  background: var(--mkx-soft);
+  border: 1px solid #eef0f6;
+}
+
+.mkx-campaign.is-flip {
+  background: #ffffff;
+  border-color: var(--mkx-line);
+  box-shadow: 0 30px 60px -50px rgba(15, 23, 42, 0.45);
+}
+
+.mkx-campaign.is-flip .mkx-campaign-copy {
+  order: 2;
+}
+
+.mkx-campaign-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.mkx-campaign-copy .mkx-actions {
+  margin-top: 10px;
+}
+
+.mkx-campaign-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Chips */
+.mkx-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.mkx-page .mkx-chips li:not(#_):not(#__) {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px 10px 12px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid var(--mkx-line);
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif) !important;
+  font-size: 15px !important;
+  font-weight: 600;
+  line-height: 1.35 !important;
+  color: var(--mkx-ink);
+  transition:
+    border-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.mkx-campaign.is-flip .mkx-chips li {
+  background: var(--mkx-soft);
+  border-color: #eef0f6;
+}
+
+.mkx-chips li:hover {
+  border-color: #c7cbe0;
+  transform: translateY(-2px);
+}
+
+.mkx-chips-center {
+  justify-content: center;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.mkx-chip-dot {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--mkx-grad);
+}
+
+/* ---- Poster cards --------------------------------------------------------------------- */
+.mkx-posters {
+  display: grid;
+  gap: 16px;
+}
+
+.mkx-posters-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.mkx-posters-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.mkx-poster {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 30px 28px 32px;
+  border-radius: 22px;
+  background: #ffffff;
+  border: 1px solid var(--mkx-line);
+  overflow: hidden;
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s ease;
+}
+
+.mkx-poster::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--mkx-grad);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.mkx-poster:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 26px 50px -36px rgba(15, 23, 42, 0.45);
+}
+
+.mkx-poster:hover::before {
+  transform: scaleX(1);
+}
+
+/* ---- Process flow ------------------------------------------------------------------------ */
+.mkx-flow {
+  display: grid;
+  grid-template-columns: repeat(var(--mkx-cols), minmax(0, 1fr));
+  gap: 20px;
+}
+
+.mkx-flow-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 26px 24px 28px;
+  border-radius: 20px;
+  background: #ffffff;
+  border: 1px solid var(--mkx-line);
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    transform 0.3s ease;
+}
+
+.mkx-flow-card:hover {
+  border-color: #c7cbe0;
+  box-shadow: 0 24px 48px -36px rgba(15, 23, 42, 0.45);
+  transform: translateY(-3px);
+}
+
+.mkx-flow-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 8px;
+}
+
+.mkx-flow-num {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--mkx-ink);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  transition: background 0.3s ease;
+}
+
+.mkx-flow-card:hover .mkx-flow-num {
+  background: var(--mkx-grad);
+}
+
+.mkx-flow-line {
+  flex: 1;
+  height: 1px;
+  background: repeating-linear-gradient(90deg, #d4d8e5 0 5px, transparent 5px 10px);
+}
+
+/* Arrow badge between neighbouring cards */
+.mkx-flow-next {
+  position: absolute;
+  z-index: 2;
+  top: 48px;
+  right: -21px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid var(--mkx-line);
+  color: var(--mkx-ink);
+}
+
+/* ---- Toggle checklist -------------------------------------------------------------------- */
+.mkx-why {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(28px, 5vw, 80px);
+  align-items: start;
+}
+
+.mkx-why-head {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.mkx-why-head .mkx-head {
+  margin-bottom: 0;
+}
+
+.mkx-checks {
+  display: flex;
+  flex-direction: column;
+  border-radius: 22px;
+  background: #ffffff;
+  border: 1px solid var(--mkx-line);
+  overflow: hidden;
+}
+
+.mkx-checks li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 22px;
+}
+
+.mkx-checks li + li {
+  border-top: 1px solid #eef0f6;
+}
+
+.mkx-check {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--mkx-ink);
+  color: #ffffff;
+}
+
+.mkx-check-text {
+  font-weight: 600;
+  color: var(--mkx-ink);
+}
+
+/* ---- AI block --------------------------------------------------------------------------- */
+.mkx-ai {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: clamp(32px, 5.5vw, 88px);
+  align-items: center;
+}
+
+.mkx-ai-photo {
+  position: relative;
+  width: 100%;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #e8ebf5;
+}
+
+.mkx-ai-photo img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 4.4;
+  object-fit: cover;
+}
+
+.mkx-ai-body .mkx-head {
+  margin-bottom: 22px;
+}
+
+.mkx-ai-body .mkx-remark {
+  margin-top: 20px;
+}
+
+/* ---- FAQ ------------------------------------------------------------------------------- */
+.mkx-faq {
+  max-width: 900px;
+  margin: 0 auto;
+  border-top: 1px solid var(--mkx-line);
+}
+
+.mkx-faq-item {
+  border-bottom: 1px solid var(--mkx-line);
+}
+
+.mkx-page button.mkx-faq-q:not(#_) {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 18px;
+  width: 100%;
+  padding: 22px 0;
+  border: 0;
+  border-radius: 0 !important;
+  background: transparent;
+  color: var(--mkx-ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.mkx-faq-sign {
+  position: relative;
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 1px solid var(--mkx-line);
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.mkx-faq-sign::before,
+.mkx-faq-sign::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 2px;
+  margin: -1px 0 0 -6px;
+  border-radius: 2px;
+  background: var(--mkx-ink);
+}
+
+.mkx-faq-sign::after {
+  transform: rotate(90deg);
+}
+
+.mkx-faq-item.is-open .mkx-faq-sign {
+  background: var(--mkx-ink);
+  border-color: var(--mkx-ink);
+  transform: rotate(135deg);
+}
+
+.mkx-faq-item.is-open .mkx-faq-sign::before,
+.mkx-faq-item.is-open .mkx-faq-sign::after {
+  background: #ffffff;
+}
+
+.mkx-faq-a {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.mkx-faq-a > div {
+  overflow: hidden;
+}
+
+.mkx-faq-item.is-open .mkx-faq-a {
+  grid-template-rows: 1fr;
+}
+
+.mkx-faq-a .mkx-text {
+  padding: 0 48px 22px 0;
+}
+
+/* ---- Closing --------------------------------------------------------------------------------- */
+.mkx-close-sec {
+  padding: var(--mkx-y) 0;
+}
+
+.mkx-close {
+  position: relative;
+  padding: 1.5px;
+  border-radius: 30px;
+  background: linear-gradient(135deg, #00d2ff, #6366f1 45%, #a855f7 70%, #e6e8ef);
+  box-shadow: 0 40px 80px -60px rgba(15, 23, 42, 0.5);
+}
+
+.mkx-close-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: clamp(40px, 6vw, 80px) clamp(24px, 6vw, 96px);
+  border-radius: 28.5px;
+  background:
+    radial-gradient(ellipse 50% 60% at 50% 0%, rgba(99, 102, 241, 0.08), transparent 70%),
+    #ffffff;
+  text-align: center;
+}
+
+.mkx-close-inner .mkx-text {
+  max-width: 760px;
+}
+
+.mkx-close-inner .mkx-kicker {
+  align-self: center !important;
+}
+
+/* ---- Responsive ------------------------------------------------------------------------------ */
+@media (max-width: 991px) {
+  .mkx-hero-grid,
+  .mkx-campaign,
+  .mkx-why,
+  .mkx-ai {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Card on small screens: text, then chips, then the button */
+  .mkx-campaign {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  .mkx-campaign-copy {
+    display: contents;
+  }
+
+  .mkx-campaign-list {
+    order: 2;
+    margin-top: 6px;
+  }
+
+  .mkx-campaign-copy > .mkx-actions {
+    order: 3;
+    margin-top: 10px;
+  }
+
+  .mkx-hero-photo {
+    max-width: 560px;
+  }
+
+  .mkx-hero-photo img {
+    aspect-ratio: 16 / 11;
+  }
+
+  .mkx-index {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mkx-posters-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mkx-flow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mkx-flow-next {
+    display: none;
+  }
+
+  .mkx-ai-photo {
+    max-width: 560px;
+  }
+
+  .mkx-ai-photo img {
+    aspect-ratio: 16 / 11;
+  }
+}
+
+@media (max-width: 640px) {
+  .mkx-container {
+    padding: 0 18px;
+  }
+
+  .mkx-posters-2,
+  .mkx-posters-3,
+  .mkx-flow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mkx-campaign {
+    padding: 24px 20px;
+    border-radius: 22px;
+  }
+
+  .mkx-index {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mkx-faq-a .mkx-text {
+    padding-right: 0;
+  }
+
+  .mkx-actions .mkx-btn {
+    width: 100%;
+  }
+}
+
+

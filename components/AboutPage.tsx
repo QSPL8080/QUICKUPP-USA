@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useId, useState } from "react";
+import React, { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Header from "@/components/Header";
@@ -251,8 +251,8 @@ function Goals({ s }: { s: Extract<AboutSection, { kind: "goals" }> }) {
 }
 
 function Route({ s, soft }: { s: Extract<AboutSection, { kind: "route" }>; soft: boolean }) {
-  const n = s.steps.length;
   const plain = s.steps.every((st) => !st.text && !st.label);
+  const hasQuote = s.steps.some((st) => !!st.quote);
   return (
     <section className={`abx-sec${soft ? " abx-soft" : ""}`}>
       <div className="abx-container">
@@ -263,18 +263,15 @@ function Route({ s, soft }: { s: Extract<AboutSection, { kind: "route" }>; soft:
           </h2>
           {s.intro && <p className="abx-text">{s.intro}</p>}
         </div>
-        <ol className={`abx-route${plain ? " abx-route-plain" : ""}`} style={{ "--abx-n": n } as React.CSSProperties}>
+        <ol className={`abx-steps${plain ? " abx-steps-plain" : ""}${hasQuote ? " has-quote" : ""}`}>
           {s.steps.map((st, i) => (
-            <li key={i} className={i % 2 === 0 ? "is-up" : "is-down"}>
-              <div className="abx-route-card">
-                {st.label && <p className="abx-route-label">{st.label}</p>}
+            <li key={i} className="abx-step">
+              <div className="abx-step-head">
+                {st.label && <p className="abx-step-label">{st.label}</p>}
                 <h3>{st.title}</h3>
-                {st.text && <p className="abx-text">{st.text}</p>}
-                {st.quote && <p className="abx-route-quote">{st.quote}</p>}
               </div>
-              <span className="abx-route-rail" aria-hidden="true">
-                <span className="abx-route-node" />
-              </span>
+              {st.text && <p className="abx-text abx-step-text">{st.text}</p>}
+              {st.quote && <p className="abx-step-quote">{st.quote}</p>}
             </li>
           ))}
         </ol>
@@ -289,53 +286,119 @@ function Route({ s, soft }: { s: Extract<AboutSection, { kind: "route" }>; soft:
   );
 }
 
+/* Scroll-driven: the block stays pinned while the page scrolls through it,
+   and the selected point follows the scroll position */
+const INDEX_STEP_VH = 26;
+
 function IndexViewer({ s }: { s: Extract<AboutSection, { kind: "index" }> }) {
   const [active, setActive] = useState(0);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const pinRef = useRef<HTMLDivElement>(null);
+  const n = s.items.length;
+
+  // Scroll range the pinned block travels through
+  const range = () => {
+    const wrap = wrapRef.current;
+    const pin = pinRef.current;
+    if (!wrap || !pin) return null;
+    const top = wrap.getBoundingClientRect().top + window.scrollY;
+    const travel = wrap.offsetHeight - pin.offsetHeight;
+    return { top, travel };
+  };
+
+  useEffect(() => {
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      if (window.innerWidth <= 991) return;
+      const r = range();
+      if (!r || r.travel <= 0) return;
+      const pinTop = parseFloat(getComputedStyle(pinRef.current!).top) || 0;
+      const progress = (window.scrollY + pinTop - r.top) / r.travel;
+      const idx = Math.min(n - 1, Math.max(0, Math.floor(progress * n)));
+      setActive((prev) => (prev === idx ? prev : idx));
+    };
+    const onScroll = () => {
+      if (!raf) raf = window.requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) window.cancelAnimationFrame(raf);
+    };
+  }, [n]);
+
+  // Clicking a point scrolls to its place in the range
+  const go = (i: number) => {
+    setActive(i);
+    if (window.innerWidth <= 991) return;
+    const r = range();
+    if (!r) return;
+    const pinTop = parseFloat(getComputedStyle(pinRef.current!).top) || 0;
+    window.scrollTo({ top: r.top - pinTop + ((i + 0.5) / n) * r.travel, behavior: "smooth" });
+  };
+
   return (
-    <section className="abx-sec abx-soft">
-      <div className="abx-container">
-        <div className="abx-head">
-          <Eyebrow text={s.eyebrow} />
-          <h2>
-            <Title t={s.title} />
-          </h2>
-        </div>
-        <div className="abx-index">
-          <div className="abx-index-nav" role="tablist" aria-orientation="vertical">
-            {s.items.map((it, i) => (
-              <button
-                key={i}
-                type="button"
-                role="tab"
-                aria-selected={active === i}
-                className={`abx-index-tab${active === i ? " is-active" : ""}`}
-                onClick={() => setActive(i)}
-                onMouseEnter={() => setActive(i)}
-              >
-                <span className="abx-index-tab-text">{it.title}</span>
-                <span className="abx-index-tab-arrow" aria-hidden="true">
-                  <Arrow size={15} />
-                </span>
-              </button>
-            ))}
+    <section className="abx-sec abx-soft abx-index-sec">
+      <div
+        ref={wrapRef}
+        className="abx-index-scroll"
+        style={{ "--abx-index-len": `${n * INDEX_STEP_VH}vh` } as React.CSSProperties}
+      >
+        <div ref={pinRef} className="abx-index-pin">
+          <div className="abx-container">
+            <div className="abx-head">
+              <Eyebrow text={s.eyebrow} />
+              <h2>
+                <Title t={s.title} />
+              </h2>
+            </div>
+            <div className="abx-index">
+              <div className="abx-index-nav" role="tablist" aria-orientation="vertical">
+                <span
+                  className="abx-index-progress"
+                  aria-hidden="true"
+                  style={{ transform: `scaleX(${(active + 1) / n})` }}
+                />
+                {s.items.map((it, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    role="tab"
+                    aria-selected={active === i}
+                    className={`abx-index-tab${active === i ? " is-active" : ""}`}
+                    onClick={() => go(i)}
+                  >
+                    <span className="abx-index-tab-text">{it.title}</span>
+                    <span className="abx-index-tab-arrow" aria-hidden="true">
+                      <Arrow size={15} />
+                    </span>
+                  </button>
+                ))}
+              </div>
+              <div className="abx-index-stage">
+                {s.items.map((it, i) => (
+                  <article key={i} className={`abx-index-panel${active === i ? " is-active" : ""}`} role="tabpanel">
+                    <h3 className="abx-index-title qs-t-lg">{it.title}</h3>
+                    <p className="abx-text">{it.desc}</p>
+                    <Checks items={it.list} cols={2} />
+                    {it.sub && <p className="abx-index-sub">{it.sub}</p>}
+                    {it.cta && (
+                      <Link href={it.cta.href} className="abx-link">
+                        <span>{it.cta.label}</span>
+                        <Arrow size={15} />
+                      </Link>
+                    )}
+                  </article>
+                ))}
+              </div>
+            </div>
           </div>
-          <div className="abx-index-stage">
-            {s.items.map((it, i) => (
-              <article key={i} className={`abx-index-panel${active === i ? " is-active" : ""}`} role="tabpanel">
-                <h3 className="abx-index-title qs-t-lg">{it.title}</h3>
-                <p className="abx-text">{it.desc}</p>
-                <Checks items={it.list} cols={2} />
-                {it.sub && <p className="abx-index-sub">{it.sub}</p>}
-                {it.cta && (
-                  <Link href={it.cta.href} className="abx-link">
-                    <span>{it.cta.label}</span>
-                    <Arrow size={15} />
-                  </Link>
-                )}
-              </article>
-            ))}
-          </div>
         </div>
+        <div className="abx-index-spacer" aria-hidden="true" />
       </div>
     </section>
   );

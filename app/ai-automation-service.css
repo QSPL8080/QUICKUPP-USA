@@ -943,3 +943,8 @@
     width: 100%;
   }
 }
+
+/* FAQ without a heading: a single centred column */
+.aix-faq-solo {
+  max-width: 900px;
+}

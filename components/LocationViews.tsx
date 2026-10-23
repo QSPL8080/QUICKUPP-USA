@@ -223,7 +223,6 @@ function DocSection({ section, index }: { section: LocSection; index: number }) 
       .map((b) => b.label);
     return (
       <section id={id} className="geo-doc-sec">
-        {head()}
         <GeoFaq items={section.faqs || []} />
         <CtaRow labels={faqCtas} />
       </section>
@@ -572,7 +571,7 @@ export function LocationServiceView({ city, page }: { city: LocCity; page: LocPa
 
         <div className="geo-container geo-doc">
           <GeoToc
-            items={body.map((s, i) => ({ id: `s-${i}`, label: s.heading }))}
+            items={body.map((s, i) => ({ id: `s-${i}`, label: s.heading, faq: s.kind === "faq" })).filter((t) => !t.faq)}
             title={
               <>
                 <LucideIcon name="map-pin" size={14} />

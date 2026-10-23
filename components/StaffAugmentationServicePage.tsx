@@ -368,17 +368,7 @@ export default function StaffAugmentationServicePage({
         {/* 6. FAQ */}
         {faqItems.length > 0 && (
           <section className="sxa-section">
-            <div className="sxa-container sxa-faq-wrap">
-              <div className="sxa-faq-aside">
-                <span className="sxa-pill">FAQ</span>
-                <h2 className="sxa-h2">
-                  <GradientHeading text={faq?.title || "Frequently Asked Questions"} />
-                </h2>
-                <div className="sxa-faq-photo" aria-hidden="true">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={photos.faq} alt="" loading="lazy" />
-                </div>
-              </div>
+            <div className="sxa-container sxa-faq-solo">
               <div className="sxa-faq">
                 {faqItems.map((f, i) => {
                   const open = openFaq === i;

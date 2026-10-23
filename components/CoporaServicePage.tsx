@@ -597,11 +597,6 @@ export default function CoporaServicePage({
       {faqItems.length > 0 && (
         <section className="copora-faq-section" style={{ paddingTop: "5rem" }}>
           <div className="container w-container">
-            <div className="section-title section-center-title copora-reveal">
-              <div className="pre-section-title">FREQUENTLY ASKED QUESTIONS</div>
-              <h2>{renderGradientHeading(faqBlock?.title || "Frequently Asked Questions")}</h2>
-            </div>
-
             <div className="copora-faq-wrap copora-reveal">
               {faqItems.map((item: any, idx: number) => {
                 const isOpen = activeFaq === idx;

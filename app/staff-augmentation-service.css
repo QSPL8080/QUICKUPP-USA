@@ -1142,3 +1142,8 @@
 .sxa-dark .sxa-head .sxa-lead {
   color: rgba(226, 232, 240, 0.88);
 }
+
+/* FAQ without a heading: a single centred column */
+.sxa-faq-solo {
+  max-width: 900px;
+}

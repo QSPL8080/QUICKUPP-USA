@@ -1041,25 +1041,6 @@ export default function MerkilCategoryHub({ category }: MerkilCategoryHubProps) 
         <section className="faq w-variant-base">
           <div className="container">
             <div className="faq-wrap">
-              <div className="section-header-wrap center">
-                <div className="section-header-content small">
-                  <div className="section-badge-wrap">
-                    <div className="section-badge w-variant-base">
-                      <div className="badge-dot" />
-                      <div className="tagline">FAQ</div>
-                    </div>
-                  </div>
-                  <div className="section-heading-wrap space">
-                    <h2 className="h2 text-center">Got questions?</h2>
-                  </div>
-                  <div className="section-subtitle-wrap">
-                    <div className="paragraph-02 text-dark-gray text-center">
-                      We combine strategy, creativity, and data to deliver impactful marketing solutions. From discovery to execution.
-                    </div>
-                  </div>
-                </div>
-              </div>
-
               <div className="faq-main-wrap">
                 {[
                   {

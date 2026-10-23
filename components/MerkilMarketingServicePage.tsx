@@ -5,7 +5,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EditorialMotion from "@/components/EditorialMotion";
-import "@/app/marketing-service-page.css";
+import "@/app/marketing-studio.css";
 import type {
   ServicePageData,
   ServiceBlock,
@@ -19,14 +19,14 @@ import type {
   CardsBlock,
   StepsBlock,
 } from "@/lib/servicePageTypes";
-import LucideIcon from "@/components/LucideIcon";
 
 /*
  * AI-Powered Digital Marketing service pages (all 9 subpages).
- * Own editorial design: full-width photo hero, hairline lists, sticky section
- * headings, solid violet accent. Every word comes from the page's data file,
- * in its original order — the template adds no labels, badges or copy.
- * Photos are local (public/images) and decorative only.
+ * "mkx-" studio design, used only here: framed hero photo, services index,
+ * campaign cards with chip lists, poster cards, a numbered process flow,
+ * a check list panel, industry chips, FAQ accordion and a gradient-edged
+ * closing card. Every word comes from the
+ * page's data file in its original order; the template adds no copy.
  */
 
 interface MerkilMarketingServicePageProps {
@@ -36,7 +36,6 @@ interface MerkilMarketingServicePageProps {
 }
 
 type PhotoSet = { hero: string; ai: string };
-
 const I = (name: string) => `/images/${name}`;
 
 /* One set per page so a photo never repeats on the same page */
@@ -51,42 +50,74 @@ const photoSets: Record<string, PhotoSet> = {
   "SMS Marketing": { hero: I("slider-01-01.jpg"), ai: I("contact-support-consultant.jpg") },
   "WhatsApp Marketing": { hero: I("service-img-01.jpg"), ai: I("contact-professional-consultant.jpg") },
 };
-
 const fallbackPhotos = photoSets["Social Media Marketing"];
 
-/** Puts the last ~45% of a heading in the brand gradient (site-wide style). */
-function GradientHeading({ text }: { text: string }) {
+const sameText = (a?: string, b?: string) => (a || "").trim().toLowerCase() === (b || "").trim().toLowerCase();
+
+function Grad({ text }: { text: string }) {
   const words = text.trim().split(/\s+/);
   if (words.length < 3) return <span className="qs-gradient-text">{text}</span>;
   const split = Math.max(1, Math.floor(words.length * 0.55));
   return (
     <>
-      {words.slice(0, split).join(" ")}{" "}
-      <span className="qs-gradient-text">{words.slice(split).join(" ")}</span>
+      {words.slice(0, split).join(" ")} <span className="qs-gradient-text">{words.slice(split).join(" ")}</span>
     </>
   );
 }
 
-function ArrowIcon() {
-  return <LucideIcon name="arrow-right" size={16} strokeWidth={2.2} />;
+function Arrow() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M5 12h14" />
+      <path d="M12 5l7 7-7 7" />
+    </svg>
+  );
 }
 
-function Button({ href, label, variant = "accent" }: { href: string; label: string; variant?: "accent" | "light" | "outline" | "outline-light" }) {
+function Btn({ href, label, variant = "dark" }: { href?: string; label: string; variant?: "dark" | "outline" }) {
   return (
-    <Link href={href || "/contact"} className={`mks-btn mks-btn-${variant}`}>
+    <Link href={href || "/contact"} className={`mkx-btn mkx-btn-${variant}`}>
       <span>{label}</span>
-      {(variant === "accent" || variant === "light") && <ArrowIcon />}
+      {variant === "dark" && <Arrow />}
     </Link>
   );
 }
 
-/** Plain list with hairline separators and an accent dash */
-function RuleList({ items, columns = 2 }: { items: string[]; columns?: 1 | 2 | 3 }) {
+/** Title row: tagline above, title, then any text lines */
+function Head({
+  title,
+  tagline,
+  lines = [],
+  center = false,
+}: {
+  title?: string;
+  tagline?: string;
+  lines?: string[];
+  center?: boolean;
+}) {
   return (
-    <ul className={`mks-rules mks-rules-${columns}`}>
+    <div className={`mkx-head${center ? " mkx-head-center" : ""}`}>
+      {tagline && !sameText(tagline, title) && <p className="mkx-kicker">{tagline}</p>}
+      {title && (
+        <h2>
+          <Grad text={title} />
+        </h2>
+      )}
+      {lines.map((l, i) => (
+        <p key={i} className="mkx-text">
+          {l}
+        </p>
+      ))}
+    </div>
+  );
+}
+
+function Chips({ items }: { items: string[] }) {
+  return (
+    <ul className="mkx-chips">
       {items.map((it, i) => (
         <li key={`${it}-${i}`}>
-          <span className="mks-dash" aria-hidden="true" />
+          <span className="mkx-chip-dot" aria-hidden="true" />
           <span>{it}</span>
         </li>
       ))}
@@ -94,69 +125,113 @@ function RuleList({ items, columns = 2 }: { items: string[]; columns?: 1 | 2 | 3
   );
 }
 
-/** Text lines a block provides besides its title/tagline, in data order. */
-function textLines(block: { desc?: string; intro?: string }) {
-  return [block.desc, block.intro].filter(Boolean) as string[];
+/** Process: numbered cards joined by arrow connectors */
+function ProcessFlow({ steps }: { steps: { num: string; title: string; text?: string }[] }) {
+  const n = steps.length;
+  const cols = n === 6 ? 3 : n >= 7 ? 4 : n;
+  return (
+    <ol className="mkx-flow" style={{ "--mkx-cols": cols } as React.CSSProperties}>
+      {steps.map((s, i) => {
+        const rowEnd = (i + 1) % cols === 0 || i === n - 1;
+        return (
+          <li key={`${s.title}-${i}`} className={`mkx-flow-card${rowEnd ? " is-row-end" : ""}`}>
+            <div className="mkx-flow-top">
+              {s.num && <span className="mkx-flow-num">{s.num}</span>}
+              <span className="mkx-flow-line" aria-hidden="true" />
+            </div>
+            <h3>{s.title}</h3>
+            {s.text && <p className="mkx-text">{s.text}</p>}
+            {!rowEnd && (
+              <span className="mkx-flow-next" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14" />
+                  <path d="M12 5l7 7-7 7" />
+                </svg>
+              </span>
+            )}
+          </li>
+        );
+      })}
+    </ol>
+  );
 }
 
-/** "01. Strategy" → { num: "01.", title: "Strategy" }; otherwise uses the step's num. */
+function CheckList({ items }: { items: string[] }) {
+  return (
+    <ul className="mkx-checks">
+      {items.map((it, i) => (
+        <li key={`${it}-${i}`}>
+          <span className="mkx-check" aria-hidden="true">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </span>
+          <span className="mkx-check-text">{it}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function FaqList({ items }: { items: { q: string; a: string }[] }) {
+  const [open, setOpen] = useState<number | null>(0);
+  return (
+    <div className="mkx-faq">
+      {items.map((f, i) => {
+        const isOpen = open === i;
+        return (
+          <div key={`${f.q}-${i}`} className={`mkx-faq-item${isOpen ? " is-open" : ""}`}>
+            <button type="button" className="mkx-faq-q" aria-expanded={isOpen} onClick={() => setOpen(isOpen ? null : i)}>
+              <span className="mkx-faq-text">{f.q}</span>
+              <span className="mkx-faq-sign" aria-hidden="true" />
+            </button>
+            <div className="mkx-faq-a">
+              <div>
+                <p className="mkx-text">{f.a}</p>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function splitStep(title: string, num?: string) {
   const m = title.match(/^(\d{1,2})\.\s*(.+)$/);
-  if (m) return { num: `${m[1]}.`, title: m[2] };
-  return { num: num ? `${num}.` : "", title };
+  if (m) return { num: m[1].padStart(2, "0"), title: m[2] };
+  return { num: num || "", title };
 }
-
-const sameText = (a?: string, b?: string) => (a || "").trim().toLowerCase() === (b || "").trim().toLowerCase();
 
 export default function MerkilMarketingServicePage({
   data,
   categoryLabel = "AI-Powered Digital Marketing",
   categorySlug = "ai-powered-digital-marketing-services",
 }: MerkilMarketingServicePageProps) {
-  const [openFaq, setOpenFaq] = useState<number | null>(0);
   const photos = photoSets[data.crumb] ?? fallbackPhotos;
   const firstListIndex = data.blocks.findIndex((b) => b.type === "list");
-
-  /* Section heading row: title (+ tagline) on the left, text on the right */
-  const headRow = (title?: string, tagline?: string, lines: string[] = [], dark = false) => (
-    <div className={`mks-headrow${lines.length === 0 ? " is-single" : ""}`}>
-      <div>
-        {title && <h2 className={`mks-h2${dark ? " is-light" : ""}`}><GradientHeading text={title} /></h2>}
-        {tagline && !sameText(tagline, title) && <p className="mks-tagline">{tagline}</p>}
-      </div>
-      {lines.length > 0 && (
-        <div className="mks-headrow-text">
-          {lines.map((l, i) => (
-            <p key={i} className="mks-text">
-              {l}
-            </p>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+  let cardFlip = false;
 
   const renderBlock = (block: ServiceBlock, index: number) => {
-    /* Overview index: the first list block */
+    /* Overview: the first list, set as a keyword wall */
     if (block.type === "list" && index === firstListIndex) {
       const b = block as ListBlock;
-      const cols = b.items.length > 9 || b.items.length % 4 === 0 ? 4 : 3;
       return (
-        <section key={index} className="mks-section">
-          <div className="mks-container">
-            {headRow(b.title, b.tagline || b.subtitle, textLines(b))}
-            <ul className={`mks-index mks-index-${cols}`}>
+        <section key={index} className="mkx-sec">
+          <div className="mkx-container">
+            <Head title={b.title} tagline={b.tagline || b.subtitle} lines={[b.desc, b.intro].filter(Boolean) as string[]} />
+            <ul className="mkx-index">
               {b.items.map((it, i) => (
                 <li key={`${it}-${i}`}>
-                  <span className="mks-index-mark" aria-hidden="true" />
+                  <span className="mkx-chip-dot" aria-hidden="true" />
                   <span>{it}</span>
                 </li>
               ))}
             </ul>
-            {b.note && <p className="mks-note">{b.note}</p>}
+            {b.note && <p className="mkx-remark">{b.note}</p>}
             {b.cta && (
-              <div className="mks-actions">
-                <Button href={b.cta.href} label={b.cta.label} />
+              <div className="mkx-actions">
+                <Btn href={b.cta.href} label={b.cta.label} />
               </div>
             )}
           </div>
@@ -164,62 +239,71 @@ export default function MerkilMarketingServicePage({
       );
     }
 
-    /* Detail sections: sticky heading column + list column */
+    /* Other lists: campaign cards with chips, alternating sides */
     if (block.type === "list") {
       const b = block as ListBlock;
+      cardFlip = !cardFlip;
+      const lines = [b.desc, b.intro].filter(Boolean) as string[];
       return (
-        <section key={index} className="mks-section mks-detail">
-          <div className="mks-container mks-detail-grid">
-            <div className="mks-detail-head">
-              <div className="mks-sticky">
-                <h2 className="mks-h2"><GradientHeading text={b.title} /></h2>
+        <section key={index} className="mkx-sec mkx-sec-card">
+          <div className="mkx-container">
+            <div className={`mkx-campaign${cardFlip ? "" : " is-flip"}`}>
+              <div className="mkx-campaign-copy">
                 {(b.tagline || b.subtitle) && !sameText(b.tagline || b.subtitle, b.title) && (
-                  <p className="mks-tagline">{b.tagline || b.subtitle}</p>
+                  <p className="mkx-kicker">{b.tagline || b.subtitle}</p>
                 )}
-                {textLines(b).map((l, i) => (
-                  <p key={i} className="mks-text">
+                <h2>
+                  <Grad text={b.title} />
+                </h2>
+                {lines.map((l, i) => (
+                  <p key={i} className="mkx-text">
                     {l}
                   </p>
                 ))}
+                {b.cta && (
+                  <div className="mkx-actions">
+                    <Btn href={b.cta.href} label={b.cta.label} />
+                  </div>
+                )}
               </div>
-            </div>
-            <div className="mks-detail-body">
-              <RuleList items={b.items} columns={b.items.length > 5 ? 2 : 1} />
-              {b.note && <p className="mks-note">{b.note}</p>}
-              {b.cta && (
-                <div className="mks-actions">
-                  <Button href={b.cta.href} label={b.cta.label} />
-                </div>
-              )}
+              <div className="mkx-campaign-list">
+                <Chips items={b.items} />
+                {b.note && <p className="mkx-remark">{b.note}</p>}
+              </div>
             </div>
           </div>
         </section>
       );
     }
 
-    /* Title + description rows */
+    /* Title + description pairs: poster cards */
     if (block.type === "descPairs" || block.type === "cards") {
       const isPairs = block.type === "descPairs";
       const pairs = block as DescPairsBlock;
       const rows = isPairs
         ? pairs.items.map((it) => ({ title: it.title, text: it.desc }))
         : (block as CardsBlock).cards.map((c) => ({ title: c.title, text: c.text }));
-      const lines = isPairs ? textLines(pairs) : (block as CardsBlock).intro ? [(block as CardsBlock).intro as string] : [];
+      const lines = isPairs
+        ? ([pairs.desc, pairs.intro].filter(Boolean) as string[])
+        : (block as CardsBlock).intro
+          ? [(block as CardsBlock).intro as string]
+          : [];
+      const cols = rows.length === 2 || rows.length === 4 ? 2 : 3;
       return (
-        <section key={index} className="mks-section mks-tint">
-          <div className="mks-container">
-            {headRow(block.title, isPairs ? pairs.tagline || pairs.subtitle : undefined, lines)}
-            <dl className="mks-pairs">
+        <section key={index} className="mkx-sec mkx-soft">
+          <div className="mkx-container">
+            <Head title={block.title} tagline={isPairs ? pairs.tagline || pairs.subtitle : undefined} lines={lines} />
+            <div className={`mkx-posters mkx-posters-${cols}`}>
               {rows.map((r, i) => (
-                <div key={`${r.title}-${i}`} className="mks-pair">
-                  <dt className="mks-h3">{r.title}</dt>
-                  {r.text && <dd className="mks-text">{r.text}</dd>}
-                </div>
+                <article key={`${r.title}-${i}`} className="mkx-poster">
+                  <h3>{r.title}</h3>
+                  {r.text && <p className="mkx-text">{r.text}</p>}
+                </article>
               ))}
-            </dl>
+            </div>
             {isPairs && pairs.cta && (
-              <div className="mks-actions">
-                <Button href={pairs.cta.href} label={pairs.cta.label} />
+              <div className="mkx-actions">
+                <Btn href={pairs.cta.href} label={pairs.cta.label} />
               </div>
             )}
           </div>
@@ -232,25 +316,21 @@ export default function MerkilMarketingServicePage({
       const proc = block as ProcessBlock;
       const steps = isProcess
         ? (proc.steps || []).map((s) => ({ ...splitStep(s.title, s.num), text: s.desc || s.text }))
-        : (block as StepsBlock).steps.map((s, i) => ({ ...splitStep(s.title, s.num || String(i + 1).padStart(2, "0")), text: s.text }));
-      const lines = isProcess ? textLines(proc) : (block as StepsBlock).intro ? [(block as StepsBlock).intro as string] : [];
+        : (block as StepsBlock).steps.map((s) => ({ ...splitStep(s.title, s.num), text: s.text }));
+      const lines = isProcess
+        ? ([proc.desc, proc.intro].filter(Boolean) as string[])
+        : (block as StepsBlock).intro
+          ? [(block as StepsBlock).intro as string]
+          : [];
       return (
-        <section key={index} className="mks-section">
-          <div className="mks-container">
-            {headRow(block.title, isProcess ? proc.tagline : undefined, lines)}
-            <ol className={`mks-timeline mks-timeline-${Math.min(steps.length, 7)}`}>
-              {steps.map((s, i) => (
-                <li key={`${s.title}-${i}`}>
-                  {s.num && <span className="mks-step-num">{s.num}</span>}
-                  <h3 className="mks-h3">{s.title}</h3>
-                  {s.text && <p className="mks-text">{s.text}</p>}
-                </li>
-              ))}
-            </ol>
-            {isProcess && proc.items && proc.items.length > 0 && <RuleList items={proc.items} columns={3} />}
+        <section key={index} className="mkx-sec mkx-soft">
+          <div className="mkx-container">
+            <Head title={block.title} tagline={isProcess ? proc.tagline : undefined} lines={lines} />
+            <ProcessFlow steps={steps} />
+            {isProcess && proc.items && proc.items.length > 0 && <Chips items={proc.items} />}
             {isProcess && proc.cta && (
-              <div className="mks-actions">
-                <Button href={proc.cta.href} label={proc.cta.label} />
+              <div className="mkx-actions">
+                <Btn href={proc.cta.href} label={proc.cta.label} />
               </div>
             )}
           </div>
@@ -261,23 +341,18 @@ export default function MerkilMarketingServicePage({
     if (block.type === "whyChoose") {
       const b = block as WhyChooseBlock;
       return (
-        <section key={index} className="mks-section mks-ink">
-          <div className="mks-container">
-            {headRow(b.title, b.tagline, b.intro ? [b.intro] : [], true)}
-            <ul className="mks-why">
-              {b.bullets.map((it, i) => (
-                <li key={`${it}-${i}`}>
-                  <LucideIcon name="check" size={18} strokeWidth={2.4} />
-                  <span>{it}</span>
-                </li>
-              ))}
-            </ul>
-            {b.desc && <p className="mks-why-desc">{b.desc}</p>}
-            {b.cta && (
-              <div className="mks-actions">
-                <Button href={b.cta.href} label={b.cta.label} variant="light" />
-              </div>
-            )}
+        <section key={index} className="mkx-sec mkx-soft">
+          <div className="mkx-container mkx-why">
+            <div className="mkx-why-head">
+              <Head title={b.title} tagline={b.tagline} lines={b.intro ? [b.intro] : []} />
+              {b.desc && <p className="mkx-text">{b.desc}</p>}
+              {b.cta && (
+                <div className="mkx-actions">
+                  <Btn href={b.cta.href} label={b.cta.label} />
+                </div>
+              )}
+            </div>
+            <CheckList items={b.bullets} />
           </div>
         </section>
       );
@@ -286,23 +361,19 @@ export default function MerkilMarketingServicePage({
     if (block.type === "ai") {
       const b = block as AiBlock;
       return (
-        <section key={index} className="mks-section mks-tint">
-          <div className="mks-container mks-ai">
-            <div className="mks-ai-photo" aria-hidden="true">
+        <section key={index} className="mkx-sec">
+          <div className="mkx-container mkx-ai">
+            <div className="mkx-ai-photo" aria-hidden="true">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={photos.ai} alt="" loading="lazy" />
             </div>
-            <div className="mks-ai-body">
-              <h2 className="mks-h2"><GradientHeading text={b.title} /></h2>
-              {(b.tagline || b.subtitle) && !sameText(b.tagline || b.subtitle, b.title) && (
-                <p className="mks-tagline">{b.tagline || b.subtitle}</p>
-              )}
-              {b.intro && <p className="mks-text">{b.intro}</p>}
-              <RuleList items={b.bullets || []} columns={2} />
-              {b.desc && <p className="mks-note">{b.desc}</p>}
+            <div className="mkx-ai-body">
+              <Head title={b.title} tagline={b.tagline || b.subtitle} lines={b.intro ? [b.intro] : []} />
+              {b.bullets && b.bullets.length > 0 && <Chips items={b.bullets} />}
+              {b.desc && <p className="mkx-remark">{b.desc}</p>}
               {b.cta && (
-                <div className="mks-actions">
-                  <Button href={b.cta.href} label={b.cta.label} />
+                <div className="mkx-actions">
+                  <Btn href={b.cta.href} label={b.cta.label} />
                 </div>
               )}
             </div>
@@ -314,12 +385,15 @@ export default function MerkilMarketingServicePage({
     if (block.type === "industries") {
       const b = block as IndustriesBlock;
       return (
-        <section key={index} className="mks-section">
-          <div className="mks-container">
-            {headRow(b.title, b.tagline, textLines(b))}
-            <ul className="mks-words">
+        <section key={index} className="mkx-sec mkx-soft">
+          <div className="mkx-container">
+            <Head title={b.title} tagline={b.tagline} lines={[b.desc, b.intro].filter(Boolean) as string[]} center />
+            <ul className="mkx-chips mkx-chips-center">
               {b.industries.map((it, i) => (
-                <li key={`${it}-${i}`}>{it}</li>
+                <li key={`${it}-${i}`}>
+                  <span className="mkx-chip-dot" aria-hidden="true" />
+                  <span>{it}</span>
+                </li>
               ))}
             </ul>
           </div>
@@ -332,36 +406,9 @@ export default function MerkilMarketingServicePage({
       const items = b.items || b.faqs || [];
       if (items.length === 0) return null;
       return (
-        <section key={index} className="mks-section mks-tint">
-          <div className="mks-container mks-faq-grid">
-            <div className="mks-faq-head">
-              {b.title && <h2 className="mks-h2"><GradientHeading text={b.title} /></h2>}
-              {b.tagline && !sameText(b.tagline, b.title) && <p className="mks-tagline">{b.tagline}</p>}
-              {textLines(b).map((l, i) => (
-                <p key={i} className="mks-text">
-                  {l}
-                </p>
-              ))}
-            </div>
-            <div className="mks-faq">
-              {items.map((f, i) => {
-                const open = openFaq === i;
-                return (
-                  <div key={`${f.q}-${i}`} className={`mks-faq-item${open ? " is-open" : ""}`}>
-                    <button
-                      type="button"
-                      className="mks-faq-q"
-                      aria-expanded={open}
-                      onClick={() => setOpenFaq(open ? null : i)}
-                    >
-                      <span className="mks-faq-text">{f.q}</span>
-                      <span className="mks-faq-sign" aria-hidden="true" />
-                    </button>
-                    {open && <p className="mks-faq-a">{f.a}</p>}
-                  </div>
-                );
-              })}
-            </div>
+        <section key={index} className="mkx-sec">
+          <div className="mkx-container">
+            <FaqList items={items} />
           </div>
         </section>
       );
@@ -373,85 +420,88 @@ export default function MerkilMarketingServicePage({
   const heroCtas = data.heroCtas && data.heroCtas.length > 0 ? data.heroCtas : data.heroCta ? [data.heroCta] : [];
 
   return (
-    <div className="mks-page">
+    <div className="mkx-page">
       <Header />
-
       <main>
-        {/* Hero: full-width photo banner */}
-        <section className="mks-hero">
-          <div className="mks-hero-bg" aria-hidden="true">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={photos.hero} alt="" />
-          </div>
-          <div className="mks-container mks-hero-inner">
-            <nav className="mks-breadcrumb" aria-label="Breadcrumb">
+        <section className="mkx-hero">
+          <div className="mkx-hero-bg" aria-hidden="true" />
+          <div className="mkx-container">
+            <nav className="mkx-crumbs" aria-label="Breadcrumb">
               <Link href="/">Home</Link>
-              <span>/</span>
+              <span aria-hidden="true">/</span>
               <span>Services</span>
-              <span>/</span>
+              <span aria-hidden="true">/</span>
               {categorySlug && categoryLabel ? (
                 <>
                   <Link href={`/services/${categorySlug}`}>{categoryLabel}</Link>
-                  <span>/</span>
+                  <span aria-hidden="true">/</span>
                 </>
               ) : null}
-              <span className="mks-breadcrumb-current">{data.crumb}</span>
+              <span className="mkx-crumb-now">{data.crumb}</span>
             </nav>
-
-            {data.heroEyebrow && <p className="mks-eyebrow">{data.heroEyebrow}</p>}
-            <h1 className="mks-h1">
-              <GradientHeading text={data.heroTitle} />
-            </h1>
-            <div className="mks-hero-copy">
-              {data.heroParagraphs.map((p, i) => (
-                <p key={i} className="mks-hero-text">
-                  {p}
-                </p>
-              ))}
-            </div>
-            {heroCtas.length > 0 && (
-              <div className="mks-actions">
-                {heroCtas.map((cta, i) => (
-                  <Button key={`${cta.label}-${i}`} href={cta.href} label={cta.label} variant={i === 0 ? "light" : "outline-light"} />
+            <div className="mkx-hero-grid">
+              <div className="mkx-hero-copy">
+                <h1>
+                  <Grad text={data.heroTitle} />
+                </h1>
+                {data.heroParagraphs.map((p, i) => (
+                  <p key={i} className={i === 0 ? "mkx-lead" : "mkx-text"}>
+                    {p}
+                  </p>
                 ))}
+                {heroCtas.length > 0 && (
+                  <div className="mkx-actions">
+                    {heroCtas.map((c, i) => (
+                      <Btn key={`${c.label}-${i}`} href={c.href} label={c.label} variant={i === 0 ? "dark" : "outline"} />
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
+              <div className="mkx-hero-photo" aria-hidden="true">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={photos.hero} alt="" />
+              </div>
+            </div>
           </div>
         </section>
 
         {data.blocks.map((block, i) => renderBlock(block, i))}
 
-        {/* Closing: full-width accent band */}
-        <section className="mks-closing">
-          <div className="mks-container mks-closing-grid">
-            <div>
-              {data.closingTitle && <h2 className="mks-h2 is-light"><GradientHeading text={data.closingTitle} /></h2>}
-              {(data.closingDesc || "")
-                .split(/\n+/)
-                .filter(Boolean)
-                .map((p, i) => (
-                  <p key={i} className="mks-closing-text">
-                    {p}
+        <section className="mkx-close-sec">
+          <div className="mkx-container">
+            <div className="mkx-close">
+              <div className="mkx-close-inner">
+                {data.closingTitle && (
+                  <h2>
+                    <Grad text={data.closingTitle} />
+                  </h2>
+                )}
+                {(data.closingDesc || "")
+                  .split(/\n+/)
+                  .filter(Boolean)
+                  .map((p, i) => (
+                    <p key={i} className="mkx-text">
+                      {p}
+                    </p>
+                  ))}
+                {data.closingTagline && <p className="mkx-kicker">{data.closingTagline}</p>}
+                {data.closingSignature && (
+                  <p className="mkx-text">
+                    <strong>{data.closingSignature.name}</strong> {data.closingSignature.line}
                   </p>
-                ))}
-              {data.closingTagline && <p className="mks-closing-tagline">{data.closingTagline}</p>}
-              {data.closingSignature && (
-                <p className="mks-closing-text">
-                  <strong>{data.closingSignature.name}</strong> {data.closingSignature.line}
-                </p>
-              )}
-            </div>
-            {data.closingCtas && data.closingCtas.length > 0 && (
-              <div className="mks-actions mks-closing-actions">
-                {data.closingCtas.map((cta, i) => (
-                  <Button key={`${cta.label}-${i}`} href={cta.href} label={cta.label} variant={i === 0 ? "light" : "outline-light"} />
-                ))}
+                )}
+                {data.closingCtas && data.closingCtas.length > 0 && (
+                  <div className="mkx-actions mkx-actions-center">
+                    {data.closingCtas.map((c, i) => (
+                      <Btn key={`${c.label}-${i}`} href={c.href} label={c.label} variant={i === 0 ? "dark" : "outline"} />
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
         </section>
       </main>
-
       <EditorialMotion />
       <Footer />
     </div>
