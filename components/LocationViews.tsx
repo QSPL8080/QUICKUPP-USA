@@ -318,63 +318,45 @@ function ClosingBand({ section }: { section: LocSection }) {
   );
 }
 
-/** The location "pass": a ticket-style card with the city and a few facts */
-function LocationPass({
-  city,
-  title,
-  rows,
-  rowsTitle,
-  icon = "map-pin",
-}: {
-  city: string;
-  title?: string;
-  rows: { label: string; value?: string | number; href?: string }[];
-  rowsTitle?: string;
-  icon?: LucideIconName;
-}) {
+/* Contour rings for the hero map (deterministic, so server and client match) */
+const CONTOURS = Array.from({ length: 10 }, (_, k) => {
+  const r0 = 46 + k * 40;
+  const pts: string[] = [];
+  for (let i = 0; i < 90; i++) {
+    const t = (i / 90) * Math.PI * 2;
+    const r =
+      r0 * (1 + 0.07 * Math.sin(3 * t + k * 0.6) + 0.045 * Math.sin(5 * t - k * 0.9) + 0.03 * Math.sin(2 * t + k));
+    pts.push(`${(450 + r * Math.cos(t)).toFixed(1)} ${(450 + r * Math.sin(t)).toFixed(1)}`);
+  }
+  return `M${pts.join("L")}Z`;
+});
+
+/** Hero map: soft topographic contour rings with the location pin at their centre */
+function GeoMap() {
   return (
-    <aside className="geo-pass">
-      <div className="geo-pass-top">
-        <span className="geo-pass-icon" aria-hidden="true">
-          <LucideIcon name={icon} size={22} />
+    <div className="geo-map" aria-hidden="true">
+      <svg className="geo-map-lines" viewBox="0 0 900 900" fill="none">
+        <defs>
+          <linearGradient id="geo-map-stroke" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#00d2ff" />
+            <stop offset="0.5" stopColor="#6366f1" />
+            <stop offset="1" stopColor="#a855f7" />
+          </linearGradient>
+        </defs>
+        <g className="geo-map-rings">
+          {CONTOURS.map((d, i) => (
+            <path key={i} d={d} className={i % 3 === 2 ? "is-major" : undefined} />
+          ))}
+        </g>
+      </svg>
+      <span className="geo-map-pin">
+        <span className="geo-map-pulse" />
+        <span className="geo-map-pulse geo-map-pulse-2" />
+        <span className="geo-map-dot">
+          <LucideIcon name="map-pin" size={22} />
         </span>
-        <div className="geo-pass-head">
-          <span className="geo-pass-city">{city}</span>
-          {title && <span className="geo-pass-title">{title}</span>}
-        </div>
-        <span className="geo-pass-pin" aria-hidden="true">
-          <LucideIcon name="map-pin" size={16} />
-        </span>
-      </div>
-      {rows.length > 0 && <div className="geo-pass-cut" aria-hidden="true" />}
-      {rows.length > 0 && rowsTitle && <span className="geo-pass-rows-title">{rowsTitle}</span>}
-      {rows.length > 0 && (
-      <ul className="geo-pass-rows">
-        {rows.map((r) =>
-          r.href ? (
-            <li key={r.label}>
-              <a href={r.href} className="geo-pass-row">
-                <span>{r.label}</span>
-                {r.value !== undefined ? (
-                  <span className="geo-pass-val">{r.value}</span>
-                ) : (
-                  <LucideIcon name="arrow-up-right" size={15} strokeWidth={2.2} />
-                )}
-              </a>
-            </li>
-          ) : (
-            <li key={r.label}>
-              <span className="geo-pass-row">
-                <span>{r.label}</span>
-                {r.value !== undefined && <span className="geo-pass-val">{r.value}</span>}
-              </span>
-            </li>
-          )
-        )}
-      </ul>
-      )}
-      <span className="geo-pass-code" aria-hidden="true" />
-    </aside>
+      </span>
+    </div>
   );
 }
 
@@ -449,23 +431,26 @@ export function CityView({ city }: { city: LocCity }) {
     <div className="geo-page">
       <Header />
       <main>
-        <section className="geo-hero geo-hero-city">
+        <section className="geo-hero geo-hero-map geo-hero-city">
           <div className="geo-hero-bg" aria-hidden="true" />
-          <div className="geo-container geo-hero-grid">
+          <GeoMap />
+          <div className="geo-container">
             <div className="geo-hero-copy">
               <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Our Locations", href: "/locations" }, { label: city.city }]} />
-              <Link href="/locations" className="geo-pill">
-                <LucideIcon name="map-pin" size={15} />
-                <span>Our Locations</span>
-              </Link>
               <h1 className="geo-h1">
                 <span className="qs-gradient-text">{city.city}</span>
               </h1>
+              <ul className="geo-hero-cats">
+                {groups.map((g) => (
+                  <li key={g.cat}>
+                    <a href={`#${g.cat}`} className="geo-hero-cat">
+                      <span>{CATEGORY_LABELS[g.cat]}</span>
+                      <LucideIcon name="chevron-right" size={16} strokeWidth={2.2} />
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <LocationPass
-              city={city.city}
-              rows={groups.map((g) => ({ label: CATEGORY_LABELS[g.cat], value: g.pages.length, href: `#${g.cat}` }))}
-            />
           </div>
         </section>
 
@@ -537,9 +522,10 @@ export function LocationServiceView({ city, page }: { city: LocCity; page: LocPa
     <div className="geo-page">
       <Header />
       <main>
-        <section className="geo-hero geo-hero-svc">
+        <section className="geo-hero geo-hero-map geo-hero-svc">
           <div className="geo-hero-bg" aria-hidden="true" />
-          <div className="geo-container geo-hero-grid">
+          <GeoMap />
+          <div className="geo-container">
             <div className="geo-hero-copy">
               <Breadcrumb
                 items={[
@@ -549,10 +535,6 @@ export function LocationServiceView({ city, page }: { city: LocCity; page: LocPa
                   { label: page.h1 },
                 ]}
               />
-              <Link href={`/locations/${city.slug}`} className="geo-pill">
-                <LucideIcon name="map-pin" size={15} />
-                <span>{city.city}</span>
-              </Link>
               <h1 className="geo-h1">
                 <GradientHeading text={page.h1} />
               </h1>
@@ -565,7 +547,6 @@ export function LocationServiceView({ city, page }: { city: LocCity; page: LocPa
               )}
               <CtaRow labels={introCtas} />
             </div>
-            <LocationPass city={city.city} icon={page.icon as LucideIconName} rows={[]} />
           </div>
         </section>
 

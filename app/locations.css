@@ -272,7 +272,7 @@
   padding-top: 6px;
 }
 
-/* ---- Breadcrumb + pill ------------------------------------------------------- */
+/* ---- Breadcrumb ------------------------------------------------------- */
 .geo-breadcrumb {
   display: flex;
   flex-wrap: wrap;
@@ -304,36 +304,6 @@
 
 .geo-crumb-sep {
   color: #cbd5e1;
-}
-
-.geo-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  align-self: flex-start;
-  margin-bottom: 18px;
-  padding: 7px 14px 7px 10px;
-  border-radius: 100px;
-  border: 1px solid var(--geo-line);
-  background: rgba(255, 255, 255, 0.85);
-  box-shadow: 0 8px 20px -14px rgba(15, 23, 42, 0.4);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--geo-ink);
-  text-decoration: none;
-}
-
-.geo-pill svg {
-  color: var(--geo-indigo);
-}
-
-.geo-pill-sep {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #cbd5e1;
 }
 
 /* ---- Hero ------------------------------------------------------------------- */
@@ -377,10 +347,6 @@
 
 .geo-hero-copy .geo-breadcrumb {
   margin-bottom: 4px;
-}
-
-.geo-hero-copy .geo-pill {
-  margin-bottom: 0;
 }
 
 /* ---- Check lists + chips ------------------------------------------------------ */
@@ -1042,8 +1008,165 @@
   border-bottom: 1px solid var(--geo-line);
 }
 
-.geo-hero-city .geo-hero-grid {
+/* Map hero: copy on the left, contour rings with the location pin on the right */
+.geo-hero-map {
+  min-height: clamp(420px, 38vw, 540px);
+  display: flex;
   align-items: center;
+}
+
+.geo-hero-map .geo-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+.geo-hero-map .geo-hero-copy {
+  max-width: 700px;
+}
+
+.geo-map {
+  position: absolute;
+  top: 50%;
+  right: max(-180px, calc((100vw - 1200px) / 2 - 260px));
+  width: clamp(620px, 62vw, 900px);
+  aspect-ratio: 1;
+  transform: translateY(-46%);
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 38%, transparent 70%);
+  mask-image: radial-gradient(circle at 50% 50%, #000 38%, transparent 70%);
+  animation: geo-map-in 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+}
+
+@keyframes geo-map-in {
+  from {
+    opacity: 0;
+    transform: translateY(-46%) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-46%) scale(1);
+  }
+}
+
+.geo-map-lines {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.geo-map-rings {
+  transform-origin: 450px 450px;
+  animation: geo-map-turn 180s linear infinite;
+}
+
+.geo-map-rings path {
+  stroke: url(#geo-map-stroke);
+  stroke-width: 1;
+  opacity: 0.32;
+}
+
+.geo-map-rings path.is-major {
+  stroke-width: 1.4;
+  opacity: 0.55;
+}
+
+@keyframes geo-map-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.geo-map-pin {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 60px;
+  height: 60px;
+  margin: -30px 0 0 -30px;
+}
+
+.geo-map-dot {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--geo-ink, #0b0f17);
+  color: #ffffff;
+  box-shadow:
+    0 0 0 6px rgba(255, 255, 255, 0.9),
+    0 18px 36px -12px rgba(15, 23, 42, 0.55);
+}
+
+.geo-map-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid rgba(99, 102, 241, 0.55);
+  animation: geo-map-pulse 3.6s ease-out infinite;
+}
+
+.geo-map-pulse-2 {
+  animation-delay: 1.8s;
+}
+
+@keyframes geo-map-pulse {
+  from {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(3.2);
+    opacity: 0;
+  }
+}
+
+/* City page: the service categories as jump links */
+.geo-hero-cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.geo-hero-cat {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px 12px 18px;
+  border-radius: 12px;
+  border: 1px solid var(--geo-line);
+  background: rgba(255, 255, 255, 0.86);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--geo-ink);
+  text-decoration: none;
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    transform 0.3s ease;
+}
+
+.geo-hero-cat svg {
+  color: var(--geo-indigo);
+  transition: transform 0.3s ease;
+}
+
+.geo-hero-cat:hover {
+  border-color: #c7cbf5;
+  box-shadow: 0 14px 28px -20px rgba(79, 70, 229, 0.5);
+  transform: translateY(-2px);
+}
+
+.geo-hero-cat:hover svg {
+  transform: translateX(3px);
 }
 
 .geo-page p.geo-tagline:not(#_):not(#__) {
@@ -1056,212 +1179,6 @@
 
 .geo-doc + .geo-closing-sec {
   padding-top: 0;
-}
-
-/* ---- Location pass (ticket card) ------------------------------------------- */
-.geo-pass {
-  --geo-pass-bg: #ffffff;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  border-radius: 22px;
-  border: 1px solid var(--geo-line);
-  background: var(--geo-pass-bg);
-  box-shadow:
-    0 1px 0 rgba(15, 23, 42, 0.03),
-    0 32px 64px -40px rgba(15, 23, 42, 0.45);
-  overflow: hidden;
-}
-
-.geo-pass::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 4px;
-  background: var(--geo-grad);
-}
-
-.geo-pass-top {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 26px 24px 22px;
-}
-
-.geo-pass-icon {
-  display: grid;
-  place-items: center;
-  flex: 0 0 auto;
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  background: var(--geo-ink);
-  color: #ffffff;
-}
-
-.geo-pass-head {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-  flex: 1 1 auto;
-}
-
-.geo-pass-city {
-  font-size: clamp(17px, 1.32vw, 19px);
-  font-weight: 700;
-  letter-spacing: -0.012em;
-  line-height: 1.3;
-  color: var(--geo-ink);
-}
-
-.geo-pass-title {
-  font-family: var(--font-body, Inter, sans-serif);
-  font-size: 14px;
-  line-height: 1.45;
-  color: var(--geo-muted);
-}
-
-.geo-pass-pin {
-  display: grid;
-  place-items: center;
-  flex: 0 0 auto;
-  width: 32px;
-  height: 32px;
-  border-radius: 999px;
-  border: 1px dashed #c7cbe0;
-  color: var(--geo-indigo);
-  animation: geo-pass-pin 2.8s ease-in-out infinite;
-}
-
-@keyframes geo-pass-pin {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-3px);
-  }
-}
-
-/* Perforated tear line with notches cut into both edges */
-.geo-pass-cut {
-  position: relative;
-  height: 0;
-  margin: 0 22px;
-  border-top: 2px dashed #e1e4ee;
-}
-
-.geo-pass-cut::before,
-.geo-pass-cut::after {
-  content: "";
-  position: absolute;
-  top: -12px;
-  width: 22px;
-  height: 22px;
-  border-radius: 999px;
-  background: #ffffff;
-  border: 1px solid var(--geo-line);
-}
-
-.geo-pass-cut::before {
-  left: -34px;
-}
-
-.geo-pass-cut::after {
-  right: -34px;
-}
-
-.geo-pass-rows-title {
-  display: block;
-  padding: 20px 24px 4px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--geo-muted);
-}
-
-.geo-pass-rows {
-  display: flex;
-  flex-direction: column;
-  padding: 10px 12px 6px;
-}
-
-.geo-pass-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 12px;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 1.4;
-  color: var(--geo-ink);
-  text-decoration: none;
-  transition:
-    background-color 0.25s ease,
-    padding 0.25s ease;
-}
-
-.geo-pass-row + .geo-pass-row,
-.geo-pass-rows li + li .geo-pass-row {
-  box-shadow: 0 -1px 0 #f0f1f6;
-}
-
-a.geo-pass-row:hover {
-  background: var(--geo-soft);
-  padding-left: 16px;
-}
-
-.geo-pass-row svg {
-  flex: 0 0 auto;
-  color: var(--geo-muted);
-  transition:
-    transform 0.25s ease,
-    color 0.25s ease;
-}
-
-a.geo-pass-row:hover svg {
-  color: var(--geo-ink);
-  transform: translate(2px, -2px);
-}
-
-.geo-pass-val {
-  display: inline-grid;
-  place-items: center;
-  min-width: 30px;
-  height: 26px;
-  padding: 0 8px;
-  border-radius: 8px;
-  background: var(--geo-ink);
-  color: #ffffff;
-  font-size: 13px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-/* Barcode strip along the bottom of the pass */
-.geo-pass-code {
-  display: block;
-  height: 30px;
-  margin: 12px 24px 22px;
-  opacity: 0.16;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--geo-ink) 0 2px,
-    transparent 2px 5px,
-    var(--geo-ink) 5px 6px,
-    transparent 6px 9px,
-    var(--geo-ink) 9px 12px,
-    transparent 12px 14px
-  );
-  border-radius: 2px;
-}
-
-.geo-pass-top + .geo-pass-code {
-  margin-top: 0;
 }
 
 /* ---- Guide layout ------------------------------------------------------------- */
@@ -1761,12 +1678,18 @@ a.geo-pass-row:hover svg {
     max-width: none;
   }
 
-  .geo-pass {
-    max-width: 520px;
+  .geo-hero-map {
+    min-height: 0;
   }
 
-  .geo-hero-city .geo-hero-grid {
-    align-items: start;
+  .geo-map {
+    right: -260px;
+    width: 620px;
+    opacity: 0.55;
+  }
+
+  .geo-map-pin {
+    display: none;
   }
 }
 
@@ -1823,7 +1746,9 @@ a.geo-pass-row:hover svg {
 
 @media (prefers-reduced-motion: reduce) {
   .geo-toc,
-  .geo-pass-pin {
+  .geo-map,
+  .geo-map-rings,
+  .geo-map-pulse {
     animation: none !important;
   }
 }

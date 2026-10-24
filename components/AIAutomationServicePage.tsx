@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -52,14 +52,6 @@ const serviceIcons: LucideIconName[] = [
   "sparkles",
 ];
 
-/* Hero photo with floating icon chips (decorative) */
-const floatIcons: { icon: LucideIconName; cls: string }[] = [
-  { icon: "bot", cls: "acx-float-a" },
-  { icon: "workflow", cls: "acx-float-b" },
-  { icon: "mail", cls: "acx-float-c" },
-  { icon: "chart-column", cls: "acx-float-d" },
-];
-
 /* One icon per "why choose" point and per industry, in content order */
 const whyIcons: LucideIconName[] = ["sparkles", "target", "plug-zap", "workflow", "layers", "code-xml", "rocket", "settings"];
 const industryIcons: Record<string, LucideIconName> = {
@@ -84,6 +76,34 @@ function Btn({ href, label, variant = "dark" }: { href?: string; label: string; 
   );
 }
 
+/* Outline of the hero frame: a rounded card with a notch cut into the top-left
+   corner (holding the breadcrumb) and one cut into the bottom-right corner
+   (holding the button). Built from the live sizes so it fits any content. */
+function notchedPath(W: number, H: number, a1: number, b1: number, a2: number, b2: number) {
+  const R = 40;
+  const r = 22;
+  return [
+    `M${a1 + r} 0`,
+    `H${W - R}`,
+    `A${R} ${R} 0 0 1 ${W} ${R}`,
+    `V${H - b2 - r}`,
+    `A${r} ${r} 0 0 1 ${W - r} ${H - b2}`,
+    `H${W - a2 + r}`,
+    `A${r} ${r} 0 0 0 ${W - a2} ${H - b2 + r}`,
+    `V${H - r}`,
+    `A${r} ${r} 0 0 1 ${W - a2 - r} ${H}`,
+    `H${R}`,
+    `A${R} ${R} 0 0 1 0 ${H - R}`,
+    `V${b1 + r}`,
+    `A${r} ${r} 0 0 1 ${r} ${b1}`,
+    `H${a1 - r}`,
+    `A${r} ${r} 0 0 0 ${a1} ${b1 - r}`,
+    `V${r}`,
+    `A${r} ${r} 0 0 1 ${a1 + r} 0`,
+    "Z",
+  ].join(" ");
+}
+
 export default function AIAutomationServicePage({
   data,
   categoryLabel,
@@ -105,6 +125,41 @@ export default function AIAutomationServicePage({
   const steps = processBlock?.steps || [];
   const [heroLead, ...heroRest] = data.heroParagraphs || [];
 
+  /* Hero frame outline, measured from the breadcrumb and button notches */
+  const frameRef = useRef<HTMLDivElement>(null);
+  const crumbRef = useRef<HTMLElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
+  const [frame, setFrame] = useState<{ d: string; w: number; h: number; b1: number; b2: number } | null>(null);
+
+  useEffect(() => {
+    const el = frameRef.current;
+    if (!el) return;
+    const measure = () => {
+      if (window.innerWidth <= 991) {
+        setFrame(null);
+        return;
+      }
+      const W = el.offsetWidth;
+      const H = el.offsetHeight;
+      const gap = 18;
+      const c = crumbRef.current;
+      const b = ctaRef.current;
+      const a1 = c ? c.offsetWidth + gap : 0;
+      const b1 = c ? c.offsetHeight + gap : 0;
+      const a2 = b ? b.offsetWidth + gap : 0;
+      const b2 = b ? b.offsetHeight + gap : 0;
+      setFrame({ d: notchedPath(W, H, a1, b1, a2, b2), w: W, h: H, b1, b2 });
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    window.addEventListener("resize", measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, []);
+
   return (
     <div className="acx-page">
       <Header />
@@ -112,9 +167,16 @@ export default function AIAutomationServicePage({
       <main>
         {/* Hero */}
         <section className="acx-hero">
-          <div className="acx-hero-bg" aria-hidden="true" />
-          <div className="acx-container">
-            <nav className="acx-crumbs" aria-label="Breadcrumb">
+          <div
+            ref={frameRef}
+            className={`acx-frame${frame ? " is-notched" : ""}`}
+            style={
+              frame
+                ? ({ "--acx-n1": `${frame.b1}px`, "--acx-n2": `${frame.b2}px` } as React.CSSProperties)
+                : undefined
+            }
+          >
+            <nav ref={crumbRef} className="acx-crumbs acx-notch-crumbs" aria-label="Breadcrumb">
               <Link href="/">Home</Link>
               <span aria-hidden="true">/</span>
               <span>Services</span>
@@ -128,38 +190,53 @@ export default function AIAutomationServicePage({
               <span className="acx-crumb-now">{data.crumb}</span>
             </nav>
 
-            <div className="acx-hero-grid">
-              <div className="acx-hero-copy">
-                <h1>
-                  <Grad text={data.heroTitle} />
-                </h1>
-                {heroLead && <p className="acx-lead">{heroLead}</p>}
-                {heroRest.map((p, i) => (
-                  <p key={i} className="acx-text">
-                    {p}
-                  </p>
-                ))}
-                {data.heroCta && (
-                  <div className="acx-actions">
-                    <Btn href={data.heroCta.href} label={data.heroCta.label} />
-                  </div>
-                )}
-              </div>
-              <div className="acx-hero-visual" aria-hidden="true">
-                <div className="acx-hero-photo">
+            <div className="acx-frame-shape">
+              <div className="acx-stage" style={frame ? { clipPath: `path("${frame.d}")` } : undefined}>
+                <div className="acx-stage-photo" aria-hidden="true">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src="/images/contact-tech-discussion.jpg" alt="" />
                 </div>
-                <span className="acx-hero-chip">
-                  <LucideIcon name="cpu" size={30} strokeWidth={1.7} />
-                </span>
-                {floatIcons.map((f) => (
-                  <span key={f.icon} className={`acx-float ${f.cls}`}>
-                    <LucideIcon name={f.icon} size={20} />
-                  </span>
-                ))}
+                <div className="acx-stage-shade" aria-hidden="true" />
+                <div className="acx-stage-inner">
+                  <div className="acx-stage-grid">
+                    <div className="acx-stage-copy">
+                      <h1>
+                        <Grad text={data.heroTitle} />
+                      </h1>
+                      {heroLead && <p className="acx-lead">{heroLead}</p>}
+                    </div>
+                    {heroRest.length > 0 && (
+                      <div className="acx-stage-glass">
+                        {heroRest.map((p, i) => (
+                          <p key={i} className="acx-text">
+                            {p}
+                          </p>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
+
+            {frame && (
+              <svg className="acx-frame-edge" width={frame.w} height={frame.h} viewBox={`0 0 ${frame.w} ${frame.h}`} aria-hidden="true">
+                <defs>
+                  <linearGradient id="acx-edge" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stopColor="#00d2ff" />
+                    <stop offset="0.5" stopColor="#6366f1" />
+                    <stop offset="1" stopColor="#a855f7" />
+                  </linearGradient>
+                </defs>
+                <path d={frame.d} />
+              </svg>
+            )}
+
+            {data.heroCta && (
+              <div ref={ctaRef} className="acx-actions acx-notch-cta">
+                <Btn href={data.heroCta.href} label={data.heroCta.label} />
+              </div>
+            )}
           </div>
         </section>
 

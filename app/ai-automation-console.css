@@ -176,22 +176,151 @@
   color: var(--acx-ink);
 }
 
-/* ---- Hero ----------------------------------------------------------------------------- */
+/* ---- Hero: immersive framed stage --------------------------------------------------------
+   A full-width rounded frame: the photo fills it under a deep shade, the heading
+   sits in white on the left and the supporting copy rests in a frosted glass
+   panel on the right. */
 .acx-hero {
   position: relative;
-  padding: clamp(118px, 10.5vw, 146px) 0 var(--acx-y);
-  overflow: hidden;
+  padding: clamp(100px, 8.6vw, 118px) clamp(14px, 1.8vw, 28px) 18px;
 }
 
-.acx-hero-bg {
+/* Outer frame: a dark card with two corner notches cut out of it — the
+   breadcrumb sits in the top-left notch, the button in the bottom-right one.
+   The outline is drawn from the live layout (see notchedPath). */
+.acx-frame {
+  position: relative;
+  max-width: 1360px;
+  margin: 0 auto;
+}
+
+.acx-frame-shape {
+  filter: drop-shadow(0 34px 50px rgba(15, 23, 42, 0.28));
+}
+
+.acx-stage {
+  position: relative;
+  border-radius: 40px;
+  overflow: hidden;
+  background: #0b0f17;
+  color: #ffffff;
+  isolation: isolate;
+}
+
+.acx-frame.is-notched .acx-stage {
+  border-radius: 0;
+  animation: acx-frame-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes acx-frame-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.acx-frame-edge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.acx-frame-edge path {
+  fill: none;
+  stroke: url(#acx-edge);
+  stroke-width: 1.5;
+  opacity: 0.9;
+}
+
+/* Breadcrumb in the top-left notch */
+.acx-notch-crumbs {
+  margin-bottom: 18px;
+}
+
+.acx-frame.is-notched .acx-notch-crumbs {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  margin: 0;
+  padding: 10px 6px 0 8px;
+}
+
+/* Button in the bottom-right notch */
+.acx-frame .acx-notch-cta {
+  margin-top: 22px;
+}
+
+.acx-frame.is-notched .acx-notch-cta {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  margin: 0;
+}
+
+.acx-stage-photo {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 46%;
+  z-index: -1;
+  clip-path: polygon(18% 0, 100% 0, 100% 100%, 0 100%);
+  animation: acx-stage-zoom 2.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.acx-stage-photo::after {
+  content: "";
   position: absolute;
   inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(ellipse 60% 45% at 50% 0%, rgba(99, 102, 241, 0.1), transparent 70%),
-    linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px) 0 0 / 100% 64px;
-  -webkit-mask-image: linear-gradient(180deg, #000 30%, transparent 90%);
-  mask-image: linear-gradient(180deg, #000 30%, transparent 90%);
+  background: linear-gradient(90deg, rgba(11, 15, 23, 0.55) 0%, rgba(11, 15, 23, 0.1) 45%, rgba(11, 15, 23, 0.25) 100%);
+}
+
+.acx-stage-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 65% center;
+}
+
+@keyframes acx-stage-zoom {
+  from {
+    transform: scale(1.08);
+    opacity: 0.4;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.acx-stage-shade {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-image:
+    radial-gradient(ellipse 45% 70% at 0% 100%, rgba(0, 210, 255, 0.2), transparent 70%),
+    radial-gradient(ellipse 40% 60% at 30% 0%, rgba(168, 85, 247, 0.18), transparent 70%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(135deg, #0b0f17 0%, #111827 100%);
+  background-size: auto, auto, 44px 44px, 44px 44px, auto;
+}
+
+.acx-stage-inner {
+  display: flex;
+  flex-direction: column;
+  min-height: clamp(500px, 42vw, 600px);
+  padding: calc(var(--acx-n1, 0px) + clamp(28px, 3vw, 44px)) clamp(24px, 4.6vw, 72px)
+    calc(var(--acx-n2, 0px) + clamp(24px, 2.6vw, 36px));
 }
 
 .acx-crumbs {
@@ -223,140 +352,50 @@
   font-weight: 600;
 }
 
-.acx-hero-grid {
+.acx-stage-grid {
+  flex: 1;
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-  gap: clamp(36px, 6vw, 96px);
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+  gap: clamp(28px, 5vw, 80px);
   align-items: center;
 }
 
-.acx-hero-copy {
+.acx-stage-copy {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 20px;
+  align-self: center;
+  max-width: 560px;
 }
 
-.acx-hero-copy h1 {
-  margin-bottom: 4px;
-}
-
-.acx-hero-copy .acx-actions {
-  margin-top: 12px;
-}
-
-/* Photo with floating icon chips */
-.acx-hero-visual {
-  position: relative;
-  padding: 28px;
-}
-
-.acx-hero-photo {
-  position: relative;
-  border-radius: 28px;
-  overflow: hidden;
-  background: #e8ebf5;
-  box-shadow: 0 50px 90px -60px rgba(15, 23, 42, 0.6);
-}
-
-.acx-hero-photo::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(160deg, rgba(99, 102, 241, 0.18), transparent 45%, rgba(11, 15, 23, 0.25));
-}
-
-.acx-hero-photo img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 4 / 4.4;
-  object-fit: cover;
-}
-
-.acx-hero-chip {
-  position: absolute;
-  z-index: 2;
-  right: 0;
-  bottom: 54px;
-  display: grid;
-  place-items: center;
-  width: 78px;
-  height: 78px;
-  border-radius: 22px;
-  background: var(--acx-ink);
+.acx-page .acx-stage h1 {
   color: #ffffff;
-  box-shadow:
-    0 0 0 6px #ffffff,
-    0 24px 44px -20px rgba(79, 70, 229, 0.7);
 }
 
-.acx-hero-chip::after {
-  content: "";
-  position: absolute;
-  inset: -12px;
-  border-radius: 28px;
-  border: 1.5px solid rgba(99, 102, 241, 0.45);
-  animation: acx-breathe 2.8s ease-in-out infinite;
+.acx-page .acx-stage p.acx-lead:not(#_) {
+  color: rgba(255, 255, 255, 0.8);
 }
 
-@keyframes acx-breathe {
-  0%,
-  100% {
-    opacity: 0.3;
-    transform: scale(0.95);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.04);
-  }
+.acx-stage-glass {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: clamp(22px, 2.6vw, 32px);
+  border-radius: 22px;
+  background: rgba(11, 15, 23, 0.58);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  backdrop-filter: blur(18px) saturate(140%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
-.acx-float {
-  position: absolute;
-  z-index: 2;
-  display: grid;
-  place-items: center;
-  width: 50px;
-  height: 50px;
-  border-radius: 15px;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid var(--acx-line);
-  color: var(--acx-ink);
-  box-shadow: 0 18px 34px -20px rgba(15, 23, 42, 0.5);
-  backdrop-filter: blur(6px);
-  animation: acx-float 6s ease-in-out infinite;
+.acx-page .acx-stage-glass p.acx-text:not(#_) {
+  color: rgba(255, 255, 255, 0.76);
 }
 
-.acx-float-a {
-  top: 0;
-  left: 40px;
-}
-
-.acx-float-b {
-  top: 34%;
-  left: 0;
-  animation-delay: -1.5s;
-}
-
-.acx-float-c {
-  top: 8%;
-  right: 4px;
-  animation-delay: -3s;
-}
-
-.acx-float-d {
-  bottom: 0;
-  left: 26%;
-  animation-delay: -4.5s;
-}
-
-@keyframes acx-float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
+.acx-stage-glass .acx-actions {
+  margin-top: 8px;
 }
 
 /* ---- Service modules -------------------------------------------------------------------- */
@@ -934,14 +973,30 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .acx-hero-grid,
+  .acx-stage-grid,
   .acx-why,
   .acx-close {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .acx-hero-visual {
-    max-width: 560px;
+  .acx-stage-inner {
+    min-height: 0;
+  }
+
+  .acx-stage-grid {
+    margin-top: 12px;
+    align-items: start;
+  }
+
+  .acx-stage-photo {
+    position: relative;
+    left: auto;
+    height: 260px;
+    clip-path: polygon(0 0, 100% 0, 100% 82%, 0 100%);
+  }
+
+  .acx-stage-photo::after {
+    background: linear-gradient(180deg, rgba(11, 15, 23, 0.1) 40%, rgba(11, 15, 23, 0.6) 100%);
   }
 
   .acx-proc {
@@ -982,12 +1037,16 @@
     padding: 0 18px;
   }
 
-  .acx-hero-visual {
-    padding: 20px;
+  .acx-stage {
+    border-radius: 28px;
   }
 
-  .acx-hero-photo img {
-    aspect-ratio: 4 / 3.6;
+  .acx-stage-inner {
+    padding: 24px 20px 22px;
+  }
+
+  .acx-stage-glass {
+    padding: 18px;
   }
 
   .acx-modules .acx-module {
@@ -1019,8 +1078,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .acx-float,
-  .acx-hero-chip::after {
+  .acx-stage-photo,
+  .acx-frame.is-notched .acx-stage {
     animation: none !important;
   }
 }
