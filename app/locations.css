@@ -1008,165 +1008,403 @@
   border-bottom: 1px solid var(--geo-line);
 }
 
-/* Map hero: copy on the left, contour rings with the location pin on the right */
-.geo-hero-map {
-  min-height: clamp(420px, 38vw, 540px);
-  display: flex;
-  align-items: center;
+/* Bento hero: a light copy tile, a photo tile and a dark tile with the pin */
+.geo-hero-bento {
+  padding-bottom: clamp(40px, 5vw, 72px);
 }
 
-.geo-hero-map .geo-container {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-}
-
-.geo-hero-map .geo-hero-copy {
-  max-width: 700px;
-}
-
-.geo-map {
-  position: absolute;
-  top: 50%;
-  right: max(-180px, calc((100vw - 1200px) / 2 - 260px));
-  width: clamp(620px, 62vw, 900px);
-  aspect-ratio: 1;
-  transform: translateY(-46%);
-  pointer-events: none;
-  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 38%, transparent 70%);
-  mask-image: radial-gradient(circle at 50% 50%, #000 38%, transparent 70%);
-  animation: geo-map-in 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
-}
-
-@keyframes geo-map-in {
-  from {
-    opacity: 0;
-    transform: translateY(-46%) scale(0.94);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(-46%) scale(1);
-  }
-}
-
-.geo-map-lines {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.geo-map-rings {
-  transform-origin: 450px 450px;
-  animation: geo-map-turn 180s linear infinite;
-}
-
-.geo-map-rings path {
-  stroke: url(#geo-map-stroke);
-  stroke-width: 1;
-  opacity: 0.32;
-}
-
-.geo-map-rings path.is-major {
-  stroke-width: 1.4;
-  opacity: 0.55;
-}
-
-@keyframes geo-map-turn {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.geo-map-pin {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 60px;
-  height: 60px;
-  margin: -30px 0 0 -30px;
-}
-
-.geo-map-dot {
+.geo-bento {
   position: relative;
   z-index: 1;
   display: grid;
-  place-items: center;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: var(--geo-ink, #0b0f17);
-  color: #ffffff;
-  box-shadow:
-    0 0 0 6px rgba(255, 255, 255, 0.9),
-    0 18px 36px -12px rgba(15, 23, 42, 0.55);
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 16px;
 }
 
-.geo-map-pulse {
+.geo-bt {
+  position: relative;
+  border-radius: 28px;
+  overflow: hidden;
+  animation: geo-tile-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.geo-bento > .geo-bt:nth-child(2) {
+  animation-delay: 0.12s;
+}
+
+.geo-bento > .geo-bt:nth-child(3) {
+  animation-delay: 0.24s;
+}
+
+@keyframes geo-tile-in {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Light copy tile */
+.geo-bt-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  padding: clamp(28px, 3.6vw, 52px);
+  background:
+    radial-gradient(ellipse 70% 60% at 100% 0%, rgba(168, 85, 247, 0.08), transparent 70%),
+    radial-gradient(ellipse 60% 60% at 0% 100%, rgba(0, 210, 255, 0.08), transparent 70%),
+    rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--geo-line);
+  box-shadow: 0 30px 60px -48px rgba(15, 23, 42, 0.45);
+}
+
+.geo-bt-copy .geo-breadcrumb {
+  margin-bottom: 4px;
+}
+
+/* Photo tile */
+.geo-bt-photo {
+  min-height: 240px;
+  background: #e8ebf5;
+}
+
+.geo-bt-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.geo-bt-photo:hover img {
+  transform: scale(1.05);
+}
+
+.geo-bt-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(11, 15, 23, 0) 55%, rgba(11, 15, 23, 0.25));
+}
+
+/* Dark tile */
+.geo-bt-dark {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: clamp(24px, 2.8vw, 36px);
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px) 0 0 / 34px 34px,
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px) 0 0 / 34px 34px,
+    #0b0f17;
+  color: #ffffff;
+  text-decoration: none;
+  isolation: isolate;
+}
+
+.geo-bt-orb {
+  position: absolute;
+  z-index: -1;
+  width: 70%;
+  aspect-ratio: 1;
+  right: -18%;
+  top: -40%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.55), rgba(168, 85, 247, 0.25) 45%, transparent 70%);
+  filter: blur(10px);
+  animation: geo-orb 12s ease-in-out infinite alternate;
+}
+
+@keyframes geo-orb {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(-22%, 18%);
+  }
+}
+
+.geo-bt-pin {
+  position: absolute;
+  top: clamp(20px, 2.4vw, 28px);
+  right: clamp(20px, 2.4vw, 28px);
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: var(--geo-ink, #0b0f17);
+}
+
+.geo-bt-pin-ring {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  border: 1.5px solid rgba(99, 102, 241, 0.55);
-  animation: geo-map-pulse 3.6s ease-out infinite;
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  animation: geo-pin-ring 2.8s ease-out infinite;
 }
 
-.geo-map-pulse-2 {
-  animation-delay: 1.8s;
-}
-
-@keyframes geo-map-pulse {
+@keyframes geo-pin-ring {
   from {
     transform: scale(1);
     opacity: 0.9;
   }
   to {
-    transform: scale(3.2);
+    transform: scale(2.2);
     opacity: 0;
   }
 }
 
-/* City page: the service categories as jump links */
-.geo-hero-cats {
+/* Service page: category above the city name, the tile links to the city page */
+.geo-bt-cat {
+  max-width: 80%;
+  line-height: 1.5;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.geo-bt-cityname {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 10px 0 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
+  font-size: clamp(28px, 2.6vw, 36px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.geo-bt-cityname > span {
+  background: linear-gradient(135deg, #00d2ff, #6366f1 50%, #a855f7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.geo-bt-cityname svg {
+  flex: 0 0 auto;
+  color: #ffffff;
+  transition: transform 0.35s ease;
+}
+
+.geo-bt-city:hover .geo-bt-cityname svg {
+  transform: translate(3px, -3px);
+}
+
+/* City page: the service categories as rows in the dark tile */
+.geo-bt-links {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.geo-hero-cat {
-  display: inline-flex;
+.geo-bt-link {
+  display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 14px 12px 18px;
-  border-radius: 12px;
-  border: 1px solid var(--geo-line);
-  background: rgba(255, 255, 255, 0.86);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
   font-weight: 600;
-  font-size: 15px;
-  color: var(--geo-ink);
+  font-size: 16px;
+  color: #ffffff;
   text-decoration: none;
-  transition:
-    border-color 0.3s ease,
-    box-shadow 0.3s ease,
-    transform 0.3s ease;
+  transition: padding-left 0.35s ease, color 0.3s ease;
 }
 
-.geo-hero-cat svg {
-  color: var(--geo-indigo);
-  transition: transform 0.3s ease;
+.geo-bt-links li:first-child .geo-bt-link {
+  border-top: 0;
 }
 
-.geo-hero-cat:hover {
-  border-color: #c7cbf5;
-  box-shadow: 0 14px 28px -20px rgba(79, 70, 229, 0.5);
-  transform: translateY(-2px);
+.geo-bt-link svg {
+  flex: 0 0 auto;
+  color: rgba(255, 255, 255, 0.7);
+  transition: transform 0.35s ease, color 0.3s ease;
 }
 
-.geo-hero-cat:hover svg {
-  transform: translateX(3px);
+.geo-bt-link:hover {
+  padding-left: 6px;
+}
+
+.geo-bt-link:hover svg {
+  color: #ffffff;
+  transform: translateX(4px);
+}
+
+/* Layouts */
+.geo-bento-svc .geo-bt-copy {
+  grid-column: span 7;
+  grid-row: span 2;
+}
+
+.geo-bento-svc .geo-bt-photo {
+  grid-column: span 5;
+}
+
+.geo-bento-svc .geo-bt-dark {
+  grid-column: span 5;
+  min-height: 210px;
+}
+
+/* City page: title row, then the service categories as large photo cards */
+.geo-city-head {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: clamp(26px, 3vw, 38px);
+}
+
+.geo-city-title {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.geo-city-pin {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: var(--geo-ink, #0b0f17);
+  color: #ffffff;
+  box-shadow: 0 14px 28px -14px rgba(15, 23, 42, 0.6);
+}
+
+.geo-city-pin .geo-bt-pin-ring {
+  border-radius: 16px;
+  border-color: rgba(99, 102, 241, 0.6);
+}
+
+.geo-city-cards {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1.25fr 1fr 1fr;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.geo-city-cards li {
+  animation: geo-tile-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.geo-city-cards li:nth-child(2) {
+  animation-delay: 0.12s;
+}
+
+.geo-city-cards li:nth-child(3) {
+  animation-delay: 0.24s;
+}
+
+.geo-city-card {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  height: clamp(280px, 26vw, 360px);
+  border-radius: 26px;
+  overflow: hidden;
+  background: #0b0f17;
+  text-decoration: none;
+  isolation: isolate;
+}
+
+.geo-city-card img {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.geo-city-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, rgba(11, 15, 23, 0) 30%, rgba(11, 15, 23, 0.86) 100%);
+  transition: background 0.5s ease;
+}
+
+.geo-city-card::after {
+  content: "";
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  bottom: 0;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: linear-gradient(90deg, #00d2ff, #6366f1, #a855f7);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.geo-city-card:hover img {
+  transform: scale(1.06);
+}
+
+.geo-city-card:hover::after {
+  transform: scaleX(1);
+}
+
+.geo-city-card-foot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  padding: 24px;
+}
+
+.geo-city-card-label {
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #ffffff;
+}
+
+.geo-city-card-go {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  transition: background 0.35s ease, color 0.35s ease, transform 0.35s ease;
+}
+
+.geo-city-card:hover .geo-city-card-go {
+  background: #ffffff;
+  color: var(--geo-ink, #0b0f17);
+  transform: rotate(-45deg);
 }
 
 .geo-page p.geo-tagline:not(#_):not(#__) {
@@ -1678,18 +1916,21 @@
     max-width: none;
   }
 
-  .geo-hero-map {
-    min-height: 0;
+  .geo-bento .geo-bt {
+    grid-column: 1 / -1 !important;
+    grid-row: auto !important;
   }
 
-  .geo-map {
-    right: -260px;
-    width: 620px;
-    opacity: 0.55;
+  .geo-bento .geo-bt-photo {
+    min-height: 240px;
   }
 
-  .geo-map-pin {
-    display: none;
+  .geo-city-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .geo-city-card {
+    height: 220px;
   }
 }
 
@@ -1746,9 +1987,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .geo-toc,
-  .geo-map,
-  .geo-map-rings,
-  .geo-map-pulse {
+  .geo-bt,
+  .geo-bt-orb,
+  .geo-bt-pin-ring,
+  .geo-city-cards li {
     animation: none !important;
   }
 }

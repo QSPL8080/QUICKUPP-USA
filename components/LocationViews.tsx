@@ -318,45 +318,33 @@ function ClosingBand({ section }: { section: LocSection }) {
   );
 }
 
-/* Contour rings for the hero map (deterministic, so server and client match) */
-const CONTOURS = Array.from({ length: 10 }, (_, k) => {
-  const r0 = 46 + k * 40;
-  const pts: string[] = [];
-  for (let i = 0; i < 90; i++) {
-    const t = (i / 90) * Math.PI * 2;
-    const r =
-      r0 * (1 + 0.07 * Math.sin(3 * t + k * 0.6) + 0.045 * Math.sin(5 * t - k * 0.9) + 0.03 * Math.sin(2 * t + k));
-    pts.push(`${(450 + r * Math.cos(t)).toFixed(1)} ${(450 + r * Math.sin(t)).toFixed(1)}`);
-  }
-  return `M${pts.join("L")}Z`;
-});
+/* Hero photos (decorative): one for city pages, one per service category */
+const HERO_PHOTOS = {
+  city: "/images/contact-team-conference.jpg",
+  marketing: "/images/contact-strategy-consultation.jpg",
+  it: "/images/contact-team-collaboration.jpg",
+  staff: "/images/contact-consultancy-meeting.jpg",
+} as const;
 
-/** Hero map: soft topographic contour rings with the location pin at their centre */
-function GeoMap() {
+function HeroPhoto({ src }: { src: string }) {
   return (
-    <div className="geo-map" aria-hidden="true">
-      <svg className="geo-map-lines" viewBox="0 0 900 900" fill="none">
-        <defs>
-          <linearGradient id="geo-map-stroke" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor="#00d2ff" />
-            <stop offset="0.5" stopColor="#6366f1" />
-            <stop offset="1" stopColor="#a855f7" />
-          </linearGradient>
-        </defs>
-        <g className="geo-map-rings">
-          {CONTOURS.map((d, i) => (
-            <path key={i} d={d} className={i % 3 === 2 ? "is-major" : undefined} />
-          ))}
-        </g>
-      </svg>
-      <span className="geo-map-pin">
-        <span className="geo-map-pulse" />
-        <span className="geo-map-pulse geo-map-pulse-2" />
-        <span className="geo-map-dot">
-          <LucideIcon name="map-pin" size={22} />
-        </span>
-      </span>
+    <div className="geo-bt geo-bt-photo" aria-hidden="true">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt="" />
     </div>
+  );
+}
+
+/** Dark tile glow + pin badge shared by both heroes */
+function TileGlow() {
+  return (
+    <>
+      <span className="geo-bt-orb" aria-hidden="true" />
+      <span className="geo-bt-pin" aria-hidden="true">
+        <span className="geo-bt-pin-ring" />
+        <LucideIcon name="map-pin" size={20} />
+      </span>
+    </>
   );
 }
 
@@ -431,26 +419,37 @@ export function CityView({ city }: { city: LocCity }) {
     <div className="geo-page">
       <Header />
       <main>
-        <section className="geo-hero geo-hero-map geo-hero-city">
+        <section className="geo-hero geo-hero-bento geo-hero-city">
           <div className="geo-hero-bg" aria-hidden="true" />
-          <GeoMap />
           <div className="geo-container">
-            <div className="geo-hero-copy">
+            <div className="geo-city-head">
               <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Our Locations", href: "/locations" }, { label: city.city }]} />
-              <h1 className="geo-h1">
-                <span className="qs-gradient-text">{city.city}</span>
-              </h1>
-              <ul className="geo-hero-cats">
-                {groups.map((g) => (
-                  <li key={g.cat}>
-                    <a href={`#${g.cat}`} className="geo-hero-cat">
-                      <span>{CATEGORY_LABELS[g.cat]}</span>
-                      <LucideIcon name="chevron-right" size={16} strokeWidth={2.2} />
-                    </a>
-                  </li>
-                ))}
-              </ul>
+              <div className="geo-city-title">
+                <span className="geo-city-pin" aria-hidden="true">
+                  <span className="geo-bt-pin-ring" />
+                  <LucideIcon name="map-pin" size={22} />
+                </span>
+                <h1 className="geo-h1">
+                  <span className="qs-gradient-text">{city.city}</span>
+                </h1>
+              </div>
             </div>
+            <ul className="geo-city-cards">
+              {groups.map((g) => (
+                <li key={g.cat}>
+                  <a href={`#${g.cat}`} className="geo-city-card">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={HERO_PHOTOS[g.cat]} alt="" />
+                    <span className="geo-city-card-foot">
+                      <span className="geo-city-card-label">{CATEGORY_LABELS[g.cat]}</span>
+                      <span className="geo-city-card-go" aria-hidden="true">
+                        <LucideIcon name="arrow-right" size={18} strokeWidth={2.2} />
+                      </span>
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         </section>
 
@@ -522,30 +521,40 @@ export function LocationServiceView({ city, page }: { city: LocCity; page: LocPa
     <div className="geo-page">
       <Header />
       <main>
-        <section className="geo-hero geo-hero-map geo-hero-svc">
+        <section className="geo-hero geo-hero-bento geo-hero-svc">
           <div className="geo-hero-bg" aria-hidden="true" />
-          <GeoMap />
           <div className="geo-container">
-            <div className="geo-hero-copy">
-              <Breadcrumb
-                items={[
-                  { label: "Home", href: "/" },
-                  { label: "Our Locations", href: "/locations" },
-                  { label: city.city, href: `/locations/${city.slug}` },
-                  { label: page.h1 },
-                ]}
-              />
-              <h1 className="geo-h1">
-                <GradientHeading text={page.h1} />
-              </h1>
-              {introText.map((b, i) =>
-                b.type === "p" ? (
-                  <Html key={i} html={b.html} className={i === firstP ? "geo-lead" : "geo-text"} />
-                ) : (
-                  <Blocks key={i} blocks={[b]} />
-                )
-              )}
-              <CtaRow labels={introCtas} />
+            <div className="geo-bento geo-bento-svc">
+              <div className="geo-bt geo-bt-copy">
+                <Breadcrumb
+                  items={[
+                    { label: "Home", href: "/" },
+                    { label: "Our Locations", href: "/locations" },
+                    { label: city.city, href: `/locations/${city.slug}` },
+                    { label: page.h1 },
+                  ]}
+                />
+                <h1 className="geo-h1">
+                  <GradientHeading text={page.h1} />
+                </h1>
+                {introText.map((b, i) =>
+                  b.type === "p" ? (
+                    <Html key={i} html={b.html} className={i === firstP ? "geo-lead" : "geo-text"} />
+                  ) : (
+                    <Blocks key={i} blocks={[b]} />
+                  )
+                )}
+                <CtaRow labels={introCtas} />
+              </div>
+              <HeroPhoto src={HERO_PHOTOS[page.category] ?? HERO_PHOTOS.city} />
+              <Link href={`/locations/${city.slug}`} className="geo-bt geo-bt-dark geo-bt-city">
+                <TileGlow />
+                <span className="geo-bt-cat">{CATEGORY_LABELS[page.category]}</span>
+                <span className="geo-bt-cityname">
+                  <span>{city.city}</span>
+                  <LucideIcon name="arrow-up-right" size={22} strokeWidth={2.2} />
+                </span>
+              </Link>
             </div>
           </div>
         </section>
