@@ -22,7 +22,7 @@ import type {
 
 /*
  * AI-Powered Digital Marketing service pages (all 9 subpages).
- * "mkx-" studio design, used only here: framed hero photo, services index,
+ * "mkx-" studio design, used only here: photo cover hero with an overlapping title card, services index,
  * campaign cards with chip lists, poster cards, a numbered process flow,
  * a check list panel, industry chips, FAQ accordion and a gradient-edged
  * closing card. Every word comes from the
@@ -418,6 +418,7 @@ export default function MerkilMarketingServicePage({
   };
 
   const heroCtas = data.heroCtas && data.heroCtas.length > 0 ? data.heroCtas : data.heroCta ? [data.heroCta] : [];
+  const [heroLead, ...heroRest] = data.heroParagraphs;
 
   return (
     <div className="mkx-page">
@@ -439,16 +440,27 @@ export default function MerkilMarketingServicePage({
               ) : null}
               <span className="mkx-crumb-now">{data.crumb}</span>
             </nav>
-            <div className="mkx-hero-grid">
-              <div className="mkx-hero-copy">
+            <div className="mkx-cover">
+              <div className="mkx-cover-photo" aria-hidden="true">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={photos.hero} alt="" />
+              </div>
+              <div className="mkx-cover-card">
                 <h1>
                   <Grad text={data.heroTitle} />
                 </h1>
-                {data.heroParagraphs.map((p, i) => (
-                  <p key={i} className={i === 0 ? "mkx-lead" : "mkx-text"}>
-                    {p}
-                  </p>
-                ))}
+                {heroLead && <p className="mkx-lead">{heroLead}</p>}
+              </div>
+            </div>
+            {(heroRest.length > 0 || heroCtas.length > 0) && (
+              <div className="mkx-cover-foot">
+                <div className="mkx-cover-more">
+                  {heroRest.map((p, i) => (
+                    <p key={i} className="mkx-text">
+                      {p}
+                    </p>
+                  ))}
+                </div>
                 {heroCtas.length > 0 && (
                   <div className="mkx-actions">
                     {heroCtas.map((c, i) => (
@@ -457,11 +469,7 @@ export default function MerkilMarketingServicePage({
                   </div>
                 )}
               </div>
-              <div className="mkx-hero-photo" aria-hidden="true">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={photos.hero} alt="" />
-              </div>
-            </div>
+            )}
           </div>
         </section>
 

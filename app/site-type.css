@@ -7,7 +7,7 @@
    Fonts stay the site's: Plus Jakarta Sans (headings, labels) + Inter (body).
 
    Scale (desktop → mobile)
-     H1  48 → 32   700  lh 1.12  -0.03em
+     H1  40 → 30   700  lh 1.12  -0.03em
      H2  34 → 26   700  lh 1.2   -0.022em
      H3  19 → 17   600  lh 1.35  -0.012em
      H4  16        600  lh 1.4
@@ -15,7 +15,7 @@
      Lead 18  lh 1.65   Body 16  400  lh 1.7   Small 14  lh 1.55
    ========================================================================== */
 :root {
-  --qs-t-h1: clamp(32px, 3.35vw, 48px);
+  --qs-t-h1: clamp(30px, 2.8vw, 40px);
   --qs-t-h2: clamp(26px, 2.4vw, 34px);
   --qs-t-h3-lg: clamp(21px, 1.75vw, 26px);
   --qs-t-h3: clamp(17px, 1.32vw, 19px);

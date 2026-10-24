@@ -183,11 +183,11 @@
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 78% 42%, rgba(168, 85, 247, 0.12), transparent 32%),
-    radial-gradient(circle at 92% 80%, rgba(0, 210, 255, 0.12), transparent 30%),
-    radial-gradient(rgba(15, 23, 42, 0.08) 1px, transparent 1px) 0 0 / 22px 22px;
-  -webkit-mask-image: linear-gradient(180deg, #000 30%, transparent 100%);
-  mask-image: linear-gradient(180deg, #000 30%, transparent 100%);
+    radial-gradient(ellipse 45% 55% at 90% 20%, rgba(99, 102, 241, 0.1), transparent 70%),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.035) 1px, transparent 1px) 0 0 / 48px 48px,
+    linear-gradient(rgba(15, 23, 42, 0.035) 1px, transparent 1px) 0 0 / 48px 48px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 70% 30%, #000 30%, transparent 80%);
+  mask-image: radial-gradient(ellipse 80% 70% at 70% 30%, #000 30%, transparent 80%);
 }
 
 .mkx-crumbs {
@@ -219,50 +219,88 @@
   font-weight: 600;
 }
 
-.mkx-hero-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
-  gap: clamp(36px, 6vw, 96px);
-  align-items: center;
-}
-
-.mkx-hero-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.mkx-hero-copy h1 {
-  margin-bottom: 4px;
-}
-
-.mkx-hero-copy .mkx-actions {
-  margin-top: 12px;
-}
-
-/* Hero photo */
-.mkx-hero-photo {
+/* Cover: wide photo banner with an overlapping white title card */
+.mkx-cover {
   position: relative;
-  border-radius: 24px;
+  padding-bottom: 72px;
+}
+
+.mkx-cover-photo {
+  position: relative;
+  border-radius: 30px;
   overflow: hidden;
   background: #e8ebf5;
-  box-shadow: 0 40px 80px -56px rgba(15, 23, 42, 0.55);
+  animation: mkx-cover-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both;
 }
 
-.mkx-hero-photo::before {
+.mkx-cover-photo::after {
   content: "";
   position: absolute;
-  inset: 0 0 auto 0;
-  z-index: 1;
-  height: 4px;
-  background: var(--mkx-grad);
+  inset: 0;
+  background: linear-gradient(180deg, rgba(11, 15, 23, 0) 40%, rgba(11, 15, 23, 0.35));
 }
 
-.mkx-hero-photo img {
+.mkx-cover-photo img {
   display: block;
   width: 100%;
-  aspect-ratio: 4 / 4.6;
+  height: clamp(320px, 38vw, 480px);
   object-fit: cover;
+  object-position: center 30%;
+}
+
+.mkx-cover-card {
+  position: absolute;
+  left: clamp(20px, 4vw, 48px);
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: min(760px, calc(100% - 40px));
+  padding: clamp(26px, 3.4vw, 44px);
+  border-radius: 24px;
+  background: #ffffff;
+  border: 1px solid var(--mkx-line);
+  box-shadow: 0 40px 80px -48px rgba(15, 23, 42, 0.55);
+  animation: mkx-cover-in 1s cubic-bezier(0.22, 1, 0.36, 1) 0.5s both;
+}
+
+@keyframes mkx-cover-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.mkx-cover-foot {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) auto;
+  gap: 20px clamp(28px, 5vw, 72px);
+  align-items: end;
+  margin-top: clamp(28px, 3.5vw, 40px);
+  padding-left: clamp(20px, 4vw, 48px);
+}
+
+.mkx-cover-more {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 32px;
+}
+
+.mkx-cover-more:has(> :only-child) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.mkx-cover-more:empty {
+  display: none;
+}
+
+.mkx-cover-foot .mkx-actions {
+  flex-direction: column;
+  margin-top: 0;
 }
 
 /* ---- Services index ----------------------------------------------------------------- */
@@ -713,7 +751,7 @@
 
 /* ---- Responsive ------------------------------------------------------------------------------ */
 @media (max-width: 991px) {
-  .mkx-hero-grid,
+  .mkx-cover-foot,
   .mkx-campaign,
   .mkx-why,
   .mkx-ai {
@@ -742,12 +780,23 @@
     margin-top: 10px;
   }
 
-  .mkx-hero-photo {
-    max-width: 560px;
+  .mkx-cover {
+    padding-bottom: 0;
   }
 
-  .mkx-hero-photo img {
-    aspect-ratio: 16 / 11;
+  .mkx-cover-card {
+    position: relative;
+    left: auto;
+    width: auto;
+    margin: -60px 16px 0;
+  }
+
+  .mkx-cover-foot {
+    padding-left: 0;
+  }
+
+  .mkx-cover-foot .mkx-actions {
+    flex-direction: row;
   }
 
   .mkx-index {
@@ -780,6 +829,26 @@
     padding: 0 18px;
   }
 
+  .mkx-cover-more {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mkx-cover-photo {
+    border-radius: 22px;
+  }
+
+  .mkx-cover-photo img {
+    height: 260px;
+  }
+
+  .mkx-cover-card {
+    margin: -48px 10px 0;
+  }
+
+  .mkx-cover-foot .mkx-actions {
+    flex-direction: column;
+  }
+
   .mkx-posters-2,
   .mkx-posters-3,
   .mkx-flow {
@@ -803,5 +872,3 @@
     width: 100%;
   }
 }
-
-

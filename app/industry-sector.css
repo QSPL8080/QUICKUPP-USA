@@ -851,7 +851,7 @@
 }
 
 .inx-stack-num {
-  font-size: clamp(44px, 5vw, 68px);
+  font-size: clamp(30px, 2.8vw, 40px);
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.04em;
