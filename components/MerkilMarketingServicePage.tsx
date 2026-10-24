@@ -35,24 +35,122 @@ interface MerkilMarketingServicePageProps {
   categorySlug?: string;
 }
 
-type PhotoSet = { hero: string; ai: string };
+type PhotoSet = { hero: string; ai: string; cta: string };
 const I = (name: string) => `/images/${name}`;
 
 /* One set per page so a photo never repeats on the same page */
 const photoSets: Record<string, PhotoSet> = {
-  "Social Media Marketing": { hero: I("slider-01-02.jpg"), ai: I("blog-img-02.jpg") },
-  "SEO & AI Search Visibility": { hero: I("project-04.jpg"), ai: I("counter-style-three-img-03.jpg") },
-  "Paid Marketing": { hero: I("home-two-about.jpg"), ai: I("counter-style-three-img-02.jpg") },
-  "Content Marketing": { hero: I("blog-img-03.jpg"), ai: I("blog-img-05.jpg") },
-  "Media Production": { hero: I("project-02.jpg"), ai: I("service-img-06.jpg") },
-  "Online Reputation Management": { hero: I("contact-customer-consultant.jpg"), ai: I("service-img-03.jpg") },
-  "Email Marketing": { hero: I("service-img-05.jpg"), ai: I("contact-office-consultation.jpg") },
-  "SMS Marketing": { hero: I("slider-01-01.jpg"), ai: I("contact-support-consultant.jpg") },
-  "WhatsApp Marketing": { hero: I("service-img-01.jpg"), ai: I("contact-professional-consultant.jpg") },
+  "Social Media Marketing": {
+    hero: I("slider-01-02.jpg"),
+    ai: I("blog-img-02.jpg"),
+    cta: I("contact-agency-consultation.jpg"),
+  },
+  "SEO & AI Search Visibility": {
+    hero: I("project-04.jpg"),
+    ai: I("counter-style-three-img-03.jpg"),
+    cta: I("contact-consulting-planning.jpg"),
+  },
+  "Paid Marketing": {
+    hero: I("home-two-about.jpg"),
+    ai: I("counter-style-three-img-02.jpg"),
+    cta: I("contact-diverse-meeting.jpg"),
+  },
+  "Content Marketing": {
+    hero: I("blog-img-03.jpg"),
+    ai: I("blog-img-05.jpg"),
+    cta: I("contact-meeting-discussion.jpg"),
+  },
+  "Media Production": {
+    hero: I("project-02.jpg"),
+    ai: I("service-img-06.jpg"),
+    cta: I("contact-video-consultation.jpg"),
+  },
+  "Online Reputation Management": {
+    hero: I("contact-customer-consultant.jpg"),
+    ai: I("service-img-03.jpg"),
+    cta: I("contact-corporate-consultation.jpg"),
+  },
+  "Email Marketing": {
+    hero: I("service-img-05.jpg"),
+    ai: I("contact-office-consultation.jpg"),
+    cta: I("contact-consultancy-partners.jpg"),
+  },
+  "SMS Marketing": {
+    hero: I("slider-01-01.jpg"),
+    ai: I("contact-support-consultant.jpg"),
+    cta: I("contact-consultancy-headway.jpg"),
+  },
+  "WhatsApp Marketing": {
+    hero: I("service-img-01.jpg"),
+    ai: I("contact-professional-consultant.jpg"),
+    cta: I("contact-boardroom.jpg"),
+  },
 };
 const fallbackPhotos = photoSets["Social Media Marketing"];
 
+const closingPerksMap: Record<string, string[]> = {
+  "Social Media Marketing": [
+    "AI Creative Ideation & Trends",
+    "Multi-Platform Organic Reach",
+    "High-Converting Ad Campaigns",
+  ],
+  "SEO & AI Search Visibility": [
+    "AI Search & LLM Engine Visibility",
+    "High-Intent Keyword Rankings",
+    "Technical Audits & Speed Tuning",
+  ],
+  "Paid Marketing": [
+    "ROAS-Driven Campaign Scaling",
+    "Precision Audience Targeting",
+    "Real-Time AI Bidding & Creative Testing",
+  ],
+  "Content Marketing": [
+    "Authority-Building Thought Leadership",
+    "Multi-Format Content Engines",
+    "High-Intent Conversion Strategy",
+  ],
+  "Media Production": [
+    "High-End Visual Storytelling",
+    "Engaging Short-Form Reels & Video Ads",
+    "Turnkey Studio Post-Production",
+  ],
+  "Online Reputation Management": [
+    "Proactive Brand & Sentiment Defense",
+    "5-Star Review Acceleration",
+    "Executive Search Result Protection",
+  ],
+  "Email Marketing": [
+    "Hyper-Personalized Automated Flows",
+    "99%+ Inbox Deliverability Focus",
+    "High-Converting Lifecycle Campaigns",
+  ],
+  "SMS Marketing": [
+    "Instant 98% Open Rate Impact",
+    "TCPA-Compliant High-Speed Routing",
+    "Automated VIP & Flash Alert Triggers",
+  ],
+  "WhatsApp Marketing": [
+    "Interactive Two-Way Conversational Flows",
+    "Direct CRM & Catalog Integration",
+    "Automated Instant Lead Qualification",
+  ],
+};
+
+const defaultClosingPerks = [
+  "AI-Powered Strategy & Execution",
+  "Transparent, Measurable ROI",
+  "Dedicated Marketing Specialists",
+];
+
 const sameText = (a?: string, b?: string) => (a || "").trim().toLowerCase() === (b || "").trim().toLowerCase();
+
+function CheckIcon() {
+  return (
+    <svg className="mkx-close-perk-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
+}
 
 function Grad({ text }: { text: string }) {
   const words = text.trim().split(/\s+/);
@@ -478,33 +576,74 @@ export default function MerkilMarketingServicePage({
         <section className="mkx-close-sec">
           <div className="mkx-container">
             <div className="mkx-close">
-              <div className="mkx-close-inner">
+              <div className="mkx-close-copy">
+                <div className="mkx-close-badge">
+                  <span className="mkx-badge-dot" aria-hidden="true" />
+                  <span>{data.closingTagline || `Ready to Scale • ${data.crumb || "Digital Marketing"}`}</span>
+                </div>
+
                 {data.closingTitle && (
                   <h2>
                     <Grad text={data.closingTitle} />
                   </h2>
                 )}
+
                 {(data.closingDesc || "")
                   .split(/\n+/)
                   .filter(Boolean)
-                  .map((p, i) => (
-                    <p key={i} className="mkx-text">
-                      {p}
-                    </p>
-                  ))}
-                {data.closingTagline && <p className="mkx-kicker">{data.closingTagline}</p>}
+                  .map((p, i) => {
+                    const isMotto = /Marketing\.\s*AI\.\s*Technology/i.test(p);
+                    return isMotto ? (
+                      <div key={i} className="mkx-close-motto">
+                        <span className="mkx-motto-dot" aria-hidden="true" />
+                        <span>{p}</span>
+                      </div>
+                    ) : (
+                      <p key={i} className="mkx-close-desc">
+                        {p}
+                      </p>
+                    );
+                  })}
+
                 {data.closingSignature && (
-                  <p className="mkx-text">
-                    <strong>{data.closingSignature.name}</strong> {data.closingSignature.line}
-                  </p>
+                  <div className="mkx-close-signature">
+                    <strong>{data.closingSignature.name}</strong> <span>{data.closingSignature.line}</span>
+                  </div>
                 )}
+
                 {data.closingCtas && data.closingCtas.length > 0 && (
-                  <div className="mkx-actions mkx-actions-center">
+                  <div className="mkx-close-actions">
                     {data.closingCtas.map((c, i) => (
-                      <Btn key={`${c.label}-${i}`} href={c.href} label={c.label} variant={i === 0 ? "dark" : "outline"} />
+                      <Link
+                        key={`${c.label}-${i}`}
+                        href={c.href || "/contact"}
+                        className={`mkx-close-btn ${i === 0 ? "mkx-close-btn-primary" : "mkx-close-btn-secondary"}`}
+                      >
+                        <span>{c.label}</span>
+                        <Arrow />
+                      </Link>
                     ))}
                   </div>
                 )}
+
+                <div className="mkx-close-perks">
+                  {(closingPerksMap[data.crumb || ""] || defaultClosingPerks).map((perk, i) => (
+                    <div key={i} className="mkx-close-perk">
+                      <CheckIcon />
+                      <span>{perk}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mkx-close-media" aria-hidden="true">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={photos.cta} alt="" loading="lazy" />
+                <div className="mkx-close-media-overlay" />
+                <div className="mkx-close-badge-float">
+                  <span className="mkx-badge-pulse" />
+                  <span>Quickupp Softech® • Growth Partner</span>
+                </div>
               </div>
             </div>
           </div>
