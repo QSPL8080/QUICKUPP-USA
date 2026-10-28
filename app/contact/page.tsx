@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CompanyMotion from "@/components/CompanyMotion";
 import Link from "next/link";
+import { CONTACT_SUBJECTS } from "@/lib/formOptions";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -263,12 +264,11 @@ export default function ContactPage() {
                       onChange={(e) => setFormData({ ...formData, projectType: e.target.value })}
                     >
                       <option value="">Select Service</option>
-                      <option value="Digital Marketing & SEO">Digital Marketing &amp; SEO</option>
-                      <option value="AI Agents & Automation">AI Agents &amp; Automation</option>
-                      <option value="Web & Mobile App Development">Web &amp; Mobile App Development</option>
-                      <option value="Paid Media & Ads">Paid Media &amp; Ads</option>
-                      <option value="Staff Augmentation">Staff Augmentation</option>
-                      <option value="General Inquiry">General Inquiry</option>
+                      {CONTACT_SUBJECTS.map((s) => (
+                        <option key={s} value={s}>
+                          {s}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </div>

@@ -25,22 +25,21 @@ export const BUDGETS: { value: string; label: string }[] = [
   { value: "Not Specified / Flexible", label: "Flexible / Not Sure" },
 ];
 
-/** "Subject / Service" options on the Contact page */
+/** "Subject / Service" options on the Contact page: the four services, plus Other */
 export const CONTACT_SUBJECTS = [
-  "Digital Marketing & SEO",
-  "AI Agents & Automation",
-  "Web & Mobile App Development",
-  "Paid Media & Ads",
+  "AI-Powered Digital Marketing Services",
+  "AI & Automation Solutions",
+  "Information Technology Services",
   "Staff Augmentation",
-  "General Inquiry",
+  "Other",
 ] as const;
 
 const groupItems = (label: string) => serviceGroups.find((g) => g.label === label)?.items.map((i) => i.label) ?? [];
 
 /**
  * The four service forms. Each one saves to its own table, and its "Service"
- * field lists that service's subpages (AI & Automation has a single page, so
- * it lists the services offered on that page).
+ * field lists that service's subpages (AI & Automation is a single page, so
+ * it offers that service plus Other).
  */
 export const SERVICE_FORMS = {
   "digital-marketing": {
@@ -51,17 +50,7 @@ export const SERVICE_FORMS = {
   "ai-automation": {
     label: "AI & Automation Solutions",
     table: "service_ai_automation",
-    options: [
-      "AI Chatbot Development",
-      "AI Agent Development",
-      "AI Workflow Automation",
-      "AI-Powered CRM Automation",
-      "AI Lead Generation & Qualification",
-      "AI Customer Support Automation",
-      "AI Document Processing",
-      "AI API Integration",
-      "Custom AI Solutions",
-    ],
+    options: ["AI & Automation Solutions", "Other"],
   },
   "it-services": {
     label: "Information Technology Services",
