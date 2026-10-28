@@ -328,8 +328,6 @@ export default function Header() {
                         </Link>
                         <a
                           href={serviceGroups[1]?.items[0]?.href || "https://quickuppaistudio.us/"}
-                          target="_blank"
-                          rel="noopener noreferrer"
                           className="nv-feature nv-feature-ai"
                           onClick={handleLinkClick}
                         >
@@ -373,8 +371,6 @@ export default function Header() {
                         </Link>
                         <a
                           href={serviceGroups[1]?.items[0]?.href || "https://quickuppaistudio.us/"}
-                          target="_blank"
-                          rel="noopener noreferrer"
                           className="nv-item"
                           onClick={handleLinkClick}
                         >
