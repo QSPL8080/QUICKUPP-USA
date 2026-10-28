@@ -9806,9 +9806,9 @@ a.secondary-button,
 }
 
 /* ==========================================================================
-   Soft photo backdrop — one quiet section per page gets a faint, content-
-   related photo behind it. The photo sits in a rounded panel inset from the
-   section edges, so the gaps to the sections above and below stay clear.
+   Soft photo backdrop — two quiet sections per page get a faint, content-
+   related photo across the full width. The photo fades out at the top and
+   bottom edges so it blends into the section gaps instead of a hard line.
    Usage: className="qs-backdrop" style={{ "--qs-backdrop": "url('/images/x.jpg')" }}
    ========================================================================== */
 .qs-backdrop {
@@ -9819,24 +9819,12 @@ a.secondary-button,
 .qs-backdrop::before {
   content: "";
   position: absolute;
+  inset: 0;
   z-index: -1;
-  top: clamp(18px, 2.2vw, 32px);
-  bottom: clamp(18px, 2.2vw, 32px);
-  left: max(16px, calc((100% - 1300px) / 2));
-  right: max(16px, calc((100% - 1300px) / 2));
-  border-radius: 32px;
-  border: 1px solid rgba(226, 232, 240, 0.9);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.84) 50%, rgba(255, 255, 255, 0.92) 100%),
-    var(--qs-backdrop) center / cover no-repeat,
-    #f1f3f9;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.82) 50%, rgba(255, 255, 255, 0.9) 100%),
+    var(--qs-backdrop) center / cover no-repeat;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 14%, #000 86%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 14%, #000 86%, transparent 100%);
   pointer-events: none;
-}
-
-@media (max-width: 767px) {
-  .qs-backdrop::before {
-    left: 10px;
-    right: 10px;
-    border-radius: 22px;
-  }
 }

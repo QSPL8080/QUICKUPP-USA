@@ -659,11 +659,14 @@ function WhySection({ block, image, alt }: { block: WhyChooseBlock; image: strin
 }
 
 /* ---- FAQ ------------------------------------------------------------------------- */
-function FaqSection({ block }: { block: FaqBlock }) {
+function FaqSection({ block, image }: { block: FaqBlock; image?: string }) {
   const items = block.items || block.faqs || [];
   const [open, setOpen] = useState<number | null>(0);
   return (
-    <section className="inx-sec">
+    <section
+      className={`inx-sec${image ? " qs-backdrop" : ""}`}
+      style={image ? ({ "--qs-backdrop": `url('${image}')` } as React.CSSProperties) : undefined}
+    >
       <div className="inx-container inx-faq-grid inx-faq-solo">
         <div className="inx-faq">
           {items.map((f, i) => {
@@ -750,7 +753,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
           }
           if (block.type === "process") return <ProcessSection key={i} block={block as ProcessBlock} image={images.processBg} />;
           if (block.type === "whyChoose") return <WhySection key={i} block={block as WhyChooseBlock} image={images.arch} alt={data.crumb} />;
-          if (block.type === "faq") return <FaqSection key={i} block={block as FaqBlock} />;
+          if (block.type === "faq") return <FaqSection key={i} block={block as FaqBlock} image={images.aiBg} />;
           return null;
         })}
 

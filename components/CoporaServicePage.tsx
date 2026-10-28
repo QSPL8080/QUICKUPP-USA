@@ -365,7 +365,7 @@ function Faq({ b }: { b: FaqBlock }) {
   const [open, setOpen] = useState<number | null>(0);
   if (!items.length) return null;
   return (
-    <section className="itx-sec itx-soft">
+    <section className="itx-sec itx-soft qs-backdrop" style={{ "--qs-backdrop": "url('/images/contact-consultancy-headway.jpg')" } as React.CSSProperties}>
       <div className="itx-container itx-faq">
         {items.map((f, i) => {
           const isOpen = open === i;

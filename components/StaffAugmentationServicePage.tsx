@@ -323,7 +323,7 @@ export default function StaffAugmentationServicePage({
 
         {/* 4. Process — chevron flow */}
         {processBlock && (
-          <section className="tlx-sec">
+          <section className="tlx-sec qs-backdrop" style={{ "--qs-backdrop": "url('/images/contact-team-conference.jpg')" } as React.CSSProperties}>
             <div className="tlx-container">
               <div className="tlx-head">
                 <h2>

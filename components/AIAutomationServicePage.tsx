@@ -408,7 +408,7 @@ export default function AIAutomationServicePage({
 
         {/* FAQ */}
         {faqItems.length > 0 && (
-          <section className="acx-sec">
+          <section className="acx-sec qs-backdrop" style={{ "--qs-backdrop": "url('/images/contact-video-consultation.jpg')" } as React.CSSProperties}>
             <div className="acx-container acx-faq">
               {faqItems.map((f, i) => {
                 const open = openFaq === i;

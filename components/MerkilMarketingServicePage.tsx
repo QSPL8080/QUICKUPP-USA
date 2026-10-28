@@ -316,7 +316,7 @@ export default function MerkilMarketingServicePage({
     if (block.type === "list" && index === firstListIndex) {
       const b = block as ListBlock;
       return (
-        <section key={index} className="mkx-sec">
+        <section key={index} className="mkx-sec qs-backdrop" style={{ "--qs-backdrop": "url('/images/blog-img-04.jpg')" } as React.CSSProperties}>
           <div className="mkx-container">
             <Head title={b.title} tagline={b.tagline || b.subtitle} lines={[b.desc, b.intro].filter(Boolean) as string[]} />
             <ul className="mkx-index">
