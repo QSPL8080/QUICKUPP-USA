@@ -12,6 +12,8 @@ export default function ContactPage() {
     email: "",
     phone: "",
     companyName: "",
+    industry: "",
+    otherIndustry: "",
     projectType: "",
     budget: "",
     message: "",
@@ -86,6 +88,8 @@ export default function ContactPage() {
                       email: "",
                       phone: "",
                       companyName: "",
+                      industry: "",
+                      otherIndustry: "",
                       projectType: "",
                       budget: "",
                       message: "",
@@ -171,8 +175,54 @@ export default function ContactPage() {
                   </div>
                 </div>
 
-                {/* Row 3: Subject / Project Type & Estimated Budget */}
+                {/* Row 3: Industry & Subject / Service */}
                 <div className="su-form-fields-grid">
+                  <div className="su-field-group">
+                    <label htmlFor="Industry" className="su-field-label">
+                      Industry
+                    </label>
+                    <select
+                      id="Industry"
+                      required
+                      className="su-select-input"
+                      value={formData.industry}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setFormData({
+                          ...formData,
+                          industry: val,
+                          otherIndustry: val === "Other" ? formData.otherIndustry : "",
+                        });
+                      }}
+                    >
+                      <option value="">Select Industry</option>
+                      <option value="Healthcare">Healthcare</option>
+                      <option value="Home Services">Home Services</option>
+                      <option value="Professional Services">Professional Services</option>
+                      <option value="Education">Education</option>
+                      <option value="IT & SaaS">IT &amp; SaaS</option>
+                      <option value="eCommerce">eCommerce</option>
+                      <option value="Real Estate">Real Estate</option>
+                      <option value="Interior Design">Interior Design</option>
+                      <option value="Travel & Hospitality">Travel &amp; Hospitality</option>
+                      <option value="Other">Other</option>
+                    </select>
+
+                    {formData.industry === "Other" && (
+                      <div style={{ marginTop: "10px" }}>
+                        <input
+                          id="Other-Industry"
+                          type="text"
+                          required
+                          placeholder="Please specify your industry..."
+                          className="su-text-input"
+                          value={formData.otherIndustry}
+                          onChange={(e) => setFormData({ ...formData, otherIndustry: e.target.value })}
+                        />
+                      </div>
+                    )}
+                  </div>
+
                   <div className="su-field-group">
                     <label htmlFor="Type-of-Project" className="su-field-label">
                       Subject / Service
@@ -193,25 +243,26 @@ export default function ContactPage() {
                       <option value="General Inquiry">General Inquiry</option>
                     </select>
                   </div>
+                </div>
 
-                  <div className="su-field-group">
-                    <label htmlFor="Budget-Range" className="su-field-label">
-                      Estimated Budget
-                    </label>
-                    <select
-                      id="Budget-Range"
-                      className="su-select-input"
-                      value={formData.budget}
-                      onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                    >
-                      <option value="">Select Budget Range</option>
-                      <option value="Under $5,000">Under $5,000</option>
-                      <option value="$5,000 - $15,000">$5,000 – $15,000</option>
-                      <option value="$15,000 - $50,000">$15,000 – $50,000</option>
-                      <option value="$50,000+">$50,000+</option>
-                      <option value="Not Specified / Flexible">Flexible / Not Sure</option>
-                    </select>
-                  </div>
+                {/* Row 4: Estimated Budget */}
+                <div className="su-field-group">
+                  <label htmlFor="Budget-Range" className="su-field-label">
+                    Estimated Budget
+                  </label>
+                  <select
+                    id="Budget-Range"
+                    className="su-select-input"
+                    value={formData.budget}
+                    onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
+                  >
+                    <option value="">Select Budget Range</option>
+                    <option value="Under $5,000">Under $5,000</option>
+                    <option value="$5,000 - $15,000">$5,000 – $15,000</option>
+                    <option value="$15,000 - $50,000">$15,000 – $50,000</option>
+                    <option value="$50,000+">$50,000+</option>
+                    <option value="Not Specified / Flexible">Flexible / Not Sure</option>
+                  </select>
                 </div>
 
                 {/* Row 4: Message */}
@@ -230,7 +281,7 @@ export default function ContactPage() {
                   />
                 </div>
 
-                {/* Checkbox: Privacy Policy (Default Ticked) */}
+                {/* Checkbox: Privacy Policy and Terms & Conditions (Default Unchecked) */}
                 <label className="su-checkbox-wrap" style={{ cursor: "pointer", userSelect: "none" }}>
                   <input
                     type="checkbox"
@@ -258,6 +309,10 @@ export default function ContactPage() {
                     By submitting this form, you agree to our{" "}
                     <Link href="/privacy-policy" style={{ color: "inherit", textDecoration: "underline" }}>
                       Privacy Policy
+                    </Link>{" "}
+                    and{" "}
+                    <Link href="/terms-and-conditions" style={{ color: "inherit", textDecoration: "underline" }}>
+                      Terms &amp; Conditions
                     </Link>
                   </span>
                 </label>
@@ -281,7 +336,7 @@ export default function ContactPage() {
                       <line x1="12" y1="8" x2="12" y2="12" />
                       <line x1="12" y1="16" x2="12.01" y2="16" />
                     </svg>
-                    Please accept the Privacy Policy before submitting your message.
+                    Please accept the Privacy Policy and Terms &amp; Conditions before submitting your message.
                   </p>
                 )}
 
