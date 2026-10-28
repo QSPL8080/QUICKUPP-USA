@@ -371,6 +371,49 @@
     }
   }
 
+  /* Service Subpages Grid — Soft card background permanently */
+  .qs-new-header .nv-tab-body .nv-items {
+    gap: 8px;
+  }
+
+  .qs-new-header .nv-tab-body .nv-item {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: var(--nv-soft);
+    border: 1px solid rgba(226, 232, 240, 0.75);
+    text-decoration: none;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .qs-new-header .nv-tab-body .nv-item:hover,
+  .qs-new-header .nv-tab-body .nv-item:focus-visible {
+    background: #ffffff;
+    border-color: var(--nv-line);
+    box-shadow: 0 6px 18px -6px rgba(15, 23, 42, 0.16);
+    transform: translateY(-1px);
+    outline: none;
+  }
+
+  .qs-new-header .nv-tab-body .nv-item:hover .nv-item-icon {
+    background: var(--nv-ink);
+    border-color: var(--nv-ink);
+    color: #ffffff;
+  }
+
+  .qs-new-header .nv-tab-body .nv-item.is-current {
+    background: #ffffff;
+    border-color: rgba(99, 102, 241, 0.35);
+    box-shadow: 0 4px 14px -6px rgba(99, 102, 241, 0.2);
+  }
+
+  .qs-new-header .nv-tab-body .nv-item.is-current .nv-item-title {
+    color: var(--nv-indigo);
+  }
+
   /* Featured column */
   .qs-new-header .nv-feature-col {
     display: flex;
