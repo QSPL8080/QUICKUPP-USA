@@ -59,7 +59,7 @@ const heroImages: Record<string, string> = {
   "Application Development": "https://images.unsplash.com/photo-1551650975-87deedd944c3?auto=format&fit=crop&w=1400&q=85",
   "Product Engineering": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1400&q=85",
   "Quality Assurance & Testing": "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1400&q=85",
-  "UI/UX Design": "https://images.unsplash.com/photo-1581291518655-9523c93269c4?auto=format&fit=crop&w=1400&q=85",
+  "UI/UX Design": "https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?auto=format&fit=crop&w=1400&q=85",
 };
 const defaultHero = "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1400&q=85";
 

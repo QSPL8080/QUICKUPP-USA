@@ -25,6 +25,8 @@
 *.pem
 *.tmp
 *.bak
+*.doc
+*.docx
 *next.config.*.ts
 *next.config.*.js
 *next.config.*.mjs

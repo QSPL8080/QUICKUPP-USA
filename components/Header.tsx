@@ -285,7 +285,7 @@ export default function Header() {
                           <span className="nv-kicker">{serviceGroups[SERVICE_TABS[serviceTab].group]?.label}</span>
                         </div>
                         <div
-                          className={`nv-items${(serviceGroups[SERVICE_TABS[serviceTab].group]?.items.length || 0) > 6 ? " nv-items-3up" : (serviceGroups[SERVICE_TABS[serviceTab].group]?.items.length || 0) > 1 ? " nv-items-2col" : ""}`}
+                          className={`nv-items${(serviceGroups[SERVICE_TABS[serviceTab].group]?.items.length || 0) > 2 ? " nv-items-3up" : (serviceGroups[SERVICE_TABS[serviceTab].group]?.items.length || 0) > 1 ? " nv-items-2col" : ""}`}
                         >
                           {serviceGroups[SERVICE_TABS[serviceTab].group]?.items.map((item) => (
                             <MenuItem key={item.href} item={item} current={pathname === item.href} onClick={handleLinkClick} />
