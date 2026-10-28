@@ -388,7 +388,10 @@ export default function StaffAugmentationServicePage({
 
         {/* 6. FAQ (no heading) */}
         {faqItems.length > 0 && (
-          <section className="tlx-sec">
+          <section
+            className="tlx-sec qs-backdrop"
+            style={{ "--qs-backdrop": "url('/images/contact-handshake-consultation.jpg')" } as React.CSSProperties}
+          >
             <div className="tlx-container tlx-faq-wrap">
               <div className="tlx-faq">
                 {faqItems.map((f, i) => {

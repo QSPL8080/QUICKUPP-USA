@@ -575,10 +575,13 @@ function ListSection({ block, image, alt }: { block: ListBlock; image?: string; 
 }
 
 /* ---- Process: stacking cards ------------------------------------------------ */
-function ProcessSection({ block }: { block: ProcessBlock }) {
+function ProcessSection({ block, image }: { block: ProcessBlock; image?: string }) {
   const steps = block.steps || [];
   return (
-    <section className="inx-sec inx-soft">
+    <section
+      className={`inx-sec inx-soft${image ? " qs-backdrop" : ""}`}
+      style={image ? ({ "--qs-backdrop": `url('${image}')` } as React.CSSProperties) : undefined}
+    >
       <div className="inx-container">
         <div className="inx-head-center">
           {block.tagline && <p className="inx-eyebrow">{cleanDash(block.tagline)}</p>}
@@ -745,7 +748,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
             listImageUsed = true;
             return <ListSection key={i} block={block as ListBlock} image={img} alt={data.crumb} />;
           }
-          if (block.type === "process") return <ProcessSection key={i} block={block as ProcessBlock} />;
+          if (block.type === "process") return <ProcessSection key={i} block={block as ProcessBlock} image={images.processBg} />;
           if (block.type === "whyChoose") return <WhySection key={i} block={block as WhyChooseBlock} image={images.arch} alt={data.crumb} />;
           if (block.type === "faq") return <FaqSection key={i} block={block as FaqBlock} />;
           return null;

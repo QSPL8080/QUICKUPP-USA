@@ -484,7 +484,11 @@ export default function MerkilMarketingServicePage({
     if (block.type === "industries") {
       const b = block as IndustriesBlock;
       return (
-        <section key={index} className="mkx-sec mkx-soft">
+        <section
+          key={index}
+          className="mkx-sec mkx-soft qs-backdrop"
+          style={{ "--qs-backdrop": "url('/images/contact-meeting-room.jpg')" } as React.CSSProperties}
+        >
           <div className="mkx-container">
             <Head title={b.title} tagline={b.tagline} lines={[b.desc, b.intro].filter(Boolean) as string[]} center />
             <ul className="mkx-chips mkx-chips-center">

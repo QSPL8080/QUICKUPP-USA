@@ -232,7 +232,10 @@ function ProcessBoard({ b }: { b: ProcessBlock }) {
   const rows: (typeof steps)[] = [];
   for (let i = 0; i < steps.length; i += perRow) rows.push(steps.slice(i, i + perRow));
   return (
-    <section className="itx-sec">
+    <section
+      className="itx-sec qs-backdrop"
+      style={{ "--qs-backdrop": "url('/images/contact-client-deal.jpg')" } as React.CSSProperties}
+    >
       <div className="itx-container">
         <div className="itx-head itx-head-center">
           <h2>

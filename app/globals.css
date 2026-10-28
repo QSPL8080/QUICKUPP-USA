@@ -9804,3 +9804,39 @@ a.secondary-button,
     padding: 0 16px;
   }
 }
+
+/* ==========================================================================
+   Soft photo backdrop — one quiet section per page gets a faint, content-
+   related photo behind it. The photo sits in a rounded panel inset from the
+   section edges, so the gaps to the sections above and below stay clear.
+   Usage: className="qs-backdrop" style={{ "--qs-backdrop": "url('/images/x.jpg')" }}
+   ========================================================================== */
+.qs-backdrop {
+  position: relative;
+  isolation: isolate;
+}
+
+.qs-backdrop::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: clamp(18px, 2.2vw, 32px);
+  bottom: clamp(18px, 2.2vw, 32px);
+  left: max(16px, calc((100% - 1300px) / 2));
+  right: max(16px, calc((100% - 1300px) / 2));
+  border-radius: 32px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.84) 50%, rgba(255, 255, 255, 0.92) 100%),
+    var(--qs-backdrop) center / cover no-repeat,
+    #f1f3f9;
+  pointer-events: none;
+}
+
+@media (max-width: 767px) {
+  .qs-backdrop::before {
+    left: 10px;
+    right: 10px;
+    border-radius: 22px;
+  }
+}

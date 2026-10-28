@@ -214,9 +214,12 @@ function Panels({ s }: { s: Extract<AboutSection, { kind: "panels" }> }) {
   );
 }
 
-function Goals({ s }: { s: Extract<AboutSection, { kind: "goals" }> }) {
+/* Soft photo backdrop for one section per page (see .qs-backdrop in globals.css) */
+const ABOUT_BACKDROP = { "--qs-backdrop": "url('/images/contact-strategy-consultation.jpg')" } as React.CSSProperties;
+
+function Goals({ s, backdrop }: { s: Extract<AboutSection, { kind: "goals" }>; backdrop?: boolean }) {
   return (
-    <section className="abx-sec">
+    <section className={`abx-sec${backdrop ? " qs-backdrop" : ""}`} style={backdrop ? ABOUT_BACKDROP : undefined}>
       <div className="abx-container">
         <div className="abx-head abx-head-split">
           <div className="abx-head-main">
@@ -250,11 +253,14 @@ function Goals({ s }: { s: Extract<AboutSection, { kind: "goals" }> }) {
   );
 }
 
-function Route({ s, soft }: { s: Extract<AboutSection, { kind: "route" }>; soft: boolean }) {
+function Route({ s, soft, backdrop }: { s: Extract<AboutSection, { kind: "route" }>; soft: boolean; backdrop?: boolean }) {
   const plain = s.steps.every((st) => !st.text && !st.label);
   const hasQuote = s.steps.some((st) => !!st.quote);
   return (
-    <section className={`abx-sec${soft ? " abx-soft" : ""}`}>
+    <section
+      className={`abx-sec${soft ? " abx-soft" : ""}${backdrop ? " qs-backdrop" : ""}`}
+      style={backdrop ? ABOUT_BACKDROP : undefined}
+    >
       <div className="abx-container">
         <div className="abx-head abx-head-center">
           <Eyebrow text={s.eyebrow} />
@@ -404,9 +410,9 @@ function IndexViewer({ s }: { s: Extract<AboutSection, { kind: "index" }> }) {
   );
 }
 
-function Proof({ s }: { s: Extract<AboutSection, { kind: "proof" }> }) {
+function Proof({ s, backdrop }: { s: Extract<AboutSection, { kind: "proof" }>; backdrop?: boolean }) {
   return (
-    <section className="abx-sec">
+    <section className={`abx-sec${backdrop ? " qs-backdrop" : ""}`} style={backdrop ? ABOUT_BACKDROP : undefined}>
       <div className="abx-container">
         <div className="abx-split">
           <div className="abx-statement-body">
@@ -447,6 +453,8 @@ export default function AboutPage({ data }: { data: AboutPageData }) {
   const isRoot = pathname === "/about";
   const { hero, closing } = data;
   let lastSoft = false;
+  /* One section per page gets the soft photo backdrop: the first goals, route or proof section */
+  const backdropIndex = data.sections.findIndex((s) => s.kind === "goals" || s.kind === "route" || s.kind === "proof");
 
   return (
     <div className="abx-page">
@@ -514,14 +522,15 @@ export default function AboutPage({ data }: { data: AboutPageData }) {
         </section>
 
         {data.sections.map((s, i) => {
+          const backdrop = i === backdropIndex;
           const soft = s.kind === "panels" || s.kind === "index" || (s.kind === "route" && !lastSoft);
           lastSoft = soft;
           if (s.kind === "statement") return <Statement key={i} s={s} />;
           if (s.kind === "panels") return <Panels key={i} s={s} />;
-          if (s.kind === "goals") return <Goals key={i} s={s} />;
+          if (s.kind === "goals") return <Goals key={i} s={s} backdrop={backdrop} />;
           if (s.kind === "index") return <IndexViewer key={i} s={s} />;
-          if (s.kind === "proof") return <Proof key={i} s={s} />;
-          if (s.kind === "route") return <Route key={i} s={s} soft={soft} />;
+          if (s.kind === "proof") return <Proof key={i} s={s} backdrop={backdrop} />;
+          if (s.kind === "route") return <Route key={i} s={s} soft={soft} backdrop={backdrop} />;
           return null;
         })}
 

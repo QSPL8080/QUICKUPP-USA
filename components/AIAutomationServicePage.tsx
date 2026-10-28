@@ -311,7 +311,10 @@ export default function AIAutomationServicePage({
 
         {/* Process: heading column + vertical stepper */}
         {processBlock && (
-          <section className="acx-sec acx-soft">
+          <section
+            className="acx-sec acx-soft qs-backdrop"
+            style={{ "--qs-backdrop": "url('/images/contact-consulting-planning.jpg')" } as React.CSSProperties}
+          >
             <div className="acx-container acx-proc">
               <div className="acx-proc-side">
                 <h2>
