@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ServiceEnquiryForm from "@/components/ServiceEnquiryForm";
 import TechMotion from "@/components/TechMotion";
 import LucideIcon, { type LucideIconName } from "@/components/LucideIcon";
 import type {
@@ -471,6 +472,8 @@ export default function CoporaServicePage({ data, categoryLabel, categorySlug }:
           if (b.type === "faq") return <Faq key={i} b={b as FaqBlock} />;
           return null;
         })}
+
+        <ServiceEnquiryForm service="it-services" current={data.crumb} />
 
         <section className="itx-close-sec">
           <div className="itx-container">

@@ -9715,3 +9715,92 @@ a.secondary-button,
   background: #e5e7eb;
   color: #0b0f17;
 }
+
+/* Enquiry forms: server error message above the submit button */
+.su-form-error {
+  margin: -8px 0 18px !important;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #b91c1c !important;
+  font-size: 13.5px !important;
+  font-weight: 600;
+  line-height: 1.45 !important;
+}
+
+/* Service page enquiry form (components/ServiceEnquiryForm.tsx) */
+.sef-section {
+  position: relative;
+  padding: clamp(56px, 6vw, 96px) 0;
+  background: #ffffff;
+}
+
+.sef-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+
+.sef-section .su-contact-form {
+  position: relative;
+}
+
+.sef-trap {
+  position: absolute !important;
+  left: -9999px !important;
+  width: 1px !important;
+  height: 1px !important;
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+.sef-other {
+  margin-top: 10px;
+}
+
+.sef-section .su-checkbox-label a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.sef-section .su-checkbox-wrap.is-error .su-checkbox-label {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.sef-section .su-checkbox-wrap.is-error .su-checkbox-input {
+  accent-color: #ef4444;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+.sef-agree-error {
+  margin: -12px 0 20px !important;
+  color: #dc2626 !important;
+  font-size: 13px !important;
+  font-weight: 600;
+  line-height: 1.4 !important;
+}
+
+.sef-success-title {
+  font-size: 24px !important;
+  font-weight: 800 !important;
+  color: #0f172a !important;
+  margin: 0 0 8px !important;
+}
+
+.sef-success-text {
+  font-size: 15px !important;
+  color: #64748b !important;
+  line-height: 1.6 !important;
+  max-width: 460px;
+  margin: 0 auto 24px !important;
+}
+
+@media (max-width: 640px) {
+  .sef-container {
+    padding: 0 16px;
+  }
+}

@@ -24,18 +24,36 @@ export default function ContactPage() {
   const [submitting, setSubmitting] = useState(false);
   const [agreedError, setAgreedError] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [submitError, setSubmitError] = useState("");
+  const [website, setWebsite] = useState(""); // hidden spam trap
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.agreed) {
       setAgreedError(true);
       return;
     }
     setAgreedError(false);
+    setSubmitError("");
     setSubmitting(true);
-    setTimeout(() => {
-      setSubmitting(false);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...formData, website, pageUrl: window.location.href }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || !json.ok) {
+        const firstError = json.errors ? Object.values(json.errors)[0] : json.error;
+        setSubmitError(String(firstError || "We couldn't send your inquiry right now. Please try again."));
+        return;
+      }
       setSubmitted(true);
-    }, 500);
+    } catch {
+      setSubmitError("We couldn't send your inquiry right now. Please check your connection and try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -104,6 +122,16 @@ export default function ContactPage() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="su-contact-form">
+                <input
+                  type="text"
+                  name="website"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  value={website}
+                  onChange={(e) => setWebsite(e.target.value)}
+                  style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", opacity: 0 }}
+                />
                 <div className="su-form-top">
                   <h2 className="su-inquiry-title">Send Your Inquiry!</h2>
                   <p className="su-inquiry-para">
@@ -337,6 +365,12 @@ export default function ContactPage() {
                       <line x1="12" y1="16" x2="12.01" y2="16" />
                     </svg>
                     Please accept the Privacy Policy and Terms &amp; Conditions before submitting your message.
+                  </p>
+                )}
+
+                {submitError && (
+                  <p className="su-form-error" role="alert">
+                    {submitError}
                   </p>
                 )}
 

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ServiceEnquiryForm from "@/components/ServiceEnquiryForm";
 import TeamMotion from "@/components/TeamMotion";
 import LucideIcon, { type LucideIconName } from "@/components/LucideIcon";
 import "@/app/staff-talent.css";
@@ -415,6 +416,8 @@ export default function StaffAugmentationServicePage({
             </div>
           </section>
         )}
+
+        <ServiceEnquiryForm service="staff-augmentation" current={data.crumb} />
 
         {/* 7. Closing */}
         <section className="tlx-sec tlx-closing-sec">

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ServiceEnquiryForm from "@/components/ServiceEnquiryForm";
 import EditorialMotion from "@/components/EditorialMotion";
 import "@/app/marketing-studio.css";
 import type {
@@ -572,6 +573,8 @@ export default function MerkilMarketingServicePage({
         </section>
 
         {data.blocks.map((block, i) => renderBlock(block, i))}
+
+        <ServiceEnquiryForm service="digital-marketing" current={data.crumb} />
 
         <section className="mkx-close-sec">
           <div className="mkx-container">

@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ServiceEnquiryForm from "@/components/ServiceEnquiryForm";
 import FlowMotion from "@/components/FlowMotion";
 import "@/app/ai-automation-console.css";
 import type {
@@ -425,6 +426,8 @@ export default function AIAutomationServicePage({
             </div>
           </section>
         )}
+
+        <ServiceEnquiryForm service="ai-automation" current={data.crumb} />
 
         {/* Closing */}
         <section className="acx-close-sec">
