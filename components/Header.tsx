@@ -49,7 +49,6 @@ const ITEM_ICONS: Record<string, LucideIconName> = {
 /* Service categories shown as tabs (index into serviceGroups) */
 const SERVICE_TABS: { group: number; icon: LucideIconName; hub: string }[] = [
   { group: 0, icon: "megaphone", hub: "/services/ai-powered-digital-marketing-services" },
-  { group: 2, icon: "bot", hub: "/services/ai-automation-solutions" },
   { group: 3, icon: "code-xml", hub: "/services/information-technology-services" },
   { group: 4, icon: "users", hub: "/services/staff-augmentation" },
 ];
@@ -208,35 +207,82 @@ export default function Header() {
                     {/* Desktop: category tabs + items + featured */}
                     <div className="nv-services">
                       <div className="nv-tabs" role="tablist" aria-label="Service categories">
-                        {SERVICE_TABS.map((t, i) => (
-                          <button
-                            key={t.hub}
-                            type="button"
-                            role="tab"
-                            aria-selected={serviceTab === i}
-                            className={`nv-tab${serviceTab === i ? " is-active" : ""}`}
-                            onMouseEnter={() => setServiceTab(i)}
-                            onFocus={() => setServiceTab(i)}
-                            onClick={() => setServiceTab(i)}
-                          >
-                            <span className="nv-tab-icon" aria-hidden="true">
-                              <LucideIcon name={t.icon} size={18} />
-                            </span>
-                            <span className="nv-tab-label">{serviceGroups[t.group]?.label}</span>
-                            <span className="nv-tab-chevron" aria-hidden="true">
-                              <LucideIcon name="chevron-right" size={16} />
-                            </span>
-                          </button>
-                        ))}
+                        {/* 1. Digital Marketing */}
+                        <button
+                          type="button"
+                          role="tab"
+                          aria-selected={serviceTab === 0}
+                          className={`nv-tab${serviceTab === 0 ? " is-active" : ""}`}
+                          onMouseEnter={() => setServiceTab(0)}
+                          onFocus={() => setServiceTab(0)}
+                          onClick={() => setServiceTab(0)}
+                        >
+                          <span className="nv-tab-icon" aria-hidden="true">
+                            <LucideIcon name="megaphone" size={18} />
+                          </span>
+                          <span className="nv-tab-label">{serviceGroups[0]?.label}</span>
+                          <span className="nv-tab-chevron" aria-hidden="true">
+                            <LucideIcon name="chevron-right" size={16} />
+                          </span>
+                        </button>
+
+                        {/* 2. AI & Automation Solutions (Direct link, mixed with services) */}
+                        <Link
+                          href="/services/ai-automation-solutions/ai-automation-solutions"
+                          className="nv-tab nv-tab-direct"
+                          onClick={handleLinkClick}
+                        >
+                          <span className="nv-tab-icon" aria-hidden="true">
+                            <LucideIcon name="bot" size={18} />
+                          </span>
+                          <span className="nv-tab-label">{serviceGroups[2]?.label}</span>
+                          <span className="nv-tab-direct-arrow" aria-hidden="true">
+                            <LucideIcon name="arrow-right" size={15} strokeWidth={2.2} />
+                          </span>
+                        </Link>
+
+                        {/* 3. Information Technology Services */}
+                        <button
+                          type="button"
+                          role="tab"
+                          aria-selected={serviceTab === 1}
+                          className={`nv-tab${serviceTab === 1 ? " is-active" : ""}`}
+                          onMouseEnter={() => setServiceTab(1)}
+                          onFocus={() => setServiceTab(1)}
+                          onClick={() => setServiceTab(1)}
+                        >
+                          <span className="nv-tab-icon" aria-hidden="true">
+                            <LucideIcon name="code-xml" size={18} />
+                          </span>
+                          <span className="nv-tab-label">{serviceGroups[3]?.label}</span>
+                          <span className="nv-tab-chevron" aria-hidden="true">
+                            <LucideIcon name="chevron-right" size={16} />
+                          </span>
+                        </button>
+
+                        {/* 4. Staff Augmentation */}
+                        <button
+                          type="button"
+                          role="tab"
+                          aria-selected={serviceTab === 2}
+                          className={`nv-tab${serviceTab === 2 ? " is-active" : ""}`}
+                          onMouseEnter={() => setServiceTab(2)}
+                          onFocus={() => setServiceTab(2)}
+                          onClick={() => setServiceTab(2)}
+                        >
+                          <span className="nv-tab-icon" aria-hidden="true">
+                            <LucideIcon name="users" size={18} />
+                          </span>
+                          <span className="nv-tab-label">{serviceGroups[4]?.label}</span>
+                          <span className="nv-tab-chevron" aria-hidden="true">
+                            <LucideIcon name="chevron-right" size={16} />
+                          </span>
+                        </button>
                       </div>
 
                       <div className="nv-tab-body" key={serviceTab}>
                         <div className="nv-body-head">
                           <span className="nv-kicker">{serviceGroups[SERVICE_TABS[serviceTab].group]?.label}</span>
-                          <Link href={SERVICE_TABS[serviceTab].hub} className="nv-head-link" onClick={handleLinkClick}>
-                            <span>View all</span>
-                            <LucideIcon name="arrow-right" size={14} strokeWidth={2.2} />
-                          </Link>
                         </div>
                         <div
                           className={`nv-items${(serviceGroups[SERVICE_TABS[serviceTab].group]?.items.length || 0) > 6 ? " nv-items-3up" : (serviceGroups[SERVICE_TABS[serviceTab].group]?.items.length || 0) > 1 ? " nv-items-2col" : ""}`}
@@ -249,12 +295,35 @@ export default function Header() {
 
                       <div className="nv-feature-col">
                         <Link href="/services/youtube-video-promotion" className="nv-feature nv-feature-yt" onClick={handleLinkClick}>
-                          <span className="nv-feature-icon" aria-hidden="true">
-                            <YouTubeMark size={30} />
-                          </span>
+                          <div className="nv-feature-yt-center" aria-hidden="true">
+                            <svg width="86" height="60" viewBox="0 0 288 200" fill="none" className="nv-feature-yt-real-logo">
+                              <defs>
+                                <linearGradient id="ytRedReal" x1="0%" y1="0%" x2="0%" y2="100%">
+                                  <stop offset="0%" stopColor="#FF1E1E" />
+                                  <stop offset="55%" stopColor="#FF0000" />
+                                  <stop offset="100%" stopColor="#CC0000" />
+                                </linearGradient>
+                                <filter id="ytRealGlow" x="-25%" y="-25%" width="150%" height="150%">
+                                  <feDropShadow dx="0" dy="8" stdDeviation="14" floodColor="rgba(255, 0, 0, 0.55)" />
+                                  <feDropShadow dx="0" dy="2" stdDeviation="4" floodColor="rgba(0, 0, 0, 0.35)" />
+                                </filter>
+                              </defs>
+                              <path
+                                fill="url(#ytRedReal)"
+                                filter="url(#ytRealGlow)"
+                                d="M278.6 31.3C275.3 19 265.7 9.4 253.4 6.1 231.2 0 144 0 144 0S56.8 0 34.6 6.1C22.3 9.4 12.7 19 9.4 31.3 3.3 53.5 3.3 100 3.3 100s0 46.5 6.1 68.7c3.3 12.3 12.9 21.9 25.2 25.2 22.2 6.1 109.4 6.1 109.4 6.1s87.2 0 109.4-6.1c12.3-3.3 21.9-12.9 25.2-25.2 6.1-22.2 6.1-68.7 6.1-68.7s0-46.5-6.1-68.7z"
+                              />
+                              <path
+                                d="M34.6 6.1C56.8 0 144 0 144 0S231.2 0 253.4 6.1C265.7 9.4 275.3 19 278.6 31.3C280 36.5 281 44 281.5 52C260 48 180 44 144 44C108 44 28 48 6.5 52C7 44 8 36.5 9.4 31.3C12.7 19 22.3 9.4 34.6 6.1Z"
+                                fill="#ffffff"
+                                opacity="0.22"
+                              />
+                              <polygon fill="#FFFFFF" points="115.2,143 192,100 115.2,57" />
+                            </svg>
+                          </div>
                           <span className="nv-feature-title">YouTube Video Promotion</span>
                           <span className="nv-feature-go" aria-hidden="true">
-                            <LucideIcon name="arrow-right" size={15} strokeWidth={2.2} />
+                            <LucideIcon name="arrow-right" size={15} strokeWidth={2.4} />
                           </span>
                         </Link>
                         <a
@@ -286,6 +355,14 @@ export default function Header() {
                         </div>
                       ))}
                       <div className="nv-mobile-group">
+                        <Link href="/services/ai-automation-solutions/ai-automation-solutions" className="nv-item" onClick={handleLinkClick}>
+                          <span className="nv-item-icon" aria-hidden="true">
+                            <LucideIcon name="bot" size={18} />
+                          </span>
+                          <span className="nv-item-text">
+                            <span className="nv-item-title">AI &amp; Automation Solutions</span>
+                          </span>
+                        </Link>
                         <Link href="/services/youtube-video-promotion" className="nv-item" onClick={handleLinkClick}>
                           <span className="nv-item-icon" aria-hidden="true">
                             <YouTubeMark size={18} />

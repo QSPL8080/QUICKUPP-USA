@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  devIndicators: false,
   images: {
     unoptimized: true,
   },
@@ -23,6 +24,14 @@ const nextConfig = {
       { source: "/services/ai-ugc-video", destination: "https://quickuppaistudio.us/", permanent: false },
       { source: "/services/ai-hyper-realistic-video", destination: "https://quickuppaistudio.us/", permanent: false },
       { source: "/services/digital-twin-clone-video", destination: "https://quickuppaistudio.us/", permanent: false },
+
+      // Category hub redirects directly to primary service
+      { source: "/services/ai-powered-digital-marketing-services", destination: "/services/ai-powered-digital-marketing-services/social-media-marketing", permanent: true },
+      { source: "/services/information-technology-services", destination: "/services/information-technology-services/web-design-development", permanent: true },
+      { source: "/services/staff-augmentation", destination: "/services/staff-augmentation/marketing-design-staff-augmentation", permanent: true },
+
+      // AI & Automation Solutions (single service page)
+      { source: "/services/ai-automation-solutions", destination: "/services/ai-automation-solutions/ai-automation-solutions", permanent: true },
 
       // Information Technology Services
       { source: "/services/web-design-development", destination: "/services/information-technology-services/web-design-development", permanent: true },

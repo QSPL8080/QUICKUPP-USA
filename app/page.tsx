@@ -603,7 +603,7 @@ export default function Home() {
                 className="button-wrap service-style-one-button"
               >
                 <a
-                  href="/services/ai-powered-digital-marketing-services"
+                  href="/services/ai-powered-digital-marketing-services/social-media-marketing"
                   data-wf--button--variant="secondary-bg"
                   data-w-id="8932a183-40ec-c216-e8b4-670b55f18dc8"
                   className="button-link w-inline-block"

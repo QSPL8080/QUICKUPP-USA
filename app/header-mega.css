@@ -262,7 +262,7 @@
     background: var(--nv-soft);
   }
 
-  .qs-new-header .nv-panel button.nv-tab:not(#_) {
+  .qs-new-header .nv-panel .nv-tab:not(#_) {
     display: flex !important;
     align-items: center !important;
     justify-content: flex-start !important;
@@ -282,14 +282,15 @@
     letter-spacing: -0.005em !important;
     text-align: left !important;
     cursor: pointer;
+    text-decoration: none !important;
     transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease !important;
   }
 
-  .qs-new-header .nv-panel button.nv-tab:not(#_):hover {
+  .qs-new-header .nv-panel .nv-tab:not(#_):hover {
     color: var(--nv-ink) !important;
   }
 
-  .qs-new-header .nv-panel button.nv-tab.is-active:not(#_) {
+  .qs-new-header .nv-panel .nv-tab.is-active:not(#_) {
     background: #ffffff !important;
     border-color: var(--nv-line) !important;
     color: var(--nv-ink) !important;
@@ -332,6 +333,28 @@
     transform: none;
   }
 
+  .qs-new-header .nv-tab-direct-arrow {
+    display: inline-flex;
+    color: var(--nv-muted);
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+
+  .qs-new-header .nv-panel a.nv-tab-direct:hover {
+    color: var(--nv-ink) !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    border-color: var(--nv-line) !important;
+  }
+
+  .qs-new-header .nv-panel a.nv-tab-direct:hover .nv-tab-icon {
+    border-color: rgba(99, 102, 241, 0.45);
+    color: var(--nv-indigo);
+  }
+
+  .qs-new-header .nv-panel a.nv-tab-direct:hover .nv-tab-direct-arrow {
+    color: var(--nv-indigo);
+    transform: translateX(3px);
+  }
+
   .qs-new-header .nv-tab-body {
     padding: 8px 4px 4px;
     animation: nv-body-in 0.25s ease both;
@@ -352,7 +375,7 @@
   .qs-new-header .nv-feature-col {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
   }
 
   .qs-new-header .nv-feature {
@@ -361,8 +384,8 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 18px;
-    padding: 18px;
+    gap: 14px;
+    padding: 16px 18px;
     border-radius: 14px;
     border: 1px solid var(--nv-line);
     overflow: hidden;
@@ -372,19 +395,44 @@
 
   .qs-new-header .nv-feature:hover {
     transform: translateY(-2px);
-    box-shadow: 0 18px 34px -22px rgba(15, 23, 42, 0.5);
+    box-shadow: 0 16px 30px -18px rgba(15, 23, 42, 0.4);
   }
 
   .qs-new-header .nv-feature-yt {
+    position: relative;
+    border-color: transparent;
     background:
-      radial-gradient(circle at 100% 0%, rgba(255, 0, 0, 0.1), transparent 60%),
-      #ffffff;
+      radial-gradient(circle at 100% 0%, rgba(255, 0, 0, 0.42), transparent 55%),
+      radial-gradient(circle at 0% 100%, rgba(255, 30, 30, 0.22), transparent 55%),
+      #0b0f17;
+    overflow: hidden;
   }
 
   .qs-new-header .nv-feature-yt:hover {
-    border-color: rgba(255, 0, 0, 0.25);
+    transform: translateY(-2px);
+    border-color: transparent;
+    box-shadow: 0 18px 36px -14px rgba(255, 0, 0, 0.45);
   }
 
+  /* Center Real YouTube Logo */
+  .qs-new-header .nv-feature-yt-center {
+    flex: 1;
+    display: grid;
+    place-items: center;
+    padding-top: 10px;
+    padding-bottom: 4px;
+    pointer-events: none;
+  }
+
+  .qs-new-header .nv-feature-yt-real-logo {
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), filter 0.25s ease;
+  }
+
+  .qs-new-header .nv-feature-yt:hover .nv-feature-yt-real-logo {
+    transform: scale(1.08);
+  }
+
+  /* Below card: AI Video Production */
   .qs-new-header .nv-feature-ai {
     border-color: transparent;
     background:
@@ -396,12 +444,14 @@
   .qs-new-header .nv-feature-icon {
     display: grid;
     place-items: center;
-    width: 48px;
-    height: 48px;
-    border-radius: 13px;
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
     background: #ffffff;
     border: 1px solid var(--nv-line);
-    box-shadow: 0 6px 14px -8px rgba(15, 23, 42, 0.35);
+    box-shadow: 0 4px 10px -6px rgba(15, 23, 42, 0.25);
+    flex-shrink: 0;
+    align-self: flex-start;
   }
 
   .qs-new-header .nv-feature-ai .nv-feature-icon {
@@ -412,32 +462,38 @@
   }
 
   .qs-new-header .nv-feature-title {
-    padding-right: 28px;
-    font-size: 15px;
+    padding-right: 26px;
+    font-size: 14px;
     font-weight: 700;
     line-height: 1.3;
     letter-spacing: -0.01em;
     color: var(--nv-ink);
   }
 
+  .qs-new-header .nv-feature-yt .nv-feature-title,
   .qs-new-header .nv-feature-ai .nv-feature-title {
     color: #ffffff;
   }
 
+  .qs-new-header .nv-feature-yt .nv-feature-title {
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  }
+
   .qs-new-header .nv-feature-go {
     position: absolute;
-    right: 16px;
-    bottom: 16px;
+    right: 13px;
+    bottom: 13px;
     display: grid;
     place-items: center;
-    width: 30px;
-    height: 30px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     background: var(--nv-ink);
     color: #ffffff;
     transition: transform 0.25s ease;
   }
 
+  .qs-new-header .nv-feature-yt .nv-feature-go,
   .qs-new-header .nv-feature-ai .nv-feature-go {
     background: #ffffff;
     color: var(--nv-ink);
