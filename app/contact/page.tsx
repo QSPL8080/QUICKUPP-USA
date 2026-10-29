@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Script from "next/script";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -12,7 +12,7 @@ import { CONTACT_SUBJECTS } from "@/lib/formOptions";
 const CALENDLY_URL =
   "https://calendly.com/quickuppsoftechmeet/strategy-call?hide_gdpr_banner=1&hide_event_type_details=1&hide_landing_page_details=1&background_color=ffffff&text_color=0b0f17&primary_color=6366f1";
 
-type CalendlyApi = { initInlineWidget: (o: { url: string; parentElement: HTMLElement }) => void };
+type CalendlyApi = { initInlineWidget: (o: { url: string; parentElement: HTMLElement; resize?: boolean }) => void };
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -29,6 +29,20 @@ export default function ContactPage() {
   });
 
   const calendlyRef = useRef<HTMLDivElement>(null);
+  const [calendlyHeight, setCalendlyHeight] = useState<number | null>(null);
+
+  /* Calendly reports its content height; the frame follows it so the calendar
+     never scrolls inside its box */
+  useEffect(() => {
+    const onMessage = (e: MessageEvent) => {
+      if (e.origin !== "https://calendly.com" || !e.data || e.data.event !== "calendly.page_height") return;
+      const h = parseInt(String(e.data.payload?.height), 10);
+      // ignore the tiny heights Calendly reports while it is still loading
+      if (h >= 400) setCalendlyHeight(h);
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, []);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [agreedError, setAgreedError] = useState(false);
@@ -404,14 +418,19 @@ export default function ContactPage() {
               <h2 className="su-inquiry-title">Book a Free Strategy Call</h2>
               <p className="su-inquiry-para">Pick a time that suits you for a 30-minute call on Google Meet.</p>
             </div>
-            <div className="su-calendly-frame" ref={calendlyRef} />
+            <div
+              className="su-calendly-scroll"
+              style={calendlyHeight ? ({ "--cal-h": `${calendlyHeight}px` } as React.CSSProperties) : undefined}
+            >
+              <div className="su-calendly-frame" ref={calendlyRef} />
+            </div>
             <Script
               src="https://assets.calendly.com/assets/external/widget.js"
               strategy="lazyOnload"
               onReady={() => {
                 const el = calendlyRef.current;
                 const api = (window as unknown as { Calendly?: CalendlyApi }).Calendly;
-                if (el && api && !el.hasChildNodes()) api.initInlineWidget({ url: CALENDLY_URL, parentElement: el });
+                if (el && api && !el.hasChildNodes()) api.initInlineWidget({ url: CALENDLY_URL, parentElement: el, resize: true });
               }}
             />
           </div>

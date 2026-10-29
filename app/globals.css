@@ -9846,34 +9846,69 @@ a.secondary-button,
   margin: 0;
 }
 
-/* The booking calendar brings its own card from Calendly, so this column has
-   no card of its own (no double border) — just the heading, lined up with
-   the form's heading */
 .su-calendly-card {
   display: flex;
   flex-direction: column;
-  padding: 44px 0 0;
-  background: transparent;
-  border: 0;
-  box-shadow: none;
+  background: #ffffff;
+  border-radius: 22px;
+  padding: 44px 32px 24px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
 }
 
 .su-calendly-card .su-form-top {
-  margin-bottom: 8px;
-  padding: 0 4px;
+  margin-bottom: 12px;
+}
+
+/* Calendly draws its own bordered card inside the iframe. The frame is as
+   tall as Calendly's content (--cal-h, reported by Calendly) and crops that
+   inner card away on every side, so only this outer card shows. The scroll
+   box around it scrolls long steps (like the time list) with no scrollbar */
+.su-calendly-scroll {
+  --cal-h: 720px;
+  --cal-crop-x: 27px;
+  --cal-crop-top: 74px;
+  --cal-crop-bottom: 40px;
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: 660px; /* Calendly's inner card stops growing at ~676px */
+  margin: 0 auto;
+  max-height: 760px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.su-calendly-scroll::-webkit-scrollbar {
+  display: none;
 }
 
 .su-calendly-frame {
-  flex: 1;
-  min-height: 720px;
+  position: relative;
+  overflow: hidden;
+  height: calc(var(--cal-h) - var(--cal-crop-top) - var(--cal-crop-bottom)) !important;
 }
 
 .su-calendly-frame iframe {
   display: block;
-  width: 100%;
-  height: 100% !important;
-  min-height: 720px;
+  position: absolute;
+  top: calc(var(--cal-crop-top) * -1);
+  left: calc(var(--cal-crop-x) * -1);
+  width: calc(100% + var(--cal-crop-x) * 2) !important;
+  height: var(--cal-h) !important;
   border: 0;
+}
+
+/* beside the form: the scroll box fills the card's height (set by the form) */
+@media (min-width: 1081px) {
+  .su-calendly-scroll {
+    flex: 1 1 0;
+    height: 0;
+    min-height: 0;
+    max-height: none;
+  }
 }
 
 @media (max-width: 1080px) {
@@ -9885,19 +9920,12 @@ a.secondary-button,
 
 @media (max-width: 767px) {
   .su-calendly-card {
-    padding: 8px 0 0;
+    padding: 28px 12px 12px;
+    border-radius: 16px;
   }
 
   .su-calendly-card .su-form-top {
-    padding: 0 20px;
+    padding: 0 8px;
   }
 
-  .su-calendly-frame {
-    margin: 0;
-    min-height: 1000px;
-  }
-
-  .su-calendly-frame iframe {
-    min-height: 1000px;
-  }
 }
