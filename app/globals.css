@@ -9846,24 +9846,26 @@ a.secondary-button,
   margin: 0;
 }
 
+/* The booking calendar brings its own card from Calendly, so this column has
+   no card of its own (no double border) — just the heading, lined up with
+   the form's heading */
 .su-calendly-card {
   display: flex;
   flex-direction: column;
-  background: #ffffff;
-  border-radius: 22px;
-  padding: 44px 32px 24px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  padding: 44px 0 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
 }
 
 .su-calendly-card .su-form-top {
-  margin-bottom: 12px;
+  margin-bottom: 8px;
+  padding: 0 4px;
 }
 
 .su-calendly-frame {
   flex: 1;
   min-height: 720px;
-  margin: 0 -20px;
 }
 
 .su-calendly-frame iframe {
@@ -9883,12 +9885,11 @@ a.secondary-button,
 
 @media (max-width: 767px) {
   .su-calendly-card {
-    padding: 28px 12px 12px;
-    border-radius: 16px;
+    padding: 8px 0 0;
   }
 
   .su-calendly-card .su-form-top {
-    padding: 0 8px;
+    padding: 0 20px;
   }
 
   .su-calendly-frame {
