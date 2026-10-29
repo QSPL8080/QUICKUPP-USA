@@ -9832,11 +9832,13 @@ a.secondary-button,
 /* Contact page: inquiry form and Calendly booking side by side */
 .su-contact-split {
   display: grid;
-  grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 24px;
   align-items: stretch;
-  max-width: 1240px;
-  margin: 0 auto;
+  /* Wider than the page container: break out evenly on both sides */
+  --su-split-w: min(1440px, calc(100vw - 64px));
+  width: var(--su-split-w);
+  margin-left: calc((100% - var(--su-split-w)) / 2);
 }
 
 .su-contact-split .su-contact-form-container {
@@ -9875,7 +9877,7 @@ a.secondary-button,
 @media (max-width: 1080px) {
   .su-contact-split {
     grid-template-columns: minmax(0, 1fr);
-    max-width: 900px;
+    --su-split-w: min(900px, calc(100vw - 32px));
   }
 }
 

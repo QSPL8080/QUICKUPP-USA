@@ -10,7 +10,7 @@ import { CONTACT_SUBJECTS } from "@/lib/formOptions";
 
 /* Calendly booking page shown beside the form (event: Free 30-Minute Strategy Call) */
 const CALENDLY_URL =
-  "https://calendly.com/quickuppsoftechmeet/strategy-call?hide_gdpr_banner=1&background_color=ffffff&primary_color=6366f1";
+  "https://calendly.com/quickuppsoftechmeet/strategy-call?hide_gdpr_banner=1&hide_event_type_details=1&hide_landing_page_details=1&background_color=ffffff&text_color=0b0f17&primary_color=6366f1";
 
 type CalendlyApi = { initInlineWidget: (o: { url: string; parentElement: HTMLElement }) => void };
 
