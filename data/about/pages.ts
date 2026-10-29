@@ -89,6 +89,8 @@ export interface AboutPageData {
 
 const SERVICES = "/services/ai-powered-digital-marketing-services";
 const img = (id: string, w = 1600) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=80`;
+/* hero photos are cut to the hero strip's wide shape, so they don't stretch */
+const heroImg = (id: string) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1920&h=560&q=80`;
 
 /* ---------------------------------------------------------------- Who We Are */
 export const whoWeAre: AboutPageData = {
@@ -104,7 +106,7 @@ export const whoWeAre: AboutPageData = {
     ],
     highlight: "We don't just deliver services. We build solutions designed around your growth.",
     cta: { label: "Explore All Services", href: SERVICES },
-    image: img("photo-1497366811353-6870744d04b2", 1920),
+    image: heroImg("photo-1556761175-b413da4baf72"),
   },
   sections: [
     {
@@ -198,7 +200,7 @@ export const ourApproach: AboutPageData = {
       "At Quickupp Softech, we don't believe in one-size-fits-all solutions. We first understand your business, identify the right opportunities and bring together Marketing, AI and Technology to build solutions aligned with your goals.",
     highlight: "We don't start with what we can sell. We start with what your business needs.",
     cta: { label: "Discuss Your Business Goals", href: "/contact" },
-    image: img("photo-1541746972996-4e0b0f43e02a", 1920),
+    image: heroImg("photo-1557804506-669a67965ba0"),
   },
   sections: [
     {
@@ -329,7 +331,7 @@ export const whyChooseUs: AboutPageData = {
     highlight:
       "We don't believe in selling disconnected services. We believe in solving business problems and building solutions that create measurable impact.",
     cta: { label: "Talk to a Growth Strategist", href: "/contact" },
-    image: img("photo-1570126618953-d437176e8c79", 1920),
+    image: heroImg("photo-1521791136064-7986c2920216"),
   },
   sections: [
     {
@@ -477,7 +479,7 @@ export const whyBusinessesChooseUs: AboutPageData = {
     highlight:
       "Quickupp Softech combines Marketing, AI and Technology to help businesses solve challenges, create opportunities and build for the future.",
     cta: { label: "Talk to a Growth Expert", href: "/contact" },
-    image: img("photo-1497215842964-222b430dc094", 1920),
+    image: heroImg("photo-1552664730-d307ca884978"),
   },
   sections: [
     {
