@@ -1,11 +1,18 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
+import Script from "next/script";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CompanyMotion from "@/components/CompanyMotion";
 import Link from "next/link";
 import { CONTACT_SUBJECTS } from "@/lib/formOptions";
+
+/* Calendly booking page shown beside the form (event: Free 30-Minute Strategy Call) */
+const CALENDLY_URL =
+  "https://calendly.com/quickuppsoftechmeet/strategy-call?hide_gdpr_banner=1&background_color=ffffff&primary_color=6366f1";
+
+type CalendlyApi = { initInlineWidget: (o: { url: string; parentElement: HTMLElement }) => void };
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -21,6 +28,7 @@ export default function ContactPage() {
     agreed: false,
   });
 
+  const calendlyRef = useRef<HTMLDivElement>(null);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [agreedError, setAgreedError] = useState(false);
@@ -87,7 +95,8 @@ export default function ContactPage() {
             </p>
           </div>
 
-          {/* Main Inquiry Form Section (No heavy card border/shadow) */}
+          {/* Inquiry form + Calendly booking side by side */}
+          <div className="su-contact-split">
           <div className="su-contact-form-container">
             {submitted ? (
               <div className="su-success-box">
@@ -387,6 +396,25 @@ export default function ContactPage() {
                 </button>
               </form>
             )}
+          </div>
+
+          {/* Calendly booking */}
+          <div className="su-calendly-card">
+            <div className="su-form-top">
+              <h2 className="su-inquiry-title">Book a Free Strategy Call</h2>
+              <p className="su-inquiry-para">Pick a time that suits you for a 30-minute call on Google Meet.</p>
+            </div>
+            <div className="su-calendly-frame" ref={calendlyRef} />
+            <Script
+              src="https://assets.calendly.com/assets/external/widget.js"
+              strategy="lazyOnload"
+              onReady={() => {
+                const el = calendlyRef.current;
+                const api = (window as unknown as { Calendly?: CalendlyApi }).Calendly;
+                if (el && api && !el.hasChildNodes()) api.initInlineWidget({ url: CALENDLY_URL, parentElement: el });
+              }}
+            />
+          </div>
           </div>
         </div>
       </section>
