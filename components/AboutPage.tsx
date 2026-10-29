@@ -218,25 +218,27 @@ function Panels({ s, backdrop }: { s: Extract<AboutSection, { kind: "panels" }>;
 const ABOUT_BACKDROPS = ["/images/contact-strategy-consultation.jpg", "/images/home-one-about-bg.jpg"];
 const bdStyle = (img?: string) => (img ? ({ "--qs-backdrop": `url('${img}')` } as React.CSSProperties) : undefined);
 const bdClass = (img?: string) => (img ? " qs-backdrop" : "");
-const BACKDROP_SCORE: Record<string, number> = { route: 5, goals: 5, proof: 4, statement: 3, panels: 2, index: 1 };
+/* Only plain sections qualify: the expanding panels, the pinned index viewer and the
+   stats section have their own animation, so they never get a backdrop */
+const BACKDROP_SCORE: Record<string, number> = { goals: 5, statement: 5, route: 3 };
 
 function pickBackdrops(kinds: string[]): (string | undefined)[] {
-  let best: number[] = [];
+  const ok = kinds.map((k, i) => (BACKDROP_SCORE[k] ? i : -1)).filter((i) => i >= 0);
+  let best: number[] = ok.slice(0, 1);
   let bestScore = -1;
-  kinds.forEach((a, i) => {
-    if (BACKDROP_SCORE[a] > bestScore && best.length < 2) {
-      best = [i];
-      bestScore = BACKDROP_SCORE[a];
-    }
-  });
-  for (let i = 0; i < kinds.length; i++)
-    for (let j = i + 2; j < kinds.length; j++) {
-      const score = (BACKDROP_SCORE[kinds[i]] || 0) + (BACKDROP_SCORE[kinds[j]] || 0) + 100;
-      if (score > bestScore) {
-        best = [i, j];
-        bestScore = score;
+  // Prefer two qualifying sections that are not next to each other; fall back to neighbours
+  for (const gap of [2, 1]) {
+    for (const i of ok)
+      for (const j of ok) {
+        if (j - i < gap) continue;
+        const score = BACKDROP_SCORE[kinds[i]] + BACKDROP_SCORE[kinds[j]];
+        if (score > bestScore) {
+          best = [i, j];
+          bestScore = score;
+        }
       }
-    }
+    if (bestScore >= 0) break;
+  }
   const out: (string | undefined)[] = kinds.map(() => undefined);
   best.forEach((idx, n) => (out[idx] = ABOUT_BACKDROPS[n]));
   return out;

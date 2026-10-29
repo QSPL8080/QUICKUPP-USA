@@ -243,7 +243,7 @@ export default function AIAutomationServicePage({
 
         {/* Services: modules */}
         {services && (
-          <section className="acx-sec">
+          <section className="acx-sec qs-backdrop" style={{ "--qs-backdrop": "url('/images/contact-consulting-planning.jpg')" } as React.CSSProperties}>
             <div className="acx-container">
               <div className="acx-head">
                 {services.title && (
@@ -311,10 +311,7 @@ export default function AIAutomationServicePage({
 
         {/* Process: heading column + vertical stepper */}
         {processBlock && (
-          <section
-            className="acx-sec acx-soft qs-backdrop"
-            style={{ "--qs-backdrop": "url('/images/contact-consulting-planning.jpg')" } as React.CSSProperties}
-          >
+          <section className="acx-sec acx-soft">
             <div className="acx-container acx-proc">
               <div className="acx-proc-side">
                 <h2>
@@ -382,7 +379,7 @@ export default function AIAutomationServicePage({
 
         {/* Industries */}
         {industries && (
-          <section className="acx-sec acx-soft">
+          <section className="acx-sec acx-soft qs-backdrop" style={{ "--qs-backdrop": "url('/images/contact-meeting-room.jpg')" } as React.CSSProperties}>
             <div className="acx-container">
               <div className="acx-head acx-head-center">
                 {industries.title && (
@@ -408,7 +405,7 @@ export default function AIAutomationServicePage({
 
         {/* FAQ */}
         {faqItems.length > 0 && (
-          <section className="acx-sec qs-backdrop" style={{ "--qs-backdrop": "url('/images/contact-video-consultation.jpg')" } as React.CSSProperties}>
+          <section className="acx-sec">
             <div className="acx-container acx-faq">
               {faqItems.map((f, i) => {
                 const open = openFaq === i;

@@ -494,12 +494,15 @@ function Band({ items }: { items: string[] }) {
 }
 
 /* ---- Text + bullets blocks ------------------------------------------------- */
-function AiSection({ block, soft }: { block: AiBlock; soft: boolean }) {
+function AiSection({ block, soft, backdrop }: { block: AiBlock; soft: boolean; backdrop?: string }) {
+  const bdProps = backdrop
+    ? { style: { "--qs-backdrop": `url('${backdrop}')` } as React.CSSProperties }
+    : {};
   const bullets = block.bullets || [];
   const chain = bullets.length > 0 && bullets.length <= 7 && bullets.every((b) => b.length <= 28);
   if (!bullets.length) {
     return (
-      <section className={`inx-sec${soft ? " inx-soft" : ""}`}>
+      <section className={`inx-sec${soft ? " inx-soft" : ""}${backdrop ? " qs-backdrop" : ""}`} {...bdProps}>
         <div className="inx-container inx-split-text">
           <h2>
             <GradientTitle text={block.title} />
@@ -514,7 +517,7 @@ function AiSection({ block, soft }: { block: AiBlock; soft: boolean }) {
     );
   }
   return (
-    <section className={`inx-sec${soft ? " inx-soft" : ""}`}>
+    <section className={`inx-sec${soft ? " inx-soft" : ""}${backdrop ? " qs-backdrop" : ""}`} {...bdProps}>
       <div className="inx-container">
         <div className="inx-head-center">
           <h2>
@@ -575,13 +578,10 @@ function ListSection({ block, image, alt }: { block: ListBlock; image?: string; 
 }
 
 /* ---- Process: stacking cards ------------------------------------------------ */
-function ProcessSection({ block, image }: { block: ProcessBlock; image?: string }) {
+function ProcessSection({ block }: { block: ProcessBlock }) {
   const steps = block.steps || [];
   return (
-    <section
-      className={`inx-sec inx-soft${image ? " qs-backdrop" : ""}`}
-      style={image ? ({ "--qs-backdrop": `url('${image}')` } as React.CSSProperties) : undefined}
-    >
+    <section className="inx-sec inx-soft">
       <div className="inx-container">
         <div className="inx-head-center">
           {block.tagline && <p className="inx-eyebrow">{cleanDash(block.tagline)}</p>}
@@ -659,14 +659,11 @@ function WhySection({ block, image, alt }: { block: WhyChooseBlock; image: strin
 }
 
 /* ---- FAQ ------------------------------------------------------------------------- */
-function FaqSection({ block, image }: { block: FaqBlock; image?: string }) {
+function FaqSection({ block }: { block: FaqBlock }) {
   const items = block.items || block.faqs || [];
   const [open, setOpen] = useState<number | null>(0);
   return (
-    <section
-      className={`inx-sec${image ? " qs-backdrop" : ""}`}
-      style={image ? ({ "--qs-backdrop": `url('${image}')` } as React.CSSProperties) : undefined}
-    >
+    <section className="inx-sec">
       <div className="inx-container inx-faq-grid inx-faq-solo">
         <div className="inx-faq">
           {items.map((f, i) => {
@@ -693,6 +690,9 @@ function FaqSection({ block, image }: { block: FaqBlock; image?: string }) {
 
 export default function IndustryDetailPage({ data }: { data: ServicePageData }) {
   const images = getImagesForIndustry(data.crumb);
+  /* Soft photo backdrops on two plain list sections: the first and the last AI block */
+  const firstAi = data.blocks.findIndex((b) => b.type === "ai");
+  const lastAi = data.blocks.map((b) => b.type).lastIndexOf("ai");
   const paras = data.heroParagraphs || [];
   let firstServices = true;
   let listImageUsed = false;
@@ -744,16 +744,23 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
           }
           if (block.type === "ai") {
             softToggle = !softToggle;
-            return <AiSection key={i} block={block as AiBlock} soft={softToggle} />;
+            return (
+              <AiSection
+                key={i}
+                block={block as AiBlock}
+                soft={softToggle}
+                backdrop={i === firstAi ? images.processBg : i === lastAi && lastAi !== firstAi ? images.aiBg : undefined}
+              />
+            );
           }
           if (block.type === "list") {
             const img = listImageUsed ? undefined : images.story;
             listImageUsed = true;
             return <ListSection key={i} block={block as ListBlock} image={img} alt={data.crumb} />;
           }
-          if (block.type === "process") return <ProcessSection key={i} block={block as ProcessBlock} image={images.processBg} />;
+          if (block.type === "process") return <ProcessSection key={i} block={block as ProcessBlock} />;
           if (block.type === "whyChoose") return <WhySection key={i} block={block as WhyChooseBlock} image={images.arch} alt={data.crumb} />;
-          if (block.type === "faq") return <FaqSection key={i} block={block as FaqBlock} image={images.aiBg} />;
+          if (block.type === "faq") return <FaqSection key={i} block={block as FaqBlock} />;
           return null;
         })}
 

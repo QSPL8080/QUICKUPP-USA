@@ -325,7 +325,7 @@ function WhySplit({ b }: { b: WhyChooseBlock }) {
 /* ---- Industries: hairline link grid ------------------------------------------- */
 function IndustryPills({ b }: { b: IndustriesBlock }) {
   return (
-    <section className="itx-sec">
+    <section className="itx-sec qs-backdrop" style={{ "--qs-backdrop": "url('/images/contact-meeting-room.jpg')" } as React.CSSProperties}>
       <div className="itx-container">
         <div className="itx-head itx-head-center">
           {b.title && (
@@ -365,7 +365,7 @@ function Faq({ b }: { b: FaqBlock }) {
   const [open, setOpen] = useState<number | null>(0);
   if (!items.length) return null;
   return (
-    <section className="itx-sec itx-soft qs-backdrop" style={{ "--qs-backdrop": "url('/images/contact-consultancy-headway.jpg')" } as React.CSSProperties}>
+    <section className="itx-sec itx-soft">
       <div className="itx-container itx-faq">
         {items.map((f, i) => {
           const isOpen = open === i;
