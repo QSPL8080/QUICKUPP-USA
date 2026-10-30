@@ -983,7 +983,7 @@
 }
 
 .crm-root .crm-pass .crm-input {
-  padding-right: 64px !important;
+  padding-right: 48px !important;
 }
 
 .crm-pass-toggle {
@@ -991,15 +991,63 @@
   right: 6px;
   top: 50%;
   transform: translateY(-50%);
-  height: 30px;
-  padding: 0 10px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 34px;
+  padding: 0;
   border: 0;
-  border-radius: 7px;
-  background: #f1f5f9;
-  color: var(--crm-text);
-  font-size: 12px;
-  font-weight: 600;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--crm-muted);
   cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.crm-pass-toggle:hover {
+  color: var(--crm-ink);
+  background: #f1f5f9;
+}
+
+/* Remember email */
+.crm-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  color: var(--crm-text);
+  font-size: 13.5px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.crm-check input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.crm-check-box {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 5px;
+  background: #fff;
+  color: transparent;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.crm-check input:checked + .crm-check-box {
+  background: var(--crm-accent);
+  border-color: var(--crm-accent);
+  color: #fff;
+}
+
+.crm-check input:focus-visible + .crm-check-box {
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
 }
 
 .crm-login .crm-input {
