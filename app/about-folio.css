@@ -1357,7 +1357,7 @@
    and toward the content, so no edge of the drawing is ever cut hard */
 .abx-art-left,
 .abx-art-right {
-  --abx-art-fade-y: linear-gradient(180deg, transparent 0%, #000 22%, #000 78%, transparent 100%);
+  --abx-art-fade-y: linear-gradient(180deg, transparent 0%, #000 12%, #000 88%, transparent 100%);
   -webkit-mask-composite: source-in;
   mask-composite: intersect;
 }
@@ -1469,6 +1469,39 @@
   opacity: 1;
 }
 
+.abx-art-spin {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: abx-art-spin 70s linear infinite;
+}
+
+@keyframes abx-art-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* gauge rings fill to their value */
+.abx-art-meter {
+  stroke-dasharray: var(--len);
+  stroke-dashoffset: var(--len);
+  transition: stroke-dashoffset 1.9s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0s);
+}
+
+.abx-art.is-in .abx-art-meter {
+  stroke-dashoffset: var(--to);
+}
+
+/* the arrow lands on the target */
+.abx-art-dart {
+  transform: translate(60px, -42px);
+  opacity: 0;
+  transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.4s, opacity 0.6s ease 0.4s;
+}
+
+.abx-art.is-in .abx-art-dart {
+  transform: none;
+  opacity: 1;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .abx-art,
   .abx-art * {
@@ -1484,8 +1517,13 @@
     stroke-dashoffset: 0;
   }
 
+  .abx-art-meter {
+    stroke-dashoffset: var(--to);
+  }
+
   .abx-art-pop,
-  .abx-art-rise {
+  .abx-art-rise,
+  .abx-art-dart {
     transform: none;
     opacity: 1;
   }

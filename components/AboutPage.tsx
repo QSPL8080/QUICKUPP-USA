@@ -479,14 +479,14 @@ function Proof({ s, backdrop, art }: { s: Extract<AboutSection, { kind: "proof" 
   );
 }
 
-/* Edge graphics: one per page, each unique to its page, beside the single section
-   it suits best (never a photo-backdrop section, never the hero) */
+/* Edge graphics: two per page (one left, one right), each used only once on the
+   site, beside the sections they suit best (never a photo-backdrop section or the hero) */
 type ArtSpot = { kind: ArtKind; side: "left" | "right" };
 const ART_SPOTS: Record<string, Partial<Record<number | "close", ArtSpot>>> = {
-  "Who We Are": { 0: { kind: "layers", side: "right" } },
-  "Our Approach": { 0: { kind: "route", side: "left" } },
-  "Why Choose Us": { 0: { kind: "growth", side: "left" } },
-  "Why Businesses Choose Us": { 0: { kind: "modules", side: "right" } },
+  "Who We Are": { 0: { kind: "layers", side: "right" }, close: { kind: "network", side: "left" } },
+  "Our Approach": { 0: { kind: "route", side: "left" }, 2: { kind: "hub", side: "right" } },
+  "Why Choose Us": { 0: { kind: "growth", side: "left" }, 1: { kind: "gauge", side: "right" } },
+  "Why Businesses Choose Us": { 0: { kind: "modules", side: "right" }, close: { kind: "target", side: "left" } },
 };
 
 /* ---- Page --------------------------------------------------------------------- */

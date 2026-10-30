@@ -3,14 +3,14 @@
 import React, { useEffect, useRef, useState } from "react";
 
 /*
- * One edge graphic per About subpage, each drawn only for its page and placed
- * beside a single chosen section (wide screens only). Every graphic grows out
+ * Two edge graphics per About subpage (one on the left, one on the right),
+ * each drawn for one spot only, so no graphic repeats anywhere (wide screens only). Every graphic grows out
  * of the screen edge and runs the full height of its section.
  * Drawn for the left edge; the right-edge version is mirrored in CSS.
  * Pure decoration: no text, hidden from screen readers.
  */
 
-export type ArtKind = "layers" | "route" | "growth" | "modules";
+export type ArtKind = "layers" | "network" | "route" | "hub" | "growth" | "gauge" | "modules" | "target";
 
 const C = { cyan: "#22d3ee", blue: "#3b82f6", indigo: "#6366f1", purple: "#a855f7", pink: "#ec4899", amber: "#f59e0b", ink: "#cbd5e1", line: "#e2e8f0" };
 const v = (o: Record<string, string | number>) => o as React.CSSProperties;
@@ -128,6 +128,92 @@ function Art({ kind }: { kind: ArtKind }) {
         </>
       );
     }
+
+    /* Who We Are (closing) — AI: a neural network feeding in from the edge */
+    case "network": {
+      const cols: [number, number[]][] = [[6, [130, 210, 290, 370, 450, 530]], [96, [170, 260, 350, 440, 510]], [186, [230, 320, 410]]];
+      const colors = [C.cyan, C.indigo, C.purple, C.pink, C.blue, C.amber];
+      const lines: string[] = [];
+      for (let c = 0; c < cols.length - 1; c++)
+        for (const y1 of cols[c][1]) for (const y2 of cols[c + 1][1]) lines.push(`M${cols[c][0]} ${y1}L${cols[c + 1][0]} ${y2}`);
+      return (
+        <>
+          <path d={lines.join("")} stroke={C.line} />
+          <path d="M6 290L96 350L186 320M6 450L96 440L186 410M6 210L96 170L186 230" stroke="url(#abx-art-v)" strokeWidth={2} className="abx-art-draw" style={v({ "--len": 700 })} />
+          {cols.map(([x, ys], ci) =>
+            ys.map((y, i) => (
+              <g key={`${ci}-${i}`} className="abx-art-pop" style={v({ "--d": `${0.2 + ci * 0.25 + i * 0.05}s` })}>
+                <circle cx={x} cy={y} r={ci === 2 ? 11 : 8} fill="#fff" stroke={colors[(i + ci) % colors.length]} />
+                <circle cx={x} cy={y} r={ci === 2 ? 4 : 3} fill={colors[(i + ci) % colors.length]} stroke="none" className="abx-art-pulse" style={v({ "--d": `${-(i + ci)}s` })} />
+              </g>
+            ))
+          )}
+          <path d="M200 320H244" stroke="url(#abx-art-h)" strokeWidth={2.4} className="abx-art-draw" style={v({ "--len": 60 })} />
+        </>
+      );
+    }
+
+    /* Our Approach (three capabilities) — one hub on the edge, capabilities in orbit */
+    case "hub":
+      return (
+        <>
+          <circle cx={0} cy={320} r={220} stroke={C.line} strokeDasharray="2 8" />
+          <circle cx={0} cy={320} r={160} stroke={C.ink} strokeDasharray="6 10" className="abx-art-flow" />
+          <circle cx={0} cy={320} r={100} stroke="url(#abx-art-v)" strokeOpacity={0.7} />
+          <circle cx={0} cy={320} r={46} stroke={C.indigo} fill="url(#abx-art-soft)" />
+          {([[100, -52, C.cyan], [160, 8, C.pink], [220, 40, C.amber]] as [number, number, string][]).map(([r, deg, c], i) => {
+            const a = (deg * Math.PI) / 180;
+            const x = r * Math.cos(a), y = 320 + r * Math.sin(a);
+            return (
+              <g key={i} className="abx-art-pop" style={v({ "--d": `${0.4 + i * 0.3}s` })}>
+                <path d={`M0 320L${x} ${y}`} stroke={c} strokeDasharray="2 6" />
+                <circle cx={x} cy={y} r={15} fill="#fff" stroke={c} />
+                <circle cx={x} cy={y} r={5.5} fill={c} stroke="none" className="abx-art-pulse" style={v({ "--d": `${-i}s` })} />
+              </g>
+            );
+          })}
+        </>
+      );
+
+    /* Why Choose Us (reasons) — a gauge reading out of the edge */
+    case "gauge": {
+      const ticks = Array.from({ length: 31 }, (_, i) => {
+        const a = ((-90 + i * 6) * Math.PI) / 180;
+        const r1 = 236, r2 = i % 5 === 0 ? 220 : 228;
+        return `M${r1 * Math.cos(a)} ${320 + r1 * Math.sin(a)}L${r2 * Math.cos(a)} ${320 + r2 * Math.sin(a)}`;
+      }).join("");
+      const ring = (r: number) => `M0 ${320 - r}A${r} ${r} 0 0 1 0 ${320 + r}`;
+      return (
+        <>
+          <path d={ticks} stroke={C.ink} />
+          {([[196, C.cyan, 0.92], [156, C.indigo, 0.78], [116, C.purple, 0.64], [76, C.pink, 0.5]] as [number, string, number][]).map(([r, c, f], i) => (
+            <g key={i}>
+              <path d={ring(r)} stroke={C.line} strokeWidth={8} />
+              <path d={ring(r)} stroke={c} strokeWidth={8} className="abx-art-meter" style={v({ "--len": Math.PI * r, "--to": Math.PI * r * (1 - f), "--d": `${0.2 + i * 0.15}s` })} />
+            </g>
+          ))}
+          <circle cx={0} cy={320} r={30} fill="#fff" stroke={C.indigo} />
+          <circle cx={0} cy={320} r={8} fill={C.indigo} stroke="none" className="abx-art-pulse" />
+        </>
+      );
+    }
+
+    /* Why Businesses Choose Us (closing) — focused on what comes next */
+    case "target":
+      return (
+        <>
+          <circle cx={0} cy={320} r={240} stroke={C.line} strokeDasharray="2 8" />
+          <circle cx={0} cy={320} r={184} stroke={C.cyan} strokeDasharray="140 30" className="abx-art-spin" />
+          <circle cx={0} cy={320} r={130} stroke={C.purple} />
+          <circle cx={0} cy={320} r={78} stroke={C.pink} />
+          <circle cx={0} cy={320} r={30} stroke={C.indigo} fill="url(#abx-art-soft)" />
+          <circle cx={0} cy={320} r={8} fill={C.indigo} stroke="none" className="abx-art-pulse" />
+          <g className="abx-art-dart">
+            <path d="M10 316L230 160" stroke={C.amber} strokeWidth={2.6} />
+            <path d="M10 316l24-4M10 316l6-23M230 160l-4 26M230 160l-26 4M214 172l-4 22M214 172l-22 4" stroke={C.amber} strokeWidth={2.6} />
+          </g>
+        </>
+      );
   }
 }
 
