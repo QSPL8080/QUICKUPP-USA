@@ -453,7 +453,7 @@ export default function ContactPage() {
               Ready to take a <span className="su-cinematic-heading-accent">consultancy with us?</span>
             </h2>
             <div className="su-cinematic-action-wrap">
-              <a href="mailto:hello@quickuppsoftech.com" className="su-flip-button">
+              <a href="mailto:info@quickuppsoftech.us" className="su-flip-button">
                 <div className="su-flip-button-texts">
                   <div className="su-flip-button-text _01">Start a Free Meeting</div>
                   <div className="su-flip-button-text _02">Start a Free Meeting</div>

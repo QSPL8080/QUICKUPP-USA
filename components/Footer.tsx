@@ -81,9 +81,16 @@ export default function Footer() {
             <div className="qs-scalient-contact-snippet" style={{ marginTop: "0" }}>
               <div className="qs-scalient-contact-chip">
                 <span className="qs-scalient-chip-dot"></span>
-                <span className="qs-scalient-chip-label">Inquiries:</span>
-                <a href="mailto:hello@quickuppsoftech.com" className="qs-scalient-chip-email">
-                  hello@quickuppsoftech.com
+                <span className="qs-scalient-chip-label">Contact:</span>
+                <a href="mailto:info@quickuppsoftech.us" className="qs-scalient-chip-email">
+                  info@quickuppsoftech.us
+                </a>
+              </div>
+              <div className="qs-scalient-contact-chip">
+                <span className="qs-scalient-chip-dot"></span>
+                <span className="qs-scalient-chip-label">Support:</span>
+                <a href="mailto:support@quickuppsoftech.us" className="qs-scalient-chip-email">
+                  support@quickuppsoftech.us
                 </a>
               </div>
               <div className="qs-scalient-chip-location">

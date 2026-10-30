@@ -18,7 +18,7 @@ import { setupScrollMotion, type MotionPreset } from "@/lib/scrollMotion";
  * Every word comes from data/services/youtube-video-promotion.ts.
  */
 
-const FORM_EMAIL = "hello@quickuppsoftech.com";
+const FORM_EMAIL = "info@quickuppsoftech.us";
 
 /* Scroll-in motion for this page only (different from every other page) */
 const YT_PRESET: MotionPreset = {
