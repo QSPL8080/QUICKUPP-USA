@@ -82,7 +82,7 @@ export default function Footer() {
               <div className="qs-ft-mails">
                 {[
                   { label: "Contact", email: "info@quickuppsoftech.us", icon: "M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM22 7l-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" },
-                  { label: "Support", email: "support@quickuppsoftech.us", icon: "M3 11h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5zm0 0a9 9 0 1 1 18 0m0 0v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM21 16v2a4 4 0 0 1-4 4h-5" },
+                  { label: "Support", email: "support@quickuppsoftech.us", icon: "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01" },
                 ].map((m) => (
                   <a key={m.email} href={`mailto:${m.email}`} className="qs-ft-mail">
                     <span className="qs-ft-mail-icon" aria-hidden="true">
