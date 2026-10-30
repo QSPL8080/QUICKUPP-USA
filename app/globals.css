@@ -9859,9 +9859,59 @@ a.secondary-button,
 
 /* wider card, three fields per row */
 .sef-section .su-contact-form-container {
-  max-width: 1060px;
+  /* scales with the screen so it never looks oversized on laptops */
+  max-width: min(1060px, 76vw);
   margin-left: auto;
   margin-right: auto;
+}
+
+@media (min-width: 992px) and (max-width: 1600px) {
+  .sef-section .su-contact-form-container {
+    padding: 34px 36px !important;
+  }
+
+  .sef-section .su-text-input:not(textarea),
+  .sef-section .su-select-input,
+  .sef-section .su-text-input.sef-locked {
+    height: 48px !important;
+  }
+
+  .sef-section .su-text-input.sef-locked {
+    font-size: 13px !important;
+  }
+
+  /* keep dropdown text centred in the shorter boxes */
+  .sef-section .su-select-input {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    line-height: 46px !important;
+  }
+
+  .sef-section .su-field-group {
+    margin-bottom: 12px !important;
+  }
+
+  .sef-section .su-form-top {
+    margin-bottom: 18px !important;
+  }
+
+  .sef-section .su-textarea-input {
+    height: 96px !important;
+    min-height: 96px !important;
+  }
+
+  .sef-section .su-checkbox-wrap {
+    margin-bottom: 18px !important;
+  }
+
+  .sef-section .su-submit-btn {
+    height: 46px !important;
+  }
+}
+
+/* long service names end with … instead of being cut mid-letter */
+.sef-section .su-text-input.sef-locked {
+  text-overflow: ellipsis;
 }
 
 .sef-row {
