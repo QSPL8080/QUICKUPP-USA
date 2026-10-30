@@ -3995,6 +3995,24 @@ section.section-gap.padding-top-0 {
   }
 }
 
+/* Desktop: give the link columns room so every link stays on one line */
+@media (min-width: 1200px) {
+  .qs-scalient-main-grid {
+    grid-template-columns: 340px minmax(0, 1fr);
+    gap: 56px;
+  }
+
+  .qs-scalient-nav-grid {
+    grid-template-columns: repeat(4, auto);
+    justify-content: space-between;
+    column-gap: 32px;
+  }
+
+  .qs-scalient-links li a {
+    white-space: nowrap;
+  }
+}
+
 .qs-scalient-col {
   display: flex;
   flex-direction: column;
