@@ -37,6 +37,10 @@ export async function DELETE(_request: Request, ctx: Ctx) {
   if (!isSuperAdmin(user)) return Response.json({ ok: false, error: "Only the super admin can delete payments." }, { status: 403 });
   const id = await parseId(ctx);
   if (!id) return Response.json({ ok: false, error: "Invalid request." }, { status: 400 });
-  await getPool().execute("DELETE FROM payments WHERE id = ?", [id]);
+  // permanently removed from the database (no hidden "deleted" copies are kept)
+  const [res] = await getPool().execute("DELETE FROM payments WHERE id = ?", [id]);
+  if (!(res as { affectedRows: number }).affectedRows) {
+    return Response.json({ ok: false, error: "This payment was already deleted." }, { status: 404 });
+  }
   return Response.json({ ok: true });
 }

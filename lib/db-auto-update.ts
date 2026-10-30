@@ -22,6 +22,8 @@ export async function updateDatabase() {
       connectTimeout: 10_000,
     });
     const applied = await runMigrations(db, { log: (m: string) => console.log(`[db] ${m}`) });
+    // clear out ended CRM sign-ins (they are also removed at each sign-in)
+    await db.query("DELETE FROM crm_sessions WHERE expires_at < NOW() OR created_at < NOW() - INTERVAL 12 HOUR");
     console.log(applied.length ? `[db] database updated (${applied.length} change${applied.length > 1 ? "s" : ""})` : "[db] database is up to date");
   } catch (err) {
     console.error("[db] automatic database update failed:", err);

@@ -26,6 +26,10 @@ export async function DELETE(request: Request) {
   if (!isEnquirySource(body?.source) || !Number.isInteger(id) || id < 1) {
     return Response.json({ ok: false, error: "Invalid request." }, { status: 400 });
   }
-  await getPool().execute(`DELETE FROM \`${SOURCES[body.source].table}\` WHERE id = ?`, [id]);
+  // permanently removed from the database (no hidden "deleted" copies are kept)
+  const [res] = await getPool().execute(`DELETE FROM \`${SOURCES[body.source].table}\` WHERE id = ?`, [id]);
+  if (!(res as { affectedRows: number }).affectedRows) {
+    return Response.json({ ok: false, error: "This enquiry was already deleted." }, { status: 404 });
+  }
   return Response.json({ ok: true });
 }

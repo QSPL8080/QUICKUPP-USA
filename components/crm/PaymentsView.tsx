@@ -109,7 +109,8 @@ export default function PaymentsView({ rows, options, canDelete, openNew }: { ro
     setBusy(true);
     const res = await fetch(`/api/crm/payments/${editing.id}`, { method: "DELETE" }).catch(() => null);
     setBusy(false);
-    if (!res?.ok) return setError("Couldn't delete the payment. Please try again.");
+    // 404 = someone already deleted it, so it's gone either way
+    if (!res?.ok && res?.status !== 404) return setError("Couldn't delete the payment. Please try again.");
     close();
     router.refresh();
   };

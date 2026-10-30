@@ -53,7 +53,8 @@ export default function EnquiryTable({
       body: JSON.stringify({ source, id: row.id }),
     }).catch(() => null);
     setBusy(false);
-    if (!res?.ok) return setError("Couldn't delete the enquiry. Please try again.");
+    // 404 = someone already deleted it, so it's gone either way
+    if (!res?.ok && res?.status !== 404) return setError("Couldn't delete the enquiry. Please try again.");
     setOpen(null);
     router.refresh();
   };

@@ -46,8 +46,7 @@ export async function startSession(userId: number, ip: string | null, userAgent:
     "INSERT INTO crm_sessions (token_hash, user_id, expires_at, ip_address, user_agent) VALUES (?, ?, NOW() + INTERVAL ? MINUTE, ?, ?)",
     [sha256(token), userId, IDLE_MINUTES, ip, userAgent]
   );
-  // tidy up expired sessions now and then
-  await getPool().execute("DELETE FROM crm_sessions WHERE expires_at < NOW()");
+  await removeExpiredSessions();
   (await cookies()).set(SESSION_COOKIE, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -55,6 +54,14 @@ export async function startSession(userId: number, ip: string | null, userAgent:
     path: "/",
     maxAge: MAX_SESSION_HOURS * 3600,
   });
+}
+
+/** Deletes ended sessions so the table never fills up with old sign-ins. */
+export async function removeExpiredSessions() {
+  await getPool().execute(
+    "DELETE FROM crm_sessions WHERE expires_at < NOW() OR created_at < NOW() - INTERVAL ? HOUR",
+    [MAX_SESSION_HOURS]
+  );
 }
 
 /** Ends the current session and clears the cookie (route handlers only). */
