@@ -243,7 +243,7 @@ export default function AboutArt({ kind, side }: { kind: ArtKind; side: "left" |
   const [a1, a2] = FRAME_ACCENTS[kind];
   return (
     <div ref={ref} className={`abx-art abx-art-${side}${inView ? " is-in" : ""}`} aria-hidden="true">
-      <svg viewBox="0 0 320 640" preserveAspectRatio="xMinYMid slice" fill="none" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+      <svg className="abx-art-frame" viewBox="0 0 320 640" preserveAspectRatio="xMinYMid slice" fill="none" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
         <defs>
           <linearGradient id="abx-art-g" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stopColor={C.cyan} />
@@ -257,9 +257,18 @@ export default function AboutArt({ kind, side }: { kind: ArtKind; side: "left" |
           </linearGradient>
         </defs>
         <Frame accent={a1} accent2={a2} />
-        <g className="abx-art-motif">
-          <Motif kind={kind} />
-        </g>
+      </svg>
+      {/* the motif keeps its own size, centred on the section, so it is never stretched or cut */}
+      <svg
+        className="abx-art-motif"
+        viewBox="0 0 320 640"
+        preserveAspectRatio="xMinYMid meet"
+        fill="none"
+        strokeWidth={1.8}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <Motif kind={kind} />
       </svg>
     </div>
   );
