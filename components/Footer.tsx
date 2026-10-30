@@ -79,19 +79,26 @@ export default function Footer() {
             </p>
 
             <div className="qs-scalient-contact-snippet" style={{ marginTop: "0" }}>
-              <div className="qs-scalient-contact-chip">
-                <span className="qs-scalient-chip-dot"></span>
-                <span className="qs-scalient-chip-label">Contact:</span>
-                <a href="mailto:info@quickuppsoftech.us" className="qs-scalient-chip-email">
-                  info@quickuppsoftech.us
-                </a>
-              </div>
-              <div className="qs-scalient-contact-chip">
-                <span className="qs-scalient-chip-dot"></span>
-                <span className="qs-scalient-chip-label">Support:</span>
-                <a href="mailto:support@quickuppsoftech.us" className="qs-scalient-chip-email">
-                  support@quickuppsoftech.us
-                </a>
+              <div className="qs-ft-mails">
+                {[
+                  { label: "Contact", email: "info@quickuppsoftech.us", icon: "M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM22 7l-10 6L2 7" },
+                  { label: "Support", email: "support@quickuppsoftech.us", icon: "M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3" },
+                ].map((m) => (
+                  <a key={m.email} href={`mailto:${m.email}`} className="qs-ft-mail">
+                    <span className="qs-ft-mail-icon" aria-hidden="true">
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+                        <path d={m.icon} />
+                      </svg>
+                    </span>
+                    <span className="qs-ft-mail-text">
+                      <span className="qs-ft-mail-label">{m.label}</span>
+                      <span className="qs-ft-mail-addr">{m.email}</span>
+                    </span>
+                    <svg className="qs-ft-mail-go" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M7 17L17 7M8 7h9v9" />
+                    </svg>
+                  </a>
+                ))}
               </div>
               <div className="qs-scalient-chip-location">
                 United States • Global Delivery
