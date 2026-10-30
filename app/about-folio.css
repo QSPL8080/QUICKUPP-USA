@@ -1317,3 +1317,188 @@
     animation: none !important;
   }
 }
+
+/* ==========================================================================
+   Gutter graphics (components/AboutArt.tsx) — line art in the empty space
+   beside chosen sections. Only on screens wide enough to have that space.
+   ========================================================================== */
+.abx-art {
+  --abx-art-w: min(290px, calc((100% - 1200px) / 2 - 56px));
+  position: absolute;
+  top: 50%;
+  width: var(--abx-art-w);
+  aspect-ratio: 300 / 340;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 0;
+  display: none;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+.abx-art svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.abx-art.is-in {
+  opacity: 0.9;
+}
+
+.abx-art-left {
+  left: calc((100% - 1200px) / 2 - var(--abx-art-w) - 28px);
+}
+
+.abx-art-right {
+  right: calc((100% - 1200px) / 2 - var(--abx-art-w) - 28px);
+}
+
+@media (min-width: 1500px) {
+  .abx-art {
+    display: block;
+  }
+}
+
+.abx-close-sec {
+  position: relative;
+}
+
+/* section content stays above the graphic */
+.abx-sec > .abx-container,
+.abx-close-sec > .abx-container,
+.abx-index-pin > .abx-container {
+  position: relative;
+  z-index: 1;
+}
+
+/* inside the pinned block the graphic sits beside the viewer, not the whole tall section */
+.abx-index-pin > .abx-art {
+  top: 52%;
+}
+
+/* motion: slow and quiet */
+.abx-art-float {
+  animation: abx-art-float 9s ease-in-out var(--d, 0s) infinite;
+}
+
+@keyframes abx-art-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+.abx-art-twinkle {
+  animation: abx-art-twinkle 4.5s ease-in-out var(--d, 0s) infinite;
+}
+
+@keyframes abx-art-twinkle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+.abx-art-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: abx-art-pulse 3.2s ease-in-out var(--d, 0s) infinite;
+}
+
+@keyframes abx-art-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.35); opacity: 0.6; }
+}
+
+.abx-art-flow {
+  animation: abx-art-flow 14s linear var(--d, 0s) infinite;
+}
+
+@keyframes abx-art-flow {
+  to { stroke-dashoffset: -220; }
+}
+
+.abx-art-spin,
+.abx-art-spin-rev {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: abx-art-spin 60s linear infinite;
+}
+
+.abx-art-spin-rev {
+  animation-direction: reverse;
+  animation-duration: 45s;
+}
+
+@keyframes abx-art-spin {
+  to { transform: rotate(360deg); }
+}
+
+.abx-art-orbit {
+  transform-origin: 150px 172px;
+  animation: abx-art-orbit var(--t, 30s) linear infinite;
+  rotate: var(--s, 0deg);
+}
+
+@keyframes abx-art-orbit {
+  to { transform: rotate(360deg); }
+}
+
+/* drawn in when the graphic comes into view */
+.abx-art-draw {
+  stroke-dasharray: 600;
+  stroke-dashoffset: 600;
+  transition: stroke-dashoffset 2.2s cubic-bezier(0.22, 1, 0.36, 1) 0.2s;
+}
+
+.abx-art.is-in .abx-art-draw {
+  stroke-dashoffset: 0;
+}
+
+.abx-art-rise {
+  transform-box: fill-box;
+  transform-origin: bottom;
+  transform: scaleY(0.2);
+  opacity: 0;
+  transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0s), opacity 0.8s ease var(--d, 0s);
+}
+
+.abx-art.is-in .abx-art-rise {
+  transform: none;
+  opacity: 1;
+}
+
+.abx-art-dart {
+  transform: translate(26px, -26px);
+  opacity: 0;
+  transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.4s, opacity 0.6s ease 0.4s;
+}
+
+.abx-art.is-in .abx-art-dart {
+  transform: none;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .abx-art *,
+  .abx-art {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .abx-art {
+    opacity: 0.9;
+  }
+
+  .abx-art-draw {
+    stroke-dashoffset: 0;
+  }
+
+  .abx-art-rise,
+  .abx-art-dart {
+    transform: none;
+  }
+
+  .abx-art-rise,
+  .abx-art-dart {
+    opacity: 1;
+  }
+}
