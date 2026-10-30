@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { isSuperAdmin, requireUser } from "@/lib/crm/auth";
+import { requireUser } from "@/lib/crm/auth";
 import { ENQUIRY_STATUSES, SOURCES, listEnquiries } from "@/lib/crm/data";
 import { isServiceFormKey, SERVICE_FORMS, type ServiceFormKey } from "@/lib/formOptions";
 import EnquiryTable from "@/components/crm/EnquiryTable";
@@ -12,7 +12,7 @@ type Props = {
 };
 
 export default async function ServiceFormPage({ params, searchParams }: Props) {
-  const user = await requireUser();
+  await requireUser();
   const { service } = await params;
   if (!isServiceFormKey(service)) notFound();
   const sp = await searchParams;
@@ -33,7 +33,7 @@ export default async function ServiceFormPage({ params, searchParams }: Props) {
       </nav>
       <Filters q={q} status={status} placeholder="Search name, email, phone or company" statuses={ENQUIRY_STATUSES.map((s) => ({ value: s, label: s[0].toUpperCase() + s.slice(1) }))} />
       <div className="crm-card crm-card-flush">
-        <EnquiryTable source={service} rows={data.items} interestLabel="Category" canDelete={isSuperAdmin(user)} />
+        <EnquiryTable source={service} rows={data.items} interestLabel="Category" />
         <Pager {...data} q={q} status={status} />
       </div>
     </>

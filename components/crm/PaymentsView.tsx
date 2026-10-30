@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { PaymentRow } from "@/lib/crm/data";
 import { PAYMENT_STATUS_LABEL, money } from "@/lib/crm/format";
+import { BulkBar, SelectBox, useSelection } from "@/components/crm/Selection";
 
 const fmtDate = (d: string | null) =>
   d ? new Date(`${d}T00:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—";
@@ -63,13 +64,15 @@ const fromRow = (p: PaymentRow): FormState => ({
   notes: p.notes || "",
 });
 
-export default function PaymentsView({ rows, options, canDelete, openNew }: { rows: PaymentRow[]; options: Options; canDelete: boolean; openNew: boolean }) {
+export default function PaymentsView({ rows, options, openNew }: { rows: PaymentRow[]; options: Options; openNew: boolean }) {
   const router = useRouter();
   const [editing, setEditing] = useState<PaymentRow | "new" | null>(openNew ? "new" : null);
   const [form, setForm] = useState<FormState>(blank());
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [listError, setListError] = useState("");
+  const sel = useSelection(rows.map((p) => p.id));
 
   const openForm = (p: PaymentRow | "new") => {
     setForm(p === "new" ? blank() : fromRow(p));
@@ -115,24 +118,58 @@ export default function PaymentsView({ rows, options, canDelete, openNew }: { ro
     router.refresh();
   };
 
+  const removeSelected = async () => {
+    const ids = sel.selected;
+    if (!ids.length) return;
+    const what = ids.length === 1 ? "this payment" : `these ${ids.length} payments`;
+    if (!window.confirm(`Permanently delete ${what}? This can't be undone.`)) return;
+    setBusy(true);
+    setListError("");
+    const res = await fetch("/api/crm/payments", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids }),
+    }).catch(() => null);
+    setBusy(false);
+    if (!res?.ok) return setListError("Couldn't delete the selected payments. Please try again.");
+    sel.clear();
+    router.refresh();
+  };
+
+  const addButton = (
+    <button type="button" className="crm-act crm-act-dark" onClick={() => openForm("new")}>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+        <path d="M12 5v14M5 12h14" />
+      </svg>
+      Add payment
+    </button>
+  );
+
   const err = (k: string) => (errors[k] ? <span className="crm-field-error">{errors[k]}</span> : null);
 
   return (
     <>
-      <div className="crm-toolbar-end">
-        <button type="button" className="crm-act crm-act-dark" onClick={() => openForm("new")}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-          Add payment
-        </button>
-      </div>
+      {rows.length ? (
+        <BulkBar sel={sel} noun={["payment", "payments"]} busy={busy} onDelete={removeSelected}>
+          {addButton}
+        </BulkBar>
+      ) : (
+        <div className="crm-toolbar-end">{addButton}</div>
+      )}
+      {listError && (
+        <p className="crm-alert crm-alert-inset" role="alert">
+          {listError}
+        </p>
+      )}
 
       {rows.length ? (
         <div className="crm-table-wrap">
-          <table className="crm-table crm-stack">
+          <table className="crm-table crm-stack crm-selectable">
             <thead>
               <tr>
+                <th className="crm-col-check">
+                  <SelectBox checked={sel.all} mixed={sel.some} onChange={sel.toggleAll} label="Select all on this page" />
+                </th>
                 <th>Client</th>
                 <th>Service</th>
                 <th className="crm-right">Amount</th>
@@ -144,8 +181,11 @@ export default function PaymentsView({ rows, options, canDelete, openNew }: { ro
             </thead>
             <tbody>
               {rows.map((p) => (
-                <tr key={p.id} className="crm-row" onClick={() => openForm(p)}>
-                  <td data-label="Client">
+                <tr key={p.id} className={`crm-row${sel.has(p.id) ? " is-picked" : ""}`} onClick={() => openForm(p)}>
+                  <td className="crm-col-check" onClick={(e) => e.stopPropagation()}>
+                    <SelectBox checked={sel.has(p.id)} onChange={(on) => sel.toggle(p.id, on)} label={`Select payment from ${p.clientName}`} />
+                  </td>
+                  <td data-label="Client" className="crm-cell-main">
                     <span className="crm-strong">{p.clientName}</span>
                     {(p.companyName || p.clientEmail) && <span className="crm-cell-sub">{p.companyName || p.clientEmail}</span>}
                   </td>
@@ -289,7 +329,7 @@ export default function PaymentsView({ rows, options, canDelete, openNew }: { ro
             )}
 
             <div className="crm-modal-foot">
-              {editing !== "new" && canDelete ? (
+              {editing !== "new" ? (
                 <button type="button" className="crm-act crm-act-danger" onClick={remove} disabled={busy}>
                   Delete
                 </button>

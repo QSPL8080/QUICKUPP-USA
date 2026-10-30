@@ -1,4 +1,4 @@
-import { isSuperAdmin, requireUser } from "@/lib/crm/auth";
+import { requireUser } from "@/lib/crm/auth";
 import { CURRENCIES, PAYMENT_METHODS, PAYMENT_SERVICES, PAYMENT_STATUSES, listPayments } from "@/lib/crm/data";
 import PaymentsView from "@/components/crm/PaymentsView";
 import { PAYMENT_STATUS_LABEL } from "@/lib/crm/format";
@@ -7,7 +7,7 @@ import { Filters, PageHead, Pager } from "@/components/crm/ListTools";
 type Props = { searchParams: Promise<{ q?: string; status?: string; page?: string; new?: string }> };
 
 export default async function PaymentsPage({ searchParams }: Props) {
-  const user = await requireUser();
+  await requireUser();
   const sp = await searchParams;
   const q = sp.q || "";
   const status = sp.status || "";
@@ -19,7 +19,6 @@ export default async function PaymentsPage({ searchParams }: Props) {
       <div className="crm-card crm-card-flush">
         <PaymentsView
           rows={data.items}
-          canDelete={isSuperAdmin(user)}
           openNew={sp.new === "1"}
           options={{ services: PAYMENT_SERVICES, methods: PAYMENT_METHODS, currencies: CURRENCIES, statuses: PAYMENT_STATUSES }}
         />

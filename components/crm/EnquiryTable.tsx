@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { EnquiryRow, EnquirySource } from "@/lib/crm/data";
+import { BulkBar, SelectBox, useSelection } from "@/components/crm/Selection";
 
 const STATUS: Record<string, string> = { new: "New", contacted: "Contacted", closed: "Closed" };
 
@@ -18,17 +19,16 @@ export default function EnquiryTable({
   source,
   rows,
   interestLabel,
-  canDelete,
 }: {
   source: EnquirySource;
   rows: EnquiryRow[];
   interestLabel: string;
-  canDelete: boolean;
 }) {
   const router = useRouter();
   const [open, setOpen] = useState<EnquiryRow | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const sel = useSelection(rows.map((r) => r.id));
 
   const setStatus = async (row: EnquiryRow, status: string) => {
     setBusy(true);
@@ -59,6 +59,24 @@ export default function EnquiryTable({
     router.refresh();
   };
 
+  const removeSelected = async () => {
+    const ids = sel.selected;
+    if (!ids.length) return;
+    const what = ids.length === 1 ? "this enquiry" : `these ${ids.length} enquiries`;
+    if (!window.confirm(`Permanently delete ${what}? This can't be undone.`)) return;
+    setBusy(true);
+    setError("");
+    const res = await fetch("/api/crm/enquiries", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ source, ids }),
+    }).catch(() => null);
+    setBusy(false);
+    if (!res?.ok) return setError("Couldn't delete the selected enquiries. Please try again.");
+    sel.clear();
+    router.refresh();
+  };
+
   if (!rows.length) {
     return (
       <div className="crm-empty">
@@ -71,14 +89,18 @@ export default function EnquiryTable({
   return (
     <>
       {error && !open && (
-        <p className="crm-alert" role="alert">
+        <p className="crm-alert crm-alert-inset" role="alert">
           {error}
         </p>
       )}
+      <BulkBar sel={sel} noun={["enquiry", "enquiries"]} busy={busy} onDelete={removeSelected} />
       <div className="crm-table-wrap">
-        <table className="crm-table crm-stack">
+        <table className="crm-table crm-stack crm-selectable">
           <thead>
             <tr>
+              <th className="crm-col-check">
+                <SelectBox checked={sel.all} mixed={sel.some} onChange={sel.toggleAll} label="Select all on this page" />
+              </th>
               <th>Name</th>
               <th>Contact</th>
               <th>{interestLabel}</th>
@@ -90,8 +112,11 @@ export default function EnquiryTable({
           </thead>
           <tbody>
             {rows.map((r) => (
-              <tr key={r.id} onClick={() => setOpen(r)} className="crm-row">
-                <td data-label="Name">
+              <tr key={r.id} onClick={() => setOpen(r)} className={`crm-row${sel.has(r.id) ? " is-picked" : ""}`}>
+                <td className="crm-col-check" onClick={(e) => e.stopPropagation()}>
+                  <SelectBox checked={sel.has(r.id)} onChange={(on) => sel.toggle(r.id, on)} label={`Select ${r.name}`} />
+                </td>
+                <td data-label="Name" className="crm-cell-main">
                   <span className="crm-strong">{r.name}</span>
                   {r.company && <span className="crm-cell-sub">{r.company}</span>}
                 </td>
@@ -207,11 +232,9 @@ export default function EnquiryTable({
               <p className="crm-message-text">{open.message}</p>
             </div>
 
-            {canDelete && (
-              <button type="button" className="crm-act crm-act-danger crm-act-sm" onClick={() => remove(open)} disabled={busy}>
-                Delete enquiry
-              </button>
-            )}
+            <button type="button" className="crm-act crm-act-danger crm-act-sm" onClick={() => remove(open)} disabled={busy}>
+              Delete enquiry
+            </button>
           </aside>
         </div>
       )}

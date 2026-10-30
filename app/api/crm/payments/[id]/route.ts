@@ -1,5 +1,5 @@
 import { getPool } from "@/lib/db";
-import { getCurrentUser, isSuperAdmin } from "@/lib/crm/auth";
+import { getCurrentUser } from "@/lib/crm/auth";
 import { validatePayment } from "@/lib/crm/payments";
 import { readJson } from "@/lib/enquiry";
 
@@ -30,11 +30,10 @@ export async function PATCH(request: Request, ctx: Ctx) {
   return Response.json({ ok: true });
 }
 
-/* DELETE → remove a payment (super admin only) */
+/* DELETE → permanently remove a payment (any CRM user) */
 export async function DELETE(_request: Request, ctx: Ctx) {
   const user = await getCurrentUser();
   if (!user) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
-  if (!isSuperAdmin(user)) return Response.json({ ok: false, error: "Only the super admin can delete payments." }, { status: 403 });
   const id = await parseId(ctx);
   if (!id) return Response.json({ ok: false, error: "Invalid request." }, { status: 400 });
   // permanently removed from the database (no hidden "deleted" copies are kept)

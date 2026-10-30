@@ -1194,18 +1194,39 @@
     text-align: left;
   }
 
-  .crm-stack td:first-child {
+  .crm-stack td:first-child,
+  .crm-stack td.crm-cell-main {
     display: block;
     text-align: left !important;
     padding-bottom: 8px;
   }
 
-  .crm-stack td:first-child::before {
+  .crm-stack td:first-child::before,
+  .crm-stack td.crm-cell-main::before {
     display: none;
   }
 
-  .crm-stack td:first-child .crm-cell-sub {
+  .crm-stack td:first-child .crm-cell-sub,
+  .crm-stack td.crm-cell-main .crm-cell-sub {
     text-align: left;
+  }
+
+  /* selectable cards: checkbox sits top-right, name beside it */
+  .crm-stack.crm-selectable tr {
+    position: relative;
+  }
+
+  .crm-stack.crm-selectable td.crm-col-check {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    width: auto;
+    padding: 0;
+  }
+
+  .crm-stack.crm-selectable tbody tr td.crm-cell-main {
+    text-align: left !important;
+    padding: 0 36px 8px 0;
   }
 }
 
@@ -1323,4 +1344,90 @@
   color: #1e40af !important;
   font-size: 13.5px !important;
   font-weight: 500 !important;
+}
+
+/* ---- Row selection & bulk delete --------------------------------------------------- */
+.crm-bulk {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  min-height: 58px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--crm-line);
+  transition: background 0.2s ease;
+}
+
+.crm-bulk.is-active {
+  background: #f5f6ff;
+}
+
+.crm-bulk-start,
+.crm-bulk-end {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.crm-bulk-end {
+  margin-left: auto;
+}
+
+.crm-bulk-count {
+  font-weight: 600;
+  color: var(--crm-ink);
+  font-size: 14px;
+}
+
+.crm-link-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--crm-accent);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.crm-link-btn:hover {
+  text-decoration: underline;
+}
+
+.crm-table th.crm-col-check,
+.crm-table td.crm-col-check {
+  width: 44px;
+  padding-right: 0;
+  cursor: default;
+}
+
+.crm-pick {
+  padding: 2px;
+}
+
+.crm-check-box.is-mixed {
+  background: var(--crm-accent);
+  border-color: var(--crm-accent);
+  color: #fff;
+}
+
+.crm-row.is-picked,
+.crm-row.is-picked:hover {
+  background: #f5f6ff;
+}
+
+.crm-alert-inset {
+  margin: 12px 16px 0 !important;
+}
+
+@media (max-width: 560px) {
+  .crm-bulk-end {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .crm-bulk:not(.is-active) .crm-bulk-end:empty {
+    display: none;
+  }
 }

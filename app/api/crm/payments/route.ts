@@ -2,6 +2,7 @@ import { getPool } from "@/lib/db";
 import { getCurrentUser } from "@/lib/crm/auth";
 import { validatePayment } from "@/lib/crm/payments";
 import { readJson } from "@/lib/enquiry";
+import { parseIds } from "@/lib/crm/ids";
 
 /* POST → add a payment entered by hand */
 export async function POST(request: Request) {
@@ -20,4 +21,17 @@ export async function POST(request: Request) {
       d.reference, d.invoiceNumber, d.paidAt, d.notes, user.id]
   );
   return Response.json({ ok: true, id: (res as { insertId: number }).insertId });
+}
+
+/* DELETE { ids: [...] } → permanently remove several payments (any CRM user) */
+export async function DELETE(request: Request) {
+  const user = await getCurrentUser();
+  if (!user) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
+  const body = await readJson(request);
+  const ids = parseIds(body?.ids);
+  if (!ids) return Response.json({ ok: false, error: "Invalid request." }, { status: 400 });
+  const [res] = await getPool().query("DELETE FROM payments WHERE id IN (?)", [ids]);
+  const deleted = (res as { affectedRows: number }).affectedRows;
+  if (!deleted) return Response.json({ ok: false, error: "These payments were already deleted." }, { status: 404 });
+  return Response.json({ ok: true, deleted });
 }

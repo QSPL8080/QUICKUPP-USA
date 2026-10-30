@@ -1,5 +1,6 @@
 import { getPool } from "@/lib/db";
-import { getCurrentUser, isSuperAdmin } from "@/lib/crm/auth";
+import { getCurrentUser } from "@/lib/crm/auth";
+import { parseIds } from "@/lib/crm/ids";
 import { ENQUIRY_STATUSES, SOURCES, isEnquirySource } from "@/lib/crm/data";
 import { readJson } from "@/lib/enquiry";
 
@@ -16,20 +17,23 @@ export async function PATCH(request: Request) {
   return Response.json({ ok: true });
 }
 
-/* DELETE { source, id } → remove an enquiry (super admin only) */
+/*
+ * DELETE { source, id } or { source, ids: [...] } → permanently remove one or
+ * more enquiries from the database (any CRM user)
+ */
 export async function DELETE(request: Request) {
   const user = await getCurrentUser();
   if (!user) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
-  if (!isSuperAdmin(user)) return Response.json({ ok: false, error: "Only the super admin can delete enquiries." }, { status: 403 });
   const body = await readJson(request);
-  const id = Number(body?.id);
-  if (!isEnquirySource(body?.source) || !Number.isInteger(id) || id < 1) {
+  const ids = body?.ids !== undefined ? parseIds(body.ids) : parseIds([body?.id]);
+  if (!isEnquirySource(body?.source) || !ids) {
     return Response.json({ ok: false, error: "Invalid request." }, { status: 400 });
   }
-  // permanently removed from the database (no hidden "deleted" copies are kept)
-  const [res] = await getPool().execute(`DELETE FROM \`${SOURCES[body.source].table}\` WHERE id = ?`, [id]);
-  if (!(res as { affectedRows: number }).affectedRows) {
-    return Response.json({ ok: false, error: "This enquiry was already deleted." }, { status: 404 });
+  // permanently removed (no hidden "deleted" copies are kept)
+  const [res] = await getPool().query(`DELETE FROM \`${SOURCES[body.source].table}\` WHERE id IN (?)`, [ids]);
+  const deleted = (res as { affectedRows: number }).affectedRows;
+  if (!deleted) {
+    return Response.json({ ok: false, error: ids.length > 1 ? "These enquiries were already deleted." : "This enquiry was already deleted." }, { status: 404 });
   }
-  return Response.json({ ok: true });
+  return Response.json({ ok: true, deleted });
 }
