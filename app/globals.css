@@ -9865,9 +9865,16 @@ a.secondary-button,
   margin-right: auto;
 }
 
+/* comfortable space between the card edge and the fields */
+@media (min-width: 1601px) {
+  .sef-section .su-contact-form-container {
+    padding: 44px 56px !important;
+  }
+}
+
 @media (min-width: 992px) and (max-width: 1600px) {
   .sef-section .su-contact-form-container {
-    padding: 34px 36px !important;
+    padding: 36px 48px !important;
   }
 
   .sef-section .su-text-input:not(textarea),
