@@ -676,3 +676,37 @@
   -webkit-line-clamp: unset;
   overflow: visible;
 }
+
+/* Pay Now: outlined companion to the white Get More Info button */
+.qs-new-cta-btn.qs-pay-btn {
+  gap: 8px !important;
+  background: transparent !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  box-shadow: none !important;
+}
+
+.qs-new-cta-btn.qs-pay-btn:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* desktop: the menu toggle is for small screens only */
+@media screen and (min-width: 992px) {
+  .qs-header-right-col .qs-mobile-toggle-btn {
+    display: none !important;
+  }
+}
+
+/* mobile menu: Pay Now and Get More Info side by side, equal width */
+@media screen and (max-width: 991px) {
+  .qs-mobile-drawer-cta {
+    display: flex !important;
+    gap: 10px;
+  }
+
+  .qs-mobile-drawer-cta .qs-new-cta-btn {
+    flex: 1 1 0;
+  }
+}

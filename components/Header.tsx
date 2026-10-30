@@ -542,6 +542,14 @@ export default function Header() {
 
             {/* Mobile Drawer Action Button */}
             <div className="qs-mobile-drawer-cta">
+              {/* Pay Now opens the Contact page until a payment link is set up */}
+              <Link href="/contact" className="qs-new-cta-btn qs-pay-btn" onClick={handleLinkClick}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <rect x="2" y="5" width="20" height="14" rx="2" />
+                  <path d="M2 10h20" />
+                </svg>
+                <span>Pay Now</span>
+              </Link>
               <Link
                 href="/contact"
                 className="qs-new-cta-btn"
@@ -554,6 +562,14 @@ export default function Header() {
 
           {/* 7. Right Header Action Button (Desktop: Get More Info) */}
           <div className="qs-header-right-col">
+            {/* Pay Now opens the Contact page until a payment link is set up */}
+            <Link href="/contact" className="qs-new-cta-btn qs-pay-btn" onClick={handleLinkClick}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="2" y="5" width="20" height="14" rx="2" />
+                <path d="M2 10h20" />
+              </svg>
+              <span>Pay Now</span>
+            </Link>
             <Link
               href="/contact"
               className="qs-new-cta-btn"
