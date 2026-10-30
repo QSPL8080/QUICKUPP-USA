@@ -1,13 +1,11 @@
 -- ============================================================================
--- Quickupp USA website — database tables
+-- Quickupp USA website — database tables (reference copy)
 --
--- On your computer : the setup script creates the Quickupp_USA database and
---                    runs this file (npm run db:setup).
--- On Hostinger     : create the database in hPanel, open phpMyAdmin, select
---                    the database and Import this file.
+-- You normally don't need this file: the website creates and updates its
+-- tables by itself every time it starts (see lib/migrations.mjs), on your
+-- computer and on Hostinger.
+-- Kept for a manual setup: phpMyAdmin → select the database → Import.
 -- Safe to run more than once (tables are only created if missing).
--- Already have the tables from before? Run npm run db:migrate to bring them
--- up to date (or db/migrations/ on Hostinger).
 -- ============================================================================
 
 -- Contact page enquiries ------------------------------------------------------
@@ -70,8 +68,8 @@ CREATE TABLE IF NOT EXISTS service_staff_augmentation LIKE service_digital_marke
 
 -- ============================================================================
 -- CRM (/login and /crm)
--- Team accounts are added by npm run db:migrate from the CRM_* values in
--- .env.local (passwords are stored as hashes, never as plain text).
+-- Team accounts are added from the CRM_* values in .env.local when the site
+-- starts (passwords are stored as hashes, never as plain text).
 -- ============================================================================
 
 -- CRM team accounts ----------------------------------------------------------
