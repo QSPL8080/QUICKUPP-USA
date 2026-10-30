@@ -1323,11 +1323,14 @@
    beside chosen sections. Only on screens wide enough to have that space.
    ========================================================================== */
 .abx-art {
-  --abx-art-w: min(290px, calc((100% - 1200px) / 2 - 56px));
+  /* grows out of the screen edge and fills the empty side space up to
+     28px before the content */
+  --abx-gutter: calc((100% - 1200px) / 2);
   position: absolute;
   top: 50%;
-  width: var(--abx-art-w);
-  aspect-ratio: 300 / 340;
+  width: calc(var(--abx-gutter) - 28px);
+  max-width: 420px;
+  height: min(640px, 100%);
   transform: translateY(-50%);
   pointer-events: none;
   z-index: 0;
@@ -1343,26 +1346,46 @@
   overflow: visible;
 }
 
+/* lines keep the same thin weight at every size */
+.abx-art svg * {
+  vector-effect: non-scaling-stroke;
+}
+
 .abx-art.is-in {
-  opacity: 0.9;
+  opacity: 1;
 }
 
 .abx-art-left {
-  left: calc((100% - 1200px) / 2 - var(--abx-art-w) - 28px);
+  left: 0;
+  -webkit-mask-image: linear-gradient(90deg, #000 70%, transparent 100%);
+  mask-image: linear-gradient(90deg, #000 70%, transparent 100%);
 }
 
 .abx-art-right {
-  right: calc((100% - 1200px) / 2 - var(--abx-art-w) - 28px);
+  right: 0;
+  -webkit-mask-image: linear-gradient(270deg, #000 70%, transparent 100%);
+  mask-image: linear-gradient(270deg, #000 70%, transparent 100%);
 }
 
-@media (min-width: 1500px) {
-  .abx-art {
-    display: block;
-  }
+/* drawn for the left edge; mirrored for the right */
+.abx-art-right svg {
+  transform: scaleX(-1);
+}
+
+/* the parts past the screen edge are cut off without a side scroll */
+.abx-sec,
+.abx-close-sec {
+  overflow-x: clip;
 }
 
 .abx-close-sec {
   position: relative;
+}
+
+@media (min-width: 1440px) {
+  .abx-art {
+    display: block;
+  }
 }
 
 /* section content stays above the graphic */
@@ -1433,9 +1456,19 @@
 }
 
 .abx-art-orbit {
-  transform-origin: 150px 172px;
+  transform-origin: 0 320px;
   animation: abx-art-orbit var(--t, 30s) linear infinite;
   rotate: var(--s, 0deg);
+}
+
+.abx-art-orbit-local {
+  transform-origin: 196px 320px;
+  animation: abx-art-orbit var(--t, 30s) linear infinite;
+  rotate: var(--s, 0deg);
+}
+
+.abx-art-pulse-soft {
+  animation: abx-art-twinkle 5s ease-in-out var(--d, 0s) infinite;
 }
 
 @keyframes abx-art-orbit {
@@ -1500,5 +1533,44 @@
   .abx-art-rise,
   .abx-art-dart {
     opacity: 1;
+  }
+}
+
+/* gauge arcs fill to their value when the graphic comes into view */
+.abx-art-meter {
+  stroke-dasharray: var(--len);
+  stroke-dashoffset: var(--len);
+  transition: stroke-dashoffset 1.8s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0s);
+}
+
+.abx-art.is-in .abx-art-meter {
+  stroke-dashoffset: var(--to);
+}
+
+.abx-art-needle {
+  transform-origin: 150px 236px;
+  transform: rotate(-60deg);
+  transition: transform 1.8s cubic-bezier(0.22, 1, 0.36, 1) 0.3s;
+}
+
+.abx-art.is-in .abx-art-needle {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .abx-art-meter {
+    stroke-dashoffset: var(--to);
+  }
+
+  .abx-art-needle {
+    transform: none;
+  }
+}
+
+/* where the side space is narrow, show only the arcs from the edge, so the
+   section motif is never cut in half */
+@media (max-width: 1799px) {
+  .abx-art-motif {
+    display: none;
   }
 }
