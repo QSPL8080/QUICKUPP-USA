@@ -49,3 +49,6 @@ next-env.d.ts
 
 # allow the example env file
 !.env.example
+
+# CRM account hashes for the Hostinger import
+/db/hostinger-crm-accounts.sql
