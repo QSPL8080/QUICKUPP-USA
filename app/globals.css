@@ -197,7 +197,7 @@ label,
 }
 
 /* 2C. MASTER BUTTON SYSTEM - EQUAL & MATCHED ACROSS ALL PAGES (Border Radius 8px & Weight 700) */
-button:not(.sc-modal-close-btn):not(.splide__arrow):not(.w-slider-arrow):not(.menu-button):not(.asx-faq-q):not(.qs-mobile-toggle-btn),
+button:not(.sc-modal-close-btn):not(.splide__arrow):not(.w-slider-arrow):not(.menu-button):not(.asx-faq-q):not(.qs-mobile-toggle-btn):not([class*="crm-"]),
 .btn,
 .button,
 .w-button,
@@ -9657,7 +9657,7 @@ section.section-gap.padding-top-0 {
 .w-button,
 .hero-btn,
 .cta-button-primary,
-button[type="submit"]:not(.qs-mobile-toggle-btn):not(.mx-tab-btn) {
+button[type="submit"]:not(.qs-mobile-toggle-btn):not(.mx-tab-btn):not([class*="crm-"]) {
   background: #0b0f17 !important;
   background-color: #0b0f17 !important;
   color: #ffffff !important;
@@ -9696,7 +9696,7 @@ button[type="submit"]:not(.qs-mobile-toggle-btn):not(.mx-tab-btn) {
 .w-button:hover,
 .hero-btn:hover,
 .cta-button-primary:hover,
-button[type="submit"]:not(.qs-mobile-toggle-btn):not(.mx-tab-btn):hover {
+button[type="submit"]:not(.qs-mobile-toggle-btn):not(.mx-tab-btn):not([class*="crm-"]):hover {
   background: #1e293b !important;
   background-color: #1e293b !important;
   border-color: #1e293b !important;
@@ -9775,7 +9775,7 @@ button[type="submit"]:not(.qs-mobile-toggle-btn):not(.mx-tab-btn):hover {
 }
 
 /* Ensure all buttons globally enforce 8px border-radius */
-button:not(.qs-mobile-toggle-btn):not(.mx-tab-btn),
+button:not(.qs-mobile-toggle-btn):not(.mx-tab-btn):not([class*="crm-"]),
 .button,
 .btn,
 .w-button,

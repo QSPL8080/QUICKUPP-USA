@@ -11,7 +11,12 @@
  *   2026-10-30  Service forms: the old service_interest column becomes
  *               "category", and a new "service" column holds the fixed
  *               service of each form (filled in for existing rows too).
+ *   2026-10-30  CRM: crm_users, crm_sessions and payments tables, and the
+ *               team accounts from the CRM_* values in .env.local (added
+ *               once; an existing account's password is never changed here).
  */
+import { randomBytes, scryptSync } from "node:crypto";
+import { readFile } from "node:fs/promises";
 import mysql from "mysql2/promise";
 
 const { DB_HOST = "127.0.0.1", DB_PORT = "3306", DB_USER, DB_PASSWORD, DB_NAME } = process.env;
@@ -29,7 +34,7 @@ const SERVICE_TABLES = {
 };
 
 const db = await mysql
-  .createConnection({ host: DB_HOST, port: Number(DB_PORT), user: DB_USER, password: DB_PASSWORD, database: DB_NAME })
+  .createConnection({ host: DB_HOST, port: Number(DB_PORT), user: DB_USER, password: DB_PASSWORD, database: DB_NAME, multipleStatements: true })
   .catch((err) => {
     console.error("✗ Could not connect to the database:", err.message);
     process.exit(1);
@@ -86,6 +91,34 @@ try {
 
     console.log(`✓ ${table}: ${done.length ? done.join(", ") : "already up to date"}`);
   }
+  /* ---- CRM tables and team accounts ---- */
+  const schema = await readFile(new URL("../db/schema.sql", import.meta.url), "utf8");
+  const crmSql = schema.slice(schema.indexOf("-- CRM (/login"));
+  await db.query(crmSql.replace(/^--.*$/gm, ""));
+  console.log("✓ CRM tables: crm_users, crm_sessions, payments");
+
+  const accounts = [
+    { role: "super_admin", name: process.env.CRM_SUPERADMIN_NAME || "Super Admin", email: process.env.CRM_SUPERADMIN_EMAIL, password: process.env.CRM_SUPERADMIN_PASSWORD },
+    { role: "admin", name: process.env.CRM_ADMIN_NAME || "Admin", email: process.env.CRM_ADMIN_EMAIL, password: process.env.CRM_ADMIN_PASSWORD },
+  ];
+  for (const a of accounts) {
+    if (!a.email || !a.password) {
+      console.log(`- ${a.role}: no CRM_${a.role === "admin" ? "ADMIN" : "SUPERADMIN"}_EMAIL / _PASSWORD in .env.local, skipped`);
+      continue;
+    }
+    const email = a.email.trim().toLowerCase();
+    const [found] = await db.query("SELECT id FROM crm_users WHERE email = ?", [email]);
+    if (found.length) {
+      console.log(`✓ ${email}: account already exists`);
+      continue;
+    }
+    const salt = randomBytes(16);
+    const hash = scryptSync(a.password, salt, 64, { N: 16384, r: 8, p: 1 });
+    const stored = `scrypt$16384$8$1$${salt.toString("base64")}$${hash.toString("base64")}`;
+    await db.query("INSERT INTO crm_users (name, email, password_hash, role) VALUES (?, ?, ?, ?)", [a.name, email, stored, a.role]);
+    console.log(`✓ ${email}: ${a.role === "super_admin" ? "super admin" : "admin"} account added`);
+  }
+
   console.log("\nDone.");
 } catch (err) {
   console.error("✗ Migration failed:", err.message);

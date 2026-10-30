@@ -34,6 +34,7 @@ const luminance = (color: string) => {
 
 function markButtons() {
   if (document.querySelector(".hero-one-section")) return; // home page: leave untouched
+  if (document.querySelector(".crm-root")) return; // CRM has its own buttons
   document.querySelectorAll<HTMLElement>(CTA_SELECTOR).forEach((el) => {
     if (el.closest("header, footer")) return;
     const cls = typeof el.className === "string" ? el.className : "";
