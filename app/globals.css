@@ -9747,6 +9747,41 @@ a.secondary-button,
   position: relative;
 }
 
+/* wider card, three fields per row */
+.sef-section .su-contact-form-container {
+  max-width: none;
+}
+
+.sef-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: 18px;
+}
+
+.sef-span-2 {
+  grid-column: span 2;
+}
+
+.sef-section .su-text-input:not(textarea) {
+  height: 55px; /* same height as the dropdowns in each row */
+}
+
+@media (max-width: 991px) {
+  .sef-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sef-span-2 {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .sef-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .sef-heading {
   max-width: 820px;
   margin: 0 auto clamp(28px, 3vw, 40px) !important;

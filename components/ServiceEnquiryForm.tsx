@@ -120,7 +120,7 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
                 <p className="su-inquiry-para">Share your project details, and we’ll get back to you within 24 hours.</p>
               </div>
 
-              <div className="su-form-fields-grid">
+              <div className="sef-row">
                 <div className="su-field-group">
                   <label htmlFor={`${idp}-name`} className="su-field-label">
                     Full name
@@ -149,9 +149,6 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
                     onChange={(e) => set({ email: e.target.value })}
                   />
                 </div>
-              </div>
-
-              <div className="su-form-fields-grid">
                 <div className="su-field-group">
                   <label htmlFor={`${idp}-phone`} className="su-field-label">
                     Phone number
@@ -165,6 +162,9 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
                     onChange={(e) => set({ phone: e.target.value })}
                   />
                 </div>
+              </div>
+
+              <div className="sef-row">
                 <div className="su-field-group">
                   <label htmlFor={`${idp}-company`} className="su-field-label">
                     Company name
@@ -178,9 +178,6 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
                     onChange={(e) => set({ companyName: e.target.value })}
                   />
                 </div>
-              </div>
-
-              <div className="su-form-fields-grid">
                 <div className="su-field-group">
                   <label htmlFor={`${idp}-service`} className="su-field-label">
                     Service
@@ -222,7 +219,7 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
                 </div>
               </div>
 
-              <div className="su-form-fields-grid">
+              <div className="sef-row">
                 <div className="su-field-group">
                   <label htmlFor={`${idp}-industry`} className="su-field-label">
                     Industry
@@ -244,21 +241,24 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
                       </option>
                     ))}
                   </select>
-                  {formData.industry === "Other" && (
-                    <div className="sef-other">
-                      <input
-                        id={`${idp}-other`}
-                        type="text"
-                        required
-                        placeholder="Please specify your industry..."
-                        className="su-text-input"
-                        value={formData.otherIndustry}
-                        onChange={(e) => set({ otherIndustry: e.target.value })}
-                      />
-                    </div>
-                  )}
                 </div>
-                <div className="su-field-group">
+                {formData.industry === "Other" && (
+                  <div className="su-field-group">
+                    <label htmlFor={`${idp}-other`} className="su-field-label">
+                      Other industry
+                    </label>
+                    <input
+                      id={`${idp}-other`}
+                      type="text"
+                      required
+                      placeholder="Please specify your industry..."
+                      className="su-text-input"
+                      value={formData.otherIndustry}
+                      onChange={(e) => set({ otherIndustry: e.target.value })}
+                    />
+                  </div>
+                )}
+                <div className={`su-field-group${formData.industry === "Other" ? "" : " sef-span-2"}`}>
                   <label htmlFor={`${idp}-budget`} className="su-field-label">
                     Estimated Budget
                   </label>
