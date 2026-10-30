@@ -8872,6 +8872,13 @@ section.section-gap.padding-top-0 {
   }
 }
 
+/* phones: one card per row (two overflowed the screen) */
+@media (max-width: 640px) {
+  .res-grid-3 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 /* ==========================================================================
    CASE STUDIES SPECIFIC ROI & PROBLEM-SOLUTION SYSTEM (3-IN-A-ROW)
    ========================================================================== */
@@ -9766,18 +9773,33 @@ a.secondary-button,
   height: 55px; /* same height as the dropdowns in each row */
 }
 
+/* tablets: all fields flow two per row, so no field is left alone on a row */
 @media (max-width: 991px) {
-  .sef-row {
+  .sef-section .su-contact-form {
+    display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 18px;
   }
 
-  .sef-span-2 {
+  .sef-section .su-contact-form > * {
+    grid-column: 1 / -1;
+  }
+
+  .sef-section .su-contact-form > .su-submit-btn {
+    justify-self: start;
+  }
+
+  .sef-row {
+    display: contents;
+  }
+
+  .sef-row > .su-field-group {
     grid-column: auto;
   }
 }
 
 @media (max-width: 640px) {
-  .sef-row {
+  .sef-section .su-contact-form {
     grid-template-columns: minmax(0, 1fr);
   }
 }
