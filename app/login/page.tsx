@@ -13,11 +13,12 @@ export default async function LoginPage() {
   if (await getCurrentUser()) redirect("/crm");
   return (
     <div className="crm-root crm-login">
-      <div className="crm-login-brand">
-        <img src="/images/logo-white.png" alt="Quickupp Softech" />
+      <div className="crm-login-photo" aria-hidden="true">
+        <img src="/images/contact-tech-discussion.jpg" alt="" />
       </div>
       <div className="crm-login-body">
         <div className="crm-login-inner">
+          <img src="/images/logo-black.png" alt="Quickupp Softech" className="crm-login-logo" />
           <h1 className="crm-title">Sign in</h1>
           <p className="crm-sub">Use your Quickupp Softech team account.</p>
           <LoginForm />

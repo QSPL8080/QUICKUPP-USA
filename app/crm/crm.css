@@ -931,32 +931,34 @@
   background: #fff;
 }
 
-.crm-login-brand {
+/* real photo on the left, with a soft dark fade so it sits well beside the form */
+.crm-login-photo {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 48px;
-  background: var(--crm-side);
   overflow: hidden;
+  background: var(--crm-side);
 }
 
-/* faint grid so the dark panel isn't flat */
-.crm-login-brand::before {
+.crm-login-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 78% center;
+}
+
+.crm-login-photo::after {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-  background-size: 44px 44px;
-  mask-image: radial-gradient(circle at center, #000 30%, transparent 75%);
-  -webkit-mask-image: radial-gradient(circle at center, #000 30%, transparent 75%);
+  background: linear-gradient(180deg, rgba(11, 13, 17, 0.05) 40%, rgba(11, 13, 17, 0.45) 100%);
 }
 
-.crm-login-brand img {
-  position: relative;
-  width: min(320px, 70%);
+.crm-login-logo {
+  display: block;
+  width: 180px;
   height: auto;
+  margin-bottom: 32px;
 }
 
 .crm-login-body {
@@ -1057,20 +1059,21 @@
 @media (max-width: 900px) {
   .crm-login {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto 1fr;
   }
 
-  .crm-login-brand {
-    padding: 36px 24px;
-  }
-
-  .crm-login-brand img {
-    width: min(220px, 60%);
+  /* phones and tablets: the form only, no photo */
+  .crm-login-photo {
+    display: none;
   }
 
   .crm-login-body {
     align-items: flex-start;
-    padding: 36px 20px 48px;
+    padding: 48px 20px;
+  }
+
+  .crm-login-logo {
+    width: 160px;
+    margin-bottom: 28px;
   }
 }
 
