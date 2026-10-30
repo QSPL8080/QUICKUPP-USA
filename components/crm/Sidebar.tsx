@@ -57,7 +57,6 @@ export default function CrmSidebar({ user, newCounts }: { user: NavUser; newCoun
       <aside className={`crm-side${open ? " is-open" : ""}`}>
         <div className="crm-side-brand">
           <img src="/images/logo-white.png" alt="Quickupp Softech" />
-          <span className="crm-side-tag">CRM</span>
         </div>
 
         <nav className="crm-nav" aria-label="CRM" onClick={() => setOpen(false)}>
