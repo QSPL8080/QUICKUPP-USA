@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AboutMotion from "@/components/AboutMotion";
-import AboutArt, { type ArtKind } from "@/components/AboutArt";
 import "@/app/about-folio.css";
 import { ABOUT_NAV, type AboutCta, type AboutPageData, type AboutSection, type AboutTitle } from "@/data/about/pages";
 
@@ -161,12 +160,11 @@ function Statement({ s, backdrop }: { s: Extract<AboutSection, { kind: "statemen
   );
 }
 
-function Panels({ s, backdrop, art }: { s: Extract<AboutSection, { kind: "panels" }>; backdrop?: string; art?: React.ReactNode }) {
+function Panels({ s, backdrop }: { s: Extract<AboutSection, { kind: "panels" }>; backdrop?: string }) {
   const [active, setActive] = useState(0);
   const hasHeadText = !!(s.paras?.length || s.highlight);
   return (
     <section className={`abx-sec abx-soft${bdClass(backdrop)}`} style={bdStyle(backdrop)}>
-      {art}
       <div className="abx-container">
         <div className={`abx-head${hasHeadText ? " abx-head-split" : ""}`}>
           <div className="abx-head-main">
@@ -282,7 +280,7 @@ function Goals({ s, backdrop }: { s: Extract<AboutSection, { kind: "goals" }>; b
   );
 }
 
-function Route({ s, soft, backdrop, art }: { s: Extract<AboutSection, { kind: "route" }>; soft: boolean; backdrop?: string; art?: React.ReactNode }) {
+function Route({ s, soft, backdrop }: { s: Extract<AboutSection, { kind: "route" }>; soft: boolean; backdrop?: string }) {
   const plain = s.steps.every((st) => !st.text && !st.label);
   const hasQuote = s.steps.some((st) => !!st.quote);
   return (
@@ -290,7 +288,6 @@ function Route({ s, soft, backdrop, art }: { s: Extract<AboutSection, { kind: "r
       className={`abx-sec${soft ? " abx-soft" : ""}${bdClass(backdrop)}`}
       style={bdStyle(backdrop)}
     >
-      {art}
       <div className="abx-container">
         <div className="abx-head abx-head-center">
           <Eyebrow text={s.eyebrow} />
@@ -326,7 +323,7 @@ function Route({ s, soft, backdrop, art }: { s: Extract<AboutSection, { kind: "r
    and the selected point follows the scroll position */
 const INDEX_STEP_VH = 26;
 
-function IndexViewer({ s, backdrop, art }: { s: Extract<AboutSection, { kind: "index" }>; backdrop?: string; art?: React.ReactNode }) {
+function IndexViewer({ s, backdrop }: { s: Extract<AboutSection, { kind: "index" }>; backdrop?: string }) {
   const [active, setActive] = useState(0);
   const wrapRef = useRef<HTMLDivElement>(null);
   const pinRef = useRef<HTMLDivElement>(null);
@@ -385,7 +382,6 @@ function IndexViewer({ s, backdrop, art }: { s: Extract<AboutSection, { kind: "i
         style={{ "--abx-index-len": `${n * INDEX_STEP_VH}vh` } as React.CSSProperties}
       >
         <div ref={pinRef} className="abx-index-pin">
-          {art}
           <div className="abx-container">
             <div className="abx-head">
               <Eyebrow text={s.eyebrow} />
@@ -441,10 +437,9 @@ function IndexViewer({ s, backdrop, art }: { s: Extract<AboutSection, { kind: "i
   );
 }
 
-function Proof({ s, backdrop, art }: { s: Extract<AboutSection, { kind: "proof" }>; backdrop?: string; art?: React.ReactNode }) {
+function Proof({ s, backdrop }: { s: Extract<AboutSection, { kind: "proof" }>; backdrop?: string }) {
   return (
     <section className={`abx-sec${bdClass(backdrop)}`} style={bdStyle(backdrop)}>
-      {art}
       <div className="abx-container">
         <div className="abx-split">
           <div className="abx-statement-body">
@@ -479,16 +474,6 @@ function Proof({ s, backdrop, art }: { s: Extract<AboutSection, { kind: "proof" 
   );
 }
 
-/* Edge graphics: two per page (one left, one right), each used only once on the
-   site, beside the sections they suit best (never a photo-backdrop section or the hero) */
-type ArtSpot = { kind: ArtKind; side: "left" | "right" };
-const ART_SPOTS: Record<string, Partial<Record<number | "close", ArtSpot>>> = {
-  "Who We Are": { 0: { kind: "layers", side: "right" }, close: { kind: "network", side: "left" } },
-  "Our Approach": { 0: { kind: "route", side: "left" }, 2: { kind: "hub", side: "right" } },
-  "Why Choose Us": { 0: { kind: "growth", side: "left" }, 1: { kind: "gauge", side: "right" } },
-  "Why Businesses Choose Us": { 0: { kind: "modules", side: "right" }, close: { kind: "target", side: "left" } },
-};
-
 /* ---- Page --------------------------------------------------------------------- */
 export default function AboutPage({ data }: { data: AboutPageData }) {
   const pathname = usePathname();
@@ -504,7 +489,6 @@ export default function AboutPage({ data }: { data: AboutPageData }) {
   /* Two sections per page get the soft photo backdrop: the best-scoring pair that are
      not next to each other, so the photos never run into one another */
   const backdropFor = pickBackdrops(data.sections.map((x) => x.kind));
-  const artSpots = ART_SPOTS[data.crumb] ?? {};
 
   return (
     <div className="abx-page">
@@ -574,19 +558,16 @@ export default function AboutPage({ data }: { data: AboutPageData }) {
         {data.sections.map((s, i) => {
           const backdrop = backdropFor[i];
           const soft = softAt[i];
-          const spot = backdrop ? undefined : artSpots[i];
-          const art = spot ? <AboutArt kind={spot.kind} side={spot.side} /> : undefined;
           if (s.kind === "statement") return <Statement key={i} s={s} backdrop={backdrop} />;
-          if (s.kind === "panels") return <Panels key={i} s={s} backdrop={backdrop} art={art} />;
+          if (s.kind === "panels") return <Panels key={i} s={s} backdrop={backdrop} />;
           if (s.kind === "goals") return <Goals key={i} s={s} backdrop={backdrop} />;
-          if (s.kind === "index") return <IndexViewer key={i} s={s} backdrop={backdrop} art={art} />;
-          if (s.kind === "proof") return <Proof key={i} s={s} backdrop={backdrop} art={art} />;
-          if (s.kind === "route") return <Route key={i} s={s} soft={soft} backdrop={backdrop} art={art} />;
+          if (s.kind === "index") return <IndexViewer key={i} s={s} backdrop={backdrop} />;
+          if (s.kind === "proof") return <Proof key={i} s={s} backdrop={backdrop} />;
+          if (s.kind === "route") return <Route key={i} s={s} soft={soft} backdrop={backdrop} />;
           return null;
         })}
 
         <section className="abx-close-sec">
-          {artSpots.close && <AboutArt kind={artSpots.close.kind} side={artSpots.close.side} />}
           <div className="abx-container">
             <div className={`abx-close${closing.lines?.length ? "" : " abx-close-solo"}`}>
               <span className="abx-close-grid" aria-hidden="true" />
