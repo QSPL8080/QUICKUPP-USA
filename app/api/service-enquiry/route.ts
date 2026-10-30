@@ -9,6 +9,8 @@ import { readJson, requestMeta, validateEnquiry } from "@/lib/enquiry";
  *   it-services        → service_it_services
  *   staff-augmentation → service_staff_augmentation
  * The table name comes only from this fixed list, never from the request.
+ * "service" is the fixed service of that form; "category" is the subpage the
+ * visitor picked (the form sends it as serviceInterest).
  */
 export async function POST(request: Request) {
   const body = await readJson(request);
@@ -21,7 +23,7 @@ export async function POST(request: Request) {
   }
   const form = SERVICE_FORMS[body.service];
 
-  const result = validateEnquiry(body, form.options, "serviceInterest");
+  const result = validateEnquiry(body, form.options, "serviceInterest", "category");
   if (!result.ok) return Response.json({ ok: false, errors: result.errors }, { status: 400 });
 
   const d = result.data;
@@ -31,11 +33,11 @@ export async function POST(request: Request) {
   try {
     const [res] = await getPool().execute(
       `INSERT INTO ${form.table}
-        (full_name, email, phone, company_name, industry, other_industry, service_interest, budget, message,
+        (full_name, email, phone, company_name, industry, other_industry, service, category, budget, message,
          agreed_terms, source_page, page_url, ip_address, user_agent)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?)`,
-      [d.fullName, d.email, d.phone, d.companyName, d.industry, d.otherIndustry, d.subject, d.budget, d.message,
-        sourcePage, meta.pageUrl, meta.ip, meta.userAgent]
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?)`,
+      [d.fullName, d.email, d.phone, d.companyName, d.industry, d.otherIndustry, form.label, d.subject, d.budget,
+        d.message, sourcePage, meta.pageUrl, meta.ip, meta.userAgent]
     );
     return Response.json({ ok: true, id: (res as { insertId: number }).insertId });
   } catch (err) {

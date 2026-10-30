@@ -23,7 +23,12 @@ type Result = { ok: true; data: EnquiryInput } | { ok: false; errors: Record<str
 const text = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-export function validateEnquiry(body: Record<string, unknown>, subjects: readonly string[], subjectField: string): Result {
+export function validateEnquiry(
+  body: Record<string, unknown>,
+  subjects: readonly string[],
+  subjectField: string,
+  subjectName = "service"
+): Result {
   const errors: Record<string, string> = {};
 
   const fullName = text(body.fullName, 150);
@@ -41,7 +46,7 @@ export function validateEnquiry(body: Record<string, unknown>, subjects: readonl
   if (phone && !/^[0-9+()\-.\s]{5,40}$/.test(phone)) errors.phone = "Please enter a valid phone number.";
   if (!(INDUSTRIES as readonly string[]).includes(industry)) errors.industry = "Please select your industry.";
   if (industry === "Other" && !otherIndustry) errors.otherIndustry = "Please specify your industry.";
-  if (!subjects.includes(subject)) errors[subjectField] = "Please select a service.";
+  if (!subjects.includes(subject)) errors[subjectField] = `Please select a ${subjectName}.`;
   if (budget && !BUDGETS.some((b) => b.value === budget)) errors.budget = "Please select a budget range.";
   if (!message) errors.message = "Please tell us about your project.";
   if (body.agreed !== true) errors.agreed = "Please accept the Privacy Policy and Terms & Conditions.";

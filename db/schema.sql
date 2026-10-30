@@ -6,6 +6,8 @@
 -- On Hostinger     : create the database in hPanel, open phpMyAdmin, select
 --                    the database and Import this file.
 -- Safe to run more than once (tables are only created if missing).
+-- Already have the tables from before? Run npm run db:migrate to bring them
+-- up to date (or db/migrations/ on Hostinger).
 -- ============================================================================
 
 -- Contact page enquiries ------------------------------------------------------
@@ -40,7 +42,8 @@ CREATE TABLE IF NOT EXISTS service_digital_marketing (
   company_name     VARCHAR(190) NULL,
   industry         VARCHAR(100) NOT NULL,
   other_industry   VARCHAR(150) NULL,
-  service_interest VARCHAR(150) NOT NULL COMMENT 'Subpage chosen in the form',
+  service          VARCHAR(150) NOT NULL COMMENT 'Service (fixed on that service''s pages)',
+  category         VARCHAR(150) NOT NULL COMMENT 'Category chosen in the form (a subpage of the service)',
   budget           VARCHAR(60)  NULL,
   message          TEXT         NOT NULL,
   agreed_terms     TINYINT(1)   NOT NULL DEFAULT 1,
@@ -53,7 +56,7 @@ CREATE TABLE IF NOT EXISTS service_digital_marketing (
   PRIMARY KEY (id),
   KEY idx_created (created_at),
   KEY idx_email (email),
-  KEY idx_service (service_interest)
+  KEY idx_category (category)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- AI & Automation Solutions form ----------------------------------------------
