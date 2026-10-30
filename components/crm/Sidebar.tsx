@@ -39,6 +39,11 @@ export default function CrmSidebar({ user, newCounts }: { user: NavUser; newCoun
   const logout = async () => {
     setLeaving(true);
     await fetch("/api/crm/logout", { method: "POST" }).catch(() => null);
+    try {
+      localStorage.setItem("qs_crm_signed_out", String(Date.now()));
+    } catch {
+      /* storage unavailable */
+    }
     router.replace("/login");
     router.refresh();
   };

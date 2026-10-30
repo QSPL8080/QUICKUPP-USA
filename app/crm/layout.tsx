@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { requireUser } from "@/lib/crm/auth";
 import { dashboardStats } from "@/lib/crm/data";
 import CrmSidebar from "@/components/crm/Sidebar";
+import IdleLogout from "@/components/crm/IdleLogout";
+import { IDLE_MINUTES } from "@/lib/crm/auth";
 import "./crm.css";
 
 export const metadata: Metadata = {
@@ -17,6 +19,7 @@ export default async function CrmLayout({ children }: { children: React.ReactNod
     <div className="crm-root">
       <CrmSidebar user={user} newCounts={newCounts} />
       <main className="crm-main">{children}</main>
+      <IdleLogout idleMinutes={IDLE_MINUTES} />
     </div>
   );
 }

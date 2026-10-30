@@ -14,7 +14,10 @@ import { getPool } from "@/lib/db";
 const scrypt = promisify(scryptCb) as (pw: string, salt: Buffer, len: number, opts: object) => Promise<Buffer>;
 
 export const SESSION_COOKIE = "qs_crm";
-const SESSION_DAYS = 7;
+/** Signed out after this many minutes with no activity */
+export const IDLE_MINUTES = 15;
+/** Signed out after this many hours even when active (sign in again) */
+const MAX_SESSION_HOURS = 12;
 
 export type CrmRole = "super_admin" | "admin";
 export type CrmUser = { id: number; name: string; email: string; role: CrmRole };
@@ -38,10 +41,10 @@ const sha256 = (v: string) => createHash("sha256").update(v).digest("hex");
 /** Starts a session for the user and sets the cookie (route handlers only). */
 export async function startSession(userId: number, ip: string | null, userAgent: string | null) {
   const token = randomBytes(32).toString("hex");
-  const expires = new Date(Date.now() + SESSION_DAYS * 864e5);
+  // times are worked out by MySQL itself, so server time zones can't shift them
   await getPool().execute(
-    "INSERT INTO crm_sessions (token_hash, user_id, expires_at, ip_address, user_agent) VALUES (?, ?, ?, ?, ?)",
-    [sha256(token), userId, expires, ip, userAgent]
+    "INSERT INTO crm_sessions (token_hash, user_id, expires_at, ip_address, user_agent) VALUES (?, ?, NOW() + INTERVAL ? MINUTE, ?, ?)",
+    [sha256(token), userId, IDLE_MINUTES, ip, userAgent]
   );
   // tidy up expired sessions now and then
   await getPool().execute("DELETE FROM crm_sessions WHERE expires_at < NOW()");
@@ -50,7 +53,7 @@ export async function startSession(userId: number, ip: string | null, userAgent:
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    expires,
+    maxAge: MAX_SESSION_HOURS * 3600,
   });
 }
 
@@ -62,16 +65,32 @@ export async function endSession() {
   store.delete(SESSION_COOKIE);
 }
 
-/** The signed-in CRM user, or null. */
+/**
+ * Pushes the session's idle deadline forward (any CRM page, action or activity
+ * ping counts). Returns false when the session has already expired.
+ */
+async function touchSession(tokenHash: string): Promise<boolean> {
+  const [res] = await getPool().execute(
+    `UPDATE crm_sessions
+        SET expires_at = NOW() + INTERVAL ? MINUTE
+      WHERE token_hash = ? AND expires_at > NOW() AND created_at > NOW() - INTERVAL ? HOUR`,
+    [IDLE_MINUTES, tokenHash, MAX_SESSION_HOURS]
+  );
+  return (res as { affectedRows: number }).affectedRows > 0;
+}
+
+/** The signed-in CRM user, or null. Being signed in also counts as activity. */
 export async function getCurrentUser(): Promise<CrmUser | null> {
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
   if (!token || !/^[a-f0-9]{64}$/.test(token)) return null;
+  const hash = sha256(token);
+  if (!(await touchSession(hash))) return null;
   const [rows] = await getPool().execute(
     `SELECT u.id, u.name, u.email, u.role
        FROM crm_sessions s JOIN crm_users u ON u.id = s.user_id
-      WHERE s.token_hash = ? AND s.expires_at > NOW() AND u.is_active = 1
+      WHERE s.token_hash = ? AND u.is_active = 1
       LIMIT 1`,
-    [sha256(token)]
+    [hash]
   );
   const row = (rows as CrmUser[])[0];
   return row ? { id: Number(row.id), name: row.name, email: row.email, role: row.role } : null;
@@ -80,7 +99,11 @@ export async function getCurrentUser(): Promise<CrmUser | null> {
 /** For CRM pages: the signed-in user, or a redirect to /login. */
 export async function requireUser(): Promise<CrmUser> {
   const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  if (!user) {
+    // only mention an ended session when there was one
+    const hadSession = (await cookies()).has(SESSION_COOKIE);
+    redirect(hadSession ? "/login?reason=expired" : "/login");
+  }
   return user;
 }
 
