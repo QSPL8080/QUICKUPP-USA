@@ -9747,6 +9747,26 @@ a.secondary-button,
   position: relative;
 }
 
+.sef-heading {
+  max-width: 820px;
+  margin: 0 auto clamp(28px, 3vw, 40px) !important;
+  text-align: center;
+  font-size: var(--qs-t-h2) !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.02em;
+  color: #0f172a !important;
+}
+
+/* the service is fixed on its own pages */
+.sef-section .su-text-input.sef-locked {
+  background-color: #f1f5f9 !important;
+  color: #475569 !important;
+  height: 55px; /* same as the Category dropdown beside it */
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .sef-trap {
   position: absolute !important;
   left: -9999px !important;

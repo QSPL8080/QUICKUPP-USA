@@ -6,9 +6,11 @@ import { BUDGETS, INDUSTRIES, SERVICE_FORMS, type ServiceFormKey } from "@/lib/f
 
 /*
  * Enquiry form shown on every subpage of a service. Same fields and look as
- * the Contact page form; the "Service" field lists that service's subpages
- * (the current one is pre-selected). Submissions go to /api/service-enquiry
- * and are saved in the service's own table.
+ * the Contact page form. "Service" is fixed to the service this page belongs
+ * to; "Category" lists that service's subpages (the current one is
+ * pre-selected). For another service, visitors use that service's pages.
+ * Submissions go to /api/service-enquiry and are saved in the service's own
+ * table (the category goes in service_interest).
  */
 
 const EMPTY = {
@@ -77,6 +79,9 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
   return (
     <section className="sef-section" id="enquiry">
       <div className="sef-container">
+        <h2 className="sef-heading">
+          Talk to Us About <span className="qs-gradient-text">{current || form.label}</span>
+        </h2>
         <div className="su-contact-form-container">
           {submitted ? (
             <div className="su-success-box">
@@ -177,6 +182,42 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
 
               <div className="su-form-fields-grid">
                 <div className="su-field-group">
+                  <label htmlFor={`${idp}-service`} className="su-field-label">
+                    Service
+                  </label>
+                  <input
+                    id={`${idp}-service`}
+                    type="text"
+                    readOnly
+                    tabIndex={-1}
+                    aria-readonly="true"
+                    className="su-text-input sef-locked"
+                    value={form.label}
+                  />
+                </div>
+                <div className="su-field-group">
+                  <label htmlFor={`${idp}-category`} className="su-field-label">
+                    Category
+                  </label>
+                  <select
+                    id={`${idp}-category`}
+                    required
+                    className="su-select-input"
+                    value={formData.serviceInterest}
+                    onChange={(e) => set({ serviceInterest: e.target.value })}
+                  >
+                    <option value="">Select Category</option>
+                    {options.map((o) => (
+                      <option key={o} value={o}>
+                        {o}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="su-form-fields-grid">
+                <div className="su-field-group">
                   <label htmlFor={`${idp}-industry`} className="su-field-label">
                     Industry
                   </label>
@@ -212,43 +253,23 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
                   )}
                 </div>
                 <div className="su-field-group">
-                  <label htmlFor={`${idp}-service`} className="su-field-label">
-                    Service
+                  <label htmlFor={`${idp}-budget`} className="su-field-label">
+                    Estimated Budget
                   </label>
                   <select
-                    id={`${idp}-service`}
-                    required
+                    id={`${idp}-budget`}
                     className="su-select-input"
-                    value={formData.serviceInterest}
-                    onChange={(e) => set({ serviceInterest: e.target.value })}
+                    value={formData.budget}
+                    onChange={(e) => set({ budget: e.target.value })}
                   >
-                    <option value="">Select Service</option>
-                    {options.map((o) => (
-                      <option key={o} value={o}>
-                        {o}
+                    <option value="">Select Budget Range</option>
+                    {BUDGETS.map((b) => (
+                      <option key={b.value} value={b.value}>
+                        {b.label}
                       </option>
                     ))}
                   </select>
                 </div>
-              </div>
-
-              <div className="su-field-group">
-                <label htmlFor={`${idp}-budget`} className="su-field-label">
-                  Estimated Budget
-                </label>
-                <select
-                  id={`${idp}-budget`}
-                  className="su-select-input"
-                  value={formData.budget}
-                  onChange={(e) => set({ budget: e.target.value })}
-                >
-                  <option value="">Select Budget Range</option>
-                  {BUDGETS.map((b) => (
-                    <option key={b.value} value={b.value}>
-                      {b.label}
-                    </option>
-                  ))}
-                </select>
               </div>
 
               <div className="su-field-group">
