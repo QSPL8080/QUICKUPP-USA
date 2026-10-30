@@ -185,15 +185,21 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
                   <label htmlFor={`${idp}-service`} className="su-field-label">
                     Service
                   </label>
-                  <input
-                    id={`${idp}-service`}
-                    type="text"
-                    readOnly
-                    tabIndex={-1}
-                    aria-readonly="true"
-                    className="su-text-input sef-locked"
-                    value={form.label}
-                  />
+                  <div className="sef-locked-wrap" title="Fixed on this service's pages">
+                    <input
+                      id={`${idp}-service`}
+                      type="text"
+                      readOnly
+                      tabIndex={-1}
+                      aria-readonly="true"
+                      className="su-text-input sef-locked"
+                      value={form.label}
+                    />
+                    <svg className="sef-lock" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <rect x="4.5" y="10.5" width="15" height="10" rx="2.5" stroke="currentColor" strokeWidth="1.8" />
+                      <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                    </svg>
+                  </div>
                 </div>
                 <div className="su-field-group">
                   <label htmlFor={`${idp}-category`} className="su-field-label">
