@@ -188,8 +188,8 @@ export default function Footer() {
         {/* Sub-Footer Bottom Bar */}
         <div className="qs-scalient-bottom-bar">
           <div className="qs-scalient-btm-left">
-            <Link href="/contact" className="qs-scalient-btm-link">
-              Support &amp; Inquiries
+            <Link href="/terms-and-conditions" className="qs-scalient-btm-link">
+              Terms &amp; Conditions
             </Link>
           </div>
 
@@ -198,8 +198,8 @@ export default function Footer() {
           </div>
 
           <div className="qs-scalient-btm-right">
-            <Link href="/about" className="qs-scalient-btm-link">
-              About Quickupp
+            <Link href="/privacy-policy" className="qs-scalient-btm-link">
+              Privacy Policy
             </Link>
           </div>
         </div>
