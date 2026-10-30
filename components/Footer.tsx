@@ -81,12 +81,12 @@ export default function Footer() {
             <div className="qs-scalient-contact-snippet" style={{ marginTop: "0" }}>
               <div className="qs-ft-mails">
                 {[
-                  { label: "Contact", email: "info@quickuppsoftech.us", icon: "M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM22 7l-10 6L2 7" },
-                  { label: "Support", email: "support@quickuppsoftech.us", icon: "M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3" },
+                  { label: "Contact", email: "info@quickuppsoftech.us", icon: "M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM22 7l-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" },
+                  { label: "Support", email: "support@quickuppsoftech.us", icon: "M3 11h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5zm0 0a9 9 0 1 1 18 0m0 0v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM21 16v2a4 4 0 0 1-4 4h-5" },
                 ].map((m) => (
                   <a key={m.email} href={`mailto:${m.email}`} className="qs-ft-mail">
                     <span className="qs-ft-mail-icon" aria-hidden="true">
-                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d={m.icon} />
                       </svg>
                     </span>
