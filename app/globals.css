@@ -3171,10 +3171,25 @@ section.section-gap.padding-top-0 {
 }
 
 .qs-header-logo-img {
-  height: 32px !important;
+  /* tall enough for the "Quickupp Softech LLC" wordmark to read clearly */
+  height: 48px !important;
   width: auto !important;
+  max-width: none !important;
   display: block !important;
   object-fit: contain !important;
+  image-rendering: -webkit-optimize-contrast;
+}
+
+@media screen and (max-width: 991px) {
+  .qs-header-logo-img {
+    height: 44px !important;
+  }
+}
+
+@media screen and (max-width: 380px) {
+  .qs-header-logo-img {
+    height: 40px !important;
+  }
 }
 
 .qs-mobile-brand {
