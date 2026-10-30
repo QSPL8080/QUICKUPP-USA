@@ -9859,7 +9859,9 @@ a.secondary-button,
 
 /* wider card, three fields per row */
 .sef-section .su-contact-form-container {
-  max-width: none;
+  max-width: 1060px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .sef-row {
@@ -9925,7 +9927,7 @@ a.secondary-button,
 
 .sef-section .su-text-input.sef-locked {
   height: 55px; /* same as the Category dropdown beside it */
-  padding-right: 44px !important;
+  padding-right: 38px !important;
   background-color: #e9edf3 !important;
   border: 1px dashed #cbd5e1 !important;
   color: #64748b !important;
