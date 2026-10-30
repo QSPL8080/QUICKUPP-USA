@@ -309,7 +309,13 @@ export default function MerkilMarketingServicePage({
 }: MerkilMarketingServicePageProps) {
   const photos = photoSets[data.crumb] ?? fallbackPhotos;
   const firstListIndex = data.blocks.findIndex((b) => b.type === "list");
-  let cardFlip = false;
+  /* campaign cards (lists after the first) alternate sides */
+  const cardFlipAt: boolean[] = [];
+  data.blocks.reduce((flip, b, i) => {
+    if (b.type !== "list" || i === firstListIndex) return flip;
+    cardFlipAt[i] = !flip;
+    return !flip;
+  }, false);
 
   const renderBlock = (block: ServiceBlock, index: number) => {
     /* Overview: the first list, set as a keyword wall */
@@ -341,7 +347,7 @@ export default function MerkilMarketingServicePage({
     /* Other lists: campaign cards with chips, alternating sides */
     if (block.type === "list") {
       const b = block as ListBlock;
-      cardFlip = !cardFlip;
+      const cardFlip = cardFlipAt[index];
       const lines = [b.desc, b.intro].filter(Boolean) as string[];
       return (
         <section key={index} className="mkx-sec mkx-sec-card">

@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import MerkilMarketingServicePage from "@/components/MerkilMarketingServicePage";
-import RitovexServicePage from "@/components/RitovexServicePage";
-import ITLifecycleServicePage from "@/components/ITLifecycleServicePage";
 import CoporaServicePage from "@/components/CoporaServicePage";
 import AIAutomationServicePage from "@/components/AIAutomationServicePage";
 import StaffAugmentationServicePage from "@/components/StaffAugmentationServicePage";
@@ -75,18 +73,8 @@ export default async function ServicePage({ params }: PageProps) {
     );
   }
 
-  if (match.service.template === "copora" || match.service.template === "itlifecycle") {
-    return (
-      <CoporaServicePage
-        data={match.service.data}
-        categoryLabel={match.category.categoryLabel}
-        categorySlug={match.category.categorySlug}
-      />
-    );
-  }
-
   return (
-    <RitovexServicePage
+    <CoporaServicePage
       data={match.service.data}
       categoryLabel={match.category.categoryLabel}
       categorySlug={match.category.categorySlug}

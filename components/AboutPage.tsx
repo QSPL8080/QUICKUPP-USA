@@ -479,7 +479,13 @@ export default function AboutPage({ data }: { data: AboutPageData }) {
   const pathname = usePathname();
   const isRoot = pathname === "/about";
   const { hero, closing } = data;
-  let lastSoft = false;
+  /* panels and index sections sit on a soft background; a route section does too,
+     unless the section before it is already soft */
+  const softAt: boolean[] = [];
+  data.sections.reduce((prevSoft, x, i) => {
+    softAt[i] = x.kind === "panels" || x.kind === "index" || (x.kind === "route" && !prevSoft);
+    return softAt[i];
+  }, false);
   /* Two sections per page get the soft photo backdrop: the best-scoring pair that are
      not next to each other, so the photos never run into one another */
   const backdropFor = pickBackdrops(data.sections.map((x) => x.kind));
@@ -551,8 +557,7 @@ export default function AboutPage({ data }: { data: AboutPageData }) {
 
         {data.sections.map((s, i) => {
           const backdrop = backdropFor[i];
-          const soft = s.kind === "panels" || s.kind === "index" || (s.kind === "route" && !lastSoft);
-          lastSoft = soft;
+          const soft = softAt[i];
           if (s.kind === "statement") return <Statement key={i} s={s} backdrop={backdrop} />;
           if (s.kind === "panels") return <Panels key={i} s={s} backdrop={backdrop} />;
           if (s.kind === "goals") return <Goals key={i} s={s} backdrop={backdrop} />;

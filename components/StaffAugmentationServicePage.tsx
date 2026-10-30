@@ -250,7 +250,7 @@ export default function StaffAugmentationServicePage({
                 </div>
               )}
               <div className="tlx-benches">
-                {tracks.map((t, ti) => (
+                {tracks.map((t) => (
                   <article key={t.title} className="tlx-bench">
                     <div className="tlx-bench-head">
                       <span className="tlx-bench-icon">

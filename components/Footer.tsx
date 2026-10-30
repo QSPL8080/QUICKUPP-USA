@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 
-export default function Footer({ hideCta = false }: { hideCta?: boolean }) {
+export default function Footer() {
   const year = new Date().getFullYear();
 
   const socialLinks = [

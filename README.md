@@ -70,8 +70,6 @@ QUICKUPP-USA/
 │   ├── Header.tsx                      # Global navigation with dropdown menus
 │   ├── Footer.tsx                      # Comprehensive footer with official social badges
 │   ├── WebflowReinit.tsx               # Route change script & animation re-initializer
-│   ├── AboutSubNav.tsx                 # Sub-navigation bar for company pages
-│   ├── RitovexServicesListing.tsx      # Interactive service grid component
 │   ├── IndustryDetailPage.tsx          # Reusable industry vertical template
 │   └── ...                             # Specialized service page templates
 ├── data/                               # Typed datasets & content modules

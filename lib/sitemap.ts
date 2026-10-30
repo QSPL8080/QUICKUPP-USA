@@ -8,7 +8,7 @@ export interface NavItem {
   external?: boolean;
 }
 
-export interface NavGroup {
+interface NavGroup {
   label: string;
   items: NavItem[];
 }
@@ -85,4 +85,3 @@ export const resourceItems: NavItem[] = [
   { label: "Client Testimonials", href: "/testimonials", desc: "What founders, executives & leaders say about us", icon: "⭐", built: true },
 ];
 
-export const allServiceItems: NavItem[] = serviceGroups.flatMap((g) => g.items);

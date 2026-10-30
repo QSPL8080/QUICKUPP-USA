@@ -1,4 +1,3 @@
-@import "./lifecycle-service.css";
 @import "./ritovex-service.css";
 @import "./css/mindix-about.css";
 
@@ -1763,7 +1762,7 @@ pre {
 .breadcrumb-section {
   position: relative;
   background-color: #090e1a !important;
-  background-image: linear-gradient(180deg, rgba(9, 14, 26, 0.9) 0%, rgba(15, 23, 42, 0.96) 100%), url('/images/banner-img.jpg') !important;
+  background-image: linear-gradient(180deg, rgba(9, 14, 26, 0.9) 0%, rgba(15, 23, 42, 0.96) 100%) !important;
   background-position: center;
   background-size: cover;
   padding: 140px 0 54px !important;

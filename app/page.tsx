@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProjectsInteractive from "@/components/ProjectsInteractive";
@@ -91,7 +92,7 @@ export default function Home() {
                       </div>
                       <div className="overflow-hidden">
                         <div className="button-wrap">
-                          <a
+                          <Link
                             href="/contact"
                             data-wf--button--variant="white-bg"
                             data-w-id="8932a183-40ec-c216-e8b4-670b55f18dc8"
@@ -118,7 +119,7 @@ export default function Home() {
                                 />
                               </div>
                             </div>
-                          </a>
+                          </Link>
                         </div>
                       </div>
                     </div>
@@ -195,7 +196,7 @@ export default function Home() {
                       </div>
                       <div className="overflow-hidden">
                         <div className="button-wrap">
-                          <a
+                          <Link
                             href="/contact"
                             data-wf--button--variant="white-bg"
                             data-w-id="8932a183-40ec-c216-e8b4-670b55f18dc8"
@@ -222,7 +223,7 @@ export default function Home() {
                                 />
                               </div>
                             </div>
-                          </a>
+                          </Link>
                         </div>
                       </div>
                     </div>
@@ -391,7 +392,7 @@ export default function Home() {
                         data-w-id="3e9c9abb-a0df-1d27-454b-456ee1b54163"
                         className="button-wrap"
                       >
-                        <a
+                        <Link
                           href="/about"
                           data-wf--button--variant="secondary-bg"
                           data-w-id="8932a183-40ec-c216-e8b4-670b55f18dc8"
@@ -416,7 +417,7 @@ export default function Home() {
                               />
                             </div>
                           </div>
-                        </a>
+                        </Link>
                       </div>
                     </div>
                     <div className="icon-style-two-wrap">
@@ -602,7 +603,7 @@ export default function Home() {
                 data-w-id="53b52da4-c64e-e83c-d859-1857c45619c0"
                 className="button-wrap service-style-one-button"
               >
-                <a
+                <Link
                   href="/services/ai-powered-digital-marketing-services/social-media-marketing"
                   data-wf--button--variant="secondary-bg"
                   data-w-id="8932a183-40ec-c216-e8b4-670b55f18dc8"
@@ -627,7 +628,7 @@ export default function Home() {
                       />
                     </div>
                   </div>
-                </a>
+                </Link>
               </div>
             </div>
           </div>
@@ -658,7 +659,7 @@ export default function Home() {
                 className="counter-heading-left-column"
               >
                 <div className="button-wrap">
-                  <a
+                  <Link
                     href="/contact"
                     data-wf--button--variant="secondary-bg"
                     data-w-id="8932a183-40ec-c216-e8b4-670b55f18dc8"
@@ -683,7 +684,7 @@ export default function Home() {
                         />
                       </div>
                     </div>
-                  </a>
+                  </Link>
                 </div>
               </div>
               <div

@@ -1,6 +1,6 @@
 import type { ServicePageData } from "@/lib/servicePageTypes";
 
-export const data: ServicePageData = {
+const data: ServicePageData = {
   metaTitle: "Product Engineering | Quickupp Softech",
   metaDescription:
     "Build, modernize, and scale custom business software, ERP, CRM, SaaS, AI-powered software, and enterprise applications with Quickupp Softech.",

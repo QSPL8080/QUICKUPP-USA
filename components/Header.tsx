@@ -94,11 +94,14 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close dropdowns on route navigation
-  useEffect(() => {
+  // Close dropdowns on route navigation (done while rendering, so there is
+  // no extra render after the new page shows)
+  const [lastPath, setLastPath] = useState(pathname);
+  if (pathname !== lastPath) {
+    setLastPath(pathname);
     setOpenDropdown(null);
     setIsMobileNavOpen(false);
-  }, [pathname]);
+  }
 
   // Close when clicking outside or pressing Escape
   useEffect(() => {

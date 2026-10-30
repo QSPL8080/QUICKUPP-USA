@@ -973,7 +973,7 @@ export default function CareerPage() {
       )}
 
       <CompanyMotion seed={2} />
-      <Footer hideCta={true} />
+      <Footer />
     </div>
   );
 }

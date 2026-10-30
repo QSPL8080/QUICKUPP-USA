@@ -25,7 +25,7 @@ import uiUxDesign from "@/data/services/ui-ux-design";
 import marketingDesignStaffAugmentation from "@/data/services/marketing-design-staff-augmentation";
 import itStaffAugmentation from "@/data/services/it-staff-augmentation";
 
-export interface ServiceCategoryMeta {
+interface ServiceCategoryMeta {
   categorySlug: string;
   categoryLabel: string;
   categoryDesc: string;
@@ -34,12 +34,10 @@ export interface ServiceCategoryMeta {
     label: string;
     desc: string;
     icon: string;
-    template: "merkil" | "ritovex" | "itlifecycle" | "copora" | "aiautomation" | "staffaug";
+    template: "merkil" | "copora" | "aiautomation" | "staffaug";
     data: ServicePageData;
   }[];
 }
-
-export type ServiceCategory = ServiceCategoryMeta;
 
 export const serviceCategories: ServiceCategoryMeta[] = [
   {

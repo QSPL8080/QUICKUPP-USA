@@ -6,7 +6,7 @@ import { BUDGETS, INDUSTRIES } from "@/lib/formOptions";
  * options before it reaches the database.
  */
 
-export type EnquiryInput = {
+type EnquiryInput = {
   fullName: string;
   email: string;
   phone: string | null;

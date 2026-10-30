@@ -51,7 +51,7 @@ function GradientHeading({ text }: { text: string }) {
 }
 
 /** YouTube icon — same mark the site footer uses, in its brand red */
-export function YouTubeIcon({ size = 24 }: { size?: number }) {
+function YouTubeIcon({ size = 24 }: { size?: number }) {
   return (
     <svg width={size} height={size * 0.72} viewBox="0 3.5 24 17" aria-hidden="true">
       <path d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z" fill="#ffffff" />

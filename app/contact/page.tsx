@@ -473,7 +473,7 @@ export default function ContactPage() {
       </section>
 
       <CompanyMotion seed={0} />
-      <Footer hideCta={true} />
+      <Footer />
     </div>
   );
 }

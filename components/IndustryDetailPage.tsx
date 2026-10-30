@@ -192,7 +192,7 @@ function getCategoryIcon(name: string) {
   return <CheckSvg size={16} />;
 }
 
-export interface IndustryMedia {
+interface IndustryMedia {
   hero: string;
   story: string;
   arch: string;
@@ -694,9 +694,15 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
   const firstAi = data.blocks.findIndex((b) => b.type === "ai");
   const lastAi = data.blocks.map((b) => b.type).lastIndexOf("ai");
   const paras = data.heroParagraphs || [];
-  let firstServices = true;
-  let listImageUsed = false;
-  let softToggle = false;
+  const firstServicesIdx = data.blocks.findIndex((b) => b.type === "descPairs");
+  const firstListIdx = data.blocks.findIndex((b) => b.type === "list");
+  /* ai sections alternate soft / plain, starting with soft */
+  const softAt: boolean[] = [];
+  data.blocks.reduce((soft, b, i) => {
+    if (b.type !== "ai") return soft;
+    softAt[i] = !soft;
+    return !soft;
+  }, false);
 
   return (
     <div className="inx-page">
@@ -738,24 +744,21 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
 
         {data.blocks.map((block, i) => {
           if (block.type === "descPairs") {
-            const id = firstServices ? "services-section" : undefined;
-            firstServices = false;
+            const id = i === firstServicesIdx ? "services-section" : undefined;
             return <ServicesBlock key={i} block={block as DescPairsBlock} id={id} />;
           }
           if (block.type === "ai") {
-            softToggle = !softToggle;
             return (
               <AiSection
                 key={i}
                 block={block as AiBlock}
-                soft={softToggle}
+                soft={softAt[i]}
                 backdrop={i === firstAi ? images.processBg : i === lastAi && lastAi !== firstAi ? images.aiBg : undefined}
               />
             );
           }
           if (block.type === "list") {
-            const img = listImageUsed ? undefined : images.story;
-            listImageUsed = true;
+            const img = i === firstListIdx ? images.story : undefined;
             return <ListSection key={i} block={block as ListBlock} image={img} alt={data.crumb} />;
           }
           if (block.type === "process") return <ProcessSection key={i} block={block as ProcessBlock} />;
