@@ -1319,18 +1319,17 @@
 }
 
 /* ==========================================================================
-   Gutter graphics (components/AboutArt.tsx) — line art in the empty space
-   beside chosen sections. Only on screens wide enough to have that space.
+   Edge graphics (components/AboutArt.tsx) — one per About subpage, beside a
+   single chosen section. Grows out of the screen edge, runs the full height
+   of the section and stops 28px before the content. Wide screens only.
    ========================================================================== */
 .abx-art {
-  /* grows out of the screen edge and fills the empty side space up to
-     28px before the content */
   --abx-gutter: calc((100% - 1200px) / 2);
   position: absolute;
   top: 0;
   bottom: 0;
   width: calc(var(--abx-gutter) - 28px);
-  max-width: 420px;
+  max-width: 400px;
   pointer-events: none;
   z-index: 0;
   display: none;
@@ -1338,20 +1337,11 @@
   transition: opacity 1.2s ease;
 }
 
-/* the arcs fill the full height of the section */
 .abx-art svg {
   display: block;
   width: 100%;
   height: 100%;
   overflow: visible;
-}
-
-.abx-art svg.abx-art-motif {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  height: min(640px, 100%);
-  transform: translateY(-50%);
 }
 
 /* lines keep the same thin weight at every size */
@@ -1360,19 +1350,28 @@
 }
 
 .abx-art.is-in {
-  opacity: 1;
+  opacity: 0.85;
+}
+
+/* dissolves into the section: fades out at the top and bottom of the section
+   and toward the content, so no edge of the drawing is ever cut hard */
+.abx-art-left,
+.abx-art-right {
+  --abx-art-fade-y: linear-gradient(180deg, transparent 0%, #000 22%, #000 78%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
 }
 
 .abx-art-left {
   left: 0;
-  -webkit-mask-image: linear-gradient(90deg, #000 70%, transparent 100%);
-  mask-image: linear-gradient(90deg, #000 70%, transparent 100%);
+  -webkit-mask-image: var(--abx-art-fade-y), linear-gradient(90deg, #000 45%, transparent 100%);
+  mask-image: var(--abx-art-fade-y), linear-gradient(90deg, #000 45%, transparent 100%);
 }
 
 .abx-art-right {
   right: 0;
-  -webkit-mask-image: linear-gradient(270deg, #000 70%, transparent 100%);
-  mask-image: linear-gradient(270deg, #000 70%, transparent 100%);
+  -webkit-mask-image: var(--abx-art-fade-y), linear-gradient(270deg, #000 45%, transparent 100%);
+  mask-image: var(--abx-art-fade-y), linear-gradient(270deg, #000 45%, transparent 100%);
 }
 
 /* drawn for the left edge; mirrored for the right */
@@ -1380,10 +1379,10 @@
   transform: scaleX(-1);
 }
 
-.abx-art-right svg.abx-art-motif {
-  left: auto;
-  right: 0;
-  transform: translateY(-50%) scaleX(-1);
+@media (min-width: 1440px) {
+  .abx-art {
+    display: block;
+  }
 }
 
 /* the parts past the screen edge are cut off without a side scroll */
@@ -1396,12 +1395,6 @@
   position: relative;
 }
 
-@media (min-width: 1440px) {
-  .abx-art {
-    display: block;
-  }
-}
-
 /* section content stays above the graphic */
 .abx-sec > .abx-container,
 .abx-close-sec > .abx-container,
@@ -1410,8 +1403,6 @@
   z-index: 1;
 }
 
-/* inside the pinned block the graphic spans the pinned area, not the whole tall section */
-
 /* motion: slow and quiet */
 .abx-art-float {
   animation: abx-art-float 9s ease-in-out var(--d, 0s) infinite;
@@ -1419,16 +1410,7 @@
 
 @keyframes abx-art-float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-7px); }
-}
-
-.abx-art-twinkle {
-  animation: abx-art-twinkle 4.5s ease-in-out var(--d, 0s) infinite;
-}
-
-@keyframes abx-art-twinkle {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.25; }
+  50% { transform: translateY(-8px); }
 }
 
 .abx-art-pulse {
@@ -1439,70 +1421,47 @@
 
 @keyframes abx-art-pulse {
   0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.35); opacity: 0.6; }
+  50% { transform: scale(1.4); opacity: 0.55; }
 }
 
 .abx-art-flow {
-  animation: abx-art-flow 14s linear var(--d, 0s) infinite;
+  animation: abx-art-flow 16s linear infinite;
 }
 
 @keyframes abx-art-flow {
-  to { stroke-dashoffset: -220; }
+  to { stroke-dashoffset: -240; }
 }
 
-.abx-art-spin,
-.abx-art-spin-rev {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: abx-art-spin 60s linear infinite;
-}
-
-.abx-art-spin-rev {
-  animation-direction: reverse;
-  animation-duration: 45s;
-}
-
-@keyframes abx-art-spin {
-  to { transform: rotate(360deg); }
-}
-
-.abx-art-orbit {
-  transform-origin: 0 320px;
-  animation: abx-art-orbit var(--t, 30s) linear infinite;
-  rotate: var(--s, 0deg);
-}
-
-.abx-art-orbit-local {
-  transform-origin: 196px 320px;
-  animation: abx-art-orbit var(--t, 30s) linear infinite;
-  rotate: var(--s, 0deg);
-}
-
-.abx-art-pulse-soft {
-  animation: abx-art-twinkle 5s ease-in-out var(--d, 0s) infinite;
-}
-
-@keyframes abx-art-orbit {
-  to { transform: rotate(360deg); }
-}
-
-/* drawn in when the graphic comes into view */
+/* drawn in, popped in and raised when the graphic comes into view */
 .abx-art-draw {
-  stroke-dasharray: 600;
-  stroke-dashoffset: 600;
-  transition: stroke-dashoffset 2.2s cubic-bezier(0.22, 1, 0.36, 1) 0.2s;
+  stroke-dasharray: var(--len, 600);
+  stroke-dashoffset: var(--len, 600);
+  transition: stroke-dashoffset 2.4s cubic-bezier(0.22, 1, 0.36, 1) 0.2s;
 }
 
 .abx-art.is-in .abx-art-draw {
   stroke-dashoffset: 0;
 }
 
+.abx-art-pop {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0.4);
+  opacity: 0;
+  transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) var(--d, 0s), opacity 0.5s ease var(--d, 0s);
+}
+
+.abx-art.is-in .abx-art-pop {
+  transform: none;
+  opacity: 1;
+}
+
 .abx-art-rise {
   transform-box: fill-box;
   transform-origin: bottom;
-  transform: scaleY(0.2);
+  transform: scaleY(0.15);
   opacity: 0;
-  transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0s), opacity 0.8s ease var(--d, 0s);
+  transition: transform 1.3s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0s), opacity 0.8s ease var(--d, 0s);
 }
 
 .abx-art.is-in .abx-art-rise {
@@ -1510,78 +1469,24 @@
   opacity: 1;
 }
 
-.abx-art-dart {
-  transform: translate(26px, -26px);
-  opacity: 0;
-  transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.4s, opacity 0.6s ease 0.4s;
-}
-
-.abx-art.is-in .abx-art-dart {
-  transform: none;
-  opacity: 1;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .abx-art *,
-  .abx-art {
+  .abx-art,
+  .abx-art * {
     animation: none !important;
     transition: none !important;
   }
 
   .abx-art {
-    opacity: 0.9;
+    opacity: 0.85;
   }
 
   .abx-art-draw {
     stroke-dashoffset: 0;
   }
 
-  .abx-art-rise,
-  .abx-art-dart {
+  .abx-art-pop,
+  .abx-art-rise {
     transform: none;
-  }
-
-  .abx-art-rise,
-  .abx-art-dart {
     opacity: 1;
-  }
-}
-
-/* gauge arcs fill to their value when the graphic comes into view */
-.abx-art-meter {
-  stroke-dasharray: var(--len);
-  stroke-dashoffset: var(--len);
-  transition: stroke-dashoffset 1.8s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0s);
-}
-
-.abx-art.is-in .abx-art-meter {
-  stroke-dashoffset: var(--to);
-}
-
-.abx-art-needle {
-  transform-origin: 150px 236px;
-  transform: rotate(-60deg);
-  transition: transform 1.8s cubic-bezier(0.22, 1, 0.36, 1) 0.3s;
-}
-
-.abx-art.is-in .abx-art-needle {
-  transform: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .abx-art-meter {
-    stroke-dashoffset: var(--to);
-  }
-
-  .abx-art-needle {
-    transform: none;
-  }
-}
-
-/* where the side space is narrow, show only the arcs from the edge, so the
-   section motif is never cut in half */
-@media (max-width: 1799px) {
-  .abx-art-motif {
-    display: none;
   }
 }
