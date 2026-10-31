@@ -69,7 +69,7 @@ QUICKUPP-USA/
 ├── components/                         # Modular React components
 │   ├── Header.tsx                      # Global navigation with dropdown menus
 │   ├── Footer.tsx                      # Comprehensive footer with official social badges
-│   ├── WebflowReinit.tsx               # Route change script & animation re-initializer
+│   ├── QuickuppEngineReinit.tsx        # Route change script & animation re-initializer
 │   ├── IndustryDetailPage.tsx          # Reusable industry vertical template
 │   └── ...                             # Specialized service page templates
 ├── data/                               # Typed datasets & content modules

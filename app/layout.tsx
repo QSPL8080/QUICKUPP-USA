@@ -3,11 +3,13 @@ import Script from "next/script";
 import "./globals.css";
 import "./assurix-service.css";
 import "./site-type.css";
-import WebflowReinit from "@/components/WebflowReinit";
+import QuickuppEngineReinit from "@/components/QuickuppEngineReinit";
 import ButtonTone from "@/components/ButtonTone";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://quickupp.com"),
+  generator: "Quickupp Softech",
+  applicationName: "Quickupp Softech",
   title: "Quickupp Softech | Marketing. AI. Technology. Built for Growth.",
   description:
     "Quickupp Softech is a full-service digital marketing, AI and technology agency helping businesses grow through social media, SEO, paid marketing, AI automation, web & app development and more.",
@@ -36,13 +38,14 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <meta name="generator" content="Quickupp Softech" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
           href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=Instrument+Serif:ital@0;1&family=Inter:ital,opsz,wght@0,14..32,300..800;1,14..32,300..800&family=JetBrains+Mono:wght@400;500;600;700&family=Lexend:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..800;1,400..800&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap"
           rel="stylesheet"
         />
-        <link rel="stylesheet" href="/css/mercket.webflow.shared.3eb5ac14d.min.css" />
+        <link rel="stylesheet" href="/css/quickupp.shared.min.css" />
         <link rel="preload" as="image" href="/images/slider-01-01.jpg" fetchPriority="high" />
         <Script
           id="webfont-script"
@@ -63,21 +66,18 @@ export default function RootLayout({
         />
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){var h=document.documentElement;h.setAttribute("data-wf-site","6944f1597ac277b25076ccab");if(location.pathname==="/"){h.setAttribute("data-wf-page","6944f1597ac277b25076cc8e");}})();`,
+            __html: `(function(){var h=document.documentElement;h.setAttribute("data-qs-site","6944f1597ac277b25076ccab");if(location.pathname==="/"){h.setAttribute("data-qs-page","6944f1597ac277b25076cc8e");}})();`,
           }}
         />
         <Script src="/js/jquery.js" strategy="beforeInteractive" />
       </head>
       <body>
         {children}
-        {/* Exactly the script set the Mercket reference home page loads. The extra
-            bundles from other template pages were re-initialising Webflow and
-            crashing it ("t is not a function"), which froze every animation. */}
-        <Script src="/js/webflow.schunk.36b8fb49256177c8.js" strategy="afterInteractive" />
-        <Script src="/js/webflow.schunk.7bc38d72505cd683.js" strategy="afterInteractive" />
-        <Script src="/js/webflow.schunk.c62231c40fdafb09.js" strategy="afterInteractive" />
-        <Script src="/js/webflow-script.js" strategy="afterInteractive" />
-        <WebflowReinit />
+        <Script src="/js/quickupp.chunk.36b8fb49256177c8.js" strategy="afterInteractive" />
+        <Script src="/js/quickupp.chunk.7bc38d72505cd683.js" strategy="afterInteractive" />
+        <Script src="/js/quickupp.chunk.c62231c40fdafb09.js" strategy="afterInteractive" />
+        <Script src="/js/quickupp-core.js" strategy="afterInteractive" />
+        <QuickuppEngineReinit />
         <ButtonTone />
       </body>
     </html>

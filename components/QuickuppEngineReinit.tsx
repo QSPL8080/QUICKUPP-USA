@@ -5,41 +5,41 @@ import { usePathname } from "next/navigation";
 
 const HOME_PAGE_ID = "6944f1597ac277b25076cc8e";
 
-type WebflowGlobal = {
+type QuickuppEngineGlobal = {
   destroy?: () => void;
   ready?: () => void;
   require?: (name: string) => { init?: () => void; destroy?: () => void } | undefined;
 };
 
 /**
- * Webflow's interaction engine only initialises once, on the first page load.
+ * Quickupp interaction engine initializes animations and interactions.
  * Next.js navigates client-side, so when the route changes we update the page id
- * and restart Webflow so scroll/hover/slider animations run on the new page too.
+ * and sync QuickuppEngine so scroll/hover/slider animations run on the new page too.
  */
-export default function WebflowReinit() {
+export default function QuickuppEngineReinit() {
   const pathname = usePathname();
   const isFirstMount = useRef(true);
 
   useEffect(() => {
     const html = document.documentElement;
     if (pathname === "/") {
-      html.setAttribute("data-wf-page", HOME_PAGE_ID);
+      html.setAttribute("data-qs-page", HOME_PAGE_ID);
     } else {
-      html.removeAttribute("data-wf-page");
+      html.removeAttribute("data-qs-page");
     }
 
-    // On initial mount, let Webflow initialize naturally from script tag without extra kicks
+    // On initial mount, let QuickuppEngine initialize naturally from script tag without extra kicks
     if (isFirstMount.current) {
       isFirstMount.current = false;
       return;
     }
 
-    // On client-side route transitions, gently sync Webflow once without spamming repeated timers
+    // On client-side route transitions, gently sync QuickuppEngine once without spamming repeated timers
     const timer = window.setTimeout(() => {
-      const wf = (window as unknown as { Webflow?: WebflowGlobal }).Webflow;
-      if (wf) {
+      const qe = (window as unknown as { QuickuppEngine?: QuickuppEngineGlobal }).QuickuppEngine;
+      if (qe) {
         try {
-          wf.ready?.();
+          qe.ready?.();
         } catch {
           /* ignore – content stays visible via CSS */
         }
