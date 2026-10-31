@@ -14,9 +14,9 @@ export default async function ContactEnquiriesPage({ searchParams }: Props) {
   return (
     <>
       <PageHead title="Contact Enquiries" sub="Submissions from the Contact page form." />
-      <Filters q={q} status={status} placeholder="Search name, email, phone or company" statuses={ENQUIRY_STATUSES.map((s) => ({ value: s, label: s[0].toUpperCase() + s.slice(1) }))} />
+      <Filters q={q} status={status} placeholder="Search name, email, phone, company or country" statuses={ENQUIRY_STATUSES.map((s) => ({ value: s, label: s[0].toUpperCase() + s.slice(1) }))} />
       <div className="crm-card crm-card-flush">
-        <EnquiryTable source="contact" rows={data.items} interestLabel="Subject / Service" />
+        <EnquiryTable source="contact" rows={data.items} interestLabel="Service" />
         <Pager {...data} q={q} status={status} />
       </div>
     </>

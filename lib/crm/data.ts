@@ -29,6 +29,9 @@ export type EnquiryRow = {
   email: string;
   phone: string | null;
   company: string | null;
+  website: string | null; // contact form
+  country: string | null; // contact form
+  timeline: string | null; // contact form
   industry: string;
   otherIndustry: string | null;
   service: string | null; // service tables: the form's fixed service
@@ -54,9 +57,14 @@ export async function listEnquiries(source: EnquirySource, opts: { q?: string; s
   }
   const q = (opts.q || "").trim().slice(0, 100);
   if (q) {
-    where.push("(full_name LIKE ? OR email LIKE ? OR phone LIKE ? OR company_name LIKE ?)");
     const like = `%${q}%`;
-    args.push(like, like, like, like);
+    if (isContact) {
+      where.push("(full_name LIKE ? OR email LIKE ? OR phone LIKE ? OR company_name LIKE ? OR country LIKE ?)");
+      args.push(like, like, like, like, like);
+    } else {
+      where.push("(full_name LIKE ? OR email LIKE ? OR phone LIKE ? OR company_name LIKE ?)");
+      args.push(like, like, like, like);
+    }
   }
   const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : "";
   const page = Math.max(1, Math.floor(opts.page || 1));
@@ -75,6 +83,9 @@ export async function listEnquiries(source: EnquirySource, opts: { q?: string; s
     email: String(r.email ?? ""),
     phone: (r.phone as string) || null,
     company: (r.company_name as string) || null,
+    website: isContact ? ((r.company_website as string) || null) : null,
+    country: isContact ? ((r.country as string) || null) : null,
+    timeline: isContact ? ((r.timeline as string) || null) : null,
     industry: String(r.industry ?? ""),
     otherIndustry: (r.other_industry as string) || null,
     service: isContact ? null : ((r.service as string) || SOURCES[source].label),

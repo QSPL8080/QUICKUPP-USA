@@ -29,6 +29,10 @@ export default function EnquiryTable({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const sel = useSelection(rows.map((r) => r.id));
+  const isContact = source === "contact";
+  // contact form: country (older enquiries kept their industry); service forms: industry
+  const place = (r: EnquiryRow) =>
+    isContact && r.country ? r.country : r.industry === "Other" && r.otherIndustry ? r.otherIndustry : r.industry;
 
   const setStatus = async (row: EnquiryRow, status: string) => {
     setBusy(true);
@@ -104,7 +108,7 @@ export default function EnquiryTable({
               <th>Name</th>
               <th>Contact</th>
               <th>{interestLabel}</th>
-              <th>Industry</th>
+              <th>{isContact ? "Country" : "Industry"}</th>
               <th>Budget</th>
               <th>Received</th>
               <th>Status</th>
@@ -125,7 +129,7 @@ export default function EnquiryTable({
                   {r.phone && <span className="crm-cell-sub">{r.phone}</span>}
                 </td>
                 <td data-label={interestLabel}>{r.interest}</td>
-                <td data-label="Industry">{r.industry === "Other" && r.otherIndustry ? r.otherIndustry : r.industry}</td>
+                <td data-label={isContact ? "Country" : "Industry"}>{place(r) || <span className="crm-muted">—</span>}</td>
                 <td data-label="Budget">{r.budget || <span className="crm-muted">—</span>}</td>
                 <td data-label="Received" className="crm-nowrap">{fmtDate(r.createdAt)}</td>
                 <td data-label="Status" onClick={(e) => e.stopPropagation()}>
@@ -201,8 +205,24 @@ export default function EnquiryTable({
               <dd>{open.phone || "—"}</dd>
               <dt>Company</dt>
               <dd>{open.company || "—"}</dd>
-              <dt>Industry</dt>
-              <dd>{open.industry === "Other" && open.otherIndustry ? `Other — ${open.otherIndustry}` : open.industry}</dd>
+              {open.website && (
+                <>
+                  <dt>Company website</dt>
+                  <dd className="crm-break">{open.website}</dd>
+                </>
+              )}
+              {open.country && (
+                <>
+                  <dt>Country</dt>
+                  <dd>{open.country}</dd>
+                </>
+              )}
+              {open.industry && (
+                <>
+                  <dt>Industry</dt>
+                  <dd>{open.industry === "Other" && open.otherIndustry ? `Other — ${open.otherIndustry}` : open.industry}</dd>
+                </>
+              )}
               {open.service && (
                 <>
                   <dt>Service</dt>
@@ -213,6 +233,12 @@ export default function EnquiryTable({
               <dd>{open.interest}</dd>
               <dt>Budget</dt>
               <dd>{open.budget || "—"}</dd>
+              {open.timeline && (
+                <>
+                  <dt>Timeline</dt>
+                  <dd>{open.timeline}</dd>
+                </>
+              )}
               {open.sourcePage && (
                 <>
                   <dt>Sent from</dt>
@@ -229,7 +255,7 @@ export default function EnquiryTable({
 
             <div className="crm-message">
               <p className="crm-label">Message</p>
-              <p className="crm-message-text">{open.message}</p>
+              <p className="crm-message-text">{open.message || "—"}</p>
             </div>
 
             <button type="button" className="crm-act crm-act-danger crm-act-sm" onClick={() => remove(open)} disabled={busy}>
