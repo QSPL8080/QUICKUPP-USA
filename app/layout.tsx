@@ -61,7 +61,12 @@ export default function RootLayout({
         />
         <script
           dangerouslySetInnerHTML={{
-            __html: `!function(o,c){var n=c.documentElement,t=" w-mod-";n.className+=t+"js",("ontouchstart"in o||o.DocumentTouch&&c instanceof DocumentTouch)&&(n.className+=t+"touch")}(window,document);`,
+            __html: `(function(){try{delete window.Webflow;Object.defineProperty(window,'Webflow',{value:undefined,writable:false,configurable:false,enumerable:false});}catch(e){}})();`,
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `!function(o,c){var n=c.documentElement,t=" qs-mod-";n.className+=t+"js",("ontouchstart"in o||o.DocumentTouch&&c instanceof DocumentTouch)&&(n.className+=t+"touch")}(window,document);`,
           }}
         />
         <script
@@ -73,10 +78,10 @@ export default function RootLayout({
       </head>
       <body>
         {children}
-        <Script src="/js/quickupp.chunk.36b8fb49256177c8.js" strategy="afterInteractive" />
-        <Script src="/js/quickupp.chunk.7bc38d72505cd683.js" strategy="afterInteractive" />
-        <Script src="/js/quickupp.chunk.c62231c40fdafb09.js" strategy="afterInteractive" />
-        <Script src="/js/quickupp-core.js" strategy="afterInteractive" />
+        <Script src="/js/quickupp.chunk.36b8fb49256177c8.js?v=qs2" strategy="afterInteractive" />
+        <Script src="/js/quickupp.chunk.7bc38d72505cd683.js?v=qs2" strategy="afterInteractive" />
+        <Script src="/js/quickupp.chunk.c62231c40fdafb09.js?v=qs2" strategy="afterInteractive" />
+        <Script src="/js/quickupp-core.js?v=qs2" strategy="afterInteractive" />
         <QuickuppEngineReinit />
         <ButtonTone />
       </body>
