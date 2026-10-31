@@ -553,20 +553,27 @@ export default function CareerView({ jobs }: { jobs: Job[] }) {
           </div>
         </section>
 
-        {/* Start Your Journey */}
+        {/* Start Your Journey: the copy beside three words that light up in turn */}
         <section className="cv-section cv-journey">
-          <div className="cv-container cv-journey-inner">
-            <h2 className="cv-h2">
-              Start Your Journey With <span className="qs-gradient-text">Quickupp Softech</span>
-            </h2>
-            <p className="cv-text">Your next career opportunity could be the beginning of something extraordinary.</p>
-            <p className="cv-text">
-              If you&apos;re ambitious, motivated, and ready to contribute to a growing global organization, we&apos;d love to hear from you.
-            </p>
-            <p className="cv-journey-strong">Let&apos;s build, innovate, and grow together.</p>
-            <div className="cv-journey-sign">
+          <div className="cv-container cv-journey-grid">
+            <div className="cv-journey-copy">
+              <h2 className="cv-h2">
+                Start Your Journey With <span className="qs-gradient-text">Quickupp Softech</span>
+              </h2>
+              <p className="cv-text">Your next career opportunity could be the beginning of something extraordinary.</p>
+              <p className="cv-text">
+                If you&apos;re ambitious, motivated, and ready to contribute to a growing global organization, we&apos;d love to hear from you.
+              </p>
+              <p className="cv-journey-strong">Let&apos;s build, innovate, and grow together.</p>
+            </div>
+
+            <div className="cv-words">
               <span className="cv-journey-brand">Quickupp Softech LLC</span>
-              <span className="cv-journey-tag">Technology. Innovation. Growth.</span>
+              <p className="cv-words-list" aria-label="Technology. Innovation. Growth.">
+                <span>Technology.</span>
+                <span>Innovation.</span>
+                <span>Growth.</span>
+              </p>
             </div>
           </div>
         </section>

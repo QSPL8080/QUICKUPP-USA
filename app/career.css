@@ -1400,69 +1400,147 @@ a.cv-envelope-value:hover {
   width: 100%;
 }
 
-/* ---- Start Your Journey -------------------------------------------------------- */
+/* ---- Start Your Journey: copy beside a travel ticket --------------------------- */
 .cv-journey {
   background:
-    radial-gradient(ellipse 50% 70% at 50% 100%, rgba(99, 102, 241, 0.12), transparent 70%),
-    #ffffff;
+    radial-gradient(ellipse 40% 60% at 85% 50%, rgba(99, 102, 241, 0.14), transparent 70%),
+    radial-gradient(ellipse 35% 50% at 10% 100%, rgba(0, 210, 255, 0.1), transparent 70%),
+    var(--cv-mist);
   overflow: hidden;
 }
 
-.cv-journey-inner {
+.cv-journey-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: clamp(40px, 6vw, 96px);
+  align-items: center;
+}
+
+.cv-journey-copy {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 16px;
-  max-width: 860px;
-  text-align: center;
 }
 
-.cv-page p.cv-journey-strong {
-  margin: 4px 0 0;
+/* the closing line sits on a gradient underline that draws itself in */
+.cv-page p.cv-journey-strong:not(#_):not(#__):not(#___) {
+  position: relative;
+  margin: 10px 0 0;
+  padding-bottom: 10px;
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif) !important;
+  font-weight: 700;
   color: var(--cv-ink);
-  font-weight: 600;
 }
 
-.cv-journey-sign {
+.cv-page p.cv-journey-strong::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--cv-grad);
+  transform-origin: left;
+  animation: cv-underline 3.2s cubic-bezier(0.16, 1, 0.3, 1) infinite alternate;
+}
+
+@keyframes cv-underline {
+  from {
+    transform: scaleX(0.15);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* three large outlined words that fill with the gradient one after another */
+.cv-words {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  margin-top: 26px;
+  gap: 18px;
+  padding-left: clamp(0px, 3vw, 48px);
+  border-left: 1px solid var(--cv-line);
 }
 
 .cv-journey-brand {
-  font-size: 15px;
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: var(--cv-muted);
 }
 
-/* flowing gradient text */
-.cv-journey-tag {
-  font-size: clamp(30px, 4.6vw, 64px);
-  font-weight: 800;
-  line-height: 1.05;
-  letter-spacing: -0.035em;
-  background: linear-gradient(90deg, #00d2ff, #6366f1, #a855f7, #6366f1, #00d2ff);
-  background-size: 300% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: cv-flow 8s linear infinite;
+.cv-page p.cv-words-list:not(#_):not(#__):not(#___) {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
 }
 
-@keyframes cv-flow {
-  to {
-    background-position: 300% 0;
+.cv-words-list span {
+  position: relative;
+  display: block;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--cv-line);
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
+  font-size: clamp(38px, 4.4vw, 62px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  color: transparent;
+  -webkit-text-stroke: 1.5px #c3c8d8;
+  background: var(--cv-grad);
+  background-size: 0% 100%;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: cv-fill 6s ease-in-out infinite;
+}
+
+.cv-words-list span:last-child {
+  border-bottom: 0;
+}
+
+.cv-words-list span:nth-child(2) {
+  animation-delay: 2s;
+}
+
+.cv-words-list span:nth-child(3) {
+  animation-delay: 4s;
+}
+
+@keyframes cv-fill {
+  0% {
+    background-size: 0% 100%;
+    -webkit-text-stroke-color: #c3c8d8;
+  }
+  10%,
+  30% {
+    background-size: 100% 100%;
+    -webkit-text-stroke-color: transparent;
+  }
+  42%,
+  100% {
+    background-size: 0% 100%;
+    -webkit-text-stroke-color: #c3c8d8;
   }
 }
 
 /* ---- Responsive -------------------------------------------------------------- */
 @media (max-width: 1080px) {
   .cv-connect,
+  .cv-journey-grid,
   .cv-hero-grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cv-words {
+    padding-left: 0;
+    padding-top: 24px;
+    border-left: 0;
+    border-top: 1px solid var(--cv-line);
   }
 
   .cv-hero::before {
@@ -1686,7 +1764,13 @@ a.cv-envelope-value:hover {
   .cv-kinetic span,
   .cv-reel-track,
   .cv-connect::before,
-  .cv-journey-tag {
+  .cv-journey-strong::after,
+  .cv-words-list span {
     animation: none !important;
+  }
+
+  .cv-words-list span {
+    background-size: 100% 100%;
+    -webkit-text-stroke-color: transparent;
   }
 }
