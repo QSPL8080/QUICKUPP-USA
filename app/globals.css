@@ -197,7 +197,7 @@ label,
 }
 
 /* 2C. MASTER BUTTON SYSTEM - EQUAL & MATCHED ACROSS ALL PAGES (Border Radius 8px & Weight 700) */
-button:not(.sc-modal-close-btn):not(.splide__arrow):not(.w-slider-arrow):not(.menu-button):not(.asx-faq-q):not(.qs-mobile-toggle-btn):not([class*="crm-"]),
+button:not(.sc-modal-close-btn):not(.splide__arrow):not(.w-slider-arrow):not(.menu-button):not(.asx-faq-q):not(.qs-mobile-toggle-btn):not([class*="crm-"]):not(.cv-dept-tab):not(.cv-filter-chip):not(.cv-job-toggle),
 .btn,
 .button,
 .w-button,

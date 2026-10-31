@@ -1,0 +1,176 @@
+/* ==========================================================================
+   CAREERS PAGE — scroll-in motion (components/CareerMotion.tsx), used on no
+   other page. Motion only: elements return to their normal styles once
+   revealed.
+   ========================================================================== */
+.cvm-pending {
+  opacity: 0;
+}
+
+.cvm-in {
+  animation-duration: 0.9s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation-fill-mode: both;
+  animation-delay: var(--cvm-delay, 0s);
+}
+
+/* Hero title: climbs up out of a mask with a slight lean */
+.cvm-climb {
+  animation-name: cvm-climb;
+  animation-duration: 1.25s;
+}
+
+@keyframes cvm-climb {
+  from {
+    opacity: 0;
+    clip-path: inset(100% 0 0 0);
+    transform: translateY(46px) skewY(3deg);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(-10% 0 -10% 0);
+    transform: none;
+  }
+}
+
+/* Headings: step in on a diagonal, like a staircase */
+.cvm-step {
+  animation-name: cvm-step;
+  animation-duration: 0.95s;
+}
+
+@keyframes cvm-step {
+  0% {
+    opacity: 0;
+    transform: translate(-28px, 28px);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-14px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Text: ascends gently */
+.cvm-ascend {
+  animation-name: cvm-ascend;
+}
+
+@keyframes cvm-ascend {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Media: tilts in toward the viewer */
+.cvm-tilt {
+  animation-name: cvm-tilt;
+  animation-duration: 1.05s;
+}
+
+@keyframes cvm-tilt {
+  from {
+    opacity: 0;
+    transform: perspective(1000px) rotateY(-16deg) translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Side-by-side columns: launch in from below the outer corners */
+.cvm-launch-l,
+.cvm-launch-r {
+  animation-duration: 1.05s;
+}
+
+.cvm-launch-l {
+  animation-name: cvm-launch-l;
+}
+
+.cvm-launch-r {
+  animation-name: cvm-launch-r;
+}
+
+@keyframes cvm-launch-l {
+  from {
+    opacity: 0;
+    transform: translate(-56px, 40px) rotate(-2deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes cvm-launch-r {
+  from {
+    opacity: 0;
+    transform: translate(56px, 40px) rotate(2deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Groups: rise stair by stair, or flip up from their base */
+.cvm-stair {
+  animation-name: cvm-stair;
+  animation-duration: 0.75s;
+}
+
+@keyframes cvm-stair {
+  0% {
+    opacity: 0;
+    transform: translateY(48px);
+  }
+  35% {
+    opacity: 1;
+    transform: translateY(18px);
+  }
+  65% {
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.cvm-flip-up {
+  animation-name: cvm-flip-up;
+  animation-duration: 0.85s;
+}
+
+@keyframes cvm-flip-up {
+  from {
+    opacity: 0;
+    transform: perspective(900px) rotateX(-65deg);
+    transform-origin: bottom center;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    transform-origin: bottom center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cvm-pending {
+    opacity: 1;
+  }
+
+  .cvm-in {
+    animation: none !important;
+  }
+}

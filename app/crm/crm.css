@@ -1431,3 +1431,16 @@
     display: none;
   }
 }
+
+/* ---- Job openings -------------------------------------------------------------------- */
+.crm-job-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.crm-job-open {
+  align-self: end;
+  padding-bottom: 12px;
+}
