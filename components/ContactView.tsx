@@ -6,7 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ContactMotion from "@/components/ContactMotion";
 import LucideIcon, { type LucideIconName } from "@/components/LucideIcon";
-import { CONTACT_BUDGETS, CONTACT_SERVICES, CONTACT_TIMELINES } from "@/lib/formOptions";
+import { BUDGETS, CONTACT_SUBJECTS, INDUSTRIES as INDUSTRY_OPTIONS } from "@/lib/formOptions";
 import "@/app/contact.css";
 
 /*
@@ -55,11 +55,10 @@ const EMPTY = {
   email: "",
   phone: "",
   companyName: "",
-  companyWebsite: "",
-  country: "",
-  service: "",
+  industry: "",
+  otherIndustry: "",
+  projectType: "",
   budget: "",
-  timeline: "",
   message: "",
   agreed: false,
 };
@@ -182,55 +181,54 @@ function InquiryForm() {
         className="ct-trap"
       />
       <div className="ct-grid">
-        <Field id="ct-fullName" label="Full Name" required error={errors.fullName} filled={!!form.fullName}>
+        <Field id="ct-fullName" label="Full name" required error={errors.fullName} filled={!!form.fullName}>
           <input id="ct-fullName" className="ct-input" autoComplete="name" placeholder=" " value={form.fullName} onChange={set("fullName")} />
         </Field>
-        <Field id="ct-email" label="Business Email" required error={errors.email} filled={!!form.email}>
+        <Field id="ct-email" label="Email address" required error={errors.email} filled={!!form.email}>
           <input id="ct-email" type="email" className="ct-input" autoComplete="email" placeholder=" " value={form.email} onChange={set("email")} />
         </Field>
-        <Field id="ct-phone" label="Phone Number" required error={errors.phone} filled={!!form.phone}>
+        <Field id="ct-phone" label="Phone number" error={errors.phone} filled={!!form.phone}>
           <input id="ct-phone" type="tel" className="ct-input" autoComplete="tel" placeholder=" " value={form.phone} onChange={set("phone")} />
         </Field>
-        <Field id="ct-companyName" label="Company Name" error={errors.companyName} filled={!!form.companyName}>
+        <Field id="ct-companyName" label="Company name" error={errors.companyName} filled={!!form.companyName}>
           <input id="ct-companyName" className="ct-input" autoComplete="organization" placeholder=" " value={form.companyName} onChange={set("companyName")} />
         </Field>
-        <Field id="ct-companyWebsite" label="Company Website" error={errors.companyWebsite} filled={!!form.companyWebsite}>
-          <input id="ct-companyWebsite" className="ct-input" autoComplete="url" placeholder=" " value={form.companyWebsite} onChange={set("companyWebsite")} />
-        </Field>
-        <Field id="ct-country" label="Country" required error={errors.country} filled={!!form.country}>
-          <input id="ct-country" className="ct-input" autoComplete="country-name" placeholder=" " value={form.country} onChange={set("country")} />
-        </Field>
-        <Field id="ct-service" label="Service Interested In" required error={errors.service} wide filled={!!form.service}>
-          <select id="ct-service" className="ct-input ct-select" value={form.service} onChange={set("service")}>
+        <Field id="ct-industry" label="Industry" required error={errors.industry} filled={!!form.industry}>
+          <select id="ct-industry" className="ct-input ct-select" value={form.industry} onChange={set("industry")}>
             <option value="" disabled hidden />
-            {CONTACT_SERVICES.map((v) => (
+            {INDUSTRY_OPTIONS.map((v) => (
               <option key={v} value={v}>
                 {v}
               </option>
             ))}
           </select>
         </Field>
-        <Field id="ct-budget" label="Estimated Project Budget" required error={errors.budget} filled={!!form.budget}>
+        <Field id="ct-projectType" label="Subject / Service" required error={errors.projectType} filled={!!form.projectType}>
+          <select id="ct-projectType" className="ct-input ct-select" value={form.projectType} onChange={set("projectType")}>
+            <option value="" disabled hidden />
+            {CONTACT_SUBJECTS.map((v) => (
+              <option key={v} value={v}>
+                {v}
+              </option>
+            ))}
+          </select>
+        </Field>
+        {form.industry === "Other" && (
+          <Field id="ct-otherIndustry" label="Please specify your industry" required error={errors.otherIndustry} wide filled={!!form.otherIndustry}>
+            <input id="ct-otherIndustry" className="ct-input" placeholder=" " value={form.otherIndustry} onChange={set("otherIndustry")} />
+          </Field>
+        )}
+        <Field id="ct-budget" label="Estimated Budget" error={errors.budget} wide filled={!!form.budget}>
           <select id="ct-budget" className="ct-input ct-select" value={form.budget} onChange={set("budget")}>
             <option value="" disabled hidden />
-            {CONTACT_BUDGETS.map((v) => (
-              <option key={v} value={v}>
-                {v}
+            {BUDGETS.map((b) => (
+              <option key={b.value} value={b.value}>
+                {b.label}
               </option>
             ))}
           </select>
         </Field>
-        <Field id="ct-timeline" label="Project Timeline" required error={errors.timeline} filled={!!form.timeline}>
-          <select id="ct-timeline" className="ct-input ct-select" value={form.timeline} onChange={set("timeline")}>
-            <option value="" disabled hidden />
-            {CONTACT_TIMELINES.map((v) => (
-              <option key={v} value={v}>
-                {v}
-              </option>
-            ))}
-          </select>
-        </Field>
-        <Field id="ct-message" label="Tell Us About Your Project / Requirements" error={errors.message} wide filled={!!form.message}>
+        <Field id="ct-message" label="Message / Project Details" required error={errors.message} wide filled={!!form.message}>
           <textarea id="ct-message" className="ct-input ct-textarea" rows={5} placeholder=" " value={form.message} onChange={set("message")} />
         </Field>
       </div>
