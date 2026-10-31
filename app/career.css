@@ -316,19 +316,19 @@
   padding-bottom: clamp(56px, 6vw, 88px);
 }
 
-.cv-hero::before {
-  content: "";
-  position: absolute;
-  top: 96px;
-  bottom: 40px;
-  left: calc(50% + 40px);
-  right: 0;
-  border-radius: 40px 0 0 40px;
-  background:
-    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(0, 210, 255, 0.18), transparent 70%),
-    radial-gradient(ellipse 70% 60% at 90% 100%, rgba(168, 85, 247, 0.2), transparent 70%),
-    #eef0fb;
-  pointer-events: none;
+/* the hero runs wider than the rest of the page so the copy sits further left */
+.cv-hero {
+  --cv-hero-pad: clamp(24px, 4.5vw, 64px);
+}
+
+.cv-hero .cv-container {
+  max-width: 1400px;
+  padding: 0 var(--cv-hero-pad);
+}
+
+.cv-hero .cv-hero-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(48px, 5vw, 88px);
 }
 
 .cv-hero-grid {
@@ -337,18 +337,34 @@
 
 .cv-reel {
   position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 16px;
   height: 600px;
-  margin-right: calc(-1 * max(24px, (100vw - 1200px) / 2 + 24px));
-  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 12%, #000 100%);
-  mask-image: linear-gradient(90deg, transparent 0, #000 12%, #000 100%);
+  padding-left: 28px;
+  margin-right: calc(-1 * max(var(--cv-hero-pad), (100vw - 1400px) / 2 + var(--cv-hero-pad)));
+}
+
+/* tinted panel behind the photos, running off the right edge of the screen */
+.cv-reel::before {
+  content: "";
+  position: absolute;
+  inset: -44px 0 -44px 0;
+  z-index: -1;
+  border-radius: 40px 0 0 40px;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(0, 210, 255, 0.18), transparent 70%),
+    radial-gradient(ellipse 70% 60% at 90% 100%, rgba(168, 85, 247, 0.2), transparent 70%),
+    #eef0fb;
+  pointer-events: none;
 }
 
 .cv-reel-row {
   overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 10%, #000 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 10%, #000 100%);
 }
 
 /* rows sit slightly staggered, like film strips */
@@ -1532,7 +1548,7 @@ a.cv-envelope-value:hover {
 @media (max-width: 1080px) {
   .cv-connect,
   .cv-journey-grid,
-  .cv-hero-grid {
+  .cv-hero .cv-hero-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 
@@ -1543,17 +1559,18 @@ a.cv-envelope-value:hover {
     border-top: 1px solid var(--cv-line);
   }
 
-  .cv-hero::before {
-    top: auto;
-    left: 0;
-    height: 460px;
-    bottom: 30px;
-    border-radius: 40px 40px 0 0;
-  }
-
   .cv-reel {
     height: 440px;
-    margin-left: -24px;
+    margin-left: calc(-1 * var(--cv-hero-pad));
+    padding-left: 0;
+  }
+
+  .cv-reel::before {
+    inset: -28px 0;
+    border-radius: 0;
+  }
+
+  .cv-reel-row {
     -webkit-mask-image: none;
     mask-image: none;
   }
@@ -1714,10 +1731,12 @@ a.cv-envelope-value:hover {
     border-radius: 16px;
   }
 
+  .cv-hero {
+    --cv-hero-pad: 16px;
+  }
+
   .cv-reel {
     height: 380px;
-    margin-left: -16px;
-    margin-right: -16px;
   }
 
   .cv-reel-row-2 {
@@ -1731,10 +1750,6 @@ a.cv-envelope-value:hover {
 
   .cv-reel-row-2 .cv-reel-track img {
     width: 190px;
-  }
-
-  .cv-hero::before {
-    height: 400px;
   }
 
   .cv-page li.cv-benefit.is-feature {
