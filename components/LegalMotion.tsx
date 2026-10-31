@@ -6,8 +6,8 @@ import { setupScrollMotion, type MotionPreset } from "@/lib/scrollMotion";
 
 /*
  * Scroll-in animations for the legal pages. Motion only: section titles are
- * drawn in from the left like ink on paper, text settles upward, list rows
- * slide in one after another and cards lift into place.
+ * drawn in from the left like ink on paper, text settles upward and list
+ * rows slide in one after another.
  */
 
 const LEGAL_PRESET: MotionPreset = {

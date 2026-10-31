@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 /*
  * Sticky side navigation for the location pages: lists the page's sections
@@ -16,17 +16,6 @@ export default function GeoToc({
 }) {
   const [active, setActive] = useState(items[0]?.id);
   const [progress, setProgress] = useState(0);
-  const navRef = useRef<HTMLElement>(null);
-
-  // A long list that scrolls inside the rail keeps the current entry in view
-  useEffect(() => {
-    const nav = navRef.current;
-    if (!nav || nav.scrollHeight <= nav.clientHeight + 2) return;
-    const link = nav.querySelector<HTMLElement>(".geo-toc-link.is-active");
-    if (!link) return;
-    const offset = link.getBoundingClientRect().top - nav.getBoundingClientRect().top + nav.scrollTop;
-    nav.scrollTo({ top: Math.max(0, offset - nav.clientHeight / 2 + link.offsetHeight / 2), behavior: "smooth" });
-  }, [active]);
 
   useEffect(() => {
     let raf = 0;
@@ -62,7 +51,7 @@ export default function GeoToc({
   }, [items]);
 
   return (
-    <nav ref={navRef} className="geo-toc" aria-label="On this page">
+    <nav className="geo-toc" aria-label="On this page">
       {title && <div className="geo-toc-title">{title}</div>}
       <div className="geo-toc-track">
         <span className="geo-toc-fill" style={{ transform: `scaleY(${progress})` }} aria-hidden="true" />
