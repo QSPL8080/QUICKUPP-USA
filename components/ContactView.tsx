@@ -11,8 +11,9 @@ import "@/app/contact.css";
 
 /*
  * Contact page ("ct-" design, used on no other page): a "signal" look —
- * a connection line with glowing nodes running down the page, pulsing rings
- * behind a ticket-style Get in Touch card, an app-window frame around the
+ * a dark hero stage with a sweeping radar, a Get in Touch dock that sits
+ * across the stage's edge, a connection line with glowing nodes running
+ * down the page, an app-window frame around the
  * Calendly calendar, floating-label form fields, an indexed services list,
  * industry pills and a closing card with a turning gradient edge. Every
  * word comes from the supplied Contact page copy; site fonts, type scale,
@@ -331,15 +332,21 @@ export default function ContactView() {
     <div className="ct-page">
       <Header />
       <main>
-        {/* Hero + Get in Touch */}
+        {/* Hero: dark stage with a radar, and the Get in Touch dock overlapping its edge */}
         <section className="ct-hero">
-          <div className="ct-aurora" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </div>
-          <div className="ct-container ct-hero-grid">
-            <div className="ct-hero-copy">
+          <div className="ct-stage">
+            <div className="ct-radar" aria-hidden="true">
+              <span className="ct-radar-ring" />
+              <span className="ct-radar-ring" />
+              <span className="ct-radar-ring" />
+              <span className="ct-radar-sweep" />
+              <i className="ct-blip" />
+              <i className="ct-blip" />
+              <i className="ct-blip" />
+              <i className="ct-blip" />
+            </div>
+            <div className="ct-stage-grid" aria-hidden="true" />
+            <div className="ct-container ct-stage-inner">
               <nav className="ct-breadcrumb" aria-label="Breadcrumb">
                 <Link href="/">Home</Link>
                 <span>/</span>
@@ -352,85 +359,78 @@ export default function ContactView() {
               <h1 className="ct-h1">
                 Contact Quickupp Softech – <span className="qs-gradient-text">Let&apos;s Grow Your Business</span>
               </h1>
-              <p className="ct-lead">
-                Looking to grow your business, generate quality leads, strengthen your online presence, or streamline operations with technology?
-              </p>
-              <p className="ct-text">
-                At Quickupp Softech LLC, we help businesses build, market, and scale through strategic digital marketing, AI-powered solutions, IT
-                services, and business process outsourcing.
-              </p>
-              <p className="ct-text">
-                Whether you&apos;re a startup, growing business, or established enterprise, our team is ready to understand your goals and explore the right
-                solutions for your business.
-              </p>
-              <p className="ct-text ct-text-strong">Let&apos;s discuss how we can help you move forward.</p>
-              <div className="ct-actions">
-                <a href="#consultation" className="ct-btn ct-btn-dark">
-                  <span>Book a Free Consultation</span>
-                  <Arrow />
-                </a>
-                <a href="#inquiry" className="ct-btn ct-btn-light">
-                  <span>Tell Us About Your Project</span>
-                </a>
-              </div>
-            </div>
-
-            <div className="ct-ticket-wrap">
-              <div className="ct-rings" aria-hidden="true">
-                <span />
-                <span />
-                <span />
-              </div>
-              <aside className="ct-ticket" aria-labelledby="ct-touch-title">
-                <div className="ct-ticket-top">
-                  <h2 id="ct-touch-title" className="ct-ticket-title">
-                    Get in Touch
-                  </h2>
-                  <p className="ct-ticket-text">
-                    Have a project in mind or need a reliable growth partner? Connect with our team to discuss your requirements, explore our services, and
-                    find the right approach for your business.
+              <div className="ct-stage-cols">
+                <p className="ct-lead">
+                  Looking to grow your business, generate quality leads, strengthen your online presence, or streamline operations with technology?
+                </p>
+                <div className="ct-stage-side">
+                  <p className="ct-text">
+                    At Quickupp Softech LLC, we help businesses build, market, and scale through strategic digital marketing, AI-powered solutions, IT
+                    services, and business process outsourcing.
                   </p>
-                </div>
-                <ul className="ct-ticket-list">
-                  <li>
-                    <a href="mailto:info@quickuppsoftech.us" className="ct-ticket-row">
-                      <span className="ct-ticket-icon" aria-hidden="true">
-                        <LucideIcon name="mail" size={18} />
-                      </span>
-                      <span className="ct-ticket-body">
-                        <span className="ct-ticket-label">Email</span>
-                        <span className="ct-ticket-value">info@quickuppsoftech.us</span>
-                      </span>
-                      <span className="ct-ticket-go" aria-hidden="true">
-                        <LucideIcon name="arrow-up-right" size={15} strokeWidth={2.2} />
-                      </span>
+                  <p className="ct-text">
+                    Whether you&apos;re a startup, growing business, or established enterprise, our team is ready to understand your goals and explore the
+                    right solutions for your business.
+                  </p>
+                  <p className="ct-text ct-text-strong">Let&apos;s discuss how we can help you move forward.</p>
+                  <div className="ct-actions">
+                    <a href="#consultation" className="ct-btn ct-btn-white">
+                      <span>Book a Free Consultation</span>
+                      <Arrow />
                     </a>
-                  </li>
-                  <li>
-                    <div className="ct-ticket-row">
-                      <span className="ct-ticket-icon" aria-hidden="true">
-                        <LucideIcon name="building" size={18} />
-                      </span>
-                      <span className="ct-ticket-body">
-                        <span className="ct-ticket-label">Business</span>
-                        <span className="ct-ticket-value">Quickupp Softech LLC</span>
-                      </span>
-                    </div>
-                  </li>
-                  <li>
-                    <div className="ct-ticket-row">
-                      <span className="ct-ticket-icon" aria-hidden="true">
-                        <LucideIcon name="map-pin" size={18} />
-                      </span>
-                      <span className="ct-ticket-body">
-                        <span className="ct-ticket-label">Office Address</span>
-                        <span className="ct-ticket-value">8 The Green, Suite A, Dover, Delaware 19901, USA</span>
-                      </span>
-                    </div>
-                  </li>
-                </ul>
-              </aside>
+                    <a href="#inquiry" className="ct-btn ct-btn-ghost">
+                      <span>Tell Us About Your Project</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
+
+          <div className="ct-container">
+            <aside className="ct-dock" aria-labelledby="ct-touch-title">
+              <div className="ct-dock-intro">
+                <h2 id="ct-touch-title" className="ct-dock-title">
+                  Get in Touch
+                </h2>
+                <p className="ct-dock-text">
+                  Have a project in mind or need a reliable growth partner? Connect with our team to discuss your requirements, explore our services, and find
+                  the right approach for your business.
+                </p>
+              </div>
+              <ul className="ct-dock-list">
+                <li>
+                  <a href="mailto:info@quickuppsoftech.us" className="ct-dock-item">
+                    <span className="ct-dock-icon" aria-hidden="true">
+                      <LucideIcon name="mail" size={19} />
+                    </span>
+                    <span className="ct-dock-label">Email</span>
+                    <span className="ct-dock-value">info@quickuppsoftech.us</span>
+                    <span className="ct-dock-go" aria-hidden="true">
+                      <LucideIcon name="arrow-up-right" size={15} strokeWidth={2.2} />
+                    </span>
+                  </a>
+                </li>
+                <li>
+                  <div className="ct-dock-item">
+                    <span className="ct-dock-icon" aria-hidden="true">
+                      <LucideIcon name="building" size={19} />
+                    </span>
+                    <span className="ct-dock-label">Business</span>
+                    <span className="ct-dock-value">Quickupp Softech LLC</span>
+                  </div>
+                </li>
+                <li>
+                  <div className="ct-dock-item">
+                    <span className="ct-dock-icon" aria-hidden="true">
+                      <LucideIcon name="map-pin" size={19} />
+                    </span>
+                    <span className="ct-dock-label">Office Address</span>
+                    <span className="ct-dock-value">8 The Green, Suite A, Dover, Delaware 19901, USA</span>
+                  </div>
+                </li>
+              </ul>
+            </aside>
           </div>
         </section>
 
