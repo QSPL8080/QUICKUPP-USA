@@ -10,8 +10,9 @@ import type { Job } from "@/lib/jobs";
 import "@/app/career.css";
 
 /*
- * Careers page ("cv-" design, used on no other page): an arched photo
- * window in the hero, benefit cards, a department switcher, staggered value
+ * Careers page ("cv-" design, used on no other page): three columns of team
+ * photos drifting in opposite directions beside the hero copy, a bento of
+ * benefits, a department switcher, staggered value
  * tiles with monograms, a hiring track that fills as you scroll, live job openings
  * from the CRM (/crm/jobs) and a closing band with flowing gradient text.
  * Every word comes from the supplied Careers copy; site fonts, type scale,
@@ -128,6 +129,13 @@ const STEPS = [
   { title: "Offer & Onboarding", text: "Selected candidates receive an offer and guidance through the onboarding process." },
 ];
 
+/* hero photo columns (pictures only, no text) */
+const REEL = [
+  ["contact-team-collaboration.jpg", "contact-meeting-discussion.jpg", "contact-strategy-consultation.jpg"],
+  ["contact-team-conference.jpg", "contact-diverse-meeting.jpg", "contact-consultation-team.jpg"],
+  ["contact-tech-discussion.jpg", "contact-office-consultation.jpg", "contact-meeting-room.jpg"],
+];
+
 const Arrow = () => (
   <svg width="16" height="16" viewBox="0 0 18 18" fill="none" aria-hidden="true">
     <path d="M3.75 9L14.25 9M14.25 9L9 3.75M14.25 9L9 14.25" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
@@ -140,8 +148,8 @@ const fmtDeadline = (d: string) =>
 function Benefits() {
   return (
     <ul className="cv-benefits">
-      {BENEFITS.map((b) => (
-        <li key={b.title} className="cv-benefit">
+      {BENEFITS.map((b, i) => (
+        <li key={b.title} className={`cv-benefit${i === 0 || i === 5 ? " is-feature" : ""}`}>
           <span className="cv-benefit-icon" aria-hidden="true">
             <LucideIcon name={b.icon} size={22} />
           </span>
@@ -340,7 +348,7 @@ export default function CareerView({ jobs }: { jobs: Job[] }) {
     <div className="cv-page">
       <Header />
       <main>
-        {/* Hero: copy beside an arched photo window */}
+        {/* Hero: copy beside three columns of team photos drifting in opposite directions */}
         <section className="cv-hero">
           <div className="cv-container cv-hero-grid">
             <div className="cv-hero-copy">
@@ -382,14 +390,16 @@ export default function CareerView({ jobs }: { jobs: Job[] }) {
               </div>
             </div>
 
-            <div className="cv-arch-wrap">
-              <span className="cv-arch-orbit" aria-hidden="true" />
-              <div className="cv-arch">
-                <img src="/images/contact-team-collaboration.jpg" alt="Team members working together at laptops" />
-              </div>
-              <div className="cv-arch-mini">
-                <img src="/images/contact-team-conference.jpg" alt="" aria-hidden="true" />
-              </div>
+            <div className="cv-reel" aria-hidden="true">
+              {REEL.map((col, ci) => (
+                <div key={ci} className={`cv-reel-col cv-reel-col-${ci + 1}`}>
+                  <div className="cv-reel-track">
+                    {[...col, ...col].map((src, i) => (
+                      <img key={i} src={`/images/${src}`} alt="" loading={i < 3 ? "eager" : "lazy"} />
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </section>
