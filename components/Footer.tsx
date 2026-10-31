@@ -81,10 +81,23 @@ export default function Footer() {
             <div className="qs-scalient-contact-snippet" style={{ marginTop: "0" }}>
               <div className="qs-ft-mails">
                 {[
-                  { label: "Contact", email: "info@quickuppsoftech.us", icon: "M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM22 7l-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" },
-                  { label: "Support", email: "support@quickuppsoftech.us", icon: "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01" },
+                  { label: "Contact", value: "info@quickuppsoftech.us", href: "mailto:info@quickuppsoftech.us", icon: "M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM22 7l-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" },
+                  { label: "Support", value: "support@quickuppsoftech.us", href: "mailto:support@quickuppsoftech.us", icon: "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01" },
+                  { label: "Phone", value: "+1 (302) 754-5679", href: "tel:+13027545679", icon: "M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z" },
+                  {
+                    label: "Address",
+                    value: "8 The Green, Suite A, Dover, Delaware - 19901, USA",
+                    href: "https://www.google.com/maps/search/?api=1&query=8+The+Green+Suite+A+Dover+Delaware+19901+USA",
+                    icon: "M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0zM12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z",
+                    wrap: true,
+                  },
                 ].map((m) => (
-                  <a key={m.email} href={`mailto:${m.email}`} className="qs-ft-mail">
+                  <a
+                    key={m.label}
+                    href={m.href}
+                    className="qs-ft-mail"
+                    {...(m.href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                  >
                     <span className="qs-ft-mail-icon" aria-hidden="true">
                       <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d={m.icon} />
@@ -92,7 +105,7 @@ export default function Footer() {
                     </span>
                     <span className="qs-ft-mail-text">
                       <span className="qs-ft-mail-label">{m.label}</span>
-                      <span className="qs-ft-mail-addr">{m.email}</span>
+                      <span className={`qs-ft-mail-addr${m.wrap ? " is-wrap" : ""}`}>{m.value}</span>
                     </span>
                     <svg className="qs-ft-mail-go" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                       <path d="M7 17L17 7M8 7h9v9" />

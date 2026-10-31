@@ -3965,6 +3965,11 @@ section.section-gap.padding-top-0 {
   transition: color 0.25s ease;
 }
 
+.qs-ft-mail-addr.is-wrap {
+  white-space: normal;
+  line-height: 1.45;
+}
+
 .qs-ft-mail:hover .qs-ft-mail-addr {
   color: #38bdf8;
 }
