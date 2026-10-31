@@ -6,6 +6,7 @@ import { useFeedback } from "@/components/crm/Feedback";
 import type { PaymentRow } from "@/lib/crm/data";
 import { PAYMENT_STATUS_LABEL, money } from "@/lib/crm/format";
 import { BulkBar, SelectBox, useSelection } from "@/components/crm/Selection";
+import { PageHead, Filters, Pager } from "@/components/crm/ListTools";
 
 const fmtDate = (d: string | null) =>
   d ? new Date(`${d}T00:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—";
@@ -65,7 +66,27 @@ const fromRow = (p: PaymentRow): FormState => ({
   notes: p.notes || "",
 });
 
-export default function PaymentsView({ rows, options, openNew }: { rows: PaymentRow[]; options: Options; openNew: boolean }) {
+export default function PaymentsView({
+  rows,
+  options,
+  openNew,
+  q = "",
+  status = "",
+  total = 0,
+  page = 1,
+  pages = 1,
+  pageSize = 20,
+}: {
+  rows: PaymentRow[];
+  options: Options;
+  openNew: boolean;
+  q?: string;
+  status?: string;
+  total?: number;
+  page?: number;
+  pages?: number;
+  pageSize?: number;
+}) {
   const router = useRouter();
   const { confirm, toast } = useFeedback();
   const [editing, setEditing] = useState<PaymentRow | "new" | null>(openNew ? "new" : null);
@@ -154,13 +175,19 @@ export default function PaymentsView({ rows, options, openNew }: { rows: Payment
 
   return (
     <>
-      {rows.length ? (
-        <BulkBar sel={sel} noun={["payment", "payments"]} busy={busy} onDelete={removeSelected}>
-          {addButton}
-        </BulkBar>
-      ) : (
-        <div className="crm-toolbar-end">{addButton}</div>
-      )}
+      <PageHead title="Payments" sub="Record payments by hand and keep track of what's paid and pending.">
+        {addButton}
+      </PageHead>
+      <Filters
+        q={q}
+        status={status}
+        placeholder="Search client, email, company, invoice or reference"
+        statuses={options.statuses.map((s) => ({ value: s, label: PAYMENT_STATUS_LABEL[s] || s }))}
+      />
+      <div className="crm-card crm-card-flush">
+        {rows.length > 0 && (
+          <BulkBar sel={sel} noun={["payment", "payments"]} busy={busy} onDelete={removeSelected} />
+        )}
       {listError && (
         <p className="crm-alert crm-alert-inset" role="alert">
           {listError}
@@ -218,10 +245,24 @@ export default function PaymentsView({ rows, options, openNew }: { rows: Payment
         </div>
       ) : (
         <div className="crm-empty">
+          <div className="crm-empty-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <rect x="2" y="5" width="20" height="14" rx="2" />
+              <line x1="2" y1="10" x2="22" y2="10" />
+            </svg>
+          </div>
           <p className="crm-empty-title">No payments yet</p>
-          <p className="crm-muted">Use “Add payment” to record a payment you received.</p>
+          <p className="crm-empty-sub">Use “Add payment” to record transactions, fees, and invoices.</p>
+          <button type="button" className="crm-act crm-act-dark" onClick={() => openForm("new")}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            Add payment
+          </button>
         </div>
       )}
+      <Pager page={page} pages={pages} total={total} pageSize={pageSize} q={q} status={status} />
+      </div>
 
       {editing && (
         <div className="crm-modal-wrap" onClick={close}>

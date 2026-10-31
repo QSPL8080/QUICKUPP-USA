@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { PageHead } from "@/components/crm/ListTools";
 import { useFeedback } from "@/components/crm/Feedback";
 import { EMPLOYMENT_TYPES, JOB_DEPARTMENTS, type Job } from "@/lib/jobs";
 import { BulkBar, SelectBox, useSelection } from "@/components/crm/Selection";
@@ -163,13 +165,26 @@ export default function JobsView({ rows, openNew }: { rows: Job[]; openNew: bool
 
   return (
     <>
-      {rows.length ? (
-        <BulkBar sel={sel} noun={["job opening", "job openings"]} busy={busy} onDelete={removeSelected}>
-          {addButton}
-        </BulkBar>
-      ) : (
-        <div className="crm-toolbar-end">{addButton}</div>
-      )}
+      <PageHead
+        title="Job Openings (Website)"
+        sub="Post and manage the vacancies listed under Current Job Openings on the Careers page. Closed openings and ones past their deadline are hidden there."
+      >
+        <Link href="/crm/applications" className="crm-act crm-act-ghost">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+            <line x1="16" y1="13" x2="8" y2="13" />
+            <line x1="16" y1="17" x2="8" y2="17" />
+          </svg>
+          View applications
+        </Link>
+        {addButton}
+      </PageHead>
+
+      <div className="crm-card crm-card-flush">
+        {rows.length > 0 && (
+          <BulkBar sel={sel} noun={["job opening", "job openings"]} busy={busy} onDelete={removeSelected} />
+        )}
       {listError && (
         <p className="crm-alert crm-alert-inset" role="alert">
           {listError}
@@ -280,10 +295,23 @@ export default function JobsView({ rows, openNew }: { rows: Job[]; openNew: bool
         </div>
       ) : (
         <div className="crm-empty">
+          <div className="crm-empty-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+            </svg>
+          </div>
           <p className="crm-empty-title">No job openings yet</p>
-          <p className="crm-muted">Use “Add job opening” to publish a vacancy on the Careers page.</p>
+          <p className="crm-empty-sub">Publish vacancies here to display them under Current Job Openings on the Careers page.</p>
+          <button type="button" className="crm-act crm-act-dark" onClick={() => openForm("new")}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            Add job opening
+          </button>
         </div>
       )}
+      </div>
 
       {editing && (
         <div className="crm-modal-wrap" onClick={close}>

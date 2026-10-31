@@ -6,7 +6,7 @@ import { ENQUIRY_STATUSES, ENQUIRY_STATUS_LABEL, SOURCE_KEYS, SOURCE_LABEL } fro
 import LeadsView from "@/components/crm/LeadsView";
 import { PageHead, Pager } from "@/components/crm/ListTools";
 
-type Props = { searchParams: Promise<{ q?: string; source?: string; status?: string; from?: string; to?: string; page?: string }> };
+type Props = { searchParams: Promise<{ q?: string; source?: string; status?: string; from?: string; to?: string; page?: string; new?: string }> };
 
 const ymd = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -52,6 +52,12 @@ export default async function EnquiriesPage({ searchParams }: Props) {
           </svg>
           Export CSV
         </a>
+        <Link href="?new=1" className="crm-act crm-act-dark">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+          Add lead
+        </Link>
       </PageHead>
 
       <form className="crm-filters crm-filters-wrap" method="get">
@@ -115,7 +121,7 @@ export default async function EnquiriesPage({ searchParams }: Props) {
       </div>
 
       <div className="crm-card crm-card-flush">
-        <LeadsView rows={data.items} offset={(data.page - 1) * data.pageSize} team={team} />
+        <LeadsView rows={data.items} offset={(data.page - 1) * data.pageSize} team={team} openNew={sp.new === "1"} />
         <Pager {...data} q={f.q} status={f.status} extra={{ source: f.source, from: f.from, to: f.to }} />
       </div>
     </>

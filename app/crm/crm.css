@@ -234,22 +234,24 @@
   display: none;
 }
 
-/* ---- Buttons (class names start with crm- so the site button rules skip them) */
 .crm-act {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  height: 40px;
-  padding: 0 16px;
-  border-radius: 9px;
+  height: 38px;
+  padding: 0 15px;
+  border-radius: 8px;
   border: 1px solid transparent;
-  font-family: var(--font-heading, sans-serif);
+  font-family: inherit;
   font-size: 13.5px;
   font-weight: 600;
+  line-height: 1;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  text-decoration: none !important;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
 .crm-act:disabled,
@@ -260,29 +262,41 @@
 }
 
 .crm-act-dark {
-  background: #0b0f17;
-  color: #fff !important;
+  background: #0f172a;
+  border-color: #0f172a;
+  color: #ffffff !important;
 }
 
 .crm-act-dark:hover {
   background: #1e293b;
+  border-color: #1e293b;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
 }
 
 .crm-act-ghost {
-  background: #fff;
-  color: var(--crm-ink) !important;
-  border-color: var(--crm-line);
+  background: #ffffff;
+  color: #0f172a !important;
+  border-color: #cbd5e1;
 }
 
 .crm-act-ghost:hover {
-  border-color: #cbd5e1;
+  border-color: #94a3b8;
   background: #f8fafc;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
 }
 
 .crm-act-danger {
-  background: #fff;
+  background: #ffffff;
   color: #dc2626 !important;
   border-color: #fecaca;
+}
+
+.crm-act-danger:hover {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  transform: translateY(-1px);
 }
 
 .crm-act-danger:hover {
@@ -324,25 +338,42 @@
   border-color: rgba(255, 255, 255, 0.25);
 }
 
-/* ---- Text ------------------------------------------------------------------------ */
+/* ---- Text & Page Header ---------------------------------------------------------- */
 .crm-head {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 16px 24px;
+  flex-wrap: wrap;
+}
+
+.crm-head-text {
+  flex: 1 1 360px;
+  min-width: 0;
+}
+
+.crm-head-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
 .crm-root .crm-title {
   margin: 0 !important;
   font-size: clamp(22px, 2.2vw, 26px) !important;
-  line-height: 1.2 !important;
+  line-height: 1.25 !important;
   font-weight: 700 !important;
+  color: #0f172a !important;
+  letter-spacing: -0.02em !important;
 }
 
 .crm-sub {
   margin-top: 6px !important;
   color: var(--crm-muted) !important;
+  font-size: 13.5px !important;
+  line-height: 1.5 !important;
+  max-width: 720px;
 }
 
 .crm-muted {
@@ -696,15 +727,39 @@
 }
 
 .crm-empty {
-  padding: 56px 20px;
+  padding: 64px 24px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.crm-empty-icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: #f1f5f9;
+  color: #64748b;
+  margin-bottom: 16px;
+  border: 1px solid #e2e8f0;
 }
 
 .crm-empty-title {
-  color: var(--crm-ink);
+  color: #0f172a;
   font-weight: 700 !important;
-  font-size: 15px !important;
-  margin-bottom: 4px !important;
+  font-size: 16px !important;
+  margin: 0 0 6px !important;
+}
+
+.crm-empty-sub {
+  color: var(--crm-muted) !important;
+  font-size: 13.5px !important;
+  margin: 0 0 20px !important;
+  max-width: 440px;
+  line-height: 1.5 !important;
 }
 
 /* ---- Forms -------------------------------------------------------------------------- */

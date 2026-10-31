@@ -86,7 +86,7 @@ export function Pager({ page, pages, total, pageSize, q, status, extra }: { page
 export function PageHead({ title, sub, children }: { title: string; sub?: string; children?: React.ReactNode }) {
   return (
     <div className="crm-head">
-      <div>
+      <div className="crm-head-text">
         <h1 className="crm-title">{title}</h1>
         {sub && <p className="crm-sub">{sub}</p>}
       </div>

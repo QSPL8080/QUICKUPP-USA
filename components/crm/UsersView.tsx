@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { PageHead } from "@/components/crm/ListTools";
 import { useFeedback } from "@/components/crm/Feedback";
 import type { TeamUser } from "@/lib/crm/users";
 
@@ -84,21 +85,26 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
 
   return (
     <>
-      <div className="crm-bulk">
-        <div className="crm-bulk-start">
-          <span className="crm-muted">
-            {users.length} {users.length === 1 ? "account" : "accounts"}
-          </span>
+      <PageHead
+        title="Team & Users"
+        sub="Add admins, change their name, username, email or password, and activate, deactivate or delete accounts. The super admin account is locked."
+      >
+        <button type="button" className="crm-act crm-act-dark" onClick={() => openForm("new")}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+          Add user
+        </button>
+      </PageHead>
+
+      <div className="crm-card crm-card-flush">
+        <div className="crm-bulk">
+          <div className="crm-bulk-start">
+            <span className="crm-muted">
+              {users.length} {users.length === 1 ? "account" : "accounts"}
+            </span>
+          </div>
         </div>
-        <div className="crm-bulk-end">
-          <button type="button" className="crm-act crm-act-dark crm-act-sm" onClick={() => openForm("new")}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            Add user
-          </button>
-        </div>
-      </div>
       {listError && (
         <p className="crm-alert crm-alert-inset" role="alert">
           {listError}
@@ -217,6 +223,7 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
             })}
           </tbody>
         </table>
+      </div>
       </div>
 
       {editing && (
