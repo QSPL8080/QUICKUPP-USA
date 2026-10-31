@@ -117,6 +117,14 @@ export default function JobsView({ rows, openNew }: { rows: Job[]; openNew: bool
     router.refresh();
   };
 
+  const removeOne = async (j: Job) => {
+    if (!window.confirm(`Permanently delete the "${j.title}" opening? This can't be undone.`)) return;
+    setListError("");
+    const res = await fetch(`/api/crm/jobs/${j.id}`, { method: "DELETE" }).catch(() => null);
+    if (!res?.ok && res?.status !== 404) return setListError("Couldn't delete the job opening. Please try again.");
+    router.refresh();
+  };
+
   const removeSelected = async () => {
     const ids = sel.selected;
     if (!ids.length) return;
@@ -176,6 +184,7 @@ export default function JobsView({ rows, openNew }: { rows: Job[]; openNew: bool
                 <th>Deadline</th>
                 <th>Applications</th>
                 <th>On careers page</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -205,11 +214,19 @@ export default function JobsView({ rows, openNew }: { rows: Job[]; openNew: bool
                         <span className="crm-muted">None yet</span>
                       )}
                     </td>
-                    <td data-label="On careers page" onClick={(e) => e.stopPropagation()}>
-                      <span className="crm-job-state">
-                        <span className={`crm-pill crm-pill-${state === "live" ? "paid" : state === "closed" ? "failed" : "pending"}`}>{STATE_LABEL[state]}</span>
+                    <td data-label="On careers page">
+                      <span className={`crm-pill crm-pill-${state === "live" ? "paid" : state === "closed" ? "failed" : "pending"}`}>{STATE_LABEL[state]}</span>
+                    </td>
+                    <td data-label="Actions" onClick={(e) => e.stopPropagation()}>
+                      <span className="crm-row-acts">
+                        <button type="button" className="crm-link-btn" onClick={() => openForm(j)}>
+                          Edit
+                        </button>
                         <button type="button" className="crm-link-btn" onClick={() => toggleOpen(j)}>
-                          {j.isOpen ? "Close" : "Open"}
+                          {j.isOpen ? "Close" : "Reopen"}
+                        </button>
+                        <button type="button" className="crm-link-btn crm-link-danger" onClick={() => removeOne(j)}>
+                          Delete
                         </button>
                       </span>
                     </td>

@@ -20,7 +20,7 @@ export const IDLE_MINUTES = 15;
 const MAX_SESSION_HOURS = 12;
 
 export type CrmRole = "super_admin" | "admin";
-export type CrmUser = { id: number; name: string; email: string; role: CrmRole };
+export type CrmUser = { id: number; name: string; username: string; email: string; role: CrmRole };
 
 export async function hashPassword(password: string): Promise<string> {
   const salt = randomBytes(16);
@@ -93,14 +93,14 @@ export async function getCurrentUser(): Promise<CrmUser | null> {
   const hash = sha256(token);
   if (!(await touchSession(hash))) return null;
   const [rows] = await getPool().execute(
-    `SELECT u.id, u.name, u.email, u.role
+    `SELECT u.id, u.name, u.username, u.email, u.role
        FROM crm_sessions s JOIN crm_users u ON u.id = s.user_id
       WHERE s.token_hash = ? AND u.is_active = 1
       LIMIT 1`,
     [hash]
   );
   const row = (rows as CrmUser[])[0];
-  return row ? { id: Number(row.id), name: row.name, email: row.email, role: row.role } : null;
+  return row ? { id: Number(row.id), name: row.name, username: row.username || "", email: row.email, role: row.role } : null;
 }
 
 /** For CRM pages: the signed-in user, or a redirect to /login. */
@@ -115,3 +115,11 @@ export async function requireUser(): Promise<CrmUser> {
 }
 
 export const isSuperAdmin = (u: CrmUser | null) => u?.role === "super_admin";
+
+/** The super admin's sign-in email, where password requests and sign-in alerts go */
+export const SUPER_ADMIN_EMAIL = "info@quickuppsoftech.us";
+
+/** Signs a user out everywhere (after deactivation or a password change) */
+export async function endUserSessions(userId: number) {
+  await getPool().execute("DELETE FROM crm_sessions WHERE user_id = ?", [userId]);
+}

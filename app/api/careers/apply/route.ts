@@ -77,27 +77,21 @@ export async function POST(request: Request) {
       ["LinkedIn / Portfolio", d.profileUrl || "—"],
       ["Resume", `${resumeName} (${fmtBytes(data.length)}, attached)`],
     ];
-    const html = `<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#0b0f17;max-width:640px">
-  <h2 style="margin:0 0 4px;font-size:20px">New job application</h2>
-  <p style="margin:0 0 18px;color:#64748b">Sent from the Careers page · Application #${id}</p>
-  <table cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%;border:1px solid #e5e7ef">
-    ${rows
-      .map(
-        ([k, v], i) =>
-          `<tr style="background:${i % 2 ? "#ffffff" : "#f8f9fc"}"><td style="width:170px;color:#64748b;font-weight:bold;border-bottom:1px solid #e5e7ef">${escapeHtml(k)}</td><td style="border-bottom:1px solid #e5e7ef">${escapeHtml(v)}</td></tr>`
-      )
-      .join("\n    ")}
-  </table>
-  <h3 style="margin:22px 0 6px;font-size:15px">Cover note</h3>
-  <p style="margin:0;white-space:pre-wrap;line-height:1.6">${escapeHtml(d.coverNote || "—")}</p>
-  <p style="margin:24px 0 0;color:#64748b;font-size:12px">This application is also saved in the CRM under Job Applications. Reply to this email to answer the candidate.</p>
+    // plain, simple layout so it reads well in any mail app
+    const html = `<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.6;color:#111">
+<p>Hello,</p>
+<p>A new job application has been received from the Careers page.</p>
+<p>${rows.map(([k, v]) => `<b>${escapeHtml(k)}:</b> ${escapeHtml(v)}`).join("<br>\n")}</p>
+<p><b>Cover note:</b><br>${escapeHtml(d.coverNote || "—").replace(/\n/g, "<br>")}</p>
+<p>The resume is attached to this email. This application is also saved in the CRM under Careers &gt; Job Applications (#${id}).<br>Reply to this email to contact the candidate.</p>
 </div>`;
-    const text = `New job application (#${id})\n\n${rows.map(([k, v]) => `${k}: ${v}`).join("\n")}\n\nCover note:\n${d.coverNote || "—"}`;
+    const text = `Hello,\n\nA new job application has been received from the Careers page.\n\n${rows.map(([k, v]) => `${k}: ${v}`).join("\n")}\n\nCover note:\n${d.coverNote || "—"}\n\nThe resume is attached. This application is also saved in the CRM under Careers > Job Applications (#${id}). Reply to this email to contact the candidate.`;
 
     // sent after the reply so the candidate never waits on the mail server
     after(async () => {
       const sent = await sendMail({
         to: HR_EMAIL,
+        fromName: "Quickupp Softech Careers",
         replyTo: `${d.fullName} <${d.email}>`,
         subject: `Career Application – ${d.fullName} – ${job.title}`,
         html,

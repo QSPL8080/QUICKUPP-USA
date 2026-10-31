@@ -80,15 +80,17 @@ export default function LoginForm() {
   return (
     <form className="crm-login-form" onSubmit={submit} noValidate>
       <label className="crm-field">
-        <span className="crm-label">Email</span>
+        <span className="crm-label">Email or username</span>
         <input
           className="crm-input"
-          type="email"
+          type="text"
+          autoCapitalize="none"
+          spellCheck={false}
           autoComplete="username"
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@quickupp.us"
+          placeholder="you@quickuppsoftech.us or username"
         />
       </label>
       <label className="crm-field">
@@ -121,7 +123,7 @@ export default function LoginForm() {
             <path d="M20 6L9 17l-5-5" />
           </svg>
         </span>
-        <span>Remember email</span>
+        <span>Remember me</span>
       </label>
       {error && (
         <p className="crm-alert" role="alert">

@@ -24,16 +24,16 @@ export function SelectBox({ checked, mixed = false, onChange, label }: { checked
  * Row selection for a list. Selected ids that are no longer on screen (after
  * changing page, filters or deleting) simply drop out.
  */
-export function useSelection(ids: number[]) {
-  const [picked, setPicked] = useState<number[]>([]);
+export function useSelection<T extends string | number = number>(ids: T[]) {
+  const [picked, setPicked] = useState<T[]>([]);
   const selected = picked.filter((id) => ids.includes(id));
   const all = ids.length > 0 && selected.length === ids.length;
   return {
     selected,
     all,
     some: selected.length > 0 && !all,
-    has: (id: number) => selected.includes(id),
-    toggle: (id: number, on: boolean) => setPicked((p) => (on ? [...p.filter((x) => x !== id), id] : p.filter((x) => x !== id))),
+    has: (id: T) => selected.includes(id),
+    toggle: (id: T, on: boolean) => setPicked((p) => (on ? [...p.filter((x) => x !== id), id] : p.filter((x) => x !== id))),
     toggleAll: (on: boolean) => setPicked(on ? [...ids] : []),
     clear: () => setPicked([]),
   };
@@ -47,7 +47,7 @@ export function BulkBar({
   onDelete,
   children,
 }: {
-  sel: ReturnType<typeof useSelection>;
+  sel: { selected: unknown[]; all: boolean; some: boolean; toggleAll: (on: boolean) => void; clear: () => void };
   noun: [string, string];
   busy: boolean;
   onDelete: () => void;

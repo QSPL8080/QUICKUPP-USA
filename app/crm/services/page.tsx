@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
-export default function ServicesIndex() {
-  redirect("/crm/services/digital-marketing");
+export default function ServicesPage() {
+  redirect("/crm/enquiries");
 }

@@ -1,104 +1,178 @@
 import "server-only";
 import { getPool } from "@/lib/db";
-import { SERVICE_FORMS, type ServiceFormKey } from "@/lib/formOptions";
+import { SERVICE_FORMS } from "@/lib/formOptions";
+import { ENQUIRY_STATUSES, isEnquirySource, type EnquirySource, type EnquiryStatus } from "@/lib/crm/leadOptions";
 
 /*
  * Reading enquiries and payments for the CRM. Table names only ever come
  * from the fixed lists below, never from the request.
  */
 
-export const ENQUIRY_STATUSES = ["new", "contacted", "closed"] as const;
-export type EnquiryStatus = (typeof ENQUIRY_STATUSES)[number];
-
-export type EnquirySource = "contact" | ServiceFormKey;
+export { ENQUIRY_STATUSES, isEnquirySource } from "@/lib/crm/leadOptions";
+export type { EnquiryStatus, EnquirySource } from "@/lib/crm/leadOptions";
 
 export const SOURCES: Record<EnquirySource, { table: string; label: string; short: string; href: string }> = {
-  contact: { table: "contact_enquiries", label: "Contact Enquiries", short: "Contact", href: "/crm/contact" },
-  "digital-marketing": { table: SERVICE_FORMS["digital-marketing"].table, label: SERVICE_FORMS["digital-marketing"].label, short: "Digital Marketing", href: "/crm/services/digital-marketing" },
-  "ai-automation": { table: SERVICE_FORMS["ai-automation"].table, label: SERVICE_FORMS["ai-automation"].label, short: "AI & Automation", href: "/crm/services/ai-automation" },
-  "it-services": { table: SERVICE_FORMS["it-services"].table, label: SERVICE_FORMS["it-services"].label, short: "IT Services", href: "/crm/services/it-services" },
-  "staff-augmentation": { table: SERVICE_FORMS["staff-augmentation"].table, label: SERVICE_FORMS["staff-augmentation"].label, short: "Staff Augmentation", href: "/crm/services/staff-augmentation" },
+  contact: { table: "contact_enquiries", label: "Contact Enquiries", short: "Contact", href: "/crm/enquiries?source=contact" },
+  "digital-marketing": { table: SERVICE_FORMS["digital-marketing"].table, label: SERVICE_FORMS["digital-marketing"].label, short: "Digital Marketing", href: "/crm/enquiries?source=digital-marketing" },
+  "ai-automation": { table: SERVICE_FORMS["ai-automation"].table, label: SERVICE_FORMS["ai-automation"].label, short: "AI & Automation", href: "/crm/enquiries?source=ai-automation" },
+  "it-services": { table: SERVICE_FORMS["it-services"].table, label: SERVICE_FORMS["it-services"].label, short: "IT Services", href: "/crm/enquiries?source=it-services" },
+  "staff-augmentation": { table: SERVICE_FORMS["staff-augmentation"].table, label: SERVICE_FORMS["staff-augmentation"].label, short: "Staff Augmentation", href: "/crm/enquiries?source=staff-augmentation" },
+  manual: { table: "manual_leads", label: "Manual Leads", short: "Manual", href: "/crm/enquiries?source=manual" },
 };
 
-export const isEnquirySource = (v: unknown): v is EnquirySource =>
-  typeof v === "string" && Object.prototype.hasOwnProperty.call(SOURCES, v);
-
+/** Full details of one lead (detail drawer) */
 export type EnquiryRow = {
+  source: EnquirySource;
   id: number;
   name: string;
   email: string;
   phone: string | null;
   company: string | null;
-  website: string | null; // contact form
-  country: string | null; // contact form
-  timeline: string | null; // contact form
+  website: string | null;
+  country: string | null;
+  timeline: string | null;
   industry: string;
   otherIndustry: string | null;
-  service: string | null; // service tables: the form's fixed service
-  interest: string; // contact: subject / service; service tables: category
+  service: string | null; // service forms / manual: the service group
+  interest: string; // contact: service chosen; service forms / manual: the service page
   budget: string | null;
   message: string;
   sourcePage: string | null;
   pageUrl: string | null;
+  channel: string | null; // manual leads
+  assignedTo: string | null; // manual leads
+  createdBy: string | null; // manual leads
+  status: EnquiryStatus;
+  createdAt: string;
+};
+
+/** One line of the All Enquiries list */
+export type LeadRow = {
+  key: string; // "source:id"
+  source: EnquirySource;
+  id: number;
+  name: string;
+  email: string;
+  phone: string | null;
+  company: string | null;
+  service: string | null;
+  detail: string;
   status: EnquiryStatus;
   createdAt: string;
 };
 
 const PAGE_SIZE = 25;
 
-export async function listEnquiries(source: EnquirySource, opts: { q?: string; status?: string; page?: number }) {
-  const { table } = SOURCES[source];
-  const isContact = source === "contact";
+/* one SELECT per source with the same columns, so they can be listed together */
+const UNION_SQL = (Object.keys(SOURCES) as EnquirySource[])
+  .map((k) => {
+    const detail = k === "contact" ? "project_type" : "category";
+    const service = k === "contact" ? "NULL" : "service";
+    return `SELECT '${k}' AS src, id, full_name, email, phone, company_name, ${detail} AS detail, ${service} AS service, status, created_at FROM \`${SOURCES[k].table}\``;
+  })
+  .join(" UNION ALL ");
+
+export type LeadFilters = { q?: string; source?: string; status?: string; from?: string; to?: string };
+
+function leadWhere(f: LeadFilters) {
   const where: string[] = [];
   const args: (string | number)[] = [];
-  if (opts.status && (ENQUIRY_STATUSES as readonly string[]).includes(opts.status)) {
-    where.push("status = ?");
-    args.push(opts.status);
+  if (f.source && isEnquirySource(f.source)) {
+    where.push("src = ?");
+    args.push(f.source);
   }
-  const q = (opts.q || "").trim().slice(0, 100);
+  if (f.status && (ENQUIRY_STATUSES as readonly string[]).includes(f.status)) {
+    where.push("status = ?");
+    args.push(f.status);
+  }
+  if (f.from && /^\d{4}-\d{2}-\d{2}$/.test(f.from)) {
+    where.push("created_at >= ?");
+    args.push(`${f.from} 00:00:00`);
+  }
+  if (f.to && /^\d{4}-\d{2}-\d{2}$/.test(f.to)) {
+    where.push("created_at < ? + INTERVAL 1 DAY");
+    args.push(`${f.to} 00:00:00`);
+  }
+  const q = (f.q || "").trim().slice(0, 100);
   if (q) {
     const like = `%${q}%`;
-    if (isContact) {
-      where.push("(full_name LIKE ? OR email LIKE ? OR phone LIKE ? OR company_name LIKE ? OR country LIKE ?)");
-      args.push(like, like, like, like, like);
-    } else {
-      where.push("(full_name LIKE ? OR email LIKE ? OR phone LIKE ? OR company_name LIKE ?)");
-      args.push(like, like, like, like);
-    }
+    where.push("(full_name LIKE ? OR email LIKE ? OR phone LIKE ? OR company_name LIKE ? OR detail LIKE ?)");
+    args.push(like, like, like, like, like);
   }
-  const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : "";
-  const page = Math.max(1, Math.floor(opts.page || 1));
+  return { sql: where.length ? `WHERE ${where.join(" AND ")}` : "", args };
+}
 
+const toLead = (r: Record<string, unknown>): LeadRow => ({
+  key: `${r.src}:${r.id}`,
+  source: r.src as EnquirySource,
+  id: Number(r.id),
+  name: String(r.full_name ?? ""),
+  email: String(r.email ?? ""),
+  phone: (r.phone as string) || null,
+  company: (r.company_name as string) || null,
+  service: (r.service as string) || null,
+  detail: String(r.detail ?? ""),
+  status: ((ENQUIRY_STATUSES as readonly string[]).includes(String(r.status)) ? r.status : "new") as EnquiryStatus,
+  createdAt: new Date(r.created_at as string).toISOString(),
+});
+
+/** Every lead from every form (and manual ones), newest first */
+export async function listLeads(f: LeadFilters & { page?: number }) {
+  const { sql, args } = leadWhere(f);
+  const page = Math.max(1, Math.floor(f.page || 1));
   const pool = getPool();
-  const [countRows] = await pool.query(`SELECT COUNT(*) AS n FROM \`${table}\` ${whereSql}`, args);
+  const [countRows] = await pool.query(`SELECT COUNT(*) AS n FROM (${UNION_SQL}) t ${sql}`, args);
   const total = Number((countRows as { n: number }[])[0]?.n || 0);
   const [rows] = await pool.query(
-    `SELECT * FROM \`${table}\` ${whereSql} ORDER BY created_at DESC, id DESC LIMIT ${PAGE_SIZE} OFFSET ${(page - 1) * PAGE_SIZE}`,
+    `SELECT * FROM (${UNION_SQL}) t ${sql} ORDER BY created_at DESC, id DESC LIMIT ${PAGE_SIZE} OFFSET ${(page - 1) * PAGE_SIZE}`,
     args
   );
+  return { items: (rows as Record<string, unknown>[]).map(toLead), total, page, pages: Math.max(1, Math.ceil(total / PAGE_SIZE)), pageSize: PAGE_SIZE };
+}
 
-  const items: EnquiryRow[] = (rows as Record<string, unknown>[]).map((r) => ({
+/** The same list without paging, for the CSV export (capped) */
+export async function exportLeads(f: LeadFilters) {
+  const { sql, args } = leadWhere(f);
+  const [rows] = await getPool().query(`SELECT * FROM (${UNION_SQL}) t ${sql} ORDER BY created_at DESC, id DESC LIMIT 10000`, args);
+  return (rows as Record<string, unknown>[]).map(toLead);
+}
+
+/** One lead with every field its form collected */
+export async function getLead(source: EnquirySource, id: number): Promise<EnquiryRow | null> {
+  const { table } = SOURCES[source];
+  const [rows] =
+    source === "manual"
+      ? await getPool().query(`SELECT m.*, u.name AS created_by_name FROM manual_leads m LEFT JOIN crm_users u ON u.id = m.created_by WHERE m.id = ?`, [id])
+      : await getPool().query(`SELECT * FROM \`${table}\` WHERE id = ?`, [id]);
+  const r = (rows as Record<string, unknown>[])[0];
+  if (!r) return null;
+  const isContact = source === "contact";
+  const isManual = source === "manual";
+  const hasExtra = isContact || isManual;
+  return {
+    source,
     id: Number(r.id),
     name: String(r.full_name ?? ""),
     email: String(r.email ?? ""),
     phone: (r.phone as string) || null,
     company: (r.company_name as string) || null,
-    website: isContact ? ((r.company_website as string) || null) : null,
-    country: isContact ? ((r.country as string) || null) : null,
-    timeline: isContact ? ((r.timeline as string) || null) : null,
+    website: hasExtra ? ((r.company_website as string) || null) : null,
+    country: hasExtra ? ((r.country as string) || null) : null,
+    timeline: hasExtra ? ((r.timeline as string) || null) : null,
     industry: String(r.industry ?? ""),
     otherIndustry: (r.other_industry as string) || null,
     service: isContact ? null : ((r.service as string) || SOURCES[source].label),
     interest: String((isContact ? r.project_type : r.category) ?? ""),
     budget: (r.budget as string) || null,
     message: String(r.message ?? ""),
-    sourcePage: isContact ? null : ((r.source_page as string) || null),
-    pageUrl: (r.page_url as string) || null,
-    status: (r.status as EnquiryStatus) || "new",
+    sourcePage: isContact || isManual ? null : ((r.source_page as string) || null),
+    pageUrl: isManual ? null : ((r.page_url as string) || null),
+    channel: isManual ? ((r.lead_channel as string) || null) : null,
+    assignedTo: isManual ? ((r.assigned_to as string) || null) : null,
+    createdBy: isManual ? ((r.created_by_name as string) || null) : null,
+    status: ((ENQUIRY_STATUSES as readonly string[]).includes(String(r.status)) ? r.status : "new") as EnquiryStatus,
     createdAt: new Date(r.created_at as string).toISOString(),
-  }));
-
-  return { items, total, page, pages: Math.max(1, Math.ceil(total / PAGE_SIZE)), pageSize: PAGE_SIZE };
+  };
 }
 
 /* ---- Payments --------------------------------------------------------------------------- */

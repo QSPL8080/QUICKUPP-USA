@@ -34,6 +34,7 @@ function transporter(): Transporter {
 
 export type Mail = {
   to: string;
+  fromName?: string;
   subject: string;
   html: string;
   text: string;
@@ -48,9 +49,10 @@ export async function sendMail(mail: Mail): Promise<boolean> {
     return false;
   }
   try {
+    const { fromName, ...rest } = mail;
     await transporter().sendMail({
-      from: { name: "Quickupp Softech Careers", address: process.env.SMTP_FROM || (process.env.SMTP_USER as string) },
-      ...mail,
+      from: { name: fromName || "Quickupp Softech", address: process.env.SMTP_FROM || (process.env.SMTP_USER as string) },
+      ...rest,
     });
     return true;
   } catch (err) {
