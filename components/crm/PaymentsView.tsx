@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useFeedback } from "@/components/crm/Feedback";
 import type { PaymentRow } from "@/lib/crm/data";
 import { PAYMENT_STATUS_LABEL, money } from "@/lib/crm/format";
 import { BulkBar, SelectBox, useSelection } from "@/components/crm/Selection";
@@ -66,6 +67,7 @@ const fromRow = (p: PaymentRow): FormState => ({
 
 export default function PaymentsView({ rows, options, openNew }: { rows: PaymentRow[]; options: Options; openNew: boolean }) {
   const router = useRouter();
+  const { confirm, toast } = useFeedback();
   const [editing, setEditing] = useState<PaymentRow | "new" | null>(openNew ? "new" : null);
   const [form, setForm] = useState<FormState>(blank());
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -103,18 +105,20 @@ export default function PaymentsView({ rows, options, openNew }: { rows: Payment
       return;
     }
     close();
+    toast(editing === "new" ? "Payment added" : "Changes saved");
     router.refresh();
   };
 
   const remove = async () => {
     if (editing === "new" || !editing) return;
-    if (!window.confirm(`Delete this payment from ${editing.clientName}? This can't be undone.`)) return;
+    if (!(await confirm({ title: `Delete the payment from ${editing.clientName}?`, message: "It will be permanently removed from the CRM and the database. This can't be undone." }))) return;
     setBusy(true);
     const res = await fetch(`/api/crm/payments/${editing.id}`, { method: "DELETE" }).catch(() => null);
     setBusy(false);
     // 404 = someone already deleted it, so it's gone either way
     if (!res?.ok && res?.status !== 404) return setError("Couldn't delete the payment. Please try again.");
     close();
+    toast("Payment deleted");
     router.refresh();
   };
 
@@ -122,7 +126,7 @@ export default function PaymentsView({ rows, options, openNew }: { rows: Payment
     const ids = sel.selected;
     if (!ids.length) return;
     const what = ids.length === 1 ? "this payment" : `these ${ids.length} payments`;
-    if (!window.confirm(`Permanently delete ${what}? This can't be undone.`)) return;
+    if (!(await confirm({ title: `Delete ${what}?`, message: "They will be permanently removed from the CRM and the database. This can't be undone." }))) return;
     setBusy(true);
     setListError("");
     const res = await fetch("/api/crm/payments", {
@@ -133,6 +137,7 @@ export default function PaymentsView({ rows, options, openNew }: { rows: Payment
     setBusy(false);
     if (!res?.ok) return setListError("Couldn't delete the selected payments. Please try again.");
     sel.clear();
+    toast(ids.length === 1 ? "Payment deleted" : `${ids.length} payments deleted`);
     router.refresh();
   };
 

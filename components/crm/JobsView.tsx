@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useFeedback } from "@/components/crm/Feedback";
 import { EMPLOYMENT_TYPES, JOB_DEPARTMENTS, type Job } from "@/lib/jobs";
 import { BulkBar, SelectBox, useSelection } from "@/components/crm/Selection";
 
@@ -55,6 +56,7 @@ const STATE_LABEL = { live: "Live", closed: "Closed", expired: "Deadline passed"
 
 export default function JobsView({ rows, openNew }: { rows: Job[]; openNew: boolean }) {
   const router = useRouter();
+  const { confirm, toast } = useFeedback();
   const [editing, setEditing] = useState<Job | "new" | null>(openNew ? "new" : null);
   const [form, setForm] = useState<FormState>(blank());
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -92,6 +94,7 @@ export default function JobsView({ rows, openNew }: { rows: Job[]; openNew: bool
       return;
     }
     close();
+    toast(isNew ? "Job opening published" : "Changes saved");
     router.refresh();
   };
 
@@ -103,25 +106,28 @@ export default function JobsView({ rows, openNew }: { rows: Job[]; openNew: bool
       body: JSON.stringify({ isOpen: !j.isOpen }),
     }).catch(() => null);
     if (!res?.ok) return setListError("Couldn't update the job opening. Please try again.");
+    toast(j.isOpen ? "Opening closed — hidden from the Careers page" : "Opening reopened on the Careers page");
     router.refresh();
   };
 
   const remove = async () => {
     if (editing === "new" || !editing) return;
-    if (!window.confirm(`Permanently delete the "${editing.title}" opening? This can't be undone.`)) return;
+    if (!(await confirm({ title: `Delete the "${editing.title}" opening?`, message: "It will be removed from the Careers page and the CRM. Applications already received are kept. This can't be undone." }))) return;
     setBusy(true);
     const res = await fetch(`/api/crm/jobs/${editing.id}`, { method: "DELETE" }).catch(() => null);
     setBusy(false);
     if (!res?.ok && res?.status !== 404) return setError("Couldn't delete the job opening. Please try again.");
     close();
+    toast("Job opening deleted");
     router.refresh();
   };
 
   const removeOne = async (j: Job) => {
-    if (!window.confirm(`Permanently delete the "${j.title}" opening? This can't be undone.`)) return;
+    if (!(await confirm({ title: `Delete the "${j.title}" opening?`, message: "It will be removed from the Careers page and the CRM. Applications already received are kept. This can't be undone." }))) return;
     setListError("");
     const res = await fetch(`/api/crm/jobs/${j.id}`, { method: "DELETE" }).catch(() => null);
     if (!res?.ok && res?.status !== 404) return setListError("Couldn't delete the job opening. Please try again.");
+    toast("Job opening deleted");
     router.refresh();
   };
 
@@ -129,7 +135,7 @@ export default function JobsView({ rows, openNew }: { rows: Job[]; openNew: bool
     const ids = sel.selected;
     if (!ids.length) return;
     const what = ids.length === 1 ? "this job opening" : `these ${ids.length} job openings`;
-    if (!window.confirm(`Permanently delete ${what}? This can't be undone.`)) return;
+    if (!(await confirm({ title: `Delete ${what}?`, message: "They will be removed from the Careers page and the CRM. This can't be undone." }))) return;
     setBusy(true);
     setListError("");
     const res = await fetch("/api/crm/jobs", {
@@ -140,6 +146,7 @@ export default function JobsView({ rows, openNew }: { rows: Job[]; openNew: bool
     setBusy(false);
     if (!res?.ok) return setListError("Couldn't delete the selected job openings. Please try again.");
     sel.clear();
+    toast(ids.length === 1 ? "Job opening deleted" : `${ids.length} job openings deleted`);
     router.refresh();
   };
 

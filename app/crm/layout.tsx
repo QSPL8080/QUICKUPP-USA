@@ -5,6 +5,7 @@ import { newApplicationCount } from "@/lib/crm/applications";
 import { getNotifications } from "@/lib/crm/notifications";
 import NotifyCenter from "@/components/crm/NotifyCenter";
 import TableFit from "@/components/crm/TableFit";
+import { FeedbackProvider } from "@/components/crm/Feedback";
 import CrmSidebar from "@/components/crm/Sidebar";
 import IdleLogout from "@/components/crm/IdleLogout";
 import { IDLE_MINUTES } from "@/lib/crm/auth";
@@ -21,11 +22,13 @@ export default async function CrmLayout({ children }: { children: React.ReactNod
   const newCounts = { leads: perSource.reduce((a, s) => a + s.fresh, 0), applications };
   return (
     <div className="crm-root">
-      <CrmSidebar user={user} newCounts={newCounts} />
-      <main className="crm-main">{children}</main>
-      <NotifyCenter data={notifications} />
-      <TableFit />
-      <IdleLogout idleMinutes={IDLE_MINUTES} />
+      <FeedbackProvider>
+        <CrmSidebar user={user} newCounts={newCounts} />
+        <main className="crm-main">{children}</main>
+        <NotifyCenter data={notifications} />
+        <TableFit />
+        <IdleLogout idleMinutes={IDLE_MINUTES} />
+      </FeedbackProvider>
     </div>
   );
 }

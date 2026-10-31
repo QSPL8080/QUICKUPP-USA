@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useFeedback } from "@/components/crm/Feedback";
 import type { TeamUser } from "@/lib/crm/users";
 
 const fmtDate = (iso: string | null) =>
@@ -11,6 +12,7 @@ type Form = { name: string; username: string; email: string; password: string; i
 
 export default function UsersView({ users, meId }: { users: TeamUser[]; meId: number }) {
   const router = useRouter();
+  const { confirm, toast } = useFeedback();
   const [editing, setEditing] = useState<TeamUser | "new" | null>(null);
   const [form, setForm] = useState<Form>({ name: "", username: "", email: "", password: "", isActive: true });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -52,28 +54,31 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
       return;
     }
     setEditing(null);
+    toast(isNew ? "User added" : "Changes saved");
     router.refresh();
   };
 
   const toggleActive = async (u: TeamUser) => {
     setListError("");
-    if (u.isActive && !window.confirm(`Deactivate ${u.name}? They will be signed out and can't sign in until you activate the account again.`)) return;
+    if (u.isActive && !(await confirm({ title: `Deactivate ${u.name}?`, message: "They will be signed out straight away and can't sign in until you activate the account again.", confirmLabel: "Deactivate", tone: "default" }))) return;
     const res = await fetch(`/api/crm/users/${u.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ isActive: !u.isActive }),
     }).catch(() => null);
     if (!res?.ok) return setListError("Couldn't update the account. Please try again.");
+    toast(u.isActive ? `${u.name} deactivated` : `${u.name} activated`);
     router.refresh();
   };
 
   const remove = async (u: TeamUser) => {
     setListError("");
-    if (!window.confirm(`Permanently delete ${u.name}'s account? This can't be undone.`)) return;
+    if (!(await confirm({ title: `Delete ${u.name}'s account?`, message: "They will no longer be able to sign in. This can't be undone." }))) return;
     const res = await fetch(`/api/crm/users/${u.id}`, { method: "DELETE" }).catch(() => null);
     const json = res ? await res.json().catch(() => ({})) : {};
     if (!res?.ok && res?.status !== 404) return setListError(json.error || "Couldn't delete the account. Please try again.");
     if (editing !== null) setEditing(null);
+    toast("Account deleted");
     router.refresh();
   };
 

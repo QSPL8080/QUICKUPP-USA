@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useFeedback } from "@/components/crm/Feedback";
 import type { EnquiryRow, LeadRow } from "@/lib/crm/data";
 import {
   ENQUIRY_STATUSES,
@@ -92,6 +93,7 @@ function StatusSelect({ value, busy, label, onChange }: { value: EnquiryStatus; 
 
 export default function LeadsView({ rows, offset, team }: { rows: LeadRow[]; offset: number; team: string[] }) {
   const router = useRouter();
+  const { confirm, toast } = useFeedback();
   const [open, setOpen] = useState<EnquiryRow | null>(null);
   const [loading, setLoading] = useState<string>("");
   const [busy, setBusy] = useState(false);
@@ -127,12 +129,13 @@ export default function LeadsView({ rows, offset, team }: { rows: LeadRow[]; off
     }).catch(() => null);
     setBusy(false);
     if (!res?.ok) return setError("Couldn't update the status. Please try again.");
+    toast("Status updated");
     if (open && open.source === source && open.id === id) setOpen({ ...open, status: status as EnquiryStatus });
     router.refresh();
   };
 
   const removeKeys = async (keys: string[], what: string) => {
-    if (!window.confirm(`Permanently delete ${what}? This can't be undone.`)) return false;
+    if (!(await confirm({ title: `Delete ${what}?`, message: "It will be permanently removed from the CRM and the database. This can't be undone." }))) return false;
     setBusy(true);
     setError("");
     const res = await fetch("/api/crm/enquiries", {
@@ -143,8 +146,10 @@ export default function LeadsView({ rows, offset, team }: { rows: LeadRow[]; off
     setBusy(false);
     if (!res?.ok && res?.status !== 404) {
       setError("Couldn't delete. Please try again.");
+      toast("Couldn't delete. Please try again.", "error");
       return false;
     }
+    toast(keys.length === 1 ? "Lead deleted" : `${keys.length} leads deleted`);
     router.refresh();
     return true;
   };
@@ -193,6 +198,7 @@ export default function LeadsView({ rows, offset, team }: { rows: LeadRow[]; off
       if (fresh?.lead) setOpen(fresh.lead);
     }
     setEditing(null);
+    toast(isNew ? "Lead added" : "Changes saved");
     router.refresh();
   };
 

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useFeedback } from "@/components/crm/Feedback";
 import { APPLICATION_STATUSES, APPLICATION_STATUS_LABEL, fmtBytes, type ApplicationRow } from "@/lib/applications";
 import { BulkBar, SelectBox, useSelection } from "@/components/crm/Selection";
 
@@ -35,6 +36,7 @@ function StatusSelect({ row, busy, onChange }: { row: ApplicationRow; busy: bool
 
 export default function ApplicationsView({ rows }: { rows: ApplicationRow[] }) {
   const router = useRouter();
+  const { confirm, toast } = useFeedback();
   const [open, setOpen] = useState<ApplicationRow | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -50,12 +52,13 @@ export default function ApplicationsView({ rows }: { rows: ApplicationRow[] }) {
     }).catch(() => null);
     setBusy(false);
     if (!res?.ok) return setError("Couldn't update the status. Please try again.");
+    toast("Status updated");
     if (open?.id === row.id) setOpen({ ...row, status: status as ApplicationRow["status"] });
     router.refresh();
   };
 
   const removeIds = async (ids: number[], what: string) => {
-    if (!window.confirm(`Permanently delete ${what}, resume included? This can't be undone.`)) return false;
+    if (!(await confirm({ title: `Delete ${what}?`, message: "The application and the candidate's resume will be permanently removed. This can't be undone." }))) return false;
     setBusy(true);
     setError("");
     const res = await fetch("/api/crm/applications", {
@@ -66,8 +69,10 @@ export default function ApplicationsView({ rows }: { rows: ApplicationRow[] }) {
     setBusy(false);
     if (!res?.ok && res?.status !== 404) {
       setError("Couldn't delete. Please try again.");
+      toast("Couldn't delete. Please try again.", "error");
       return false;
     }
+    toast(ids.length === 1 ? "Application deleted" : `${ids.length} applications deleted`);
     router.refresh();
     return true;
   };
