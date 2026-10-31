@@ -1908,3 +1908,31 @@ a.crm-link-btn {
     overflow-wrap: anywhere;
   }
 }
+
+/* checkbox as a full-width row (e.g. Account active) */
+.crm-root .crm-check.crm-check-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--crm-line);
+  border-radius: 10px;
+  background: #fafbfd;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.crm-root .crm-check.crm-check-row:hover {
+  border-color: #c7d2fe;
+}
+
+.crm-check-row .crm-check-box {
+  flex-shrink: 0;
+}
+
+.crm-check-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  line-height: 1.35;
+}

@@ -216,14 +216,17 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
                     <input className="crm-input" type="text" value={form.password} onChange={set("password")} autoComplete="new-password" placeholder="At least 8 characters" />
                     {err("password")}
                   </label>
-                  <label className="crm-field crm-check crm-span-2">
+                  <label className="crm-check crm-check-row crm-span-2">
                     <input type="checkbox" checked={form.isActive} onChange={set("isActive")} />
                     <span className="crm-check-box" aria-hidden="true">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M20 6L9 17l-5-5" />
                       </svg>
                     </span>
-                    <span>Account active (can sign in)</span>
+                    <span className="crm-check-text">
+                      <span className="crm-strong">Account active</span>
+                      <span className="crm-cell-sub">{form.isActive ? "This user can sign in to the CRM." : "This user can't sign in until the account is activated."}</span>
+                    </span>
                   </label>
                 </>
               )}
