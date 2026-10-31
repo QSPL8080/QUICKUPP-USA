@@ -34,7 +34,7 @@ export const LEAD_SERVICES = (Object.keys(SERVICE_FORMS) as ServiceFormKey[]).ma
   value: SERVICE_FORMS[k].label,
   options: SERVICE_FORMS[k].options as readonly string[],
 }));
-export const LEAD_CHANNELS = ["Phone Call", "Email", "WhatsApp", "Referral", "Social Media", "Walk-in / Meeting", "Other"] as const;
+export const LEAD_CHANNELS = ["Website", "Manual", "Meta"] as const;
 export const LEAD_BUDGETS = BUDGETS.map((b) => b.value);
 export const LEAD_TIMELINES = CONTACT_TIMELINES;
 export const LEAD_INDUSTRIES = INDUSTRIES;
@@ -88,7 +88,7 @@ export function validateManualLead(body: Record<string, unknown>): { ok: true; d
   if (industry && !(LEAD_INDUSTRIES as readonly string[]).includes(industry)) errors.industry = "Please choose an industry.";
   if (budget && !LEAD_BUDGETS.includes(budget)) errors.budget = "Please choose a budget.";
   if (timeline && !(LEAD_TIMELINES as readonly string[]).includes(timeline)) errors.timeline = "Please choose a timeline.";
-  if (!(LEAD_CHANNELS as readonly string[]).includes(channel)) errors.channel = "Please choose how the lead reached us.";
+  if (!(LEAD_CHANNELS as readonly string[]).includes(channel)) errors.channel = "Please choose the lead source.";
   if (!(ENQUIRY_STATUSES as readonly string[]).includes(status)) errors.status = "Please choose a status.";
 
   if (Object.keys(errors).length) return { ok: false, errors };

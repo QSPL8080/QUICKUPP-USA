@@ -54,7 +54,7 @@ const blankForm = (): LeadForm => ({
   category: "",
   budget: "",
   timeline: "",
-  channel: "Phone Call",
+  channel: "Manual",
   assignedTo: "",
   notes: "",
   status: "new",
@@ -72,7 +72,7 @@ const formFrom = (l: EnquiryRow): LeadForm => ({
   category: l.interest || "",
   budget: l.budget || "",
   timeline: l.timeline || "",
-  channel: l.channel || "Other",
+  channel: l.channel && (LEAD_CHANNELS as readonly string[]).includes(l.channel) ? l.channel : "Manual",
   assignedTo: l.assignedTo || "",
   notes: l.message || "",
   status: l.status,
@@ -321,7 +321,7 @@ export default function LeadsView({ rows, offset, team }: { rows: LeadRow[]; off
               <dd>{SOURCE_LABEL[open.source]}</dd>
               {open.channel && (
                 <>
-                  <dt>Reached us by</dt>
+                  <dt>Lead source</dt>
                   <dd>{open.channel}</dd>
                 </>
               )}
@@ -428,7 +428,7 @@ export default function LeadsView({ rows, offset, team }: { rows: LeadRow[]; off
 
             <div className="crm-form-grid crm-form-grid-3">
               <label className="crm-field">
-                <span className="crm-label">Reached us by *</span>
+                <span className="crm-label">Lead source *</span>
                 <select className="crm-input crm-select" value={form.channel} onChange={set("channel")}>
                   {LEAD_CHANNELS.map((c) => (
                     <option key={c} value={c}>
