@@ -1444,3 +1444,36 @@
   align-self: end;
   padding-bottom: 12px;
 }
+
+/* ---- Job applications ------------------------------------------------------ */
+.crm-file {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--crm-line, #e5e7eb);
+  background: #ffffff;
+  color: var(--crm-accent);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.crm-file:hover {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+}
+
+.crm-root select.crm-app-status-new { background-color: #eef2ff; color: #4f46e5; border-color: #e0e7ff; }
+.crm-root select.crm-app-status-reviewing { background-color: #fffbeb; color: #b45309; border-color: #fef3c7; }
+.crm-root select.crm-app-status-shortlisted { background-color: #ecfeff; color: #0e7490; border-color: #cffafe; }
+.crm-root select.crm-app-status-rejected { background-color: #fef2f2; color: #b91c1c; border-color: #fee2e2; }
+.crm-root select.crm-app-status-hired { background-color: #ecfdf5; color: #047857; border-color: #d1fae5; }
+
+a.crm-link-btn {
+  text-decoration: none;
+  white-space: nowrap;
+}

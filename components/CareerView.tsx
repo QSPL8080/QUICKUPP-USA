@@ -2,11 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { createPortal } from "react-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CareerMotion from "@/components/CareerMotion";
 import LucideIcon, { type LucideIconName } from "@/components/LucideIcon";
 import type { Job } from "@/lib/jobs";
+import { RESUME_ACCEPT, checkResume, fmtBytes } from "@/lib/applications";
 import "@/app/career.css";
 
 /*
@@ -249,7 +251,7 @@ function HiringTrack() {
   );
 }
 
-function JobCard({ job }: { job: Job }) {
+function JobCard({ job, onApply }: { job: Job; onApply: (job: Job) => void }) {
   const [open, setOpen] = useState(false);
   const meta: { label: string; value: string; icon: LucideIconName }[] = [
     { label: "Department", value: job.department, icon: "layers" },
@@ -275,10 +277,10 @@ function JobCard({ job }: { job: Job }) {
           </dl>
         </div>
         <div className="cv-job-side">
-          <a href={mailto(`Career Application – [Your Name] – ${job.title}`)} className="cv-btn cv-btn-dark">
+          <button type="button" className="cv-btn cv-btn-dark" onClick={() => onApply(job)}>
             <span>Apply Now</span>
             <Arrow />
-          </a>
+          </button>
           <button type="button" className="cv-job-toggle" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={open ? "Hide details" : "Show details"}>
             <LucideIcon name="chevron-right" size={18} strokeWidth={2.4} />
           </button>
@@ -313,12 +315,310 @@ function JobCard({ job }: { job: Job }) {
   );
 }
 
+type ApplyFields = {
+  fullName: string;
+  email: string;
+  phone: string;
+  currentLocation: string;
+  experience: string;
+  profileUrl: string;
+  coverNote: string;
+};
+
+const EMPTY_APPLY: ApplyFields = {
+  fullName: "",
+  email: "",
+  phone: "",
+  currentLocation: "",
+  experience: "",
+  profileUrl: "",
+  coverNote: "",
+};
+
+/** Apply Now: a side sheet with the application form for one opening */
+function ApplyForm({ job, onClose }: { job: Job; onClose: () => void }) {
+  const [f, setF] = useState<ApplyFields>(EMPTY_APPLY);
+  const [file, setFile] = useState<File | null>(null);
+  const [agreed, setAgreed] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [formError, setFormError] = useState("");
+  const [sending, setSending] = useState(false);
+  const [done, setDone] = useState(false);
+  const trapRef = useRef<HTMLInputElement>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    sheetRef.current?.querySelector<HTMLInputElement>("input")?.focus();
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [onClose]);
+
+  const set =
+    (k: keyof ApplyFields) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setF((p) => ({ ...p, [k]: e.target.value }));
+      if (errors[k]) setErrors((p) => ({ ...p, [k]: "" }));
+    };
+
+  const pickFile = (picked: File | null) => {
+    setFile(picked);
+    setErrors((p) => ({ ...p, resume: picked ? checkResume(picked) : "" }));
+  };
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const errs: Record<string, string> = {};
+    if (!f.fullName.trim()) errs.fullName = "Please enter your full name.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.email.trim()))
+      errs.email = "Please enter a valid email address.";
+    if (!/^[0-9+()\-.\s]{5,40}$/.test(f.phone.trim()))
+      errs.phone = "Please enter a valid phone number.";
+    if (!f.currentLocation.trim())
+      errs.currentLocation = "Please enter your current location.";
+    if (!f.experience.trim())
+      errs.experience = "Please enter your total experience.";
+    const fileErr = checkResume(file);
+    if (fileErr) errs.resume = fileErr;
+    if (!agreed)
+      errs.agreed = "Please accept the Privacy Policy and Terms & Conditions.";
+    setErrors(errs);
+    setFormError("");
+    if (Object.keys(errs).length) return;
+
+    const body = new FormData();
+    body.set("jobId", String(job.id));
+    (Object.keys(f) as (keyof ApplyFields)[]).forEach((k) => body.set(k, f[k]));
+    body.set("agreed", "true");
+    body.set("pageUrl", window.location.href);
+    body.set("website", trapRef.current?.value || "");
+    body.set("resume", file as File);
+
+    setSending(true);
+    const res = await fetch("/api/careers/apply", {
+      method: "POST",
+      body,
+    }).catch(() => null);
+    const data = res ? await res.json().catch(() => null) : null;
+    setSending(false);
+    if (res?.ok && data?.ok) return setDone(true);
+    if (data?.errors) setErrors(data.errors);
+    setFormError(
+      data?.error ||
+        (data?.errors
+          ? "Please check the highlighted fields."
+          : "We couldn't send your application right now. Please try again."),
+    );
+  };
+
+  const err = (k: string) =>
+    errors[k] ? <span className="cv-apply-error">{errors[k]}</span> : null;
+  const field = (
+    k: keyof ApplyFields,
+    label: string,
+    props: React.InputHTMLAttributes<HTMLInputElement> = {},
+    required = true,
+  ) => (
+    <label className={`cv-apply-field${errors[k] ? " has-error" : ""}`}>
+      <span className="cv-apply-label">
+        {label}
+        {required && <i aria-hidden="true">*</i>}
+      </span>
+      <input
+        className="cv-apply-input"
+        value={f[k]}
+        onChange={set(k)}
+        {...props}
+      />
+      {err(k)}
+    </label>
+  );
+
+  // rendered at the end of <body> so no animated parent can shift the fixed sheet
+  return createPortal(
+    <div className="cv-page cv-apply-portal">
+      <div className="cv-apply-wrap" onClick={onClose}>
+        <div
+          className="cv-apply"
+          ref={sheetRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Apply for ${job.title}`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="cv-apply-head">
+            <div>
+              <span className="cv-apply-kicker">Apply Now</span>
+              <h3 className="cv-apply-title">{job.title}</h3>
+              <ul className="cv-apply-tags">
+                <li>{job.department}</li>
+                <li>{job.employmentType}</li>
+                <li>{job.location}</li>
+                <li>{job.experience}</li>
+              </ul>
+            </div>
+            <button
+              type="button"
+              className="cv-apply-x"
+              onClick={onClose}
+              aria-label="Close"
+            >
+              <LucideIcon name="x" size={20} strokeWidth={2.2} />
+            </button>
+          </div>
+
+          {done ? (
+            <div className="cv-apply-done">
+              <span className="cv-apply-done-icon" aria-hidden="true">
+                <LucideIcon name="check" size={30} strokeWidth={2.6} />
+              </span>
+              <h3 className="cv-apply-title">Application sent</h3>
+              <p className="cv-apply-note">
+                Thank you, {f.fullName.split(" ")[0]}. Your application for{" "}
+                {job.title} has reached our recruitment team. If your profile
+                matches the role, we will contact you at {f.email}.
+              </p>
+              <button
+                type="button"
+                className="cv-btn cv-btn-dark"
+                onClick={onClose}
+              >
+                <span>Close</span>
+              </button>
+            </div>
+          ) : (
+            <form className="cv-apply-form" onSubmit={submit} noValidate>
+              <input
+                ref={trapRef}
+                type="text"
+                name="website"
+                tabIndex={-1}
+                autoComplete="off"
+                className="cv-apply-trap"
+                aria-hidden="true"
+              />
+              <div className="cv-apply-grid">
+                {field("fullName", "Full Name", { autoComplete: "name" })}
+                {field("email", "Email Address", {
+                  type: "email",
+                  autoComplete: "email",
+                })}
+                {field("phone", "Phone Number", {
+                  type: "tel",
+                  autoComplete: "tel",
+                })}
+                {field("currentLocation", "Current Location", {
+                  placeholder: "City, Country",
+                  autoComplete: "address-level2",
+                })}
+                {field("experience", "Total Experience", {
+                  placeholder: "e.g. 3 years",
+                })}
+                {field(
+                  "profileUrl",
+                  "LinkedIn / Portfolio URL",
+                  { type: "url", placeholder: "https://" },
+                  false,
+                )}
+              </div>
+
+              <label
+                className={`cv-apply-drop${file ? " has-file" : ""}${errors.resume ? " has-error" : ""}`}
+              >
+                <input
+                  type="file"
+                  accept={RESUME_ACCEPT}
+                  onChange={(e) => pickFile(e.target.files?.[0] || null)}
+                />
+                <span className="cv-apply-drop-icon" aria-hidden="true">
+                  <LucideIcon name={file ? "file-check" : "upload"} size={22} />
+                </span>
+                <span className="cv-apply-drop-text">
+                  <strong>{file ? file.name : "Upload your resume"}</strong>
+                  <span>
+                    {file
+                      ? `${fmtBytes(file.size)} · click to change`
+                      : "PDF, DOC or DOCX · up to 5 MB"}
+                  </span>
+                </span>
+                <i className="cv-apply-req" aria-hidden="true">
+                  *
+                </i>
+              </label>
+              {err("resume")}
+
+              <label className="cv-apply-field">
+                <span className="cv-apply-label">Cover Note</span>
+                <textarea
+                  className="cv-apply-input cv-apply-textarea"
+                  rows={4}
+                  value={f.coverNote}
+                  onChange={set("coverNote")}
+                  placeholder="Tell us briefly why you're a good fit for this role"
+                />
+              </label>
+
+              <label
+                className={`cv-apply-agree${errors.agreed ? " has-error" : ""}`}
+              >
+                <input
+                  type="checkbox"
+                  checked={agreed}
+                  onChange={(e) => {
+                    setAgreed(e.target.checked);
+                    setErrors((p) => ({ ...p, agreed: "" }));
+                  }}
+                />
+                <span>
+                  I agree to the{" "}
+                  <Link href="/privacy-policy" target="_blank">
+                    Privacy Policy
+                  </Link>{" "}
+                  and{" "}
+                  <Link href="/terms-and-conditions" target="_blank">
+                    Terms &amp; Conditions
+                  </Link>
+                  .
+                </span>
+              </label>
+              {err("agreed")}
+
+              {formError && (
+                <p className="cv-apply-alert" role="alert">
+                  {formError}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                className="cv-btn cv-btn-dark cv-apply-submit"
+                disabled={sending}
+              >
+                <span>{sending ? "Sending…" : "Submit Application"}</span>
+                {!sending && <Arrow />}
+              </button>
+            </form>
+          )}
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
 function Openings({ jobs }: { jobs: Job[] }) {
   const depts = Array.from(new Set(jobs.map((j) => j.department)));
   const [filter, setFilter] = useState<string>("");
   const shown = filter ? jobs.filter((j) => j.department === filter) : jobs;
+  const [applying, setApplying] = useState<Job | null>(null);
   return (
     <div className="cv-openings">
+      {applying && <ApplyForm job={applying} onClose={() => setApplying(null)} />}
       {depts.length > 1 && (
         <div className="cv-filter" role="group" aria-label="Filter by department">
           <button type="button" className={`cv-filter-chip${!filter ? " is-on" : ""}`} onClick={() => setFilter("")}>
@@ -335,7 +635,7 @@ function Openings({ jobs }: { jobs: Job[] }) {
       )}
       <div className="cv-jobs">
         {shown.map((j) => (
-          <JobCard key={j.id} job={j} />
+          <JobCard key={j.id} job={j} onApply={setApplying} />
         ))}
       </div>
     </div>

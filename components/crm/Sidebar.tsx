@@ -94,10 +94,22 @@ export default function CrmSidebar({ user, newCounts }: { user: NavUser; newCoun
             <Icon d={I.payments} />
             <span>Payments</span>
           </Link>
-          <Link href="/crm/jobs" className={`crm-nav-link${on("/crm/jobs") ? " is-on" : ""}`}>
+
+          <p className="crm-nav-group">
             <Icon d={I.jobs} />
-            <span>Job Openings</span>
-          </Link>
+            <span>Careers</span>
+          </p>
+          <div className="crm-nav-sub">
+            <Link href="/crm/jobs" className={`crm-nav-link crm-nav-sublink${on("/crm/jobs") ? " is-on" : ""}`}>
+              <span className="crm-nav-dot" aria-hidden="true" />
+              <span>Job Openings (Website)</span>
+            </Link>
+            <Link href="/crm/applications" className={`crm-nav-link crm-nav-sublink${on("/crm/applications") ? " is-on" : ""}`}>
+              <span className="crm-nav-dot" aria-hidden="true" />
+              <span>Job Applications</span>
+              {badge("applications")}
+            </Link>
+          </div>
         </nav>
 
         <div className="crm-side-foot">

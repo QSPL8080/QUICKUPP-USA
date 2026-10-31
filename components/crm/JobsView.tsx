@@ -174,6 +174,7 @@ export default function JobsView({ rows, openNew }: { rows: Job[]; openNew: bool
                 <th>Type</th>
                 <th>Location</th>
                 <th>Deadline</th>
+                <th>Applications</th>
                 <th>On careers page</th>
               </tr>
             </thead>
@@ -194,6 +195,15 @@ export default function JobsView({ rows, openNew }: { rows: Job[]; openNew: bool
                     <td data-label="Location">{j.location}</td>
                     <td data-label="Deadline" className="crm-nowrap">
                       {fmtDate(j.deadline)}
+                    </td>
+                    <td data-label="Applications" onClick={(e) => e.stopPropagation()}>
+                      {j.applications ? (
+                        <a className="crm-link-btn" href={`/crm/applications?job=${j.id}`}>
+                          {j.applications} {j.applications === 1 ? "application" : "applications"}
+                        </a>
+                      ) : (
+                        <span className="crm-muted">None yet</span>
+                      )}
                     </td>
                     <td data-label="On careers page" onClick={(e) => e.stopPropagation()}>
                       <span className="crm-job-state">

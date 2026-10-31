@@ -42,12 +42,13 @@ export function Filters({
 }
 
 /* Page links that keep the current filters */
-export function Pager({ page, pages, total, pageSize, q, status }: { page: number; pages: number; total: number; pageSize: number; q: string; status: string }) {
+export function Pager({ page, pages, total, pageSize, q, status, extra }: { page: number; pages: number; total: number; pageSize: number; q: string; status: string; extra?: Record<string, string> }) {
   if (total === 0) return null;
   const href = (p: number) => {
     const sp = new URLSearchParams();
     if (q) sp.set("q", q);
     if (status) sp.set("status", status);
+    for (const [k, v] of Object.entries(extra || {})) if (v) sp.set(k, v);
     if (p > 1) sp.set("page", String(p));
     const s = sp.toString();
     return s ? `?${s}` : "?";

@@ -28,6 +28,7 @@ export type Job = {
   deadline: string | null; // YYYY-MM-DD
   isOpen: boolean;
   createdAt: string;
+  applications?: number; // CRM only
 };
 
 export type JobInput = {

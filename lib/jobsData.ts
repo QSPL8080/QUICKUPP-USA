@@ -27,6 +27,7 @@ const toJob = (r: Record<string, unknown>): Job => ({
   deadline: toDate(r.deadline),
   isOpen: Number(r.is_open) === 1,
   createdAt: new Date(r.created_at as string).toISOString(),
+  ...(r.applications !== undefined ? { applications: Number(r.applications) } : {}),
 });
 
 /** Open jobs for the Careers page: closed ones and ones past their deadline are left out */
@@ -39,6 +40,16 @@ export async function listOpenJobs(): Promise<Job[]> {
 
 /** Every job, for the CRM */
 export async function listAllJobs(): Promise<Job[]> {
-  const [rows] = await getPool().query("SELECT * FROM job_openings ORDER BY created_at DESC, id DESC");
+  const pool = getPool();
+  try {
+    const [rows] = await pool.query(
+      `SELECT j.*, (SELECT COUNT(*) FROM job_applications a WHERE a.job_id = j.id) AS applications
+         FROM job_openings j ORDER BY j.created_at DESC, j.id DESC`
+    );
+    return (rows as Record<string, unknown>[]).map(toJob);
+  } catch {
+    // applications table not created yet
+  }
+  const [rows] = await pool.query("SELECT * FROM job_openings ORDER BY created_at DESC, id DESC");
   return (rows as Record<string, unknown>[]).map(toJob);
 }
