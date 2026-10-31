@@ -10,10 +10,9 @@ import type { Job } from "@/lib/jobs";
 import "@/app/career.css";
 
 /*
- * Careers page ("cv-" design, used on no other page): a "trajectory" look —
- * rising growth lines and two crossing role ribbons in the hero, rising bars,
- * expanding benefit panels, a department switcher, staggered value tiles
- * with monograms, a hiring track that fills as you scroll, live job openings
+ * Careers page ("cv-" design, used on no other page): an arched photo
+ * window in the hero, benefit cards, a department switcher, staggered value
+ * tiles with monograms, a hiring track that fills as you scroll, live job openings
  * from the CRM (/crm/jobs) and a closing band with flowing gradient text.
  * Every word comes from the supplied Careers copy; site fonts, type scale,
  * heading gradient and black/white buttons.
@@ -129,9 +128,6 @@ const STEPS = [
   { title: "Offer & Onboarding", text: "Selected candidates receive an offer and guidance through the onboarding process." },
 ];
 
-/* every role named on the page, for the hero ribbons */
-const ALL_ROLES = DEPARTMENTS.flatMap((d) => d.roles);
-
 const Arrow = () => (
   <svg width="16" height="16" viewBox="0 0 18 18" fill="none" aria-hidden="true">
     <path d="M3.75 9L14.25 9M14.25 9L9 3.75M14.25 9L9 14.25" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
@@ -141,46 +137,19 @@ const Arrow = () => (
 const fmtDeadline = (d: string) =>
   new Date(`${d}T00:00:00`).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
 
-function Ribbon({ items, reverse, tone }: { items: string[]; reverse?: boolean; tone: "ink" | "grad" }) {
-  const run = [...items, ...items];
-  return (
-    <div className={`cv-ribbon cv-ribbon-${tone}`} aria-hidden="true">
-      <div className={`cv-ribbon-track${reverse ? " is-reverse" : ""}`}>
-        {run.map((r, i) => (
-          <span key={i} className="cv-ribbon-item">
-            {r}
-            <i className="cv-ribbon-star" />
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function Benefits() {
-  const [active, setActive] = useState(0);
   return (
-    <div className="cv-panels">
-      {BENEFITS.map((b, i) => (
-        <article
-          key={b.title}
-          className={`cv-panel${i === active ? " is-active" : ""}`}
-          onMouseEnter={() => setActive(i)}
-          onFocus={() => setActive(i)}
-          onClick={() => setActive(i)}
-          tabIndex={0}
-        >
-          <span className="cv-panel-num" aria-hidden="true">
-            {String(i + 1).padStart(2, "0")}
-          </span>
-          <span className="cv-panel-icon" aria-hidden="true">
+    <ul className="cv-benefits">
+      {BENEFITS.map((b) => (
+        <li key={b.title} className="cv-benefit">
+          <span className="cv-benefit-icon" aria-hidden="true">
             <LucideIcon name={b.icon} size={22} />
           </span>
-          <h3 className="cv-panel-title">{b.title}</h3>
-          <p className="cv-panel-text">{b.text}</p>
-        </article>
+          <h3 className="cv-benefit-title">{b.title}</h3>
+          <p className="cv-benefit-text">{b.text}</p>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }
 
@@ -371,36 +340,24 @@ export default function CareerView({ jobs }: { jobs: Job[] }) {
     <div className="cv-page">
       <Header />
       <main>
-        {/* Hero */}
+        {/* Hero: copy beside an arched photo window */}
         <section className="cv-hero">
-          <svg className="cv-lines" viewBox="0 0 1440 760" preserveAspectRatio="none" aria-hidden="true">
-            <defs>
-              <linearGradient id="cv-line-grad" x1="0" y1="1" x2="1" y2="0">
-                <stop offset="0" stopColor="#00d2ff" stopOpacity="0" />
-                <stop offset="0.5" stopColor="#6366f1" />
-                <stop offset="1" stopColor="#a855f7" stopOpacity="0" />
-              </linearGradient>
-            </defs>
-            <path d="M-40 700 C 300 640, 420 520, 640 470 S 1040 300, 1480 80" />
-            <path d="M-40 740 C 260 700, 520 600, 760 540 S 1140 380, 1480 220" />
-            <path d="M-40 620 C 200 560, 380 420, 600 360 S 980 160, 1480 -20" />
-          </svg>
-          <div className="cv-container cv-hero-inner">
-            <nav className="cv-breadcrumb" aria-label="Breadcrumb">
-              <Link href="/">Home</Link>
-              <span>/</span>
-              <span className="cv-crumb-current">Careers</span>
-            </nav>
-            <p className="cv-motto">
-              <span>Driven by Passion.</span>
-              <i aria-hidden="true" />
-              <span>Defined by Impact.</span>
-            </p>
-            <h1 className="cv-h1">
-              Careers at Quickupp Softech – <span className="qs-gradient-text">Build Your Future With Us</span>
-            </h1>
-            <div className="cv-hero-cols">
-              <p className="cv-text">
+          <div className="cv-container cv-hero-grid">
+            <div className="cv-hero-copy">
+              <nav className="cv-breadcrumb" aria-label="Breadcrumb">
+                <Link href="/">Home</Link>
+                <span>/</span>
+                <span className="cv-crumb-current">Careers</span>
+              </nav>
+              <p className="cv-motto">
+                <span>Driven by Passion.</span>
+                <i aria-hidden="true" />
+                <span>Defined by Impact.</span>
+              </p>
+              <h1 className="cv-h1">
+                Careers at Quickupp Softech – <span className="qs-gradient-text">Build Your Future With Us</span>
+              </h1>
+              <p className="cv-lead">
                 At Quickupp Softech, we believe great companies are built by ambitious people who challenge possibilities, embrace innovation, and turn
                 ideas into meaningful outcomes.
               </p>
@@ -411,23 +368,29 @@ export default function CareerView({ jobs }: { jobs: Job[] }) {
               <p className="cv-text">
                 We&apos;re always looking for talented individuals who are passionate about their work, eager to learn, and ready to make an impact.
               </p>
+              <p className="cv-kinetic">
+                <span>Your skills.</span> <span>Your ambition.</span> <span>Your next opportunity.</span> <span>Let&apos;s grow together.</span>
+              </p>
+              <div className="cv-actions">
+                <a href="#openings" className="cv-btn cv-btn-dark">
+                  <span>Explore Open Positions</span>
+                  <Arrow />
+                </a>
+                <a href={mailto(APPLY_SUBJECT)} className="cv-btn cv-btn-light">
+                  <span>Apply Now</span>
+                </a>
+              </div>
             </div>
-            <p className="cv-kinetic">
-              <span>Your skills.</span> <span>Your ambition.</span> <span>Your next opportunity.</span> <span>Let&apos;s grow together.</span>
-            </p>
-            <div className="cv-actions">
-              <a href="#openings" className="cv-btn cv-btn-dark">
-                <span>Explore Open Positions</span>
-                <Arrow />
-              </a>
-              <a href={mailto(APPLY_SUBJECT)} className="cv-btn cv-btn-light">
-                <span>Apply Now</span>
-              </a>
+
+            <div className="cv-arch-wrap">
+              <span className="cv-arch-orbit" aria-hidden="true" />
+              <div className="cv-arch">
+                <img src="/images/contact-team-collaboration.jpg" alt="Team members working together at laptops" />
+              </div>
+              <div className="cv-arch-mini">
+                <img src="/images/contact-team-conference.jpg" alt="" aria-hidden="true" />
+              </div>
             </div>
-          </div>
-          <div className="cv-ribbons">
-            <Ribbon items={ALL_ROLES.slice(0, Math.ceil(ALL_ROLES.length / 2))} tone="ink" />
-            <Ribbon items={ALL_ROLES.slice(Math.ceil(ALL_ROLES.length / 2))} tone="grad" reverse />
           </div>
         </section>
 
@@ -438,13 +401,6 @@ export default function CareerView({ jobs }: { jobs: Job[] }) {
               <h2 className="cv-h2">
                 Build a Career That <span className="qs-gradient-text">Moves You Forward</span>
               </h2>
-              <div className="cv-bars" aria-hidden="true">
-                <span />
-                <span />
-                <span />
-                <span />
-                <span />
-              </div>
             </div>
             <div className="cv-forward-copy">
               <p className="cv-text">
