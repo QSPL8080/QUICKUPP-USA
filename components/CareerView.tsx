@@ -10,9 +10,9 @@ import type { Job } from "@/lib/jobs";
 import "@/app/career.css";
 
 /*
- * Careers page ("cv-" design, used on no other page): three columns of team
- * photos drifting in opposite directions beside the hero copy, a bento of
- * benefits, a department switcher, staggered value
+ * Careers page ("cv-" design, used on no other page): three rows of team
+ * photos gliding to the right beside the hero copy, a bento of benefits,
+ * a deck of department slabs that open sideways, staggered value
  * tiles with monograms, a hiring track that fills as you scroll, live job openings
  * from the CRM (/crm/jobs) and a closing band with flowing gradient text.
  * Every word comes from the supplied Careers copy; site fonts, type scale,
@@ -129,11 +129,11 @@ const STEPS = [
   { title: "Offer & Onboarding", text: "Selected candidates receive an offer and guidance through the onboarding process." },
 ];
 
-/* hero photo columns (pictures only, no text) */
+/* hero photo rows (pictures only, no text), each gliding to the right */
 const REEL = [
-  ["contact-team-collaboration.jpg", "contact-meeting-discussion.jpg", "contact-strategy-consultation.jpg"],
-  ["contact-team-conference.jpg", "contact-diverse-meeting.jpg", "contact-consultation-team.jpg"],
-  ["contact-tech-discussion.jpg", "contact-office-consultation.jpg", "contact-meeting-room.jpg"],
+  ["contact-team-collaboration.jpg", "contact-meeting-discussion.jpg", "contact-strategy-consultation.jpg", "contact-agency-consultation.jpg"],
+  ["contact-team-conference.jpg", "contact-diverse-meeting.jpg", "contact-consultation-team.jpg", "contact-consultancy-partners.jpg"],
+  ["contact-tech-discussion.jpg", "contact-office-consultation.jpg", "contact-meeting-room.jpg", "contact-client-meeting-table.jpg"],
 ];
 
 const Arrow = () => (
@@ -163,44 +163,43 @@ function Benefits() {
 
 function Departments() {
   const [active, setActive] = useState(0);
-  const d = DEPARTMENTS[active];
   return (
-    <div className="cv-dept">
-      <div className="cv-dept-tabs" role="tablist" aria-label="Departments">
-        {DEPARTMENTS.map((dep, i) => (
-          <button
-            key={dep.title}
-            type="button"
-            role="tab"
-            aria-selected={i === active}
-            className={`cv-dept-tab${i === active ? " is-active" : ""}`}
-            onClick={() => setActive(i)}
-          >
-            <span className="cv-dept-num">{i + 1}.</span>
-            <span className="cv-dept-name">{dep.title}</span>
-            <span className="cv-dept-go" aria-hidden="true">
-              <LucideIcon name="arrow-right" size={16} strokeWidth={2.2} />
-            </span>
-          </button>
-        ))}
-      </div>
-      <div className="cv-dept-panel" role="tabpanel" key={d.title}>
-        <span className="cv-dept-icon" aria-hidden="true">
-          <LucideIcon name={d.icon} size={26} />
-        </span>
-        <h3 className="cv-dept-title">
-          {active + 1}. {d.title}
-        </h3>
-        <p className="cv-dept-text">{d.text}</p>
-        <p className="cv-dept-label">{d.label}</p>
-        <ul className="cv-roles">
-          {d.roles.map((r, i) => (
-            <li key={r} className="cv-role" style={{ animationDelay: `${0.05 * i}s` }}>
-              {r}
-            </li>
-          ))}
-        </ul>
-      </div>
+    <div className="cv-deck">
+      {DEPARTMENTS.map((d, i) => {
+        const on = i === active;
+        const num = String(i + 1).padStart(2, "0");
+        return (
+          <article key={d.title} className={`cv-slab${on ? " is-active" : ""}`}>
+            <button type="button" className="cv-dept-tab cv-slab-tab" aria-expanded={on} onClick={() => setActive(i)} tabIndex={on ? -1 : 0}>
+              <span className="cv-slab-num">{num}</span>
+              <span className="cv-slab-name">{d.title}</span>
+              <span className="cv-slab-icon" aria-hidden="true">
+                <LucideIcon name={d.icon} size={20} />
+              </span>
+            </button>
+            <div className="cv-slab-body" aria-hidden={!on}>
+              <span className="cv-slab-mark" aria-hidden="true">
+                {num}
+              </span>
+              <span className="cv-dept-icon" aria-hidden="true">
+                <LucideIcon name={d.icon} size={26} />
+              </span>
+              <h3 className="cv-dept-title">
+                {i + 1}. {d.title}
+              </h3>
+              <p className="cv-dept-text">{d.text}</p>
+              <p className="cv-dept-label">{d.label}</p>
+              <ul className="cv-roles">
+                {d.roles.map((r, k) => (
+                  <li key={r} className="cv-role" style={{ animationDelay: `${0.25 + 0.04 * k}s` }}>
+                    {r}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </article>
+        );
+      })}
     </div>
   );
 }
@@ -348,7 +347,7 @@ export default function CareerView({ jobs }: { jobs: Job[] }) {
     <div className="cv-page">
       <Header />
       <main>
-        {/* Hero: copy beside three columns of team photos drifting in opposite directions */}
+        {/* Hero: copy beside three rows of team photos gliding to the right */}
         <section className="cv-hero">
           <div className="cv-container cv-hero-grid">
             <div className="cv-hero-copy">
@@ -391,11 +390,11 @@ export default function CareerView({ jobs }: { jobs: Job[] }) {
             </div>
 
             <div className="cv-reel" aria-hidden="true">
-              {REEL.map((col, ci) => (
-                <div key={ci} className={`cv-reel-col cv-reel-col-${ci + 1}`}>
+              {REEL.map((row, ri) => (
+                <div key={ri} className={`cv-reel-row cv-reel-row-${ri + 1}`}>
                   <div className="cv-reel-track">
-                    {[...col, ...col].map((src, i) => (
-                      <img key={i} src={`/images/${src}`} alt="" loading={i < 3 ? "eager" : "lazy"} />
+                    {[...row, ...row].map((src, i) => (
+                      <img key={i} src={`/images/${src}`} alt="" loading={i < 4 ? "eager" : "lazy"} />
                     ))}
                   </div>
                 </div>
