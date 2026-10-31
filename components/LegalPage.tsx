@@ -64,56 +64,103 @@ function Linked({ text }: { text: string }) {
   );
 }
 
-/** "Label: text" lines show the label in bold */
+const LABEL_RE = /^([A-Z][A-Za-z &-]{1,32}):(?:\s(.*))?$/;
+
+/** "Label: text" → [label, text] (text may be empty, e.g. "US Mailing Address:") */
+const splitLabel = (text: string) => {
+  const m = text.match(LABEL_RE);
+  return m ? { label: m[1], value: m[2] ?? "" } : null;
+};
+
+/** A labelled row as one line: a multi-line address is joined with commas */
+const asRow = (b: LegalBlock) => {
+  if ("p" in b) return splitLabel(b.p);
+  if ("lines" in b) {
+    const head = splitLabel(b.lines[0]);
+    if (!head) return null;
+    return { label: head.label, value: [head.value, ...b.lines.slice(1)].filter(Boolean).join(", ") };
+  }
+  return null;
+};
+
 function Labelled({ text }: { text: string }) {
-  const m = text.match(/^([A-Z][A-Za-z &-]{1,32}:)(\s.*)?$/);
-  if (!m) return <Linked text={text} />;
+  const row = splitLabel(text);
+  if (!row) return <Linked text={text} />;
   return (
     <>
-      <strong className="lgl-label">{m[1]}</strong>
-      {m[2] && <Linked text={m[2]} />}
+      <strong className="lgl-label">{row.label}:</strong>
+      {row.value && (
+        <>
+          {" "}
+          <Linked text={row.value} />
+        </>
+      )}
     </>
   );
 }
 
 function Blocks({ blocks }: { blocks: LegalBlock[] }) {
-  return (
-    <>
-      {blocks.map((b, i) => {
-        if ("p" in b)
-          return (
-            <p key={i} className="lgl-text">
-              <Labelled text={b.p} />
-            </p>
-          );
-        if ("h3" in b)
-          return (
-            <h3 key={i} className="lgl-h3">
-              {b.h3}
-            </h3>
-          );
-        if ("lines" in b)
-          return (
-            <p key={i} className="lgl-text lgl-lines">
-              {b.lines.map((l, j) => (
-                <span key={j} className="lgl-line">
-                  {j === 0 ? <Labelled text={l} /> : <Linked text={l} />}
-                </span>
-              ))}
-            </p>
-          );
-        return (
-          <ul key={i} className="lgl-list">
-            {b.list.map((t) => (
-              <li key={t}>
-                <Labelled text={t} />
-              </li>
-            ))}
-          </ul>
-        );
-      })}
-    </>
-  );
+  const out: React.ReactNode[] = [];
+  for (let i = 0; i < blocks.length; i++) {
+    const b = blocks[i];
+
+    // Two or more "Label: value" lines in a row become a details card
+    const rows: { label: string; value: string }[] = [];
+    for (let j = i; j < blocks.length; j++) {
+      const r = asRow(blocks[j]);
+      if (!r || !r.value) break;
+      rows.push(r);
+    }
+    if (rows.length >= 2) {
+      out.push(
+        <dl key={i} className="lgl-info">
+          {rows.map((r) => (
+            <div key={r.label} className="lgl-info-row">
+              <dt>{r.label}</dt>
+              <dd>
+                <Linked text={r.value} />
+              </dd>
+            </div>
+          ))}
+        </dl>
+      );
+      i += rows.length - 1;
+      continue;
+    }
+
+    if ("p" in b) {
+      out.push(
+        <p key={i} className="lgl-text">
+          <Labelled text={b.p} />
+        </p>
+      );
+    } else if ("h3" in b) {
+      out.push(
+        <h3 key={i} className="lgl-h3">
+          {b.h3}
+        </h3>
+      );
+    } else if ("lines" in b) {
+      const r = asRow(b);
+      out.push(
+        <p key={i} className="lgl-text">
+          {r ? <Labelled text={`${r.label}: ${r.value}`} /> : <Linked text={b.lines.join(", ")} />}
+        </p>
+      );
+    } else {
+      const twoCol = b.list.length >= 6 && b.list.every((t) => t.length <= 44);
+      out.push(
+        <ul key={i} className={`lgl-list${twoCol ? " lgl-list-2" : ""}`}>
+          {b.list.map((t) => (
+            <li key={t}>
+              <Labelled text={t} />
+            </li>
+          ))}
+        </ul>
+      );
+    }
+  }
+  return <>{out}</>;
 }
 
 export default function LegalPage({ doc }: { doc: LegalDoc }) {
@@ -140,10 +187,11 @@ export default function LegalPage({ doc }: { doc: LegalDoc }) {
             </h1>
             <div className="lgl-dates">
               <span className="lgl-date">
+                <span className="lgl-date-dot" aria-hidden="true" />
                 <span className="lgl-date-label">Effective Date:</span> {doc.effective}
               </span>
-              <span className="lgl-date-dot" aria-hidden="true" />
               <span className="lgl-date">
+                <span className="lgl-date-dot" aria-hidden="true" />
                 <span className="lgl-date-label">Last Updated:</span> {doc.updated}
               </span>
             </div>
@@ -153,10 +201,18 @@ export default function LegalPage({ doc }: { doc: LegalDoc }) {
         <div className="lgl-container lgl-doc">
           {doc.sections.map((s, i) => (
             <section key={s.title} id={`section-${i + 1}`} className="lgl-sec">
-              <h2 className="lgl-h2">
-                <span className="lgl-num">{i + 1}.</span> {s.title}
-              </h2>
-              <Blocks blocks={s.blocks} />
+              <div className="lgl-sec-head">
+                <span className="lgl-num" aria-hidden="true">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h2 className="lgl-h2">
+                  <span className="lgl-sr">{i + 1}. </span>
+                  {s.title}
+                </h2>
+              </div>
+              <div className="lgl-sec-body">
+                <Blocks blocks={s.blocks} />
+              </div>
             </section>
           ))}
         </div>
