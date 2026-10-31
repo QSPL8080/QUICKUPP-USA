@@ -1936,3 +1936,51 @@ a.crm-link-btn {
   gap: 1px;
   line-height: 1.35;
 }
+
+/* job opening modal: the Careers-page switch lines up with the deadline field */
+.crm-root .crm-check.crm-check-row.crm-job-open {
+  align-self: end;
+  min-height: 44px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+/* detail drawers: wider labels, one line per detail */
+.crm-root .crm-details {
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 0;
+  padding: 4px 16px;
+}
+
+.crm-root .crm-details dt,
+.crm-root .crm-details dd {
+  padding: 10px 0;
+  border-bottom: 1px solid #eef0f5;
+}
+
+.crm-root .crm-details dt:nth-last-of-type(1),
+.crm-root .crm-details dd:nth-last-of-type(1) {
+  border-bottom: 0;
+}
+
+.crm-root .crm-details dd {
+  padding-left: 12px;
+}
+
+.crm-root .crm-drawer .crm-message .crm-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--crm-muted);
+}
+
+.crm-root .crm-drawer > .crm-act-danger {
+  align-self: flex-start;
+}
+
+@media (max-width: 560px) {
+  .crm-root .crm-details {
+    grid-template-columns: 120px minmax(0, 1fr);
+  }
+}

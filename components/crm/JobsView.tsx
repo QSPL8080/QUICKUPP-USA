@@ -313,14 +313,17 @@ export default function JobsView({ rows, openNew }: { rows: Job[]; openNew: bool
                 <input className="crm-input" type="date" value={form.deadline} onChange={set("deadline")} />
                 {err("deadline")}
               </label>
-              <label className="crm-field crm-check crm-job-open">
+              <label className="crm-check crm-check-row crm-job-open">
                 <input type="checkbox" checked={form.isOpen} onChange={set("isOpen")} />
                 <span className="crm-check-box" aria-hidden="true">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M20 6L9 17l-5-5" />
                   </svg>
                 </span>
-                <span>Show on the Careers page</span>
+                <span className="crm-check-text">
+                  <span className="crm-strong">Show on the Careers page</span>
+                  <span className="crm-cell-sub">{form.isOpen ? "Visible under Current Job Openings" : "Hidden from the website"}</span>
+                </span>
               </label>
             </div>
 
