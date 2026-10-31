@@ -9,7 +9,7 @@ export default function Footer() {
   const socialLinks = [
     {
       name: "Facebook",
-      href: "https://www.facebook.com/quickupp",
+      href: "https://www.facebook.com/profile.php?id=61581644461743",
       badgeClass: "qs-soc-fb",
       icon: (
         <svg width="15" height="15" viewBox="0 0 24 24" fill="#ffffff">
@@ -19,7 +19,7 @@ export default function Footer() {
     },
     {
       name: "X (Twitter)",
-      href: "https://x.com/quickupp",
+      href: "https://x.com/QuickuppL57802",
       badgeClass: "qs-soc-x",
       icon: (
         <svg width="13" height="13" viewBox="0 0 24 24" fill="#ffffff">
@@ -29,7 +29,7 @@ export default function Footer() {
     },
     {
       name: "Instagram",
-      href: "https://www.instagram.com/quickupp/",
+      href: "https://www.instagram.com/quickuppsoftech.usa/",
       badgeClass: "qs-soc-insta",
       icon: (
         <svg width="14" height="14" viewBox="0 0 24 24" fill="#ffffff">
@@ -39,7 +39,7 @@ export default function Footer() {
     },
     {
       name: "LinkedIn",
-      href: "https://www.linkedin.com/company/quickupp",
+      href: "https://www.linkedin.com/company/108772091/",
       badgeClass: "qs-soc-linkedin",
       icon: (
         <svg width="13" height="13" viewBox="0 0 24 24" fill="#ffffff">
@@ -49,7 +49,7 @@ export default function Footer() {
     },
     {
       name: "YouTube",
-      href: "https://www.youtube.com/@quickupp",
+      href: "https://www.youtube.com/@quickuppsoftechusa",
       badgeClass: "qs-soc-youtube",
       icon: (
         <svg width="14" height="14" viewBox="0 0 24 24" fill="#ffffff">

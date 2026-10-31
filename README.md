@@ -146,11 +146,11 @@ npm start
 
 The footer includes authentic official social channels configured with verified brand vectors:
 
-- **Facebook:** [https://www.facebook.com/quickupp](https://www.facebook.com/quickupp)
-- **X (Twitter):** [https://x.com/quickupp](https://x.com/quickupp)
-- **Instagram:** [https://www.instagram.com/quickupp](https://www.instagram.com/quickupp)
-- **LinkedIn:** [https://www.linkedin.com/company/quickupp](https://www.linkedin.com/company/quickupp)
-- **YouTube:** [https://www.youtube.com/@quickupp](https://www.youtube.com/@quickupp)
+- **Facebook:** [https://www.facebook.com/profile.php?id=61581644461743](https://www.facebook.com/profile.php?id=61581644461743)
+- **X (Twitter):** [https://x.com/QuickuppL57802](https://x.com/QuickuppL57802)
+- **Instagram:** [https://www.instagram.com/quickuppsoftech.usa/](https://www.instagram.com/quickuppsoftech.usa/)
+- **LinkedIn:** [https://www.linkedin.com/company/108772091/](https://www.linkedin.com/company/108772091/)
+- **YouTube:** [https://www.youtube.com/@quickuppsoftechusa](https://www.youtube.com/@quickuppsoftechusa)
 
 ---
 

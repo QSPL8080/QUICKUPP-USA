@@ -24,6 +24,7 @@ export const metadata: Metadata = {
     description:
       "Digital marketing, AI and technology solutions for businesses across the US.",
     images: ["/images/graph.webp"],
+    creator: "@QuickuppL57802",
   },
 };
 
