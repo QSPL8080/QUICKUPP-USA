@@ -28,37 +28,72 @@ export async function POST(req: Request) {
       notes,
     } = body;
 
-    // 1. Capture the order with PayPal API
-    const captureData = await capturePayPalOrder(orderID);
-    const captureStatus = captureData.status;
-
-    if (captureStatus !== "COMPLETED") {
-      return NextResponse.json(
-        {
-          error: `Payment was not completed by PayPal (Status: ${captureStatus}). Please try again.`,
-          details: captureData,
-        },
-        { status: 400 }
-      );
-    }
-
-    const captureDetail = captureData.purchase_units?.[0]?.payments?.captures?.[0];
-    const captureID = captureDetail?.id || orderID;
-    const capturedAmount = Number(captureDetail?.amount?.value || amount || 0);
-    const currency = captureDetail?.amount?.currency_code || "USD";
     const isPartial = paymentType === "partial";
-    const finalTotal = Number(totalAmount) || capturedAmount;
-    const finalRemaining = isPartial ? Math.max(0, Number(remainingAmount || (finalTotal - capturedAmount))) : 0;
-    const paymentStatus = isPartial ? "partially_paid" : "paid";
+    const parsedAmount = Number(amount) || 0;
+    const finalTotal = Number(totalAmount) || parsedAmount;
+    const finalRemaining = isPartial
+      ? Math.max(0, Number(remainingAmount ?? (finalTotal - parsedAmount)))
+      : 0;
 
     const categoryStr = Array.isArray(category)
       ? category.filter(Boolean).join(", ")
       : (typeof category === "string" ? category : "");
 
-    // 2. Save payment record in MySQL database
+    // 1. Attempt to capture with PayPal
+    let captureData: any = null;
+    let captureError: any = null;
+    try {
+      captureData = await capturePayPalOrder(orderID);
+    } catch (err: any) {
+      captureError = err;
+    }
+
+    // Determine Payment Status
+    let paymentStatus: "paid" | "partially_paid" | "pending" | "failed" = "failed";
+    let failureReason = "";
+    let pendingReason = "";
+
+    const captureDetail = captureData?.purchase_units?.[0]?.payments?.captures?.[0];
+    const captureID = captureDetail?.id || orderID;
+    const capturedAmount = Number(captureDetail?.amount?.value || parsedAmount);
+    const currency = captureDetail?.amount?.currency_code || "USD";
+
+    if (captureError) {
+      paymentStatus = "failed";
+      failureReason = captureError.message || "Payment authorization or capture failed.";
+    } else if (captureData?.status === "COMPLETED") {
+      paymentStatus = isPartial ? "partially_paid" : "paid";
+    } else if (captureData?.status === "PENDING") {
+      paymentStatus = "pending";
+      pendingReason = captureDetail?.status_details?.reason || "Funds pending clearing in PayPal";
+    } else {
+      paymentStatus = "failed";
+      failureReason =
+        captureData?.status_details?.reason ||
+        captureData?.message ||
+        `PayPal returned status: ${captureData?.status || "DECLINED"}`;
+    }
+
+    // 2. Save payment record in MySQL database (real payment attempt)
     let insertedId = 0;
     try {
       const pool = getPool();
+      let paymentDesc = "";
+      if (paymentStatus === "failed") {
+        paymentDesc = `Payment Failed (${isPartial ? "Partial Deposit" : "Full Payment"}) - ${service || ""} (${categoryStr || ""})`.trim();
+      } else if (paymentStatus === "pending") {
+        paymentDesc = `Website Payment Pending (${isPartial ? "Partial Deposit" : "Full Payment"}) - ${service || ""} (${categoryStr || ""})`.trim();
+      } else {
+        paymentDesc = `Website PayPal Payment (${isPartial ? "Partial Deposit" : "Full Payment"}) - ${service || ""} (${categoryStr || ""})`.trim();
+      }
+
+      const paymentNotes =
+        paymentStatus === "failed"
+          ? `[PAYMENT FAILED / DECLINED]: ${failureReason}${notes ? ` | Client Note: ${notes}` : ""}`
+          : paymentStatus === "pending"
+          ? `[PAYMENT PENDING CLEARING]: ${pendingReason}${notes ? ` | Client Note: ${notes}` : ""}`
+          : notes || null;
+
       const [insertRes] = await pool.query(
         `INSERT INTO payments (
           client_name,
@@ -82,15 +117,15 @@ export async function POST(req: Request) {
           billing_end_date,
           paid_at,
           notes
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'paypal', ?, 'website', ?, ?, ?, ?, CURDATE(), ?)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PayPal', ?, 'website', ?, ?, ?, ?, CURDATE(), ?)`,
         [
-          clientName,
+          clientName || "Valued Client",
           clientEmail || null,
           clientPhone || null,
           companyName || null,
           categoryStr || null,
           service || "General Consultation",
-          `Website PayPal Payment (${isPartial ? "Partial Deposit" : "Full Payment"}) - ${service || ""} (${categoryStr || ""})`.trim(),
+          paymentDesc,
           capturedAmount,
           finalTotal,
           isPartial ? "partial" : "full",
@@ -101,13 +136,12 @@ export async function POST(req: Request) {
           orderID,
           billingStartDate || null,
           billingEndDate || null,
-          notes || null,
+          paymentNotes,
         ]
       );
       insertedId = (insertRes as any).insertId || 0;
     } catch (dbErr) {
       console.error("[Database Save Payment Error]", dbErr);
-      // We don't fail the response if DB fails, because payment was already captured
     }
 
     const currentYear = new Date().getFullYear();
@@ -119,8 +153,16 @@ export async function POST(req: Request) {
       try {
         const pool = getPool();
         await pool.query(`UPDATE payments SET invoice_number = ? WHERE id = ?`, [orderNumber, insertedId]);
-        
+
         // Also save customer into CRM enquiries so they appear in Leads
+        const leadStatus = paymentStatus === "failed" ? "contacted" : paymentStatus === "pending" ? "new" : "closed";
+        const leadMsg =
+          paymentStatus === "failed"
+            ? `[PAYMENT FAILED]: Order #${orderNumber}. Attempted: $${capturedAmount.toFixed(2)} USD. Failure reason: ${failureReason}. Client phone: ${clientPhone || "None"}.`
+            : paymentStatus === "pending"
+            ? `[PAYMENT PENDING]: Order #${orderNumber}. Amount: $${capturedAmount.toFixed(2)} USD (Pending clearing in PayPal). Reason: ${pendingReason}.`
+            : `Website Pay Now Payment. Order #${orderNumber}. PayPal Capture ID: ${captureID}. Total Amount: $${finalTotal.toFixed(2)}, Paid: $${capturedAmount.toFixed(2)}${isPartial ? `, Due: $${finalRemaining.toFixed(2)}` : ""}. Notes: ${notes || "None"}`;
+
         await pool.query(
           `INSERT INTO contact_enquiries (
             full_name,
@@ -132,7 +174,7 @@ export async function POST(req: Request) {
             budget,
             message,
             status
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'closed')`,
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             clientName,
             clientEmail || "customer@payment.quickupp.com",
@@ -141,7 +183,8 @@ export async function POST(req: Request) {
             "Other",
             `${service}${categoryStr ? ` – ${categoryStr}` : ""}`,
             `$${capturedAmount.toFixed(2)} USD (${isPartial ? "Partial Deposit" : "Full Payment"})`,
-            `Website Pay Now Payment. Order #${orderNumber}. PayPal Capture ID: ${captureID}. Total Amount: $${finalTotal.toFixed(2)}, Paid: $${capturedAmount.toFixed(2)}${isPartial ? `, Due: $${finalRemaining.toFixed(2)}` : ""}. Notes: ${notes || "None"}`,
+            leadMsg,
+            leadStatus,
           ]
         );
       } catch (updErr) {
@@ -149,23 +192,40 @@ export async function POST(req: Request) {
       }
     }
 
-    // 3. Dispatch email notifications in background via after()
+    // 3. Dispatch emails asynchronously via after()
     after(async () => {
       // Admin Notification Email
       try {
-        const typeLabel = isPartial ? "Partial Payment" : "Full Payment";
-        const adminSubject = `${typeLabel} Received: $${capturedAmount.toFixed(2)} USD from ${clientName} (#${orderNumber})`;
+        let adminSubject = "";
+        let headerColor = "#0f172a";
+        let statusTag = "PAYMENT RECEIVED";
+
+        if (paymentStatus === "failed") {
+          adminSubject = `⚠️ Failed Payment Attempt: $${capturedAmount.toFixed(2)} USD from ${clientName} (#${orderNumber})`;
+          headerColor = "#991b1b";
+          statusTag = "PAYMENT FAILED / DECLINED";
+        } else if (paymentStatus === "pending") {
+          adminSubject = `⏳ Payment Pending Clearing: $${capturedAmount.toFixed(2)} USD from ${clientName} (#${orderNumber})`;
+          headerColor = "#d97706";
+          statusTag = "PAYMENT PENDING CLEARING";
+        } else {
+          const typeLabel = isPartial ? "Partial Payment (50% Deposit)" : "Full Payment";
+          adminSubject = `${typeLabel} Received: $${capturedAmount.toFixed(2)} USD from ${clientName} (#${orderNumber})`;
+          headerColor = "#065f46";
+          statusTag = "PAYMENT CONFIRMED";
+        }
+
         const adminHtml = `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px;">
-            <div style="background: #0f172a; padding: 18px 24px; border-radius: 8px; margin-bottom: 24px;">
-              <h2 style="color: #ffffff; margin: 0; font-size: 20px;">${typeLabel} Received via PayPal</h2>
-              <p style="color: #38bdf8; margin: 4px 0 0; font-size: 13px;">Quickupp Softech LLC Online Checkout</p>
+            <div style="background: ${headerColor}; padding: 18px 24px; border-radius: 8px; margin-bottom: 24px;">
+              <h2 style="color: #ffffff; margin: 0; font-size: 20px;">${statusTag}</h2>
+              <p style="color: #cbd5e1; margin: 4px 0 0; font-size: 13px;">Quickupp Softech LLC Online Checkout</p>
             </div>
             
             <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
               <tr><td style="padding: 8px 0; color: #64748b; width: 40%;">Order / Invoice No:</td><td style="padding: 8px 0; font-weight: bold; color: #0f172a; font-family: monospace;">${orderNumber}</td></tr>
-              <tr><td style="padding: 8px 0; color: #64748b;">Payment Type:</td><td style="padding: 8px 0; font-weight: bold; color: ${isPartial ? "#d97706" : "#10b981"};">${typeLabel}</td></tr>
-              <tr><td style="padding: 8px 0; color: #64748b;">Amount Paid Now:</td><td style="padding: 8px 0; font-weight: bold; color: #10b981; font-size: 18px;">$${capturedAmount.toFixed(2)} ${currency}</td></tr>
+              <tr><td style="padding: 8px 0; color: #64748b;">Status:</td><td style="padding: 8px 0; font-weight: bold; color: ${paymentStatus === "failed" ? "#dc2626" : paymentStatus === "pending" ? "#d97706" : "#10b981"};">${paymentStatus.toUpperCase()}</td></tr>
+              <tr><td style="padding: 8px 0; color: #64748b;">Amount:</td><td style="padding: 8px 0; font-weight: bold; color: ${paymentStatus === "failed" ? "#dc2626" : "#10b981"}; font-size: 18px;">$${capturedAmount.toFixed(2)} ${currency}</td></tr>
               ${isPartial ? `<tr><td style="padding: 8px 0; color: #64748b;">Total Service Amount:</td><td style="padding: 8px 0; font-weight: 600; color: #0f172a;">$${finalTotal.toFixed(2)} ${currency}</td></tr>` : ""}
               ${isPartial ? `<tr><td style="padding: 8px 0; color: #64748b;">Remaining Balance Due:</td><td style="padding: 8px 0; font-weight: bold; color: #ef4444;">$${finalRemaining.toFixed(2)} ${currency}</td></tr>` : ""}
               <tr><td style="padding: 8px 0; color: #64748b;">Client Name:</td><td style="padding: 8px 0; font-weight: bold; color: #0f172a;">${clientName}</td></tr>
@@ -175,8 +235,8 @@ export async function POST(req: Request) {
               ${categoryStr ? `<tr><td style="padding: 8px 0; color: #64748b;">Category:</td><td style="padding: 8px 0; color: #0f172a;">${categoryStr}</td></tr>` : ""}
               ${service ? `<tr><td style="padding: 8px 0; color: #64748b;">Service:</td><td style="padding: 8px 0; color: #0f172a;">${service}</td></tr>` : ""}
               ${billingStartDate || billingEndDate ? `<tr><td style="padding: 8px 0; color: #64748b;">Billing Period:</td><td style="padding: 8px 0; color: #0f172a;">${billingStartDate || "—"} to ${billingEndDate || "—"}</td></tr>` : ""}
-              <tr><td style="padding: 8px 0; color: #64748b;">PayPal Capture ID:</td><td style="padding: 8px 0; color: #0f172a; font-family: monospace;">${captureID}</td></tr>
-              <tr><td style="padding: 8px 0; color: #64748b;">PayPal Order ID:</td><td style="padding: 8px 0; color: #0f172a; font-family: monospace;">${orderID}</td></tr>
+              <tr><td style="padding: 8px 0; color: #64748b;">Transaction / Order ID:</td><td style="padding: 8px 0; color: #0f172a; font-family: monospace;">${captureID}</td></tr>
+              ${paymentStatus === "failed" ? `<tr><td style="padding: 8px 0; color: #dc2626; font-weight: bold;">Failure Reason:</td><td style="padding: 8px 0; color: #dc2626;">${failureReason}</td></tr>` : ""}
               ${notes ? `<tr><td style="padding: 8px 0; color: #64748b;">Notes:</td><td style="padding: 8px 0; color: #0f172a;">${notes}</td></tr>` : ""}
             </table>
             
@@ -190,18 +250,20 @@ export async function POST(req: Request) {
           to: LEADS_NOTIFICATION_EMAIL,
           subject: adminSubject,
           html: adminHtml,
-          text: `${typeLabel} of $${capturedAmount.toFixed(2)} ${currency} received from ${clientName} (${clientEmail}, ${clientPhone}) for ${service || categoryStr || "service"}. Order Number: ${orderNumber}. Transaction ID: ${captureID}`,
+          text: `${adminSubject} - ${clientName} (${clientEmail}, ${clientPhone}) for ${service || categoryStr || "service"}. Order Number: ${orderNumber}. Reference: ${captureID}`,
           replyTo: clientEmail || undefined,
         });
       } catch (mailErr) {
         console.error("[Payment Notification Email Error]", mailErr);
       }
 
-      // Customer Confirmation & Receipt Email
-      if (clientEmail) {
+      // Customer Confirmation & Receipt Email (for paid or pending)
+      if (paymentStatus !== "failed" && clientEmail && clientEmail.includes("@")) {
         try {
           const firstName = clientName.trim().split(" ")[0] || "Valued Client";
-          const clientSubject = `Payment Confirmed — Quickupp Softech LLC | Order #${orderNumber}`;
+          const clientSubject = paymentStatus === "pending"
+            ? `Payment Processing (Pending Clearing) — Quickupp Softech LLC | Order #${orderNumber}`
+            : `Payment Confirmed — Quickupp Softech LLC | Order #${orderNumber}`;
 
           const now = new Date();
           const paymentDateFormatted = now.toLocaleDateString("en-US", {
@@ -242,6 +304,13 @@ export async function POST(req: Request) {
           const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://quickuppsoftech.us";
           const receiptDownloadUrl = `${siteUrl}/api/payments/receipt?order=${encodeURIComponent(orderNumber)}`;
 
+          const statusBannerTitle = paymentStatus === "pending" ? "PAYMENT PROCESSING (PENDING)" : "PAYMENT CONFIRMED";
+          const statusBannerValue = paymentStatus === "pending"
+            ? "Status: PENDING CLEARING ⏳"
+            : isPartial
+            ? "Status: PARTIALLY PAID ✓"
+            : "Status: PAID ✓";
+
           const clientHtml = `
             <!DOCTYPE html>
             <html>
@@ -265,13 +334,15 @@ export async function POST(req: Request) {
                     Thank you for choosing <strong>Quickupp Softech LLC</strong>.
                   </p>
                   <p style="font-size: 15px; line-height: 1.6; color: #334155; margin: 0 0 24px;">
-                    We’re pleased to confirm that your payment has been successfully received.
+                    ${paymentStatus === "pending"
+                      ? "Your payment is currently being cleared by PayPal. Once clearance completes, your confirmation will finalize automatically."
+                      : "We're pleased to confirm that your payment has been successfully received."}
                   </p>
 
-                  <!-- Payment Confirmed Banner -->
-                  <div style="background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border: 1px solid #a7f3d0; border-radius: 12px; padding: 18px 24px; margin-bottom: 28px; text-align: center;">
-                    <span style="font-size: 12px; font-weight: 800; letter-spacing: 0.1em; color: #047857; text-transform: uppercase; display: block; margin-bottom: 4px;">PAYMENT CONFIRMED</span>
-                    <span style="font-size: 20px; font-weight: 800; color: #065f46;">Status: ${isPartial ? "PARTIALLY PAID ✓" : "PAID ✓"}</span>
+                  <!-- Payment Status Banner -->
+                  <div style="background: ${paymentStatus === "pending" ? "#fffbeb" : "linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)"}; border: 1px solid ${paymentStatus === "pending" ? "#fde68a" : "#a7f3d0"}; border-radius: 12px; padding: 18px 24px; margin-bottom: 28px; text-align: center;">
+                    <span style="font-size: 12px; font-weight: 800; letter-spacing: 0.1em; color: ${paymentStatus === "pending" ? "#b45309" : "#047857"}; text-transform: uppercase; display: block; margin-bottom: 4px;">${statusBannerTitle}</span>
+                    <span style="font-size: 20px; font-weight: 800; color: ${paymentStatus === "pending" ? "#92400e" : "#065f46"};">${statusBannerValue}</span>
                   </div>
 
                   <!-- Order Details Table -->
@@ -309,10 +380,6 @@ export async function POST(req: Request) {
                     <tr>
                       <td style="padding: 9px 0; color: #64748b;">Payment Date</td>
                       <td style="padding: 9px 0; color: #0f172a;">${paymentDateFormatted}</td>
-                    </tr>
-                    <tr>
-                      <td style="padding: 9px 0; color: #64748b;">Payment Time</td>
-                      <td style="padding: 9px 0; color: #0f172a;">${paymentTimeFormatted}</td>
                     </tr>
                     <tr>
                       <td style="padding: 9px 0; color: #64748b;">Payment Method</td>
@@ -356,42 +423,25 @@ export async function POST(req: Request) {
                   <!-- PDF Receipt Download Section -->
                   <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; text-align: center; margin: 24px 0 28px;">
                     <p style="font-size: 14px; color: #334155; margin: 0 0 14px; font-weight: 600;">
-                      📎 Your payment receipt/invoice is attached to this email as a PDF.
+                      📎 Your official payment receipt is attached to this email as a PDF.
                     </p>
                     <a href="${receiptDownloadUrl}" style="display: inline-block; background: #0f172a; color: #ffffff; text-decoration: none; font-size: 13.5px; font-weight: 700; padding: 12px 28px; border-radius: 8px; letter-spacing: 0.02em;">
                       DOWNLOAD PAYMENT RECEIPT
                     </a>
                   </div>
 
-                  <!-- What Happens Next -->
-                  <div style="background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
-                    <h3 style="font-size: 15px; font-weight: 800; color: #581c87; margin: 0 0 8px;">What Happens Next?</h3>
-                    <p style="font-size: 14px; color: #4c1d95; line-height: 1.6; margin: 0 0 10px;">
-                      Our team will process your order and contact you with the next steps.
-                    </p>
-                    <p style="font-size: 13.5px; color: #6b21a8; line-height: 1.5; margin: 0 0 10px;">
-                      If you purchased a creative, video, or technology service, please keep your order number handy when communicating with our team:
-                    </p>
-                    <div style="background: #ffffff; border: 1px dashed #c084fc; border-radius: 6px; padding: 8px 14px; font-weight: 800; font-size: 14px; color: #581c87; display: inline-block;">
-                      Order Number: ${orderNumber}
-                    </div>
-                  </div>
-
-                  <!-- Contact Support -->
+                  <!-- Support -->
                   <p style="font-size: 14px; color: #475569; line-height: 1.6; margin: 0 0 20px;">
-                    If you have any questions, simply reply to this email or contact us at:<br />
+                    If you have any questions or require custom onboarding, simply reply to this email or contact us at:<br />
                     <strong>Quickupp Softech LLC</strong><br />
                     Email: <a href="mailto:info@quickuppsoftech.us" style="color: #4f46e5; text-decoration: none;">info@quickuppsoftech.us</a><br />
                     Website: <a href="https://quickuppsoftech.us/" style="color: #4f46e5; text-decoration: none;">quickuppsoftech.us</a>
                   </p>
 
-                  <p style="font-size: 14.5px; color: #1e293b; line-height: 1.5; margin: 0 0 4px;">
-                    Thank you for choosing Quickupp Softech LLC.
-                  </p>
                   <p style="font-size: 14.5px; color: #1e293b; line-height: 1.5; margin: 0;">
                     Best regards,<br />
                     <strong>Quickupp Softech LLC</strong><br />
-                    <span style="font-size: 12px; color: #64748b;">Operated by Quickupp Softech LLC</span>
+                    <span style="font-size: 12px; color: #64748b;">8 The Green, Suite A, Dover, Delaware - 19901, USA</span>
                   </p>
                 </div>
 
@@ -409,7 +459,7 @@ export async function POST(req: Request) {
             to: clientEmail,
             subject: clientSubject,
             html: clientHtml,
-            text: `Payment Confirmed — Quickupp Softech LLC | Order #${orderNumber}\n\nHi ${firstName},\n\nThank you for choosing Quickupp Softech LLC. We're pleased to confirm that your payment of $${capturedAmount.toFixed(2)} ${currency} has been successfully received.\n\nOrder / Invoice No: ${orderNumber}\nService: ${service}\nPayment Method: PayPal\nTransaction ID: ${captureID}\nStatus: ${isPartial ? "PARTIALLY PAID" : "PAID"}\n\nDownload receipt: ${receiptDownloadUrl}\n\nWhat happens next?\nOur team will process your order and contact you with next steps.\n\nNeed help? info@quickuppsoftech.us\n\nBest regards,\nQuickupp Softech LLC`,
+            text: `${clientSubject}\n\nHi ${firstName},\n\nThank you for choosing Quickupp Softech LLC. Order Number: ${orderNumber}. Amount: $${capturedAmount.toFixed(2)} ${currency}. Status: ${statusBannerValue}. Download receipt: ${receiptDownloadUrl}\n\nQuickupp Softech LLC`,
             attachments: [
               {
                 filename: `Quickupp-Receipt-${orderNumber}.pdf`,
@@ -424,8 +474,19 @@ export async function POST(req: Request) {
       }
     });
 
+    // 4. Return API response
+    if (paymentStatus === "failed") {
+      return NextResponse.json({
+        success: false,
+        status: "failed",
+        orderNumber,
+        error: failureReason || "Payment was declined or could not be processed. Please check your card details or try a different payment method.",
+      });
+    }
+
     return NextResponse.json({
       success: true,
+      status: paymentStatus,
       orderNumber,
       captureID,
       orderID,
@@ -436,9 +497,9 @@ export async function POST(req: Request) {
       currency,
     });
   } catch (err: any) {
-    console.error("[Capture Order API Error]", err);
+    console.error("[Capture Order API Fatal Error]", err);
     return NextResponse.json(
-      { error: err.message || "Failed to finalize PayPal payment capture." },
+      { error: err.message || "An unexpected error occurred while capturing payment." },
       { status: 500 }
     );
   }

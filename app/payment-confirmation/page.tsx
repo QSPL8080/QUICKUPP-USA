@@ -21,6 +21,7 @@ type Props = {
     category?: string;
     amount?: string;
     type?: string;
+    status?: string;
   }>;
 };
 
@@ -62,6 +63,7 @@ export default async function PaymentConfirmationPage({ searchParams }: Props) {
   const paymentType = (paymentRecord?.payment_type as "full" | "partial") || (sp.type as any) || "full";
   const remainingAmount = Number(paymentRecord?.remaining_amount || 0);
   const transactionId = paymentRecord?.reference || sp.ref || sp.txn || "COMPLETED-PAYPAL";
+  const isPending = paymentRecord?.status === "pending" || sp.status === "pending";
   const isPartial = paymentType === "partial";
 
   const downloadReceiptUrl = `/api/payments/receipt?order=${encodeURIComponent(orderNumber)}`;
@@ -89,14 +91,23 @@ export default async function PaymentConfirmationPage({ searchParams }: Props) {
       <main className="pc-card">
         {/* Hero Section */}
         <div className="pc-hero">
-          <div className="pc-badge-icon">
-            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20 6 9 17l-5-5" />
-            </svg>
+          <div className="pc-badge-icon" style={isPending ? { background: "#fef3c7", color: "#b45309" } : {}}>
+            {isPending ? (
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 14 14" />
+              </svg>
+            ) : (
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+            )}
           </div>
-          <h1 className="pc-title">Payment Successful! 🎉</h1>
+          <h1 className="pc-title">{isPending ? "Payment Received (Processing) ⏳" : "Payment Successful! 🎉"}</h1>
           <p className="pc-subtitle">
-            Thank you for your order. Your payment has been received successfully and your order is now confirmed.
+            {isPending
+              ? "Thank you for your order. Your payment is currently being cleared by PayPal. As soon as clearing completes, your order confirmation will update automatically."
+              : "Thank you for your order. Your payment has been received successfully and your order is now confirmed."}
           </p>
         </div>
 
@@ -159,8 +170,11 @@ export default async function PaymentConfirmationPage({ searchParams }: Props) {
                 <tr>
                   <td className="pc-label-cell">Status:</td>
                   <td className="pc-val-cell">
-                    <span className={`pc-status-pill ${isPartial ? "is-partial" : ""}`}>
-                      {isPartial ? "✓ PARTIALLY PAID" : "✓ PAID"}
+                    <span
+                      className={`pc-status-pill ${isPending ? "is-pending" : isPartial ? "is-partial" : ""}`}
+                      style={isPending ? { background: "#fef3c7", color: "#92400e", borderColor: "#fde68a" } : {}}
+                    >
+                      {isPending ? "⏳ PENDING CLEARING" : isPartial ? "✓ PARTIALLY PAID" : "✓ PAID"}
                     </span>
                   </td>
                 </tr>

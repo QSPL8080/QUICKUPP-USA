@@ -434,22 +434,56 @@ export default function PaymentsView({
                         )}
                       </td>
 
-                      {/* Amount & Status (Fully Paid vs Partial Paid breakdown) */}
+                      {/* Amount & Status (Fully Paid vs Partial Paid vs Pending vs Failed) */}
                       <td data-label="Amount" className="crm-nowrap">
-                        <span
-                          className={`crm-pill crm-pill-${isPartial ? "partially_paid" : "paid"}`}
-                          style={{ marginBottom: "4px", display: "inline-block" }}
-                        >
-                          {isPartial ? "Partially Paid" : "Fully Paid"}
-                        </span>
-                        {isPartial ? (
-                          <span style={{ display: "block", fontSize: "12px", color: "#d97706", fontWeight: 600 }}>
-                            {money(p.amount, p.currency)} received · {money(remAmt, p.currency)} due
-                          </span>
+                        {p.status === "failed" ? (
+                          <>
+                            <span
+                              className="crm-pill crm-pill-failed"
+                              style={{ marginBottom: "4px", display: "inline-block" }}
+                            >
+                              Failed
+                            </span>
+                            <span style={{ display: "block", fontSize: "12px", color: "#dc2626", fontWeight: 600 }}>
+                              {money(p.amount, p.currency)} attempted
+                            </span>
+                          </>
+                        ) : p.status === "pending" ? (
+                          <>
+                            <span
+                              className="crm-pill crm-pill-pending"
+                              style={{ marginBottom: "4px", display: "inline-block" }}
+                            >
+                              Pending Clearing
+                            </span>
+                            <span style={{ display: "block", fontSize: "12px", color: "#d97706", fontWeight: 600 }}>
+                              {money(p.amount, p.currency)} processing
+                            </span>
+                          </>
+                        ) : isPartial ? (
+                          <>
+                            <span
+                              className="crm-pill crm-pill-partially_paid"
+                              style={{ marginBottom: "4px", display: "inline-block" }}
+                            >
+                              Partially Paid
+                            </span>
+                            <span style={{ display: "block", fontSize: "12px", color: "#2563eb", fontWeight: 600 }}>
+                              {money(p.amount, p.currency)} received · {money(remAmt, p.currency)} due
+                            </span>
+                          </>
                         ) : (
-                          <span style={{ display: "block", fontSize: "12px", color: "#15803d", fontWeight: 600 }}>
-                            {money(p.amount, p.currency)} received
-                          </span>
+                          <>
+                            <span
+                              className="crm-pill crm-pill-paid"
+                              style={{ marginBottom: "4px", display: "inline-block" }}
+                            >
+                              Fully Paid
+                            </span>
+                            <span style={{ display: "block", fontSize: "12px", color: "#15803d", fontWeight: 600 }}>
+                              {money(p.amount, p.currency)} received
+                            </span>
+                          </>
                         )}
                       </td>
 
@@ -768,17 +802,50 @@ export default function PaymentsView({
                     Financial Summary (USD)
                   </span>
                   <span
-                    className={`crm-pill crm-pill-${viewing.paymentType === "partial" ? "partially_paid" : "paid"}`}
+                    className={`crm-pill crm-pill-${
+                      viewing.status === "failed"
+                        ? "failed"
+                        : viewing.status === "pending"
+                        ? "pending"
+                        : viewing.paymentType === "partial"
+                        ? "partially_paid"
+                        : "paid"
+                    }`}
                   >
-                    {viewing.paymentType === "partial" ? "Partially Paid" : "Fully Paid"}
+                    {viewing.status === "failed"
+                      ? "Failed"
+                      : viewing.status === "pending"
+                      ? "Pending Clearing"
+                      : viewing.paymentType === "partial"
+                      ? "Partially Paid"
+                      : "Fully Paid"}
                   </span>
                 </div>
 
                 <div className="crm-fin-grid">
                   <div className="crm-fin-stat">
                     <div className="crm-fin-stat-label">Payment Status</div>
-                    <div className="crm-fin-stat-val" style={{ fontSize: "14px", color: viewing.paymentType === "partial" ? "#d97706" : "#15803d" }}>
-                      {viewing.paymentType === "partial" ? "Deposit Received" : "100% Cleared"}
+                    <div
+                      className="crm-fin-stat-val"
+                      style={{
+                        fontSize: "14px",
+                        color:
+                          viewing.status === "failed"
+                            ? "#dc2626"
+                            : viewing.status === "pending"
+                            ? "#d97706"
+                            : viewing.paymentType === "partial"
+                            ? "#2563eb"
+                            : "#15803d",
+                      }}
+                    >
+                      {viewing.status === "failed"
+                        ? "Declined / Failed"
+                        : viewing.status === "pending"
+                        ? "Pending Clearing"
+                        : viewing.paymentType === "partial"
+                        ? "Deposit Received"
+                        : "100% Cleared"}
                     </div>
                   </div>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import LucideIcon from "@/components/LucideIcon";
 import "@/app/pay-modal.css";
 
@@ -103,6 +104,7 @@ function getInitialDates() {
 }
 
 export default function PayNowModal() {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState<"form" | "paypal" | "success">("form");
 
@@ -240,7 +242,22 @@ export default function PayNowModal() {
       return;
     }
 
-    setStep("paypal");
+    const query = new URLSearchParams({
+      name: clientName.trim(),
+      email: clientEmail.trim(),
+      phone: clientPhone.trim(),
+      company: companyName.trim(),
+      service: service.trim(),
+      category: selectedCategories.join(", "),
+      from: billingStartDate,
+      to: billingEndDate,
+      amount: String(numTotal),
+      type: paymentType,
+      notes: notes.trim(),
+    }).toString();
+
+    handleClose();
+    router.push(`/checkout?${query}`);
   };
 
   // Load and render PayPal buttons when entering "paypal" step
