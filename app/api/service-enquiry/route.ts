@@ -1,6 +1,6 @@
 import { getPool } from "@/lib/db";
 import { SERVICE_FORMS, isServiceFormKey } from "@/lib/formOptions";
-import { readJson, requestMeta, validateEnquiry } from "@/lib/enquiry";
+import { readJson, validateServiceEnquiry } from "@/lib/enquiry";
 
 /*
  * Service page forms → one table per service:
@@ -10,7 +10,7 @@ import { readJson, requestMeta, validateEnquiry } from "@/lib/enquiry";
  *   staff-augmentation → service_staff_augmentation
  * The table name comes only from this fixed list, never from the request.
  * "service" is the fixed service of that form; "category" is the subpage the
- * visitor picked (the form sends it as serviceInterest).
+ * visitor picked.
  */
 export async function POST(request: Request) {
   const body = await readJson(request);
@@ -23,21 +23,32 @@ export async function POST(request: Request) {
   }
   const form = SERVICE_FORMS[body.service];
 
-  const result = validateEnquiry(body, form.options, "serviceInterest", "category");
+  const result = validateServiceEnquiry(body, form.options);
   if (!result.ok) return Response.json({ ok: false, errors: result.errors }, { status: 400 });
 
   const d = result.data;
-  const meta = requestMeta(request, body.pageUrl);
-  const sourcePage = typeof body.sourcePage === "string" ? body.sourcePage.trim().slice(0, 150) || null : null;
 
   try {
+    // Only the fields we have in the form should be saved + form filled time (created_at is auto-timestamped), nothing else
     const [res] = await getPool().execute(
       `INSERT INTO ${form.table}
-        (full_name, email, phone, company_name, industry, other_industry, service, category, budget, message,
-         agreed_terms, source_page, page_url, ip_address, user_agent)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?)`,
-      [d.fullName, d.email, d.phone, d.companyName, d.industry, d.otherIndustry, form.label, d.subject, d.budget,
-        d.message, sourcePage, meta.pageUrl, meta.ip, meta.userAgent]
+        (full_name, email, phone, company_name, company_website, country, industry, other_industry, service, category, budget, timeline, message)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        d.fullName,
+        d.email,
+        d.phone,
+        d.companyName,
+        d.companyWebsite,
+        d.country,
+        d.industry,
+        d.otherIndustry,
+        form.label,
+        d.category,
+        d.budget,
+        d.timeline,
+        d.message,
+      ]
     );
     return Response.json({ ok: true, id: (res as { insertId: number }).insertId });
   } catch (err) {

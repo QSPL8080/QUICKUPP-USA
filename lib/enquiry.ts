@@ -21,6 +21,21 @@ export type ContactEnquiryInput = {
   message: string | null;
 };
 
+export type ServiceEnquiryInput = {
+  fullName: string;
+  email: string;
+  phone: string;
+  companyName: string | null;
+  companyWebsite: string | null;
+  country: string;
+  industry: string;
+  otherIndustry: string | null;
+  category: string;
+  budget: string;
+  timeline: string;
+  message: string | null;
+};
+
 type EnquiryInput = {
   fullName: string;
   email: string;
@@ -123,6 +138,56 @@ export function validateContactEnquiry(body: Record<string, unknown>): { ok: tru
       industry,
       otherIndustry: industry === "Other" ? otherIndustry : null,
       service,
+      budget,
+      timeline,
+      message: message || null,
+    },
+  };
+}
+
+export function validateServiceEnquiry(
+  body: Record<string, unknown>,
+  options: readonly string[]
+): { ok: true; data: ServiceEnquiryInput } | { ok: false; errors: Record<string, string> } {
+  const errors: Record<string, string> = {};
+
+  const fullName = text(body.fullName, 150);
+  const email = text(body.email, 190).toLowerCase();
+  const phone = text(body.phone, 40);
+  const companyName = text(body.companyName, 190);
+  const companyWebsite = text(body.companyWebsite, 255);
+  const country = text(body.country, 100);
+  const industry = text(body.industry, 100);
+  const otherIndustry = text(body.otherIndustry, 150);
+  const category = text(body.category || body.serviceInterest, 150);
+  const budget = text(body.budget, 60);
+  const timeline = text(body.timeline, 60);
+  const message = text(body.message, 5000);
+
+  if (!fullName) errors.fullName = "Please enter your full name.";
+  if (!email || !EMAIL_RE.test(email)) errors.email = "Please enter a valid business email.";
+  if (!phone || !/^[0-9+()\-.\s]{5,40}$/.test(phone)) errors.phone = "Please enter a valid phone number.";
+  if (!country) errors.country = "Please enter your country.";
+  if (!(INDUSTRIES as readonly string[]).includes(industry)) errors.industry = "Please select your industry.";
+  if (industry === "Other" && !otherIndustry) errors.otherIndustry = "Please specify your industry.";
+  if (!options.includes(category)) errors.category = "Please select a category.";
+  if (!(CONTACT_BUDGETS as readonly string[]).includes(budget)) errors.budget = "Please select an estimated budget.";
+  if (!(CONTACT_TIMELINES as readonly string[]).includes(timeline)) errors.timeline = "Please select a project timeline.";
+  if (body.agreed !== true && body.agreed !== "true") errors.agreed = "Please accept the Privacy Policy and Terms & Conditions.";
+
+  if (Object.keys(errors).length) return { ok: false, errors };
+  return {
+    ok: true,
+    data: {
+      fullName,
+      email,
+      phone,
+      companyName: companyName || null,
+      companyWebsite: companyWebsite || null,
+      country,
+      industry,
+      otherIndustry: industry === "Other" ? otherIndustry : null,
+      category,
       budget,
       timeline,
       message: message || null,

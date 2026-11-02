@@ -9951,6 +9951,10 @@ a.secondary-button,
   grid-column: span 2;
 }
 
+.sef-row-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .sef-section .su-text-input:not(textarea) {
   height: 55px; /* same height as the dropdowns in each row */
 }

@@ -2,15 +2,13 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { BUDGETS, INDUSTRIES, SERVICE_FORMS, type ServiceFormKey } from "@/lib/formOptions";
+import { CONTACT_BUDGETS, CONTACT_TIMELINES, INDUSTRIES, SERVICE_FORMS, type ServiceFormKey } from "@/lib/formOptions";
 
 /*
- * Enquiry form shown on every subpage of a service. Same fields and look as
- * the Contact page form. "Service" is fixed to the service this page belongs
- * to; "Category" lists that service's subpages (the current one is
- * pre-selected). For another service, visitors use that service's pages.
- * Submissions go to /api/service-enquiry and are saved in the service's own
- * table (the category goes in service_interest).
+ * Enquiry form shown on every subpage of a service.
+ * "Service" is fixed to the service this page belongs to;
+ * "Category" lists that service's subpages (the current one is pre-selected).
+ * Submissions go to /api/service-enquiry and are saved in the service's own table.
  */
 
 const EMPTY = {
@@ -18,10 +16,13 @@ const EMPTY = {
   email: "",
   phone: "",
   companyName: "",
+  companyWebsite: "",
+  country: "",
   industry: "",
   otherIndustry: "",
   serviceInterest: "",
   budget: "",
+  timeline: "",
   message: "",
   agreed: false,
 };
@@ -55,11 +56,21 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...formData,
+          fullName: formData.fullName,
+          email: formData.email,
+          phone: formData.phone,
+          companyName: formData.companyName,
+          companyWebsite: formData.companyWebsite,
+          country: formData.country,
+          industry: formData.industry,
+          otherIndustry: formData.otherIndustry,
+          category: formData.serviceInterest,
+          budget: formData.budget,
+          timeline: formData.timeline,
+          message: formData.message,
+          agreed: formData.agreed,
           service,
-          sourcePage: current || null,
           website,
-          pageUrl: window.location.href,
         }),
       });
       const json = await res.json().catch(() => ({}));
@@ -88,8 +99,7 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
               <div className="su-success-icon">✓</div>
               <h3 className="sef-success-title">Thank You! Your Inquiry Has Been Received.</h3>
               <p className="sef-success-text">
-                We appreciate you reaching out, <strong>{formData.fullName || "friend"}</strong>. Our strategy team will review
-                your project details and get back to you at <strong>{formData.email}</strong> within 24 hours.
+                Our team will review your details and contact you to discuss your requirements.
               </p>
               <button
                 type="button"
@@ -117,13 +127,14 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
 
               <div className="su-form-top">
                 <h2 className="su-inquiry-title">Send Your Inquiry!</h2>
-                <p className="su-inquiry-para">Share your project details, and we’ll get back to you within 24 hours.</p>
+                <p className="su-inquiry-para">Our team will review your details and contact you to discuss your requirements.</p>
               </div>
 
+              {/* Row 1: Full name, Business email, Phone number */}
               <div className="sef-row">
                 <div className="su-field-group">
                   <label htmlFor={`${idp}-name`} className="su-field-label">
-                    Full name
+                    Full Name*
                   </label>
                   <input
                     id={`${idp}-name`}
@@ -137,13 +148,13 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
                 </div>
                 <div className="su-field-group">
                   <label htmlFor={`${idp}-email`} className="su-field-label">
-                    Email address
+                    Business Email*
                   </label>
                   <input
                     id={`${idp}-email`}
                     type="email"
                     required
-                    placeholder="Email Address"
+                    placeholder="Business Email"
                     className="su-text-input"
                     value={formData.email}
                     onChange={(e) => set({ email: e.target.value })}
@@ -151,11 +162,12 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
                 </div>
                 <div className="su-field-group">
                   <label htmlFor={`${idp}-phone`} className="su-field-label">
-                    Phone number
+                    Phone Number*
                   </label>
                   <input
                     id={`${idp}-phone`}
                     type="tel"
+                    required
                     placeholder="+1 (555) 000-0000"
                     className="su-text-input"
                     value={formData.phone}
@@ -164,10 +176,11 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
                 </div>
               </div>
 
+              {/* Row 2: Company name, Company website, Country */}
               <div className="sef-row">
                 <div className="su-field-group">
                   <label htmlFor={`${idp}-company`} className="su-field-label">
-                    Company name
+                    Company Name
                   </label>
                   <input
                     id={`${idp}-company`}
@@ -179,8 +192,39 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
                   />
                 </div>
                 <div className="su-field-group">
+                  <label htmlFor={`${idp}-website`} className="su-field-label">
+                    Company Website
+                  </label>
+                  <input
+                    id={`${idp}-website`}
+                    type="url"
+                    placeholder="https://example.com"
+                    className="su-text-input"
+                    value={formData.companyWebsite}
+                    onChange={(e) => set({ companyWebsite: e.target.value })}
+                  />
+                </div>
+                <div className="su-field-group">
+                  <label htmlFor={`${idp}-country`} className="su-field-label">
+                    Country*
+                  </label>
+                  <input
+                    id={`${idp}-country`}
+                    type="text"
+                    required
+                    placeholder="United States"
+                    className="su-text-input"
+                    value={formData.country}
+                    onChange={(e) => set({ country: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              {/* Row 3: Service (fixed), Category, Industry */}
+              <div className="sef-row">
+                <div className="su-field-group">
                   <label htmlFor={`${idp}-service`} className="su-field-label">
-                    Service
+                    Service Interested In*
                   </label>
                   <div className="sef-locked-wrap" title="Fixed on this service's pages">
                     <input
@@ -200,7 +244,7 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
                 </div>
                 <div className="su-field-group">
                   <label htmlFor={`${idp}-category`} className="su-field-label">
-                    Category
+                    Category*
                   </label>
                   <select
                     id={`${idp}-category`}
@@ -217,12 +261,9 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
                     ))}
                   </select>
                 </div>
-              </div>
-
-              <div className="sef-row">
                 <div className="su-field-group">
                   <label htmlFor={`${idp}-industry`} className="su-field-label">
-                    Industry
+                    Industry*
                   </label>
                   <select
                     id={`${idp}-industry`}
@@ -242,10 +283,14 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
                     ))}
                   </select>
                 </div>
-                {formData.industry === "Other" && (
+              </div>
+
+              {/* Row 4: (Other Industry if selected) + Estimated Budget + Project Timeline */}
+              {formData.industry === "Other" ? (
+                <div className="sef-row">
                   <div className="su-field-group">
                     <label htmlFor={`${idp}-other`} className="su-field-label">
-                      Other industry
+                      Please specify your industry*
                     </label>
                     <input
                       id={`${idp}-other`}
@@ -257,36 +302,97 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
                       onChange={(e) => set({ otherIndustry: e.target.value })}
                     />
                   </div>
-                )}
-                <div className={`su-field-group${formData.industry === "Other" ? "" : " sef-span-2"}`}>
-                  <label htmlFor={`${idp}-budget`} className="su-field-label">
-                    Estimated Budget
-                  </label>
-                  <select
-                    id={`${idp}-budget`}
-                    className="su-select-input"
-                    value={formData.budget}
-                    onChange={(e) => set({ budget: e.target.value })}
-                  >
-                    <option value="">Select Budget Range</option>
-                    {BUDGETS.map((b) => (
-                      <option key={b.value} value={b.value}>
-                        {b.label}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="su-field-group">
+                    <label htmlFor={`${idp}-budget`} className="su-field-label">
+                      Estimated Project Budget*
+                    </label>
+                    <select
+                      id={`${idp}-budget`}
+                      required
+                      className="su-select-input"
+                      value={formData.budget}
+                      onChange={(e) => set({ budget: e.target.value })}
+                    >
+                      <option value="">Select Budget Range</option>
+                      {CONTACT_BUDGETS.map((b) => (
+                        <option key={b} value={b}>
+                          {b}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="su-field-group">
+                    <label htmlFor={`${idp}-timeline`} className="su-field-label">
+                      Project Timeline*
+                    </label>
+                    <select
+                      id={`${idp}-timeline`}
+                      required
+                      className="su-select-input"
+                      value={formData.timeline}
+                      onChange={(e) => set({ timeline: e.target.value })}
+                    >
+                      <option value="">Select Timeline</option>
+                      {CONTACT_TIMELINES.map((t) => (
+                        <option key={t} value={t}>
+                          {t}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="sef-row sef-row-2">
+                  <div className="su-field-group">
+                    <label htmlFor={`${idp}-budget`} className="su-field-label">
+                      Estimated Project Budget*
+                    </label>
+                    <select
+                      id={`${idp}-budget`}
+                      required
+                      className="su-select-input"
+                      value={formData.budget}
+                      onChange={(e) => set({ budget: e.target.value })}
+                    >
+                      <option value="">Select Budget Range</option>
+                      {CONTACT_BUDGETS.map((b) => (
+                        <option key={b} value={b}>
+                          {b}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="su-field-group">
+                    <label htmlFor={`${idp}-timeline`} className="su-field-label">
+                      Project Timeline*
+                    </label>
+                    <select
+                      id={`${idp}-timeline`}
+                      required
+                      className="su-select-input"
+                      value={formData.timeline}
+                      onChange={(e) => set({ timeline: e.target.value })}
+                    >
+                      <option value="">Select Timeline</option>
+                      {CONTACT_TIMELINES.map((t) => (
+                        <option key={t} value={t}>
+                          {t}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              )}
 
+              {/* Message / Project Details */}
               <div className="su-field-group">
                 <label htmlFor={`${idp}-message`} className="su-field-label">
-                  Message / Project Details
+                  Tell Us About Your Project / Requirements
                 </label>
                 <textarea
                   id={`${idp}-message`}
                   rows={4}
-                  required
-                  placeholder="Tell us about your project, goals, and timeline..."
+                  placeholder="Tell us about your project, goals, and requirements..."
                   className="su-textarea-input"
                   value={formData.message}
                   onChange={(e) => set({ message: e.target.value })}
@@ -321,7 +427,7 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
               )}
 
               <button type="submit" disabled={submitting} className="su-submit-btn">
-                <span>{submitting ? "Sending..." : "Send Message"}</span>
+                <span>{submitting ? "Submitting..." : "Submit Your Inquiry"}</span>
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 18 18" fill="none" className="su-submit-arrow">
                   <path
                     d="M3.75 9L14.25 9M14.25 9L9 3.75M14.25 9L9 14.25"
