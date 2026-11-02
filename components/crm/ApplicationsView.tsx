@@ -99,7 +99,19 @@ export default function ApplicationsView({ rows }: { rows: ApplicationRow[] }) {
           {error}
         </p>
       )}
-      <BulkBar sel={sel} noun={["application", "applications"]} busy={busy} onDelete={removeSelected} />
+      <BulkBar sel={sel} noun={["application", "applications"]} busy={busy} onDelete={removeSelected}>
+        {sel.selected.length > 0 && (
+          <a
+            href={`/api/crm/applications/export?ids=${sel.selected.join(",")}`}
+            className="crm-act crm-act-ghost crm-act-sm"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+            </svg>
+            Export selected ({sel.selected.length})
+          </a>
+        )}
+      </BulkBar>
       <div className="crm-table-wrap">
         <table className="crm-table crm-stack crm-selectable">
           <thead>
