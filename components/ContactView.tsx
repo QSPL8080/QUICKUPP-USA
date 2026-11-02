@@ -6,7 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ContactMotion from "@/components/ContactMotion";
 import LucideIcon, { type LucideIconName } from "@/components/LucideIcon";
-import { BUDGETS, CONTACT_SUBJECTS, INDUSTRIES as INDUSTRY_OPTIONS } from "@/lib/formOptions";
+import { CONTACT_BUDGETS, CONTACT_SERVICES, CONTACT_TIMELINES, INDUSTRIES as INDUSTRY_OPTIONS } from "@/lib/formOptions";
 import "@/app/contact.css";
 
 /*
@@ -55,10 +55,13 @@ const EMPTY = {
   email: "",
   phone: "",
   companyName: "",
+  companyWebsite: "",
+  country: "",
   industry: "",
   otherIndustry: "",
   projectType: "",
   budget: "",
+  timeline: "",
   message: "",
   agreed: false,
 };
@@ -125,7 +128,7 @@ function InquiryForm() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, website: trap, pageUrl: window.location.href }),
+        body: JSON.stringify({ ...form, website: trap }),
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok || !json.ok) {
@@ -181,17 +184,23 @@ function InquiryForm() {
         className="ct-trap"
       />
       <div className="ct-grid">
-        <Field id="ct-fullName" label="Full name" required error={errors.fullName} filled={!!form.fullName}>
+        <Field id="ct-fullName" label="Full Name" required error={errors.fullName} filled={!!form.fullName}>
           <input id="ct-fullName" className="ct-input" autoComplete="name" placeholder=" " value={form.fullName} onChange={set("fullName")} />
         </Field>
-        <Field id="ct-email" label="Email address" required error={errors.email} filled={!!form.email}>
+        <Field id="ct-email" label="Business Email" required error={errors.email} filled={!!form.email}>
           <input id="ct-email" type="email" className="ct-input" autoComplete="email" placeholder=" " value={form.email} onChange={set("email")} />
         </Field>
-        <Field id="ct-phone" label="Phone number" error={errors.phone} filled={!!form.phone}>
+        <Field id="ct-phone" label="Phone Number" required error={errors.phone} filled={!!form.phone}>
           <input id="ct-phone" type="tel" className="ct-input" autoComplete="tel" placeholder=" " value={form.phone} onChange={set("phone")} />
         </Field>
-        <Field id="ct-companyName" label="Company name" error={errors.companyName} filled={!!form.companyName}>
+        <Field id="ct-companyName" label="Company Name" error={errors.companyName} filled={!!form.companyName}>
           <input id="ct-companyName" className="ct-input" autoComplete="organization" placeholder=" " value={form.companyName} onChange={set("companyName")} />
+        </Field>
+        <Field id="ct-companyWebsite" label="Company Website" error={errors.companyWebsite} filled={!!form.companyWebsite}>
+          <input id="ct-companyWebsite" type="url" className="ct-input" placeholder=" " value={form.companyWebsite} onChange={set("companyWebsite")} />
+        </Field>
+        <Field id="ct-country" label="Country" required error={errors.country} filled={!!form.country}>
+          <input id="ct-country" className="ct-input" autoComplete="country-name" placeholder=" " value={form.country} onChange={set("country")} />
         </Field>
         <Field id="ct-industry" label="Industry" required error={errors.industry} filled={!!form.industry}>
           <select id="ct-industry" className="ct-input ct-select" value={form.industry} onChange={set("industry")}>
@@ -203,10 +212,10 @@ function InquiryForm() {
             ))}
           </select>
         </Field>
-        <Field id="ct-projectType" label="Subject / Service" required error={errors.projectType} filled={!!form.projectType}>
+        <Field id="ct-projectType" label="Service Interested In" required error={errors.projectType} filled={!!form.projectType}>
           <select id="ct-projectType" className="ct-input ct-select" value={form.projectType} onChange={set("projectType")}>
             <option value="" disabled hidden />
-            {CONTACT_SUBJECTS.map((v) => (
+            {CONTACT_SERVICES.map((v) => (
               <option key={v} value={v}>
                 {v}
               </option>
@@ -218,18 +227,28 @@ function InquiryForm() {
             <input id="ct-otherIndustry" className="ct-input" placeholder=" " value={form.otherIndustry} onChange={set("otherIndustry")} />
           </Field>
         )}
-        <Field id="ct-budget" label="Estimated Budget" error={errors.budget} wide filled={!!form.budget}>
+        <Field id="ct-budget" label="Estimated Project Budget" required error={errors.budget} filled={!!form.budget}>
           <select id="ct-budget" className="ct-input ct-select" value={form.budget} onChange={set("budget")}>
             <option value="" disabled hidden />
-            {BUDGETS.map((b) => (
-              <option key={b.value} value={b.value}>
-                {b.label}
+            {CONTACT_BUDGETS.map((b) => (
+              <option key={b} value={b}>
+                {b}
               </option>
             ))}
           </select>
         </Field>
-        <Field id="ct-message" label="Message / Project Details" required error={errors.message} wide filled={!!form.message}>
-          <textarea id="ct-message" className="ct-input ct-textarea" rows={5} placeholder=" " value={form.message} onChange={set("message")} />
+        <Field id="ct-timeline" label="Project Timeline" required error={errors.timeline} filled={!!form.timeline}>
+          <select id="ct-timeline" className="ct-input ct-select" value={form.timeline} onChange={set("timeline")}>
+            <option value="" disabled hidden />
+            {CONTACT_TIMELINES.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field id="ct-message" label="Tell Us About Your Project / Requirements" error={errors.message} wide filled={!!form.message}>
+          <textarea id="ct-message" className="ct-input ct-textarea" rows={4} placeholder=" " value={form.message} onChange={set("message")} />
         </Field>
       </div>
 

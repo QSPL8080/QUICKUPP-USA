@@ -1,6 +1,5 @@
 import { getPool } from "@/lib/db";
-import { CONTACT_SUBJECTS } from "@/lib/formOptions";
-import { readJson, requestMeta, validateEnquiry } from "@/lib/enquiry";
+import { readJson, validateContactEnquiry } from "@/lib/enquiry";
 
 /* Contact page form → contact_enquiries (shown in CRM > All Enquiries as "Contact Form") */
 export async function POST(request: Request) {
@@ -10,20 +9,31 @@ export async function POST(request: Request) {
   // Hidden "website" field: filled in only by spam bots
   if (typeof body.website === "string" && body.website.trim()) return Response.json({ ok: true });
 
-  const result = validateEnquiry(body, CONTACT_SUBJECTS, "projectType");
+  const result = validateContactEnquiry(body);
   if (!result.ok) return Response.json({ ok: false, errors: result.errors }, { status: 400 });
 
   const d = result.data;
-  const meta = requestMeta(request, body.pageUrl);
 
   try {
+    // Only the fields we have in the form should be saved + form filled time (created_at is auto-timestamped), nothing else
     const [res] = await getPool().execute(
       `INSERT INTO contact_enquiries
-        (full_name, email, phone, company_name, industry, other_industry, project_type, budget, message,
-         agreed_terms, page_url, ip_address, user_agent)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?)`,
-      [d.fullName, d.email, d.phone, d.companyName, d.industry, d.otherIndustry, d.subject, d.budget, d.message,
-        meta.pageUrl, meta.ip, meta.userAgent]
+        (full_name, email, phone, company_name, company_website, country, industry, other_industry, project_type, budget, timeline, message)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        d.fullName,
+        d.email,
+        d.phone,
+        d.companyName,
+        d.companyWebsite,
+        d.country,
+        d.industry,
+        d.otherIndustry,
+        d.service,
+        d.budget,
+        d.timeline,
+        d.message,
+      ]
     );
     return Response.json({ ok: true, id: (res as { insertId: number }).insertId });
   } catch (err) {
