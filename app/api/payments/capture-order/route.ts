@@ -51,6 +51,10 @@ export async function POST(req: Request) {
     const finalRemaining = isPartial ? Math.max(0, Number(remainingAmount || (finalTotal - capturedAmount))) : 0;
     const paymentStatus = isPartial ? "partially_paid" : "paid";
 
+    const categoryStr = Array.isArray(category)
+      ? category.filter(Boolean).join(", ")
+      : (typeof category === "string" ? category : "");
+
     // 2. Save payment record in MySQL database
     let insertedId = 0;
     try {
@@ -84,9 +88,9 @@ export async function POST(req: Request) {
           clientEmail || null,
           clientPhone || null,
           companyName || null,
-          category || null,
+          categoryStr || null,
           service || "General Consultation",
-          `Website PayPal Payment (${isPartial ? "Partial Deposit" : "Full Payment"}) - ${service || ""} (${category || ""})`.trim(),
+          `Website PayPal Payment (${isPartial ? "Partial Deposit" : "Full Payment"}) - ${service || ""} (${categoryStr || ""})`.trim(),
           capturedAmount,
           finalTotal,
           isPartial ? "partial" : "full",
@@ -135,7 +139,7 @@ export async function POST(req: Request) {
             clientPhone || null,
             companyName || null,
             "Other",
-            `${service}${category ? ` – ${category}` : ""}`,
+            `${service}${categoryStr ? ` – ${categoryStr}` : ""}`,
             `$${capturedAmount.toFixed(2)} USD (${isPartial ? "Partial Deposit" : "Full Payment"})`,
             `Website Pay Now Payment. Order #${orderNumber}. PayPal Capture ID: ${captureID}. Total Amount: $${finalTotal.toFixed(2)}, Paid: $${capturedAmount.toFixed(2)}${isPartial ? `, Due: $${finalRemaining.toFixed(2)}` : ""}. Notes: ${notes || "None"}`,
           ]
@@ -168,7 +172,7 @@ export async function POST(req: Request) {
               <tr><td style="padding: 8px 0; color: #64748b;">Client Email:</td><td style="padding: 8px 0; color: #0f172a;"><a href="mailto:${clientEmail}">${clientEmail}</a></td></tr>
               <tr><td style="padding: 8px 0; color: #64748b;">Client Phone:</td><td style="padding: 8px 0; color: #0f172a;"><a href="tel:${clientPhone}">${clientPhone}</a></td></tr>
               ${companyName ? `<tr><td style="padding: 8px 0; color: #64748b;">Company:</td><td style="padding: 8px 0; color: #0f172a;">${companyName}</td></tr>` : ""}
-              ${category ? `<tr><td style="padding: 8px 0; color: #64748b;">Category:</td><td style="padding: 8px 0; color: #0f172a;">${category}</td></tr>` : ""}
+              ${categoryStr ? `<tr><td style="padding: 8px 0; color: #64748b;">Category:</td><td style="padding: 8px 0; color: #0f172a;">${categoryStr}</td></tr>` : ""}
               ${service ? `<tr><td style="padding: 8px 0; color: #64748b;">Service:</td><td style="padding: 8px 0; color: #0f172a;">${service}</td></tr>` : ""}
               ${billingStartDate || billingEndDate ? `<tr><td style="padding: 8px 0; color: #64748b;">Billing Period:</td><td style="padding: 8px 0; color: #0f172a;">${billingStartDate || "—"} to ${billingEndDate || "—"}</td></tr>` : ""}
               <tr><td style="padding: 8px 0; color: #64748b;">PayPal Capture ID:</td><td style="padding: 8px 0; color: #0f172a; font-family: monospace;">${captureID}</td></tr>
@@ -186,7 +190,7 @@ export async function POST(req: Request) {
           to: LEADS_NOTIFICATION_EMAIL,
           subject: adminSubject,
           html: adminHtml,
-          text: `${typeLabel} of $${capturedAmount.toFixed(2)} ${currency} received from ${clientName} (${clientEmail}, ${clientPhone}) for ${service || category || "service"}. Order Number: ${orderNumber}. Transaction ID: ${captureID}`,
+          text: `${typeLabel} of $${capturedAmount.toFixed(2)} ${currency} received from ${clientName} (${clientEmail}, ${clientPhone}) for ${service || categoryStr || "service"}. Order Number: ${orderNumber}. Transaction ID: ${captureID}`,
           replyTo: clientEmail || undefined,
         });
       } catch (mailErr) {
@@ -224,7 +228,7 @@ export async function POST(req: Request) {
             clientPhone,
             companyName,
             service,
-            category,
+            category: categoryStr,
             amountPaid: capturedAmount,
             totalAmount: finalTotal,
             paymentType: isPartial ? "partial" : "full",

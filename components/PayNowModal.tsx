@@ -99,7 +99,11 @@ export default function PayNowModal() {
   const [clientPhone, setClientPhone] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [service, setService] = useState(SERVICES_DATA[0].service);
-  const [category, setCategory] = useState(SERVICES_DATA[0].categories[0]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([
+    SERVICES_DATA[0].categories[0],
+  ]);
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+  const categoryDropdownRef = useRef<HTMLDivElement>(null);
   const [billingStartDate, setBillingStartDate] = useState(getInitialDates().start);
   const [billingEndDate, setBillingEndDate] = useState(getInitialDates().end);
 
@@ -126,12 +130,27 @@ export default function PayNowModal() {
   const paypalContainerRef = useRef<HTMLDivElement>(null);
   const paypalRenderedRef = useRef(false);
 
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        categoryDropdownRef.current &&
+        !categoryDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsCategoryDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   // Listen for open events
   useEffect(() => {
     const handleOpen = () => {
       setIsOpen(true);
       setStep("form");
       setFormError("");
+      setIsCategoryDropdownOpen(false);
     };
 
     window.addEventListener("quickupp:open-pay-modal", handleOpen);
@@ -145,10 +164,29 @@ export default function PayNowModal() {
     setService(newService);
     const matched = SERVICES_DATA.find((s) => s.service === newService);
     if (matched && matched.categories.length > 0) {
-      setCategory(matched.categories[0]);
+      setSelectedCategories([matched.categories[0]]);
     } else {
-      setCategory("General / Custom");
+      setSelectedCategories(["General / Custom"]);
     }
+    setIsCategoryDropdownOpen(false);
+  };
+
+  const toggleCategory = (catName: string) => {
+    setSelectedCategories((prev) => {
+      if (prev.includes(catName)) {
+        return prev.filter((c) => c !== catName);
+      } else {
+        return [...prev, catName];
+      }
+    });
+  };
+
+  const selectAllCategories = () => {
+    setSelectedCategories([...availableCategories]);
+  };
+
+  const clearCategories = () => {
+    setSelectedCategories([]);
   };
 
   const handleClose = () => {
@@ -178,6 +216,10 @@ export default function PayNowModal() {
     }
     if (!clientPhone.trim()) {
       setFormError("Please enter your phone number.");
+      return;
+    }
+    if (selectedCategories.length === 0) {
+      setFormError("Please select at least one service category.");
       return;
     }
     if (!numTotal || isNaN(numTotal) || numTotal <= 0) {
@@ -228,7 +270,7 @@ export default function PayNowModal() {
                 clientEmail,
                 clientPhone,
                 companyName,
-                category,
+                category: selectedCategories.join(", "),
                 service,
                 billingStartDate,
                 billingEndDate,
@@ -258,7 +300,7 @@ export default function PayNowModal() {
                   clientEmail,
                   clientPhone,
                   companyName,
-                  category,
+                  category: selectedCategories.join(", "),
                   service,
                   billingStartDate,
                   billingEndDate,
@@ -341,7 +383,7 @@ export default function PayNowModal() {
     clientEmail,
     clientPhone,
     companyName,
-    category,
+    selectedCategories,
     service,
     billingStartDate,
     billingEndDate,
@@ -482,21 +524,102 @@ export default function PayNowModal() {
                     ))}
                   </select>
                 </div>
-                <div className="pm-field">
+                <div className="pm-field" ref={categoryDropdownRef} style={{ position: "relative" }}>
                   <label className="pm-label">
-                    Service Category <span className="pm-req">*</span>
+                    Category <span className="pm-req">*</span>
+                    <span style={{ fontWeight: 500, color: "#64748b", fontSize: "11px", marginLeft: "auto" }}>
+                      (Multi-Select)
+                    </span>
                   </label>
-                  <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="pm-select"
+                  <button
+                    type="button"
+                    onClick={() => setIsCategoryDropdownOpen((v) => !v)}
+                    className="pm-multiselect-btn"
+                    aria-expanded={isCategoryDropdownOpen}
                   >
-                    {availableCategories.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    ))}
-                  </select>
+                    <span className="pm-multiselect-text">
+                      {selectedCategories.length === 0 ? (
+                        <span style={{ color: "#94a3b8" }}>Select categories...</span>
+                      ) : selectedCategories.length === 1 ? (
+                        <span>{selectedCategories[0]}</span>
+                      ) : selectedCategories.length === 2 ? (
+                        <span>{selectedCategories[0]}, {selectedCategories[1]}</span>
+                      ) : (
+                        <>
+                          <span className="pm-badge-count">{selectedCategories.length} selected</span>
+                          <span style={{ color: "#334155", marginLeft: "6px" }}>
+                            {selectedCategories[0]}, +{selectedCategories.length - 1} more
+                          </span>
+                        </>
+                      )}
+                    </span>
+                    <svg
+                      width="13"
+                      height="13"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      style={{
+                        transform: isCategoryDropdownOpen ? "rotate(180deg)" : "rotate(0deg)",
+                        transition: "transform 0.18s ease",
+                        flexShrink: 0,
+                        color: "#64748b",
+                      }}
+                    >
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  </button>
+
+                  {isCategoryDropdownOpen && (
+                    <div className="pm-multiselect-popover">
+                      <div className="pm-ms-popover-header">
+                        <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748b" }}>
+                          {availableCategories.length} Available
+                        </span>
+                        <div style={{ display: "flex", gap: "8px" }}>
+                          <button
+                            type="button"
+                            onClick={selectAllCategories}
+                            className="pm-ms-action-btn"
+                          >
+                            Select All
+                          </button>
+                          <span style={{ color: "#cbd5e1" }}>|</span>
+                          <button
+                            type="button"
+                            onClick={clearCategories}
+                            className="pm-ms-action-btn"
+                          >
+                            Clear
+                          </button>
+                        </div>
+                      </div>
+                      <div className="pm-ms-items">
+                        {availableCategories.map((c) => {
+                          const checked = selectedCategories.includes(c);
+                          return (
+                            <div
+                              key={c}
+                              className={`pm-ms-item ${checked ? "pm-ms-item-active" : ""}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleCategory(c);
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                onChange={() => {}} // onClick handled on parent
+                                className="pm-ms-checkbox"
+                              />
+                              <span className="pm-ms-item-label">{c}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -792,10 +915,29 @@ export default function PayNowModal() {
                       <td style={{ color: "#64748b" }}>Service:</td>
                       <td style={{ fontWeight: 600, color: "#0f172a" }}>{service}</td>
                     </tr>
-                    {category && (
+                    {selectedCategories.length > 0 && (
                       <tr>
                         <td style={{ color: "#64748b" }}>Category:</td>
-                        <td style={{ color: "#0f172a" }}>{category}</td>
+                        <td style={{ color: "#0f172a" }}>
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                            {selectedCategories.map((cat, idx) => (
+                              <span
+                                key={idx}
+                                style={{
+                                  background: "#f5f3ff",
+                                  color: "#7c3aed",
+                                  border: "1px solid #ddd6fe",
+                                  padding: "2px 7px",
+                                  borderRadius: "4px",
+                                  fontSize: "12px",
+                                  fontWeight: 600,
+                                }}
+                              >
+                                {cat}
+                              </span>
+                            ))}
+                          </div>
+                        </td>
                       </tr>
                     )}
                     {receipt.paymentType === "partial" && (

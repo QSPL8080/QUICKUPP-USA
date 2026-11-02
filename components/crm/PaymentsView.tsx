@@ -410,22 +410,27 @@ export default function PaymentsView({
                           {p.service}
                         </span>
                         {p.category && (
-                          <span
-                            className="crm-cell-sub"
-                            style={{
-                              display: "inline-block",
-                              marginTop: "3px",
-                              color: "#7c3aed",
-                              fontWeight: 600,
-                              background: "#faf5ff",
-                              padding: "2px 6px",
-                              borderRadius: "4px",
-                              fontSize: "12px",
-                              border: "1px solid #f3e8ff",
-                            }}
-                          >
-                            {p.category}
-                          </span>
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px" }}>
+                            {p.category.split(",").map((cat, idx) => (
+                              <span
+                                key={idx}
+                                className="crm-cell-sub"
+                                style={{
+                                  display: "inline-block",
+                                  color: "#7c3aed",
+                                  fontWeight: 600,
+                                  background: "#faf5ff",
+                                  padding: "2px 7px",
+                                  borderRadius: "4px",
+                                  fontSize: "11.5px",
+                                  border: "1px solid #f3e8ff",
+                                  lineHeight: "1.3",
+                                }}
+                              >
+                                {cat.trim()}
+                              </span>
+                            ))}
+                          </div>
                         )}
                       </td>
 
@@ -721,8 +726,29 @@ export default function PaymentsView({
                     <span style={{ fontWeight: 700, color: "#0f172a" }}>{viewing.service}</span>
                   </div>
                   <div>
-                    <span style={{ color: "#64748b", display: "block", marginBottom: "2px" }}>Category / Package:</span>
-                    <span style={{ fontWeight: 700, color: "#7c3aed" }}>{viewing.category || "Standard"}</span>
+                    <span style={{ color: "#64748b", display: "block", marginBottom: "4px" }}>Category / Package:</span>
+                    {viewing.category ? (
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
+                        {viewing.category.split(",").map((cat, idx) => (
+                          <span
+                            key={idx}
+                            style={{
+                              fontWeight: 600,
+                              color: "#7c3aed",
+                              background: "#faf5ff",
+                              border: "1px solid #f3e8ff",
+                              padding: "2px 8px",
+                              borderRadius: "4px",
+                              fontSize: "12px",
+                            }}
+                          >
+                            {cat.trim()}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <span style={{ fontWeight: 700, color: "#64748b" }}>Standard</span>
+                    )}
                   </div>
                 </div>
                 {viewing.notes && (
@@ -882,8 +908,8 @@ export default function PaymentsView({
               </label>
 
               <label className="crm-field">
-                <span className="crm-label">Category / Package</span>
-                <input className="crm-input" value={form.category} onChange={set("category")} placeholder="e.g. Social Media Marketing" />
+                <span className="crm-label">Category / Package (Single or Multiple)</span>
+                <input className="crm-input" value={form.category} onChange={set("category")} placeholder="e.g. AI UGC Video, AI Avatar Video (comma-separated)" />
               </label>
 
               <label className="crm-field">

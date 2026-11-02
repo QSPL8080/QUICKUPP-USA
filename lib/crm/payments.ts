@@ -35,7 +35,10 @@ export function validatePayment(body: Record<string, unknown>):
   const clientEmail = text(body.clientEmail, 190).toLowerCase();
   const clientPhone = text(body.clientPhone, 50);
   const companyName = text(body.companyName, 190);
-  const category = text(body.category, 150);
+  const rawCat = Array.isArray(body.category)
+    ? body.category.filter(Boolean).join(", ")
+    : body.category;
+  const category = text(rawCat, 500);
   const service = text(body.service, 150);
   const description = text(body.description, 255);
   const amountRaw = typeof body.amount === "number" ? String(body.amount) : text(body.amount, 20).replace(/,/g, "");

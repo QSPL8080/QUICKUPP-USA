@@ -45,7 +45,11 @@ export async function POST(req: Request) {
       ? `Partial Payment ($${parsedAmount.toFixed(2)} of $${parsedTotal.toFixed(2)} USD)`
       : `Full Payment ($${parsedAmount.toFixed(2)} USD)`;
 
-    const desc = `${prefix} - ${service || category || "Quickupp Softech"} - ${billingStartDate || ""} to ${billingEndDate || ""}`.trim();
+    const categoryStr = Array.isArray(category)
+      ? category.filter(Boolean).join(", ")
+      : (category || "");
+
+    const desc = `${prefix} - ${service || categoryStr || "Quickupp Softech"} - ${billingStartDate || ""} to ${billingEndDate || ""}`.trim();
 
     const order = await createPayPalOrder({
       amount: parsedAmount,
