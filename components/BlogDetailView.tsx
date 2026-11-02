@@ -41,67 +41,80 @@ function cleanText(str: string): string {
     .replace(/&amp;/g, "&");
 }
 
-function parseSectionHeading(heading: string, index: number) {
-  const cleaned = cleanText(heading).trim();
-  const match = cleaned.match(/^(\d+)[\.\)]\s*(.*)$/);
-  if (match) {
-    const num = String(match[1]).padStart(2, "0");
-    return { num, title: match[2] };
-  }
-  return { num: String(index + 1).padStart(2, "0"), title: cleaned };
-}
+type ContentBlock =
+  | { type: "prose"; text: string }
+  | { type: "intro"; text: string }
+  | { type: "list"; items: { title?: string; text: string }[] };
 
-interface ParsedParagraph {
-  type: "prose" | "intro" | "feature" | "bullet";
-  title?: string;
-  text: string;
-}
-
-function parseParagraphs(paragraphs: string[]): ParsedParagraph[] {
-  const result: ParsedParagraph[] = [];
-  let inListContext = false;
+function parseSectionBlocks(paragraphs: string[]): ContentBlock[] {
+  const blocks: ContentBlock[] = [];
+  let currentList: { title?: string; text: string }[] | null = null;
+  let expectingList = false;
 
   for (let i = 0; i < paragraphs.length; i++) {
     const raw = cleanText(paragraphs[i]).trim();
     if (!raw) continue;
 
-    // Check if this paragraph ends with a colon introducing a list
-    if (raw.endsWith(":") && raw.length < 120) {
-      result.push({ type: "intro", text: raw });
-      inListContext = true;
+    // Check if this is a lead-in sentence ending in a colon
+    if (raw.endsWith(":") && raw.length < 140) {
+      if (currentList && currentList.length > 0) {
+        blocks.push({ type: "list", items: currentList });
+        currentList = null;
+      }
+      blocks.push({ type: "intro", text: raw });
+      expectingList = true;
       continue;
     }
 
-    // Check for "Key: Value" feature pattern
+    // Check for "Key: Value" pattern (e.g. "Location targeting: Piercing through...")
     const colonIdx = raw.indexOf(":");
-    if (colonIdx > 2 && colonIdx < 50 && raw.length > colonIdx + 5) {
+    const hasKeyVal =
+      colonIdx > 2 &&
+      colonIdx < 60 &&
+      raw.length > colonIdx + 4 &&
+      !raw.substring(0, colonIdx).includes(".") &&
+      raw.substring(0, colonIdx).split(" ").length <= 8;
+
+    if (hasKeyVal) {
       const title = raw.substring(0, colonIdx).trim();
       const text = raw.substring(colonIdx + 1).trim();
-      // Ensure title looks like a label (not a full sentence ending in colon)
-      if (!title.includes(".") && title.split(" ").length <= 7) {
-        result.push({ type: "feature", title, text });
-        continue;
-      }
+      if (!currentList) currentList = [];
+      currentList.push({ title, text });
+      expectingList = true;
+      continue;
     }
 
-    // If we're inside a list context and sentence is short or bullet-like
-    if (inListContext) {
-      // Long narrative paragraphs (e.g. > 180 chars or 2+ sentences) exit list context
-      const sentenceCount = (raw.match(/\.\s/g) || []).length;
-      if (raw.length > 200 || sentenceCount >= 2) {
-        inListContext = false;
-        result.push({ type: "prose", text: raw });
+    // If we are expecting list items after a lead-in:
+    if (expectingList) {
+      // Sentences that are clearly narrative paragraphs (long or multiple sentences) exit list mode
+      const isLongProse = raw.length > 200 || (raw.match(/\.\s/g) || []).length >= 2;
+      if (isLongProse) {
+        if (currentList && currentList.length > 0) {
+          blocks.push({ type: "list", items: currentList });
+          currentList = null;
+        }
+        expectingList = false;
+        blocks.push({ type: "prose", text: raw });
       } else {
-        result.push({ type: "bullet", text: raw });
+        if (!currentList) currentList = [];
+        currentList.push({ text: raw });
       }
       continue;
     }
 
     // Regular prose paragraph
-    result.push({ type: "prose", text: raw });
+    if (currentList && currentList.length > 0) {
+      blocks.push({ type: "list", items: currentList });
+      currentList = null;
+    }
+    blocks.push({ type: "prose", text: raw });
   }
 
-  return result;
+  if (currentList && currentList.length > 0) {
+    blocks.push({ type: "list", items: currentList });
+  }
+
+  return blocks;
 }
 
 export default function BlogDetailView({
@@ -165,8 +178,6 @@ export default function BlogDetailView({
         style={{ transform: `scaleX(${scrollProgress})` }}
         aria-hidden="true"
       />
-
-      <div className="bd-hero-ambient" />
 
       {/* Main Container */}
       <div className="bd-container">
@@ -267,41 +278,35 @@ export default function BlogDetailView({
             </div>
           </div>
 
-          {/* High-Impact Featured Media */}
+          {/* Featured Media */}
           <div className="bd-featured-media">
             <img src={post.img} alt={cleanText(post.title)} />
-            <div className="bd-featured-overlay">
-              <span className="bd-featured-caption">Quickupp Softech Strategic Insights • {cleanText(post.category)}</span>
-              <span className="bd-featured-caption">Verified Editorial Guide</span>
-            </div>
           </div>
         </section>
 
-        {/* 2-Column Editorial Grid */}
+        {/* 2-Column Natural Editorial Layout */}
         <div className="bd-main-grid">
           {/* Main Article Body (Left Column) */}
           <main className="bd-content-col">
             {/* Introduction Lead */}
-            <div className="bd-intro-card">
-              <p className="bd-intro-text">
-                {cleanText(post.content.intro)}
-              </p>
-            </div>
+            <p className="bd-intro-lead">
+              {cleanText(post.content.intro)}
+            </p>
 
-            {/* Key Takeaways Highlight Box */}
+            {/* Key Takeaways Highlight Box (Clean Single Callout) */}
             {post.content.keyTakeaways && post.content.keyTakeaways.length > 0 && (
-              <div className="bd-takeaways-card">
+              <div className="bd-takeaways-box">
                 <div className="bd-takeaways-kicker">
                   <LucideIcon name="sparkles" size={13} />
-                  <span>EXECUTIVE BRIEFING</span>
+                  <span>KEY TAKEAWAYS</span>
                 </div>
-                <h2 className="bd-takeaways-title">Key Takeaways &amp; Strategic Insights</h2>
+                <h2 className="bd-takeaways-title">Strategic Summary</h2>
                 <ul className="bd-takeaways-list">
                   {post.content.keyTakeaways.map((takeaway, tIdx) => (
                     <li key={tIdx} className="bd-takeaway-item">
-                      <div className="bd-takeaway-icon">
-                        <LucideIcon name="check" size={13} />
-                      </div>
+                      <span className="bd-takeaway-icon">
+                        <LucideIcon name="check" size={16} />
+                      </span>
                       <span>{cleanText(takeaway)}</span>
                     </li>
                   ))}
@@ -309,63 +314,53 @@ export default function BlogDetailView({
               </div>
             )}
 
-            {/* Article Sections Stream */}
+            {/* Article Sections Stream (NATURAL, NO CARDS) */}
             <div className="bd-sections-stream">
               {post.content.sections.map((sec, sIdx) => {
-                const parsedHeader = parseSectionHeading(sec.heading, sIdx);
-                const parsedParas = parseParagraphs(sec.paragraphs);
+                const blocks = parseSectionBlocks(sec.paragraphs);
 
                 return (
                   <article
                     key={sIdx}
                     id={`section-${sIdx}`}
-                    className="bd-section-block"
+                    className="bd-article-section"
                   >
-                    <header className="bd-section-header">
-                      <div className="bd-section-badge">
-                        <span>SECTION {parsedHeader.num}</span>
-                      </div>
-                      <h2 className="bd-section-title">
-                        {parsedHeader.title}
-                      </h2>
-                    </header>
+                    <h2 className="bd-section-title">
+                      {cleanText(sec.heading)}
+                    </h2>
 
-                    <div className="bd-section-body">
-                      {parsedParas.map((item, pIdx) => {
-                        if (item.type === "intro") {
+                    <div>
+                      {blocks.map((block, bIdx) => {
+                        if (block.type === "intro") {
                           return (
-                            <div key={pIdx} className="bd-list-intro">
-                              <span>{item.text}</span>
-                            </div>
+                            <p key={bIdx} className="bd-article-intro-p">
+                              {block.text}
+                            </p>
                           );
                         }
 
-                        if (item.type === "feature") {
+                        if (block.type === "list") {
                           return (
-                            <div key={pIdx} className="bd-feature-card">
-                              <div className="bd-feature-card-title">
-                                <span className="bd-feature-dot" />
-                                <span>{item.title}</span>
-                              </div>
-                              <p className="bd-feature-card-desc">{item.text}</p>
-                            </div>
-                          );
-                        }
-
-                        if (item.type === "bullet") {
-                          return (
-                            <div key={pIdx} className="bd-bullet-card">
-                              <div className="bd-bullet-check">
-                                <LucideIcon name="check" size={12} />
-                              </div>
-                              <span>{item.text}</span>
-                            </div>
+                            <ul key={bIdx} className="bd-article-list">
+                              {block.items.map((item, iIdx) => (
+                                <li key={iIdx} className="bd-article-li">
+                                  {item.title ? (
+                                    <>
+                                      <strong className="bd-li-title">{item.title}:</strong>{" "}
+                                      <span className="bd-li-desc">{item.text}</span>
+                                    </>
+                                  ) : (
+                                    <span className="bd-li-desc">{item.text}</span>
+                                  )}
+                                </li>
+                              ))}
+                            </ul>
                           );
                         }
 
                         return (
-                          <p key={pIdx} className="bd-prose-p">
-                            {item.text}
+                          <p key={bIdx} className="bd-article-p">
+                            {block.text}
                           </p>
                         );
                       })}
@@ -378,36 +373,35 @@ export default function BlogDetailView({
             {/* Strategic Conclusion */}
             {post.content.conclusion && (
               <div className="bd-conclusion-box">
-                <div className="bd-conclusion-glow" />
                 <div className="bd-conclusion-kicker">
                   <LucideIcon name="sparkles" size={13} />
-                  <span>THE STRATEGIC BOTTOM LINE</span>
+                  <span>FINAL THOUGHTS</span>
                 </div>
-                <h3 className="bd-conclusion-title">Conclusion &amp; Recommended Next Steps</h3>
+                <h3 className="bd-conclusion-title">Conclusion</h3>
                 <p className="bd-conclusion-text">
                   {cleanText(post.content.conclusion)}
                 </p>
                 <div className="bd-conclusion-cta-row">
                   <Link href="/contact" className="bd-conclusion-btn">
-                    <span>Discuss Your Growth Plan</span>
+                    <span>Discuss Your Strategy</span>
                     <LucideIcon name="arrow-right" size={14} />
                   </Link>
                   <Link
                     href="/case-studies"
                     style={{
-                      color: "#94a3b8",
+                      color: "#475569",
                       fontSize: "13.5px",
                       textDecoration: "underline",
                       fontWeight: 600,
                     }}
                   >
-                    View Real Case Studies
+                    Explore Case Studies
                   </Link>
                 </div>
               </div>
             )}
 
-            {/* Author Credibility Box */}
+            {/* Author Row */}
             <div className="bd-author-card">
               <img
                 src="/images/home-two-about-p-500.jpg"
@@ -416,34 +410,35 @@ export default function BlogDetailView({
               />
               <div>
                 <div className="bd-author-card-name">{cleanText(post.author)}</div>
-                <div className="bd-author-card-title">{cleanText(post.authorRole)} • Quickupp Editorial Team</div>
+                <div className="bd-author-card-title">{cleanText(post.authorRole)}</div>
                 <p className="bd-author-card-bio">
-                  Specializing in enterprise AI automation, performance paid acquisition, and scalable full-stack engineering for businesses expanding across the United States.
+                  Quickupp Softech digital growth and engineering team, sharing insights on SEO, AI automation, and scalable marketing architectures.
                 </p>
               </div>
             </div>
 
-            {/* Interactive Helpful Feedback */}
+            {/* Reader Feedback */}
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                padding: "20px 24px",
-                background: "#ffffff",
+                padding: "16px 20px",
+                background: "#f8fafc",
                 border: "1px solid #e2e8f0",
-                borderRadius: "16px",
+                borderRadius: "12px",
                 flexWrap: "wrap",
-                gap: "14px",
+                gap: "12px",
+                margin: "24px 0 40px",
               }}
             >
-              <div style={{ fontSize: "14.5px", fontWeight: 700, color: "#0f172a" }}>
-                Did you find this strategic guide helpful?
+              <div style={{ fontSize: "14px", fontWeight: 650, color: "#0f172a" }}>
+                Was this guide helpful?
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                 {feedbackGiven ? (
-                  <span style={{ fontSize: "13.5px", color: "#10b981", fontWeight: 700 }}>
-                    ✓ Thank you for your feedback!
+                  <span style={{ fontSize: "13px", color: "#10b981", fontWeight: 700 }}>
+                    ✓ Thanks for your feedback!
                   </span>
                 ) : (
                   <>
@@ -451,27 +446,27 @@ export default function BlogDetailView({
                       type="button"
                       onClick={() => setFeedbackGiven("yes")}
                       style={{
-                        padding: "8px 16px",
-                        background: "#f1f5f9",
+                        padding: "6px 14px",
+                        background: "#ffffff",
                         border: "1px solid #cbd5e1",
-                        borderRadius: "10px",
-                        fontSize: "13px",
+                        borderRadius: "8px",
+                        fontSize: "12.5px",
                         fontWeight: 600,
                         color: "#0f172a",
                         cursor: "pointer",
                       }}
                     >
-                      👍 Yes, very helpful
+                      👍 Yes, helpful
                     </button>
                     <button
                       type="button"
                       onClick={() => setFeedbackGiven("no")}
                       style={{
-                        padding: "8px 16px",
-                        background: "#f8fafc",
+                        padding: "6px 14px",
+                        background: "#ffffff",
                         border: "1px solid #e2e8f0",
-                        borderRadius: "10px",
-                        fontSize: "13px",
+                        borderRadius: "8px",
+                        fontSize: "12.5px",
                         color: "#64748b",
                         cursor: "pointer",
                       }}
@@ -491,17 +486,16 @@ export default function BlogDetailView({
               <div className="bd-sidebar-card">
                 <div className="bd-sidebar-head">
                   <div className="bd-sidebar-title">
-                    <LucideIcon name="book-open" size={15} />
-                    <span>In This Guide</span>
+                    <LucideIcon name="book-open" size={14} />
+                    <span>In This Article</span>
                   </div>
-                  <span style={{ fontSize: "12px", color: "#64748b", fontWeight: 600 }}>
+                  <span style={{ fontSize: "11.5px", color: "#64748b", fontWeight: 600 }}>
                     {post.content.sections.length} Sections
                   </span>
                 </div>
 
                 <nav className="bd-toc-nav" aria-label="Table of Contents">
                   {post.content.sections.map((sec, idx) => {
-                    const parsed = parseSectionHeading(sec.heading, idx);
                     const isActive = activeSection === idx;
 
                     return (
@@ -517,23 +511,23 @@ export default function BlogDetailView({
                         }}
                         className={`bd-toc-item ${isActive ? "is-active" : ""}`}
                       >
-                        <span className="bd-toc-num">{parsed.num}</span>
-                        <span style={{ flex: 1 }}>{parsed.title}</span>
+                        <span className="bd-toc-num">{String(idx + 1).padStart(2, "0")}</span>
+                        <span style={{ flex: 1 }}>{cleanText(sec.heading).replace(/^\d+[\.\)]\s*/, "")}</span>
                       </a>
                     );
                   })}
                 </nav>
               </div>
 
-              {/* Conversion Strategy Call Card */}
+              {/* Conversion Strategy Card */}
               <div className="bd-sidebar-cta">
-                <div className="bd-sidebar-cta-kicker">GROWTH CONSULTATION</div>
-                <h3 className="bd-sidebar-cta-title">Want to implement these strategies?</h3>
+                <div className="bd-sidebar-cta-kicker">GROWTH STRATEGY</div>
+                <h3 className="bd-sidebar-cta-title">Want to scale this in your business?</h3>
                 <p className="bd-sidebar-cta-desc">
-                  Our digital marketing and AI engineers build end-to-end acquisition systems tailored to your industry.
+                  Our growth strategists build custom digital marketing and automation systems for your team.
                 </p>
                 <Link href="/contact" className="bd-sidebar-cta-btn">
-                  <span>Schedule Strategy Call</span>
+                  <span>Talk to an Expert</span>
                   <LucideIcon name="arrow-right" size={14} />
                 </Link>
               </div>
@@ -546,7 +540,7 @@ export default function BlogDetailView({
       <section className="bd-related-section">
         <div className="bd-container">
           <div className="bd-related-head">
-            <div className="bd-category-pill" style={{ margin: "0 auto 12px" }}>
+            <div className="bd-category-pill" style={{ margin: "0 auto 10px" }}>
               <span className="bd-category-dot" />
               <span>CONTINUE READING</span>
             </div>
