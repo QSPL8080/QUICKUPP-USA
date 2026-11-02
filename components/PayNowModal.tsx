@@ -195,9 +195,13 @@ export default function PayNowModal() {
       return;
     }
 
-    const clientId =
-      process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID ||
-      "BAADsN-KaPbg9Hk2SEUeY-d5b7nKuDIJGmN38uu5tnGwPOBHdELRWBwZ4hhAY4aT0nASGUKsQzvKur90lo";
+    const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "";
+    if (!clientId) {
+      setFormError(
+        "PayPal is not configured yet. Please add NEXT_PUBLIC_PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET to your Hostinger environment settings."
+      );
+      return;
+    }
 
     function renderButtons() {
       if (!window.paypal || !paypalContainerRef.current) return;
@@ -323,7 +327,9 @@ export default function PayNowModal() {
         script.async = true;
         script.onload = renderButtons;
         script.onerror = () => {
-          setFormError("Could not connect to PayPal. Please check your internet connection.");
+          setFormError(
+            "Could not connect to PayPal. Please verify that your NEXT_PUBLIC_PAYPAL_CLIENT_ID is valid in your Hostinger environment settings."
+          );
         };
         document.body.appendChild(script);
       }
@@ -494,11 +500,29 @@ export default function PayNowModal() {
                 </div>
               </div>
 
-              {/* Billing Period (Coverage Range) */}
-              <div className="pm-row">
+              {/* Row 4: Amount & Billing Period in 1 row */}
+              <div className="pm-row pm-row-3">
                 <div className="pm-field">
-                  <label className="pm-label" style={{ fontSize: "12px", color: "#64748b" }}>
-                    Billing Period (From Date):
+                  <label className="pm-label">
+                    Total Amount (USD) <span className="pm-req">*</span>
+                  </label>
+                  <div className="pm-currency-input-wrap">
+                    <span className="pm-currency-symbol">$</span>
+                    <input
+                      type="number"
+                      min="1"
+                      step="any"
+                      required
+                      placeholder="1000.00"
+                      value={totalAmount}
+                      onChange={(e) => setTotalAmount(e.target.value)}
+                      className="pm-input"
+                    />
+                  </div>
+                </div>
+                <div className="pm-field">
+                  <label className="pm-label" style={{ color: "#64748b" }}>
+                    Billing From:
                   </label>
                   <input
                     type="date"
@@ -508,35 +532,13 @@ export default function PayNowModal() {
                   />
                 </div>
                 <div className="pm-field">
-                  <label className="pm-label" style={{ fontSize: "12px", color: "#64748b" }}>
-                    Billing Period (To Date):
+                  <label className="pm-label" style={{ color: "#64748b" }}>
+                    Billing To:
                   </label>
                   <input
                     type="date"
                     value={billingEndDate}
                     onChange={(e) => setBillingEndDate(e.target.value)}
-                    className="pm-input"
-                  />
-                </div>
-              </div>
-
-              {/* Amount Box: Direct Numeric Input (Preset Buttons Removed per user request) */}
-              <div className="pm-field">
-                <label className="pm-label">
-                  Total Service / Invoice Amount (USD) <span className="pm-req">*</span>
-                </label>
-                <div className="pm-currency-input-wrap">
-                  <span className="pm-currency-symbol">$</span>
-                  <input
-                    type="number"
-                    min="1"
-                    step="any"
-                    required
-                    placeholder="e.g. 1000.00"
-                    value={totalAmount}
-                    onChange={(e) => {
-                      setTotalAmount(e.target.value);
-                    }}
                     className="pm-input"
                   />
                 </div>
@@ -607,14 +609,15 @@ export default function PayNowModal() {
                 )}
               </div>
 
-              {/* Optional Notes */}
+              {/* Optional Notes (single line input to prevent scrolling) */}
               <div className="pm-field">
                 <label className="pm-label">Additional Notes or Invoice Reference (Optional)</label>
-                <textarea
-                  placeholder="e.g. Project milestone payment or monthly retainer note"
+                <input
+                  type="text"
+                  placeholder="e.g. Project milestone payment or retainer note"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="pm-textarea"
+                  className="pm-input"
                 />
               </div>
 
