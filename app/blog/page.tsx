@@ -9,23 +9,23 @@ import { blogPosts } from "@/data/blogs";
 
 const categories = [
   "All",
-  "AI & Search Visibility",
-  "Digital Marketing",
-  "AI Automation",
-  "Web Engineering",
-  "eCommerce",
-  "Paid Advertising",
+  ...Array.from(new Set(blogPosts.map((p) => p.category))),
 ];
 
 export default function BlogPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  const featuredPost = blogPosts[0];
+  const filteredPosts =
+    selectedCategory === "All"
+      ? blogPosts
+      : blogPosts.filter((post) => post.category === selectedCategory);
+
+  const featuredPost = filteredPosts[0] || blogPosts[0];
 
   const gridPosts =
     selectedCategory === "All"
       ? blogPosts.slice(1)
-      : blogPosts.filter((post) => post.category === selectedCategory);
+      : filteredPosts;
 
   return (
     <div className="res-page-wrap">
