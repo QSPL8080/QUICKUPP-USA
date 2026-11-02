@@ -235,7 +235,7 @@ export async function POST(req: Request) {
             billingPeriod: billingCoverageStr,
           });
 
-          const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://quickupp.com";
+          const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://quickuppsoftech.us";
           const receiptDownloadUrl = `${siteUrl}/api/payments/receipt?order=${encodeURIComponent(orderNumber)}`;
 
           const clientHtml = `
@@ -378,7 +378,7 @@ export async function POST(req: Request) {
                     If you have any questions, simply reply to this email or contact us at:<br />
                     <strong>Quickupp Softech LLC</strong><br />
                     Email: <a href="mailto:info@quickuppsoftech.us" style="color: #4f46e5; text-decoration: none;">info@quickuppsoftech.us</a><br />
-                    Website: <a href="https://quickupp.com" style="color: #4f46e5; text-decoration: none;">quickupp.com</a>
+                    Website: <a href="https://quickuppsoftech.us/" style="color: #4f46e5; text-decoration: none;">quickuppsoftech.us</a>
                   </p>
 
                   <p style="font-size: 14.5px; color: #1e293b; line-height: 1.5; margin: 0 0 4px;">

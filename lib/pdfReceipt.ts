@@ -184,35 +184,43 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
     });
   }
 
-  // Under Logo text
-  let curY = 715;
-  page.drawText("AI-Powered Creative & Video Studio", {
+  // Under Logo text - Official Company Details
+  let curY = 724;
+  page.drawText("Quickupp Softech LLC", {
     x: leftX,
     y: curY,
-    size: 8.5,
+    size: 9.5,
+    font: fontBold,
+    color: darkNavy,
+  });
+  curY -= 12;
+  page.drawText("8 The Green, Suite A, Dover, Delaware - 19901, USA", {
+    x: leftX,
+    y: curY,
+    size: 8,
     font,
     color: slateMid,
   });
-  curY -= 12;
-  page.drawText("Operated by Quickupp Softech LLC", {
+  curY -= 11;
+  page.drawText("Phone: +1 (302) 754-5679", {
     x: leftX,
     y: curY,
-    size: 8.5,
+    size: 8,
     font,
     color: slateMid,
   });
-  curY -= 12;
+  curY -= 11;
   page.drawText("Email: ", { x: leftX, y: curY, size: 8.5, font, color: slateMid });
   page.drawText("info@quickuppsoftech.us", {
-    x: leftX + 27,
+    x: leftX + 28,
     y: curY,
     size: 8.5,
     font,
     color: linkBlue,
   });
-  curY -= 12;
+  curY -= 11;
   page.drawText("Website: ", { x: leftX, y: curY, size: 8.5, font, color: slateMid });
-  page.drawText("quickupp.com", {
+  page.drawText("https://quickuppsoftech.us/", {
     x: leftX + 38,
     y: curY,
     size: 8.5,
@@ -358,14 +366,7 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
     font: fontBold,
     color: slateDark,
   });
-  page.drawText("Qty", {
-    x: tblX + 340,
-    y: tblY + tblH - 18,
-    size: 9.5,
-    font: fontBold,
-    color: slateDark,
-  });
-  const amtHeader = "Amount";
+  const amtHeader = "Amount (USD)";
   const amtHW = fontBold.widthOfTextAtSize(amtHeader, 9.5);
   page.drawText(amtHeader, {
     x: tblX + tblW - 20 - amtHW,
@@ -378,7 +379,7 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
   // Line item row
   const itemDesc = `${service}${category ? ` – ${category}` : ""}`;
   const truncatedDesc =
-    itemDesc.length > 55 ? `${itemDesc.substring(0, 52)}...` : itemDesc;
+    itemDesc.length > 75 ? `${itemDesc.substring(0, 72)}...` : itemDesc;
   const itemY = tblY + tblH - 52;
 
   page.drawText(truncatedDesc, {
@@ -386,13 +387,6 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
     y: itemY,
     size: 9.5,
     font: fontBold,
-    color: darkNavy,
-  });
-  page.drawText("1", {
-    x: tblX + 348,
-    y: itemY,
-    size: 9.5,
-    font,
     color: darkNavy,
   });
   const totalStr = `$${finalTotal.toFixed(2)}`;
@@ -701,7 +695,7 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
   });
   supY -= 13;
   page.drawText("Website: ", { x: leftX, y: supY, size: 8.5, font, color: slateMid });
-  page.drawText("quickupp.com", {
+  page.drawText("https://quickuppsoftech.us/", {
     x: leftX + 38,
     y: supY,
     size: 8.5,
