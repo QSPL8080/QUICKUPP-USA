@@ -82,7 +82,7 @@ export async function POST(request: Request) {
       const rows = [
         ["Lead ID", `#${insertId}`],
         ["Service", form.label],
-        ["Sub-service / Category", d.category || "—"],
+        ["Selected Categories", d.category || "—"],
         ["Full Name", d.fullName],
         ["Business Email", d.email],
         ["Phone Number", d.phone],

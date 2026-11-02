@@ -74,7 +74,15 @@ export const SERVICE_FORMS = {
   "ai-automation": {
     label: "AI & Automation Solutions",
     table: "service_ai_automation",
-    options: ["AI & Automation Solutions", "Other"],
+    options: [
+      "Custom AI Solutions & Workflow Automation",
+      "AI Chatbots & Intelligent Agents",
+      "Process Automation & CRM Integrations",
+      "Predictive Analytics & Enterprise AI",
+      "General AI Consulting & Strategy",
+      "AI & Automation Solutions",
+      "Other",
+    ],
   },
   "it-services": {
     label: "Information Technology Services",
@@ -84,7 +92,10 @@ export const SERVICE_FORMS = {
   "staff-augmentation": {
     label: "Staff Augmentation",
     table: "service_staff_augmentation",
-    options: groupItems("Staff Augmentation"),
+    options: [
+      ...groupItems("Staff Augmentation"),
+      "Dedicated Developers & Engineers",
+    ],
   },
   youtube: {
     label: "YouTube Video Promotion",
@@ -97,6 +108,7 @@ export const SERVICE_FORMS = {
       "Channel Growth & Optimization",
       "Video SEO & Ranking",
       "Targeted YouTube Views Campaign",
+      "Custom Strategy / Retainer",
       "Other",
     ],
   },

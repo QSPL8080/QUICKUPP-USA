@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useFeedback } from "@/components/crm/Feedback";
 import type { EnquiryRow, LeadRow } from "@/lib/crm/data";
@@ -185,6 +185,42 @@ export default function LeadsView({
   const err = (k: string) => (errors[k] ? <span className="crm-field-error">{errors[k]}</span> : null);
   const serviceOptions = LEAD_SERVICES.find((s) => s.value === form.service)?.options || [];
 
+  const [isLeadCategoryOpen, setIsLeadCategoryOpen] = useState(false);
+  const leadCategoryRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (leadCategoryRef.current && !leadCategoryRef.current.contains(e.target as Node)) {
+        setIsLeadCategoryOpen(false);
+      }
+    }
+    if (isLeadCategoryOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [isLeadCategoryOpen]);
+
+  const selectedLeadCategories = form.category
+    ? form.category.split(",").map((s) => s.trim()).filter(Boolean)
+    : [];
+
+  const toggleLeadCategory = (cat: string) => {
+    const next = selectedLeadCategories.includes(cat)
+      ? selectedLeadCategories.filter((c) => c !== cat)
+      : [...selectedLeadCategories, cat];
+    setForm((f) => ({ ...f, category: next.join(", ") }));
+    if (errors.category) setErrors((p) => ({ ...p, category: "" }));
+  };
+
+  const selectAllLeadCategories = () => {
+    setForm((f) => ({ ...f, category: serviceOptions.join(", ") }));
+    if (errors.category) setErrors((p) => ({ ...p, category: "" }));
+  };
+
+  const clearLeadCategories = () => {
+    setForm((f) => ({ ...f, category: "" }));
+  };
+
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
@@ -259,7 +295,26 @@ export default function LeadsView({
                   </td>
                   <td data-label="Source">
                     <span className={`crm-src crm-src-${r.source === "contact" ? "contact" : r.source === "manual" ? "manual" : "service"}`}>{SOURCE_LABEL[r.source]}</span>
-                    {r.detail && <span className="crm-cell-sub">{r.detail}</span>}
+                    {r.detail && (
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px" }}>
+                        {r.detail.split(",").map((cat, idx) => (
+                          <span
+                            key={idx}
+                            style={{
+                              fontSize: "11px",
+                              lineHeight: "1.25",
+                              padding: "2px 6px",
+                              background: "#f1f5f9",
+                              borderRadius: "4px",
+                              color: "#334155",
+                              fontWeight: 500,
+                            }}
+                          >
+                            {cat.trim()}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </td>
                   <td data-label="Received" className="crm-nowrap">
                     {fmtDate(r.createdAt)}
@@ -393,8 +448,31 @@ export default function LeadsView({
                   </dd>
                 </>
               )}
-              <dt>{open.source === "contact" ? "Service" : "Service type"}</dt>
-              <dd>{open.interest || "—"}</dd>
+              <dt>{open.source === "contact" ? "Service" : "Service Category / Scope"}</dt>
+              <dd>
+                {open.interest ? (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "2px" }}>
+                    {open.interest.split(",").map((cat, idx) => (
+                      <span
+                        key={idx}
+                        style={{
+                          fontSize: "12px",
+                          lineHeight: "1.3",
+                          padding: "3px 9px",
+                          background: "#ede9fe",
+                          color: "#5b21b6",
+                          borderRadius: "5px",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {cat.trim()}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  "—"
+                )}
+              </dd>
               <dt>Budget</dt>
               <dd>{open.budget || "—"}</dd>
               {open.timeline && (
@@ -513,18 +591,133 @@ export default function LeadsView({
                 </select>
                 {err("service")}
               </label>
-              <label className="crm-field">
-                <span className="crm-label">Service type *</span>
-                <select className="crm-input crm-select" value={form.category} onChange={set("category")} disabled={!form.service}>
-                  <option value="">{form.service ? "Select service type" : "Choose a service first"}</option>
-                  {serviceOptions.map((o) => (
-                    <option key={o} value={o}>
-                      {o}
-                    </option>
-                  ))}
-                </select>
+              <div className="crm-field" ref={leadCategoryRef} style={{ position: "relative" }}>
+                <span className="crm-label">
+                  Service Categories * {selectedLeadCategories.length > 0 && <span style={{ color: "#7c3aed", fontWeight: 700 }}>({selectedLeadCategories.length} selected)</span>}
+                </span>
+
+                <button
+                  type="button"
+                  className={`crm-input crm-select ${errors.category ? "has-error" : ""}`}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    textAlign: "left",
+                    cursor: form.service ? "pointer" : "not-allowed",
+                    opacity: form.service ? 1 : 0.6,
+                    height: "38px",
+                    padding: "0 10px",
+                  }}
+                  disabled={!form.service}
+                  onClick={() => setIsLeadCategoryOpen((v) => !v)}
+                >
+                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1, color: selectedLeadCategories.length ? "#0f172a" : "#94a3b8" }}>
+                    {!form.service
+                      ? "Choose a service first"
+                      : selectedLeadCategories.length === 0
+                      ? "Select service categories..."
+                      : selectedLeadCategories.length === 1
+                      ? selectedLeadCategories[0]
+                      : `${selectedLeadCategories[0]} (+${selectedLeadCategories.length - 1} more)`}
+                  </span>
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    style={{ transform: isLeadCategoryOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}
+                  >
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </button>
+
+                {isLeadCategoryOpen && form.service && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "calc(100% + 4px)",
+                      left: 0,
+                      right: 0,
+                      background: "#ffffff",
+                      border: "1px solid #cbd5e1",
+                      borderRadius: "8px",
+                      boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
+                      zIndex: 100,
+                      overflow: "hidden",
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 10px", background: "#f8fafc", borderBottom: "1px solid #e2e8f0", fontSize: "11px", fontWeight: 700, color: "#64748b" }}>
+                      <span>{serviceOptions.length} Categories</span>
+                      <div style={{ display: "flex", gap: "8px" }}>
+                        <button type="button" onClick={selectAllLeadCategories} style={{ background: "none", border: "none", color: "#3b82f6", cursor: "pointer", fontWeight: 600 }}>Select All</button>
+                        <span>•</span>
+                        <button type="button" onClick={clearLeadCategories} style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontWeight: 600 }}>Clear</button>
+                      </div>
+                    </div>
+                    <div style={{ maxHeight: "200px", overflowY: "auto", padding: "4px 0" }}>
+                      {serviceOptions.map((opt) => {
+                        const isChecked = selectedLeadCategories.includes(opt);
+                        return (
+                          <div
+                            key={opt}
+                            onClick={() => toggleLeadCategory(opt)}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "8px",
+                              padding: "6px 12px",
+                              fontSize: "12.5px",
+                              cursor: "pointer",
+                              background: isChecked ? "#f5f3ff" : "transparent",
+                              fontWeight: isChecked ? 600 : 400,
+                              color: isChecked ? "#5b21b6" : "#334155",
+                            }}
+                          >
+                            <input type="checkbox" checked={isChecked} onChange={() => {}} style={{ accentColor: "#7c3aed" }} />
+                            <span style={{ flex: 1 }}>{opt}</span>
+                            {isChecked && <span style={{ color: "#10b981", fontWeight: 800 }}>✓</span>}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Selected pills in modal */}
+                {selectedLeadCategories.length > 0 && (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "6px" }}>
+                    {selectedLeadCategories.map((c) => (
+                      <span
+                        key={c}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "4px",
+                          fontSize: "11px",
+                          padding: "2px 7px",
+                          background: "#ede9fe",
+                          color: "#5b21b6",
+                          borderRadius: "4px",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {c}
+                        <button
+                          type="button"
+                          onClick={() => toggleLeadCategory(c)}
+                          style={{ background: "none", border: "none", color: "#7c3aed", cursor: "pointer", padding: "0 2px", fontSize: "13px" }}
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
                 {err("category")}
-              </label>
+              </div>
               <label className="crm-field">
                 <span className="crm-label">Industry</span>
                 <select className="crm-input crm-select" value={form.industry} onChange={set("industry")}>

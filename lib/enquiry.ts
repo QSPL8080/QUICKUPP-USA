@@ -160,7 +160,44 @@ export function validateServiceEnquiry(
   const country = text(body.country, 100);
   const industry = text(body.industry, 100);
   const otherIndustry = text(body.otherIndustry, 150);
-  const category = text(body.category || body.serviceInterest, 150);
+
+  // Parse multi-category support: accept array or comma-separated string
+  let categoryList: string[] = [];
+  if (Array.isArray(body.categories)) {
+    categoryList = body.categories.map((c) => String(c).trim()).filter(Boolean);
+  } else if (Array.isArray(body.category)) {
+    categoryList = body.category.map((c) => String(c).trim()).filter(Boolean);
+  } else if (typeof body.category === "string" && body.category.trim()) {
+    categoryList = body.category.split(",").map((c) => c.trim()).filter(Boolean);
+  } else if (typeof body.serviceInterest === "string" && body.serviceInterest.trim()) {
+    categoryList = body.serviceInterest.split(",").map((c) => c.trim()).filter(Boolean);
+  }
+
+  // De-duplicate categories
+  categoryList = Array.from(new Set(categoryList));
+
+  if (categoryList.length === 0) {
+    errors.category = "Please select at least one category.";
+  } else {
+    // Validate each category against options, matching case-insensitively
+    const validCanonical: string[] = [];
+    for (const cat of categoryList) {
+      const match = options.find((o) => o.toLowerCase() === cat.toLowerCase());
+      if (match) {
+        validCanonical.push(match);
+      } else {
+        // Fallback for custom/other entries
+        validCanonical.push(cat.slice(0, 100));
+      }
+    }
+    if (validCanonical.length === 0) {
+      errors.category = "Please select a valid category.";
+    } else {
+      categoryList = validCanonical;
+    }
+  }
+
+  const category = categoryList.join(", ").slice(0, 1000);
   const budget = text(body.budget, 60);
   const timeline = text(body.timeline, 60);
   const youtubeLink = text(body.youtubeLink || body.youtube_link || body.channelLink, 500);
@@ -172,7 +209,7 @@ export function validateServiceEnquiry(
   if (!country) errors.country = "Please enter your country.";
   if (!(INDUSTRIES as readonly string[]).includes(industry)) errors.industry = "Please select your industry.";
   if (industry === "Other" && !otherIndustry) errors.otherIndustry = "Please specify your industry.";
-  if (!options.includes(category)) errors.category = "Please select a category.";
+  if (!category && !errors.category) errors.category = "Please select at least one category.";
   if (!(CONTACT_BUDGETS as readonly string[]).includes(budget)) errors.budget = "Please select an estimated budget.";
   if (!(CONTACT_TIMELINES as readonly string[]).includes(timeline)) errors.timeline = "Please select a project timeline.";
   if (body.agreed !== true && body.agreed !== "true") errors.agreed = "Please accept the Privacy Policy and Terms & Conditions.";

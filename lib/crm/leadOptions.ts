@@ -92,8 +92,30 @@ export function validateManualLead(body: Record<string, unknown>): { ok: true; d
   if (email && !EMAIL_RE.test(email)) errors.email = "Please enter a valid email address.";
   if (companyWebsite && !/^https?:\/\//i.test(companyWebsite)) companyWebsite = `https://${companyWebsite}`;
   const group = LEAD_SERVICES.find((s) => s.value === service);
-  if (!group) errors.service = "Please choose a service.";
-  else if (!group.options.includes(category)) errors.category = "Please choose the service type.";
+  let finalCategory = "";
+  if (!group) {
+    errors.service = "Please choose a service.";
+  } else {
+    let catList: string[] = [];
+    if (Array.isArray(body.categories)) {
+      catList = body.categories.map((c) => String(c).trim()).filter(Boolean);
+    } else if (Array.isArray(body.category)) {
+      catList = body.category.map((c) => String(c).trim()).filter(Boolean);
+    } else if (typeof body.category === "string" && body.category.trim()) {
+      catList = body.category.split(",").map((c) => c.trim()).filter(Boolean);
+    }
+    catList = Array.from(new Set(catList));
+    if (catList.length === 0) {
+      errors.category = "Please choose at least one service category.";
+    } else {
+      const validCanonical = catList.map((c) => {
+        const found = group.options.find((o) => o.toLowerCase() === c.toLowerCase());
+        return found || c;
+      });
+      finalCategory = validCanonical.join(", ").slice(0, 1000);
+    }
+  }
+
   if (industry && !(LEAD_INDUSTRIES as readonly string[]).includes(industry)) errors.industry = "Please choose an industry.";
   if (budget && !LEAD_BUDGETS.includes(budget)) errors.budget = "Please choose a budget.";
   if (timeline && !(LEAD_TIMELINES as readonly string[]).includes(timeline)) errors.timeline = "Please choose a timeline.";
@@ -112,7 +134,7 @@ export function validateManualLead(body: Record<string, unknown>): { ok: true; d
       country: country || null,
       industry: industry || null,
       service,
-      category,
+      category: finalCategory,
       budget: budget || null,
       timeline: timeline || null,
       channel,

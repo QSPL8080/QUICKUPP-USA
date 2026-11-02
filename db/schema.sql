@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS service_digital_marketing (
   industry         VARCHAR(100) NOT NULL,
   other_industry   VARCHAR(150) NULL,
   service          VARCHAR(150) NOT NULL COMMENT 'Service (fixed on that service''s pages)',
-  category         VARCHAR(150) NOT NULL COMMENT 'Category chosen in the form (a subpage of the service)',
+  category         VARCHAR(1000) NOT NULL COMMENT 'Categories chosen in the form (subpages of the service)',
   budget           VARCHAR(60)  NULL,
   timeline         VARCHAR(60)  NULL,
   message          TEXT         NULL,
@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS service_digital_marketing (
   PRIMARY KEY (id),
   KEY idx_created (created_at),
   KEY idx_email (email),
-  KEY idx_category (category)
+  KEY idx_category (category(191))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- AI & Automation Solutions form ----------------------------------------------
