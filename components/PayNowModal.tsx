@@ -20,6 +20,13 @@ export function openPayNowModal() {
 
 const PRESET_AMOUNTS = ["500", "1000", "2500", "5000"];
 
+const PARTIAL_PRESETS = [
+  { id: "50", label: "50% Deposit", pct: 0.5 },
+  { id: "30", label: "30% Milestone", pct: 0.3 },
+  { id: "25", label: "25% Retainer", pct: 0.25 },
+  { id: "custom", label: "Custom Amount", pct: null },
+] as const;
+
 function getInitialDates() {
   const now = new Date();
   const year = now.getFullYear();
@@ -49,15 +56,24 @@ export default function PayNowModal() {
   const [service, setService] = useState(serviceGroups[0]?.items[0]?.label || "");
   const [billingStartDate, setBillingStartDate] = useState(getInitialDates().start);
   const [billingEndDate, setBillingEndDate] = useState(getInitialDates().end);
-  const [amount, setAmount] = useState("1000");
-  const [notes, setNotes] = useState("");
 
+  // Amount & Payment Options
+  const [totalAmount, setTotalAmount] = useState("1000");
+  const [paymentType, setPaymentType] = useState<"full" | "partial">("full");
+  const [partialPreset, setPartialPreset] = useState<"50" | "30" | "25" | "custom">("50");
+  const [customPartialAmount, setCustomPartialAmount] = useState("500");
+
+  const [notes, setNotes] = useState("");
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [receipt, setReceipt] = useState<{
     captureID: string;
     orderID: string;
     amount: number;
+    totalAmount: number;
+    paymentType: "full" | "partial";
+    remainingAmount: number;
     currency: string;
     date: string;
   } | null>(null);
@@ -96,6 +112,19 @@ export default function PayNowModal() {
     paypalRenderedRef.current = false;
   };
 
+  // Calculations for Full vs Partial
+  const numTotal = Number(totalAmount) || 0;
+  const getPayAmount = (): number => {
+    if (paymentType === "full") return numTotal;
+    if (partialPreset === "50") return Math.round(numTotal * 0.5 * 100) / 100;
+    if (partialPreset === "30") return Math.round(numTotal * 0.3 * 100) / 100;
+    if (partialPreset === "25") return Math.round(numTotal * 0.25 * 100) / 100;
+    return Number(customPartialAmount) || 0;
+  };
+
+  const payAmount = getPayAmount();
+  const remainingAmount = Math.max(0, Math.round((numTotal - payAmount) * 100) / 100);
+
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setFormError("");
@@ -112,10 +141,22 @@ export default function PayNowModal() {
       setFormError("Please enter your phone number.");
       return;
     }
-    const numAmount = Number(amount);
-    if (!numAmount || isNaN(numAmount) || numAmount <= 0) {
-      setFormError("Please enter a valid USD payment amount.");
+    if (!numTotal || isNaN(numTotal) || numTotal <= 0) {
+      setFormError("Please enter a valid invoice or service amount in USD.");
       return;
+    }
+
+    if (paymentType === "partial") {
+      if (!payAmount || isNaN(payAmount) || payAmount <= 0) {
+        setFormError("Please enter a valid partial payment deposit amount.");
+        return;
+      }
+      if (payAmount >= numTotal) {
+        setFormError(
+          `Partial payment amount ($${payAmount.toFixed(2)}) must be less than the total invoice amount ($${numTotal.toFixed(2)}). Or switch to Full Payment.`
+        );
+        return;
+      }
     }
 
     setStep("paypal");
@@ -161,7 +202,10 @@ export default function PayNowModal() {
                 service,
                 billingStartDate,
                 billingEndDate,
-                amount: Number(amount),
+                amount: payAmount,
+                totalAmount: numTotal,
+                paymentType,
+                remainingAmount,
                 notes,
               }),
             });
@@ -188,7 +232,10 @@ export default function PayNowModal() {
                   service,
                   billingStartDate,
                   billingEndDate,
-                  amount: Number(amount),
+                  amount: payAmount,
+                  totalAmount: numTotal,
+                  paymentType,
+                  remainingAmount,
                   notes,
                 }),
               });
@@ -201,8 +248,11 @@ export default function PayNowModal() {
               setReceipt({
                 captureID: captureData.captureID,
                 orderID: data.orderID,
-                amount: Number(amount),
-                currency: "USD",
+                amount: Number(captureData.amount || payAmount),
+                totalAmount: Number(captureData.totalAmount || numTotal),
+                paymentType: captureData.paymentType || paymentType,
+                remainingAmount: Number(captureData.remainingAmount ?? remainingAmount),
+                currency: captureData.currency || "USD",
                 date: new Date().toLocaleDateString("en-US", {
                   month: "short",
                   day: "numeric",
@@ -218,7 +268,9 @@ export default function PayNowModal() {
           },
           onError: (err: any) => {
             console.error("[PayPal Buttons Error]", err);
-            setFormError("PayPal was unable to process your payment. Please check your card or balance and try again.");
+            setFormError(
+              "PayPal was unable to process your payment. Please check your card or balance and try again."
+            );
           },
         })
         .render(paypalContainerRef.current)
@@ -260,7 +312,10 @@ export default function PayNowModal() {
     service,
     billingStartDate,
     billingEndDate,
-    amount,
+    payAmount,
+    numTotal,
+    paymentType,
+    remainingAmount,
     notes,
   ]);
 
@@ -273,14 +328,23 @@ export default function PayNowModal() {
         <div className="pm-head">
           <div className="pm-head-left">
             <div className="pm-head-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <rect x="2" y="5" width="20" height="14" rx="2" />
                 <path d="M2 10h20" />
               </svg>
             </div>
             <div>
               <h2 className="pm-head-title">
-                {step === "success" ? "Payment Receipt" : "Quickupp Softech Payment Portal"}
+                {step === "success" ? "Payment Confirmation" : "Quickupp Softech Payment Portal"}
               </h2>
               <div className="pm-head-sub">
                 {step === "success"
@@ -302,26 +366,15 @@ export default function PayNowModal() {
         {/* Modal Body */}
         <div className="pm-body">
           {formError && (
-            <div
-              style={{
-                padding: "12px 16px",
-                background: "#fef2f2",
-                border: "1px solid #fecaca",
-                borderRadius: "10px",
-                color: "#b91c1c",
-                fontSize: "13.5px",
-                fontWeight: 600,
-                marginBottom: "18px",
-              }}
-            >
+            <div className="pm-error-alert" role="alert">
               ⚠️ {formError}
             </div>
           )}
 
-          {/* Step 1: Customer & Service Details Form */}
+          {/* Step 1: Client & Service Form */}
           {step === "form" && (
-            <form onSubmit={handleFormSubmit} className="pm-form">
-              {/* Row 1: Full Name & Phone */}
+            <form onSubmit={handleFormSubmit} className="pm-form" noValidate>
+              {/* Row 1: Full Name & Phone Number */}
               <div className="pm-row">
                 <div className="pm-field">
                   <label className="pm-label">
@@ -343,7 +396,7 @@ export default function PayNowModal() {
                   <input
                     type="tel"
                     required
-                    placeholder="+1 (555) 000-0000"
+                    placeholder="e.g. +1 (555) 000-0000"
                     value={clientPhone}
                     onChange={(e) => setClientPhone(e.target.value)}
                     className="pm-input"
@@ -351,7 +404,7 @@ export default function PayNowModal() {
                 </div>
               </div>
 
-              {/* Row 2: Email & Company Name */}
+              {/* Row 2: Email Address & Company Name */}
               <div className="pm-row">
                 <div className="pm-field">
                   <label className="pm-label">
@@ -360,17 +413,17 @@ export default function PayNowModal() {
                   <input
                     type="email"
                     required
-                    placeholder="john@company.com"
+                    placeholder="e.g. john@company.com"
                     value={clientEmail}
                     onChange={(e) => setClientEmail(e.target.value)}
                     className="pm-input"
                   />
                 </div>
                 <div className="pm-field">
-                  <label className="pm-label">Company Name</label>
+                  <label className="pm-label">Company Name (Optional)</label>
                   <input
                     type="text"
-                    placeholder="e.g. Acme Health LLC"
+                    placeholder="e.g. Acme Corp"
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
                     className="pm-input"
@@ -378,7 +431,7 @@ export default function PayNowModal() {
                 </div>
               </div>
 
-              {/* Row 3: Category & Cascading Service Selection */}
+              {/* Cascading Category & Service */}
               <div className="pm-row">
                 <div className="pm-field">
                   <label className="pm-label">
@@ -389,16 +442,13 @@ export default function PayNowModal() {
                     onChange={(e) => handleCategoryChange(e.target.value)}
                     className="pm-select"
                   >
-                    {serviceGroups.map((g, idx) => (
-                      <option key={idx} value={g.label}>
+                    {serviceGroups.map((g) => (
+                      <option key={g.label} value={g.label}>
                         {g.label}
                       </option>
                     ))}
-                    <option value="YouTube Video Promotion">YouTube Video Promotion</option>
-                    <option value="Custom Retainer">Custom Strategy / Retainer</option>
                   </select>
                 </div>
-
                 <div className="pm-field">
                   <label className="pm-label">
                     Service <span className="pm-req">*</span>
@@ -408,25 +458,18 @@ export default function PayNowModal() {
                     onChange={(e) => setService(e.target.value)}
                     className="pm-select"
                   >
-                    {availableServices.length > 0 ? (
-                      availableServices.map((s, idx) => (
-                        <option key={idx} value={s}>
-                          {s}
-                        </option>
-                      ))
-                    ) : (
-                      <>
-                        <option value="Custom Marketing Retainer">Custom Marketing Retainer</option>
-                        <option value="Custom Engineering Development">Custom Engineering Development</option>
-                      </>
-                    )}
+                    {availableServices.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
 
-              {/* Billing Period (From Date to To Date) */}
-              <div className="pm-date-box">
-                <div className="pm-date-title">
+              {/* Billing Period (Coverage Range) */}
+              <div className="pm-field">
+                <div className="pm-field-heading">
                   <LucideIcon name="calendar" size={14} />
                   <span>Billing Period (Payment Month Coverage)</span>
                 </div>
@@ -456,10 +499,10 @@ export default function PayNowModal() {
                 </div>
               </div>
 
-              {/* Amount USD with Preset Pills */}
+              {/* Amount Box: Total Invoice / Service Amount */}
               <div className="pm-field">
                 <label className="pm-label">
-                  Amount to Pay (USD) <span className="pm-req">*</span>
+                  Total Service / Invoice Amount (USD) <span className="pm-req">*</span>
                 </label>
                 <div className="pm-currency-input-wrap">
                   <span className="pm-currency-symbol">$</span>
@@ -469,8 +512,15 @@ export default function PayNowModal() {
                     step="any"
                     required
                     placeholder="1000"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
+                    value={totalAmount}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setTotalAmount(val);
+                      const n = Number(val) || 0;
+                      if (n > 0 && Number(customPartialAmount) >= n) {
+                        setCustomPartialAmount(String(Math.round(n * 0.5)));
+                      }
+                    }}
                     className="pm-input"
                   />
                 </div>
@@ -479,27 +529,135 @@ export default function PayNowModal() {
                     <button
                       key={p}
                       type="button"
-                      onClick={() => setAmount(p)}
-                      className={`pm-amount-pill ${amount === p ? "is-active" : ""}`}
+                      onClick={() => {
+                        setTotalAmount(p);
+                        const n = Number(p);
+                        setCustomPartialAmount(String(Math.round(n * 0.5)));
+                      }}
+                      className={`pm-amount-pill ${totalAmount === p ? "is-active" : ""}`}
                     >
                       ${Number(p).toLocaleString()}
                     </button>
                   ))}
                   <button
                     type="button"
-                    onClick={() => setAmount("")}
-                    className={`pm-amount-pill ${!PRESET_AMOUNTS.includes(amount) ? "is-active" : ""}`}
+                    onClick={() => setTotalAmount("")}
+                    className={`pm-amount-pill ${!PRESET_AMOUNTS.includes(totalAmount) ? "is-active" : ""}`}
                   >
                     Custom
                   </button>
                 </div>
               </div>
 
+              {/* Payment Type: Full vs Partial Payment */}
+              <div className="pm-field">
+                <label className="pm-label">
+                  Choose Payment Option <span className="pm-req">*</span>
+                </label>
+                <div className="pm-type-toggle">
+                  {/* Full Payment Card */}
+                  <div
+                    className={`pm-type-card ${paymentType === "full" ? "is-active" : ""}`}
+                    onClick={() => setPaymentType("full")}
+                  >
+                    <div className="pm-type-card-head">
+                      <span className="pm-type-card-title">Full Payment (100%)</span>
+                      <div className="pm-type-radio">
+                        {paymentType === "full" && <div className="pm-type-radio-dot" />}
+                      </div>
+                    </div>
+                    <span className="pm-type-card-desc">
+                      Pay full amount of <strong>${numTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })} USD</strong> today with zero remaining balance.
+                    </span>
+                  </div>
+
+                  {/* Partial Payment Card */}
+                  <div
+                    className={`pm-type-card ${paymentType === "partial" ? "is-active" : ""}`}
+                    onClick={() => setPaymentType("partial")}
+                  >
+                    <div className="pm-type-card-head">
+                      <span className="pm-type-card-title">Partial Payment</span>
+                      <div className="pm-type-radio">
+                        {paymentType === "partial" && <div className="pm-type-radio-dot" />}
+                      </div>
+                    </div>
+                    <span className="pm-type-card-desc">
+                      Pay an advance deposit or milestone now; balance due per terms.
+                    </span>
+                  </div>
+                </div>
+
+                {/* If Partial Payment Selected: Show Selector & Custom Box */}
+                {paymentType === "partial" && (
+                  <div className="pm-partial-box">
+                    <label className="pm-label" style={{ fontSize: "12.5px", color: "#6b21a8" }}>
+                      Select Partial Deposit Ratio or Custom Amount:
+                    </label>
+                    <div className="pm-partial-pills">
+                      {PARTIAL_PRESETS.map((item) => (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => setPartialPreset(item.id)}
+                          className={`pm-partial-pill ${partialPreset === item.id ? "is-active" : ""}`}
+                        >
+                          {item.label}
+                          {item.pct && numTotal > 0
+                            ? ` ($${(numTotal * item.pct).toLocaleString(undefined, { maximumFractionDigits: 0 })})`
+                            : ""}
+                        </button>
+                      ))}
+                    </div>
+
+                    {partialPreset === "custom" && (
+                      <div className="pm-field" style={{ marginTop: "4px" }}>
+                        <label className="pm-label" style={{ fontSize: "12px", color: "#64748b" }}>
+                          Custom Partial Amount to Pay Now (USD):
+                        </label>
+                        <div className="pm-currency-input-wrap">
+                          <span className="pm-currency-symbol">$</span>
+                          <input
+                            type="number"
+                            min="1"
+                            step="any"
+                            placeholder="500"
+                            value={customPartialAmount}
+                            onChange={(e) => setCustomPartialAmount(e.target.value)}
+                            className="pm-input"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Breakdown Preview */}
+                    <div className="pm-breakdown-card">
+                      <div className="pm-breakdown-row">
+                        <span>Total Service Fee:</span>
+                        <span>${numTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })} USD</span>
+                      </div>
+                      <div className="pm-breakdown-row is-highlight">
+                        <span style={{ color: "#7c3aed" }}>Paying Now (via PayPal):</span>
+                        <span style={{ color: "#7c3aed" }}>
+                          ${payAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })} USD
+                        </span>
+                      </div>
+                      <div className="pm-breakdown-row is-balance">
+                        <span>Remaining Balance Due:</span>
+                        <span>
+                          ${remainingAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })} USD
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Optional Notes */}
               <div className="pm-field">
                 <label className="pm-label">Additional Notes or Invoice Reference (Optional)</label>
                 <textarea
-                  placeholder="e.g. Project milestone 1 payment or monthly retainer"
+                  placeholder="e.g. Project milestone payment or monthly retainer note"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   className="pm-textarea"
@@ -508,7 +666,10 @@ export default function PayNowModal() {
 
               {/* Action Button */}
               <button type="submit" className="pm-submit-btn">
-                <span>Continue to Secure Payment</span>
+                <span>
+                  Proceed to Pay ${payAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })} USD (
+                  {paymentType === "partial" ? "Partial Deposit" : "Full Payment"})
+                </span>
                 <LucideIcon name="arrow-right" size={16} />
               </button>
             </form>
@@ -541,12 +702,44 @@ export default function PayNowModal() {
                     {billingStartDate} to {billingEndDate}
                   </span>
                 </div>
+                <div className="pm-summary-row">
+                  <span className="pm-summary-label">Payment Option:</span>
+                  <span
+                    className="pm-summary-val"
+                    style={{
+                      fontWeight: 800,
+                      color: paymentType === "partial" ? "#7c3aed" : "#10b981",
+                    }}
+                  >
+                    {paymentType === "partial" ? "Partial Payment (Deposit)" : "Full Payment (100%)"}
+                  </span>
+                </div>
+
+                {paymentType === "partial" && (
+                  <>
+                    <div className="pm-summary-row">
+                      <span className="pm-summary-label">Total Invoice Amount:</span>
+                      <span className="pm-summary-val">
+                        ${numTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })} USD
+                      </span>
+                    </div>
+                    <div className="pm-summary-row">
+                      <span className="pm-summary-label" style={{ color: "#dc2626" }}>
+                        Remaining Balance Due Later:
+                      </span>
+                      <span className="pm-summary-val" style={{ color: "#dc2626", fontWeight: 700 }}>
+                        ${remainingAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })} USD
+                      </span>
+                    </div>
+                  </>
+                )}
+
                 <div className="pm-summary-total">
                   <span style={{ fontWeight: 800, color: "#0f172a", fontSize: "16px" }}>
-                    Total to Pay:
+                    {paymentType === "partial" ? "Due Today (PayPal):" : "Total to Pay (PayPal):"}
                   </span>
                   <span className="pm-total-amount">
-                    ${Number(amount).toLocaleString(undefined, { minimumFractionDigits: 2 })} USD
+                    ${payAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })} USD
                   </span>
                 </div>
               </div>
@@ -563,7 +756,14 @@ export default function PayNowModal() {
               </div>
 
               {isSubmitting && (
-                <div style={{ textAlign: "center", padding: "16px", color: "#4f46e5", fontWeight: 700 }}>
+                <div
+                  style={{
+                    textAlign: "center",
+                    padding: "16px",
+                    color: "#4f46e5",
+                    fontWeight: 700,
+                  }}
+                >
                   ⏳ Processing and confirming payment with PayPal...
                 </div>
               )}
@@ -574,7 +774,7 @@ export default function PayNowModal() {
                 className="pm-btn-secondary"
                 style={{ width: "100%", marginTop: "12px" }}
               >
-                ← Back to Edit Details
+                ← Back to Edit Amount &amp; Details
               </button>
             </div>
           )}
@@ -585,26 +785,102 @@ export default function PayNowModal() {
               <div className="pm-success-icon">
                 <LucideIcon name="check" size={32} />
               </div>
-              <h3 className="pm-success-title">Payment Completed!</h3>
+              <h3 className="pm-success-title">Payment Confirmed &amp; Received!</h3>
               <p className="pm-success-desc">
-                Your payment of <strong>${receipt.amount.toFixed(2)} USD</strong> has been received and verified.
+                Your {receipt.paymentType === "partial" ? "partial deposit" : "full payment"} of{" "}
+                <strong>${receipt.amount.toFixed(2)} USD</strong> has been successfully captured and confirmed via PayPal.
               </p>
 
+              {/* High-visibility Confirmation Message Banner */}
+              <div className="pm-confirm-banner">
+                <div className="pm-confirm-banner-icon">
+                  <LucideIcon name="check" size={16} />
+                </div>
+                <div>
+                  <div className="pm-confirm-banner-title">
+                    Payment Confirmation Sent
+                  </div>
+                  <p className="pm-confirm-banner-text">
+                    Thank you, <strong>{clientName}</strong>! An official confirmation receipt has been dispatched to{" "}
+                    <strong>{clientEmail}</strong>.
+                    {receipt.paymentType === "partial" && (
+                      <>
+                        {" "}Your remaining balance of{" "}
+                        <strong>${receipt.remainingAmount.toFixed(2)} USD</strong> will be billed per milestone terms.
+                      </>
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              {/* Receipt Table */}
               <table className="pm-receipt-table">
                 <tbody>
                   <tr>
-                    <td style={{ color: "#64748b", width: "40%" }}>Transaction ID:</td>
+                    <td style={{ color: "#64748b", width: "40%" }}>Status:</td>
+                    <td>
+                      <span
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "6px",
+                          background: "#dcfce7",
+                          color: "#15803d",
+                          fontWeight: 800,
+                          padding: "3px 10px",
+                          borderRadius: "999px",
+                          fontSize: "12px",
+                        }}
+                      >
+                        ✓ COMPLETED &amp; CONFIRMED
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={{ color: "#64748b" }}>Payment Type:</td>
+                    <td style={{ fontWeight: 700, color: "#0f172a" }}>
+                      {receipt.paymentType === "partial" ? "Partial Payment (Deposit)" : "Full Payment (100%)"}
+                    </td>
+                  </tr>
+                  {receipt.paymentType === "partial" && (
+                    <tr>
+                      <td style={{ color: "#64748b" }}>Total Invoice Amount:</td>
+                      <td style={{ fontWeight: 600, color: "#475569" }}>
+                        ${receipt.totalAmount.toFixed(2)} USD
+                      </td>
+                    </tr>
+                  )}
+                  <tr>
+                    <td style={{ color: "#64748b" }}>Amount Paid Now:</td>
+                    <td style={{ fontWeight: 800, color: "#10b981", fontSize: "16px" }}>
+                      ${receipt.amount.toFixed(2)} USD
+                    </td>
+                  </tr>
+                  {receipt.paymentType === "partial" && (
+                    <tr>
+                      <td style={{ color: "#64748b" }}>Remaining Balance Due:</td>
+                      <td style={{ fontWeight: 700, color: "#dc2626" }}>
+                        ${receipt.remainingAmount.toFixed(2)} USD
+                      </td>
+                    </tr>
+                  )}
+                  <tr>
+                    <td style={{ color: "#64748b" }}>Transaction / Capture ID:</td>
                     <td style={{ fontWeight: 700, fontFamily: "monospace", color: "#0f172a" }}>
                       {receipt.captureID}
                     </td>
                   </tr>
                   <tr>
-                    <td style={{ color: "#64748b" }}>Order ID:</td>
+                    <td style={{ color: "#64748b" }}>PayPal Order ID:</td>
                     <td style={{ fontFamily: "monospace", color: "#475569" }}>{receipt.orderID}</td>
                   </tr>
                   <tr>
                     <td style={{ color: "#64748b" }}>Client Name:</td>
                     <td style={{ fontWeight: 600, color: "#0f172a" }}>{clientName}</td>
+                  </tr>
+                  <tr>
+                    <td style={{ color: "#64748b" }}>Client Phone:</td>
+                    <td style={{ color: "#0f172a" }}>{clientPhone}</td>
                   </tr>
                   <tr>
                     <td style={{ color: "#64748b" }}>Service:</td>
@@ -634,7 +910,14 @@ export default function PayNowModal() {
                   className="pm-btn-secondary"
                   style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
                 >
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
                     <polyline points="6 9 6 2 18 2 18 9" />
                     <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
                     <rect x="6" y="14" width="12" height="8" />

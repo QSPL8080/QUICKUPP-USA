@@ -200,6 +200,9 @@ export type PaymentRow = {
   service: string;
   description: string | null;
   amount: number;
+  totalAmount?: number | null;
+  paymentType?: "full" | "partial";
+  remainingAmount?: number | null;
   currency: string;
   method: string;
   status: (typeof PAYMENT_STATUSES)[number];
@@ -248,6 +251,9 @@ export async function listPayments(opts: { q?: string; status?: string; page?: n
     service: String(r.service ?? ""),
     description: (r.description as string) || null,
     amount: Number(r.amount),
+    totalAmount: r.total_amount != null ? Number(r.total_amount) : null,
+    paymentType: (r.payment_type as "full" | "partial") || "full",
+    remainingAmount: r.remaining_amount != null ? Number(r.remaining_amount) : null,
     currency: String(r.currency ?? "USD"),
     method: String(r.method ?? ""),
     status: r.status as PaymentRow["status"],

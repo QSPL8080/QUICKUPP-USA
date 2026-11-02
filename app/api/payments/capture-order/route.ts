@@ -21,6 +21,9 @@ export async function POST(req: Request) {
       billingStartDate,
       billingEndDate,
       amount,
+      totalAmount,
+      paymentType,
+      remainingAmount,
       notes,
     } = body;
 
@@ -42,6 +45,10 @@ export async function POST(req: Request) {
     const captureID = captureDetail?.id || orderID;
     const capturedAmount = Number(captureDetail?.amount?.value || amount || 0);
     const currency = captureDetail?.amount?.currency_code || "USD";
+    const isPartial = paymentType === "partial";
+    const finalTotal = Number(totalAmount) || capturedAmount;
+    const finalRemaining = isPartial ? Math.max(0, Number(remainingAmount || (finalTotal - capturedAmount))) : 0;
+    const paymentStatus = isPartial ? "partially_paid" : "paid";
 
     // 2. Save payment record in MySQL database
     try {
@@ -56,6 +63,9 @@ export async function POST(req: Request) {
           service,
           description,
           amount,
+          total_amount,
+          payment_type,
+          remaining_amount,
           currency,
           method,
           status,
@@ -66,7 +76,7 @@ export async function POST(req: Request) {
           billing_end_date,
           paid_at,
           notes
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'paypal', 'paid', 'online', ?, ?, ?, ?, CURDATE(), ?)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'paypal', ?, 'online', ?, ?, ?, ?, CURDATE(), ?)`,
         [
           clientName,
           clientEmail || null,
@@ -74,9 +84,13 @@ export async function POST(req: Request) {
           companyName || null,
           category || null,
           service || "General Consultation",
-          `Online PayPal Payment - ${category || ""} ${service || ""}`.trim(),
+          `Online PayPal Payment (${isPartial ? "Partial Deposit" : "Full Payment"}) - ${category || ""} ${service || ""}`.trim(),
           capturedAmount,
+          finalTotal,
+          isPartial ? "partial" : "full",
+          finalRemaining,
           currency,
+          paymentStatus,
           captureID,
           orderID,
           billingStartDate || null,
@@ -93,16 +107,20 @@ export async function POST(req: Request) {
     after(async () => {
       // Admin Notification Email
       try {
-        const adminSubject = `Payment Received: $${capturedAmount.toFixed(2)} USD from ${clientName}`;
+        const typeLabel = isPartial ? "Partial Payment" : "Full Payment";
+        const adminSubject = `${typeLabel} Received: $${capturedAmount.toFixed(2)} USD from ${clientName}`;
         const adminHtml = `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px;">
             <div style="background: #0f172a; padding: 18px 24px; border-radius: 8px; margin-bottom: 24px;">
-              <h2 style="color: #ffffff; margin: 0; font-size: 20px;">Payment Received via PayPal</h2>
+              <h2 style="color: #ffffff; margin: 0; font-size: 20px;">${typeLabel} Received via PayPal</h2>
               <p style="color: #38bdf8; margin: 4px 0 0; font-size: 13px;">Quickupp Softech LLC Online Checkout</p>
             </div>
             
             <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-              <tr><td style="padding: 8px 0; color: #64748b;">Amount:</td><td style="padding: 8px 0; font-weight: bold; color: #10b981; font-size: 18px;">$${capturedAmount.toFixed(2)} ${currency}</td></tr>
+              <tr><td style="padding: 8px 0; color: #64748b;">Payment Type:</td><td style="padding: 8px 0; font-weight: bold; color: ${isPartial ? "#d97706" : "#10b981"};">${typeLabel}</td></tr>
+              <tr><td style="padding: 8px 0; color: #64748b;">Amount Paid Now:</td><td style="padding: 8px 0; font-weight: bold; color: #10b981; font-size: 18px;">$${capturedAmount.toFixed(2)} ${currency}</td></tr>
+              ${isPartial ? `<tr><td style="padding: 8px 0; color: #64748b;">Total Service Amount:</td><td style="padding: 8px 0; font-weight: 600; color: #0f172a;">$${finalTotal.toFixed(2)} ${currency}</td></tr>` : ""}
+              ${isPartial ? `<tr><td style="padding: 8px 0; color: #64748b;">Remaining Balance Due:</td><td style="padding: 8px 0; font-weight: bold; color: #ef4444;">$${finalRemaining.toFixed(2)} ${currency}</td></tr>` : ""}
               <tr><td style="padding: 8px 0; color: #64748b;">Client Name:</td><td style="padding: 8px 0; font-weight: bold; color: #0f172a;">${clientName}</td></tr>
               <tr><td style="padding: 8px 0; color: #64748b;">Client Email:</td><td style="padding: 8px 0; color: #0f172a;"><a href="mailto:${clientEmail}">${clientEmail}</a></td></tr>
               <tr><td style="padding: 8px 0; color: #64748b;">Client Phone:</td><td style="padding: 8px 0; color: #0f172a;"><a href="tel:${clientPhone}">${clientPhone}</a></td></tr>
@@ -116,7 +134,7 @@ export async function POST(req: Request) {
             </table>
             
             <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8;">
-              This record has been automatically logged into the CRM Payments database.
+              This payment record has been automatically logged into the CRM Payments database.
             </div>
           </div>
         `;
@@ -125,7 +143,7 @@ export async function POST(req: Request) {
           to: LEADS_NOTIFICATION_EMAIL,
           subject: adminSubject,
           html: adminHtml,
-          text: `Payment of $${capturedAmount.toFixed(2)} ${currency} received from ${clientName} (${clientEmail}, ${clientPhone}) for ${service || category || "service"}. Transaction ID: ${captureID}`,
+          text: `${typeLabel} of $${capturedAmount.toFixed(2)} ${currency} received from ${clientName} (${clientEmail}, ${clientPhone}) for ${service || category || "service"}. Transaction ID: ${captureID}`,
           replyTo: clientEmail || undefined,
         });
       } catch (mailErr) {
@@ -135,7 +153,8 @@ export async function POST(req: Request) {
       // Customer Confirmation & Receipt Email
       if (clientEmail) {
         try {
-          const clientSubject = `Payment Receipt - Quickupp Softech LLC (Transaction #${captureID})`;
+          const typeLabel = isPartial ? "Partial Deposit" : "Payment";
+          const clientSubject = `${typeLabel} Confirmation & Receipt - Quickupp Softech LLC (#${captureID})`;
           const clientHtml = `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px;">
               <div style="background: #0f172a; padding: 20px 24px; border-radius: 8px; margin-bottom: 24px;">
@@ -145,18 +164,27 @@ export async function POST(req: Request) {
 
               <p style="font-size: 15px; color: #334155; line-height: 1.6;">
                 Dear ${clientName},<br><br>
-                We have successfully received your payment of <strong>$${capturedAmount.toFixed(2)} ${currency}</strong>.
+                We have successfully received your ${isPartial ? "partial deposit" : "full payment"} of <strong>$${capturedAmount.toFixed(2)} ${currency}</strong>.
               </p>
 
               <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px 20px; margin: 20px 0;">
                 <table style="width: 100%; font-size: 14px; border-collapse: collapse;">
-                  <tr><td style="padding: 6px 0; color: #64748b;">Amount Paid:</td><td style="padding: 6px 0; font-weight: bold; color: #0f172a;">$${capturedAmount.toFixed(2)} ${currency}</td></tr>
+                  <tr><td style="padding: 6px 0; color: #64748b;">Payment Type:</td><td style="padding: 6px 0; font-weight: 600; color: #0f172a;">${isPartial ? "Partial Payment (Deposit)" : "Full Payment"}</td></tr>
+                  <tr><td style="padding: 6px 0; color: #64748b;">Amount Paid Now:</td><td style="padding: 6px 0; font-weight: bold; color: #10b981; font-size: 16px;">$${capturedAmount.toFixed(2)} ${currency}</td></tr>
+                  ${isPartial ? `<tr><td style="padding: 6px 0; color: #64748b;">Total Invoice Amount:</td><td style="padding: 6px 0; font-weight: 600; color: #0f172a;">$${finalTotal.toFixed(2)} ${currency}</td></tr>` : ""}
+                  ${isPartial ? `<tr><td style="padding: 6px 0; color: #64748b;">Remaining Balance:</td><td style="padding: 6px 0; font-weight: bold; color: #ef4444;">$${finalRemaining.toFixed(2)} ${currency}</td></tr>` : ""}
                   <tr><td style="padding: 6px 0; color: #64748b;">Transaction ID:</td><td style="padding: 6px 0; font-family: monospace; color: #0f172a;">${captureID}</td></tr>
                   ${service ? `<tr><td style="padding: 6px 0; color: #64748b;">Service:</td><td style="padding: 6px 0; color: #0f172a;">${service}</td></tr>` : ""}
                   ${billingStartDate || billingEndDate ? `<tr><td style="padding: 6px 0; color: #64748b;">Billing Coverage:</td><td style="padding: 6px 0; color: #0f172a;">${billingStartDate || ""} to ${billingEndDate || ""}</td></tr>` : ""}
                   <tr><td style="padding: 6px 0; color: #64748b;">Date:</td><td style="padding: 6px 0; color: #0f172a;">${new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</td></tr>
                 </table>
               </div>
+
+              ${isPartial ? `
+                <div style="background: #fffbeb; border: 1px solid #fef3c7; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; font-size: 13.5px; color: #92400e;">
+                  <strong>Note:</strong> Your remaining balance of <strong>$${finalRemaining.toFixed(2)} ${currency}</strong> will be billed per project milestone terms.
+                </div>
+              ` : ""}
 
               <p style="font-size: 14px; color: #64748b; line-height: 1.6;">
                 If you have any questions regarding your invoice or billing period, please reply directly to this email or reach us at <a href="mailto:support@quickuppsoftech.us">support@quickuppsoftech.us</a>.
@@ -185,6 +213,9 @@ export async function POST(req: Request) {
       captureID,
       orderID,
       amount: capturedAmount,
+      totalAmount: finalTotal,
+      paymentType: isPartial ? "partial" : "full",
+      remainingAmount: finalRemaining,
       currency,
     });
   } catch (err: any) {

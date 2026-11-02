@@ -236,7 +236,14 @@ export default function PaymentsView({
                       <span className="crm-cell-sub">{p.description}</span>
                     )}
                   </td>
-                  <td data-label="Amount" className="crm-right crm-strong crm-nowrap">{money(p.amount, p.currency)}</td>
+                  <td data-label="Amount" className="crm-right crm-strong crm-nowrap">
+                    {money(p.amount, p.currency)}
+                    {p.paymentType === "partial" && (
+                      <span className="crm-cell-sub" style={{ color: "#d97706" }}>
+                        Partial of {money(p.totalAmount || p.amount, p.currency)}
+                      </span>
+                    )}
+                  </td>
                   <td data-label="Method">
                     {p.method}
                     <span className="crm-cell-sub">{p.source === "manual" ? "Manual entry" : "Online"}</span>

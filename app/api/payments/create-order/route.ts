@@ -18,6 +18,9 @@ export async function POST(req: Request) {
       billingStartDate,
       billingEndDate,
       amount,
+      totalAmount,
+      paymentType,
+      remainingAmount,
       notes,
     } = body;
 
@@ -36,16 +39,23 @@ export async function POST(req: Request) {
       );
     }
 
-    const desc = `${service || category || "Quickupp Softech"} - ${billingStartDate || ""} to ${billingEndDate || ""}`.trim();
+    const isPartial = paymentType === "partial";
+    const parsedTotal = Number(totalAmount) || parsedAmount;
+    const prefix = isPartial
+      ? `Partial Payment ($${parsedAmount.toFixed(2)} of $${parsedTotal.toFixed(2)} USD)`
+      : `Full Payment ($${parsedAmount.toFixed(2)} USD)`;
+
+    const desc = `${prefix} - ${service || category || "Quickupp Softech"} - ${billingStartDate || ""} to ${billingEndDate || ""}`.trim();
 
     const order = await createPayPalOrder({
       amount: parsedAmount,
       currency: "USD",
-      description: desc || "Quickupp Softech Service Payment",
+      description: desc.slice(0, 127) || "Quickupp Softech Service Payment",
       customId: JSON.stringify({
-        n: clientName.slice(0, 40),
-        e: clientEmail.slice(0, 50),
+        n: clientName.slice(0, 30),
+        e: clientEmail.slice(0, 40),
         p: clientPhone.slice(0, 20),
+        t: isPartial ? "partial" : "full",
       }),
     });
 

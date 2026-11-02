@@ -430,6 +430,207 @@
   background: #e2e8f0;
 }
 
+/* Payment Type Toggle: Full vs Partial */
+.pm-type-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+@media (max-width: 520px) {
+  .pm-type-toggle {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pm-type-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pm-type-card:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.pm-type-card.is-active {
+  background: #f5f3ff;
+  border-color: #6366f1;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.15);
+}
+
+.pm-type-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.pm-type-card-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pm-type-card.is-active .pm-type-card-title {
+  color: #4f46e5;
+}
+
+.pm-type-radio {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #cbd5e1;
+  display: grid;
+  place-items: center;
+  transition: all 0.15s ease;
+}
+
+.pm-type-card.is-active .pm-type-radio {
+  border-color: #6366f1;
+  background: #6366f1;
+}
+
+.pm-type-radio-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.pm-type-card-desc {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+/* Partial Payment Options Container */
+.pm-partial-box {
+  background: #faf5ff;
+  border: 1px solid #e9d5ff;
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: pm-fade-in 0.2s ease-out;
+}
+
+.pm-partial-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pm-partial-pill {
+  padding: 6px 14px;
+  font-size: 12.5px;
+  font-weight: 700;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #d8b4fe;
+  color: #6b21a8;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pm-partial-pill:hover {
+  background: #f3e8ff;
+}
+
+.pm-partial-pill.is-active {
+  background: #7c3aed;
+  border-color: #7c3aed;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.25);
+}
+
+/* Breakdown Card */
+.pm-breakdown-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pm-breakdown-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.pm-breakdown-row.is-highlight {
+  padding-top: 8px;
+  border-top: 1px dashed #cbd5e1;
+  font-size: 14.5px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.pm-breakdown-row.is-balance {
+  font-size: 13px;
+  font-weight: 700;
+  color: #dc2626;
+}
+
+/* Confirmation message banner */
+.pm-confirm-banner {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  text-align: left;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.pm-confirm-banner-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #10b981;
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.pm-confirm-banner-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #065f46;
+  margin: 0 0 4px 0;
+}
+
+.pm-confirm-banner-text {
+  font-size: 13.5px;
+  color: #047857;
+  line-height: 1.5;
+  margin: 0;
+}
+
 /* Print styles for receipt */
 @media print {
   body * {
