@@ -68,6 +68,7 @@ export default function PayNowModal() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [receipt, setReceipt] = useState<{
+    orderNumber: string;
     captureID: string;
     orderID: string;
     amount: number;
@@ -246,6 +247,7 @@ export default function PayNowModal() {
               }
 
               setReceipt({
+                orderNumber: captureData.orderNumber || `QS-${new Date().getFullYear()}-000127`,
                 captureID: captureData.captureID,
                 orderID: data.orderID,
                 amount: Number(captureData.amount || payAmount),
@@ -782,127 +784,191 @@ export default function PayNowModal() {
           {/* Step 3: Success Confirmation & Receipt */}
           {step === "success" && receipt && (
             <div className="pm-success-box">
+              {/* Logo */}
+              <div style={{ textAlign: "center", marginBottom: "16px" }}>
+                <img
+                  src="/images/logo-black.png"
+                  alt="Quickupp Softech LLC"
+                  width="155"
+                  style={{ display: "inline-block", maxWidth: "155px", height: "auto" }}
+                />
+              </div>
+
               <div className="pm-success-icon">
                 <LucideIcon name="check" size={32} />
               </div>
-              <h3 className="pm-success-title">Payment Confirmed &amp; Received!</h3>
-              <p className="pm-success-desc">
-                Your {receipt.paymentType === "partial" ? "partial deposit" : "full payment"} of{" "}
-                <strong>${receipt.amount.toFixed(2)} USD</strong> has been successfully captured and confirmed via PayPal.
+              <h3 className="pm-success-title">Payment Successful! 🎉</h3>
+              <p style={{ fontSize: "15px", fontWeight: 700, color: "#0f172a", margin: "0 0 4px" }}>
+                Thank you for your order.
+              </p>
+              <p className="pm-success-desc" style={{ marginBottom: "20px" }}>
+                Your payment has been received successfully and your order is now confirmed.
               </p>
 
-              {/* High-visibility Confirmation Message Banner */}
-              <div className="pm-confirm-banner">
-                <div className="pm-confirm-banner-icon">
-                  <LucideIcon name="check" size={16} />
+              {/* Payment Details Table */}
+              <div style={{ textAlign: "left", marginBottom: "16px" }}>
+                <div
+                  style={{
+                    fontSize: "14.5px",
+                    fontWeight: 800,
+                    color: "#0f172a",
+                    marginBottom: "8px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="2" y="5" width="20" height="14" rx="2" />
+                    <path d="M2 10h20" />
+                  </svg>
+                  <span>Payment Details</span>
                 </div>
-                <div>
-                  <div className="pm-confirm-banner-title">
-                    Payment Confirmation Sent
-                  </div>
-                  <p className="pm-confirm-banner-text">
-                    Thank you, <strong>{clientName}</strong>! An official confirmation receipt has been dispatched to{" "}
-                    <strong>{clientEmail}</strong>.
-                    {receipt.paymentType === "partial" && (
-                      <>
-                        {" "}Your remaining balance of{" "}
-                        <strong>${receipt.remainingAmount.toFixed(2)} USD</strong> will be billed per milestone terms.
-                      </>
+
+                <table className="pm-receipt-table" style={{ marginBottom: "0" }}>
+                  <tbody>
+                    <tr>
+                      <td style={{ color: "#64748b", width: "42%" }}>Order Number:</td>
+                      <td style={{ fontWeight: 800, fontFamily: "monospace", color: "#0f172a", fontSize: "14px" }}>
+                        {receipt.orderNumber}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ color: "#64748b" }}>Service:</td>
+                      <td style={{ fontWeight: 600, color: "#0f172a" }}>{service}</td>
+                    </tr>
+                    {category && (
+                      <tr>
+                        <td style={{ color: "#64748b" }}>Category:</td>
+                        <td style={{ color: "#0f172a" }}>{category}</td>
+                      </tr>
                     )}
-                  </p>
-                </div>
+                    {receipt.paymentType === "partial" && (
+                      <tr>
+                        <td style={{ color: "#64748b" }}>Total Invoice Amount:</td>
+                        <td style={{ fontWeight: 600, color: "#475569" }}>
+                          ${receipt.totalAmount.toFixed(2)} USD
+                        </td>
+                      </tr>
+                    )}
+                    <tr>
+                      <td style={{ color: "#64748b" }}>Amount Paid:</td>
+                      <td style={{ fontWeight: 850, color: "#10b981", fontSize: "16px" }}>
+                        ${receipt.amount.toFixed(2)} USD
+                      </td>
+                    </tr>
+                    {receipt.paymentType === "partial" && (
+                      <tr>
+                        <td style={{ color: "#64748b" }}>Remaining Balance:</td>
+                        <td style={{ fontWeight: 700, color: "#dc2626" }}>
+                          ${receipt.remainingAmount.toFixed(2)} USD
+                        </td>
+                      </tr>
+                    )}
+                    <tr>
+                      <td style={{ color: "#64748b" }}>Payment Method:</td>
+                      <td style={{ color: "#0f172a" }}>PayPal</td>
+                    </tr>
+                    <tr>
+                      <td style={{ color: "#64748b" }}>Transaction ID:</td>
+                      <td style={{ fontFamily: "monospace", color: "#0f172a", wordBreak: "break-all" }}>
+                        {receipt.captureID}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ color: "#64748b" }}>Status:</td>
+                      <td>
+                        <span
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "5px",
+                            background: receipt.paymentType === "partial" ? "#fef3c7" : "#dcfce7",
+                            color: receipt.paymentType === "partial" ? "#b45309" : "#15803d",
+                            fontWeight: 800,
+                            padding: "3px 10px",
+                            borderRadius: "999px",
+                            fontSize: "12px",
+                          }}
+                        >
+                          {receipt.paymentType === "partial" ? "✓ PARTIALLY PAID" : "✓ PAID"}
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
 
-              {/* Receipt Table */}
-              <table className="pm-receipt-table">
-                <tbody>
-                  <tr>
-                    <td style={{ color: "#64748b", width: "40%" }}>Status:</td>
-                    <td>
-                      <span
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "6px",
-                          background: "#dcfce7",
-                          color: "#15803d",
-                          fontWeight: 800,
-                          padding: "3px 10px",
-                          borderRadius: "999px",
-                          fontSize: "12px",
-                        }}
-                      >
-                        ✓ COMPLETED &amp; CONFIRMED
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style={{ color: "#64748b" }}>Payment Type:</td>
-                    <td style={{ fontWeight: 700, color: "#0f172a" }}>
-                      {receipt.paymentType === "partial" ? "Partial Payment (Deposit)" : "Full Payment (100%)"}
-                    </td>
-                  </tr>
-                  {receipt.paymentType === "partial" && (
-                    <tr>
-                      <td style={{ color: "#64748b" }}>Total Invoice Amount:</td>
-                      <td style={{ fontWeight: 600, color: "#475569" }}>
-                        ${receipt.totalAmount.toFixed(2)} USD
-                      </td>
-                    </tr>
-                  )}
-                  <tr>
-                    <td style={{ color: "#64748b" }}>Amount Paid Now:</td>
-                    <td style={{ fontWeight: 800, color: "#10b981", fontSize: "16px" }}>
-                      ${receipt.amount.toFixed(2)} USD
-                    </td>
-                  </tr>
-                  {receipt.paymentType === "partial" && (
-                    <tr>
-                      <td style={{ color: "#64748b" }}>Remaining Balance Due:</td>
-                      <td style={{ fontWeight: 700, color: "#dc2626" }}>
-                        ${receipt.remainingAmount.toFixed(2)} USD
-                      </td>
-                    </tr>
-                  )}
-                  <tr>
-                    <td style={{ color: "#64748b" }}>Transaction / Capture ID:</td>
-                    <td style={{ fontWeight: 700, fontFamily: "monospace", color: "#0f172a" }}>
-                      {receipt.captureID}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style={{ color: "#64748b" }}>PayPal Order ID:</td>
-                    <td style={{ fontFamily: "monospace", color: "#475569" }}>{receipt.orderID}</td>
-                  </tr>
-                  <tr>
-                    <td style={{ color: "#64748b" }}>Client Name:</td>
-                    <td style={{ fontWeight: 600, color: "#0f172a" }}>{clientName}</td>
-                  </tr>
-                  <tr>
-                    <td style={{ color: "#64748b" }}>Client Phone:</td>
-                    <td style={{ color: "#0f172a" }}>{clientPhone}</td>
-                  </tr>
-                  <tr>
-                    <td style={{ color: "#64748b" }}>Service:</td>
-                    <td style={{ fontWeight: 600, color: "#0f172a" }}>{service}</td>
-                  </tr>
-                  <tr>
-                    <td style={{ color: "#64748b" }}>Billing Coverage:</td>
-                    <td style={{ color: "#0f172a" }}>
-                      {billingStartDate} to {billingEndDate}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style={{ color: "#64748b" }}>Date &amp; Time:</td>
-                    <td style={{ color: "#0f172a" }}>{receipt.date}</td>
-                  </tr>
-                  <tr>
-                    <td style={{ color: "#64748b" }}>Receipt Sent To:</td>
-                    <td style={{ color: "#0f172a" }}>{clientEmail}</td>
-                  </tr>
-                </tbody>
-              </table>
+              {/* Your Receipt Has Been Emailed Card */}
+              <div
+                style={{
+                  background: "#f0fdf4",
+                  border: "1px solid #bbf7d0",
+                  borderRadius: "12px",
+                  padding: "16px",
+                  textAlign: "left",
+                  marginBottom: "16px",
+                }}
+              >
+                <div style={{ fontSize: "14px", fontWeight: 800, color: "#166534", marginBottom: "4px" }}>
+                  Your Receipt Has Been Emailed
+                </div>
+                <p style={{ fontSize: "13px", color: "#15803d", margin: "0 0 6px", lineHeight: "1.5" }}>
+                  A payment confirmation and PDF receipt have been sent to:{" "}
+                  <strong style={{ color: "#0f172a", background: "#dcfce7", padding: "1px 6px", borderRadius: "4px" }}>
+                    {clientEmail}
+                  </strong>
+                </p>
+                <p style={{ fontSize: "12px", color: "#166534", margin: "0 0 10px" }}>
+                  Please check your inbox, and your spam/junk folder if you don&apos;t see it shortly.
+                </p>
+                <a
+                  href={`/api/payments/receipt?order=${encodeURIComponent(receipt.orderNumber)}`}
+                  className="pm-btn-secondary"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    fontSize: "12.5px",
+                    padding: "7px 14px",
+                    textDecoration: "none",
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" x2="12" y1="15" y2="3" />
+                  </svg>
+                  <span>Download PDF Receipt</span>
+                </a>
+              </div>
 
+              {/* What's Next? Card */}
+              <div
+                style={{
+                  background: "#faf5ff",
+                  border: "1px solid #e9d5ff",
+                  borderRadius: "12px",
+                  padding: "16px",
+                  textAlign: "left",
+                  marginBottom: "20px",
+                }}
+              >
+                <div style={{ fontSize: "14px", fontWeight: 800, color: "#581c87", marginBottom: "4px" }}>
+                  What&apos;s Next?
+                </div>
+                <p style={{ fontSize: "13px", color: "#6b21a8", margin: "0 0 6px", lineHeight: "1.5" }}>
+                  Our team will review your order and contact you with the next steps.
+                </p>
+                <p style={{ fontSize: "12.5px", color: "#7e22ce", margin: "0" }}>
+                  Need help?{" "}
+                  <a href="mailto:info@quickuppsoftech.us" style={{ color: "#581c87", fontWeight: 700, textDecoration: "underline" }}>
+                    info@quickuppsoftech.us
+                  </a>
+                </p>
+              </div>
+
+              {/* Actions */}
               <div className="pm-receipt-actions">
                 <button
                   type="button"
@@ -930,7 +996,7 @@ export default function PayNowModal() {
                   className="pm-submit-btn"
                   style={{ width: "auto", padding: "0 28px" }}
                 >
-                  Done
+                  Back to Quickupp Softech LLC
                 </button>
               </div>
             </div>
