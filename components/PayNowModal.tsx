@@ -73,13 +73,6 @@ export const SERVICES_DATA = [
   },
 ];
 
-const PARTIAL_PRESETS = [
-  { id: "50", label: "50% Deposit", pct: 0.5 },
-  { id: "30", label: "30% Milestone", pct: 0.3 },
-  { id: "25", label: "25% Retainer", pct: 0.25 },
-  { id: "custom", label: "Custom Amount", pct: null },
-] as const;
-
 function getInitialDates() {
   const now = new Date();
   const year = now.getFullYear();
@@ -110,11 +103,9 @@ export default function PayNowModal() {
   const [billingStartDate, setBillingStartDate] = useState(getInitialDates().start);
   const [billingEndDate, setBillingEndDate] = useState(getInitialDates().end);
 
-  // Amount & Payment Options
+  // Amount & Payment Options (Partial is always 50%)
   const [totalAmount, setTotalAmount] = useState("1000");
   const [paymentType, setPaymentType] = useState<"full" | "partial">("full");
-  const [partialPreset, setPartialPreset] = useState<"50" | "30" | "25" | "custom">("50");
-  const [customPartialAmount, setCustomPartialAmount] = useState("500");
 
   const [notes, setNotes] = useState("");
   const [formError, setFormError] = useState("");
@@ -166,17 +157,12 @@ export default function PayNowModal() {
   };
 
   // Calculations for Full vs Partial
+  // Calculations for Full vs Partial (Partial is strictly 50% deposit)
   const numTotal = Number(totalAmount) || 0;
-  const getPayAmount = (): number => {
-    if (paymentType === "full") return numTotal;
-    if (partialPreset === "50") return Math.round(numTotal * 0.5 * 100) / 100;
-    if (partialPreset === "30") return Math.round(numTotal * 0.3 * 100) / 100;
-    if (partialPreset === "25") return Math.round(numTotal * 0.25 * 100) / 100;
-    return Number(customPartialAmount) || 0;
-  };
-
-  const payAmount = getPayAmount();
-  const remainingAmount = Math.max(0, Math.round((numTotal - payAmount) * 100) / 100);
+  const payAmount =
+    paymentType === "full" ? numTotal : Math.round(numTotal * 0.5 * 100) / 100;
+  const remainingAmount =
+    paymentType === "full" ? 0 : Math.max(0, Math.round((numTotal - payAmount) * 100) / 100);
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -197,19 +183,6 @@ export default function PayNowModal() {
     if (!numTotal || isNaN(numTotal) || numTotal <= 0) {
       setFormError("Please enter a valid invoice or service amount in USD.");
       return;
-    }
-
-    if (paymentType === "partial") {
-      if (!payAmount || isNaN(payAmount) || payAmount <= 0) {
-        setFormError("Please enter a valid partial payment deposit amount.");
-        return;
-      }
-      if (payAmount >= numTotal) {
-        setFormError(
-          `Partial payment amount ($${payAmount.toFixed(2)}) must be less than the total invoice amount ($${numTotal.toFixed(2)}). Or switch to Full Payment.`
-        );
-        return;
-      }
     }
 
     setStep("paypal");
@@ -562,12 +535,7 @@ export default function PayNowModal() {
                     placeholder="e.g. 1000.00"
                     value={totalAmount}
                     onChange={(e) => {
-                      const val = e.target.value;
-                      setTotalAmount(val);
-                      const n = Number(val) || 0;
-                      if (n > 0 && Number(customPartialAmount) >= n) {
-                        setCustomPartialAmount(String(Math.round(n * 0.5)));
-                      }
+                      setTotalAmount(e.target.value);
                     }}
                     className="pm-input"
                   />
@@ -602,73 +570,34 @@ export default function PayNowModal() {
                     onClick={() => setPaymentType("partial")}
                   >
                     <div className="pm-type-card-head">
-                      <span className="pm-type-card-title">Partial Payment</span>
+                      <span className="pm-type-card-title">Partial Payment (50%)</span>
                       <div className="pm-type-radio">
                         {paymentType === "partial" && <div className="pm-type-radio-dot" />}
                       </div>
                     </div>
                     <span className="pm-type-card-desc">
-                      Pay an advance deposit or milestone now; balance due per terms.
+                      Pay 50% advance deposit today; remaining 50% balance due per terms.
                     </span>
                   </div>
                 </div>
 
-                {/* If Partial Payment Selected: Show Selector & Custom Box */}
+                {/* If Partial Payment Selected: Show 50% Deposit Breakdown */}
                 {paymentType === "partial" && (
                   <div className="pm-partial-box">
-                    <label className="pm-label" style={{ fontSize: "12.5px", color: "#6b21a8" }}>
-                      Select Partial Deposit Ratio or Custom Amount:
-                    </label>
-                    <div className="pm-partial-pills">
-                      {PARTIAL_PRESETS.map((item) => (
-                        <button
-                          key={item.id}
-                          type="button"
-                          onClick={() => setPartialPreset(item.id)}
-                          className={`pm-partial-pill ${partialPreset === item.id ? "is-active" : ""}`}
-                        >
-                          {item.label}
-                          {item.pct && numTotal > 0
-                            ? ` ($${(numTotal * item.pct).toLocaleString(undefined, { maximumFractionDigits: 0 })})`
-                            : ""}
-                        </button>
-                      ))}
-                    </div>
-
-                    {partialPreset === "custom" && (
-                      <div className="pm-field" style={{ marginTop: "4px" }}>
-                        <label className="pm-label" style={{ fontSize: "12px", color: "#64748b" }}>
-                          Custom Partial Amount to Pay Now (USD):
-                        </label>
-                        <div className="pm-currency-input-wrap">
-                          <span className="pm-currency-symbol">$</span>
-                          <input
-                            type="number"
-                            min="1"
-                            step="any"
-                            placeholder="500"
-                            value={customPartialAmount}
-                            onChange={(e) => setCustomPartialAmount(e.target.value)}
-                            className="pm-input"
-                          />
-                        </div>
-                      </div>
-                    )}
-
                     {/* Breakdown Preview */}
-                    <div className="pm-breakdown-card">
+                    <div className="pm-breakdown-card" style={{ marginTop: 0 }}>
                       <div className="pm-breakdown-row">
                         <span>Total Service Fee:</span>
                         <span>${numTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })} USD</span>
                       </div>
                       <div className="pm-breakdown-row is-highlight">
-                        <span style={{ color: "#7c3aed" }}>Paying Now (via PayPal):</span>
+                        <span style={{ color: "#7c3aed" }}>Paying Now (50% Deposit via PayPal):</span>
                         <span style={{ color: "#7c3aed" }}>
                           ${payAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })} USD
                         </span>
                       </div>
                       <div className="pm-breakdown-row is-balance">
-                        <span>Remaining Balance Due:</span>
+                        <span>Remaining Balance Due (50%):</span>
                         <span>
                           ${remainingAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })} USD
                         </span>
@@ -693,7 +622,7 @@ export default function PayNowModal() {
               <button type="submit" className="pm-submit-btn">
                 <span>
                   Proceed to Pay ${payAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })} USD (
-                  {paymentType === "partial" ? "Partial Deposit" : "Full Payment"})
+                  {paymentType === "partial" ? "50% Deposit" : "Full Payment"})
                 </span>
                 <LucideIcon name="arrow-right" size={16} />
               </button>
@@ -736,7 +665,7 @@ export default function PayNowModal() {
                       color: paymentType === "partial" ? "#7c3aed" : "#10b981",
                     }}
                   >
-                    {paymentType === "partial" ? "Partial Payment (Deposit)" : "Full Payment (100%)"}
+                    {paymentType === "partial" ? "Partial Payment (50% Deposit)" : "Full Payment (100%)"}
                   </span>
                 </div>
 
