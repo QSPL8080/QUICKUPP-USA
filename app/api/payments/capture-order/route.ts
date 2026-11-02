@@ -192,7 +192,7 @@ export async function POST(req: Request) {
               : "Active Service Retainer";
 
           // Generate PDF Receipt buffer
-          const pdfBuffer = generateReceiptPdf({
+          const pdfBuffer = await generateReceiptPdf({
             orderNumber,
             clientName,
             clientEmail,

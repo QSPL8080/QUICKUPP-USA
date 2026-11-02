@@ -53,7 +53,7 @@ export async function GET(req: Request) {
         ? `${payment.billing_start_date ? String(payment.billing_start_date).slice(0, 10) : "—"} to ${payment.billing_end_date ? String(payment.billing_end_date).slice(0, 10) : "—"}`
         : null;
 
-    const pdfBuffer = generateReceiptPdf({
+    const pdfBuffer = await generateReceiptPdf({
       orderNumber,
       clientName: payment.client_name || "Valued Client",
       clientEmail: payment.client_email || "",

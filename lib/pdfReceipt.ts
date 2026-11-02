@@ -1,7 +1,6 @@
-/**
- * Pure JavaScript PDF generator for Quickupp Softech LLC payment receipts.
- * Produces standard PDF 1.4 documents without native binary dependencies.
- */
+import { PDFDocument, rgb, StandardFonts, PDFPage } from "pdf-lib";
+import fs from "node:fs";
+import path from "node:path";
 
 export interface ReceiptData {
   orderNumber: string;
@@ -9,6 +8,7 @@ export interface ReceiptData {
   clientEmail: string;
   clientPhone?: string | null;
   companyName?: string | null;
+  billingAddress?: string | null;
   service: string;
   category?: string | null;
   amountPaid: number;
@@ -21,13 +21,93 @@ export interface ReceiptData {
   billingPeriod?: string | null;
 }
 
-export function generateReceiptPdf(data: ReceiptData): Buffer {
+/**
+ * Format any date string into "16 October 2026"
+ */
+function formatReceiptDate(raw: string | undefined): string {
+  if (!raw) {
+    const d = new Date();
+    return `${d.getDate()} ${d.toLocaleString("en-US", { month: "long" })} ${d.getFullYear()}`;
+  }
+  const parsed = new Date(raw);
+  if (isNaN(parsed.getTime())) {
+    return raw;
+  }
+  const day = parsed.getDate();
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
+  ];
+  return `${day} ${months[parsed.getMonth()]} ${parsed.getFullYear()}`;
+}
+
+/**
+ * Draw a clean rounded rectangle path in pdf-lib
+ */
+function drawRoundedRect(
+  p: PDFPage,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+  fillColor?: ReturnType<typeof rgb>,
+  borderColor?: ReturnType<typeof rgb>,
+  borderWidth = 1
+) {
+  const path =
+    `M ${x + r} ${y} ` +
+    `h ${w - 2 * r} ` +
+    `a ${r} ${r} 0 0 1 ${r} ${r} ` +
+    `v ${h - 2 * r} ` +
+    `a ${r} ${r} 0 0 1 -${r} ${r} ` +
+    `h -${w - 2 * r} ` +
+    `a ${r} ${r} 0 0 1 -${r} -${r} ` +
+    `v -${h - 2 * r} ` +
+    `a ${r} ${r} 0 0 1 ${r} -${r} Z`;
+
+  p.drawSvgPath(path, {
+    color: fillColor,
+    borderColor: borderColor,
+    borderWidth: borderColor ? borderWidth : 0,
+  });
+}
+
+/**
+ * Draw a crisp vector checkmark that bypasses WinAnsi unicode limits
+ */
+function drawCheckmark(
+  p: PDFPage,
+  x: number,
+  y: number,
+  color: ReturnType<typeof rgb>,
+  scale = 1
+) {
+  p.drawLine({
+    start: { x: x, y: y + 2 * scale },
+    end: { x: x + 3 * scale, y: y - 2 * scale },
+    thickness: 1.5 * scale,
+    color,
+  });
+  p.drawLine({
+    start: { x: x + 3 * scale, y: y - 2 * scale },
+    end: { x: x + 8 * scale, y: y + 5 * scale },
+    thickness: 1.5 * scale,
+    color,
+  });
+}
+
+/**
+ * Generate a production-grade PDF receipt matching the Quickupp Softech branding and layout.
+ */
+export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
   const {
     orderNumber,
     clientName,
     clientEmail,
     clientPhone,
     companyName,
+    billingAddress,
     service,
     category,
     amountPaid,
@@ -37,249 +117,618 @@ export function generateReceiptPdf(data: ReceiptData): Buffer {
     transactionId,
     paymentDate,
     paymentTime,
-    billingPeriod,
   } = data;
 
-  const esc = (s: unknown) =>
-    String(s ?? "")
-      .replace(/\\/g, "\\\\")
-      .replace(/\(/g, "\\(")
-      .replace(/\)/g, "\\)");
+  const doc = await PDFDocument.create();
+  const page = doc.addPage([595.28, 841.89]); // A4 (595.28 x 841.89 pt)
 
-  const streamOps: string[] = [];
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const fontBold = await doc.embedFont(StandardFonts.HelveticaBold);
 
-  // Header background rectangle
-  streamOps.push("0.05 0.07 0.12 rg"); // dark slate fill
-  streamOps.push("0 710 612 82 re f");
+  // Palette matching design
+  const primaryPurple = rgb(0.486, 0.227, 0.929); // #7c3aed
+  const deepPurple = rgb(0.427, 0.161, 0.851);    // #6d28d9
+  const darkNavy = rgb(0.06, 0.09, 0.16);         // #0f172a
+  const slateDark = rgb(0.12, 0.16, 0.23);        // #1e293b
+  const slateMid = rgb(0.28, 0.34, 0.42);         // #475569
+  const borderLight = rgb(0.88, 0.91, 0.94);      // #e2e8f0
+  const bgCard = rgb(0.97, 0.98, 0.99);           // #f8fafc
+  const linkBlue = rgb(0.145, 0.388, 0.922);      // #2563eb
+  const greenText = rgb(0.086, 0.502, 0.239);     // #15803d
+  const greenBg = rgb(0.863, 0.980, 0.906);       // #dcfce7
+  const amberText = rgb(0.706, 0.325, 0.035);     // #b45309
+  const amberBg = rgb(0.996, 0.953, 0.780);       // #fef3c7
+  const purpleRowBg = rgb(0.953, 0.914, 0.996);   // #f3e8ff
+  const magentaBar = rgb(0.753, 0.149, 0.827);    // #c026d3
 
-  // Header Brand Name
-  streamOps.push("BT");
-  streamOps.push("/F2 18 Tf");
-  streamOps.push("1 1 1 rg");
-  streamOps.push("50 750 Td");
-  streamOps.push(`(${esc("QUICKUPP SOFTECH LLC")}) Tj`);
-  streamOps.push("ET");
-
-  streamOps.push("BT");
-  streamOps.push("/F1 10 Tf");
-  streamOps.push("0.65 0.8 0.98 rg");
-  streamOps.push("50 732 Td");
-  streamOps.push(`(${esc("Official Order Confirmation & Payment Receipt")}) Tj`);
-  streamOps.push("ET");
-
-  // Status badge in header
-  streamOps.push("BT");
-  streamOps.push("/F2 12 Tf");
-  streamOps.push(paymentType === "partial" ? "0.95 0.7 0.1 rg" : "0.2 0.85 0.5 rg");
-  streamOps.push("440 745 Td");
-  streamOps.push(`(${esc(paymentType === "partial" ? "PARTIALLY PAID" : "PAID")}) Tj`);
-  streamOps.push("ET");
-
-  // Section 1: Order Details Box
-  streamOps.push("0.96 0.97 0.99 rg");
-  streamOps.push("0.85 0.88 0.92 RG");
-  streamOps.push("1 w");
-  streamOps.push("50 535 512 150 re b");
-
-  streamOps.push("BT");
-  streamOps.push("/F2 11 Tf");
-  streamOps.push("0.1 0.15 0.25 rg");
-  streamOps.push("68 662 Td");
-  streamOps.push(`(${esc("ORDER & TRANSACTION DETAILS")}) Tj`);
-  streamOps.push("ET");
-
-  const orderRows: [string, string][] = [
-    ["Order / Invoice No:", orderNumber],
-    ["Payment Date & Time:", `${paymentDate} at ${paymentTime}`],
-    ["Payment Method:", "PayPal (Verified Checkout)"],
-    ["Transaction ID:", transactionId],
-    ["Service Name:", service],
-    ["Service Category:", category || "Information Technology & Digital Marketing"],
-    ["Billing Coverage:", billingPeriod || "Active Project Retainer"],
-  ];
-
-  let curY = 642;
-  for (const [k, v] of orderRows) {
-    streamOps.push("BT");
-    streamOps.push("/F2 9 Tf");
-    streamOps.push("0.35 0.4 0.5 rg");
-    streamOps.push(`68 ${curY} Td`);
-    streamOps.push(`(${esc(k)}) Tj`);
-    streamOps.push("ET");
-
-    streamOps.push("BT");
-    streamOps.push("/F1 9 Tf");
-    streamOps.push("0.1 0.1 0.15 rg");
-    streamOps.push(`210 ${curY} Td`);
-    streamOps.push(`(${esc(v)}) Tj`);
-    streamOps.push("ET");
-
-    curY -= 15;
-  }
-
-  // Section 2: Customer & Billing Details
-  streamOps.push("0.98 0.98 0.99 rg");
-  streamOps.push("0.85 0.88 0.92 RG");
-  streamOps.push("50 415 512 105 re b");
-
-  streamOps.push("BT");
-  streamOps.push("/F2 11 Tf");
-  streamOps.push("0.1 0.15 0.25 rg");
-  streamOps.push("68 500 Td");
-  streamOps.push(`(${esc("CUSTOMER & BILLING INFORMATION")}) Tj`);
-  streamOps.push("ET");
-
-  const custRows: [string, string][] = [
-    ["Customer Name:", clientName],
-    ["Customer Email:", clientEmail],
-    ["Phone Number:", clientPhone || "—"],
-    companyName ? ["Company Name:", companyName] : null,
-  ].filter(Boolean) as [string, string][];
-
-  curY = 480;
-  for (const [k, v] of custRows) {
-    streamOps.push("BT");
-    streamOps.push("/F2 9 Tf");
-    streamOps.push("0.35 0.4 0.5 rg");
-    streamOps.push(`68 ${curY} Td`);
-    streamOps.push(`(${esc(k)}) Tj`);
-    streamOps.push("ET");
-
-    streamOps.push("BT");
-    streamOps.push("/F1 9 Tf");
-    streamOps.push("0.1 0.1 0.15 rg");
-    streamOps.push(`210 ${curY} Td`);
-    streamOps.push(`(${esc(v)}) Tj`);
-    streamOps.push("ET");
-
-    curY -= 15;
-  }
-
-  // Section 3: Financial Summary Box
-  streamOps.push("0.95 0.97 1.0 rg");
-  streamOps.push("0.8 0.85 0.95 RG");
-  streamOps.push("50 295 512 105 re b");
-
-  streamOps.push("BT");
-  streamOps.push("/F2 11 Tf");
-  streamOps.push("0.1 0.15 0.25 rg");
-  streamOps.push("68 380 Td");
-  streamOps.push(`(${esc("FINANCIAL SUMMARY (USD)")}) Tj`);
-  streamOps.push("ET");
+  const leftX = 40;
+  const rightX = 555;
+  const contentWidth = rightX - leftX; // 515
 
   const isPartial = paymentType === "partial";
-  const finRows: [string, string][] = [
-    ["Payment Type:", isPartial ? "Partial Payment (Deposit / Milestone)" : "Full Payment (100%)"],
-    isPartial ? ["Total Service / Invoice Amount:", `$${Number(totalAmount || amountPaid).toFixed(2)} USD`] : null,
-    ["Amount Paid Now (PayPal):", `$${Number(amountPaid).toFixed(2)} USD`],
-    isPartial ? ["Remaining Balance Due:", `$${Number(remainingAmount).toFixed(2)} USD`] : null,
-  ].filter(Boolean) as [string, string][];
+  const finalTotal = totalAmount != null && Number(totalAmount) > 0 ? Number(totalAmount) : Number(amountPaid);
+  const formattedDate = formatReceiptDate(paymentDate);
 
-  curY = 360;
-  for (const [k, v] of finRows) {
-    streamOps.push("BT");
-    streamOps.push("/F2 9 Tf");
-    streamOps.push("0.35 0.4 0.5 rg");
-    streamOps.push(`68 ${curY} Td`);
-    streamOps.push(`(${esc(k)}) Tj`);
-    streamOps.push("ET");
-
-    streamOps.push("BT");
-    streamOps.push(k.includes("Paid Now") ? "/F2 10 Tf" : "/F1 9 Tf");
-    streamOps.push(
-      k.includes("Paid Now")
-        ? "0.05 0.6 0.3 rg"
-        : k.includes("Remaining")
-          ? "0.8 0.1 0.1 rg"
-          : "0.1 0.1 0.15 rg"
-    );
-    streamOps.push(`240 ${curY} Td`);
-    streamOps.push(`(${esc(v)}) Tj`);
-    streamOps.push("ET");
-
-    curY -= 16;
+  // 1. Logo
+  const logoPath = path.join(process.cwd(), "public", "images", "logo-black.png");
+  if (fs.existsSync(logoPath)) {
+    try {
+      const pngBytes = fs.readFileSync(logoPath);
+      const logo = await doc.embedPng(pngBytes);
+      const logoScale = 0.095;
+      const logoW = logo.width * logoScale;
+      const logoH = logo.height * logoScale;
+      page.drawImage(logo, {
+        x: leftX,
+        y: 775 - logoH,
+        width: logoW,
+        height: logoH,
+      });
+    } catch {
+      // Fallback text if logo load fails
+      page.drawText("QUICKUPP", {
+        x: leftX,
+        y: 755,
+        size: 18,
+        font: fontBold,
+        color: deepPurple,
+      });
+    }
+  } else {
+    page.drawText("QUICKUPP", {
+      x: leftX,
+      y: 755,
+      size: 18,
+      font: fontBold,
+      color: deepPurple,
+    });
   }
 
-  // Section 4: What Happens Next & Footer
-  streamOps.push("BT");
-  streamOps.push("/F2 10 Tf");
-  streamOps.push("0.1 0.15 0.25 rg");
-  streamOps.push("50 240 Td");
-  streamOps.push(`(${esc("What Happens Next?")}) Tj`);
-  streamOps.push("ET");
+  // Under Logo text
+  let curY = 715;
+  page.drawText("AI-Powered Creative & Video Studio", {
+    x: leftX,
+    y: curY,
+    size: 8.5,
+    font,
+    color: slateMid,
+  });
+  curY -= 12;
+  page.drawText("Operated by Quickupp Softech LLC", {
+    x: leftX,
+    y: curY,
+    size: 8.5,
+    font,
+    color: slateMid,
+  });
+  curY -= 12;
+  page.drawText("Email: ", { x: leftX, y: curY, size: 8.5, font, color: slateMid });
+  page.drawText("info@quickuppsoftech.us", {
+    x: leftX + 27,
+    y: curY,
+    size: 8.5,
+    font,
+    color: linkBlue,
+  });
+  curY -= 12;
+  page.drawText("Website: ", { x: leftX, y: curY, size: 8.5, font, color: slateMid });
+  page.drawText("quickupp.com", {
+    x: leftX + 38,
+    y: curY,
+    size: 8.5,
+    font,
+    color: linkBlue,
+  });
 
-  streamOps.push("BT");
-  streamOps.push("/F1 8.5 Tf");
-  streamOps.push("0.35 0.4 0.5 rg");
-  streamOps.push("50 225 Td");
-  streamOps.push(
-    `(${esc("Our team will review your order and contact you with next steps.")}) Tj`
-  );
-  streamOps.push("ET");
+  // Top Right Header
+  const titleText = "PAYMENT RECEIPT";
+  const titleW = fontBold.widthOfTextAtSize(titleText, 21);
+  page.drawText(titleText, {
+    x: rightX - titleW,
+    y: 755,
+    size: 21,
+    font: fontBold,
+    color: darkNavy,
+  });
 
-  streamOps.push("BT");
-  streamOps.push("/F1 8.5 Tf");
-  streamOps.push("0.35 0.4 0.5 rg");
-  streamOps.push("50 210 Td");
-  streamOps.push(
-    `(${esc("Please keep your Order Number handy when communicating with our team: " + orderNumber)}) Tj`
-  );
-  streamOps.push("ET");
+  const rcptText = `Receipt No: ${orderNumber}`;
+  const rcptW = fontBold.widthOfTextAtSize(rcptText, 10);
+  page.drawText(rcptText, {
+    x: rightX - rcptW,
+    y: 735,
+    size: 10,
+    font: fontBold,
+    color: slateDark,
+  });
 
-  // Separator Line
-  streamOps.push("0.85 0.88 0.92 RG");
-  streamOps.push("50 180 m 562 180 l S");
+  const dateText = `Date: ${formattedDate}`;
+  const dateW = font.widthOfTextAtSize(dateText, 9.5);
+  page.drawText(dateText, {
+    x: rightX - dateW,
+    y: 720,
+    size: 9.5,
+    font,
+    color: slateMid,
+  });
 
-  // Footer Branding
-  streamOps.push("BT");
-  streamOps.push("/F1 8 Tf");
-  streamOps.push("0.5 0.55 0.6 rg");
-  streamOps.push("50 160 Td");
-  streamOps.push(
-    `(${esc("Quickupp Softech LLC • Support: info@quickuppsoftech.us • Website: https://quickupp.com")}) Tj`
-  );
-  streamOps.push("ET");
+  // Pill Badge (PAID / PARTIALLY PAID)
+  const badgeLabel = isPartial ? "PAYMENT: PARTIALLY PAID" : "PAYMENT: PAID";
+  const badgeFontColor = isPartial ? amberText : greenText;
+  const badgeBgColor = isPartial ? amberBg : greenBg;
+  const badgeTextW = fontBold.widthOfTextAtSize(badgeLabel, 8.5);
+  const pillW = badgeTextW + 36;
+  const pillH = 20;
+  const pillX = rightX - pillW;
+  const pillY = 692;
 
-  streamOps.push("BT");
-  streamOps.push("/F1 7.5 Tf");
-  streamOps.push("0.6 0.65 0.7 rg");
-  streamOps.push("50 145 Td");
-  streamOps.push(
-    `(${esc("This is an official electronically generated payment receipt. Operated by Quickupp Softech LLC.")}) Tj`
-  );
-  streamOps.push("ET");
+  drawRoundedRect(page, pillX, pillY, pillW, pillH, 10, badgeBgColor, undefined);
+  page.drawText(badgeLabel, {
+    x: pillX + 12,
+    y: pillY + 6,
+    size: 8.5,
+    font: fontBold,
+    color: badgeFontColor,
+  });
+  drawCheckmark(page, pillX + 16 + badgeTextW, pillY + 9, badgeFontColor, 0.9);
 
-  const streamContent = streamOps.join("\n");
-  const streamLength = Buffer.byteLength(streamContent, "utf-8");
+  // Top Divider Line
+  page.drawLine({
+    start: { x: leftX, y: 668 },
+    end: { x: rightX, y: 668 },
+    thickness: 1,
+    color: borderLight,
+  });
 
-  // Standard PDF 1.4 Objects
-  const objects: string[] = [
-    "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj",
-    "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj",
-    "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>\nendobj",
-    "4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj",
-    "5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>\nendobj",
-    `6 0 obj\n<< /Length ${streamLength} >>\nstream\n${streamContent}\nendstream\nendobj`,
-  ];
+  // BILL TO
+  page.drawText("BILL TO", {
+    x: leftX,
+    y: 648,
+    size: 11,
+    font: fontBold,
+    color: primaryPurple,
+  });
 
-  let offset = 9; // length of "%PDF-1.4\n"
-  const xrefOffsets = [0];
-  let body = "%PDF-1.4\n";
+  page.drawText("Customer Name: ", { x: leftX, y: 630, size: 9, font, color: slateMid });
+  page.drawText(clientName || "Valued Client", {
+    x: leftX + 80,
+    y: 630,
+    size: 9,
+    font: fontBold,
+    color: darkNavy,
+  });
 
-  for (const obj of objects) {
-    xrefOffsets.push(offset);
-    body += obj + "\n";
-    offset = Buffer.byteLength(body, "utf-8");
+  page.drawText("Email: ", { x: leftX, y: 615, size: 9, font, color: slateMid });
+  page.drawText(clientEmail || "info@quickuppsoftech.us", {
+    x: leftX + 32,
+    y: 615,
+    size: 9,
+    font,
+    color: linkBlue,
+  });
+
+  const addressVal =
+    billingAddress ||
+    companyName ||
+    (clientPhone ? `Phone: ${clientPhone}` : "United States");
+  page.drawText("Billing Address: ", { x: leftX, y: 600, size: 9, font, color: slateMid });
+  page.drawText(addressVal, {
+    x: leftX + 74,
+    y: 600,
+    size: 9,
+    font: fontBold,
+    color: darkNavy,
+  });
+
+  // PAYMENT DETAILS
+  page.drawText("PAYMENT DETAILS", {
+    x: leftX,
+    y: 575,
+    size: 11,
+    font: fontBold,
+    color: primaryPurple,
+  });
+
+  // Table Card
+  const tblX = leftX;
+  const tblW = contentWidth;
+  const tblH = isPartial ? 160 : 138;
+  const tblY = isPartial ? 400 : 422;
+
+  drawRoundedRect(page, tblX, tblY, tblW, tblH, 6, rgb(1, 1, 1), borderLight);
+
+  // Table Header Row
+  page.drawRectangle({
+    x: tblX + 0.5,
+    y: tblY + tblH - 26,
+    width: tblW - 1,
+    height: 25.5,
+    color: rgb(0.95, 0.96, 0.98),
+  });
+  page.drawLine({
+    start: { x: tblX, y: tblY + tblH - 26 },
+    end: { x: tblX + tblW, y: tblY + tblH - 26 },
+    thickness: 1,
+    color: borderLight,
+  });
+
+  page.drawText("Description", {
+    x: tblX + 16,
+    y: tblY + tblH - 18,
+    size: 9.5,
+    font: fontBold,
+    color: slateDark,
+  });
+  page.drawText("Qty", {
+    x: tblX + 340,
+    y: tblY + tblH - 18,
+    size: 9.5,
+    font: fontBold,
+    color: slateDark,
+  });
+  const amtHeader = "Amount";
+  const amtHW = fontBold.widthOfTextAtSize(amtHeader, 9.5);
+  page.drawText(amtHeader, {
+    x: tblX + tblW - 20 - amtHW,
+    y: tblY + tblH - 18,
+    size: 9.5,
+    font: fontBold,
+    color: slateDark,
+  });
+
+  // Line item row
+  const itemDesc = `${service}${category ? ` – ${category}` : ""}`;
+  const truncatedDesc =
+    itemDesc.length > 55 ? `${itemDesc.substring(0, 52)}...` : itemDesc;
+  const itemY = tblY + tblH - 52;
+
+  page.drawText(truncatedDesc, {
+    x: tblX + 16,
+    y: itemY,
+    size: 9.5,
+    font: fontBold,
+    color: darkNavy,
+  });
+  page.drawText("1", {
+    x: tblX + 348,
+    y: itemY,
+    size: 9.5,
+    font,
+    color: darkNavy,
+  });
+  const totalStr = `$${finalTotal.toFixed(2)}`;
+  const totalStrW = fontBold.widthOfTextAtSize(totalStr, 9.5);
+  page.drawText(totalStr, {
+    x: tblX + tblW - 20 - totalStrW,
+    y: itemY,
+    size: 9.5,
+    font: fontBold,
+    color: darkNavy,
+  });
+
+  // Table summary separator
+  page.drawLine({
+    start: { x: tblX, y: tblY + (isPartial ? 86 : 64) },
+    end: { x: tblX + tblW, y: tblY + (isPartial ? 86 : 64) },
+    thickness: 1,
+    color: borderLight,
+  });
+
+  // Summary lines
+  if (isPartial) {
+    // Row 1: Order Total
+    page.drawText("Order Total:", {
+      x: tblX + 270,
+      y: tblY + 68,
+      size: 9,
+      font,
+      color: slateMid,
+    });
+    const otW = fontBold.widthOfTextAtSize(totalStr, 9);
+    page.drawText(totalStr, {
+      x: tblX + tblW - 20 - otW,
+      y: tblY + 68,
+      size: 9,
+      font: fontBold,
+      color: darkNavy,
+    });
+
+    // Row 2: Amount Paid Now (Deposit)
+    const paidDepositStr = `$${Number(amountPaid).toFixed(2)}`;
+    page.drawText("Amount Paid Now (Deposit):", {
+      x: tblX + 225,
+      y: tblY + 52,
+      size: 9,
+      font,
+      color: slateMid,
+    });
+    const pdW = fontBold.widthOfTextAtSize(paidDepositStr, 9);
+    page.drawText(paidDepositStr, {
+      x: tblX + tblW - 20 - pdW,
+      y: tblY + 52,
+      size: 9,
+      font: fontBold,
+      color: greenText,
+    });
+
+    // Row 3: Remaining Balance Due
+    const remStr = `$${Number(remainingAmount).toFixed(2)}`;
+    page.drawText("Remaining Balance Due:", {
+      x: tblX + 233,
+      y: tblY + 36,
+      size: 9,
+      font,
+      color: slateMid,
+    });
+    const remW = fontBold.widthOfTextAtSize(remStr, 9);
+    page.drawText(remStr, {
+      x: tblX + tblW - 20 - remW,
+      y: tblY + 36,
+      size: 9,
+      font: fontBold,
+      color: rgb(0.85, 0.15, 0.15),
+    });
+  } else {
+    // Single summary: Order Total
+    page.drawText("Order Total:", {
+      x: tblX + 280,
+      y: tblY + 45,
+      size: 9,
+      font,
+      color: slateMid,
+    });
+    const otW = fontBold.widthOfTextAtSize(totalStr, 9);
+    page.drawText(totalStr, {
+      x: tblX + tblW - 20 - otW,
+      y: tblY + 45,
+      size: 9,
+      font: fontBold,
+      color: darkNavy,
+    });
   }
 
-  const startXref = offset;
-  let xref = `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
-  for (let i = 1; i <= objects.length; i++) {
-    xref += String(xrefOffsets[i]).padStart(10, "0") + " 00000 n \n";
-  }
+  // Highlighted Total Row at bottom of table
+  page.drawRectangle({
+    x: tblX + 0.5,
+    y: tblY + 0.5,
+    width: tblW - 1,
+    height: 31.5,
+    color: purpleRowBg,
+  });
+  page.drawLine({
+    start: { x: tblX, y: tblY + 32 },
+    end: { x: tblX + tblW, y: tblY + 32 },
+    thickness: 1,
+    color: borderLight,
+  });
 
-  const trailer = `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${startXref}\n%%EOF\n`;
-  const finalPdf = body + xref + trailer;
+  const totPaidLabel = isPartial
+    ? "Total Paid (Partial Deposit):"
+    : "Total Paid (Fully Paid):";
+  page.drawText(totPaidLabel, {
+    x: tblX + (isPartial ? 150 : 175),
+    y: tblY + 11,
+    size: 10.5,
+    font: fontBold,
+    color: deepPurple,
+  });
+  const finalValStr = `$${Number(amountPaid).toFixed(2)} USD`;
+  const finalValW = fontBold.widthOfTextAtSize(finalValStr, 10.5);
+  page.drawText(finalValStr, {
+    x: tblX + tblW - 20 - finalValW,
+    y: tblY + 11,
+    size: 10.5,
+    font: fontBold,
+    color: deepPurple,
+  });
 
-  return Buffer.from(finalPdf, "utf-8");
+  // PAYMENT INFORMATION Card
+  const infoH = 82;
+  const infoY = tblY - infoH - 24;
+  drawRoundedRect(page, leftX, infoY, contentWidth, infoH, 6, bgCard, borderLight);
+
+  page.drawText("PAYMENT INFORMATION", {
+    x: leftX + 16,
+    y: infoY + infoH - 20,
+    size: 10,
+    font: fontBold,
+    color: slateDark,
+  });
+
+  // Left column
+  page.drawText("Payment Method: ", {
+    x: leftX + 16,
+    y: infoY + infoH - 39,
+    size: 9,
+    font,
+    color: slateMid,
+  });
+  page.drawText("PayPal", {
+    x: leftX + 100,
+    y: infoY + infoH - 39,
+    size: 9,
+    font: fontBold,
+    color: darkNavy,
+  });
+
+  page.drawText("Transaction ID: ", {
+    x: leftX + 16,
+    y: infoY + infoH - 55,
+    size: 9,
+    font,
+    color: slateMid,
+  });
+  const txShort =
+    transactionId.length > 24
+      ? `${transactionId.substring(0, 22)}...`
+      : transactionId || "N/A";
+  page.drawText(txShort, {
+    x: leftX + 90,
+    y: infoY + infoH - 55,
+    size: 9,
+    font: fontBold,
+    color: darkNavy,
+  });
+
+  page.drawText("Payment Status: ", {
+    x: leftX + 16,
+    y: infoY + infoH - 71,
+    size: 9,
+    font,
+    color: slateMid,
+  });
+  const statusStr = isPartial ? "PARTIALLY PAID" : "PAID";
+  const statusColor = isPartial ? amberText : greenText;
+  page.drawText(statusStr, {
+    x: leftX + 90,
+    y: infoY + infoH - 71,
+    size: 9,
+    font: fontBold,
+    color: statusColor,
+  });
+  const statusTextW = fontBold.widthOfTextAtSize(statusStr, 9);
+  drawCheckmark(page, leftX + 94 + statusTextW, infoY + infoH - 69, statusColor, 0.85);
+
+  // Right column
+  page.drawText("Payment Date: ", {
+    x: leftX + 270,
+    y: infoY + infoH - 39,
+    size: 9,
+    font,
+    color: slateMid,
+  });
+  page.drawText(formattedDate, {
+    x: leftX + 342,
+    y: infoY + infoH - 39,
+    size: 9,
+    font: fontBold,
+    color: darkNavy,
+  });
+
+  page.drawText("Payment Time: ", {
+    x: leftX + 270,
+    y: infoY + infoH - 55,
+    size: 9,
+    font,
+    color: slateMid,
+  });
+  page.drawText(paymentTime || "EST", {
+    x: leftX + 342,
+    y: infoY + infoH - 55,
+    size: 9,
+    font: fontBold,
+    color: darkNavy,
+  });
+
+  page.drawText("Payment Type: ", {
+    x: leftX + 270,
+    y: infoY + infoH - 71,
+    size: 9,
+    font,
+    color: slateMid,
+  });
+  const typeDisplay = isPartial ? "Advance Deposit" : "Full Payment";
+  page.drawText(typeDisplay, {
+    x: leftX + 342,
+    y: infoY + infoH - 71,
+    size: 9,
+    font: fontBold,
+    color: darkNavy,
+  });
+
+  // THANK YOU FOR YOUR PURCHASE
+  let tyY = infoY - 24;
+  page.drawText("THANK YOU FOR YOUR PURCHASE", {
+    x: leftX,
+    y: tyY,
+    size: 13,
+    font: fontBold,
+    color: darkNavy,
+  });
+  tyY -= 17;
+  page.drawText("Your payment has been successfully received.", {
+    x: leftX,
+    y: tyY,
+    size: 9,
+    font,
+    color: slateMid,
+  });
+  tyY -= 16;
+  const thankOrderText = isPartial
+    ? `Your order ${orderNumber} deposit has been received. Thank you!`
+    : `Your order ${orderNumber} is now fully paid. Thank you!`;
+  page.drawText(thankOrderText, {
+    x: leftX,
+    y: tyY,
+    size: 9.5,
+    font: fontBold,
+    color: greenText,
+  });
+
+  // Divider Line
+  const divY = tyY - 18;
+  page.drawLine({
+    start: { x: leftX, y: divY },
+    end: { x: rightX, y: divY },
+    thickness: 1,
+    color: borderLight,
+  });
+
+  // Support / Questions
+  let supY = divY - 20;
+  page.drawText("For questions regarding your order or payment:", {
+    x: leftX,
+    y: supY,
+    size: 8.5,
+    font: fontBold,
+    color: slateDark,
+  });
+  supY -= 16;
+  page.drawText("Quickupp Softech LLC", {
+    x: leftX,
+    y: supY,
+    size: 10.5,
+    font: fontBold,
+    color: primaryPurple,
+  });
+  supY -= 14;
+  page.drawText("Email: ", { x: leftX, y: supY, size: 8.5, font, color: slateMid });
+  page.drawText("info@quickuppsoftech.us", {
+    x: leftX + 28,
+    y: supY,
+    size: 8.5,
+    font,
+    color: linkBlue,
+  });
+  supY -= 13;
+  page.drawText("Website: ", { x: leftX, y: supY, size: 8.5, font, color: slateMid });
+  page.drawText("quickupp.com", {
+    x: leftX + 38,
+    y: supY,
+    size: 8.5,
+    font,
+    color: linkBlue,
+  });
+
+  // Fine print
+  const finePrint =
+    "This document serves as your official payment receipt for the transaction described above. Operated by Quickupp Softech LLC.";
+  page.drawText(finePrint, {
+    x: leftX,
+    y: 42,
+    size: 7.5,
+    font,
+    color: rgb(0.55, 0.6, 0.68),
+  });
+
+  // Bottom Vibrant Magenta Bar
+  page.drawRectangle({
+    x: 0,
+    y: 0,
+    width: 595.28,
+    height: 10,
+    color: magentaBar,
+  });
+
+  const pdfBytes = await doc.save();
+  return Buffer.from(pdfBytes);
 }
