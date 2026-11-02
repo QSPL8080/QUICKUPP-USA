@@ -44,11 +44,44 @@ function cleanText(str: string): string {
 type ContentBlock =
   | { type: "prose"; text: string }
   | { type: "intro"; text: string }
-  | { type: "list"; items: { title?: string; text: string }[] };
+  | { type: "list"; items: string[] }
+  | { type: "table"; headers: string[]; rows: string[][] };
 
-function parseSectionBlocks(paragraphs: string[]): ContentBlock[] {
+function parseSectionBlocks(sec: BlogSection): ContentBlock[] {
+  const paragraphs = sec.paragraphs || [];
+  const headingLower = sec.heading.toLowerCase();
+
+  // Special comparison table detection (e.g. Google Ads vs Meta Ads)
+  if (headingLower.includes("vs") && paragraphs.length >= 10) {
+    const hasGoogle = paragraphs.some((p) => p.trim() === "Google Ads");
+    const hasMeta = paragraphs.some((p) => p.trim() === "Meta Ads");
+    if (hasGoogle && hasMeta) {
+      const gIdx = paragraphs.findIndex((p) => p.trim() === "Google Ads");
+      const introPara = paragraphs.slice(0, gIdx).join("\n\n");
+      const concludingPara = paragraphs[paragraphs.length - 1];
+
+      // Build comparison table rows from pairs
+      const tablePairs = [
+        [paragraphs[gIdx + 2] || "", paragraphs[gIdx + 3] || ""],
+        [paragraphs[gIdx + 4] || "", paragraphs[gIdx + 5] || ""],
+        [paragraphs[gIdx + 6] || "", paragraphs[gIdx + 7] || ""],
+        [paragraphs[gIdx + 8] || "", paragraphs[gIdx + 9] || ""],
+      ].filter(([c1, c2]) => c1 && c2);
+
+      const blocks: ContentBlock[] = [];
+      if (introPara) blocks.push({ type: "prose", text: introPara });
+      blocks.push({
+        type: "table",
+        headers: ["Google Ads", "Meta Ads"],
+        rows: tablePairs,
+      });
+      if (concludingPara) blocks.push({ type: "prose", text: concludingPara });
+      return blocks;
+    }
+  }
+
   const blocks: ContentBlock[] = [];
-  let currentList: { title?: string; text: string }[] | null = null;
+  let currentList: string[] | null = null;
   let expectingList = false;
 
   for (let i = 0; i < paragraphs.length; i++) {
@@ -56,7 +89,8 @@ function parseSectionBlocks(paragraphs: string[]): ContentBlock[] {
     if (!raw) continue;
 
     // Check if this is a lead-in sentence ending in a colon
-    if (raw.endsWith(":") && raw.length < 140) {
+    const isLeadIn = raw.endsWith(":") || /as (follows|mentioned below):?$/i.test(raw);
+    if (isLeadIn) {
       if (currentList && currentList.length > 0) {
         blocks.push({ type: "list", items: currentList });
         currentList = null;
@@ -66,29 +100,25 @@ function parseSectionBlocks(paragraphs: string[]): ContentBlock[] {
       continue;
     }
 
-    // Check for "Key: Value" pattern (e.g. "Location targeting: Piercing through...")
+    // Check for "Key: Value" feature item
     const colonIdx = raw.indexOf(":");
-    const hasKeyVal =
+    const isKeyVal =
       colonIdx > 2 &&
       colonIdx < 60 &&
       raw.length > colonIdx + 4 &&
       !raw.substring(0, colonIdx).includes(".") &&
       raw.substring(0, colonIdx).split(" ").length <= 8;
 
-    if (hasKeyVal) {
-      const title = raw.substring(0, colonIdx).trim();
-      const text = raw.substring(colonIdx + 1).trim();
-      if (!currentList) currentList = [];
-      currentList.push({ title, text });
-      expectingList = true;
-      continue;
-    }
+    // Closing narrative paragraph check
+    const isClosing =
+      (raw.length > 130 &&
+        /^(With|Using|These|This|By|The goal|Overall|In addition|Such|It is|Targeting|Effective|Maintaining|A smooth|Each piece|Although|In an|Many)\b/.test(
+          raw
+        )) ||
+      (raw.match(/\.\s+[A-Z]/g) || []).length >= 2;
 
-    // If we are expecting list items after a lead-in:
     if (expectingList) {
-      // Sentences that are clearly narrative paragraphs (long or multiple sentences) exit list mode
-      const isLongProse = raw.length > 200 || (raw.match(/\.\s/g) || []).length >= 2;
-      if (isLongProse) {
+      if (isClosing) {
         if (currentList && currentList.length > 0) {
           blocks.push({ type: "list", items: currentList });
           currentList = null;
@@ -97,12 +127,18 @@ function parseSectionBlocks(paragraphs: string[]): ContentBlock[] {
         blocks.push({ type: "prose", text: raw });
       } else {
         if (!currentList) currentList = [];
-        currentList.push({ text: raw });
+        currentList.push(raw);
       }
       continue;
     }
 
-    // Regular prose paragraph
+    if (isKeyVal) {
+      if (!currentList) currentList = [];
+      currentList.push(raw);
+      expectingList = true;
+      continue;
+    }
+
     if (currentList && currentList.length > 0) {
       blocks.push({ type: "list", items: currentList });
       currentList = null;
@@ -143,7 +179,7 @@ export default function BlogDetailView({
         document.getElementById(`section-${idx}`)
       );
 
-      const scrollPos = window.scrollY + 160;
+      const scrollPos = window.scrollY + 170;
       let currentActive = 0;
       for (let i = 0; i < sectionElements.length; i++) {
         const el = sectionElements[i];
@@ -284,7 +320,7 @@ export default function BlogDetailView({
           </div>
         </section>
 
-        {/* 2-Column Natural Editorial Layout */}
+        {/* 2-Column Editorial Layout */}
         <div className="bd-main-grid">
           {/* Main Article Body (Left Column) */}
           <main className="bd-content-col">
@@ -314,10 +350,10 @@ export default function BlogDetailView({
               </div>
             )}
 
-            {/* Article Sections Stream (NATURAL, NO CARDS) */}
+            {/* Article Sections Stream */}
             <div className="bd-sections-stream">
               {post.content.sections.map((sec, sIdx) => {
-                const blocks = parseSectionBlocks(sec.paragraphs);
+                const blocks = parseSectionBlocks(sec);
 
                 return (
                   <article
@@ -339,21 +375,59 @@ export default function BlogDetailView({
                           );
                         }
 
+                        if (block.type === "table") {
+                          return (
+                            <div key={bIdx} className="bd-comparison-table-wrap">
+                              <table className="bd-comparison-table">
+                                <thead>
+                                  <tr>
+                                    {block.headers.map((h, hIdx) => (
+                                      <th key={hIdx}>{h}</th>
+                                    ))}
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {block.rows.map((row, rIdx) => (
+                                    <tr key={rIdx}>
+                                      {row.map((cell, cIdx) => (
+                                        <td key={cIdx}>{cell}</td>
+                                      ))}
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          );
+                        }
+
                         if (block.type === "list") {
                           return (
-                            <ul key={bIdx} className="bd-article-list">
-                              {block.items.map((item, iIdx) => (
-                                <li key={iIdx} className="bd-article-li">
-                                  {item.title ? (
-                                    <>
-                                      <strong className="bd-li-title">{item.title}:</strong>{" "}
-                                      <span className="bd-li-desc">{item.text}</span>
-                                    </>
-                                  ) : (
-                                    <span className="bd-li-desc">{item.text}</span>
-                                  )}
-                                </li>
-                              ))}
+                            <ul key={bIdx} className="bd-article-bullets">
+                              {block.items.map((rawItem, iIdx) => {
+                                const colonIdx = rawItem.indexOf(":");
+                                const isKeyVal =
+                                  colonIdx > 2 &&
+                                  colonIdx < 60 &&
+                                  !rawItem.substring(0, colonIdx).includes(".") &&
+                                  rawItem.substring(0, colonIdx).split(" ").length <= 8;
+
+                                if (isKeyVal) {
+                                  const label = rawItem.substring(0, colonIdx).trim();
+                                  const desc = rawItem.substring(colonIdx + 1).trim();
+                                  return (
+                                    <li key={iIdx} className="bd-article-bullet-item">
+                                      <strong className="bd-bullet-label">{label}:</strong>{" "}
+                                      <span className="bd-bullet-text">{desc}</span>
+                                    </li>
+                                  );
+                                }
+
+                                return (
+                                  <li key={iIdx} className="bd-article-bullet-item">
+                                    <span className="bd-bullet-text">{rawItem}</span>
+                                  </li>
+                                );
+                              })}
                             </ul>
                           );
                         }

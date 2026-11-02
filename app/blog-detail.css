@@ -40,7 +40,7 @@
 
 /* Hero Section */
 .bd-hero {
-  padding-top: clamp(100px, 10vw, 136px);
+  padding-top: clamp(110px, 11vw, 148px);
   padding-bottom: 32px;
 }
 
@@ -132,9 +132,9 @@
 
 .bd-title {
   font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
-  font-size: clamp(30px, 4vw, 48px);
+  font-size: clamp(30px, 3.8vw, 48px);
   font-weight: 850;
-  line-height: 1.18;
+  line-height: 1.2;
   letter-spacing: -0.025em;
   color: #0b0f17;
   margin: 0 0 18px 0;
@@ -157,7 +157,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  padding: 16px 0 24px;
+  padding: 18px 0 24px;
   border-top: 1px solid #f1f5f9;
   border-bottom: 1px solid #f1f5f9;
   margin-bottom: 36px;
@@ -263,7 +263,7 @@
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 16px 36px -12px rgba(15, 23, 42, 0.1);
-  margin-bottom: 48px;
+  margin-bottom: 52px;
   background: #f1f5f9;
 }
 
@@ -281,14 +281,14 @@
 }
 
 /* ==========================================================================
-   MAIN EDITORIAL LAYOUT (Natural Reading Stream + Companion Sidebar)
+   MAIN EDITORIAL LAYOUT
    ========================================================================== */
 .bd-main-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 56px;
+  gap: 60px;
   align-items: start;
-  margin-bottom: 64px;
+  margin-bottom: 72px;
 }
 
 @media (max-width: 1024px) {
@@ -304,18 +304,18 @@
   line-height: 1.8;
   color: #1e293b;
   font-weight: 500;
-  margin: 0 0 32px 0;
+  margin: 0 0 36px 0;
   text-wrap: pretty;
 }
 
-/* Executive Key Takeaways Box (Single clean callout) */
+/* Executive Key Takeaways Box (Clean Single Callout) */
 .bd-takeaways-box {
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-left: 4px solid #4f46e5;
   border-radius: 0 16px 16px 0;
   padding: 28px 32px;
-  margin: 0 0 44px 0;
+  margin: 0 0 48px 0;
 }
 
 .bd-takeaways-kicker {
@@ -364,27 +364,27 @@
 }
 
 /* ==========================================================================
-   NATURAL SECTION FLOW (NO HEAVY CARDS)
+   ARTICLE SECTIONS & NATURAL TYPOGRAPHY
    ========================================================================== */
 .bd-sections-stream {
   display: flex;
   flex-direction: column;
-  gap: 40px;
-  margin-bottom: 48px;
+  gap: 48px;
+  margin-bottom: 56px;
 }
 
 .bd-article-section {
-  scroll-margin-top: 110px;
+  scroll-margin-top: 130px;
 }
 
 .bd-section-title {
   font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
-  font-size: clamp(22px, 2.4vw, 28px);
+  font-size: clamp(23px, 2.5vw, 30px);
   font-weight: 800;
   color: #0f172a;
   line-height: 1.32;
   letter-spacing: -0.015em;
-  margin: 0 0 18px 0;
+  margin: 0 0 20px 0;
   text-wrap: balance;
 }
 
@@ -393,55 +393,89 @@
   font-size: 17px;
   line-height: 1.85;
   color: #334155;
-  margin: 0 0 18px 0;
+  margin: 0 0 20px 0;
   text-wrap: pretty;
 }
 
-/* Natural lead-in before lists (e.g. "For example, the following is possible:") */
+/* Natural lead-in before lists (e.g. "Some valuable types of Meta ads include the following:") */
 .bd-article-intro-p {
-  font-size: 17px;
-  font-weight: 650;
+  font-size: 17.5px;
+  font-weight: 700;
   color: #0f172a;
+  line-height: 1.65;
+  margin: 24px 0 14px 0;
+}
+
+/* Natural bulleted list with clear, visible bullets & generous spacing */
+.bd-article-bullets {
+  list-style: disc !important;
+  list-style-type: disc !important;
+  padding-left: 28px !important;
+  margin: 14px 0 26px 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+}
+
+.bd-article-bullet-item {
+  display: list-item !important;
+  list-style-type: disc !important;
+  font-size: 16.5px !important;
+  line-height: 1.8 !important;
+  color: #334155 !important;
+  padding-left: 4px !important;
+}
+
+.bd-bullet-label {
+  font-weight: 750 !important;
+  color: #0f172a !important;
+}
+
+.bd-bullet-text {
+  color: #334155 !important;
+}
+
+/* Comparison Table (e.g. Google Ads vs Meta Ads) */
+.bd-comparison-table-wrap {
+  margin: 24px 0 32px 0;
+  overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 16px -6px rgba(15, 23, 42, 0.05);
+  background: #ffffff;
+}
+
+.bd-comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 15.5px;
+}
+
+.bd-comparison-table th {
+  background: #f1f5f9;
+  color: #0f172a;
+  font-weight: 800;
+  font-size: 16px;
+  padding: 16px 22px;
+  border-bottom: 2px solid #cbd5e1;
+  width: 50%;
+}
+
+.bd-comparison-table td {
+  padding: 16px 22px;
+  border-bottom: 1px solid #e2e8f0;
+  color: #334155;
   line-height: 1.7;
-  margin: 20px 0 12px 0;
+  vertical-align: top;
 }
 
-/* Natural bulleted list */
-.bd-article-list {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 22px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.bd-comparison-table tr:last-child td {
+  border-bottom: none;
 }
 
-.bd-article-li {
-  position: relative;
-  padding-left: 24px;
-  font-size: 16.5px;
-  line-height: 1.75;
-  color: #334155;
-}
-
-.bd-article-li::before {
-  content: "";
-  position: absolute;
-  left: 6px;
-  top: 11px;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #4f46e5;
-}
-
-.bd-li-title {
-  font-weight: 750;
-  color: #0f172a;
-}
-
-.bd-li-desc {
-  color: #334155;
+.bd-comparison-table tr:nth-child(even) td {
+  background: #f8fafc;
 }
 
 /* Natural Conclusion Block */
@@ -449,8 +483,8 @@
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 18px;
-  padding: 32px 36px;
-  margin: 48px 0 36px;
+  padding: 34px 38px;
+  margin: 52px 0 36px;
 }
 
 .bd-conclusion-kicker {
@@ -477,7 +511,7 @@
   font-size: 16.5px;
   line-height: 1.8;
   color: #334155;
-  margin: 0 0 20px 0;
+  margin: 0 0 22px 0;
   white-space: pre-line;
 }
 
@@ -496,7 +530,7 @@
   color: #ffffff;
   font-size: 13.5px;
   font-weight: 700;
-  padding: 10px 20px;
+  padding: 10px 22px;
   border-radius: 999px;
   text-decoration: none;
   transition: all 0.2s ease;
@@ -513,7 +547,7 @@
   display: flex;
   align-items: center;
   gap: 18px;
-  padding: 22px 0;
+  padding: 24px 0;
   border-top: 1px solid #f1f5f9;
   border-bottom: 1px solid #f1f5f9;
   margin-bottom: 32px;
@@ -551,7 +585,7 @@
    ========================================================================== */
 .bd-sidebar {
   position: sticky;
-  top: 100px;
+  top: 110px;
   display: flex;
   flex-direction: column;
   gap: 20px;
