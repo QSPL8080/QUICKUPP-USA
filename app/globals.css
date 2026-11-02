@@ -10230,9 +10230,9 @@ a.secondary-button,
   align-items: center !important;
   justify-content: space-between !important;
   cursor: pointer;
-  background: #ffffff;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
   padding: 0 16px;
   font-family: inherit;
   font-size: 14.5px;
@@ -10240,7 +10240,7 @@ a.secondary-button,
   text-align: left;
   transition: all 0.2s ease;
   user-select: none;
-  box-sizing: border-box;
+  box-sizing: border-box !important;
 }
 
 .sef-multi-trigger:hover {

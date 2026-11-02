@@ -564,8 +564,25 @@ export default function PayNowModal() {
                   <button
                     type="button"
                     onClick={() => setIsCategoryDropdownOpen((v) => !v)}
-                    className="pm-multiselect-btn"
+                    className={`pm-input pm-select pm-multiselect-btn ${isCategoryDropdownOpen ? "is-open" : ""}`}
                     aria-expanded={isCategoryDropdownOpen}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      width: "100%",
+                      height: "36px",
+                      padding: "0 12px",
+                      border: isCategoryDropdownOpen ? "1.5px solid #4f46e5" : "1px solid #cbd5e1",
+                      borderRadius: "8px",
+                      backgroundColor: "#ffffff",
+                      boxSizing: "border-box",
+                      cursor: "pointer",
+                      outline: "none",
+                      boxShadow: isCategoryDropdownOpen ? "0 0 0 3px rgba(79, 70, 229, 0.15)" : "none",
+                      transition: "all 0.18s ease",
+                      textAlign: "left",
+                    }}
                   >
                     <span className="pm-multiselect-text">
                       {selectedCategories.length === 0 ? (
