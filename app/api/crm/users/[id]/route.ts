@@ -40,15 +40,17 @@ export async function PATCH(request: Request, ctx: Ctx) {
   const errors: Record<string, string> = {};
   if (!f.name) errors.name = "Please enter a name.";
   if (!USERNAME_RE.test(f.username)) errors.username = "3–30 characters: letters, numbers, dot, dash or underscore.";
-  if (!self) {
-    if (!EMAIL_RE.test(f.email)) errors.email = "Please enter a valid email address.";
-    if (f.password && f.password.length < 8) errors.password = "At least 8 characters.";
-  }
-  Object.assign(errors, await uniqueErrors({ username: errors.username ? "" : f.username, email: self || errors.email ? "" : f.email }, t.id));
+  if (!EMAIL_RE.test(f.email)) errors.email = "Please enter a valid email address.";
+  if (f.password && f.password.length < 8) errors.password = "Password must be at least 8 characters.";
+
+  Object.assign(errors, await uniqueErrors({ username: errors.username ? "" : f.username, email: errors.email ? "" : f.email }, t.id));
   if (Object.keys(errors).length) return Response.json({ ok: false, errors }, { status: 400 });
 
   if (self) {
-    await getPool().execute("UPDATE crm_users SET name = ?, username = ? WHERE id = ?", [f.name, f.username, t.id]);
+    await getPool().execute("UPDATE crm_users SET name = ?, username = ?, email = ? WHERE id = ?", [f.name, f.username, f.email, t.id]);
+    if (f.password) {
+      await getPool().execute("UPDATE crm_users SET password_hash = ?, failed_attempts = 0 WHERE id = ?", [await hashPassword(f.password), t.id]);
+    }
   } else {
     await getPool().execute("UPDATE crm_users SET name = ?, username = ?, email = ?, is_active = ? WHERE id = ?", [
       f.name,

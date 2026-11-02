@@ -87,7 +87,7 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
     <>
       <PageHead
         title="Team & Users"
-        sub="Add admins, change their name, username, email or password, and activate, deactivate or delete accounts. The super admin account is locked."
+        sub="Add admins, change names, usernames, emails, or passwords, and activate, deactivate or delete accounts."
       >
         <button type="button" className="crm-act crm-act-dark" onClick={() => openForm("new")}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
@@ -231,7 +231,7 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
           <form className="crm-modal" onClick={(e) => e.stopPropagation()} onSubmit={save} noValidate role="dialog" aria-label={editing === "new" ? "Add user" : "Edit user"}>
             <div className="crm-drawer-head">
               <div>
-                <p className="crm-drawer-kicker">{editing === "new" ? "Team & Users" : isSA(editing) ? "Super Admin · locked account" : "Admin account"}</p>
+                <p className="crm-drawer-kicker">{editing === "new" ? "Team & Users" : isSA(editing) ? "Super Admin account" : "Admin account"}</p>
                 <h2 className="crm-drawer-title">{editing === "new" ? "Add user" : `Edit ${editing.name}`}</h2>
               </div>
               <button type="button" className="crm-icon-act" onClick={() => setEditing(null)} aria-label="Close">
@@ -253,32 +253,28 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
                 {err("username")}
               </label>
               <label className="crm-field crm-span-2">
-                <span className="crm-label">Email *{isSA(editing) && " (locked)"}</span>
-                <input className="crm-input" type="email" value={form.email} onChange={set("email")} disabled={isSA(editing)} autoComplete="off" />
+                <span className="crm-label">Email *</span>
+                <input className="crm-input" type="email" value={form.email} onChange={set("email")} autoComplete="off" />
                 {err("email")}
               </label>
-              {isSA(editing) ? (
-                <p className="crm-note crm-span-2">The super admin&apos;s sign-in email and password are fixed and can&apos;t be changed here. You can change the name and username.</p>
-              ) : (
-                <>
-                  <label className="crm-field crm-span-2">
-                    <span className="crm-label">{editing === "new" ? "Password *" : "New password (leave empty to keep the current one)"}</span>
-                    <input className="crm-input" type="text" value={form.password} onChange={set("password")} autoComplete="new-password" placeholder="At least 8 characters" />
-                    {err("password")}
-                  </label>
-                  <label className="crm-check crm-check-row crm-span-2">
-                    <input type="checkbox" checked={form.isActive} onChange={set("isActive")} />
-                    <span className="crm-check-box" aria-hidden="true">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M20 6L9 17l-5-5" />
-                      </svg>
-                    </span>
-                    <span className="crm-check-text">
-                      <span className="crm-strong">Account active</span>
-                      <span className="crm-cell-sub">{form.isActive ? "This user can sign in to the CRM." : "This user can't sign in until the account is activated."}</span>
-                    </span>
-                  </label>
-                </>
+              <label className="crm-field crm-span-2">
+                <span className="crm-label">{editing === "new" ? "Password *" : "New password (leave empty to keep the current one)"}</span>
+                <input className="crm-input" type="text" value={form.password} onChange={set("password")} autoComplete="new-password" placeholder="At least 8 characters" />
+                {err("password")}
+              </label>
+              {!isSA(editing) && (
+                <label className="crm-check crm-check-row crm-span-2">
+                  <input type="checkbox" checked={form.isActive} onChange={set("isActive")} />
+                  <span className="crm-check-box" aria-hidden="true">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 6L9 17l-5-5" />
+                    </svg>
+                  </span>
+                  <span className="crm-check-text">
+                    <span className="crm-strong">Account active</span>
+                    <span className="crm-cell-sub">{form.isActive ? "This user can sign in to the CRM." : "This user can't sign in until the account is activated."}</span>
+                  </span>
+                </label>
               )}
             </div>
 
