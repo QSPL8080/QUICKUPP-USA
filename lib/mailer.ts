@@ -13,6 +13,9 @@ declare global {
 }
 
 export const HR_EMAIL = process.env.HR_EMAIL || "hr@quickuppsoftech.us";
+export const LEADS_NOTIFICATION_EMAIL = process.env.LEADS_EMAIL || "info@quickuppsoftech.us";
+export const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL || "support@quickuppsoftech.us";
+export const CALENDLY_MEETING_EMAIL = "quickuppsoftechmeet@gmail.com";
 
 export const mailConfigured = () => Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
 

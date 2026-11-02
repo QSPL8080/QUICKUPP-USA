@@ -421,8 +421,20 @@ export default function ContactView() {
                     <span className="ct-dock-icon" aria-hidden="true">
                       <LucideIcon name="mail" size={19} />
                     </span>
-                    <span className="ct-dock-label">Email</span>
+                    <span className="ct-dock-label">Inquiries</span>
                     <span className="ct-dock-value">info@quickuppsoftech.us</span>
+                    <span className="ct-dock-go" aria-hidden="true">
+                      <LucideIcon name="arrow-up-right" size={15} strokeWidth={2.2} />
+                    </span>
+                  </a>
+                </li>
+                <li>
+                  <a href="mailto:support@quickuppsoftech.us" className="ct-dock-item">
+                    <span className="ct-dock-icon" aria-hidden="true">
+                      <LucideIcon name="headset" size={19} />
+                    </span>
+                    <span className="ct-dock-label">Help &amp; Support</span>
+                    <span className="ct-dock-value">support@quickuppsoftech.us</span>
                     <span className="ct-dock-go" aria-hidden="true">
                       <LucideIcon name="arrow-up-right" size={15} strokeWidth={2.2} />
                     </span>
