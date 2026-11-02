@@ -78,7 +78,7 @@ export async function POST(req: Request) {
           billing_end_date,
           paid_at,
           notes
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'paypal', ?, 'online', ?, ?, ?, ?, CURDATE(), ?)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'paypal', ?, 'website', ?, ?, ?, ?, CURDATE(), ?)`,
         [
           clientName,
           clientEmail || null,
@@ -86,7 +86,7 @@ export async function POST(req: Request) {
           companyName || null,
           category || null,
           service || "General Consultation",
-          `Online PayPal Payment (${isPartial ? "Partial Deposit" : "Full Payment"}) - ${category || ""} ${service || ""}`.trim(),
+          `Website PayPal Payment (${isPartial ? "Partial Deposit" : "Full Payment"}) - ${service || ""} (${category || ""})`.trim(),
           capturedAmount,
           finalTotal,
           isPartial ? "partial" : "full",
@@ -115,8 +115,33 @@ export async function POST(req: Request) {
       try {
         const pool = getPool();
         await pool.query(`UPDATE payments SET invoice_number = ? WHERE id = ?`, [orderNumber, insertedId]);
+        
+        // Also save customer into CRM enquiries so they appear in Leads
+        await pool.query(
+          `INSERT INTO contact_enquiries (
+            full_name,
+            email,
+            phone,
+            company_name,
+            industry,
+            project_type,
+            budget,
+            message,
+            status
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'closed')`,
+          [
+            clientName,
+            clientEmail || "customer@payment.quickupp.com",
+            clientPhone || null,
+            companyName || null,
+            "Other",
+            `${service}${category ? ` – ${category}` : ""}`,
+            `$${capturedAmount.toFixed(2)} USD (${isPartial ? "Partial Deposit" : "Full Payment"})`,
+            `Website Pay Now Payment. Order #${orderNumber}. PayPal Capture ID: ${captureID}. Total Amount: $${finalTotal.toFixed(2)}, Paid: $${capturedAmount.toFixed(2)}${isPartial ? `, Due: $${finalRemaining.toFixed(2)}` : ""}. Notes: ${notes || "None"}`,
+          ]
+        );
       } catch (updErr) {
-        console.error("[Database Update Invoice Number Error]", updErr);
+        console.error("[Database Update Invoice / Lead Sync Error]", updErr);
       }
     }
 

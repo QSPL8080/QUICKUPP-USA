@@ -21,10 +21,11 @@ export async function PATCH(request: Request, ctx: Ctx) {
   if (!result.ok) return Response.json({ ok: false, errors: result.errors }, { status: 400 });
   const d = result.data;
   await getPool().execute(
-    `UPDATE payments SET client_name = ?, client_email = ?, company_name = ?, service = ?, description = ?, amount = ?,
-       currency = ?, method = ?, status = ?, reference = ?, invoice_number = ?, paid_at = ?, notes = ?
+    `UPDATE payments SET client_name = ?, client_email = ?, client_phone = ?, company_name = ?, category = ?, service = ?, description = ?, amount = ?,
+       total_amount = ?, payment_type = ?, remaining_amount = ?, currency = ?, method = ?, status = ?, reference = ?, invoice_number = ?, paid_at = ?, notes = ?
      WHERE id = ?`,
-    [d.clientName, d.clientEmail, d.companyName, d.service, d.description, d.amount, d.currency, d.method, d.status,
+    [d.clientName, d.clientEmail, d.clientPhone, d.companyName, d.category, d.service, d.description, d.amount,
+      d.totalAmount, d.paymentType, d.remainingAmount, d.currency, d.method, d.status,
       d.reference, d.invoiceNumber, d.paidAt, d.notes, id]
   );
   return Response.json({ ok: true });

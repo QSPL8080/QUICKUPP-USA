@@ -206,7 +206,7 @@ export type PaymentRow = {
   currency: string;
   method: string;
   status: (typeof PAYMENT_STATUSES)[number];
-  source: "manual" | "online";
+  source: "website" | "payment_link" | "manual" | "online";
   reference: string | null;
   paypalOrderId?: string | null;
   billingStartDate?: string | null;
@@ -218,22 +218,51 @@ export type PaymentRow = {
   createdAt: string;
 };
 
-export async function listPayments(opts: { q?: string; status?: string; page?: number }) {
+export async function listPayments(opts: {
+  q?: string;
+  status?: string;
+  tab?: "website" | "payment_link" | "all";
+  page?: number;
+}) {
+  const pool = getPool();
+  const currentTab = opts.tab || "website";
+
+  // Tab counts
+  const [tabCounts] = await pool.query(`
+    SELECT
+      SUM(CASE WHEN source IN ('website', 'online') THEN 1 ELSE 0 END) AS website_count,
+      SUM(CASE WHEN source IN ('payment_link', 'manual') THEN 1 ELSE 0 END) AS payment_link_count,
+      COUNT(*) AS all_count
+    FROM payments
+  `);
+  const counts = (tabCounts as any[])?.[0] || {};
+  const websiteCount = Number(counts.website_count || 0);
+  const paymentLinkCount = Number(counts.payment_link_count || 0);
+  const allCount = Number(counts.all_count || 0);
+
   const where: string[] = [];
   const args: (string | number)[] = [];
+
+  if (currentTab === "website") {
+    where.push("p.source IN ('website', 'online')");
+  } else if (currentTab === "payment_link") {
+    where.push("p.source IN ('payment_link', 'manual')");
+  }
+
   if (opts.status && (PAYMENT_STATUSES as readonly string[]).includes(opts.status)) {
     where.push("p.status = ?");
     args.push(opts.status);
   }
   const q = (opts.q || "").trim().slice(0, 100);
   if (q) {
-    where.push("(p.client_name LIKE ? OR p.client_email LIKE ? OR p.client_phone LIKE ? OR p.company_name LIKE ? OR p.invoice_number LIKE ? OR p.reference LIKE ? OR p.paypal_order_id LIKE ?)");
+    where.push(
+      "(p.client_name LIKE ? OR p.client_email LIKE ? OR p.client_phone LIKE ? OR p.company_name LIKE ? OR p.invoice_number LIKE ? OR p.reference LIKE ? OR p.paypal_order_id LIKE ? OR p.service LIKE ? OR p.category LIKE ?)"
+    );
     const like = `%${q}%`;
-    args.push(like, like, like, like, like, like, like);
+    args.push(like, like, like, like, like, like, like, like, like);
   }
   const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : "";
   const page = Math.max(1, Math.floor(opts.page || 1));
-  const pool = getPool();
   const [countRows] = await pool.query(`SELECT COUNT(*) AS n FROM payments p ${whereSql}`, args);
   const total = Number((countRows as { n: number }[])[0]?.n || 0);
   const [rows] = await pool.query(
@@ -257,7 +286,7 @@ export async function listPayments(opts: { q?: string; status?: string; page?: n
     currency: String(r.currency ?? "USD"),
     method: String(r.method ?? ""),
     status: r.status as PaymentRow["status"],
-    source: (r.source as PaymentRow["source"]) || "manual",
+    source: (r.source as PaymentRow["source"]) || "website",
     reference: (r.reference as string) || null,
     paypalOrderId: (r.paypal_order_id as string) || null,
     billingStartDate: r.billing_start_date ? toDateOnly(r.billing_start_date) : null,
@@ -268,7 +297,19 @@ export async function listPayments(opts: { q?: string; status?: string; page?: n
     createdBy: (r.created_by_name as string) || null,
     createdAt: new Date(r.created_at as string).toISOString(),
   }));
-  return { items, total, page, pages: Math.max(1, Math.ceil(total / PAGE_SIZE)), pageSize: PAGE_SIZE };
+  return {
+    items,
+    total,
+    page,
+    pages: Math.max(1, Math.ceil(total / PAGE_SIZE)),
+    pageSize: PAGE_SIZE,
+    tab: currentTab,
+    counts: {
+      website: websiteCount,
+      paymentLink: paymentLinkCount,
+      all: allCount,
+    },
+  };
 }
 
 function toDateOnly(v: unknown): string {

@@ -6,10 +6,15 @@ import { CURRENCIES, PAYMENT_METHODS, PAYMENT_SERVICES, PAYMENT_STATUSES } from 
 export type PaymentInput = {
   clientName: string;
   clientEmail: string | null;
+  clientPhone: string | null;
   companyName: string | null;
+  category: string | null;
   service: string;
   description: string | null;
   amount: number;
+  totalAmount: number | null;
+  paymentType: "full" | "partial";
+  remainingAmount: number | null;
   currency: string;
   method: string;
   status: string;
@@ -28,11 +33,18 @@ export function validatePayment(body: Record<string, unknown>):
   const errors: Record<string, string> = {};
   const clientName = text(body.clientName, 150);
   const clientEmail = text(body.clientEmail, 190).toLowerCase();
+  const clientPhone = text(body.clientPhone, 50);
   const companyName = text(body.companyName, 190);
+  const category = text(body.category, 150);
   const service = text(body.service, 150);
   const description = text(body.description, 255);
   const amountRaw = typeof body.amount === "number" ? String(body.amount) : text(body.amount, 20).replace(/,/g, "");
   const amount = Number(amountRaw);
+  const totalAmountRaw = typeof body.totalAmount === "number" ? String(body.totalAmount) : text(body.totalAmount, 20).replace(/,/g, "");
+  const totalAmount = totalAmountRaw ? Number(totalAmountRaw) : null;
+  const paymentType = body.paymentType === "partial" ? "partial" : "full";
+  const remainingAmountRaw = typeof body.remainingAmount === "number" ? String(body.remainingAmount) : text(body.remainingAmount, 20).replace(/,/g, "");
+  const remainingAmount = remainingAmountRaw ? Number(remainingAmountRaw) : null;
   const currency = text(body.currency, 3).toUpperCase();
   const method = text(body.method, 40);
   const status = text(body.status, 20);
@@ -43,10 +55,10 @@ export function validatePayment(body: Record<string, unknown>):
 
   if (!clientName) errors.clientName = "Enter the client's name.";
   if (clientEmail && !EMAIL_RE.test(clientEmail)) errors.clientEmail = "Enter a valid email address.";
-  if (!(PAYMENT_SERVICES as readonly string[]).includes(service)) errors.service = "Choose a service.";
+  if (!service) errors.service = "Enter or choose a service.";
   if (!/^\d{1,10}(\.\d{1,2})?$/.test(amountRaw) || !(amount > 0)) errors.amount = "Enter an amount greater than 0 (up to 2 decimals).";
   if (!(CURRENCIES as readonly string[]).includes(currency)) errors.currency = "Choose a currency.";
-  if (!(PAYMENT_METHODS as readonly string[]).includes(method)) errors.method = "Choose a payment method.";
+  if (!method) errors.method = "Choose a payment method.";
   if (!(PAYMENT_STATUSES as readonly string[]).includes(status)) errors.status = "Choose a status.";
   if (paidAt && (!/^\d{4}-\d{2}-\d{2}$/.test(paidAt) || Number.isNaN(Date.parse(paidAt)))) errors.paidAt = "Enter a valid date.";
   if ((status === "paid" || status === "partially_paid") && !paidAt) errors.paidAt = "Enter the date the payment was received.";
@@ -57,10 +69,15 @@ export function validatePayment(body: Record<string, unknown>):
     data: {
       clientName,
       clientEmail: clientEmail || null,
+      clientPhone: clientPhone || null,
       companyName: companyName || null,
+      category: category || null,
       service,
       description: description || null,
       amount: Math.round(amount * 100) / 100,
+      totalAmount: totalAmount != null ? Math.round(totalAmount * 100) / 100 : null,
+      paymentType,
+      remainingAmount: remainingAmount != null ? Math.round(remainingAmount * 100) / 100 : null,
       currency,
       method,
       status,

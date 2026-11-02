@@ -14,10 +14,10 @@ export async function POST(request: Request) {
   if (!result.ok) return Response.json({ ok: false, errors: result.errors }, { status: 400 });
   const d = result.data;
   const [res] = await getPool().execute(
-    `INSERT INTO payments (client_name, client_email, company_name, service, description, amount, currency, method, status,
+    `INSERT INTO payments (client_name, client_email, client_phone, company_name, category, service, description, amount, total_amount, payment_type, remaining_amount, currency, method, status,
        source, reference, invoice_number, paid_at, notes, created_by)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'manual', ?, ?, ?, ?, ?)`,
-    [d.clientName, d.clientEmail, d.companyName, d.service, d.description, d.amount, d.currency, d.method, d.status,
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'manual', ?, ?, ?, ?, ?)`,
+    [d.clientName, d.clientEmail, d.clientPhone, d.companyName, d.category, d.service, d.description, d.amount, d.totalAmount, d.paymentType, d.remainingAmount, d.currency, d.method, d.status,
       d.reference, d.invoiceNumber, d.paidAt, d.notes, user.id]
   );
   return Response.json({ ok: true, id: (res as { insertId: number }).insertId });

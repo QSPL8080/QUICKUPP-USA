@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import LucideIcon from "@/components/LucideIcon";
-import { serviceGroups } from "@/lib/sitemap";
 import "@/app/pay-modal.css";
 
 declare global {
@@ -18,7 +17,61 @@ export function openPayNowModal() {
   }
 }
 
-const PRESET_AMOUNTS = ["500", "1000", "2500", "5000"];
+export const SERVICES_DATA = [
+  {
+    service: "AI-Powered Digital Marketing Services",
+    categories: [
+      "Social Media Marketing",
+      "SEO & AI Search Visibility",
+      "Paid Marketing",
+      "Content Marketing",
+      "Media Production",
+      "Online Reputation Management",
+      "Email Marketing",
+      "SMS Marketing",
+      "WhatsApp Marketing",
+    ],
+  },
+  {
+    service: "AI & Automation Solutions",
+    categories: [
+      "AI & Automation Solutions",
+      "AI Workflow & CRM Integration",
+      "Conversational AI & Bots",
+      "Custom AI Agents",
+      "Process Automation",
+    ],
+  },
+  {
+    service: "Information Technology Services",
+    categories: [
+      "Web Design & Development",
+      "Application Development",
+      "Product Engineering",
+      "Quality Assurance & Testing",
+      "UI/UX Design",
+      "Cloud & DevOps Infrastructure",
+    ],
+  },
+  {
+    service: "Staff Augmentation",
+    categories: [
+      "Marketing & Design Staff Augmentation",
+      "IT Staff Augmentation",
+      "Dedicated Developers & Engineers",
+    ],
+  },
+  {
+    service: "AI Video Production & Creative Studio",
+    categories: [
+      "AI UGC Video (60-Second Video)",
+      "AI Avatar Video",
+      "YouTube Video Promotion",
+      "Brand Commercial & Reel",
+      "Product Demo Video",
+    ],
+  },
+];
 
 const PARTIAL_PRESETS = [
   { id: "50", label: "50% Deposit", pct: 0.5 },
@@ -52,8 +105,8 @@ export default function PayNowModal() {
   const [clientEmail, setClientEmail] = useState("");
   const [clientPhone, setClientPhone] = useState("");
   const [companyName, setCompanyName] = useState("");
-  const [category, setCategory] = useState(serviceGroups[0]?.label || "");
-  const [service, setService] = useState(serviceGroups[0]?.items[0]?.label || "");
+  const [service, setService] = useState(SERVICES_DATA[0].service);
+  const [category, setCategory] = useState(SERVICES_DATA[0].categories[0]);
   const [billingStartDate, setBillingStartDate] = useState(getInitialDates().start);
   const [billingEndDate, setBillingEndDate] = useState(getInitialDates().end);
 
@@ -94,17 +147,16 @@ export default function PayNowModal() {
     return () => window.removeEventListener("quickupp:open-pay-modal", handleOpen);
   }, []);
 
-  // Update services when category changes
-  const availableServices =
-    serviceGroups.find((g) => g.label === category)?.items.map((i) => i.label) || [];
+  const availableCategories =
+    SERVICES_DATA.find((s) => s.service === service)?.categories || [];
 
-  const handleCategoryChange = (newCat: string) => {
-    setCategory(newCat);
-    const matched = serviceGroups.find((g) => g.label === newCat);
-    if (matched && matched.items.length > 0) {
-      setService(matched.items[0].label);
+  const handleServiceChange = (newService: string) => {
+    setService(newService);
+    const matched = SERVICES_DATA.find((s) => s.service === newService);
+    if (matched && matched.categories.length > 0) {
+      setCategory(matched.categories[0]);
     } else {
-      setService("Custom Consultation");
+      setCategory("General / Custom");
     }
   };
 
@@ -433,36 +485,36 @@ export default function PayNowModal() {
                 </div>
               </div>
 
-              {/* Cascading Category & Service */}
+              {/* Cascading Service & Category */}
               <div className="pm-row">
-                <div className="pm-field">
-                  <label className="pm-label">
-                    Service Category <span className="pm-req">*</span>
-                  </label>
-                  <select
-                    value={category}
-                    onChange={(e) => handleCategoryChange(e.target.value)}
-                    className="pm-select"
-                  >
-                    {serviceGroups.map((g) => (
-                      <option key={g.label} value={g.label}>
-                        {g.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
                 <div className="pm-field">
                   <label className="pm-label">
                     Service <span className="pm-req">*</span>
                   </label>
                   <select
                     value={service}
-                    onChange={(e) => setService(e.target.value)}
+                    onChange={(e) => handleServiceChange(e.target.value)}
                     className="pm-select"
                   >
-                    {availableServices.map((s) => (
-                      <option key={s} value={s}>
-                        {s}
+                    {SERVICES_DATA.map((s) => (
+                      <option key={s.service} value={s.service}>
+                        {s.service}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="pm-field">
+                  <label className="pm-label">
+                    Service Category <span className="pm-req">*</span>
+                  </label>
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="pm-select"
+                  >
+                    {availableCategories.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
                       </option>
                     ))}
                   </select>
@@ -470,38 +522,32 @@ export default function PayNowModal() {
               </div>
 
               {/* Billing Period (Coverage Range) */}
-              <div className="pm-field">
-                <div className="pm-field-heading">
-                  <LucideIcon name="calendar" size={14} />
-                  <span>Billing Period (Payment Month Coverage)</span>
+              <div className="pm-row">
+                <div className="pm-field">
+                  <label className="pm-label" style={{ fontSize: "12px", color: "#64748b" }}>
+                    Billing Period (From Date):
+                  </label>
+                  <input
+                    type="date"
+                    value={billingStartDate}
+                    onChange={(e) => setBillingStartDate(e.target.value)}
+                    className="pm-input"
+                  />
                 </div>
-                <div className="pm-row">
-                  <div className="pm-field">
-                    <label className="pm-label" style={{ fontSize: "12px", color: "#64748b" }}>
-                      From Date:
-                    </label>
-                    <input
-                      type="date"
-                      value={billingStartDate}
-                      onChange={(e) => setBillingStartDate(e.target.value)}
-                      className="pm-input"
-                    />
-                  </div>
-                  <div className="pm-field">
-                    <label className="pm-label" style={{ fontSize: "12px", color: "#64748b" }}>
-                      To Date:
-                    </label>
-                    <input
-                      type="date"
-                      value={billingEndDate}
-                      onChange={(e) => setBillingEndDate(e.target.value)}
-                      className="pm-input"
-                    />
-                  </div>
+                <div className="pm-field">
+                  <label className="pm-label" style={{ fontSize: "12px", color: "#64748b" }}>
+                    Billing Period (To Date):
+                  </label>
+                  <input
+                    type="date"
+                    value={billingEndDate}
+                    onChange={(e) => setBillingEndDate(e.target.value)}
+                    className="pm-input"
+                  />
                 </div>
               </div>
 
-              {/* Amount Box: Total Invoice / Service Amount */}
+              {/* Amount Box: Direct Numeric Input (Preset Buttons Removed per user request) */}
               <div className="pm-field">
                 <label className="pm-label">
                   Total Service / Invoice Amount (USD) <span className="pm-req">*</span>
@@ -513,7 +559,7 @@ export default function PayNowModal() {
                     min="1"
                     step="any"
                     required
-                    placeholder="1000"
+                    placeholder="e.g. 1000.00"
                     value={totalAmount}
                     onChange={(e) => {
                       const val = e.target.value;
@@ -525,29 +571,6 @@ export default function PayNowModal() {
                     }}
                     className="pm-input"
                   />
-                </div>
-                <div className="pm-amount-pills">
-                  {PRESET_AMOUNTS.map((p) => (
-                    <button
-                      key={p}
-                      type="button"
-                      onClick={() => {
-                        setTotalAmount(p);
-                        const n = Number(p);
-                        setCustomPartialAmount(String(Math.round(n * 0.5)));
-                      }}
-                      className={`pm-amount-pill ${totalAmount === p ? "is-active" : ""}`}
-                    >
-                      ${Number(p).toLocaleString()}
-                    </button>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => setTotalAmount("")}
-                    className={`pm-amount-pill ${!PRESET_AMOUNTS.includes(totalAmount) ? "is-active" : ""}`}
-                  >
-                    Custom
-                  </button>
                 </div>
               </div>
 
