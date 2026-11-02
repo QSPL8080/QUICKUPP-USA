@@ -3,7 +3,9 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ResourceCtaBanner from "@/components/ResourceCtaBanner";
-import { blogPosts } from "@/data/blogs";
+import { getPublishedBlogs } from "@/lib/blogs";
+
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Resources & Insights | Quickupp Softech",
@@ -42,8 +44,9 @@ const hubCategories = [
   },
 ];
 
-export default function ResourcesPage() {
-  const topArticles = blogPosts.slice(0, 3);
+export default async function ResourcesPage() {
+  const blogs = await getPublishedBlogs();
+  const topArticles = blogs.slice(0, 3);
 
   return (
     <div className="res-page-wrap">

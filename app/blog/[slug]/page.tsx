@@ -4,12 +4,14 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ResourceCtaBanner from "@/components/ResourceCtaBanner";
-import { blogPosts } from "@/data/blogs";
+import { getAllBlogSlugs, getPublishedBlogBySlug, getPublishedBlogs } from "@/lib/blogs";
+
+export const dynamicParams = true;
+export const revalidate = 60;
 
 export async function generateStaticParams() {
-  return blogPosts.map((post) => ({
-    slug: post.slug,
-  }));
+  const slugs = await getAllBlogSlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
@@ -18,7 +20,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const post = blogPosts.find((p) => p.slug === slug);
+  const post = await getPublishedBlogBySlug(slug);
   if (!post) return { title: "Blog Article | Quickupp Softech" };
 
   return {
@@ -50,13 +52,14 @@ export default async function SingleBlogPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = blogPosts.find((p) => p.slug === slug);
+  const post = await getPublishedBlogBySlug(slug);
 
   if (!post) {
     notFound();
   }
 
-  const relatedPosts = blogPosts.filter((p) => p.slug !== slug).slice(0, 3);
+  const allPosts = await getPublishedBlogs();
+  const relatedPosts = allPosts.filter((p) => p.slug !== slug).slice(0, 3);
 
   return (
     <div className="res-page-wrap">

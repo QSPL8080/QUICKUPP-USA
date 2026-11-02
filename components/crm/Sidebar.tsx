@@ -11,6 +11,7 @@ const I = {
   contact: "M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM22 7l-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7",
   payments: "M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM2 10h20M6 15h4",
   jobs: "M10 6V5a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v1M4 6h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2zM2 12h20",
+  blogs: "M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5zM6 6h10M6 10h10M6 14h6",
   users: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75",
   logout: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9",
   menu: "M4 6h16M4 12h16M4 18h16",
@@ -73,6 +74,11 @@ export default function CrmSidebar({ user, newCounts }: { user: NavUser; newCoun
           <Link href="/crm/payments" className={`crm-nav-link${on("/crm/payments") ? " is-on" : ""}`}>
             <Icon d={I.payments} />
             <span>Payments</span>
+          </Link>
+
+          <Link href="/crm/blogs" className={`crm-nav-link${on("/crm/blogs") ? " is-on" : ""}`}>
+            <Icon d={I.blogs} />
+            <span>Blogs (Website)</span>
           </Link>
 
           <p className="crm-nav-group">
