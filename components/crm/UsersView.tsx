@@ -151,17 +151,7 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
                     {fmtDate(u.lastLoginAt)}
                   </td>
                   <td data-label="Account">
-                    {locked ? (
-                      <span className="crm-lock" title="The super admin account is locked">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                          <rect x="4" y="11" width="16" height="10" rx="2" />
-                          <path d="M8 11V7a4 4 0 0 1 8 0v4" />
-                        </svg>
-                        Locked
-                      </span>
-                    ) : (
-                      <span className={`crm-pill ${u.isActive ? "crm-pill-paid" : "crm-pill-failed"}`}>{u.isActive ? "Active" : "Deactivated"}</span>
-                    )}
+                    <span className={`crm-pill ${u.isActive ? "crm-pill-paid" : "crm-pill-failed"}`}>{u.isActive ? "Active" : "Deactivated"}</span>
                   </td>
                   <td data-label="Actions" onClick={(e) => e.stopPropagation()}>
                     <span className="crm-row-acts">

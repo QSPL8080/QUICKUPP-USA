@@ -67,7 +67,7 @@ export async function PATCH(request: Request, ctx: Ctx) {
   return Response.json({ ok: true });
 }
 
-/* DELETE → super admin removes an admin account (their own account is locked) */
+/* DELETE → super admin removes an admin account (super admin account cannot be deleted) */
 export async function DELETE(_request: Request, ctx: Ctx) {
   const me = await getCurrentUser();
   if (!me) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
@@ -75,7 +75,7 @@ export async function DELETE(_request: Request, ctx: Ctx) {
   const t = await target(ctx);
   if (!t) return Response.json({ ok: false, error: "This account was already deleted." }, { status: 404 });
   if (t.role === "super_admin" || t.id === me.id) {
-    return Response.json({ ok: false, error: "The super admin account is locked and can't be deleted." }, { status: 400 });
+    return Response.json({ ok: false, error: "The super admin account cannot be deleted to prevent system lockout." }, { status: 400 });
   }
   await getPool().execute("DELETE FROM crm_users WHERE id = ?", [t.id]);
   return Response.json({ ok: true });
