@@ -23,6 +23,7 @@ const EMPTY = {
   serviceInterest: "",
   budget: "",
   timeline: "",
+  youtubeLink: "",
   message: "",
   agreed: false,
 };
@@ -67,6 +68,7 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
           category: formData.serviceInterest,
           budget: formData.budget,
           timeline: formData.timeline,
+          youtubeLink: formData.youtubeLink,
           message: formData.message,
           agreed: formData.agreed,
           service,
@@ -219,6 +221,25 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
                   />
                 </div>
               </div>
+
+              {service === "youtube" && (
+                <div className="sef-row">
+                  <div className="su-field-group" style={{ gridColumn: "1 / -1" }}>
+                    <label htmlFor={`${idp}-ytlink`} className="su-field-label">
+                      YouTube Video or Channel Link*
+                    </label>
+                    <input
+                      id={`${idp}-ytlink`}
+                      type="url"
+                      required
+                      placeholder="https://www.youtube.com/@yourchannel or https://youtu.be/..."
+                      className="su-text-input"
+                      value={formData.youtubeLink}
+                      onChange={(e) => set({ youtubeLink: e.target.value })}
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* Row 3: Service (fixed), Category, Industry */}
               <div className="sef-row">

@@ -71,6 +71,19 @@ export const SERVICES_DATA = [
       "Product Demo Video",
     ],
   },
+  {
+    service: "YouTube Video Promotion",
+    categories: [
+      "YouTube In-Stream Ads",
+      "YouTube In-Feed Ads",
+      "YouTube Shorts Ads",
+      "YouTube Search Promotion",
+      "Channel Growth & Optimization",
+      "Video SEO & Ranking",
+      "Targeted YouTube Views Campaign",
+      "Custom Strategy / Retainer",
+    ],
+  },
 ];
 
 function getInitialDates() {

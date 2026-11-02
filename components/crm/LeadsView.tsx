@@ -378,6 +378,21 @@ export default function LeadsView({
                   <dd>{open.service}</dd>
                 </>
               )}
+              {open.youtubeLink && (
+                <>
+                  <dt>YouTube Link</dt>
+                  <dd className="crm-break">
+                    <a
+                      href={open.youtubeLink}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ color: "#ef4444", fontWeight: 700 }}
+                    >
+                      ▶ {open.youtubeLink}
+                    </a>
+                  </dd>
+                </>
+              )}
               <dt>{open.source === "contact" ? "Service" : "Service type"}</dt>
               <dd>{open.interest || "—"}</dd>
               <dt>Budget</dt>

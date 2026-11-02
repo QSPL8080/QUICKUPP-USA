@@ -15,7 +15,15 @@ export const ENQUIRY_STATUS_LABEL: Record<EnquiryStatus, string> = {
 };
 
 export type EnquirySource = "contact" | ServiceFormKey | "manual";
-export const SOURCE_KEYS: EnquirySource[] = ["contact", "digital-marketing", "ai-automation", "it-services", "staff-augmentation", "manual"];
+export const SOURCE_KEYS: EnquirySource[] = [
+  "contact",
+  "digital-marketing",
+  "ai-automation",
+  "it-services",
+  "staff-augmentation",
+  "youtube",
+  "manual",
+];
 
 /* how each source is named in the lead list and its filter */
 export const SOURCE_LABEL: Record<EnquirySource, string> = {
@@ -24,6 +32,7 @@ export const SOURCE_LABEL: Record<EnquirySource, string> = {
   "ai-automation": "Service Form · AI & Automation",
   "it-services": "Service Form · IT Services",
   "staff-augmentation": "Service Form · Staff Augmentation",
+  youtube: "YouTube Video Promotion",
   manual: "Added Manually",
 };
 

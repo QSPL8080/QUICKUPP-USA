@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import "@/app/youtube-promotion-page.css";
 import type { YouTubePromotionContent } from "@/data/services/youtube-video-promotion";
 import LucideIcon, { type LucideIconName } from "@/components/LucideIcon";
+import ServiceEnquiryForm from "@/components/ServiceEnquiryForm";
 import { setupScrollMotion, type MotionPreset } from "@/lib/scrollMotion";
 
 /*
@@ -18,7 +19,6 @@ import { setupScrollMotion, type MotionPreset } from "@/lib/scrollMotion";
  * Every word comes from data/services/youtube-video-promotion.ts.
  */
 
-const FORM_EMAIL = "info@quickuppsoftech.us";
 
 /* Scroll-in motion for this page only (different from every other page) */
 const YT_PRESET: MotionPreset = {
@@ -177,7 +177,6 @@ export default function YouTubePromotionPage({ content }: { content: YouTubeProm
   const editorRef = useRef<HTMLDivElement>(null);
   const [activeStep, setActiveStep] = useState(0);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [values, setValues] = useState<string[]>(() => c.form.fields.map(() => ""));
 
   /* Scroll-in motion + "switch on when visible" details */
   useEffect(() => {
@@ -229,19 +228,6 @@ export default function YouTubePromotionPage({ content }: { content: YouTubeProm
       if (raf) window.cancelAnimationFrame(raf);
     };
   }, [c.process.steps.length]);
-
-  const fieldTypes: Record<string, string> = {
-    Email: "email",
-    "Phone / WhatsApp": "tel",
-    "YouTube Video or Channel URL": "url",
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const body = c.form.fields.map((f, i) => `${f}: ${values[i] || "-"}`).join("\n");
-    const subject = `${c.form.cardTitle} — ${values[0] || ""}`.trim();
-    window.location.href = `mailto:${FORM_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  };
 
   return (
     <div className="ytv-page" ref={rootRef}>
@@ -618,49 +604,9 @@ export default function YouTubePromotionPage({ content }: { content: YouTubeProm
         </section>
 
         {/* 11. Request form */}
-        <section id="promotion-plan" className="ytv-section ytv-form-sec">
-          <div className="ytv-container ytv-form-grid">
-            <div className="ytv-form-copy">
-              <h2 className="ytv-h2">
-                <GradientHeading text={c.form.title} />
-              </h2>
-              <p className="ytv-text">{c.form.intro}</p>
-            </div>
-            <form className="ytv-form" onSubmit={handleSubmit}>
-              <div className="ytv-form-top">
-                <YouTubeIcon size={30} />
-                <h3 className="ytv-h3">{c.form.cardTitle}</h3>
-              </div>
-              <div className="ytv-fields">
-                {c.form.fields.map((f, i) => {
-                  const id = `ytv-field-${i}`;
-                  const wide = i === c.form.fields.length - 1 && c.form.fields.length % 2 === 1;
-                  return (
-                    <label key={f} htmlFor={id} className={`ytv-field${wide ? " is-wide" : ""}`}>
-                      <span>{f}</span>
-                      <input
-                        id={id}
-                        type={fieldTypes[f] || "text"}
-                        required={i <= 1 || i === 3}
-                        value={values[i]}
-                        onChange={(e) => {
-                          const next = [...values];
-                          next[i] = e.target.value;
-                          setValues(next);
-                        }}
-                      />
-                    </label>
-                  );
-                })}
-              </div>
-              <button type="submit" className="ytv-btn ytv-btn-dark ytv-submit">
-                <span>{c.form.submit}</span>
-                <ArrowIcon />
-              </button>
-              <p className="ytv-form-note">{c.form.note}</p>
-            </form>
-          </div>
-        </section>
+        <div id="promotion-plan">
+          <ServiceEnquiryForm service="youtube" current="YouTube Video Promotion" />
+        </div>
       </main>
 
       <Footer />

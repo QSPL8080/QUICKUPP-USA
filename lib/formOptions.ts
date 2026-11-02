@@ -86,6 +86,20 @@ export const SERVICE_FORMS = {
     table: "service_staff_augmentation",
     options: groupItems("Staff Augmentation"),
   },
+  youtube: {
+    label: "YouTube Video Promotion",
+    table: "service_youtube_promotion",
+    options: [
+      "YouTube In-Stream Ads",
+      "YouTube In-Feed Ads",
+      "YouTube Shorts Ads",
+      "YouTube Search Promotion",
+      "Channel Growth & Optimization",
+      "Video SEO & Ranking",
+      "Targeted YouTube Views Campaign",
+      "Other",
+    ],
+  },
 } as const satisfies Record<string, { label: string; table: string; options: readonly string[] }>;
 
 export type ServiceFormKey = keyof typeof SERVICE_FORMS;

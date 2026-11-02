@@ -31,27 +31,49 @@ export async function POST(request: Request) {
   const d = result.data;
 
   try {
-    // Only the fields we have in the form should be saved + form filled time (created_at is auto-timestamped), nothing else
-    const [res] = await getPool().execute(
-      `INSERT INTO ${form.table}
-        (full_name, email, phone, company_name, company_website, country, industry, other_industry, service, category, budget, timeline, message)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        d.fullName,
-        d.email,
-        d.phone,
-        d.companyName,
-        d.companyWebsite,
-        d.country,
-        d.industry,
-        d.otherIndustry,
-        form.label,
-        d.category,
-        d.budget,
-        d.timeline,
-        d.message,
-      ]
-    );
+    const isYoutube = form.table === "service_youtube_promotion";
+    const insertSql = isYoutube
+      ? `INSERT INTO ${form.table}
+          (full_name, email, phone, company_name, company_website, country, industry, other_industry, service, category, budget, timeline, youtube_link, message)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      : `INSERT INTO ${form.table}
+          (full_name, email, phone, company_name, company_website, country, industry, other_industry, service, category, budget, timeline, message)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+    const insertParams = isYoutube
+      ? [
+          d.fullName,
+          d.email,
+          d.phone,
+          d.companyName,
+          d.companyWebsite,
+          d.country,
+          d.industry,
+          d.otherIndustry,
+          form.label,
+          d.category,
+          d.budget,
+          d.timeline,
+          d.youtubeLink || null,
+          d.message,
+        ]
+      : [
+          d.fullName,
+          d.email,
+          d.phone,
+          d.companyName,
+          d.companyWebsite,
+          d.country,
+          d.industry,
+          d.otherIndustry,
+          form.label,
+          d.category,
+          d.budget,
+          d.timeline,
+          d.message,
+        ];
+
+    const [res] = await getPool().execute(insertSql, insertParams);
 
     const insertId = (res as { insertId: number }).insertId;
 
@@ -71,6 +93,9 @@ export async function POST(request: Request) {
         ["Estimated Project Budget", d.budget],
         ["Project Timeline", d.timeline],
       ];
+      if (d.youtubeLink) {
+        rows.push(["YouTube Video / Channel Link", d.youtubeLink]);
+      }
 
       const html = `<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.6;color:#111">
 <h2 style="color:#0f172a;margin-bottom:16px;">New Service Lead: ${escapeHtml(form.label)}</h2>

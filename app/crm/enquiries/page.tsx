@@ -43,9 +43,20 @@ export default async function EnquiriesPage({ searchParams }: Props) {
   const exportHref = `/api/crm/enquiries/export?${new URLSearchParams(Object.entries(f).filter(([, v]) => v) as [string, string][]).toString()}`;
   const filtered = Boolean(f.q || f.source || f.status || f.from || f.to);
 
+  const sourceHref = (s: string) => {
+    const p = new URLSearchParams();
+    if (f.q) p.set("q", f.q);
+    if (s) p.set("source", s);
+    if (f.status) p.set("status", f.status);
+    if (f.from) p.set("from", f.from);
+    if (f.to) p.set("to", f.to);
+    const qs = p.toString();
+    return qs ? `?${qs}` : "/crm/enquiries";
+  };
+
   return (
     <>
-      <PageHead title="All Enquiries" sub="Every lead in one place — Contact form, the four service forms and leads added by hand. Newest first.">
+      <PageHead title="All Enquiries" sub="Every lead in one place — Contact form, the four service forms, YouTube promotion and manual leads. Newest first.">
         <a href={exportHref} className="crm-act crm-act-ghost">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
@@ -60,6 +71,48 @@ export default async function EnquiriesPage({ searchParams }: Props) {
         </Link>
       </PageHead>
 
+      {/* Quick source tabs: All, Contact Form, Service Forms (4), YouTube Promotion, Manual */}
+      <div className="crm-payments-tabs" style={{ marginBottom: "1rem" }}>
+        <Link
+          href={sourceHref("")}
+          className={`crm-payments-tab ${!f.source ? "is-active" : ""}`}
+        >
+          <span>All Leads</span>
+          <span className="crm-tab-badge">{data.counts?.all ?? 0}</span>
+        </Link>
+        <Link
+          href={sourceHref("contact")}
+          className={`crm-payments-tab ${f.source === "contact" ? "is-active" : ""}`}
+        >
+          <span>Contact Form</span>
+          <span className="crm-tab-badge">{data.counts?.contact ?? 0}</span>
+        </Link>
+        <Link
+          href={sourceHref("services")}
+          className={`crm-payments-tab ${f.source === "services" ? "is-active" : ""}`}
+        >
+          <span>Service Forms (4)</span>
+          <span className="crm-tab-badge">{data.counts?.services ?? 0}</span>
+        </Link>
+        <Link
+          href={sourceHref("youtube")}
+          className={`crm-payments-tab ${f.source === "youtube" ? "is-active" : ""}`}
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style={{ color: "#ef4444" }}>
+            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+          </svg>
+          <span>YouTube Promotion</span>
+          <span className="crm-tab-badge">{data.counts?.youtube ?? 0}</span>
+        </Link>
+        <Link
+          href={sourceHref("manual")}
+          className={`crm-payments-tab ${f.source === "manual" ? "is-active" : ""}`}
+        >
+          <span>Manual Leads</span>
+          <span className="crm-tab-badge">{data.counts?.manual ?? 0}</span>
+        </Link>
+      </div>
+
       <form className="crm-filters crm-filters-wrap" method="get">
         <label className="crm-search">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
@@ -70,11 +123,16 @@ export default async function EnquiriesPage({ searchParams }: Props) {
         </label>
         <select className="crm-input crm-select" name="source" defaultValue={f.source} aria-label="Source">
           <option value="">All sources</option>
-          {SOURCE_KEYS.map((k) => (
-            <option key={k} value={k}>
-              {SOURCE_LABEL[k]}
-            </option>
-          ))}
+          <option value="contact">Contact Form</option>
+          <option value="services">Service Forms (4)</option>
+          <option value="youtube">YouTube Video Promotion</option>
+          <option value="manual">Added Manually</option>
+          <optgroup label="Individual Service Forms">
+            <option value="digital-marketing">Digital Marketing</option>
+            <option value="ai-automation">AI & Automation</option>
+            <option value="it-services">IT Services</option>
+            <option value="staff-augmentation">Staff Augmentation</option>
+          </optgroup>
         </select>
         <select className="crm-input crm-select" name="status" defaultValue={f.status} aria-label="Lead status">
           <option value="">All lead statuses</option>

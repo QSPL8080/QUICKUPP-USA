@@ -17,6 +17,7 @@ export const SOURCES: Record<EnquirySource, { table: string; label: string; shor
   "ai-automation": { table: SERVICE_FORMS["ai-automation"].table, label: SERVICE_FORMS["ai-automation"].label, short: "AI & Automation", href: "/crm/enquiries?source=ai-automation" },
   "it-services": { table: SERVICE_FORMS["it-services"].table, label: SERVICE_FORMS["it-services"].label, short: "IT Services", href: "/crm/enquiries?source=it-services" },
   "staff-augmentation": { table: SERVICE_FORMS["staff-augmentation"].table, label: SERVICE_FORMS["staff-augmentation"].label, short: "Staff Augmentation", href: "/crm/enquiries?source=staff-augmentation" },
+  youtube: { table: SERVICE_FORMS["youtube"].table, label: SERVICE_FORMS["youtube"].label, short: "YouTube", href: "/crm/enquiries?source=youtube" },
   manual: { table: "manual_leads", label: "Manual Leads", short: "Manual", href: "/crm/enquiries?source=manual" },
 };
 
@@ -36,6 +37,7 @@ export type EnquiryRow = {
   service: string | null; // service forms / manual: the service group
   interest: string; // contact: service chosen; service forms / manual: the service page
   budget: string | null;
+  youtubeLink?: string | null;
   message: string;
   sourcePage: string | null;
   pageUrl: string | null;
@@ -77,7 +79,9 @@ export type LeadFilters = { q?: string; source?: string; status?: string; from?:
 function leadWhere(f: LeadFilters) {
   const where: string[] = [];
   const args: (string | number)[] = [];
-  if (f.source && isEnquirySource(f.source)) {
+  if (f.source === "services") {
+    where.push("src IN ('digital-marketing', 'ai-automation', 'it-services', 'staff-augmentation')");
+  } else if (f.source && isEnquirySource(f.source)) {
     where.push("src = ?");
     args.push(f.source);
   }
@@ -123,11 +127,30 @@ export async function listLeads(f: LeadFilters & { page?: number }) {
   const pool = getPool();
   const [countRows] = await pool.query(`SELECT COUNT(*) AS n FROM (${UNION_SQL}) t ${sql}`, args);
   const total = Number((countRows as { n: number }[])[0]?.n || 0);
+
+  const [tabCounts] = await pool.query(`
+    SELECT
+      COUNT(*) AS all_count,
+      SUM(CASE WHEN src = 'contact' THEN 1 ELSE 0 END) AS contact_count,
+      SUM(CASE WHEN src IN ('digital-marketing', 'ai-automation', 'it-services', 'staff-augmentation') THEN 1 ELSE 0 END) AS services_count,
+      SUM(CASE WHEN src = 'youtube' THEN 1 ELSE 0 END) AS youtube_count,
+      SUM(CASE WHEN src = 'manual' THEN 1 ELSE 0 END) AS manual_count
+    FROM (${UNION_SQL}) t
+  `);
+  const tc = (tabCounts as Record<string, unknown>[])?.[0] || {};
+  const counts = {
+    all: Number(tc.all_count || 0),
+    contact: Number(tc.contact_count || 0),
+    services: Number(tc.services_count || 0),
+    youtube: Number(tc.youtube_count || 0),
+    manual: Number(tc.manual_count || 0),
+  };
+
   const [rows] = await pool.query(
     `SELECT * FROM (${UNION_SQL}) t ${sql} ORDER BY created_at DESC, id DESC LIMIT ${PAGE_SIZE} OFFSET ${(page - 1) * PAGE_SIZE}`,
     args
   );
-  return { items: (rows as Record<string, unknown>[]).map(toLead), total, page, pages: Math.max(1, Math.ceil(total / PAGE_SIZE)), pageSize: PAGE_SIZE };
+  return { items: (rows as Record<string, unknown>[]).map(toLead), total, page, pages: Math.max(1, Math.ceil(total / PAGE_SIZE)), pageSize: PAGE_SIZE, counts };
 }
 
 /** The same list without paging, for the CSV export (capped) */
@@ -164,6 +187,7 @@ export async function getLead(source: EnquirySource, id: number): Promise<Enquir
     service: isContact ? null : ((r.service as string) || SOURCES[source].label),
     interest: String((isContact ? r.project_type : r.category) ?? ""),
     budget: (r.budget as string) || null,
+    youtubeLink: (r.youtube_link as string) || null,
     message: String(r.message ?? ""),
     sourcePage: isContact || isManual ? null : ((r.source_page as string) || null),
     pageUrl: isManual ? null : ((r.page_url as string) || null),

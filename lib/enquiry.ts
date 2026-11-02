@@ -33,6 +33,7 @@ export type ServiceEnquiryInput = {
   category: string;
   budget: string;
   timeline: string;
+  youtubeLink?: string | null;
   message: string | null;
 };
 
@@ -162,6 +163,7 @@ export function validateServiceEnquiry(
   const category = text(body.category || body.serviceInterest, 150);
   const budget = text(body.budget, 60);
   const timeline = text(body.timeline, 60);
+  const youtubeLink = text(body.youtubeLink || body.youtube_link || body.channelLink, 500);
   const message = text(body.message, 5000);
 
   if (!fullName) errors.fullName = "Please enter your full name.";
@@ -190,6 +192,7 @@ export function validateServiceEnquiry(
       category,
       budget,
       timeline,
+      youtubeLink: youtubeLink || null,
       message: message || null,
     },
   };
