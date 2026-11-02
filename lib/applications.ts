@@ -50,7 +50,6 @@ export type ApplicationRow = {
   resumeName: string;
   resumeSize: number;
   status: ApplicationStatus;
-  mailSent: boolean;
   createdAt: string;
 };
 

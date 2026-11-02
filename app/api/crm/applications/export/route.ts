@@ -41,9 +41,6 @@ export async function GET(request: Request) {
     "Resume File Name",
     "Resume File Size",
     "Status",
-    "Emailed to HR",
-    "Agreed to Terms",
-    "Source Page",
     "Received Date & Time",
   ];
 
@@ -63,9 +60,6 @@ export async function GET(request: Request) {
       r.resumeName,
       fmtBytes(r.resumeSize),
       APPLICATION_STATUS_LABEL[r.status] || r.status,
-      r.mailSent ? "Yes" : "No",
-      r.agreedTerms ? "Yes" : "No",
-      r.pageUrl || "—",
       new Date(r.createdAt).toISOString().replace("T", " ").slice(0, 19),
     ]
       .map(cell)

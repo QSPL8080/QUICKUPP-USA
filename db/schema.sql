@@ -122,3 +122,45 @@ CREATE TABLE IF NOT EXISTS payments (
   KEY idx_status (status),
   CONSTRAINT fk_payments_user FOREIGN KEY (created_by) REFERENCES crm_users (id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Job openings (Careers page and CRM) -----------------------------------------
+CREATE TABLE IF NOT EXISTS job_openings (
+  id                INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  title             VARCHAR(190) NOT NULL,
+  department        VARCHAR(100) NOT NULL,
+  employment_type   VARCHAR(40)  NOT NULL,
+  location          VARCHAR(150) NOT NULL,
+  experience        VARCHAR(100) NOT NULL,
+  responsibilities  TEXT         NOT NULL COMMENT 'One per line',
+  skills            TEXT         NOT NULL COMMENT 'One per line',
+  deadline          DATE         NULL COMMENT 'Application deadline, if any',
+  is_open           TINYINT(1)   NOT NULL DEFAULT 1,
+  created_at        TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_open (is_open, deadline)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Job applications (Apply Now form and CRM) -----------------------------------
+CREATE TABLE IF NOT EXISTS job_applications (
+  id                INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  job_id            INT UNSIGNED NULL,
+  job_title         VARCHAR(190) NOT NULL COMMENT 'Copied from opening',
+  department        VARCHAR(100) NULL,
+  full_name         VARCHAR(150) NOT NULL,
+  email             VARCHAR(190) NOT NULL,
+  phone             VARCHAR(40)  NOT NULL,
+  current_location  VARCHAR(150) NOT NULL,
+  experience        VARCHAR(100) NOT NULL,
+  profile_url       VARCHAR(255) NULL,
+  cover_note        TEXT         NULL,
+  resume_name       VARCHAR(255) NOT NULL,
+  resume_type       VARCHAR(100) NOT NULL,
+  resume_size       INT UNSIGNED NOT NULL,
+  resume_data       MEDIUMBLOB   NOT NULL,
+  status            VARCHAR(20)  NOT NULL DEFAULT 'new',
+  created_at        TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_job (job_id),
+  KEY idx_status (status, created_at),
+  CONSTRAINT fk_applications_job FOREIGN KEY (job_id) REFERENCES job_openings (id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -1,6 +1,5 @@
 import { after } from "next/server";
 import { getPool } from "@/lib/db";
-import { requestMeta } from "@/lib/enquiry";
 import { RESUME_TYPES, checkResume, fmtBytes, resumeExt, validateApplication } from "@/lib/applications";
 import { HR_EMAIL, escapeHtml, sendMail } from "@/lib/mailer";
 
@@ -51,15 +50,28 @@ export async function POST(request: Request) {
     const ext = resumeExt(resume.name);
     const data = Buffer.from(await resume.arrayBuffer());
     const resumeName = resume.name.replace(/[^\w.\- ()]+/g, "_").slice(0, 200) || `resume.${ext}`;
-    const meta = requestMeta(request, fields.pageUrl);
 
     const [res] = await pool.execute(
       `INSERT INTO job_applications
         (job_id, job_title, department, full_name, email, phone, current_location, experience, profile_url, cover_note,
-         resume_name, resume_type, resume_size, resume_data, agreed_terms, page_url, ip_address, user_agent)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?)`,
-      [Number(job.id), String(job.title), String(job.department), d.fullName, d.email, d.phone, d.currentLocation, d.experience, d.profileUrl, d.coverNote,
-        resumeName, RESUME_TYPES[ext], data.length, data, meta.pageUrl, meta.ip, meta.userAgent]
+         resume_name, resume_type, resume_size, resume_data)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        Number(job.id),
+        String(job.title),
+        String(job.department),
+        d.fullName,
+        d.email,
+        d.phone,
+        d.currentLocation,
+        d.experience,
+        d.profileUrl,
+        d.coverNote,
+        resumeName,
+        RESUME_TYPES[ext],
+        data.length,
+        data,
+      ]
     );
     const id = (res as { insertId: number }).insertId;
 
@@ -89,7 +101,7 @@ export async function POST(request: Request) {
 
     // sent after the reply so the candidate never waits on the mail server
     after(async () => {
-      const sent = await sendMail({
+      await sendMail({
         to: HR_EMAIL,
         fromName: "Quickupp Softech Careers",
         replyTo: `${d.fullName} <${d.email}>`,
@@ -97,8 +109,7 @@ export async function POST(request: Request) {
         html,
         text,
         attachments: [{ filename: resumeName, content: data, contentType: RESUME_TYPES[ext] }],
-      });
-      if (sent) await pool.execute("UPDATE job_applications SET mail_sent = 1 WHERE id = ?", [id]).catch(() => {});
+      }).catch((err) => console.error("[api/careers/apply] email failed:", err));
     });
 
     return Response.json({ ok: true, id });

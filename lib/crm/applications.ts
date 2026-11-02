@@ -58,7 +58,7 @@ export async function listApplications(opts: ApplicationFilters & { page?: numbe
   const total = Number((countRows as { n: number }[])[0]?.n || 0);
   const [rows] = await pool.query(
     `SELECT id, job_id, job_title, department, full_name, email, phone, current_location, experience, profile_url, cover_note,
-            resume_name, resume_size, status, mail_sent, created_at
+            resume_name, resume_size, status, created_at
        FROM job_applications ${whereSql}
       ORDER BY created_at DESC, id DESC LIMIT ${PAGE_SIZE} OFFSET ${(page - 1) * PAGE_SIZE}`,
     args
@@ -79,7 +79,6 @@ export async function listApplications(opts: ApplicationFilters & { page?: numbe
     resumeName: String(r.resume_name ?? ""),
     resumeSize: Number(r.resume_size || 0),
     status: (APPLICATION_STATUSES as readonly string[]).includes(String(r.status)) ? (String(r.status) as ApplicationStatus) : "new",
-    mailSent: Number(r.mail_sent) === 1,
     createdAt: new Date(r.created_at as string).toISOString(),
   }));
 
@@ -101,9 +100,6 @@ export type ExportApplicationItem = {
   resumeName: string;
   resumeSize: number;
   status: ApplicationStatus;
-  mailSent: boolean;
-  agreedTerms: boolean;
-  pageUrl: string;
   createdAt: string;
 };
 
@@ -112,7 +108,7 @@ export async function exportApplications(opts: ApplicationFilters): Promise<Expo
   const { whereSql, args } = buildApplicationsWhere(opts);
   const [rows] = await getPool().query(
     `SELECT id, job_id, job_title, department, full_name, email, phone, current_location, experience, profile_url, cover_note,
-            resume_name, resume_size, status, mail_sent, agreed_terms, page_url, created_at
+            resume_name, resume_size, status, created_at
        FROM job_applications ${whereSql}
       ORDER BY created_at DESC, id DESC LIMIT 10000`,
     args
@@ -133,9 +129,6 @@ export async function exportApplications(opts: ApplicationFilters): Promise<Expo
     resumeName: String(r.resume_name ?? ""),
     resumeSize: Number(r.resume_size || 0),
     status: (APPLICATION_STATUSES as readonly string[]).includes(String(r.status)) ? (String(r.status) as ApplicationStatus) : "new",
-    mailSent: Number(r.mail_sent) === 1,
-    agreedTerms: Number(r.agreed_terms) === 1,
-    pageUrl: r.page_url == null ? "" : String(r.page_url),
     createdAt: new Date(r.created_at as string).toISOString(),
   }));
 }

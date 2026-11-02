@@ -14,9 +14,9 @@ export async function POST(request: Request) {
   if (!result.ok) return Response.json({ ok: false, errors: result.errors }, { status: 400 });
   const d = result.data;
   const [res] = await getPool().execute(
-    `INSERT INTO job_openings (title, department, employment_type, location, experience, responsibilities, skills, deadline, is_open, created_by)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [d.title, d.department, d.employmentType, d.location, d.experience, d.responsibilities, d.skills, d.deadline, d.isOpen ? 1 : 0, user.id]
+    `INSERT INTO job_openings (title, department, employment_type, location, experience, responsibilities, skills, deadline, is_open)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [d.title, d.department, d.employmentType, d.location, d.experience, d.responsibilities, d.skills, d.deadline, d.isOpen ? 1 : 0]
   );
   return Response.json({ ok: true, id: (res as { insertId: number }).insertId });
 }

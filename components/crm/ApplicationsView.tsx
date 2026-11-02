@@ -230,8 +230,6 @@ export default function ApplicationsView({ rows }: { rows: ApplicationRow[] }) {
               <dd className="crm-break">
                 {open.resumeName} ({fmtBytes(open.resumeSize)})
               </dd>
-              <dt>Emailed to HR</dt>
-              <dd>{open.mailSent ? "Yes" : "No — check the email (SMTP) settings"}</dd>
             </dl>
 
             <div className="crm-message">
