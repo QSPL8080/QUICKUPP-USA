@@ -228,7 +228,7 @@ export const blogPosts: BlogPost[] = [
           "heading": "2. How Google Ads Helps Generate Admission Leads",
           "paragraphs": [
             "Educational institutions can reach students interested in research about the courses, institutions and admission through Google Ads.",
-            "For instance, whenever someone searches the terms &quot;best engineering colleges in Pune&quot; or &quot;MBA admission 2026&quot;, appropriate advertisements are shown on Google search pages.",
+            "For instance, whenever someone searches the terms \"best engineering colleges in Pune\" or \"MBA admission 2026\", appropriate advertisements are shown on Google search pages.",
             "Google Ads helps to get admission leads through various means, such as:",
             "Advertisements displayed on search pages: Posting relevant ads for courses or any admission related queries.",
             "Location targeting: Piercing through the potential audience in particular locations along the queries made online.",
@@ -280,7 +280,7 @@ export const blogPosts: BlogPost[] = [
             "Course duration and facilities.",
             "Student achievements and testimonials.",
             "Simple enquiry forms and contact details.",
-            "Strong CTAs like &quot;Apply Now&quot; or &quot;Enquire Today&quot;.",
+            "Strong CTAs like \"Apply Now\" or \"Enquire Today\".",
             "So if an institution wants to push admissions for MBA, the visitors should reach an MBA landing page and not the homepage.",
             "A good landing page makes for a better user experience and gives you increased potential to conversions of enquiries.6. Generating Quality Admission Leads as Opposed to Generating More Admission Leads",
             "The generation of a huge number of enquiries does not necessarily lead to increased admissions. An educational institution should try to attract someone who is interested in the given courses and programmes.",
@@ -346,7 +346,7 @@ export const blogPosts: BlogPost[] = [
         {
           "heading": "1. Enhancing Visibility in Local Google Searches",
           "paragraphs": [
-            "When a search is performed using terms like &quot;apartments available near me,&quot; &quot;two-bedroom flats in Pune,&quot; or &quot;property dealers in Hinjawadi,&quot; Google presents results on the basis of proximity, importance, and relevance.",
+            "When a search is performed using terms like \"apartments available near me,\" \"two-bedroom flats in Pune,\" or \"property dealers in Hinjawadi,\" Google presents results on the basis of proximity, importance, and relevance.",
             "Local Search Engine Optimization allows real estate companies to boost recognition in such specific searches.",
             "Businesses can achieve a higher probability to be seen in local search results by optimizing website content as well as writing business details and location-based keywords.",
             "People willing to buy property can find out about real estate offerings and services in the relevant area."
@@ -809,7 +809,7 @@ export const blogPosts: BlogPost[] = [
           "heading": "2. Reach More Potential Customers Through Search Engines",
           "paragraphs": [
             "Search engines are one of the most important channels through which customers discover professional services.",
-            "When someone searches for terms such as &quot;business consultant near me,&quot; &quot;accounting services in Pune,&quot; or &quot;best digital marketing agency,&quot; businesses with relevant online visibility have a better opportunity to reach them.",
+            "When someone searches for terms such as \"business consultant near me,\" \"accounting services in Pune,\" or \"best digital marketing agency,\" businesses with relevant online visibility have a better opportunity to reach them.",
             "Search Engine Optimisation (SEO) helps improve your website's visibility for relevant searches.",
             "Professional service businesses can strengthen their SEO strategy through:",
             "Relevant keyword research.",
@@ -1055,7 +1055,7 @@ export const blogPosts: BlogPost[] = [
         {
           "heading": "1. Improves Visibility in Search Engine Results",
           "paragraphs": [
-            "When someone searches for terms such as &quot;best holiday packages in India&quot;, &quot;international tour packages&quot; or &quot;family vacation packages&quot;, they usually explore the websites appearing on the first page of Google.",
+            "When someone searches for terms such as \"best holiday packages in India\", \"international tour packages\" or \"family vacation packages\", they usually explore the websites appearing on the first page of Google.",
             "If your travel agency's website does not appear in relevant search results, potential customers may choose your competitors instead.",
             "SEO helps improve your website's visibility by optimising its content, structure, technical performance, and relevance to what people are searching for.",
             "For example, a travel agency offering domestic and international packages can target relevant search terms such as:",
@@ -1086,7 +1086,7 @@ export const blogPosts: BlogPost[] = [
           "paragraphs": [
             "Getting website traffic is important, but attracting the right audience matters even more.",
             "SEO focuses on bringing visitors who are genuinely interested in your travel services. Instead of reaching a broad audience, travel agencies can target people searching for specific destinations, experiences, packages, and travel requirements.",
-            "For example, if your agency specialises in honeymoon packages, optimising your website for keywords such as &quot;romantic honeymoon packages in Bali&quot; or &quot;Maldives honeymoon packages&quot; can help attract couples looking for those experiences.",
+            "For example, if your agency specialises in honeymoon packages, optimising your website for keywords such as \"romantic honeymoon packages in Bali\" or \"Maldives honeymoon packages\" can help attract couples looking for those experiences.",
             "Relevant website traffic can lead to:",
             "More package enquiries",
             "Increased calls and WhatsApp conversations",
