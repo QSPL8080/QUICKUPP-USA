@@ -7,6 +7,7 @@ import { serviceGroups, industryItems, aboutItems, resourceItems } from "@/lib/s
 import "@/app/header-mega.css";
 import LucideIcon, { type LucideIconName } from "@/components/LucideIcon";
 import type { NavItem } from "@/lib/sitemap";
+import { openPayNowModal } from "@/components/PayNowModal";
 
 /* Icons for every menu item (keyed by link) and for each service category */
 const ITEM_ICONS: Record<string, LucideIconName> = {
@@ -542,14 +543,22 @@ export default function Header() {
 
             {/* Mobile Drawer Action Button */}
             <div className="qs-mobile-drawer-cta">
-              {/* Pay Now opens the Contact page until a payment link is set up */}
-              <Link href="/contact" className="qs-new-cta-btn qs-pay-btn" onClick={handleLinkClick}>
+              {/* Pay Now opens the interactive PayPal checkout popup modal */}
+              <button
+                type="button"
+                className="qs-new-cta-btn qs-pay-btn"
+                onClick={() => {
+                  handleLinkClick();
+                  openPayNowModal();
+                }}
+                aria-label="Pay online with PayPal"
+              >
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <rect x="2" y="5" width="20" height="14" rx="2" />
                   <path d="M2 10h20" />
                 </svg>
                 <span>Pay Now</span>
-              </Link>
+              </button>
               <Link
                 href="/contact"
                 className="qs-new-cta-btn"
@@ -562,14 +571,22 @@ export default function Header() {
 
           {/* 7. Right Header Action Button (Desktop: Get More Info) */}
           <div className="qs-header-right-col">
-            {/* Pay Now opens the Contact page until a payment link is set up */}
-            <Link href="/contact" className="qs-new-cta-btn qs-pay-btn" onClick={handleLinkClick}>
+            {/* Pay Now opens the interactive PayPal checkout popup modal */}
+            <button
+              type="button"
+              className="qs-new-cta-btn qs-pay-btn"
+              onClick={() => {
+                handleLinkClick();
+                openPayNowModal();
+              }}
+              aria-label="Pay online with PayPal"
+            >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <rect x="2" y="5" width="20" height="14" rx="2" />
                 <path d="M2 10h20" />
               </svg>
               <span>Pay Now</span>
-            </Link>
+            </button>
             <Link
               href="/contact"
               className="qs-new-cta-btn"

@@ -219,11 +219,22 @@ export default function PaymentsView({
                   </td>
                   <td data-label="Client" className="crm-cell-main">
                     <span className="crm-strong">{p.clientName}</span>
-                    {(p.companyName || p.clientEmail) && <span className="crm-cell-sub">{p.companyName || p.clientEmail}</span>}
+                    {(p.companyName || p.clientEmail || p.clientPhone) && (
+                      <span className="crm-cell-sub">
+                        {[p.companyName, p.clientEmail, p.clientPhone].filter(Boolean).join(" • ")}
+                      </span>
+                    )}
                   </td>
                   <td data-label="Service">
                     {p.service}
-                    {p.description && <span className="crm-cell-sub">{p.description}</span>}
+                    {(p.billingStartDate || p.billingEndDate) && (
+                      <span className="crm-cell-sub">
+                        Period: {p.billingStartDate || "—"} to {p.billingEndDate || "—"}
+                      </span>
+                    )}
+                    {!p.billingStartDate && !p.billingEndDate && p.description && (
+                      <span className="crm-cell-sub">{p.description}</span>
+                    )}
                   </td>
                   <td data-label="Amount" className="crm-right crm-strong crm-nowrap">{money(p.amount, p.currency)}</td>
                   <td data-label="Method">

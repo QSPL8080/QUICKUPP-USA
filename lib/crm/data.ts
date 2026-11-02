@@ -194,7 +194,9 @@ export type PaymentRow = {
   id: number;
   clientName: string;
   clientEmail: string | null;
+  clientPhone?: string | null;
   companyName: string | null;
+  category?: string | null;
   service: string;
   description: string | null;
   amount: number;
@@ -203,6 +205,9 @@ export type PaymentRow = {
   status: (typeof PAYMENT_STATUSES)[number];
   source: "manual" | "online";
   reference: string | null;
+  paypalOrderId?: string | null;
+  billingStartDate?: string | null;
+  billingEndDate?: string | null;
   invoiceNumber: string | null;
   paidAt: string | null;
   notes: string | null;
@@ -219,9 +224,9 @@ export async function listPayments(opts: { q?: string; status?: string; page?: n
   }
   const q = (opts.q || "").trim().slice(0, 100);
   if (q) {
-    where.push("(p.client_name LIKE ? OR p.client_email LIKE ? OR p.company_name LIKE ? OR p.invoice_number LIKE ? OR p.reference LIKE ?)");
+    where.push("(p.client_name LIKE ? OR p.client_email LIKE ? OR p.client_phone LIKE ? OR p.company_name LIKE ? OR p.invoice_number LIKE ? OR p.reference LIKE ? OR p.paypal_order_id LIKE ?)");
     const like = `%${q}%`;
-    args.push(like, like, like, like, like);
+    args.push(like, like, like, like, like, like, like);
   }
   const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : "";
   const page = Math.max(1, Math.floor(opts.page || 1));
@@ -237,7 +242,9 @@ export async function listPayments(opts: { q?: string; status?: string; page?: n
     id: Number(r.id),
     clientName: String(r.client_name ?? ""),
     clientEmail: (r.client_email as string) || null,
+    clientPhone: (r.client_phone as string) || null,
     companyName: (r.company_name as string) || null,
+    category: (r.category as string) || null,
     service: String(r.service ?? ""),
     description: (r.description as string) || null,
     amount: Number(r.amount),
@@ -246,6 +253,9 @@ export async function listPayments(opts: { q?: string; status?: string; page?: n
     status: r.status as PaymentRow["status"],
     source: (r.source as PaymentRow["source"]) || "manual",
     reference: (r.reference as string) || null,
+    paypalOrderId: (r.paypal_order_id as string) || null,
+    billingStartDate: r.billing_start_date ? toDateOnly(r.billing_start_date) : null,
+    billingEndDate: r.billing_end_date ? toDateOnly(r.billing_end_date) : null,
     invoiceNumber: (r.invoice_number as string) || null,
     paidAt: r.paid_at ? toDateOnly(r.paid_at) : null,
     notes: (r.notes as string) || null,

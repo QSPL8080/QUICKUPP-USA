@@ -1,0 +1,454 @@
+/* ==========================================================================
+   QUICKUPP USA 'PAY NOW' POPUP MODAL (PAYPAL CHECKOUT)
+   ========================================================================== */
+
+.pm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: rgba(11, 15, 23, 0.78);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow-y: auto;
+  animation: pm-fade-in 0.22s ease-out;
+}
+
+@keyframes pm-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.pm-modal {
+  position: relative;
+  width: 100%;
+  max-width: 620px;
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  animation: pm-scale-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  margin: auto;
+  font-family: var(--font-body, "Inter", sans-serif);
+}
+
+@keyframes pm-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Modal Header */
+.pm-head {
+  background: linear-gradient(135deg, #0b0f17 0%, #1e1b4b 100%);
+  color: #ffffff;
+  padding: 24px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pm-head-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.pm-head-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: grid;
+  place-items: center;
+  color: #38bdf8;
+}
+
+.pm-head-title {
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
+  font-size: 19px;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.pm-head-sub {
+  font-size: 12.5px;
+  color: #94a3b8;
+  margin-top: 3px;
+}
+
+.pm-close-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.pm-close-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  transform: rotate(90deg);
+}
+
+/* Modal Body */
+.pm-body {
+  padding: 26px 28px 28px;
+  max-height: calc(90vh - 100px);
+  overflow-y: auto;
+}
+
+@media (max-width: 640px) {
+  .pm-body {
+    padding: 20px 18px 24px;
+  }
+}
+
+/* Form Groups & Layout */
+.pm-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.pm-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 580px) {
+  .pm-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pm-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pm-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pm-req {
+  color: #ef4444;
+}
+
+.pm-input,
+.pm-select {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #ffffff;
+  font-size: 14.5px;
+  color: #0f172a;
+  transition: all 0.18s ease;
+  box-sizing: border-box;
+}
+
+.pm-input:focus,
+.pm-select:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+.pm-textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #ffffff;
+  font-size: 14px;
+  color: #0f172a;
+  resize: vertical;
+  min-height: 70px;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.pm-textarea:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+/* Amount Selector */
+.pm-amount-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.pm-amount-pill {
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 999px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pm-amount-pill:hover {
+  background: #e2e8f0;
+}
+
+.pm-amount-pill.is-active {
+  background: #4f46e5;
+  border-color: #4f46e5;
+  color: #ffffff;
+}
+
+.pm-currency-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.pm-currency-symbol {
+  position: absolute;
+  left: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #64748b;
+  pointer-events: none;
+}
+
+.pm-currency-input-wrap .pm-input {
+  padding-left: 28px;
+  font-size: 17px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* Date range section */
+.pm-date-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.pm-date-title {
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #4f46e5;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Proceed CTA button */
+.pm-submit-btn {
+  width: 100%;
+  height: 48px;
+  background: linear-gradient(135deg, #00d2ff 0%, #6366f1 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 15.5px;
+  font-weight: 750;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(0, 210, 255, 0.35);
+  transition: all 0.2s ease;
+}
+
+.pm-submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0, 210, 255, 0.5);
+}
+
+.pm-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Summary Card on Payment Step */
+.pm-summary-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 22px;
+}
+
+.pm-summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 13.5px;
+}
+
+.pm-summary-label {
+  color: #64748b;
+}
+
+.pm-summary-val {
+  font-weight: 650;
+  color: #0f172a;
+}
+
+.pm-summary-total {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pm-total-amount {
+  font-size: 24px;
+  font-weight: 850;
+  color: #10b981;
+}
+
+/* PayPal Button Container */
+.pm-paypal-container {
+  min-height: 120px;
+  margin: 16px 0;
+}
+
+/* Success Receipt */
+.pm-success-box {
+  text-align: center;
+  padding: 10px 0;
+}
+
+.pm-success-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #10b981;
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 16px;
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35);
+  animation: pm-bounce 0.5s ease-out;
+}
+
+@keyframes pm-bounce {
+  0% { transform: scale(0.3); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+.pm-success-title {
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
+  font-size: 23px;
+  font-weight: 850;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+}
+
+.pm-success-desc {
+  font-size: 14.5px;
+  color: #64748b;
+  margin: 0 0 24px 0;
+}
+
+.pm-receipt-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 24px;
+  text-align: left;
+  font-size: 13.5px;
+}
+
+.pm-receipt-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.pm-receipt-table tr:last-child td {
+  border-bottom: none;
+}
+
+.pm-receipt-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+}
+
+.pm-btn-secondary {
+  padding: 10px 20px;
+  font-size: 13.5px;
+  font-weight: 700;
+  border-radius: 10px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #1e293b;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pm-btn-secondary:hover {
+  background: #e2e8f0;
+}
+
+/* Print styles for receipt */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .pm-modal,
+  .pm-modal * {
+    visibility: visible;
+  }
+  .pm-modal {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    box-shadow: none;
+    border: none;
+  }
+  .pm-close-btn,
+  .pm-receipt-actions {
+    display: none !important;
+  }
+}

@@ -5,6 +5,7 @@ import "./assurix-service.css";
 import "./site-type.css";
 import QuickuppEngineReinit from "@/components/QuickuppEngineReinit";
 import ButtonTone from "@/components/ButtonTone";
+import PayNowModal from "@/components/PayNowModal";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://quickupp.com"),
@@ -84,6 +85,7 @@ export default function RootLayout({
         <Script src="/js/quickupp-core.js?v=qs2" strategy="afterInteractive" />
         <QuickuppEngineReinit />
         <ButtonTone />
+        <PayNowModal />
       </body>
     </html>
   );
