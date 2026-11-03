@@ -212,7 +212,6 @@ export const PAYMENT_SERVICES = [
   "Information Technology Services",
   "Staff Augmentation",
   "YouTube Video Promotion",
-  "AI Video Production",
   "Other",
 ] as const;
 

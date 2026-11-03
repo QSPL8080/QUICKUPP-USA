@@ -35,13 +35,7 @@ export const SERVICES_DATA = [
   },
   {
     service: "AI & Automation Solutions",
-    categories: [
-      "AI & Automation Solutions",
-      "AI Workflow & CRM Integration",
-      "Conversational AI & Bots",
-      "Custom AI Agents",
-      "Process Automation",
-    ],
+    categories: [],
   },
   {
     service: "Information Technology Services",
@@ -51,7 +45,6 @@ export const SERVICES_DATA = [
       "Product Engineering",
       "Quality Assurance & Testing",
       "UI/UX Design",
-      "Cloud & DevOps Infrastructure",
     ],
   },
   {
@@ -59,31 +52,11 @@ export const SERVICES_DATA = [
     categories: [
       "Marketing & Design Staff Augmentation",
       "IT Staff Augmentation",
-      "Dedicated Developers & Engineers",
-    ],
-  },
-  {
-    service: "AI Video Production & Creative Studio",
-    categories: [
-      "AI UGC Video (60-Second Video)",
-      "AI Avatar Video",
-      "YouTube Video Promotion",
-      "Brand Commercial & Reel",
-      "Product Demo Video",
     ],
   },
   {
     service: "YouTube Video Promotion",
-    categories: [
-      "YouTube In-Stream Ads",
-      "YouTube In-Feed Ads",
-      "YouTube Shorts Ads",
-      "YouTube Search Promotion",
-      "Channel Growth & Optimization",
-      "Video SEO & Ranking",
-      "Targeted YouTube Views Campaign",
-      "Custom Strategy / Retainer",
-    ],
+    categories: [],
   },
 ];
 
@@ -181,7 +154,7 @@ export default function PayNowModal() {
     if (matched && matched.categories.length > 0) {
       setSelectedCategories([matched.categories[0]]);
     } else {
-      setSelectedCategories(["General / Custom"]);
+      setSelectedCategories([]);
     }
     setIsCategoryDropdownOpen(false);
   };
@@ -248,7 +221,7 @@ export default function PayNowModal() {
       setFormError("Please enter your phone number.");
       return;
     }
-    if (selectedCategories.length === 0) {
+    if (availableCategories.length > 0 && selectedCategories.length === 0) {
       setFormError("Please select at least one service category.");
       return;
     }
@@ -257,13 +230,18 @@ export default function PayNowModal() {
       return;
     }
 
+    const finalCategory =
+      availableCategories.length > 0
+        ? selectedCategories.join(", ")
+        : "Not Applicable";
+
     const query = new URLSearchParams({
       name: clientName.trim(),
       email: clientEmail.trim(),
       phone: clientPhone.trim(),
       company: companyName.trim(),
       service: service.trim(),
-      category: selectedCategories.join(", "),
+      category: finalCategory,
       from: billingStartDate,
       to: billingEndDate,
       balanceDue: paymentType === "partial" ? computedBalanceDueDateIso : "",
@@ -572,116 +550,142 @@ export default function PayNowModal() {
                 </div>
                 <div className="pm-field" ref={categoryDropdownRef} style={{ position: "relative" }}>
                   <label className="pm-label">
-                    Category <span className="pm-req">*</span>
-                    <span style={{ fontWeight: 500, color: "#64748b", fontSize: "11px", marginLeft: "auto" }}>
-                      (Multi-Select)
-                    </span>
+                    Category <span className="pm-req">{availableCategories.length > 0 ? "*" : ""}</span>
+                    {availableCategories.length > 0 ? (
+                      <span style={{ fontWeight: 500, color: "#64748b", fontSize: "11px", marginLeft: "auto" }}>
+                        (Multi-Select)
+                      </span>
+                    ) : (
+                      <span style={{ fontWeight: 500, color: "#94a3b8", fontSize: "11px", marginLeft: "auto" }}>
+                        (Not Applicable)
+                      </span>
+                    )}
                   </label>
-                  <button
-                    type="button"
-                    onClick={() => setIsCategoryDropdownOpen((v) => !v)}
-                    className={`pm-input pm-select pm-multiselect-btn ${isCategoryDropdownOpen ? "is-open" : ""}`}
-                    aria-expanded={isCategoryDropdownOpen}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      width: "100%",
-                      height: "36px",
-                      padding: "0 12px",
-                      border: isCategoryDropdownOpen ? "1.5px solid #4f46e5" : "1px solid #cbd5e1",
-                      borderRadius: "8px",
-                      backgroundColor: "#ffffff",
-                      boxSizing: "border-box",
-                      cursor: "pointer",
-                      outline: "none",
-                      boxShadow: isCategoryDropdownOpen ? "0 0 0 3px rgba(79, 70, 229, 0.15)" : "none",
-                      transition: "all 0.18s ease",
-                      textAlign: "left",
-                    }}
-                  >
-                    <span className="pm-multiselect-text">
-                      {selectedCategories.length === 0 ? (
-                        <span style={{ color: "#94a3b8" }}>Select categories...</span>
-                      ) : selectedCategories.length === 1 ? (
-                        <span>{selectedCategories[0]}</span>
-                      ) : selectedCategories.length === 2 ? (
-                        <span>{selectedCategories[0]}, {selectedCategories[1]}</span>
-                      ) : (
-                        <>
-                          <span className="pm-badge-count">{selectedCategories.length} selected</span>
-                          <span style={{ color: "#334155", marginLeft: "6px" }}>
-                            {selectedCategories[0]}, +{selectedCategories.length - 1} more
-                          </span>
-                        </>
-                      )}
-                    </span>
-                    <svg
-                      width="13"
-                      height="13"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      style={{
-                        transform: isCategoryDropdownOpen ? "rotate(180deg)" : "rotate(0deg)",
-                        transition: "transform 0.18s ease",
-                        flexShrink: 0,
-                        color: "#64748b",
-                      }}
-                    >
-                      <polyline points="6 9 12 15 18 9" />
-                    </svg>
-                  </button>
-
-                  {isCategoryDropdownOpen && (
-                    <div className="pm-multiselect-popover">
-                      <div className="pm-ms-popover-header">
-                        <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748b" }}>
-                          {availableCategories.length} Available
+                  {availableCategories.length > 0 ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setIsCategoryDropdownOpen((v) => !v)}
+                        className={`pm-input pm-select pm-multiselect-btn ${isCategoryDropdownOpen ? "is-open" : ""}`}
+                        aria-expanded={isCategoryDropdownOpen}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          width: "100%",
+                          height: "36px",
+                          padding: "0 12px",
+                          border: isCategoryDropdownOpen ? "1.5px solid #4f46e5" : "1px solid #cbd5e1",
+                          borderRadius: "8px",
+                          backgroundColor: "#ffffff",
+                          boxSizing: "border-box",
+                          cursor: "pointer",
+                          outline: "none",
+                          boxShadow: isCategoryDropdownOpen ? "0 0 0 3px rgba(79, 70, 229, 0.15)" : "none",
+                          transition: "all 0.18s ease",
+                          textAlign: "left",
+                        }}
+                      >
+                        <span className="pm-multiselect-text">
+                          {selectedCategories.length === 0 ? (
+                            <span style={{ color: "#94a3b8" }}>Select categories...</span>
+                          ) : selectedCategories.length === 1 ? (
+                            <span>{selectedCategories[0]}</span>
+                          ) : selectedCategories.length === 2 ? (
+                            <span>{selectedCategories[0]}, {selectedCategories[1]}</span>
+                          ) : (
+                            <>
+                              <span className="pm-badge-count">{selectedCategories.length} selected</span>
+                              <span style={{ color: "#334155", marginLeft: "6px" }}>
+                                {selectedCategories[0]}, +{selectedCategories.length - 1} more
+                              </span>
+                            </>
+                          )}
                         </span>
-                        <div style={{ display: "flex", gap: "8px" }}>
-                          <button
-                            type="button"
-                            onClick={selectAllCategories}
-                            className="pm-ms-action-btn"
-                          >
-                            Select All
-                          </button>
-                          <span style={{ color: "#cbd5e1" }}>|</span>
-                          <button
-                            type="button"
-                            onClick={clearCategories}
-                            className="pm-ms-action-btn"
-                          >
-                            Clear
-                          </button>
-                        </div>
-                      </div>
-                      <div className="pm-ms-items">
-                        {availableCategories.map((c) => {
-                          const checked = selectedCategories.includes(c);
-                          return (
-                            <div
-                              key={c}
-                              className={`pm-ms-item ${checked ? "pm-ms-item-active" : ""}`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleCategory(c);
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                checked={checked}
-                                onChange={() => {}} // onClick handled on parent
-                                className="pm-ms-checkbox"
-                              />
-                              <span className="pm-ms-item-label">{c}</span>
+                        <svg
+                          width="13"
+                          height="13"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          style={{
+                            transform: isCategoryDropdownOpen ? "rotate(180deg)" : "rotate(0deg)",
+                            transition: "transform 0.18s ease",
+                            flexShrink: 0,
+                            color: "#64748b",
+                          }}
+                        >
+                          <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                      </button>
+
+                      {isCategoryDropdownOpen && (
+                        <div className="pm-multiselect-popover">
+                          <div className="pm-ms-popover-header">
+                            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748b" }}>
+                              {availableCategories.length} Available
+                            </span>
+                            <div style={{ display: "flex", gap: "8px" }}>
+                              <button
+                                type="button"
+                                onClick={selectAllCategories}
+                                className="pm-ms-action-btn"
+                              >
+                                Select All
+                              </button>
+                              <span style={{ color: "#cbd5e1" }}>|</span>
+                              <button
+                                type="button"
+                                onClick={clearCategories}
+                                className="pm-ms-action-btn"
+                              >
+                                Clear
+                              </button>
                             </div>
-                          );
-                        })}
-                      </div>
-                    </div>
+                          </div>
+                          <div className="pm-ms-items">
+                            {availableCategories.map((c) => {
+                              const checked = selectedCategories.includes(c);
+                              return (
+                                <div
+                                  key={c}
+                                  className={`pm-ms-item ${checked ? "pm-ms-item-active" : ""}`}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleCategory(c);
+                                  }}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={checked}
+                                    onChange={() => {}} // onClick handled on parent
+                                    className="pm-ms-checkbox"
+                                  />
+                                  <span className="pm-ms-item-label">{c}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <input
+                      type="text"
+                      readOnly
+                      disabled
+                      value="Not Applicable"
+                      className="pm-input"
+                      style={{
+                        backgroundColor: "#f8fafc",
+                        color: "#94a3b8",
+                        cursor: "not-allowed",
+                        borderColor: "#e2e8f0",
+                        fontSize: "13px",
+                      }}
+                      title="This service does not require category selection"
+                    />
                   )}
                 </div>
               </div>

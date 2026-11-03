@@ -423,7 +423,9 @@ export default function PayTokenPage({ params }: { params: Promise<{ token: stri
                 <span className="ck-detail-label">Service</span>
                 <span className="ck-detail-val">{order.service}</span>
               </div>
-              {(order.quantity || order.category) && (
+              {(order.quantity || order.category) &&
+                order.quantity !== "Not Applicable" &&
+                order.category !== "Not Applicable" && (
                 <div className="ck-detail-row">
                   <span className="ck-detail-label">Scope</span>
                   <div className="ck-cat-tags">

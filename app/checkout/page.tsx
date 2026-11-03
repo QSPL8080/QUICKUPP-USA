@@ -29,7 +29,7 @@ function CheckoutContent() {
   const clientPhone = existingOrder?.clientPhone || sp.get("phone") || "";
   const companyName = existingOrder?.companyName || sp.get("company") || "";
   const service = existingOrder?.service || sp.get("service") || "AI-Powered Digital Marketing Services";
-  const category = existingOrder?.category || sp.get("category") || "Social Media Marketing";
+  const category = existingOrder?.category ?? (sp.has("category") ? sp.get("category")! : "Social Media Marketing");
   const billingStartDate = sp.get("from") || "";
   const billingEndDate = sp.get("to") || "";
   const notes = existingOrder?.notes || sp.get("notes") || "";
@@ -254,7 +254,12 @@ function CheckoutContent() {
     router,
   ]);
 
-  const categories: string[] = typeof category === "string" ? category.split(",").map((c: string) => c.trim()).filter(Boolean) : [];
+  const categories: string[] = typeof category === "string"
+    ? category
+        .split(",")
+        .map((c: string) => c.trim())
+        .filter((c) => Boolean(c) && c !== "Not Applicable")
+    : [];
 
   return (
     <div className="ck-page">

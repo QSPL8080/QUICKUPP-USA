@@ -188,9 +188,9 @@ export default function PaymentsView({
     clientEmail: "",
     companyName: "",
     service: SERVICES_DATA[0].service,
-    category: SERVICES_DATA[0].categories[0],
+    category: SERVICES_DATA[0].categories[0] || "",
     industry: CRM_INDUSTRIES[0] as string,
-    quantity: SERVICES_DATA[0].categories[0],
+    quantity: SERVICES_DATA[0].categories[0] || "",
     totalAmount: "",
     paymentOption: "full" as "full" | "partial",
     depositAmount: "",
@@ -209,9 +209,9 @@ export default function PaymentsView({
     clientEmail: "",
     companyName: "",
     service: SERVICES_DATA[0].service,
-    category: SERVICES_DATA[0].categories[0],
+    category: SERVICES_DATA[0].categories[0] || "",
     industry: CRM_INDUSTRIES[0] as string,
-    quantity: SERVICES_DATA[0].categories[0],
+    quantity: SERVICES_DATA[0].categories[0] || "",
     totalAmount: "",
     paymentOption: "full" as "full" | "partial",
     billingStartDate: "",
@@ -371,6 +371,8 @@ Quickupp Softech LLC`;
   const openEditLink = (p: PaymentRow) => {
     setError("");
     setEditingLink(p);
+    const serviceMatch = SERVICES_DATA.find((s) => s.service === p.service) || SERVICES_DATA[0];
+    const initialCategory = p.category || p.quantity || (serviceMatch.categories[0] || "");
     setEditLinkForm({
       id: p.id,
       clientName: p.clientName,
@@ -378,9 +380,9 @@ Quickupp Softech LLC`;
       clientEmail: p.clientEmail || "",
       companyName: p.companyName || "",
       service: p.service || SERVICES_DATA[0].service,
-      category: p.category || p.quantity || SERVICES_DATA[0].categories[0],
+      category: initialCategory,
       industry: p.industry || (CRM_INDUSTRIES[0] as string),
-      quantity: p.category || p.quantity || SERVICES_DATA[0].categories[0],
+      quantity: initialCategory,
       totalAmount: String(p.totalAmount || p.amount || ""),
       paymentOption: (p.paymentType as "full" | "partial") || "full",
       billingStartDate: p.billingStartDate || "",
@@ -395,12 +397,17 @@ Quickupp Softech LLC`;
     e.preventDefault();
     setBusy(true);
     setError("");
+    const matchedService = SERVICES_DATA.find((s) => s.service === editLinkForm.service);
+    const hasCategories = (matchedService?.categories?.length || 0) > 0;
+    const finalCategory = hasCategories ? editLinkForm.category : "Not Applicable";
+
     const res = await fetch("/api/crm/payment-links", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ...editLinkForm,
-        quantity: editLinkForm.category,
+        category: finalCategory,
+        quantity: finalCategory,
       }),
     }).catch(() => null);
     setBusy(false);
@@ -479,12 +486,17 @@ Quickupp Softech LLC`;
     e.preventDefault();
     setBusy(true);
     setError("");
+    const matchedService = SERVICES_DATA.find((s) => s.service === linkForm.service);
+    const hasCategories = (matchedService?.categories?.length || 0) > 0;
+    const finalCategory = hasCategories ? linkForm.category : "Not Applicable";
+
     const res = await fetch("/api/crm/payment-links", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ...linkForm,
-        quantity: linkForm.category,
+        category: finalCategory,
+        quantity: finalCategory,
       }),
     }).catch(() => null);
     setBusy(false);
@@ -501,9 +513,9 @@ Quickupp Softech LLC`;
       clientName: linkForm.clientName,
       clientPhone: linkForm.clientPhone,
       service: linkForm.service,
-      category: linkForm.category,
+      category: finalCategory,
       industry: linkForm.industry,
-      quantity: linkForm.category,
+      quantity: finalCategory,
       totalAmount: Number(linkForm.totalAmount) || 0,
       paymentOption: linkForm.paymentOption,
     });
@@ -1715,7 +1727,7 @@ Quickupp Softech LLC`;
                       onChange={(e) => {
                         const newServ = e.target.value;
                         const match = SERVICES_DATA.find((s) => s.service === newServ);
-                        const firstCat = match?.categories?.[0] || "";
+                        const firstCat = match && match.categories.length > 0 ? match.categories[0] : "";
                         setLinkForm((f) => ({
                           ...f,
                           service: newServ,
@@ -1732,15 +1744,38 @@ Quickupp Softech LLC`;
 
                   <label className="crm-field">
                     <span className="crm-label">Category / Scope *</span>
-                    <select
-                      className="crm-input crm-select"
-                      value={linkForm.category}
-                      onChange={(e) => setLinkForm((f) => ({ ...f, category: e.target.value, quantity: e.target.value }))}
-                    >
-                      {(SERVICES_DATA.find((s) => s.service === linkForm.service)?.categories || []).map((cat) => (
-                        <option key={cat} value={cat}>{cat}</option>
-                      ))}
-                    </select>
+                    {(() => {
+                      const cats = SERVICES_DATA.find((s) => s.service === linkForm.service)?.categories || [];
+                      if (cats.length > 0) {
+                        return (
+                          <select
+                            className="crm-input crm-select"
+                            value={linkForm.category}
+                            onChange={(e) => setLinkForm((f) => ({ ...f, category: e.target.value, quantity: e.target.value }))}
+                          >
+                            {cats.map((cat) => (
+                              <option key={cat} value={cat}>{cat}</option>
+                            ))}
+                          </select>
+                        );
+                      }
+                      return (
+                        <input
+                          type="text"
+                          readOnly
+                          disabled
+                          value="Not Applicable"
+                          className="crm-input is-disabled"
+                          style={{
+                            background: "rgba(255, 255, 255, 0.04)",
+                            color: "#94a3b8",
+                            cursor: "not-allowed",
+                            border: "1px solid #334155",
+                          }}
+                          title="This service does not require category selection"
+                        />
+                      );
+                    })()}
                   </label>
                 </div>
 
@@ -2079,7 +2114,7 @@ Quickupp Softech LLC`;
                       onChange={(e) => {
                         const newServ = e.target.value;
                         const match = SERVICES_DATA.find((s) => s.service === newServ);
-                        const firstCat = match?.categories?.[0] || "";
+                        const firstCat = match && match.categories.length > 0 ? match.categories[0] : "";
                         setEditLinkForm((f) => ({
                           ...f,
                           service: newServ,
@@ -2095,15 +2130,38 @@ Quickupp Softech LLC`;
                   </label>
                   <label className="crm-field">
                     <span className="crm-label">Category / Scope *</span>
-                    <select
-                      className="crm-input crm-select"
-                      value={editLinkForm.category}
-                      onChange={(e) => setEditLinkForm((f) => ({ ...f, category: e.target.value, quantity: e.target.value }))}
-                    >
-                      {(SERVICES_DATA.find((s) => s.service === editLinkForm.service)?.categories || []).map((cat) => (
-                        <option key={cat} value={cat}>{cat}</option>
-                      ))}
-                    </select>
+                    {(() => {
+                      const cats = SERVICES_DATA.find((s) => s.service === editLinkForm.service)?.categories || [];
+                      if (cats.length > 0) {
+                        return (
+                          <select
+                            className="crm-input crm-select"
+                            value={editLinkForm.category}
+                            onChange={(e) => setEditLinkForm((f) => ({ ...f, category: e.target.value, quantity: e.target.value }))}
+                          >
+                            {cats.map((cat) => (
+                              <option key={cat} value={cat}>{cat}</option>
+                            ))}
+                          </select>
+                        );
+                      }
+                      return (
+                        <input
+                          type="text"
+                          readOnly
+                          disabled
+                          value="Not Applicable"
+                          className="crm-input is-disabled"
+                          style={{
+                            background: "rgba(255, 255, 255, 0.04)",
+                            color: "#94a3b8",
+                            cursor: "not-allowed",
+                            border: "1px solid #334155",
+                          }}
+                          title="This service does not require category selection"
+                        />
+                      );
+                    })()}
                   </label>
                 </div>
 
