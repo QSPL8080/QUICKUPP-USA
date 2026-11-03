@@ -57,7 +57,7 @@ function CheckoutContent() {
             color: "gold",
             shape: "rect",
             label: "pay",
-            height: 46,
+            height: 38,
           },
           createOrder: async () => {
             setError("");
@@ -201,8 +201,8 @@ function CheckoutContent() {
           <Image
             src="/images/logo-black.png"
             alt="Quickupp Softech LLC"
-            width={155}
-            height={36}
+            width={140}
+            height={34}
             className="ck-logo-img"
             priority
           />
@@ -232,144 +232,152 @@ function CheckoutContent() {
       {/* Main Container */}
       <main className={`ck-container ${step === "payment" ? "is-payment" : ""}`}>
         {step === "summary" && (
-          /* Step 1: Order Summary */
+          /* Step 1: Order Summary (Ultra-Compact 2-Column Side-by-Side) */
           <div className="ck-card">
-            <h1 className="ck-card-title">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-                <path d="M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1Z" />
-              </svg>
-              <span>Order Summary</span>
-            </h1>
-            <p className="ck-card-subtitle">
-              Review your service engagement details and pricing below.
-            </p>
+            <div className="ck-card-header">
+              <h1 className="ck-card-title">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                  <path d="M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1Z" />
+                </svg>
+                <span>Order Summary</span>
+              </h1>
+              <p className="ck-card-subtitle">
+                Review your service engagement details and pricing below.
+              </p>
+            </div>
 
-            <div className="ck-detail-list">
-              <div className="ck-detail-row">
-                <span className="ck-detail-label">Client Name</span>
-                <span className="ck-detail-val">{clientName}</span>
-              </div>
-              {clientEmail && (
-                <div className="ck-detail-row">
-                  <span className="ck-detail-label">Email Address</span>
-                  <span className="ck-detail-val">{clientEmail}</span>
-                </div>
-              )}
-              {clientPhone && (
-                <div className="ck-detail-row">
-                  <span className="ck-detail-label">Phone Number</span>
-                  <span className="ck-detail-val">{clientPhone}</span>
-                </div>
-              )}
-              {companyName && (
-                <div className="ck-detail-row">
-                  <span className="ck-detail-label">Company</span>
-                  <span className="ck-detail-val">{companyName}</span>
-                </div>
-              )}
-              <div className="ck-detail-row">
-                <span className="ck-detail-label">Service</span>
-                <span className="ck-detail-val">{service}</span>
-              </div>
-              {categories.length > 0 && (
-                <div className="ck-detail-row">
-                  <span className="ck-detail-label">Categories / Scope</span>
-                  <div className="ck-cat-tags">
-                    {categories.map((cat, i) => (
-                      <span key={i} className="ck-cat-tag">
-                        {cat}
+            <div className="ck-summary-grid">
+              {/* Left Column: Engagement Information */}
+              <div className="ck-summary-left">
+                <div className="ck-detail-list">
+                  <div className="ck-detail-row">
+                    <span className="ck-detail-label">Client Name</span>
+                    <span className="ck-detail-val">{clientName}</span>
+                  </div>
+                  {clientEmail && (
+                    <div className="ck-detail-row">
+                      <span className="ck-detail-label">Email Address</span>
+                      <span className="ck-detail-val">{clientEmail}</span>
+                    </div>
+                  )}
+                  {clientPhone && (
+                    <div className="ck-detail-row">
+                      <span className="ck-detail-label">Phone Number</span>
+                      <span className="ck-detail-val">{clientPhone}</span>
+                    </div>
+                  )}
+                  {companyName && (
+                    <div className="ck-detail-row">
+                      <span className="ck-detail-label">Company</span>
+                      <span className="ck-detail-val">{companyName}</span>
+                    </div>
+                  )}
+                  <div className="ck-detail-row">
+                    <span className="ck-detail-label">Service</span>
+                    <span className="ck-detail-val">{service}</span>
+                  </div>
+                  {categories.length > 0 && (
+                    <div className="ck-detail-row">
+                      <span className="ck-detail-label">Categories / Scope</span>
+                      <div className="ck-cat-tags">
+                        {categories.map((cat, i) => (
+                          <span key={i} className="ck-cat-tag">
+                            {cat}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {billingStartDate && (
+                    <div className="ck-detail-row">
+                      <span className="ck-detail-label">Coverage Period</span>
+                      <span className="ck-detail-val">
+                        {billingStartDate} to {billingEndDate || "Ongoing"}
                       </span>
-                    ))}
+                    </div>
+                  )}
+                  <div className="ck-detail-row">
+                    <span className="ck-detail-label">Payment Option</span>
+                    <span
+                      className="ck-detail-val"
+                      style={{
+                        color: isPartial ? "#7c3aed" : "#059669",
+                        fontWeight: 700,
+                      }}
+                    >
+                      {isPartial ? "Partial (50% Deposit)" : "Full (100%)"}
+                    </span>
                   </div>
                 </div>
-              )}
-              {billingStartDate && (
-                <div className="ck-detail-row">
-                  <span className="ck-detail-label">Coverage Period</span>
-                  <span className="ck-detail-val">
-                    {billingStartDate} to {billingEndDate || "Ongoing"}
-                  </span>
+              </div>
+
+              {/* Right Column: Pricing Breakdown & Action */}
+              <div className="ck-summary-right">
+                <div className="ck-breakdown-box">
+                  <div className="ck-breakdown-row">
+                    <span>Total Service Invoice</span>
+                    <strong>${numTotal.toFixed(2)} USD</strong>
+                  </div>
+                  {isPartial && (
+                    <div className="ck-breakdown-row">
+                      <span style={{ color: "#dc2626" }}>Remaining 50% Due Later</span>
+                      <strong style={{ color: "#dc2626" }}>${remainingAmount.toFixed(2)} USD</strong>
+                    </div>
+                  )}
+                  <div className="ck-breakdown-row is-total">
+                    <span>{isPartial ? "Due Today (50% Deposit)" : "Total Due Today"}</span>
+                    <span className="ck-total-highlight">${payAmount.toFixed(2)} USD</span>
+                  </div>
                 </div>
-              )}
-              <div className="ck-detail-row">
-                <span className="ck-detail-label">Payment Option</span>
-                <span
-                  className="ck-detail-val"
-                  style={{
-                    color: isPartial ? "#7c3aed" : "#059669",
-                    fontWeight: 700,
+
+                <div className="ck-trust-box">
+                  <div className="ck-trust-item">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+                    </svg>
+                    <span>PayPal Protection</span>
+                  </div>
+                  <div className="ck-trust-item">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                    <span>Receipt Emailed</span>
+                  </div>
+                  <div className="ck-trust-item">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                    <span>256-Bit SSL</span>
+                  </div>
+                  <div className="ck-trust-item">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <polyline points="12 6 12 12 14 14" />
+                    </svg>
+                    <span>Instant Confirm</span>
+                  </div>
+                </div>
+
+                {/* Proceed to Payment CTA */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setError("");
+                    setStep("payment");
                   }}
+                  className="ck-proceed-btn"
                 >
-                  {isPartial ? "Partial Payment (50% Deposit)" : "Full Payment (100%)"}
-                </span>
+                  <span>Proceed to Payment (${payAmount.toFixed(2)} USD)</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 12h14" />
+                    <path d="m12 5 7 7-7 7" />
+                  </svg>
+                </button>
               </div>
             </div>
-
-            {/* Pricing Breakdown Box */}
-            <div className="ck-breakdown-box">
-              <div className="ck-breakdown-row">
-                <span>Total Service Invoice</span>
-                <strong>${numTotal.toFixed(2)} USD</strong>
-              </div>
-              {isPartial && (
-                <div className="ck-breakdown-row">
-                  <span style={{ color: "#dc2626" }}>Remaining 50% Due Later</span>
-                  <strong style={{ color: "#dc2626" }}>${remainingAmount.toFixed(2)} USD</strong>
-                </div>
-              )}
-              <div className="ck-breakdown-row is-total">
-                <span>{isPartial ? "Due Today (50% Deposit)" : "Total Due Today"}</span>
-                <span className="ck-total-highlight">${payAmount.toFixed(2)} USD</span>
-              </div>
-            </div>
-
-            {/* Trust and Assurance Box */}
-            <div className="ck-trust-box">
-              <div className="ck-trust-item">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                </svg>
-                <span>SSL 256-Bit Secure</span>
-              </div>
-              <div className="ck-trust-item">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
-                </svg>
-                <span>PayPal Buyer Protection</span>
-              </div>
-              <div className="ck-trust-item">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                  <polyline points="14 2 14 8 20 8" />
-                </svg>
-                <span>PDF Receipt Emailed</span>
-              </div>
-              <div className="ck-trust-item">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10" />
-                  <polyline points="12 6 12 12 14 14" />
-                </svg>
-                <span>Instant Confirmation</span>
-              </div>
-            </div>
-
-            {/* Proceed to Payment CTA */}
-            <button
-              type="button"
-              onClick={() => {
-                setError("");
-                setStep("payment");
-              }}
-              className="ck-proceed-btn"
-            >
-              <span>Proceed to Payment (${payAmount.toFixed(2)} USD)</span>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12h14" />
-                <path d="m12 5 7 7-7 7" />
-              </svg>
-            </button>
           </div>
         )}
 
