@@ -14,6 +14,9 @@ export const metadata: Metadata = {
   title: "Quickupp Softech | Marketing. AI. Technology. Built for Growth.",
   description:
     "Quickupp Softech is a full-service digital marketing, AI and technology agency helping businesses grow through social media, SEO, paid marketing, AI automation, web & app development and more.",
+  verification: {
+    google: "LRVDf14TwT0MYqtLiUhSCGZRgMOALA6QyZ8aThDo86s",
+  },
   openGraph: {
     title: "Quickupp Softech | Marketing. AI. Technology. Built for Growth.",
     description:
@@ -39,6 +42,27 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Google Search Console */}
+        <meta name="google-site-verification" content="LRVDf14TwT0MYqtLiUhSCGZRgMOALA6QyZ8aThDo86s" />
+
+        {/* Google Analytics (gtag.js) */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-6Z6BNGCRLG"
+          strategy="afterInteractive"
+        />
+        <Script
+          id="google-analytics"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-6Z6BNGCRLG');
+            `,
+          }}
+        />
+
         <meta name="generator" content="Quickupp Softech" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
