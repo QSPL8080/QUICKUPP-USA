@@ -31,18 +31,10 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
   const form = SERVICE_FORMS[service];
   const options: readonly string[] = form.options;
   const hasCategories = service !== "youtube" && options.length > 0;
-  const initialPreset =
-    hasCategories && current && options.some((o) => o.toLowerCase() === current.toLowerCase())
-      ? options.find((o) => o.toLowerCase() === current.toLowerCase()) || current
-      : hasCategories
-      ? options[0]
-      : "";
   const idp = `sef-${service}`;
 
   const [formData, setFormData] = useState(EMPTY);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(
-    initialPreset ? [initialPreset] : []
-  );
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [categoryError, setCategoryError] = useState(false);
   const categoryRef = useRef<HTMLDivElement>(null);
@@ -162,7 +154,7 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
                 onClick={() => {
                   setSubmitted(false);
                   setFormData(EMPTY);
-                  setSelectedCategories(initialPreset ? [initialPreset] : []);
+                  setSelectedCategories([]);
                   setCategoryError(false);
                 }}
               >
@@ -322,11 +314,11 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
 
                 {hasCategories && (
                   <div className="su-field-group sef-category-group" ref={categoryRef}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "7px" }}>
                       <label htmlFor={`${idp}-category`} className="su-field-label" style={{ margin: 0 }}>
-                        Category <span style={{ color: "#ef4444" }}>*</span>
+                        Category*
                       </label>
-                      <span style={{ fontSize: "11px", color: "#64748b", fontWeight: 500 }}>
+                      <span style={{ fontSize: "11px", color: "#64748b", fontWeight: 500, letterSpacing: "normal", textTransform: "none" }}>
                         Select multiple
                       </span>
                     </div>
@@ -362,11 +354,12 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
-                          strokeWidth="2.2"
+                          strokeWidth="2"
                           strokeLinecap="round"
                           strokeLinejoin="round"
+                          aria-hidden="true"
                         >
-                          <path d="M6 9l6 6 6-6" />
+                          <polyline points="6 9 12 15 18 9" />
                         </svg>
                       </button>
 

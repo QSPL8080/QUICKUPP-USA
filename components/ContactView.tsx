@@ -241,8 +241,7 @@ function InquiryForm() {
             value={form.projectType}
             onChange={(e) => {
               const val = e.target.value;
-              const cats = getCategoriesForService(val);
-              setForm((f) => ({ ...f, projectType: val, category: cats[0] || "" }));
+              setForm((f) => ({ ...f, projectType: val, category: "" }));
               if (errors.projectType) setErrors((x) => ({ ...x, projectType: "" }));
             }}
           >
