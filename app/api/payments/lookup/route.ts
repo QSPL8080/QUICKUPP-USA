@@ -56,18 +56,23 @@ export async function GET(req: Request) {
       }, { status: 410 });
     }
 
-    // Check 24-hour expiration ONLY for unpaid initial payment links (amount = 0 and pending).
-    // Balance payment links (partially_paid) DO NOT expire in 24 hours.
-    if (p.expires_at && p.status === "pending" && Number(p.amount || 0) === 0) {
-      const expDate = new Date(p.expires_at);
-      if (!isNaN(expDate.getTime()) && new Date() > expDate) {
-        return NextResponse.json({
-          ok: false,
-          error: "This payment link has expired. Please contact Quickupp support to generate a fresh link.",
-          expired: true,
-          orderNumber: p.invoice_number,
-        }, { status: 410 });
-      }
+    // Check 24-hour expiration for unpaid payment links (amount = 0 and pending).
+    const isPast24h =
+      p.link_status === "expired" ||
+      (p.expires_at && !isNaN(new Date(p.expires_at).getTime()) && new Date() > new Date(p.expires_at)) ||
+      (p.created_at && !isNaN(new Date(p.created_at).getTime()) && new Date().getTime() - new Date(p.created_at).getTime() > 24 * 60 * 60 * 1000);
+
+    if (isPast24h && p.status === "pending" && Number(p.amount || 0) === 0) {
+      // Mark as expired in DB
+      await pool.query("UPDATE payment_links SET link_status = 'expired' WHERE id = ?", [p.id]).catch(() => {});
+      await pool.query("UPDATE payments SET link_status = 'expired' WHERE id = ?", [p.id]).catch(() => {});
+
+      return NextResponse.json({
+        ok: false,
+        error: "This payment link has expired (valid for 24 hours). Please contact Quickupp support to generate a fresh link.",
+        expired: true,
+        orderNumber: p.invoice_number,
+      }, { status: 410 });
     }
 
     const totalAmount = Number(p.total_amount != null ? p.total_amount : p.amount);

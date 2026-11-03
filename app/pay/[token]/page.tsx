@@ -62,7 +62,7 @@ export default function PayTokenPage({ params }: { params: Promise<{ token: stri
           return;
         }
         setOrder(data.order);
-        if (data.order.status === "paid") {
+        if (data.order.status === "paid" || data.order.linkStatus === "used") {
           setIsPaid(true);
         } else if (data.order.amountPaid > 0) {
           // Already partially paid, next payment is remaining balance!

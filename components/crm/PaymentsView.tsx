@@ -241,6 +241,14 @@ export default function PaymentsView({
     toast("Payment link copied to clipboard!");
   };
 
+  const isExpiredLink = (p: { expiresAt?: string | null; createdAt?: string | null; status?: string | null; amount?: number | null; linkStatus?: string | null }) => {
+    if (p.linkStatus === "expired") return true;
+    if (p.status === "paid" || p.linkStatus === "used") return false;
+    if (p.expiresAt && !isNaN(new Date(p.expiresAt).getTime()) && new Date(p.expiresAt) < new Date()) return true;
+    if (p.createdAt && !isNaN(new Date(p.createdAt).getTime()) && p.status !== "paid" && (new Date().getTime() - new Date(p.createdAt).getTime() > 24 * 60 * 60 * 1000)) return true;
+    return false;
+  };
+
   const getWhatsAppMessage = (p: {
     clientName: string;
     clientPhone?: string | null;
@@ -410,6 +418,30 @@ Quickupp Softech LLC`;
     if (!res?.ok || !json.ok) {
       setError(json.error || "Failed to update payment link.");
       return;
+    }
+    if (viewing && viewing.id === editLinkForm.id) {
+      setViewing((prev) =>
+        prev
+          ? {
+              ...prev,
+              clientName: editLinkForm.clientName,
+              clientPhone: editLinkForm.clientPhone,
+              clientEmail: editLinkForm.clientEmail,
+              companyName: editLinkForm.companyName,
+              service: editLinkForm.service,
+              category: finalCategory,
+              quantity: finalCategory,
+              industry: editLinkForm.industry,
+              totalAmount: Number(editLinkForm.totalAmount) || prev.totalAmount,
+              paymentType: editLinkForm.paymentOption,
+              billingStartDate: editLinkForm.billingStartDate,
+              billingEndDate: editLinkForm.billingEndDate,
+              balanceDueDate: editLinkForm.balanceDueDate,
+              linkStatus: editLinkForm.linkStatus,
+              notes: editLinkForm.notes,
+            }
+          : null
+      );
     }
     setEditingLink(null);
     toast("Payment link updated!");
@@ -714,9 +746,9 @@ Quickupp Softech LLC`;
                   const remAmt = p.remainingAmount != null ? p.remainingAmount : Math.max(0, totAmt - p.amount);
 
                   // Link status check
-                  const isLinkExpired = p.expiresAt && new Date(p.expiresAt) < new Date() && p.status !== "paid";
+                  const isLinkExpired = isExpiredLink(p);
                   const linkStatusBadge =
-                    p.status === "paid"
+                    p.status === "paid" || p.linkStatus === "used"
                       ? "used"
                       : isLinkExpired
                       ? "expired"
@@ -891,29 +923,31 @@ Quickupp Softech LLC`;
                             </button>
 
                             {/* WhatsApp (Green Button) */}
-                            <button
-                              type="button"
-                              className="crm-act crm-act-sm"
-                              style={{
-                                fontSize: "12px",
-                                padding: "4px 12px",
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: "5px",
-                                background: "#10b981",
-                                color: "#ffffff",
-                                border: "none",
-                                fontWeight: 700,
-                                borderRadius: "8px",
-                              }}
-                              onClick={() => openWhatsApp(p)}
-                              title="Share on WhatsApp"
-                            >
-                              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M20.52 3.48A11.93 11.93 0 0 0 12.06 0C5.46 0 .09 5.37.09 11.97c0 2.11.55 4.17 1.6 6L0 24l6.19-1.62a11.93 11.93 0 0 0 5.87 1.51h.01c6.6 0 11.97-5.37 11.97-11.97 0-3.2-1.25-6.21-3.52-8.44zm-8.46 18.36h-.01a9.92 9.92 0 0 1-5.06-1.39l-.36-.22-3.76.99 1-3.66-.24-.38a9.93 9.93 0 0 1-1.52-5.21c0-5.5 4.47-9.97 9.97-9.97 2.66 0 5.16 1.04 7.05 2.92a9.92 9.92 0 0 1 2.92 7.05c0 5.5-4.48 9.97-9.99 9.97zm5.46-7.46c-.3-.15-1.77-.87-2.04-.97-.28-.1-.48-.15-.68.15-.2.3-.77.97-.95 1.17-.17.2-.35.22-.65.07-.3-.15-1.27-.47-2.42-1.49-.9-.8-1.5-1.78-1.68-2.08-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.68-1.64-.93-2.25-.24-.59-.49-.51-.68-.52h-.58c-.2 0-.52.07-.8.37-.27.3-1.05 1.03-1.05 2.51s1.08 2.91 1.23 3.11c.15.2 2.12 3.24 5.14 4.54.72.31 1.28.5 1.72.64.72.23 1.38.2 1.9.12.58-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.18-1.42-.08-.13-.27-.2-.57-.35z" />
-                              </svg>
-                              WhatsApp
-                            </button>
+                            {!isLinkExpired && p.status !== "paid" && p.linkStatus !== "used" && p.linkStatus !== "cancelled" ? (
+                              <button
+                                type="button"
+                                className="crm-act crm-act-sm"
+                                style={{
+                                  fontSize: "12px",
+                                  padding: "4px 12px",
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: "5px",
+                                  background: "#10b981",
+                                  color: "#ffffff",
+                                  border: "none",
+                                  fontWeight: 700,
+                                  borderRadius: "8px",
+                                }}
+                                onClick={() => openWhatsApp(p)}
+                                title="Share on WhatsApp (valid 24h)"
+                              >
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M20.52 3.48A11.93 11.93 0 0 0 12.06 0C5.46 0 .09 5.37.09 11.97c0 2.11.55 4.17 1.6 6L0 24l6.19-1.62a11.93 11.93 0 0 0 5.87 1.51h.01c6.6 0 11.97-5.37 11.97-11.97 0-3.2-1.25-6.21-3.52-8.44zm-8.46 18.36h-.01a9.92 9.92 0 0 1-5.06-1.39l-.36-.22-3.76.99 1-3.66-.24-.38a9.93 9.93 0 0 1-1.52-5.21c0-5.5 4.47-9.97 9.97-9.97 2.66 0 5.16 1.04 7.05 2.92a9.92 9.92 0 0 1 2.92 7.05c0 5.5-4.48 9.97-9.99 9.97zm5.46-7.46c-.3-.15-1.77-.87-2.04-.97-.28-.1-.48-.15-.68.15-.2.3-.77.97-.95 1.17-.17.2-.35.22-.65.07-.3-.15-1.27-.47-2.42-1.49-.9-.8-1.5-1.78-1.68-2.08-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.68-1.64-.93-2.25-.24-.59-.49-.51-.68-.52h-.58c-.2 0-.52.07-.8.37-.27.3-1.05 1.03-1.05 2.51s1.08 2.91 1.23 3.11c.15.2 2.12 3.24 5.14 4.54.72.31 1.28.5 1.72.64.72.23 1.38.2 1.9.12.58-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.18-1.42-.08-.13-.27-.2-.57-.35z" />
+                                </svg>
+                                WhatsApp
+                              </button>
+                            ) : null}
 
                             {/* Details */}
                             <button
@@ -1292,201 +1326,286 @@ Quickupp Softech LLC`;
       </div>
 
       {/* ---- DETAILS MODAL (Matching Screenshot 4 & 5) ---- */}
-      {viewing && (
-        <div className="crm-modal-wrap" onClick={() => setViewing(null)}>
-          <div className="crm-view-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "860px" }}>
-            {/* Header */}
-            <div className="crm-view-modal-head">
-              <div>
-                <div
-                  className="crm-view-modal-title"
-                  style={{
-                    fontSize: "15px",
-                    fontWeight: 700,
-                    color: "#0f172a",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    flexWrap: "wrap",
-                    lineHeight: "1.4",
-                  }}
-                >
-                  <span style={{ color: "#0f172a", fontWeight: 800 }}>{viewing.clientName}</span>
-                  <span style={{ color: "#94a3b8" }}>•</span>
-                  <span style={{ color: "#334155", fontWeight: 600 }}>{viewing.service}</span>
-                  {viewing.quantity && (
-                    <span
-                      style={{
-                        background: "#faf5ff",
-                        color: "#7c3aed",
-                        border: "1px solid #f3e8ff",
-                        padding: "1px 7px",
-                        borderRadius: "4px",
-                        fontSize: "12px",
-                        fontWeight: 600,
-                      }}
-                    >
-                      {viewing.quantity}
-                    </span>
-                  )}
-                  <span style={{ color: "#94a3b8" }}>•</span>
-                  <span
-                    style={{
-                      background: "#f5f3ff",
-                      color: "#6d28d9",
-                      fontWeight: 800,
-                      padding: "2px 8px",
-                      borderRadius: "6px",
-                      fontSize: "13px",
-                    }}
-                  >
-                    ${(viewing.totalAmount != null ? viewing.totalAmount : viewing.amount).toFixed(2)} USD
-                  </span>
-                </div>
-                <p className="crm-view-modal-sub" style={{ fontSize: "12px", marginTop: "4px" }}>
-                  Generated by {viewing.createdBy || "Admin"} on {fmtDate(viewing.createdAt, true)}
-                  {viewing.expiresAt && ` · expires ${fmtDate(viewing.expiresAt, true)}`}
-                </p>
-              </div>
+      {viewing && (() => {
+        const isViewingExpired = isExpiredLink(viewing);
+        const isViewingPaid = viewing.status === "paid" || viewing.linkStatus === "used";
+        const canShareViewing = !isViewingExpired && !isViewingPaid && viewing.linkStatus !== "cancelled";
 
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                {viewing.token && (
+        return (
+          <div className="crm-modal-wrap" onClick={() => setViewing(null)}>
+            <div className="crm-view-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "880px" }}>
+              {/* Header */}
+              <div className="crm-drawer-head" style={{ padding: "16px 24px", borderBottom: "1px solid #e2e8f0" }}>
+                <div>
+                  <h3 className="crm-modal-title" style={{ fontSize: "16px", fontWeight: 700, margin: 0, color: "#0f172a" }}>
+                    Payment Link Details
+                  </h3>
+                  <p className="crm-modal-sub" style={{ fontSize: "12px", margin: "2px 0 0", color: "#64748b" }}>
+                    Order #{viewing.invoiceNumber || `QAS-${viewing.id}`} · Generated by {viewing.createdBy || "Admin"} on {fmtDate(viewing.createdAt, true)}
+                  </p>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  {viewing.token && (
+                    <button
+                      type="button"
+                      className="crm-act crm-act-ghost crm-act-sm"
+                      onClick={() => copyLink(viewing.token!)}
+                      style={{ display: "inline-flex", alignItems: "center", gap: "5px", fontSize: "12px", padding: "5px 11px" }}
+                    >
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                      </svg>
+                      <span>Copy Link</span>
+                    </button>
+                  )}
                   <button
                     type="button"
-                    className="crm-act crm-act-dark crm-act-sm"
-                    onClick={() => copyLink(viewing.token!)}
-                    style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}
+                    className="crm-icon-act"
+                    onClick={() => setViewing(null)}
+                    aria-label="Close"
                   >
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                      <path d="M18 6L6 18M6 6l12 12" />
                     </svg>
-                    <span>Copy Link</span>
                   </button>
-                )}
-                <button
-                  type="button"
-                  className="crm-icon-act"
-                  onClick={() => setViewing(null)}
-                  aria-label="Close"
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                    <path d="M18 6L6 18M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            {/* Modal Subtabs (Orders (1) vs Payments) */}
-            <div style={{ padding: "16px 24px 0" }}>
-              <div className="crm-modal-subtabs">
-                <button
-                  type="button"
-                  className={`crm-modal-subtab ${modalSubtab === "orders" ? "is-active" : ""}`}
-                  onClick={() => setModalSubtab("orders")}
-                >
-                  Orders (1)
-                </button>
-                <button
-                  type="button"
-                  className={`crm-modal-subtab ${modalSubtab === "payments" ? "is-active" : ""}`}
-                  onClick={() => setModalSubtab("payments")}
-                >
-                  Payments ({viewing.amount > 0 ? 1 : 0})
-                </button>
-              </div>
-            </div>
-
-            {/* Modal Body */}
-            <div className="crm-view-modal-body" style={{ paddingTop: "10px" }}>
-              {modalSubtab === "orders" ? (
-                /* Orders Subtab Table (Screenshot 4) */
-                <div className="crm-table-wrap" style={{ border: "1px solid #e2e8f0", borderRadius: "10px" }}>
-                  <table className="crm-table" style={{ fontSize: "12.5px" }}>
-                    <thead>
-                      <tr style={{ background: "#f8fafc" }}>
-                        <th>ORDER</th>
-                        <th>CUSTOMER</th>
-                        <th>VIDEO</th>
-                        <th>AMOUNT</th>
-                        <th>PAYMENT STATUS</th>
-                        <th>LINK</th>
-                        <th style={{ textAlign: "right" }}>ACTIONS</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>
-                          <span style={{ fontWeight: 800, fontFamily: "monospace", color: "#0f172a" }}>
-                            {viewing.invoiceNumber || `QAS-${viewing.id}`}
-                          </span>
-                          <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>
-                            {fmtDate(viewing.createdAt, true)}
-                          </span>
-                          <span style={{ display: "block", fontSize: "10.5px", color: "#7c3aed", fontWeight: 700 }}>
-                            Source: {viewing.leadSource || "Manual"}
-                          </span>
-                        </td>
-                        <td>
-                          <span style={{ fontWeight: 700, color: "#0f172a", display: "block" }}>
-                            {viewing.clientName}
-                          </span>
-                          <span style={{ color: "#64748b", fontSize: "11.5px" }}>
-                            {viewing.clientPhone || "—"}
-                          </span>
-                        </td>
-                        <td>
-                          <span style={{ fontWeight: 600, color: "#0f172a", display: "block" }}>
-                            {viewing.service}
-                          </span>
-                          <span style={{ color: "#64748b", fontSize: "11.5px" }}>
-                            Qty {viewing.quantity || "1"}
-                          </span>
-                        </td>
-                        <td>
-                          <span style={{ display: "block", fontWeight: 700, color: "#0f172a" }}>
-                            Total ${(viewing.totalAmount != null ? viewing.totalAmount : viewing.amount).toFixed(2)}
-                          </span>
-                          <span style={{ display: "block", color: "#16a34a", fontSize: "11.5px", fontWeight: 600 }}>
-                            Paid ${viewing.amount.toFixed(2)}
-                          </span>
-                          <span style={{ display: "block", color: "#ef4444", fontSize: "11.5px", fontWeight: 600 }}>
-                            Remaining ${(viewing.remainingAmount != null ? viewing.remainingAmount : 0).toFixed(2)}
-                          </span>
-                        </td>
-                        <td>
-                          {Number(viewing.amount) === 0 ? (
-                            <span style={{ color: "#64748b", fontWeight: 700 }}>Not Paid</span>
-                          ) : viewing.status === "failed" ? (
-                            <span className="crm-pill crm-pill-failed">Payment Failed</span>
-                          ) : viewing.status === "paid" ? (
-                            <span className="crm-pill crm-pill-paid">Fully Paid</span>
-                          ) : viewing.status === "pending" && Number(viewing.amount) > 0 ? (
-                            <span className="crm-pill crm-pill-pending">Pending Clearing</span>
-                          ) : (
-                            <span className="crm-pill crm-pill-partially_paid">Partially Paid</span>
-                          )}
-                        </td>
-                        <td>
-                          <span className={`crm-link-pill crm-link-pill-${viewing.status === "paid" ? "used" : viewing.linkStatus || "active"}`}>
-                            {viewing.status === "paid" ? "Used" : viewing.linkStatus || "Active"}
-                          </span>
-                        </td>
-                        <td style={{ textAlign: "right" }}>
-                          <button
-                            type="button"
-                            className="crm-act crm-act-danger crm-act-sm"
-                            onClick={() => deleteSingle(viewing)}
-                            style={{ fontSize: "11.5px", padding: "3px 8px" }}
-                          >
-                            Delete
-                          </button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
                 </div>
-              ) : (
+              </div>
+
+              {/* Info Summary in Details */}
+              <div style={{ padding: "14px 24px 0" }}>
+                <div
+                  style={{
+                    background: "#f8fafc",
+                    border: "1px solid #e2e8f0",
+                    borderRadius: "10px",
+                    padding: "12px 16px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    flexWrap: "wrap",
+                    gap: "12px",
+                  }}
+                >
+                  <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                      <span style={{ fontSize: "14.5px", fontWeight: 800, color: "#0f172a" }}>{viewing.clientName}</span>
+                      {viewing.companyName && (
+                        <span style={{ fontSize: "12px", color: "#64748b", fontWeight: 500 }}>
+                          ({viewing.companyName})
+                        </span>
+                      )}
+                      <span style={{ color: "#cbd5e1" }}>•</span>
+                      <span style={{ fontSize: "13px", fontWeight: 600, color: "#334155" }}>{viewing.service}</span>
+                      {viewing.quantity && (
+                        <span
+                          style={{
+                            background: "#faf5ff",
+                            color: "#7c3aed",
+                            border: "1px solid #f3e8ff",
+                            padding: "1px 7px",
+                            borderRadius: "4px",
+                            fontSize: "11.5px",
+                            fontWeight: 700,
+                          }}
+                        >
+                          {viewing.quantity}
+                        </span>
+                      )}
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "11.5px", color: "#64748b", flexWrap: "wrap" }}>
+                      {viewing.clientEmail && <span>{viewing.clientEmail}</span>}
+                      {viewing.clientPhone && <span>• {viewing.clientPhone}</span>}
+                      {viewing.industry && <span>• Industry: {viewing.industry}</span>}
+                    </div>
+                  </div>
+
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontSize: "16px", fontWeight: 800, color: "#0f172a" }}>
+                      ${(viewing.totalAmount != null ? viewing.totalAmount : viewing.amount).toFixed(2)} USD
+                    </div>
+                    <div style={{ fontSize: "11px", fontWeight: 600, marginTop: "2px" }}>
+                      {isViewingPaid ? (
+                        <span style={{ color: "#16a34a" }}>Payment Completed</span>
+                      ) : isViewingExpired ? (
+                        <span style={{ color: "#dc2626" }}>Link Expired (24h exceeded)</span>
+                      ) : viewing.expiresAt ? (
+                        <span style={{ color: "#64748b" }}>Expires {fmtDate(viewing.expiresAt, true)}</span>
+                      ) : (
+                        <span style={{ color: "#64748b" }}>Valid for 24 hours</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Subtabs (Orders (1) vs Payments) */}
+              <div style={{ padding: "14px 24px 0" }}>
+                <div className="crm-modal-subtabs">
+                  <button
+                    type="button"
+                    className={`crm-modal-subtab ${modalSubtab === "orders" ? "is-active" : ""}`}
+                    onClick={() => setModalSubtab("orders")}
+                  >
+                    Orders (1)
+                  </button>
+                  <button
+                    type="button"
+                    className={`crm-modal-subtab ${modalSubtab === "payments" ? "is-active" : ""}`}
+                    onClick={() => setModalSubtab("payments")}
+                  >
+                    Payments ({viewing.amount > 0 ? 1 : 0})
+                  </button>
+                </div>
+              </div>
+
+              {/* Modal Body */}
+              <div className="crm-view-modal-body" style={{ paddingTop: "10px" }}>
+                {modalSubtab === "orders" ? (
+                  /* Orders Subtab Table */
+                  <div className="crm-table-wrap" style={{ border: "1px solid #e2e8f0", borderRadius: "10px" }}>
+                    <table className="crm-table" style={{ fontSize: "12.5px" }}>
+                      <thead>
+                        <tr style={{ background: "#f8fafc" }}>
+                          <th>ORDER</th>
+                          <th>CUSTOMER</th>
+                          <th>SERVICE &amp; CATEGORY</th>
+                          <th>AMOUNT</th>
+                          <th>PAYMENT STATUS</th>
+                          <th>LINK</th>
+                          <th style={{ textAlign: "right" }}>ACTIONS</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>
+                            <span style={{ fontWeight: 800, fontFamily: "monospace", color: "#0f172a" }}>
+                              {viewing.invoiceNumber || `QAS-${viewing.id}`}
+                            </span>
+                            <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>
+                              {fmtDate(viewing.createdAt, true)}
+                            </span>
+                            <span style={{ display: "block", fontSize: "10.5px", color: "#7c3aed", fontWeight: 700 }}>
+                              Source: {viewing.leadSource || "Manual"}
+                            </span>
+                          </td>
+                          <td>
+                            <span style={{ fontWeight: 700, color: "#0f172a", display: "block" }}>
+                              {viewing.clientName}
+                            </span>
+                            <span style={{ color: "#64748b", fontSize: "11.5px" }}>
+                              {viewing.clientPhone || "—"}
+                            </span>
+                          </td>
+                          <td>
+                            <span style={{ fontWeight: 600, color: "#0f172a", display: "block" }}>
+                              {viewing.service}
+                            </span>
+                            <span style={{ color: "#64748b", fontSize: "11.5px" }}>
+                              {viewing.quantity || viewing.category || "Standard"}
+                            </span>
+                          </td>
+                          <td>
+                            <span style={{ display: "block", fontWeight: 700, color: "#0f172a" }}>
+                              Total ${(viewing.totalAmount != null ? viewing.totalAmount : viewing.amount).toFixed(2)}
+                            </span>
+                            <span style={{ display: "block", color: "#16a34a", fontSize: "11.5px", fontWeight: 600 }}>
+                              Paid ${viewing.amount.toFixed(2)}
+                            </span>
+                            <span style={{ display: "block", color: "#ef4444", fontSize: "11.5px", fontWeight: 600 }}>
+                              Remaining ${(viewing.remainingAmount != null ? viewing.remainingAmount : 0).toFixed(2)}
+                            </span>
+                          </td>
+                          <td>
+                            {Number(viewing.amount) === 0 ? (
+                              <span style={{ color: "#64748b", fontWeight: 700 }}>Not Paid</span>
+                            ) : viewing.status === "failed" ? (
+                              <span className="crm-pill crm-pill-failed">Payment Failed</span>
+                            ) : viewing.status === "paid" ? (
+                              <span className="crm-pill crm-pill-paid">Fully Paid</span>
+                            ) : viewing.status === "pending" && Number(viewing.amount) > 0 ? (
+                              <span className="crm-pill crm-pill-pending">Pending Clearing</span>
+                            ) : (
+                              <span className="crm-pill crm-pill-partially_paid">Partially Paid</span>
+                            )}
+                          </td>
+                          <td>
+                            <span className={`crm-link-pill crm-link-pill-${isViewingPaid ? "used" : isViewingExpired ? "expired" : viewing.linkStatus || "active"}`}>
+                              {isViewingPaid ? "Used" : isViewingExpired ? "Expired" : viewing.linkStatus || "Active"}
+                            </span>
+                          </td>
+                          <td style={{ textAlign: "right" }}>
+                            <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", justifyContent: "flex-end", flexWrap: "wrap" }}>
+                              {/* Copy Link */}
+                              {viewing.token && (
+                                <button
+                                  type="button"
+                                  className="crm-att-btn"
+                                  onClick={() => copyLink(viewing.token!)}
+                                  title="Copy Payment Link"
+                                  style={{ fontSize: "11px", padding: "4px 8px" }}
+                                >
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                  </svg>
+                                  Copy Link
+                                </button>
+                              )}
+
+                              {/* WhatsApp (only if not expired and not used/paid) */}
+                              {canShareViewing && (
+                                <button
+                                  type="button"
+                                  className="crm-att-btn"
+                                  onClick={() => openWhatsApp(viewing)}
+                                  title="Share on WhatsApp (valid 24h)"
+                                  style={{ fontSize: "11px", padding: "4px 8px", color: "#15803d", borderColor: "#bbf7d0", background: "#f0fdf4" }}
+                                >
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.54 1.777.804 2.791.805h.005c3.18 0 5.767-2.586 5.768-5.766 0-1.541-.6-2.99-1.69-4.08-1.09-1.09-2.54-1.691-4.084-1.691zm0-2c4.29 0 7.768 3.477 7.768 7.766 0 2.072-.807 4.02-2.273 5.485-1.467 1.467-3.414 2.275-5.49 2.275h-.005c-1.332 0-2.639-.356-3.784-1.031l-4.247 1.114 1.134-4.143c-.742-1.2-1.133-2.584-1.133-3.966.002-4.289 3.479-7.766 7.77-7.766zm-3.34 4.542c-.183-.408-.376-.416-.55-.424l-.468-.008c-.161 0-.424.061-.646.303-.222.242-.848.828-.848 2.02 0 1.192.868 2.343.989 2.505.121.162 1.676 2.678 4.12 3.633 1.996.779 2.404.624 2.838.584.434-.04 1.393-.57 1.59-1.121.198-.55.198-1.022.139-1.122-.06-.099-.222-.161-.468-.283-.246-.121-1.455-.718-1.68-.8-.226-.081-.39-.122-.555.122-.164.243-.637.8-.781.962-.144.162-.288.182-.534.061-.246-.122-1.038-.383-1.978-1.221-.731-.652-1.225-1.457-1.369-1.703-.144-.246-.015-.379.108-.501.111-.11.246-.283.37-.424.123-.142.164-.243.246-.405.082-.162.041-.304-.02-.425-.062-.122-.55-1.353-.768-1.854z" />
+                                  </svg>
+                                  WhatsApp
+                                </button>
+                              )}
+
+                              {/* Edit */}
+                              <button
+                                type="button"
+                                className="crm-att-btn"
+                                onClick={() => openEditLink(viewing)}
+                                title="Edit payment lead"
+                                style={{ fontSize: "11px", padding: "4px 8px" }}
+                              >
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                                  <path d="M12 20h9" />
+                                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                                </svg>
+                                Edit
+                              </button>
+
+                              {/* Delete */}
+                              <button
+                                type="button"
+                                className="crm-att-btn crm-att-btn-del"
+                                onClick={() => deleteSingle(viewing)}
+                                title="Delete payment link"
+                                style={{ fontSize: "11px", padding: "4px 8px" }}
+                              >
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                                  <polyline points="3 6 5 6 21 6" />
+                                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                </svg>
+                                Delete
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
                 /* Payments Subtab Table (Screenshot 5) */
                 viewing.amount > 0 ? (
                   <div className="crm-table-wrap" style={{ border: "1px solid #e2e8f0", borderRadius: "10px" }}>
@@ -1637,6 +1756,44 @@ Quickupp Softech LLC`;
                       <span>Copy Link</span>
                     </button>
                   )}
+                  {canShareViewing && (
+                    <button
+                      type="button"
+                      className="crm-act crm-act-sm"
+                      style={{ background: "#10b981", color: "#ffffff", border: "none", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: "5px" }}
+                      onClick={() => openWhatsApp(viewing)}
+                      title="Share link on WhatsApp (valid 24h)"
+                    >
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20.52 3.48A11.93 11.93 0 0 0 12.06 0C5.46 0 .09 5.37.09 11.97c0 2.11.55 4.17 1.6 6L0 24l6.19-1.62a11.93 11.93 0 0 0 5.87 1.51h.01c6.6 0 11.97-5.37 11.97-11.97 0-3.2-1.25-6.21-3.52-8.44zm-8.46 18.36h-.01a9.92 9.92 0 0 1-5.06-1.39l-.36-.22-3.76.99 1-3.66-.24-.38a9.93 9.93 0 0 1-1.52-5.21c0-5.5 4.47-9.97 9.97-9.97 2.66 0 5.16 1.04 7.05 2.92a9.92 9.92 0 0 1 2.92 7.05c0 5.5-4.48 9.97-9.99 9.97zm5.46-7.46c-.3-.15-1.77-.87-2.04-.97-.28-.1-.48-.15-.68.15-.2.3-.77.97-.95 1.17-.17.2-.35.22-.65.07-.3-.15-1.27-.47-2.42-1.49-.9-.8-1.5-1.78-1.68-2.08-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.68-1.64-.93-2.25-.24-.59-.49-.51-.68-.52h-.58c-.2 0-.52.07-.8.37-.27.3-1.05 1.03-1.05 2.51s1.08 2.91 1.23 3.11c.15.2 2.12 3.24 5.14 4.54.72.31 1.28.5 1.72.64.72.23 1.38.2 1.9.12.58-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.18-1.42-.08-.13-.27-.2-.57-.35z" />
+                      </svg>
+                      <span>Share on WhatsApp</span>
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="crm-act crm-act-ghost crm-act-sm"
+                    onClick={() => openEditLink(viewing)}
+                    style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 20h9" />
+                      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                    </svg>
+                    <span>Edit Payment Lead</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="crm-act crm-act-ghost crm-act-sm"
+                    onClick={() => deleteSingle(viewing)}
+                    style={{ display: "inline-flex", alignItems: "center", gap: "5px", color: "#dc2626" }}
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    </svg>
+                    <span>Delete</span>
+                  </button>
                 </div>
                 <button type="button" className="crm-act crm-act-dark" onClick={() => setViewing(null)}>
                   Close
@@ -1645,7 +1802,8 @@ Quickupp Softech LLC`;
             </div>
           </div>
         </div>
-      )}
+        );
+      })()}
 
       {/* ---- GENERATE PAYMENT LINK MODAL (Screenshot 3) ---- */}
       {generatingLink && (
@@ -2066,297 +2224,289 @@ Quickupp Softech LLC`;
         </div>
       )}
 
-      {/* ---- EDIT PAYMENT LINK MODAL ---- */}
+      {/* ---- EDIT PAYMENT LINK MODAL (Matching LeadsView Edit Panel) ---- */}
       {editingLink && (
-        <div className="crm-modal-wrap" onClick={() => setEditingLink(null)}>
-          <div className="crm-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "880px", width: "95vw" }}>
-            <div className="crm-drawer-head" style={{ padding: "16px 22px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                <div style={{ width: "36px", height: "36px", borderRadius: "8px", background: "#f8fafc", border: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0f172a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 20h9" />
-                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-                  </svg>
-                </div>
-                <div>
-                  <div className="crm-drawer-title" style={{ fontSize: "16px", fontWeight: 800, color: "#0f172a" }}>Edit Payment Link</div>
-                  <p style={{ margin: "2px 0 0", fontSize: "12px", color: "#64748b" }}>
-                    Order #{editingLink.invoiceNumber || `QS-${editingLink.id}`}
-                  </p>
-                </div>
+        <div className="crm-modal-wrap" style={{ zIndex: 120 }} onClick={() => setEditingLink(null)}>
+          <form
+            className="crm-modal crm-modal-wide"
+            onClick={(e) => e.stopPropagation()}
+            onSubmit={saveEditLink}
+            noValidate
+            role="dialog"
+            aria-label={`Edit payment link — ${editingLink.clientName}`}
+          >
+            <div className="crm-drawer-head">
+              <div>
+                <p className="crm-drawer-kicker">Payment Link Lead</p>
+                <h2 className="crm-drawer-title">Edit payment link — {editingLink.clientName}</h2>
               </div>
               <button type="button" className="crm-icon-act" onClick={() => setEditingLink(null)} aria-label="Close">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
                   <path d="M18 6L6 18M6 6l12 12" />
                 </svg>
               </button>
             </div>
 
-            <form onSubmit={saveEditLink} style={{ padding: "18px 22px" }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                {/* Row 1: Customer Name, Phone, Email */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
-                  <label className="crm-field">
-                    <span className="crm-label">Customer full name *</span>
-                    <input
-                      className="crm-input"
-                      value={editLinkForm.clientName}
-                      onChange={(e) => setEditLinkForm((f) => ({ ...f, clientName: e.target.value }))}
-                      required
-                    />
-                  </label>
-                  <label className="crm-field">
-                    <span className="crm-label">Mobile number (WhatsApp) *</span>
-                    <input
-                      className="crm-input"
-                      value={editLinkForm.clientPhone}
-                      onChange={(e) => setEditLinkForm((f) => ({ ...f, clientPhone: e.target.value }))}
-                      required
-                    />
-                  </label>
-                  <label className="crm-field">
-                    <span className="crm-label">Email address *</span>
-                    <input
-                      className="crm-input"
-                      type="email"
-                      value={editLinkForm.clientEmail}
-                      onChange={(e) => setEditLinkForm((f) => ({ ...f, clientEmail: e.target.value }))}
-                      required
-                    />
-                  </label>
-                </div>
+            <div className="crm-form-grid crm-form-grid-3">
+              {/* Row 1: Customer Name, Phone, Email */}
+              <label className="crm-field">
+                <span className="crm-label">Client full name *</span>
+                <input
+                  className="crm-input"
+                  value={editLinkForm.clientName}
+                  onChange={(e) => setEditLinkForm((f) => ({ ...f, clientName: e.target.value }))}
+                  placeholder="e.g. John Carter"
+                  required
+                />
+              </label>
+              <label className="crm-field">
+                <span className="crm-label">Mobile number (WhatsApp) *</span>
+                <input
+                  className="crm-input"
+                  type="tel"
+                  value={editLinkForm.clientPhone}
+                  onChange={(e) => setEditLinkForm((f) => ({ ...f, clientPhone: e.target.value }))}
+                  placeholder="+1 302 555 0147"
+                  required
+                />
+              </label>
+              <label className="crm-field">
+                <span className="crm-label">Email address *</span>
+                <input
+                  className="crm-input"
+                  type="email"
+                  value={editLinkForm.clientEmail}
+                  onChange={(e) => setEditLinkForm((f) => ({ ...f, clientEmail: e.target.value }))}
+                  placeholder="client@company.com"
+                  required
+                />
+              </label>
 
-                {/* Row 2: Company, Service, Category */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1.25fr 1.25fr", gap: "12px" }}>
-                  <label className="crm-field">
-                    <span className="crm-label">Company name</span>
-                    <input
-                      className="crm-input"
-                      value={editLinkForm.companyName}
-                      onChange={(e) => setEditLinkForm((f) => ({ ...f, companyName: e.target.value }))}
-                    />
-                  </label>
-                  <label className="crm-field">
-                    <span className="crm-label">Service *</span>
-                    <select
-                      className="crm-input crm-select"
-                      value={editLinkForm.service}
-                      onChange={(e) => {
-                        const newServ = e.target.value;
-                        const match = SERVICES_DATA.find((s) => s.service === newServ);
-                        const firstCat = match && match.categories.length > 0 ? match.categories[0] : "";
-                        setEditLinkForm((f) => ({
-                          ...f,
-                          service: newServ,
-                          category: firstCat,
-                          quantity: firstCat,
-                        }));
-                      }}
-                    >
-                      {SERVICES_DATA.map((s) => (
-                        <option key={s.service} value={s.service}>{s.service}</option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="crm-field">
-                    <span className="crm-label">Category / Scope *</span>
-                    {(() => {
-                      const cats = SERVICES_DATA.find((s) => s.service === editLinkForm.service)?.categories || [];
-                      if (cats.length > 0) {
-                        return (
-                          <select
-                            className="crm-input crm-select"
-                            value={editLinkForm.category}
-                            onChange={(e) => setEditLinkForm((f) => ({ ...f, category: e.target.value, quantity: e.target.value }))}
-                          >
-                            {cats.map((cat) => (
-                              <option key={cat} value={cat}>{cat}</option>
-                            ))}
-                          </select>
-                        );
-                      }
-                      return (
-                        <input
-                          type="text"
-                          readOnly
-                          disabled
-                          value="Not Applicable"
-                          className="crm-input is-disabled"
-                          style={{
-                            background: "rgba(255, 255, 255, 0.04)",
-                            color: "#94a3b8",
-                            cursor: "not-allowed",
-                            border: "1px solid #334155",
-                          }}
-                          title="This service does not require category selection"
-                        />
-                      );
-                    })()}
-                  </label>
-                </div>
-
-                {/* Row 3: Industry, Amount, Payment Option */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
-                  <label className="crm-field">
-                    <span className="crm-label">Industry *</span>
-                    <select
-                      className="crm-input crm-select"
-                      value={editLinkForm.industry}
-                      onChange={(e) => setEditLinkForm((f) => ({ ...f, industry: e.target.value }))}
-                    >
-                      {CRM_INDUSTRIES.map((ind) => (
-                        <option key={ind} value={ind}>{ind}</option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="crm-field">
-                    <span className="crm-label">Total amount ($ USD)</span>
-                    <div style={{ display: "flex", alignItems: "stretch", width: "100%" }}>
-                      <span
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          padding: "0 14px",
-                          background: "#1e293b",
-                          border: "1px solid #334155",
-                          borderRight: "none",
-                          borderTopLeftRadius: "6px",
-                          borderBottomLeftRadius: "6px",
-                          fontWeight: 700,
-                          color: "#f8fafc",
-                          fontSize: "15px",
-                          userSelect: "none",
-                        }}
-                      >
-                        $
-                      </span>
-                      <input
-                        className="crm-input"
-                        type="text"
-                        inputMode="decimal"
-                        style={{
-                          borderTopLeftRadius: 0,
-                          borderBottomLeftRadius: 0,
-                          fontSize: "14px",
-                          fontWeight: 600,
-                        }}
-                        value={editLinkForm.totalAmount}
-                        onChange={(e) => {
-                          const clean = e.target.value.replace(/[^0-9.]/g, "");
-                          const parts = clean.split(".");
-                          const sanitized = parts.length > 2 ? `${parts[0]}.${parts.slice(1).join("")}` : clean;
-                          setEditLinkForm((f) => ({ ...f, totalAmount: sanitized }));
-                        }}
-                        placeholder="0.00"
-                        disabled={editingLink.status === "paid"}
-                        required
-                      />
-                    </div>
-                  </label>
-                  <label className="crm-field">
-                    <span className="crm-label">Payment option</span>
-                    <select
-                      className="crm-input crm-select"
-                      value={editLinkForm.paymentOption}
-                      onChange={(e) => {
-                        const opt = e.target.value as "full" | "partial";
-                        setEditLinkForm((f) => ({ ...f, paymentOption: opt }));
-                      }}
-                      disabled={editingLink.status === "paid"}
-                    >
-                      <option value="full">Full Payment (100% upfront)</option>
-                      <option value="partial">50% Deposit (Partial Payment)</option>
-                    </select>
-                  </label>
-                </div>
-
-                {/* Row 4: Billing Dates & Balance Due Date */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
-                  <label className="crm-field">
-                    <span className="crm-label">Billing From</span>
-                    <input
-                      type="date"
-                      className="crm-input"
-                      value={editLinkForm.billingStartDate}
-                      onChange={(e) => setEditLinkForm((f) => ({ ...f, billingStartDate: e.target.value }))}
-                    />
-                  </label>
-                  <label className="crm-field">
-                    <span className="crm-label">Billing To</span>
-                    <input
-                      type="date"
-                      className="crm-input"
-                      value={editLinkForm.billingEndDate}
-                      onChange={(e) => {
-                        const newEnd = e.target.value;
-                        setEditLinkForm((f) => {
-                          let due = f.balanceDueDate;
-                          if (newEnd) {
-                            const d = new Date(newEnd);
-                            if (!isNaN(d.getTime())) {
-                              d.setDate(d.getDate() - 10);
-                              due = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-                            }
-                          }
-                          return { ...f, billingEndDate: newEnd, balanceDueDate: due };
-                        });
-                      }}
-                    />
-                  </label>
-                  <label className="crm-field">
-                    <span className="crm-label">Tentative Balance Due Date</span>
-                    <input
-                      type="date"
-                      className="crm-input"
-                      value={editLinkForm.balanceDueDate}
-                      onChange={(e) => setEditLinkForm((f) => ({ ...f, balanceDueDate: e.target.value }))}
-                    />
-                  </label>
-                </div>
-
-                {/* Row 5: Link Status & Notes */}
-                <div style={{ display: "grid", gridTemplateColumns: "180px 1fr", gap: "12px" }}>
-                  <label className="crm-field">
-                    <span className="crm-label">Link Status</span>
-                    <select
-                      className="crm-input crm-select"
-                      value={editLinkForm.linkStatus}
-                      onChange={(e) => setEditLinkForm((f) => ({ ...f, linkStatus: e.target.value }))}
-                    >
-                      <option value="active">Active</option>
-                      <option value="cancelled">Cancelled</option>
-                      <option value="used">Used</option>
-                      <option value="expired">Expired</option>
-                    </select>
-                  </label>
-                  <label className="crm-field">
-                    <span className="crm-label">Internal notes</span>
-                    <input
-                      className="crm-input"
-                      value={editLinkForm.notes}
-                      onChange={(e) => setEditLinkForm((f) => ({ ...f, notes: e.target.value }))}
-                      placeholder="Deliverables, agreement terms, or internal team notes"
-                    />
-                  </label>
-                </div>
-              </div>
-
-              {error && (
-                <p className="crm-alert crm-alert-inset" style={{ marginTop: "10px" }}>
-                  {error}
-                </p>
-              )}
-
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "16px" }}>
-                <button
-                  type="button"
-                  className="crm-act crm-act-ghost"
-                  onClick={() => setEditingLink(null)}
-                  disabled={busy}
+              {/* Row 2: Company, Service, Category */}
+              <label className="crm-field">
+                <span className="crm-label">Company / brand</span>
+                <input
+                  className="crm-input"
+                  value={editLinkForm.companyName}
+                  onChange={(e) => setEditLinkForm((f) => ({ ...f, companyName: e.target.value }))}
+                  placeholder="e.g. Acme Corp"
+                />
+              </label>
+              <label className="crm-field">
+                <span className="crm-label">Service *</span>
+                <select
+                  className="crm-input crm-select"
+                  value={editLinkForm.service}
+                  onChange={(e) => {
+                    const newServ = e.target.value;
+                    const match = SERVICES_DATA.find((s) => s.service === newServ);
+                    const firstCat = match && match.categories.length > 0 ? match.categories[0] : "";
+                    setEditLinkForm((f) => ({
+                      ...f,
+                      service: newServ,
+                      category: firstCat,
+                      quantity: firstCat,
+                    }));
+                  }}
                 >
-                  Cancel
-                </button>
+                  {SERVICES_DATA.map((s) => (
+                    <option key={s.service} value={s.service}>{s.service}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="crm-field">
+                <span className="crm-label">Category / Scope *</span>
+                {(() => {
+                  const cats = SERVICES_DATA.find((s) => s.service === editLinkForm.service)?.categories || [];
+                  if (cats.length > 0) {
+                    return (
+                      <select
+                        className="crm-input crm-select"
+                        value={editLinkForm.category}
+                        onChange={(e) => setEditLinkForm((f) => ({ ...f, category: e.target.value, quantity: e.target.value }))}
+                      >
+                        {cats.map((cat) => (
+                          <option key={cat} value={cat}>{cat}</option>
+                        ))}
+                      </select>
+                    );
+                  }
+                  return (
+                    <input
+                      type="text"
+                      readOnly
+                      disabled
+                      value="Not Applicable"
+                      className="crm-input is-disabled"
+                      style={{
+                        background: "#f8fafc",
+                        color: "#94a3b8",
+                        cursor: "not-allowed",
+                        border: "1px solid #e2e8f0",
+                      }}
+                      title="This service does not require category selection"
+                    />
+                  );
+                })()}
+              </label>
+
+              {/* Row 3: Industry, Amount, Payment Option */}
+              <label className="crm-field">
+                <span className="crm-label">Industry *</span>
+                <select
+                  className="crm-input crm-select"
+                  value={editLinkForm.industry}
+                  onChange={(e) => setEditLinkForm((f) => ({ ...f, industry: e.target.value }))}
+                >
+                  {CRM_INDUSTRIES.map((ind) => (
+                    <option key={ind} value={ind}>{ind}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="crm-field">
+                <span className="crm-label">Total amount ($ USD)</span>
+                <div style={{ display: "flex", alignItems: "stretch", width: "100%" }}>
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "0 14px",
+                      background: "#f1f5f9",
+                      border: "1px solid #cbd5e1",
+                      borderRight: "none",
+                      borderTopLeftRadius: "6px",
+                      borderBottomLeftRadius: "6px",
+                      fontWeight: 700,
+                      color: "#334155",
+                      fontSize: "14px",
+                      userSelect: "none",
+                    }}
+                  >
+                    $
+                  </span>
+                  <input
+                    className="crm-input"
+                    type="text"
+                    inputMode="decimal"
+                    style={{
+                      borderTopLeftRadius: 0,
+                      borderBottomLeftRadius: 0,
+                      fontSize: "14px",
+                      fontWeight: 600,
+                    }}
+                    value={editLinkForm.totalAmount}
+                    onChange={(e) => {
+                      const clean = e.target.value.replace(/[^0-9.]/g, "");
+                      const parts = clean.split(".");
+                      const sanitized = parts.length > 2 ? `${parts[0]}.${parts.slice(1).join("")}` : clean;
+                      setEditLinkForm((f) => ({ ...f, totalAmount: sanitized }));
+                    }}
+                    placeholder="0.00"
+                    disabled={editingLink.status === "paid"}
+                    required
+                  />
+                </div>
+              </label>
+              <label className="crm-field">
+                <span className="crm-label">Payment option</span>
+                <select
+                  className="crm-input crm-select"
+                  value={editLinkForm.paymentOption}
+                  onChange={(e) => {
+                    const opt = e.target.value as "full" | "partial";
+                    setEditLinkForm((f) => ({ ...f, paymentOption: opt }));
+                  }}
+                  disabled={editingLink.status === "paid"}
+                >
+                  <option value="full">Full Payment (100% upfront)</option>
+                  <option value="partial">50% Deposit (Partial Payment)</option>
+                </select>
+              </label>
+
+              {/* Row 4: Billing Dates & Balance Due Date */}
+              <label className="crm-field">
+                <span className="crm-label">Billing From</span>
+                <input
+                  type="date"
+                  className="crm-input"
+                  value={editLinkForm.billingStartDate}
+                  onChange={(e) => setEditLinkForm((f) => ({ ...f, billingStartDate: e.target.value }))}
+                />
+              </label>
+              <label className="crm-field">
+                <span className="crm-label">Billing To</span>
+                <input
+                  type="date"
+                  className="crm-input"
+                  value={editLinkForm.billingEndDate}
+                  onChange={(e) => {
+                    const newEnd = e.target.value;
+                    setEditLinkForm((f) => {
+                      let due = f.balanceDueDate;
+                      if (newEnd) {
+                        const d = new Date(newEnd);
+                        if (!isNaN(d.getTime())) {
+                          d.setDate(d.getDate() - 10);
+                          due = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+                        }
+                      }
+                      return { ...f, billingEndDate: newEnd, balanceDueDate: due };
+                    });
+                  }}
+                />
+              </label>
+              <label className="crm-field">
+                <span className="crm-label">Tentative Balance Due Date</span>
+                <input
+                  type="date"
+                  className="crm-input"
+                  value={editLinkForm.balanceDueDate}
+                  onChange={(e) => setEditLinkForm((f) => ({ ...f, balanceDueDate: e.target.value }))}
+                />
+              </label>
+
+              {/* Row 5: Link Status & Notes */}
+              <label className="crm-field">
+                <span className="crm-label">Link Status</span>
+                <select
+                  className="crm-input crm-select"
+                  value={editLinkForm.linkStatus}
+                  onChange={(e) => setEditLinkForm((f) => ({ ...f, linkStatus: e.target.value }))}
+                >
+                  <option value="active">Active</option>
+                  <option value="cancelled">Cancelled</option>
+                  <option value="used">Used</option>
+                  <option value="expired">Expired</option>
+                </select>
+              </label>
+              <label className="crm-field crm-span-2">
+                <span className="crm-label">Internal notes</span>
+                <input
+                  className="crm-input"
+                  value={editLinkForm.notes}
+                  onChange={(e) => setEditLinkForm((f) => ({ ...f, notes: e.target.value }))}
+                  placeholder="Deliverables, agreement terms, or internal team notes"
+                />
+              </label>
+            </div>
+
+            {error && (
+              <p className="crm-alert crm-alert-inset" style={{ marginTop: "10px" }}>
+                {error}
+              </p>
+            )}
+
+            <div className="crm-modal-foot">
+              <button
+                type="button"
+                className="crm-act crm-act-ghost"
+                onClick={() => setEditingLink(null)}
+                disabled={busy}
+              >
+                Cancel
+              </button>
+              <span className="crm-modal-foot-end">
                 <button
                   type="submit"
                   className="crm-act crm-act-dark"
@@ -2364,9 +2514,9 @@ Quickupp Softech LLC`;
                 >
                   {busy ? "Saving…" : "Save Changes"}
                 </button>
-              </div>
-            </form>
-          </div>
+              </span>
+            </div>
+          </form>
         </div>
       )}
 
