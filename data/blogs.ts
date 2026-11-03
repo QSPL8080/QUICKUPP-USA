@@ -10,7 +10,7 @@ export interface BlogPost {
   img: string;
   content: {
     intro: string;
-    keyTakeaways: string[];
+    keyTakeaways?: string[];
     sections: {
       heading: string;
       paragraphs: string[];
@@ -32,12 +32,6 @@ export const blogPosts: BlogPost[] = [
     "img": "/images/blog-img-01.jpg",
     "content": {
       "intro": "The field of healthcare is witnessing a tremendous transformation, brought about mainly by technological advancements and applications which, in turn, create new possibilities of interaction between medical workers and patients. Under this influence, hospitals, diagnostic agencies, and individual doctors are increasingly willing to employ various digital tools and innovations to enhance their communication and reach as well as to provide better patient experience.\n\nAmong the innovations introduced into the industry, AI is the most promising solution that enables healthcare organizations to satisfy the needs of their patients in a new manner and to provide them with the necessary information.\n\nThe application of artificial intelligence has gone beyond the medical field, as it has begun to shape healthcare marketing as well. This is possible for its ability to personalize communications, improve efficiency of marketing campaigns, and enhance patient engagement.\n\nIn this article, we will find out how artificial intelligence transforms the healthcare industry and enables improved patient engagement.",
-      "keyTakeaways": [
-        "Customised Communication with Patients",
-        "AI Chatbots for Nonstop Patient Help",
-        "Enhanced Medical Promotion with AI",
-        "Content Marketing Using AI Technology Implementation in Health Industry"
-      ],
       "sections": [
         {
           "heading": "1. Customised Communication with Patients",
@@ -205,12 +199,6 @@ export const blogPosts: BlogPost[] = [
     "img": "/images/blog-img-02.jpg",
     "content": {
       "intro": "The education sector is facing tough competition as schools, colleges, universities, and coaching centres are striving to lure more and more students. Nowadays, students and parents are using online platforms to gather information about courses, compare different institutions, and search for admission details.\n\nEven though traditional marketing strategies including newspaper advertisements, banners, and leaflets remain in use, there is no doubt that digital marketing techniques are much more powerful in terms of the targeted mailing of promotions to the audience, size of the audience reached, and measuring results.\n\nThat is when Google Ads and Meta Ads come into play. They help educational institutions reach their potential students, generate relevant queries regarding admission, and increase the number of enrolled students.\n\nLet's see how these ads can assist in lead generation.",
-      "keyTakeaways": [
-        "Connecting with Relevant Students with Targeted Advertising",
-        "How Google Ads Helps Generate Admission Leads",
-        "How Meta Ads Assists Educational Institutions to Acquire More Students",
-        "Google Ads vs Meta Ads: Which Is Better?"
-      ],
       "sections": [
         {
           "heading": "1. Connecting with Relevant Students with Targeted Advertising",
@@ -336,12 +324,6 @@ export const blogPosts: BlogPost[] = [
     "img": "/images/blog-img-03.jpg",
     "content": {
       "intro": "Real estate business is extremely reliant upon location factors. Property buyers normally wish to find a residence, apartment, lot, or commercial unit in certain cities, neighborhoods, or areas. Whether a property buyer wishes to procure an apartment, make an investment, or secure commercial property, their search usually starts from Google.\n\nThat is the importance of local SEO for real estate businesses. Local SEO is what makes it possible for real estate agents, property experts, and property developers to improve their ratings in local searches and get visibility in front of potential property buyers.\n\nIn this section, it is necessary to reveal how local SEO can help real estate businesses in reaching more targeted potential buyers and securing quality leads.",
-      "keyTakeaways": [
-        "Enhancing Visibility in Local Google Searches",
-        "Make Your Google Business Profile Better",
-        "Keywords Based on Location",
-        "Set up specific pages for each location"
-      ],
       "sections": [
         {
           "heading": "1. Enhancing Visibility in Local Google Searches",
@@ -456,12 +438,6 @@ export const blogPosts: BlogPost[] = [
     "img": "/images/blog-img-04.jpg",
     "content": {
       "intro": "Today, customers expect quick responses, easy communication, and convenient ways to book services. Whether they need plumbing repairs, home cleaning, electrical maintenance, pest control, or interior renovation, most customers prefer contacting service providers directly rather than waiting for callbacks or emails.\n\nThis is where WhatsApp Marketing for Home Service Businesses can make a difference. With its easy-to-use messaging features, WhatsApp helps businesses communicate with customers, respond to enquiries, share service details, and build stronger customer relationships.\n\nLet's explore how WhatsApp marketing can help home service businesses improve communication and generate more enquiries.",
-      "keyTakeaways": [
-        "Connect with Customers Instantly",
-        "Make Service Bookings Easier",
-        "Share Service Details, Offers, and Updates",
-        "Build Trust Through Personalised Communication"
-      ],
       "sections": [
         {
           "heading": "1. Connect with Customers Instantly",
@@ -563,12 +539,6 @@ export const blogPosts: BlogPost[] = [
     "img": "/images/blog-img-05.jpg",
     "content": {
       "intro": "In today's competitive digital landscape, IT and SaaS companies need more than innovative products and technical expertise to stand out. They also need to build trust, communicate their expertise, and establish a strong online presence.\n\nPotential customers often research multiple technology providers before choosing a product or service. They compare solutions, read blogs, explore case studies, and look for information that helps them make informed decisions.\n\nThis is where content marketing for IT and SaaS companies plays an important role. By consistently sharing valuable, relevant, and informative content, businesses can demonstrate their industry knowledge, connect with their target audience, and build long-term brand authority.\n\nLet's explore how content marketing helps IT and SaaS companies strengthen their brand presence and attract potential customers.",
-      "keyTakeaways": [
-        "Establish Industry Expertise Through Valuable Content",
-        "Improve Search Engine Visibility Through SEO Content",
-        "Build Trust Through Case Studies and Success Stories",
-        "Use Different Content Formats to Reach Your Audience"
-      ],
       "sections": [
         {
           "heading": "1. Establish Industry Expertise Through Valuable Content",
@@ -667,12 +637,6 @@ export const blogPosts: BlogPost[] = [
     "img": "/images/blog-img-06.jpg",
     "content": {
       "intro": "Interior design is a visual industry where creativity, space planning, aesthetics, and attention to detail play an important role in attracting clients. Before choosing an interior designer, potential customers often want to see completed projects, understand the design approach, and explore the quality of work.\n\nWhile photographs and portfolios help showcase designs, videos offer a more engaging way to present spaces and communicate the complete design experience.\n\nThis is where video marketing for interior designers becomes valuable. From virtual walkthroughs and project transformations to client testimonials and behind-the-scenes videos, businesses can use video content to showcase their expertise, build trust, and attract potential clients.\n\nLet's explore how video marketing helps interior designers strengthen their online presence and generate more project enquiries.",
-      "keyTakeaways": [
-        "Showcase Interior Design Projects in a More Engaging Way",
-        "Highlight Before-and-After Transformations",
-        "Build Trust Through Project Walkthrough Videos",
-        "Increase Engagement on Social Media Platforms"
-      ],
       "sections": [
         {
           "heading": "1. Showcase Interior Design Projects in a More Engaging Way",
@@ -789,12 +753,6 @@ export const blogPosts: BlogPost[] = [
     "img": "/images/blog-img-01.jpg",
     "content": {
       "intro": "Today, most customers search online before choosing a professional service provider. Whether they are looking for a business consultant, financial advisor, lawyer, accountant, architect, or marketing agency, their journey often begins with a Google search.\n\nBefore making a decision, potential clients explore websites, read reviews, compare expertise, and check the credibility of different businesses. This makes having a strong online presence essential for professional service businesses.\n\nA well-planned digital presence helps businesses showcase their expertise, build trust, reach the right audience, and generate valuable enquiries.\n\nLet's understand why an online presence matters and how professional service providers can strengthen their digital visibility.",
-      "keyTakeaways": [
-        "Build Credibility and Trust with Potential Clients",
-        "Reach More Potential Customers Through Search Engines",
-        "Showcase Your Expertise Through Content Marketing",
-        "Generate Quality Leads Through Digital Marketing"
-      ],
       "sections": [
         {
           "heading": "1. Build Credibility and Trust with Potential Clients",
@@ -921,12 +879,6 @@ export const blogPosts: BlogPost[] = [
     "img": "/images/blog-img-02.jpg",
     "content": {
       "intro": "The eCommerce industry is growing rapidly, and customer expectations are changing along with it. Online shoppers expect personalized product recommendations, faster responses, relevant offers, and a smooth shopping experience.\n\nTo meet these expectations, eCommerce businesses are increasingly adopting Artificial Intelligence (AI) in their digital marketing strategies.\n\nAI helps businesses understand customer behaviour, automate marketing activities, optimise advertising campaigns, and deliver personalised shopping experiences. It also allows brands to make better marketing decisions using data and customer insights.\n\nLet's explore how AI is transforming digital marketing for eCommerce businesses and creating new opportunities for online growth.",
-      "keyTakeaways": [
-        "Personalised Shopping Experiences",
-        "Smarter Customer Targeting Through AI",
-        "Improve Advertising Performance with AI",
-        "Use AI Chatbots for Better Customer Support"
-      ],
       "sections": [
         {
           "heading": "1. Personalised Shopping Experiences",
@@ -1045,12 +997,6 @@ export const blogPosts: BlogPost[] = [
     "img": "/images/blog-img-03.jpg",
     "content": {
       "intro": "The way people plan and book their trips has changed significantly. Today, most travellers begin their journey online by searching for holiday packages, hotels, flight deals, destination guides, and travel experiences. Before choosing a travel agency, they often compare options, read reviews, explore websites, and check available packages.\n\nFor travel agencies, this creates an important opportunity to connect with potential customers at the exact moment they are looking for travel-related services.\n\nThis is where Search Engine Optimisation (SEO) becomes valuable. A well-planned SEO strategy helps travel agencies improve their visibility on search engines, attract relevant website visitors, build customer trust, and generate more online bookings.\n\nLet's understand how SEO can help travel agencies grow their online presence and reach more travellers.",
-      "keyTakeaways": [
-        "Improves Visibility in Search Engine Results",
-        "Attracts Travellers Who Are Actively Looking to Book",
-        "Helps Generate More Relevant Website Traffic",
-        "Builds Trust and Credibility Among Travellers"
-      ],
       "sections": [
         {
           "heading": "1. Improves Visibility in Search Engine Results",

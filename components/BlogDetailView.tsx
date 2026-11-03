@@ -23,7 +23,7 @@ export interface BlogPostDetail {
   img: string;
   content: {
     intro: string;
-    keyTakeaways: string[];
+    keyTakeaways?: string[];
     sections: BlogSection[];
     conclusion: string;
   };
