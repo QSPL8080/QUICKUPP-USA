@@ -4,6 +4,26 @@ import { getPool } from "@/lib/db";
 import { getCurrentUser } from "@/lib/crm/auth";
 import { readJson } from "@/lib/enquiry";
 
+function getDefaultDates() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+
+  const fmt = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+  const due = new Date(lastDay);
+  due.setDate(due.getDate() - 10);
+
+  return {
+    start: fmt(firstDay),
+    end: fmt(lastDay),
+    due: fmt(due),
+  };
+}
+
 export async function POST(req: Request) {
   try {
     const user = await getCurrentUser();
@@ -16,17 +36,47 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "Invalid request payload." }, { status: 400 });
     }
 
+    // Cancellation action via POST
+    if (body.action === "cancel" && body.id) {
+      const pool = getPool();
+      await pool.query("UPDATE payments SET link_status = 'cancelled' WHERE id = ?", [Number(body.id)]);
+      return NextResponse.json({ ok: true, message: "Payment link cancelled." });
+    }
+
     const clientName = String(body.clientName || "").trim().slice(0, 150);
     const clientEmail = String(body.clientEmail || "").trim().toLowerCase().slice(0, 190);
     const clientPhone = String(body.clientPhone || "").trim().slice(0, 50);
     const companyName = String(body.companyName || "").trim().slice(0, 190) || null;
     const service = String(body.service || "").trim().slice(0, 150);
-    const quantity = String(body.quantity || "Single Scope").trim().slice(0, 100);
+    const quantity = String(body.quantity || "Single Reel").trim().slice(0, 100);
     const leadSource = String(body.leadSource || "Manual").trim().slice(0, 100);
     const notes = String(body.notes || "").trim().slice(0, 2000) || null;
 
+    const defaults = getDefaultDates();
+    const rawStart = typeof body.billingStartDate === "string" ? body.billingStartDate.trim() : "";
+    const rawEnd = typeof body.billingEndDate === "string" ? body.billingEndDate.trim() : "";
+    const rawDue = typeof body.balanceDueDate === "string" ? body.balanceDueDate.trim() : "";
+
+    const billingStartDate = /^\d{4}-\d{2}-\d{2}$/.test(rawStart) ? rawStart : defaults.start;
+    const billingEndDate = /^\d{4}-\d{2}-\d{2}$/.test(rawEnd) ? rawEnd : defaults.end;
+
     const totalAmount = Number(body.totalAmount) || 0;
     const paymentOption = body.paymentOption === "partial" ? "partial" : "full";
+
+    let balanceDueDate: string | null = null;
+    if (paymentOption === "partial") {
+      if (/^\d{4}-\d{2}-\d{2}$/.test(rawDue)) {
+        balanceDueDate = rawDue;
+      } else {
+        const d = new Date(billingEndDate);
+        if (!isNaN(d.getTime())) {
+          d.setDate(d.getDate() - 10);
+          balanceDueDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+        } else {
+          balanceDueDate = defaults.due;
+        }
+      }
+    }
 
     if (!clientName) {
       return NextResponse.json({ ok: false, error: "Customer full name is required." }, { status: 400 });
@@ -72,11 +122,14 @@ export async function POST(req: Request) {
         link_status,
         source,
         lead_source,
+        billing_start_date,
+        billing_end_date,
+        balance_due_date,
         token,
         expires_at,
         notes,
         created_by
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'USD', 'PayPal', 'pending', 'active', 'payment_link', ?, ?, DATE_ADD(NOW(), INTERVAL 24 HOUR), ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'USD', 'PayPal', 'pending', 'active', 'payment_link', ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 24 HOUR), ?, ?)`,
       [
         clientName,
         clientEmail,
@@ -91,6 +144,9 @@ export async function POST(req: Request) {
         isPartial ? "partial" : "full",
         remainingAmount,
         leadSource,
+        billingStartDate,
+        billingEndDate,
+        balanceDueDate,
         token,
         notes,
         user.id,
@@ -114,6 +170,118 @@ export async function POST(req: Request) {
     console.error("[CRM Payment Link Generation Error]", err);
     return NextResponse.json(
       { ok: false, error: err.message || "Failed to generate payment link. Please try again." },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(req: Request) {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ ok: false, error: "Please sign in again." }, { status: 401 });
+    }
+
+    const body = await readJson(req);
+    if (!body || !body.id) {
+      return NextResponse.json({ ok: false, error: "Payment ID is required." }, { status: 400 });
+    }
+
+    const id = Number(body.id);
+    const pool = getPool();
+    const [existingRows] = await pool.query("SELECT * FROM payments WHERE id = ? LIMIT 1", [id]);
+    const existing = (existingRows as any[])?.[0];
+    if (!existing) {
+      return NextResponse.json({ ok: false, error: "Payment link record not found." }, { status: 404 });
+    }
+
+    const clientName = body.clientName !== undefined ? String(body.clientName).trim().slice(0, 150) : existing.client_name;
+    const clientEmail = body.clientEmail !== undefined ? String(body.clientEmail).trim().toLowerCase().slice(0, 190) : existing.client_email;
+    const clientPhone = body.clientPhone !== undefined ? String(body.clientPhone).trim().slice(0, 50) : existing.client_phone;
+    const companyName = body.companyName !== undefined ? (String(body.companyName).trim().slice(0, 190) || null) : existing.company_name;
+    const service = body.service !== undefined ? String(body.service).trim().slice(0, 150) : existing.service;
+    const quantity = body.quantity !== undefined ? String(body.quantity).trim().slice(0, 100) : existing.quantity;
+    const notes = body.notes !== undefined ? (String(body.notes).trim().slice(0, 2000) || null) : existing.notes;
+    const linkStatus = body.linkStatus !== undefined ? String(body.linkStatus).trim() : existing.link_status;
+
+    let totalAmount = existing.total_amount;
+    let paymentType = existing.payment_type;
+    let remainingAmount = existing.remaining_amount;
+
+    // Only allow updating amount and payment_type if it hasn't been paid yet
+    if (existing.status === "pending" && Number(existing.amount) === 0) {
+      if (body.totalAmount !== undefined && Number(body.totalAmount) > 0) {
+        totalAmount = Number(body.totalAmount);
+        remainingAmount = totalAmount;
+      }
+      if (body.paymentOption !== undefined) {
+        paymentType = body.paymentOption === "partial" ? "partial" : "full";
+      }
+    }
+
+    const billingStartDate = typeof body.billingStartDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(body.billingStartDate)
+      ? body.billingStartDate
+      : (existing.billing_start_date ? String(existing.billing_start_date).slice(0, 10) : null);
+    const billingEndDate = typeof body.billingEndDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(body.billingEndDate)
+      ? body.billingEndDate
+      : (existing.billing_end_date ? String(existing.billing_end_date).slice(0, 10) : null);
+    let balanceDueDate = typeof body.balanceDueDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(body.balanceDueDate)
+      ? body.balanceDueDate
+      : (existing.balance_due_date ? String(existing.balance_due_date).slice(0, 10) : null);
+
+    if (paymentType === "partial" && !balanceDueDate && billingEndDate) {
+      const d = new Date(billingEndDate);
+      if (!isNaN(d.getTime())) {
+        d.setDate(d.getDate() - 10);
+        balanceDueDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      }
+    }
+
+    await pool.query(
+      `UPDATE payments SET
+        client_name = ?,
+        client_email = ?,
+        client_phone = ?,
+        company_name = ?,
+        service = ?,
+        category = ?,
+        quantity = ?,
+        description = ?,
+        total_amount = ?,
+        payment_type = ?,
+        remaining_amount = ?,
+        billing_start_date = ?,
+        billing_end_date = ?,
+        balance_due_date = ?,
+        link_status = ?,
+        notes = ?
+      WHERE id = ?`,
+      [
+        clientName,
+        clientEmail,
+        clientPhone,
+        companyName,
+        service,
+        quantity,
+        quantity,
+        `Payment Link: ${service} (${quantity})`,
+        totalAmount,
+        paymentType,
+        remainingAmount,
+        billingStartDate,
+        billingEndDate,
+        balanceDueDate,
+        linkStatus,
+        notes,
+        id,
+      ]
+    );
+
+    return NextResponse.json({ ok: true, message: "Payment link updated successfully." });
+  } catch (err: any) {
+    console.error("[CRM Payment Link Edit Error]", err);
+    return NextResponse.json(
+      { ok: false, error: err.message || "Failed to update payment link." },
       { status: 500 }
     );
   }

@@ -209,13 +209,28 @@ export default function PayNowModal() {
     paypalRenderedRef.current = false;
   };
 
-  // Calculations for Full vs Partial
   // Calculations for Full vs Partial (Partial is strictly 50% deposit)
   const numTotal = Number(totalAmount) || 0;
   const payAmount =
     paymentType === "full" ? numTotal : Math.round(numTotal * 0.5 * 100) / 100;
   const remainingAmount =
     paymentType === "full" ? 0 : Math.max(0, Math.round((numTotal - payAmount) * 100) / 100);
+
+  const computedBalanceDueDate = (() => {
+    if (!billingEndDate) return "";
+    const d = new Date(billingEndDate);
+    if (isNaN(d.getTime())) return "";
+    d.setDate(d.getDate() - 10);
+    return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  })();
+
+  const computedBalanceDueDateIso = (() => {
+    if (!billingEndDate) return "";
+    const d = new Date(billingEndDate);
+    if (isNaN(d.getTime())) return "";
+    d.setDate(d.getDate() - 10);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  })();
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -251,6 +266,7 @@ export default function PayNowModal() {
       category: selectedCategories.join(", "),
       from: billingStartDate,
       to: billingEndDate,
+      balanceDue: paymentType === "partial" ? computedBalanceDueDateIso : "",
       amount: String(numTotal),
       type: paymentType,
       notes: notes.trim(),
@@ -774,6 +790,14 @@ export default function PayNowModal() {
                           ${remainingAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })} USD
                         </span>
                       </div>
+                      {computedBalanceDueDate && (
+                        <div className="pm-breakdown-row" style={{ paddingTop: "8px", borderTop: "1px dashed #e2e8f0" }}>
+                          <span style={{ color: "#64748b", fontSize: "12.5px" }}>Tentative Balance Due Date:</span>
+                          <span style={{ color: "#0f172a", fontWeight: 700, fontSize: "12.5px" }}>
+                            {computedBalanceDueDate} <span style={{ color: "#64748b", fontWeight: 400 }}>(10 days before period end)</span>
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}

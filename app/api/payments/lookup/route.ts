@@ -31,8 +31,19 @@ export async function GET(req: Request) {
 
     const p = rows[0];
 
-    // Check expiration if expires_at is set and not yet fully paid
-    if (p.expires_at && p.status !== "paid") {
+    // Check if link was cancelled
+    if (p.link_status === "cancelled") {
+      return NextResponse.json({
+        ok: false,
+        error: "This payment link has been cancelled. Please contact Quickupp support.",
+        cancelled: true,
+        orderNumber: p.invoice_number,
+      }, { status: 410 });
+    }
+
+    // Check 24-hour expiration ONLY for unpaid initial payment links (amount = 0 and pending).
+    // Balance payment links (partially_paid) DO NOT expire in 24 hours.
+    if (p.expires_at && p.status === "pending" && Number(p.amount || 0) === 0) {
       const expDate = new Date(p.expires_at);
       if (!isNaN(expDate.getTime()) && new Date() > expDate) {
         return NextResponse.json({

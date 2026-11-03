@@ -245,6 +245,8 @@ export type PaymentRow = {
   linkStatus?: string | null;
   leadSource?: string | null;
   quantity?: string | null;
+  balanceDueDate?: string | null;
+  balanceReminderSentAt?: string | null;
 };
 
 export async function listPayments(opts: {
@@ -330,6 +332,8 @@ export async function listPayments(opts: {
     linkStatus: (r.link_status as string) || null,
     leadSource: (r.lead_source as string) || null,
     quantity: (r.quantity as string) || null,
+    balanceDueDate: r.balance_due_date ? toDateOnly(r.balance_due_date) : null,
+    balanceReminderSentAt: r.balance_reminder_sent_at ? new Date(r.balance_reminder_sent_at as string).toISOString() : null,
   }));
   return {
     items,

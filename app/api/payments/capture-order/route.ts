@@ -1,4 +1,5 @@
 import { NextResponse, after } from "next/server";
+import { randomBytes } from "node:crypto";
 import { capturePayPalOrder } from "@/lib/paypal";
 import { getPool } from "@/lib/db";
 import { sendMail, LEADS_NOTIFICATION_EMAIL } from "@/lib/mailer";
@@ -222,6 +223,25 @@ export async function POST(req: Request) {
             ? `[PAYMENT PENDING CLEARING]: ${pendingReason}${notes ? ` | Client Note: ${notes}` : ""}`
             : notes || null;
 
+        let balanceDueDate: string | null = null;
+        if (isPartial) {
+          if (billingEndDate) {
+            const d = new Date(billingEndDate);
+            if (!isNaN(d.getTime())) {
+              d.setDate(d.getDate() - 10);
+              balanceDueDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+            }
+          }
+          if (!balanceDueDate) {
+            const now = new Date();
+            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            lastDay.setDate(lastDay.getDate() - 10);
+            balanceDueDate = `${lastDay.getFullYear()}-${String(lastDay.getMonth() + 1).padStart(2, "0")}-${String(lastDay.getDate()).padStart(2, "0")}`;
+          }
+        }
+        const persistentToken = isPartial ? randomBytes(16).toString("hex") : null;
+        const initialLinkStatus = isPartial ? "active" : "used";
+
         const [insertRes] = await pool.query(
           `INSERT INTO payments (
             client_name,
@@ -238,14 +258,17 @@ export async function POST(req: Request) {
             currency,
             method,
             status,
+            link_status,
             source,
             reference,
             paypal_order_id,
             billing_start_date,
             billing_end_date,
+            balance_due_date,
+            token,
             paid_at,
             notes
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PayPal', ?, 'website', ?, ?, ?, ?, CURDATE(), ?)`,
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PayPal', ?, ?, 'website', ?, ?, ?, ?, ?, ?, CURDATE(), ?)`,
           [
             effectiveClientName,
             effectiveClientEmail || null,
@@ -260,10 +283,13 @@ export async function POST(req: Request) {
             finalRemaining,
             currency,
             paymentStatus,
+            initialLinkStatus,
             captureID,
             orderID,
             billingStartDate || null,
             billingEndDate || null,
+            balanceDueDate,
+            persistentToken,
             paymentNotes,
           ]
         );

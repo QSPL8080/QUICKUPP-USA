@@ -124,6 +124,23 @@ export const PAYMENT_LINK_QUANTITIES = [
   "Custom Scope",
 ] as const;
 
+function getInitialBillingDates() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const fmt = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const due = new Date(lastDay);
+  due.setDate(due.getDate() - 10);
+  return {
+    start: fmt(firstDay),
+    end: fmt(lastDay),
+    due: fmt(due),
+  };
+}
+
 export default function PaymentsView({
   rows,
   options,
@@ -158,8 +175,9 @@ export default function PaymentsView({
   const [modalSubtab, setModalSubtab] = useState<"orders" | "payments">("orders");
 
   // Generate Payment Link State
+  const initialDates = getInitialBillingDates();
   const [generatingLink, setGeneratingLink] = useState(false);
-  const [createdLink, setCreatedLink] = useState<{ url: string; token: string; orderNumber: string } | null>(null);
+  const [createdLink, setCreatedLink] = useState<{ url: string; token: string; orderNumber: string; clientName?: string; clientPhone?: string; service?: string; quantity?: string; totalAmount?: number; paymentOption?: string } | null>(null);
   const [linkForm, setLinkForm] = useState({
     leadSource: "Manual",
     clientName: "",
@@ -171,6 +189,28 @@ export default function PaymentsView({
     totalAmount: "",
     paymentOption: "full" as "full" | "partial",
     depositAmount: "",
+    billingStartDate: initialDates.start,
+    billingEndDate: initialDates.end,
+    balanceDueDate: initialDates.due,
+    notes: "",
+  });
+
+  // Edit Payment Link State
+  const [editingLink, setEditingLink] = useState<PaymentRow | null>(null);
+  const [editLinkForm, setEditLinkForm] = useState({
+    id: 0,
+    clientName: "",
+    clientPhone: "",
+    clientEmail: "",
+    companyName: "",
+    service: "AI UGC Video",
+    quantity: "Single Reel",
+    totalAmount: "",
+    paymentOption: "full" as "full" | "partial",
+    billingStartDate: "",
+    billingEndDate: "",
+    balanceDueDate: "",
+    linkStatus: "active",
     notes: "",
   });
 
@@ -197,6 +237,193 @@ export default function PaymentsView({
     const fullUrl = tokenOrUrl.startsWith("http") ? tokenOrUrl : `${window.location.origin}/pay/${tokenOrUrl}`;
     navigator.clipboard.writeText(fullUrl);
     toast("Payment link copied to clipboard!");
+  };
+
+  const getWhatsAppMessage = (p: {
+    clientName: string;
+    clientPhone?: string | null;
+    service: string;
+    quantity?: string | null;
+    category?: string | null;
+    amount?: number | null;
+    totalAmount?: number | null;
+    remainingAmount?: number | null;
+    paymentType?: string | null;
+    status?: string | null;
+    token?: string | null;
+    invoiceNumber?: string | null;
+    id?: number | null;
+    balanceDueDate?: string | null;
+    billingEndDate?: string | null;
+  }) => {
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://quickuppsoftech.us";
+    const payUrl = p.token ? `${origin}/pay/${p.token}` : `${origin}/pay`;
+    const tot = Number(p.totalAmount || p.amount || 0);
+    const isPartial = p.paymentType === "partial" || (p.remainingAmount != null && p.remainingAmount > 0);
+    const deposit = Number(p.amount || 0);
+    const remaining = Number(p.remainingAmount != null ? p.remainingAmount : (tot - deposit));
+
+    if (p.status === "partially_paid" && remaining > 0) {
+      // Balance notice message
+      return `Hello ${p.clientName},
+
+This is a courtesy reminder regarding your outstanding balance for ${p.service} (${p.quantity || p.category || "Deliverables"}) with Quickupp Softech LLC.
+
+• Order / Invoice: ${p.invoiceNumber || (p.id ? `QS-${p.id}` : "")}
+• Total Engagement: $${tot.toFixed(2)} USD
+• Amount Paid: $${deposit.toFixed(2)} USD
+• Remaining Balance Due: $${remaining.toFixed(2)} USD
+• Balance Due Date: ${p.balanceDueDate || (p.billingEndDate ? p.billingEndDate.slice(0, 10) : "Due Shortly")}
+
+Please complete your balance payment securely via PayPal or Debit/Credit Card using the link below:
+👉 ${payUrl}
+
+If you have any questions, feel free to reply directly or contact us at info@quickuppsoftech.us.
+
+Website: https://quickuppsoftech.us/
+Email: info@quickuppsoftech.us
+
+Best regards,
+Quickupp Softech LLC`;
+    }
+
+    // Initial Payment link message (CRITICAL: 24h expiration is NOT conveyed to client)
+    const partialLines = isPartial
+      ? `• Initial Deposit Due: $${(tot * 0.5).toFixed(2)} USD (50% Deposit)\n• Remaining Balance: $${(tot * 0.5).toFixed(2)} USD`
+      : "";
+
+    return `Hello ${p.clientName},
+
+Thank you for choosing Quickupp Softech LLC!
+
+Here are your custom engagement details:
+• Service: ${p.service}
+• Scope / Package: ${p.quantity || p.category || "Deliverables"}
+• Total Amount: $${tot.toFixed(2)} USD
+${partialLines ? `${partialLines}\n` : ""}
+Please complete your secure payment via PayPal or Debit/Credit Card using the link below:
+👉 ${payUrl}
+
+If you have any questions or need custom assistance, feel free to reply directly or contact us at info@quickuppsoftech.us.
+
+Website: https://quickuppsoftech.us/
+Email: info@quickuppsoftech.us
+
+Best regards,
+Quickupp Softech LLC`;
+  };
+
+  const openWhatsApp = (p: {
+    clientName: string;
+    clientPhone?: string | null;
+    service: string;
+    quantity?: string | null;
+    category?: string | null;
+    amount?: number | null;
+    totalAmount?: number | null;
+    remainingAmount?: number | null;
+    paymentType?: string | null;
+    status?: string | null;
+    token?: string | null;
+    invoiceNumber?: string | null;
+    id?: number | null;
+    balanceDueDate?: string | null;
+    billingEndDate?: string | null;
+  }) => {
+    const msg = getWhatsAppMessage(p);
+    const cleanPhone = (p.clientPhone || "").replace(/[^0-9+]/g, "");
+    const url = cleanPhone
+      ? `https://api.whatsapp.com/send?phone=${encodeURIComponent(cleanPhone)}&text=${encodeURIComponent(msg)}`
+      : `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+    window.open(url, "_blank");
+  };
+
+  const cancelLink = async (p: PaymentRow) => {
+    if (
+      !(await confirm({
+        title: "Cancel this payment link?",
+        message: "The link will immediately be deactivated and cannot be paid by the customer.",
+      }))
+    )
+      return;
+    setBusy(true);
+    const res = await fetch("/api/crm/payment-links", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "cancel", id: p.id }),
+    }).catch(() => null);
+    setBusy(false);
+    if (!res?.ok) {
+      toast("Couldn't cancel payment link. Please try again.");
+      return;
+    }
+    toast("Payment link cancelled");
+    router.refresh();
+  };
+
+  const openEditLink = (p: PaymentRow) => {
+    setError("");
+    setEditingLink(p);
+    setEditLinkForm({
+      id: p.id,
+      clientName: p.clientName,
+      clientPhone: p.clientPhone || "",
+      clientEmail: p.clientEmail || "",
+      companyName: p.companyName || "",
+      service: p.service,
+      quantity: p.quantity || "Single Reel",
+      totalAmount: String(p.totalAmount || p.amount || ""),
+      paymentOption: (p.paymentType as "full" | "partial") || "full",
+      billingStartDate: p.billingStartDate || "",
+      billingEndDate: p.billingEndDate || "",
+      balanceDueDate: p.balanceDueDate || "",
+      linkStatus: p.linkStatus || "active",
+      notes: p.notes || "",
+    });
+  };
+
+  const saveEditLink = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    setError("");
+    const res = await fetch("/api/crm/payment-links", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(editLinkForm),
+    }).catch(() => null);
+    setBusy(false);
+    const json = res ? await res.json().catch(() => ({})) : {};
+    if (!res?.ok || !json.ok) {
+      setError(json.error || "Failed to update payment link.");
+      return;
+    }
+    setEditingLink(null);
+    toast("Payment link updated!");
+    router.refresh();
+  };
+
+  const sendBalanceReminder = async (p: PaymentRow) => {
+    if (
+      !(await confirm({
+        title: "Send balance reminder email?",
+        message: `An official balance reminder email with direct payment link will be sent to ${p.clientEmail}.`,
+      }))
+    )
+      return;
+    setBusy(true);
+    const res = await fetch("/api/crm/payments/send-balance-reminder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: p.id }),
+    }).catch(() => null);
+    setBusy(false);
+    const json = res ? await res.json().catch(() => ({})) : {};
+    if (!res?.ok || !json.ok) {
+      toast(json.error || "Couldn't send balance reminder. Please try again.");
+      return;
+    }
+    toast("Balance reminder email sent!");
+    router.refresh();
   };
 
   const openForm = (p: PaymentRow | "new") => {
@@ -256,6 +483,12 @@ export default function PaymentsView({
       url: `${window.location.origin}${json.url}`,
       token: json.token,
       orderNumber: json.orderNumber,
+      clientName: linkForm.clientName,
+      clientPhone: linkForm.clientPhone,
+      service: linkForm.service,
+      quantity: linkForm.quantity,
+      totalAmount: Number(linkForm.totalAmount) || 0,
+      paymentOption: linkForm.paymentOption,
     });
     toast("Payment link generated!");
     router.refresh();
@@ -314,28 +547,32 @@ export default function PaymentsView({
 
   const headerActions = (
     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-      <button
-        type="button"
-        className="crm-act crm-act-purple"
-        onClick={() => {
-          setError("");
-          setGeneratingLink(true);
-        }}
-        title="Generate client payment link"
-      >
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-        </svg>
-        + Generate Payment Link
-      </button>
+      {currentTab !== "website" && (
+        <button
+          type="button"
+          className="crm-act crm-act-purple"
+          onClick={() => {
+            setError("");
+            setGeneratingLink(true);
+          }}
+          title="Generate client payment link"
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+          </svg>
+          + Generate Payment Link
+        </button>
+      )}
 
-      <button type="button" className="crm-act crm-act-dark" onClick={() => openForm("new")}>
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-          <path d="M12 5v14M5 12h14" />
-        </svg>
-        Add payment
-      </button>
+      {currentTab !== "website" && currentTab !== "payment_link" && (
+        <button type="button" className="crm-act crm-act-dark" onClick={() => openForm("new")}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+          Add payment
+        </button>
+      )}
     </div>
   );
 
@@ -610,54 +847,155 @@ export default function PaymentsView({
                         {/* Generated · Expires */}
                         <td data-label="Generated · Expires" style={{ fontSize: "12.5px" }}>
                           <span style={{ fontWeight: 700, color: "#0f172a", display: "block" }}>
-                            {p.createdBy || "Admin"}
+                            {p.createdBy || "Super Admin"}
                           </span>
                           <span style={{ color: "#64748b", display: "block", fontSize: "11.5px" }}>
                             {fmtDate(p.createdAt, true)}
                           </span>
-                          {p.expiresAt && (
+                          {p.status === "partially_paid" ? (
+                            <span style={{ color: "#7c3aed", display: "block", fontSize: "11px", marginTop: "2px", fontWeight: 700 }}>
+                              Balance Due {p.balanceDueDate || (p.billingEndDate ? p.billingEndDate.slice(0, 10) : "Pending")}
+                            </span>
+                          ) : p.expiresAt ? (
                             <span style={{ color: isLinkExpired ? "#dc2626" : "#64748b", display: "block", fontSize: "11px", marginTop: "2px" }}>
                               Expires {fmtDate(p.expiresAt, true)}
                             </span>
-                          )}
+                          ) : null}
                         </td>
 
-                        {/* Actions */}
+                        {/* Actions matching screenshot media_1793689282840.png */}
                         <td data-label="Actions" onClick={(e) => e.stopPropagation()} style={{ textAlign: "right" }}>
-                          <div style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+                          <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", flexWrap: "nowrap" }}>
+                            {/* Copy Link */}
                             <button
                               type="button"
                               className="crm-act crm-act-ghost crm-act-sm"
+                              style={{
+                                fontSize: "12px",
+                                padding: "4px 10px",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "5px",
+                                background: "#f8fafc",
+                                border: "1px solid #cbd5e1",
+                                color: "#0f172a",
+                                fontWeight: 600,
+                              }}
+                              onClick={() => copyLink(p.token || String(p.id))}
+                              title="Copy Payment Link"
+                            >
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                              </svg>
+                              Copy Link
+                            </button>
+
+                            {/* WhatsApp (Green Button) */}
+                            <button
+                              type="button"
+                              className="crm-act crm-act-sm"
+                              style={{
+                                fontSize: "12px",
+                                padding: "4px 12px",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "5px",
+                                background: "#10b981",
+                                color: "#ffffff",
+                                border: "none",
+                                fontWeight: 700,
+                                borderRadius: "8px",
+                              }}
+                              onClick={() => openWhatsApp(p)}
+                              title="Share on WhatsApp"
+                            >
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M20.52 3.48A11.93 11.93 0 0 0 12.06 0C5.46 0 .09 5.37.09 11.97c0 2.11.55 4.17 1.6 6L0 24l6.19-1.62a11.93 11.93 0 0 0 5.87 1.51h.01c6.6 0 11.97-5.37 11.97-11.97 0-3.2-1.25-6.21-3.52-8.44zm-8.46 18.36h-.01a9.92 9.92 0 0 1-5.06-1.39l-.36-.22-3.76.99 1-3.66-.24-.38a9.93 9.93 0 0 1-1.52-5.21c0-5.5 4.47-9.97 9.97-9.97 2.66 0 5.16 1.04 7.05 2.92a9.92 9.92 0 0 1 2.92 7.05c0 5.5-4.48 9.97-9.99 9.97zm5.46-7.46c-.3-.15-1.77-.87-2.04-.97-.28-.1-.48-.15-.68.15-.2.3-.77.97-.95 1.17-.17.2-.35.22-.65.07-.3-.15-1.27-.47-2.42-1.49-.9-.8-1.5-1.78-1.68-2.08-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.68-1.64-.93-2.25-.24-.59-.49-.51-.68-.52h-.58c-.2 0-.52.07-.8.37-.27.3-1.05 1.03-1.05 2.51s1.08 2.91 1.23 3.11c.15.2 2.12 3.24 5.14 4.54.72.31 1.28.5 1.72.64.72.23 1.38.2 1.9.12.58-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.18-1.42-.08-.13-.27-.2-.57-.35z" />
+                              </svg>
+                              WhatsApp
+                            </button>
+
+                            {/* Details */}
+                            <button
+                              type="button"
+                              className="crm-act crm-act-ghost crm-act-sm"
+                              style={{ fontSize: "12px", padding: "4px 10px" }}
                               onClick={() => {
                                 setViewing(p);
                                 setModalSubtab("orders");
                               }}
-                              style={{ fontSize: "12px", padding: "4px 10px" }}
                             >
                               Details
                             </button>
-                            {p.token && (
-                              <button
-                                type="button"
-                                className="crm-action-btn is-view"
-                                title="Copy Payment Link"
-                                onClick={() => copyLink(p.token!)}
-                              >
-                                📋
-                              </button>
-                            )}
+
+                            {/* Edit */}
                             <button
                               type="button"
-                              className="crm-action-btn is-delete"
-                              title="Delete Link"
-                              onClick={() => deleteSingle(p)}
+                              className="crm-act crm-act-ghost crm-act-sm"
+                              style={{ fontSize: "12px", padding: "4px 9px", display: "inline-flex", alignItems: "center", gap: "4px" }}
+                              onClick={() => openEditLink(p)}
+                              title="Edit Payment Link"
                             >
-                              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M12 20h9" />
+                                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                              </svg>
+                              Edit
+                            </button>
+
+                            {/* Cancel */}
+                            {p.linkStatus !== "cancelled" && p.status !== "paid" && (
+                              <button
+                                type="button"
+                                className="crm-act crm-act-ghost crm-act-sm"
+                                style={{ fontSize: "12px", padding: "4px 9px", display: "inline-flex", alignItems: "center", gap: "4px", color: "#64748b" }}
+                                onClick={() => cancelLink(p)}
+                                title="Cancel Link"
+                              >
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                                  <circle cx="12" cy="12" r="10" />
+                                  <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+                                </svg>
+                                Cancel
+                              </button>
+                            )}
+
+                            {/* Delete */}
+                            <button
+                              type="button"
+                              className="crm-act crm-act-ghost crm-act-sm"
+                              style={{ fontSize: "12px", padding: "4px 8px", color: "#ef4444" }}
+                              onClick={() => deleteSingle(p)}
+                              title="Delete Link"
+                            >
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M3 6h18" />
                                 <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
                                 <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
                               </svg>
                             </button>
+
+                            {/* If partially paid: Send Balance Reminder Email */}
+                            {p.status === "partially_paid" && (
+                              <button
+                                type="button"
+                                className="crm-act crm-act-sm"
+                                style={{
+                                  fontSize: "11px",
+                                  padding: "4px 8px",
+                                  background: "#faf5ff",
+                                  color: "#7c3aed",
+                                  border: "1px solid #d8b4fe",
+                                  fontWeight: 700,
+                                  borderRadius: "6px",
+                                }}
+                                onClick={() => sendBalanceReminder(p)}
+                                title="Send Balance Reminder Email"
+                              >
+                                📧 Balance
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -869,26 +1207,30 @@ export default function PaymentsView({
             </p>
             <p className="crm-empty-sub">
               {currentTab === "website"
-                ? "Payments completed via the website checkout will automatically appear here."
+                ? "Payments completed via the website Pay Now button will automatically appear here."
                 : currentTab === "payment_link"
                 ? "Generate your first customer payment link using the button below."
                 : "All payments and links will appear here."}
             </p>
-            <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
-              <button
-                type="button"
-                className="crm-act crm-act-purple"
-                onClick={() => {
-                  setError("");
-                  setGeneratingLink(true);
-                }}
-              >
-                + Generate Payment Link
-              </button>
-              <button type="button" className="crm-act crm-act-dark" onClick={() => openForm("new")}>
-                Add payment
-              </button>
-            </div>
+            {currentTab === "website" ? null : (
+              <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
+                <button
+                  type="button"
+                  className="crm-act crm-act-purple"
+                  onClick={() => {
+                    setError("");
+                    setGeneratingLink(true);
+                  }}
+                >
+                  + Generate Payment Link
+                </button>
+                {currentTab !== "payment_link" && (
+                  <button type="button" className="crm-act crm-act-dark" onClick={() => openForm("new")}>
+                    Add payment
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         )}
         <Pager page={page} pages={pages} total={total} pageSize={pageSize} q={q} status={status} />
@@ -1147,9 +1489,40 @@ export default function PaymentsView({
                 )
               )}
 
-              {/* Close Button in Footer */}
-              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "12px" }}>
-                <button type="button" className="crm-act crm-act-ghost" onClick={() => setViewing(null)}>
+              {/* Actions in Footer */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "16px", paddingTop: "12px", borderTop: "1px solid #e2e8f0", flexWrap: "wrap", gap: "8px" }}>
+                <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                  {viewing.status === "partially_paid" && (
+                    <>
+                      <button
+                        type="button"
+                        className="crm-act crm-act-sm"
+                        style={{ background: "#faf5ff", color: "#7c3aed", border: "1px solid #d8b4fe", fontWeight: 700 }}
+                        onClick={() => sendBalanceReminder(viewing)}
+                      >
+                        📧 Send Balance Reminder Email
+                      </button>
+                      <button
+                        type="button"
+                        className="crm-act crm-act-sm"
+                        style={{ background: "#10b981", color: "#ffffff", border: "none", fontWeight: 700 }}
+                        onClick={() => openWhatsApp(viewing)}
+                      >
+                        WhatsApp Balance Notice
+                      </button>
+                    </>
+                  )}
+                  {viewing.token && (
+                    <button
+                      type="button"
+                      className="crm-act crm-act-ghost crm-act-sm"
+                      onClick={() => copyLink(viewing.token!)}
+                    >
+                      📋 Copy Link
+                    </button>
+                  )}
+                </div>
+                <button type="button" className="crm-act crm-act-dark" onClick={() => setViewing(null)}>
                   Close
                 </button>
               </div>
@@ -1313,16 +1686,78 @@ export default function PaymentsView({
 
                 {/* Payment Option (Full vs 50% Deposit) */}
                 <label className="crm-field">
-                  <span className="crm-label">Payment option</span>
+                  <span className="crm-label">Payment option *</span>
                   <select
                     className="crm-input crm-select"
                     value={linkForm.paymentOption}
-                    onChange={(e) => setLinkForm((f) => ({ ...f, paymentOption: e.target.value as "full" | "partial" }))}
+                    onChange={(e) => {
+                      const opt = e.target.value as "full" | "partial";
+                      setLinkForm((f) => ({ ...f, paymentOption: opt }));
+                    }}
                   >
                     <option value="full">Full Payment (100% upfront)</option>
                     <option value="partial">Allow 50% Deposit / Partial Payment</option>
                   </select>
                 </label>
+
+                {/* Billing Coverage Dates */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <label className="crm-field">
+                    <span className="crm-label">Billing From *</span>
+                    <input
+                      type="date"
+                      className="crm-input"
+                      value={linkForm.billingStartDate}
+                      onChange={(e) => setLinkForm((f) => ({ ...f, billingStartDate: e.target.value }))}
+                      required
+                    />
+                  </label>
+                  <label className="crm-field">
+                    <span className="crm-label">Billing To *</span>
+                    <input
+                      type="date"
+                      className="crm-input"
+                      value={linkForm.billingEndDate}
+                      onChange={(e) => {
+                        const newEnd = e.target.value;
+                        setLinkForm((f) => {
+                          let due = f.balanceDueDate;
+                          if (newEnd) {
+                            const d = new Date(newEnd);
+                            if (!isNaN(d.getTime())) {
+                              d.setDate(d.getDate() - 10);
+                              due = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+                            }
+                          }
+                          return { ...f, billingEndDate: newEnd, balanceDueDate: due };
+                        });
+                      }}
+                      required
+                    />
+                  </label>
+                </div>
+
+                {/* If Partial: Show Tentative Balance Due Date and Deposit Breakdown */}
+                {linkForm.paymentOption === "partial" && (
+                  <div style={{ background: "#faf5ff", border: "1.5px solid #d8b4fe", borderRadius: "10px", padding: "14px 16px" }}>
+                    <label className="crm-field" style={{ marginBottom: "10px" }}>
+                      <span className="crm-label" style={{ color: "#6b21a8", fontWeight: 700 }}>
+                        Tentative Balance Due Date (10 days prior to period end) *
+                      </span>
+                      <input
+                        type="date"
+                        className="crm-input"
+                        value={linkForm.balanceDueDate}
+                        onChange={(e) => setLinkForm((f) => ({ ...f, balanceDueDate: e.target.value }))}
+                        required
+                      />
+                    </label>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12.5px", color: "#6b21a8", fontWeight: 700, paddingTop: "8px", borderTop: "1px dashed #d8b4fe" }}>
+                      <span>Due Today (50% Deposit): ${((Number(linkForm.totalAmount) || 0) * 0.5).toFixed(2)} USD</span>
+                      <span>Remaining Balance: ${((Number(linkForm.totalAmount) || 0) * 0.5).toFixed(2)} USD</span>
+                    </div>
+                  </div>
+                )}
 
                 {/* Notes for Team */}
                 <label className="crm-field">
@@ -1368,7 +1803,7 @@ export default function PaymentsView({
       {/* ---- CREATED LINK SUCCESS MODAL ---- */}
       {createdLink && (
         <div className="crm-modal-wrap" onClick={() => setCreatedLink(null)}>
-          <div className="crm-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "540px", padding: "28px" }}>
+          <div className="crm-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "560px", padding: "28px" }}>
             <div style={{ textAlign: "center", marginBottom: "16px" }}>
               <div style={{ fontSize: "40px", marginBottom: "10px" }}>🎉</div>
               <h2 style={{ fontSize: "19px", fontWeight: 800, color: "#0f172a", margin: "0 0 6px" }}>
@@ -1383,13 +1818,32 @@ export default function PaymentsView({
               {createdLink.url}
             </div>
 
-            <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
+            <div style={{ display: "flex", gap: "10px", justifyContent: "center", flexWrap: "wrap" }}>
               <button
                 type="button"
                 className="crm-act crm-act-purple"
                 onClick={() => copyLink(createdLink.url)}
               >
                 📋 Copy Link
+              </button>
+              <button
+                type="button"
+                className="crm-act"
+                style={{ background: "#10b981", color: "#ffffff", fontWeight: 700, border: "none", display: "inline-flex", alignItems: "center", gap: "6px" }}
+                onClick={() =>
+                  openWhatsApp({
+                    clientName: createdLink.clientName || "Valued Client",
+                    clientPhone: createdLink.clientPhone,
+                    service: createdLink.service || "Services",
+                    quantity: createdLink.quantity,
+                    totalAmount: createdLink.totalAmount,
+                    paymentType: createdLink.paymentOption,
+                    token: createdLink.token,
+                    invoiceNumber: createdLink.orderNumber,
+                  })
+                }
+              >
+                WhatsApp Share
               </button>
               <a
                 href={createdLink.url}
@@ -1407,6 +1861,217 @@ export default function PaymentsView({
                 Done
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ---- EDIT PAYMENT LINK MODAL ---- */}
+      {editingLink && (
+        <div className="crm-modal-wrap" onClick={() => setEditingLink(null)}>
+          <div className="crm-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "620px" }}>
+            <div className="crm-drawer-head" style={{ padding: "18px 22px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <span style={{ fontSize: "24px" }}>✏️</span>
+                <div>
+                  <h2 className="crm-drawer-title" style={{ fontSize: "17px" }}>Edit Payment Link</h2>
+                  <p style={{ margin: "2px 0 0", fontSize: "12px", color: "#64748b" }}>
+                    Order #{editingLink.invoiceNumber || `QS-${editingLink.id}`}
+                  </p>
+                </div>
+              </div>
+              <button type="button" className="crm-icon-act" onClick={() => setEditingLink(null)} aria-label="Close">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <form onSubmit={saveEditLink} style={{ padding: "20px 22px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <label className="crm-field">
+                    <span className="crm-label">Customer full name *</span>
+                    <input
+                      className="crm-input"
+                      value={editLinkForm.clientName}
+                      onChange={(e) => setEditLinkForm((f) => ({ ...f, clientName: e.target.value }))}
+                      required
+                    />
+                  </label>
+                  <label className="crm-field">
+                    <span className="crm-label">Mobile number (WhatsApp) *</span>
+                    <input
+                      className="crm-input"
+                      value={editLinkForm.clientPhone}
+                      onChange={(e) => setEditLinkForm((f) => ({ ...f, clientPhone: e.target.value }))}
+                      required
+                    />
+                  </label>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <label className="crm-field">
+                    <span className="crm-label">Email address *</span>
+                    <input
+                      className="crm-input"
+                      type="email"
+                      value={editLinkForm.clientEmail}
+                      onChange={(e) => setEditLinkForm((f) => ({ ...f, clientEmail: e.target.value }))}
+                      required
+                    />
+                  </label>
+                  <label className="crm-field">
+                    <span className="crm-label">Company name</span>
+                    <input
+                      className="crm-input"
+                      value={editLinkForm.companyName}
+                      onChange={(e) => setEditLinkForm((f) => ({ ...f, companyName: e.target.value }))}
+                    />
+                  </label>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <label className="crm-field">
+                    <span className="crm-label">Service *</span>
+                    <select
+                      className="crm-input crm-select"
+                      value={editLinkForm.service}
+                      onChange={(e) => setEditLinkForm((f) => ({ ...f, service: e.target.value }))}
+                    >
+                      {PAYMENT_LINK_SERVICES.map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="crm-field">
+                    <span className="crm-label">Quantity / Scope *</span>
+                    <select
+                      className="crm-input crm-select"
+                      value={editLinkForm.quantity}
+                      onChange={(e) => setEditLinkForm((f) => ({ ...f, quantity: e.target.value }))}
+                    >
+                      {PAYMENT_LINK_QUANTITIES.map((q) => (
+                        <option key={q} value={q}>{q}</option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+
+                {/* Amount ($ USD) */}
+                <label className="crm-field">
+                  <span className="crm-label">Total amount ($ USD)</span>
+                  <input
+                    className="crm-input"
+                    type="number"
+                    step="any"
+                    value={editLinkForm.totalAmount}
+                    onChange={(e) => setEditLinkForm((f) => ({ ...f, totalAmount: e.target.value }))}
+                    disabled={editingLink.status === "paid"}
+                  />
+                  {editingLink.status === "paid" && (
+                    <span style={{ fontSize: "11px", color: "#64748b" }}>
+                      Amount cannot be modified after full payment.
+                    </span>
+                  )}
+                </label>
+
+                {/* Billing Dates */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <label className="crm-field">
+                    <span className="crm-label">Billing From</span>
+                    <input
+                      type="date"
+                      className="crm-input"
+                      value={editLinkForm.billingStartDate}
+                      onChange={(e) => setEditLinkForm((f) => ({ ...f, billingStartDate: e.target.value }))}
+                    />
+                  </label>
+                  <label className="crm-field">
+                    <span className="crm-label">Billing To</span>
+                    <input
+                      type="date"
+                      className="crm-input"
+                      value={editLinkForm.billingEndDate}
+                      onChange={(e) => {
+                        const newEnd = e.target.value;
+                        setEditLinkForm((f) => {
+                          let due = f.balanceDueDate;
+                          if (newEnd) {
+                            const d = new Date(newEnd);
+                            if (!isNaN(d.getTime())) {
+                              d.setDate(d.getDate() - 10);
+                              due = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+                            }
+                          }
+                          return { ...f, billingEndDate: newEnd, balanceDueDate: due };
+                        });
+                      }}
+                    />
+                  </label>
+                </div>
+
+                {/* Balance Due Date */}
+                <label className="crm-field">
+                  <span className="crm-label">Tentative Balance Due Date</span>
+                  <input
+                    type="date"
+                    className="crm-input"
+                    value={editLinkForm.balanceDueDate}
+                    onChange={(e) => setEditLinkForm((f) => ({ ...f, balanceDueDate: e.target.value }))}
+                  />
+                </label>
+
+                {/* Status */}
+                <label className="crm-field">
+                  <span className="crm-label">Link Status</span>
+                  <select
+                    className="crm-input crm-select"
+                    value={editLinkForm.linkStatus}
+                    onChange={(e) => setEditLinkForm((f) => ({ ...f, linkStatus: e.target.value }))}
+                  >
+                    <option value="active">Active</option>
+                    <option value="cancelled">Cancelled</option>
+                    <option value="used">Used</option>
+                    <option value="expired">Expired</option>
+                  </select>
+                </label>
+
+                {/* Notes */}
+                <label className="crm-field">
+                  <span className="crm-label">Internal notes</span>
+                  <textarea
+                    className="crm-textarea"
+                    rows={2}
+                    value={editLinkForm.notes}
+                    onChange={(e) => setEditLinkForm((f) => ({ ...f, notes: e.target.value }))}
+                  />
+                </label>
+              </div>
+
+              {error && (
+                <p className="crm-alert crm-alert-inset" style={{ marginTop: "12px" }}>
+                  {error}
+                </p>
+              )}
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "20px" }}>
+                <button
+                  type="button"
+                  className="crm-act crm-act-ghost"
+                  onClick={() => setEditingLink(null)}
+                  disabled={busy}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="crm-act crm-act-purple"
+                  disabled={busy}
+                >
+                  {busy ? "Saving…" : "Save Changes"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
