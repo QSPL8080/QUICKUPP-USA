@@ -442,9 +442,9 @@ export default function PayNowModal() {
               </svg>
             </div>
             <div>
-              <h2 className="pm-head-title">
+              <h3 className="pm-head-title">
                 {step === "success" ? "Payment Confirmation" : "Quickupp Softech Payment Portal"}
-              </h2>
+              </h3>
               <div className="pm-head-sub">
                 {step === "success"
                   ? "Transaction confirmed successfully"
