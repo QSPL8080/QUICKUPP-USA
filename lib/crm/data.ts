@@ -222,6 +222,7 @@ export type PaymentRow = {
   companyName: string | null;
   category?: string | null;
   service: string;
+  industry?: string | null;
   description: string | null;
   amount: number;
   totalAmount?: number | null;
@@ -309,6 +310,7 @@ export async function listPayments(opts: {
     companyName: (r.company_name as string) || null,
     category: (r.category as string) || null,
     service: String(r.service ?? ""),
+    industry: (r.industry as string) || null,
     description: (r.description as string) || null,
     amount: Number(r.amount),
     totalAmount: r.total_amount != null ? Number(r.total_amount) : null,

@@ -48,8 +48,10 @@ export async function POST(req: Request) {
     const clientPhone = String(body.clientPhone || "").trim().slice(0, 50);
     const companyName = String(body.companyName || "").trim().slice(0, 190) || null;
     const service = String(body.service || "").trim().slice(0, 150);
-    const quantity = String(body.quantity || "Single Reel").trim().slice(0, 100);
-    const leadSource = String(body.leadSource || "Manual").trim().slice(0, 100);
+    const category = String(body.category || body.quantity || "").trim().slice(0, 150);
+    const industry = String(body.industry || "").trim().slice(0, 150) || null;
+    const quantity = category;
+    const leadSource = "manual";
     const notes = String(body.notes || "").trim().slice(0, 2000) || null;
 
     const defaults = getDefaultDates();
@@ -88,7 +90,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "Mobile number (WhatsApp) is required." }, { status: 400 });
     }
     if (!service) {
-      return NextResponse.json({ ok: false, error: "Service / Video type is required." }, { status: 400 });
+      return NextResponse.json({ ok: false, error: "Service selection is required." }, { status: 400 });
     }
     if (!totalAmount || totalAmount <= 0) {
       return NextResponse.json({ ok: false, error: "Please enter a valid total amount in USD ($)." }, { status: 400 });
@@ -110,6 +112,7 @@ export async function POST(req: Request) {
         company_name,
         service,
         category,
+        industry,
         quantity,
         description,
         amount,
@@ -129,21 +132,21 @@ export async function POST(req: Request) {
         expires_at,
         notes,
         created_by
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'USD', 'PayPal', 'pending', 'active', 'payment_link', ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 24 HOUR), ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'USD', 'PayPal', 'pending', 'active', 'payment_link', 'manual', ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 24 HOUR), ?, ?)`,
       [
         clientName,
         clientEmail,
         clientPhone,
         companyName,
         service,
-        quantity, // category holds quantity/package
+        category,
+        industry,
         quantity,
-        `Payment Link: ${service} (${quantity})`,
+        `Payment Link: ${service}${category ? ` - ${category}` : ""}${industry ? ` (${industry})` : ""}`,
         initialAmount,
         totalAmount,
         isPartial ? "partial" : "full",
         remainingAmount,
-        leadSource,
         billingStartDate,
         billingEndDate,
         balanceDueDate,
@@ -200,7 +203,9 @@ export async function PATCH(req: Request) {
     const clientPhone = body.clientPhone !== undefined ? String(body.clientPhone).trim().slice(0, 50) : existing.client_phone;
     const companyName = body.companyName !== undefined ? (String(body.companyName).trim().slice(0, 190) || null) : existing.company_name;
     const service = body.service !== undefined ? String(body.service).trim().slice(0, 150) : existing.service;
-    const quantity = body.quantity !== undefined ? String(body.quantity).trim().slice(0, 100) : existing.quantity;
+    const category = body.category !== undefined ? String(body.category).trim().slice(0, 150) : (existing.category || existing.quantity);
+    const industry = body.industry !== undefined ? (String(body.industry).trim().slice(0, 150) || null) : existing.industry;
+    const quantity = category;
     const notes = body.notes !== undefined ? (String(body.notes).trim().slice(0, 2000) || null) : existing.notes;
     const linkStatus = body.linkStatus !== undefined ? String(body.linkStatus).trim() : existing.link_status;
 
@@ -245,6 +250,7 @@ export async function PATCH(req: Request) {
         company_name = ?,
         service = ?,
         category = ?,
+        industry = ?,
         quantity = ?,
         description = ?,
         total_amount = ?,
@@ -262,9 +268,10 @@ export async function PATCH(req: Request) {
         clientPhone,
         companyName,
         service,
+        category,
+        industry,
         quantity,
-        quantity,
-        `Payment Link: ${service} (${quantity})`,
+        `Payment Link: ${service}${category ? ` - ${category}` : ""}${industry ? ` (${industry})` : ""}`,
         totalAmount,
         paymentType,
         remainingAmount,
