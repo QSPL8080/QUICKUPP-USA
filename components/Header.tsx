@@ -20,6 +20,15 @@ const ITEM_ICONS: Record<string, LucideIconName> = {
   "/services/ai-powered-digital-marketing-services/email-marketing": "mail",
   "/services/ai-powered-digital-marketing-services/sms-marketing": "smartphone",
   "/services/ai-powered-digital-marketing-services/whatsapp-marketing": "message-circle",
+  "/services/ai-automation-solutions/ai-chatbot-development": "bot",
+  "/services/ai-automation-solutions/ai-agent-development": "cpu",
+  "/services/ai-automation-solutions/ai-workflow-automation": "workflow",
+  "/services/ai-automation-solutions/ai-crm-automation": "users",
+  "/services/ai-automation-solutions/ai-lead-generation-qualification": "user-round-check",
+  "/services/ai-automation-solutions/ai-customer-support-automation": "headset",
+  "/services/ai-automation-solutions/ai-document-processing": "file-text",
+  "/services/ai-automation-solutions/ai-api-integration": "plug-zap",
+  "/services/ai-automation-solutions/custom-ai-solutions": "sparkles",
   "/services/ai-automation-solutions/ai-automation-solutions": "bot",
   "/services/information-technology-services/web-design-development": "globe",
   "/services/information-technology-services/application-development": "monitor-smartphone",
@@ -50,6 +59,7 @@ const ITEM_ICONS: Record<string, LucideIconName> = {
 /* Service categories shown as tabs (index into serviceGroups) */
 const SERVICE_TABS: { group: number; icon: LucideIconName; hub: string }[] = [
   { group: 0, icon: "megaphone", hub: "/services/ai-powered-digital-marketing-services" },
+  { group: 2, icon: "bot", hub: "/services/ai-automation-solutions" },
   { group: 3, icon: "code-xml", hub: "/services/information-technology-services" },
   { group: 4, icon: "users", hub: "/services/staff-augmentation" },
 ];
@@ -230,22 +240,7 @@ export default function Header() {
                           </span>
                         </button>
 
-                        {/* 2. AI & Automation Solutions (Direct link, mixed with services) */}
-                        <Link
-                          href="/services/ai-automation-solutions/ai-automation-solutions"
-                          className="nv-tab nv-tab-direct"
-                          onClick={handleLinkClick}
-                        >
-                          <span className="nv-tab-icon" aria-hidden="true">
-                            <LucideIcon name="bot" size={18} />
-                          </span>
-                          <span className="nv-tab-label">{serviceGroups[2]?.label}</span>
-                          <span className="nv-tab-direct-arrow" aria-hidden="true">
-                            <LucideIcon name="arrow-right" size={15} strokeWidth={2.2} />
-                          </span>
-                        </Link>
-
-                        {/* 3. Information Technology Services */}
+                        {/* 2. AI & Automation Solutions */}
                         <button
                           type="button"
                           role="tab"
@@ -254,6 +249,25 @@ export default function Header() {
                           onMouseEnter={() => setServiceTab(1)}
                           onFocus={() => setServiceTab(1)}
                           onClick={() => setServiceTab(1)}
+                        >
+                          <span className="nv-tab-icon" aria-hidden="true">
+                            <LucideIcon name="bot" size={18} />
+                          </span>
+                          <span className="nv-tab-label">{serviceGroups[2]?.label}</span>
+                          <span className="nv-tab-chevron" aria-hidden="true">
+                            <LucideIcon name="chevron-right" size={16} />
+                          </span>
+                        </button>
+
+                        {/* 3. Information Technology Services */}
+                        <button
+                          type="button"
+                          role="tab"
+                          aria-selected={serviceTab === 2}
+                          className={`nv-tab${serviceTab === 2 ? " is-active" : ""}`}
+                          onMouseEnter={() => setServiceTab(2)}
+                          onFocus={() => setServiceTab(2)}
+                          onClick={() => setServiceTab(2)}
                         >
                           <span className="nv-tab-icon" aria-hidden="true">
                             <LucideIcon name="code-xml" size={18} />
@@ -268,11 +282,11 @@ export default function Header() {
                         <button
                           type="button"
                           role="tab"
-                          aria-selected={serviceTab === 2}
-                          className={`nv-tab${serviceTab === 2 ? " is-active" : ""}`}
-                          onMouseEnter={() => setServiceTab(2)}
-                          onFocus={() => setServiceTab(2)}
-                          onClick={() => setServiceTab(2)}
+                          aria-selected={serviceTab === 3}
+                          className={`nv-tab${serviceTab === 3 ? " is-active" : ""}`}
+                          onMouseEnter={() => setServiceTab(3)}
+                          onFocus={() => setServiceTab(3)}
+                          onClick={() => setServiceTab(3)}
                         >
                           <span className="nv-tab-icon" aria-hidden="true">
                             <LucideIcon name="users" size={18} />
@@ -357,14 +371,6 @@ export default function Header() {
                         </div>
                       ))}
                       <div className="nv-mobile-group">
-                        <Link href="/services/ai-automation-solutions/ai-automation-solutions" className="nv-item" onClick={handleLinkClick}>
-                          <span className="nv-item-icon" aria-hidden="true">
-                            <LucideIcon name="bot" size={18} />
-                          </span>
-                          <span className="nv-item-text">
-                            <span className="nv-item-title">AI &amp; Automation Solutions</span>
-                          </span>
-                        </Link>
                         <Link href="/services/youtube-video-promotion" className="nv-item" onClick={handleLinkClick}>
                           <span className="nv-item-icon" aria-hidden="true">
                             <YouTubeMark size={18} />

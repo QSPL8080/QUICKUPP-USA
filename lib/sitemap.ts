@@ -37,7 +37,15 @@ export const serviceGroups: NavGroup[] = [
   {
     label: "AI & Automation Solutions",
     items: [
-      { label: "AI & Automation Solutions", href: "/services/ai-automation-solutions/ai-automation-solutions", desc: "Automate workflows, CRM sync & enterprise intelligence.", icon: "⚡", built: true },
+      { label: "AI Chatbot Development", href: "/services/ai-automation-solutions/ai-chatbot-development", desc: "Intelligent conversational chatbots for websites, support & sales.", icon: "🤖", built: true },
+      { label: "AI Agent Development", href: "/services/ai-automation-solutions/ai-agent-development", desc: "Autonomous AI agents to execute tasks, make decisions & automate.", icon: "🧠", built: true },
+      { label: "AI Workflow Automation", href: "/services/ai-automation-solutions/ai-workflow-automation", desc: "End-to-end automation of manual business processes & pipelines.", icon: "⚡", built: true },
+      { label: "AI-Powered CRM Automation", href: "/services/ai-automation-solutions/ai-crm-automation", desc: "Sync customer data, pipeline stages & automated outreach.", icon: "👥", built: true },
+      { label: "AI Lead Generation & Qualification", href: "/services/ai-automation-solutions/ai-lead-generation-qualification", desc: "Capture, qualify, and score high-intent leads automatically.", icon: "🎯", built: true },
+      { label: "AI Customer Support Automation", href: "/services/ai-automation-solutions/ai-customer-support-automation", desc: "24/7 automated resolution, ticketing & smart escalations.", icon: "🎧", built: true },
+      { label: "AI Document Processing", href: "/services/ai-automation-solutions/ai-document-processing", desc: "Intelligent OCR, data extraction & document classification.", icon: "📄", built: true },
+      { label: "AI API Integration", href: "/services/ai-automation-solutions/ai-api-integration", desc: "Seamless LLM, custom AI model & enterprise API integrations.", icon: "🔌", built: true },
+      { label: "Custom AI Solutions", href: "/services/ai-automation-solutions/custom-ai-solutions", desc: "Bespoke AI architectures built for proprietary business workflows.", icon: "✨", built: true },
     ],
   },
   {

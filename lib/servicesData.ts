@@ -13,6 +13,15 @@ import whatsappMarketing from "@/data/services/whatsapp-marketing";
 
 // AI & Automation Solutions
 import aiAutomationSolutions from "@/data/services/ai-automation-solutions";
+import aiChatbotDevelopment from "@/data/services/ai-chatbot-development";
+import aiAgentDevelopment from "@/data/services/ai-agent-development";
+import aiWorkflowAutomation from "@/data/services/ai-workflow-automation";
+import aiCrmAutomation from "@/data/services/ai-crm-automation";
+import aiLeadGenerationQualification from "@/data/services/ai-lead-generation-qualification";
+import aiCustomerSupportAutomation from "@/data/services/ai-customer-support-automation";
+import aiDocumentProcessing from "@/data/services/ai-document-processing";
+import aiApiIntegration from "@/data/services/ai-api-integration";
+import customAiSolutions from "@/data/services/custom-ai-solutions";
 
 // Information Technology Services
 import webDesignDevelopment from "@/data/services/web-design-development";
@@ -126,6 +135,78 @@ export const serviceCategories: ServiceCategoryMeta[] = [
     categoryDesc:
       "Modernize manual operations, sync CRM workflows, and embed customized autonomous AI agents into your business operations.",
     services: [
+      {
+        slug: "ai-chatbot-development",
+        label: "AI Chatbot Development",
+        desc: "Intelligent conversational chatbots for websites, support & sales.",
+        icon: "🤖",
+        template: "aiautomation",
+        data: aiChatbotDevelopment,
+      },
+      {
+        slug: "ai-agent-development",
+        label: "AI Agent Development",
+        desc: "Autonomous AI agents to execute tasks, make decisions & automate.",
+        icon: "🧠",
+        template: "aiautomation",
+        data: aiAgentDevelopment,
+      },
+      {
+        slug: "ai-workflow-automation",
+        label: "AI Workflow Automation",
+        desc: "End-to-end automation of manual business processes & pipelines.",
+        icon: "⚡",
+        template: "aiautomation",
+        data: aiWorkflowAutomation,
+      },
+      {
+        slug: "ai-crm-automation",
+        label: "AI-Powered CRM Automation",
+        desc: "Sync customer data, pipeline stages & automated outreach.",
+        icon: "👥",
+        template: "aiautomation",
+        data: aiCrmAutomation,
+      },
+      {
+        slug: "ai-lead-generation-qualification",
+        label: "AI Lead Generation & Qualification",
+        desc: "Capture, qualify, and score high-intent leads automatically.",
+        icon: "🎯",
+        template: "aiautomation",
+        data: aiLeadGenerationQualification,
+      },
+      {
+        slug: "ai-customer-support-automation",
+        label: "AI Customer Support Automation",
+        desc: "24/7 automated resolution, ticketing & smart escalations.",
+        icon: "🎧",
+        template: "aiautomation",
+        data: aiCustomerSupportAutomation,
+      },
+      {
+        slug: "ai-document-processing",
+        label: "AI Document Processing",
+        desc: "Intelligent OCR, data extraction & document classification.",
+        icon: "📄",
+        template: "aiautomation",
+        data: aiDocumentProcessing,
+      },
+      {
+        slug: "ai-api-integration",
+        label: "AI API Integration",
+        desc: "Seamless LLM, custom AI model & enterprise API integrations.",
+        icon: "🔌",
+        template: "aiautomation",
+        data: aiApiIntegration,
+      },
+      {
+        slug: "custom-ai-solutions",
+        label: "Custom AI Solutions",
+        desc: "Bespoke AI architectures built for proprietary business workflows.",
+        icon: "✨",
+        template: "aiautomation",
+        data: customAiSolutions,
+      },
       {
         slug: "ai-automation-solutions",
         label: "AI & Automation Solutions",

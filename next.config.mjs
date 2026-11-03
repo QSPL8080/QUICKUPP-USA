@@ -30,8 +30,17 @@ const nextConfig = {
       { source: "/services/information-technology-services", destination: "/services/information-technology-services/web-design-development", permanent: true },
       { source: "/services/staff-augmentation", destination: "/services/staff-augmentation/marketing-design-staff-augmentation", permanent: true },
 
-      // AI & Automation Solutions (single service page)
-      { source: "/services/ai-automation-solutions", destination: "/services/ai-automation-solutions/ai-automation-solutions", permanent: true },
+      // AI & Automation Solutions
+      { source: "/services/ai-automation-solutions", destination: "/services/ai-automation-solutions/ai-chatbot-development", permanent: true },
+      { source: "/services/ai-chatbot-development", destination: "/services/ai-automation-solutions/ai-chatbot-development", permanent: true },
+      { source: "/services/ai-agent-development", destination: "/services/ai-automation-solutions/ai-agent-development", permanent: true },
+      { source: "/services/ai-workflow-automation", destination: "/services/ai-automation-solutions/ai-workflow-automation", permanent: true },
+      { source: "/services/ai-crm-automation", destination: "/services/ai-automation-solutions/ai-crm-automation", permanent: true },
+      { source: "/services/ai-lead-generation-qualification", destination: "/services/ai-automation-solutions/ai-lead-generation-qualification", permanent: true },
+      { source: "/services/ai-customer-support-automation", destination: "/services/ai-automation-solutions/ai-customer-support-automation", permanent: true },
+      { source: "/services/ai-document-processing", destination: "/services/ai-automation-solutions/ai-document-processing", permanent: true },
+      { source: "/services/ai-api-integration", destination: "/services/ai-automation-solutions/ai-api-integration", permanent: true },
+      { source: "/services/custom-ai-solutions", destination: "/services/ai-automation-solutions/custom-ai-solutions", permanent: true },
 
       // Information Technology Services
       { source: "/services/web-design-development", destination: "/services/information-technology-services/web-design-development", permanent: true },

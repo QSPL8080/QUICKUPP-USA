@@ -74,7 +74,7 @@ export const SERVICE_FORMS = {
   "ai-automation": {
     label: "AI & Automation Solutions",
     table: "service_ai_automation",
-    options: [],
+    options: groupItems("AI & Automation Solutions"),
   },
   "it-services": {
     label: "Information Technology Services",

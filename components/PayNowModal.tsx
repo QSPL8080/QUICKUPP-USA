@@ -35,7 +35,17 @@ export const SERVICES_DATA = [
   },
   {
     service: "AI & Automation Solutions",
-    categories: [],
+    categories: [
+      "AI Chatbot Development",
+      "AI Agent Development",
+      "AI Workflow Automation",
+      "AI-Powered CRM Automation",
+      "AI Lead Generation & Qualification",
+      "AI Customer Support Automation",
+      "AI Document Processing",
+      "AI API Integration",
+      "Custom AI Solutions",
+    ],
   },
   {
     service: "Information Technology Services",
