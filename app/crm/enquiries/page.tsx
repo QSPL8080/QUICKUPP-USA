@@ -12,7 +12,7 @@ const ymd = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 export default async function EnquiriesPage({ searchParams }: Props) {
-  await requireUser();
+  const user = await requireUser();
   const sp = await searchParams;
   const f = {
     q: sp.q || "",
@@ -179,7 +179,7 @@ export default async function EnquiriesPage({ searchParams }: Props) {
       </div>
 
       <div className="crm-card crm-card-flush">
-        <LeadsView rows={data.items} offset={(data.page - 1) * data.pageSize} team={team} openNew={sp.new === "1"} />
+        <LeadsView rows={data.items} offset={(data.page - 1) * data.pageSize} team={team} currentUser={user} openNew={sp.new === "1"} />
         <Pager {...data} q={f.q} status={f.status} extra={{ source: f.source, from: f.from, to: f.to }} />
       </div>
     </>

@@ -28,46 +28,96 @@ export async function POST(request: Request) {
   const result = validateManualLead(body);
   if (!result.ok) return Response.json({ ok: false, errors: result.errors }, { status: 400 });
   const d = result.data;
+  const assignedTo = d.assignedTo || user.name || "Super Admin";
   const [res] = await getPool().execute(
     `INSERT INTO manual_leads
       (full_name, email, phone, company_name, company_website, country, industry, service, category, budget, timeline,
        lead_channel, assigned_to, message, status, created_by)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [d.fullName, d.email, d.phone, d.companyName, d.companyWebsite, d.country, d.industry, d.service, d.category, d.budget, d.timeline,
-      d.channel, d.assignedTo, d.notes, d.status, user.id]
+      d.channel, assignedTo, d.notes, d.status, user.id]
   );
   return Response.json({ ok: true, id: (res as { insertId: number }).insertId });
 }
 
-/* PUT { id, ...fields } → edit a lead that was added by hand */
+/* PUT { id, source, ...fields } → edit a lead */
 export async function PUT(request: Request) {
   if (!(await getCurrentUser())) return unauthorized();
   const body = await readJson(request);
   const id = Number(body?.id);
+  const source: EnquirySource = isEnquirySource(body?.source) ? body.source : "manual";
   if (!body || !Number.isInteger(id) || id < 1) return invalid();
   const result = validateManualLead(body);
   if (!result.ok) return Response.json({ ok: false, errors: result.errors }, { status: 400 });
   const d = result.data;
-  const [res] = await getPool().execute(
-    `UPDATE manual_leads SET full_name = ?, email = ?, phone = ?, company_name = ?, company_website = ?, country = ?, industry = ?,
-       service = ?, category = ?, budget = ?, timeline = ?, lead_channel = ?, assigned_to = ?, message = ?, status = ?
-     WHERE id = ?`,
-    [d.fullName, d.email, d.phone, d.companyName, d.companyWebsite, d.country, d.industry, d.service, d.category, d.budget, d.timeline,
-      d.channel, d.assignedTo, d.notes, d.status, id]
-  );
-  if (!(res as { affectedRows: number }).affectedRows) return Response.json({ ok: false, error: "This lead was deleted." }, { status: 404 });
+  const pool = getPool();
+  if (source === "manual") {
+    const [res] = await pool.execute(
+      `UPDATE manual_leads SET full_name = ?, email = ?, phone = ?, company_name = ?, company_website = ?, country = ?, industry = ?,
+         service = ?, category = ?, budget = ?, timeline = ?, lead_channel = ?, assigned_to = ?, message = ?, status = ?
+       WHERE id = ?`,
+      [d.fullName, d.email, d.phone, d.companyName, d.companyWebsite, d.country, d.industry, d.service, d.category, d.budget, d.timeline,
+        d.channel, d.assignedTo, d.notes, d.status, id]
+    );
+    if (!(res as { affectedRows: number }).affectedRows) return Response.json({ ok: false, error: "This lead was deleted." }, { status: 404 });
+  } else if (source === "contact") {
+    const [res] = await pool.execute(
+      `UPDATE contact_enquiries SET full_name = ?, email = ?, phone = ?, company_name = ?, company_website = ?, country = ?, industry = ?,
+         project_type = ?, budget = ?, timeline = ?, message = ?, assigned_to = ?, status = ?
+       WHERE id = ?`,
+      [d.fullName, d.email, d.phone, d.companyName, d.companyWebsite, d.country, d.industry, d.service || d.category, d.budget, d.timeline,
+        d.notes, d.assignedTo, d.status, id]
+    );
+    if (!(res as { affectedRows: number }).affectedRows) return Response.json({ ok: false, error: "This lead was deleted." }, { status: 404 });
+  } else if (source === "youtube") {
+    const [res] = await pool.execute(
+      `UPDATE service_youtube_promotion SET full_name = ?, email = ?, phone = ?, company_name = ?, company_website = ?, country = ?, industry = ?,
+         budget = ?, timeline = ?, message = ?, assigned_to = ?, status = ?
+       WHERE id = ?`,
+      [d.fullName, d.email, d.phone, d.companyName, d.companyWebsite, d.country, d.industry, d.budget, d.timeline,
+        d.notes, d.assignedTo, d.status, id]
+    );
+    if (!(res as { affectedRows: number }).affectedRows) return Response.json({ ok: false, error: "This lead was deleted." }, { status: 404 });
+  } else {
+    const table = SOURCES[source].table;
+    const [res] = await pool.execute(
+      `UPDATE \`${table}\` SET full_name = ?, email = ?, phone = ?, company_name = ?, company_website = ?, country = ?, industry = ?,
+         service = ?, category = ?, budget = ?, timeline = ?, message = ?, assigned_to = ?, status = ?
+       WHERE id = ?`,
+      [d.fullName, d.email, d.phone, d.companyName, d.companyWebsite, d.country, d.industry, d.service, d.category, d.budget, d.timeline,
+        d.notes, d.assignedTo, d.status, id]
+    );
+    if (!(res as { affectedRows: number }).affectedRows) return Response.json({ ok: false, error: "This lead was deleted." }, { status: 404 });
+  }
   return Response.json({ ok: true });
 }
 
-/* PATCH { source, id, status } → change a lead's status (any CRM user) */
+/* PATCH { source, id, status, assignedTo } → change a lead's status or assignedTo (any CRM user) */
 export async function PATCH(request: Request) {
   if (!(await getCurrentUser())) return unauthorized();
   const body = await readJson(request);
   const id = Number(body?.id);
-  if (!isEnquirySource(body?.source) || !Number.isInteger(id) || id < 1 || !(ENQUIRY_STATUSES as readonly string[]).includes(String(body?.status))) {
+  if (!isEnquirySource(body?.source) || !Number.isInteger(id) || id < 1) {
     return invalid();
   }
-  await getPool().execute(`UPDATE \`${SOURCES[body.source].table}\` SET status = ? WHERE id = ?`, [String(body.status), id]);
+  const sets: string[] = [];
+  const args: (string | null)[] = [];
+  if (body?.status !== undefined) {
+    if (!(ENQUIRY_STATUSES as readonly string[]).includes(String(body.status))) {
+      return invalid();
+    }
+    sets.push("status = ?");
+    args.push(String(body.status));
+  }
+  if (body?.assignedTo !== undefined) {
+    sets.push("assigned_to = ?");
+    args.push(body.assignedTo ? String(body.assignedTo).trim() : null);
+  }
+  if (!sets.length) return invalid();
+  await getPool().execute(
+    `UPDATE \`${SOURCES[body.source].table}\` SET ${sets.join(", ")} WHERE id = ?`,
+    [...args, id]
+  );
   return Response.json({ ok: true });
 }
 

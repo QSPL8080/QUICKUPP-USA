@@ -59,6 +59,7 @@ export type LeadRow = {
   company: string | null;
   service: string | null;
   detail: string;
+  assignedTo?: string | null;
   status: EnquiryStatus;
   createdAt: string;
 };
@@ -70,7 +71,7 @@ const UNION_SQL = (Object.keys(SOURCES) as EnquirySource[])
   .map((k) => {
     const detail = k === "contact" ? "project_type" : k === "youtube" ? "''" : "category";
     const service = k === "contact" ? "NULL" : "service";
-    return `SELECT '${k}' AS src, id, full_name, email, phone, company_name, ${detail} AS detail, ${service} AS service, status, created_at FROM \`${SOURCES[k].table}\``;
+    return `SELECT '${k}' AS src, id, full_name, email, phone, company_name, ${detail} AS detail, ${service} AS service, assigned_to, status, created_at FROM \`${SOURCES[k].table}\``;
   })
   .join(" UNION ALL ");
 
@@ -116,6 +117,7 @@ const toLead = (r: Record<string, unknown>): LeadRow => ({
   company: (r.company_name as string) || null,
   service: (r.service as string) || null,
   detail: String(r.detail ?? ""),
+  assignedTo: (r.assigned_to as string) || null,
   status: ((ENQUIRY_STATUSES as readonly string[]).includes(String(r.status)) ? r.status : "new") as EnquiryStatus,
   createdAt: new Date(r.created_at as string).toISOString(),
 });
@@ -192,7 +194,7 @@ export async function getLead(source: EnquirySource, id: number): Promise<Enquir
     sourcePage: isContact || isManual ? null : ((r.source_page as string) || null),
     pageUrl: isManual ? null : ((r.page_url as string) || null),
     channel: isManual ? ((r.lead_channel as string) || null) : null,
-    assignedTo: isManual ? ((r.assigned_to as string) || null) : null,
+    assignedTo: (r.assigned_to as string) || null,
     createdBy: isManual ? ((r.created_by_name as string) || null) : null,
     status: ((ENQUIRY_STATUSES as readonly string[]).includes(String(r.status)) ? r.status : "new") as EnquiryStatus,
     createdAt: new Date(r.created_at as string).toISOString(),
