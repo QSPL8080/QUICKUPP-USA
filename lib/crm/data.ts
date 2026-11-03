@@ -70,16 +70,16 @@ const PAGE_SIZE = 25;
 /* one SELECT per source with the same columns, so they can be listed together */
 const UNION_SQL = (Object.keys(SOURCES) as EnquirySource[])
   .map((k) => {
-    const detail = k === "contact" ? "project_type" : k === "youtube" ? "''" : "category";
-    const service = k === "contact" ? "NULL" : "service";
+    const detail = k === "contact" ? "COALESCE(category, project_type)" : k === "youtube" ? "''" : "category";
+    const service = k === "contact" ? "project_type" : "service";
     return `SELECT '${k}' AS src, id, full_name, email, phone, company_name, ${detail} AS detail, ${service} AS service, assigned_to, status, created_at FROM \`${SOURCES[k].table}\``;
   })
   .join(" UNION ALL ");
 
 const UNION_SQL_SAFE = (Object.keys(SOURCES) as EnquirySource[])
   .map((k) => {
-    const detail = k === "contact" ? "project_type" : k === "youtube" ? "''" : "category";
-    const service = k === "contact" ? "NULL" : "service";
+    const detail = k === "contact" ? "COALESCE(category, project_type)" : k === "youtube" ? "''" : "category";
+    const service = k === "contact" ? "project_type" : "service";
     const assigned = k === "manual" ? "assigned_to" : "NULL AS assigned_to";
     return `SELECT '${k}' AS src, id, full_name, email, phone, company_name, ${detail} AS detail, ${service} AS service, ${assigned}, status, created_at FROM \`${SOURCES[k].table}\``;
   })
@@ -234,8 +234,8 @@ export async function getLead(source: EnquirySource, id: number): Promise<Enquir
     timeline: (r.timeline as string) || null,
     industry: String(r.industry ?? ""),
     otherIndustry: (r.other_industry as string) || null,
-    service: isContact ? null : ((r.service as string) || SOURCES[source].label),
-    interest: String((isContact ? r.project_type : source === "youtube" ? "" : r.category) ?? ""),
+    service: isContact ? ((r.project_type as string) || "Contact Form") : ((r.service as string) || SOURCES[source].label),
+    interest: String((isContact ? (r.category || r.project_type) : source === "youtube" ? "" : r.category) ?? ""),
     category: (r.category as string) || (r.project_type as string) || null,
     budget: (r.budget as string) || null,
     youtubeLink: (r.youtube_link as string) || null,

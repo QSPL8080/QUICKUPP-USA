@@ -18,27 +18,51 @@ export async function POST(request: Request) {
 
   try {
     // Only the fields we have in the form should be saved + form filled time (created_at is auto-timestamped), nothing else
-    const [res] = await getPool().execute(
-      `INSERT INTO contact_enquiries
-        (full_name, email, phone, company_name, company_website, country, industry, other_industry, project_type, budget, timeline, message)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        d.fullName,
-        d.email,
-        d.phone,
-        d.companyName,
-        d.companyWebsite,
-        d.country,
-        d.industry,
-        d.otherIndustry,
-        d.service,
-        d.budget,
-        d.timeline,
-        d.message,
-      ]
-    );
-
-    const insertId = (res as { insertId: number }).insertId;
+    let insertId: number;
+    try {
+      const [res] = await getPool().execute(
+        `INSERT INTO contact_enquiries
+          (full_name, email, phone, company_name, company_website, country, industry, other_industry, project_type, category, budget, timeline, message)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          d.fullName,
+          d.email,
+          d.phone,
+          d.companyName,
+          d.companyWebsite,
+          d.country,
+          d.industry,
+          d.otherIndustry,
+          d.service,
+          d.category || null,
+          d.budget,
+          d.timeline,
+          d.message,
+        ]
+      );
+      insertId = (res as { insertId: number }).insertId;
+    } catch {
+      const [res] = await getPool().execute(
+        `INSERT INTO contact_enquiries
+          (full_name, email, phone, company_name, company_website, country, industry, other_industry, project_type, budget, timeline, message)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          d.fullName,
+          d.email,
+          d.phone,
+          d.companyName,
+          d.companyWebsite,
+          d.country,
+          d.industry,
+          d.otherIndustry,
+          d.service,
+          d.budget,
+          d.timeline,
+          d.category ? `[Category: ${d.category}]\n\n${d.message || ""}` : d.message,
+        ]
+      );
+      insertId = (res as { insertId: number }).insertId;
+    }
 
     // Send email notification to info@quickuppsoftech.us (asynchronously, so client does not wait)
     after(async () => {
@@ -52,6 +76,7 @@ export async function POST(request: Request) {
         ["Country", d.country],
         ["Industry", d.industry === "Other" && d.otherIndustry ? `Other (${d.otherIndustry})` : d.industry],
         ["Service Interested In", d.service],
+        ["Category / Scope", d.category || "—"],
         ["Estimated Project Budget", d.budget],
         ["Project Timeline", d.timeline],
       ];

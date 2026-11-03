@@ -36,15 +36,30 @@ export const CONTACT_SUBJECTS = [
 
 /* Contact page form: Services */
 export const CONTACT_SERVICES = [
+  "AI & Automation Solutions",
+  "AI-Powered Digital Marketing Services",
+  "Information Technology Services",
+  "Staff Augmentation",
+  "AI Solutions & Automation",
   "AI-Powered Digital Marketing",
   "SEO / AEO / GEO",
   "Paid Advertising & Lead Generation",
-  "AI Solutions & Automation",
   "Website & Software Development",
   "Mobile App Development",
   "BPO Services",
-  "Staff Augmentation",
   "Other",
+] as const;
+
+export const AI_AUTOMATION_CATEGORIES = [
+  "AI Chatbot Development",
+  "AI Agent Development",
+  "AI Workflow Automation",
+  "AI-Powered CRM Automation",
+  "AI Lead Generation & Qualification",
+  "AI Customer Support Automation",
+  "AI Document Processing",
+  "AI API Integration",
+  "Custom AI Solutions",
 ] as const;
 
 /* Contact page form: Estimated Project Budgets */

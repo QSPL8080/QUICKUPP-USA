@@ -32,6 +32,7 @@ const nextConfig = {
 
       // AI & Automation Solutions
       { source: "/services/ai-automation-solutions", destination: "/services/ai-automation-solutions/ai-chatbot-development", permanent: true },
+      { source: "/services/ai-automation-solutions/ai-automation-solutions", destination: "/services/ai-automation-solutions/ai-chatbot-development", permanent: true },
       { source: "/services/ai-chatbot-development", destination: "/services/ai-automation-solutions/ai-chatbot-development", permanent: true },
       { source: "/services/ai-agent-development", destination: "/services/ai-automation-solutions/ai-agent-development", permanent: true },
       { source: "/services/ai-workflow-automation", destination: "/services/ai-automation-solutions/ai-workflow-automation", permanent: true },

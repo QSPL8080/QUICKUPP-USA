@@ -16,6 +16,7 @@ export type ContactEnquiryInput = {
   industry: string;
   otherIndustry: string | null;
   service: string;
+  category?: string | null;
   budget: string;
   timeline: string;
   message: string | null;
@@ -111,6 +112,7 @@ export function validateContactEnquiry(body: Record<string, unknown>): { ok: tru
   const industry = text(body.industry, 100);
   const otherIndustry = text(body.otherIndustry, 150);
   const service = text(body.projectType || body.service, 150);
+  const category = text(body.category, 500);
   const budget = text(body.budget, 60);
   const timeline = text(body.timeline, 60);
   const message = text(body.message, 5000);
@@ -139,6 +141,7 @@ export function validateContactEnquiry(body: Record<string, unknown>): { ok: tru
       industry,
       otherIndustry: industry === "Other" ? otherIndustry : null,
       service,
+      category: category || null,
       budget,
       timeline,
       message: message || null,

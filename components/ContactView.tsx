@@ -6,8 +6,29 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ContactMotion from "@/components/ContactMotion";
 import LucideIcon, { type LucideIconName } from "@/components/LucideIcon";
-import { CONTACT_BUDGETS, CONTACT_SERVICES, CONTACT_TIMELINES, INDUSTRIES as INDUSTRY_OPTIONS } from "@/lib/formOptions";
+import { AI_AUTOMATION_CATEGORIES, CONTACT_BUDGETS, CONTACT_SERVICES, CONTACT_TIMELINES, INDUSTRIES as INDUSTRY_OPTIONS } from "@/lib/formOptions";
+import { SERVICES_DATA } from "@/components/PayNowModal";
 import "@/app/contact.css";
+
+const getCategoriesForService = (service: string): readonly string[] => {
+  if (service === "AI & Automation Solutions" || service === "AI Solutions & Automation") {
+    return AI_AUTOMATION_CATEGORIES;
+  }
+  const match = SERVICES_DATA.find(
+    (s) => s.service.toLowerCase() === service.toLowerCase() || service.toLowerCase().includes(s.service.toLowerCase())
+  );
+  if (match && match.categories.length > 0) return match.categories;
+  if (service.includes("Marketing") || service.includes("SEO") || service.includes("Paid Advertising")) {
+    return SERVICES_DATA[0].categories;
+  }
+  if (service.includes("Development") || service.includes("Technology")) {
+    return SERVICES_DATA[2].categories;
+  }
+  if (service.includes("Staff") || service.includes("BPO")) {
+    return SERVICES_DATA[3].categories;
+  }
+  return [];
+};
 
 /*
  * Contact page ("ct-" design, used on no other page): a "signal" look —
@@ -60,6 +81,7 @@ const EMPTY = {
   industry: "",
   otherIndustry: "",
   projectType: "",
+  category: "",
   budget: "",
   timeline: "",
   message: "",
@@ -213,7 +235,17 @@ function InquiryForm() {
           </select>
         </Field>
         <Field id="ct-projectType" label="Service Interested In" required error={errors.projectType} filled={!!form.projectType}>
-          <select id="ct-projectType" className="ct-input ct-select" value={form.projectType} onChange={set("projectType")}>
+          <select
+            id="ct-projectType"
+            className="ct-input ct-select"
+            value={form.projectType}
+            onChange={(e) => {
+              const val = e.target.value;
+              const cats = getCategoriesForService(val);
+              setForm((f) => ({ ...f, projectType: val, category: cats[0] || "" }));
+              if (errors.projectType) setErrors((x) => ({ ...x, projectType: "" }));
+            }}
+          >
             <option value="" disabled hidden />
             {CONTACT_SERVICES.map((v) => (
               <option key={v} value={v}>
@@ -222,6 +254,18 @@ function InquiryForm() {
             ))}
           </select>
         </Field>
+        {getCategoriesForService(form.projectType).length > 0 && (
+          <Field id="ct-category" label="Category / Sub-service" required error={errors.category} filled={!!form.category}>
+            <select id="ct-category" className="ct-input ct-select" value={form.category} onChange={set("category")}>
+              <option value="" disabled hidden />
+              {getCategoriesForService(form.projectType).map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </Field>
+        )}
         {form.industry === "Other" && (
           <Field id="ct-otherIndustry" label="Please specify your industry" required error={errors.otherIndustry} wide filled={!!form.otherIndustry}>
             <input id="ct-otherIndustry" className="ct-input" placeholder=" " value={form.otherIndustry} onChange={set("otherIndustry")} />

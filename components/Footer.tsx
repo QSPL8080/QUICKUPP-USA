@@ -145,7 +145,7 @@ export default function Footer() {
               <h3 className="qs-scalient-col-title">Services</h3>
               <ul className="qs-scalient-links">
                 <li><Link href="/services/ai-powered-digital-marketing-services/social-media-marketing">AI-Powered Digital Marketing</Link></li>
-                <li><Link href="/services/ai-automation-solutions/ai-automation-solutions">AI &amp; Automation Solutions</Link></li>
+                <li><Link href="/services/ai-automation-solutions/ai-chatbot-development">AI &amp; Automation Solutions</Link></li>
                 <li><Link href="/services/information-technology-services/web-design-development">Information Technology Services</Link></li>
                 <li><Link href="/services/staff-augmentation/marketing-design-staff-augmentation">Staff Augmentation</Link></li>
                 <li><Link href="/services/youtube-video-promotion">YouTube Video Promotion</Link></li>

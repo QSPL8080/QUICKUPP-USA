@@ -29,7 +29,6 @@ const ITEM_ICONS: Record<string, LucideIconName> = {
   "/services/ai-automation-solutions/ai-document-processing": "file-text",
   "/services/ai-automation-solutions/ai-api-integration": "plug-zap",
   "/services/ai-automation-solutions/custom-ai-solutions": "sparkles",
-  "/services/ai-automation-solutions/ai-automation-solutions": "bot",
   "/services/information-technology-services/web-design-development": "globe",
   "/services/information-technology-services/application-development": "monitor-smartphone",
   "/services/information-technology-services/product-engineering": "layers",

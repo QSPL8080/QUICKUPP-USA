@@ -12,7 +12,6 @@ import smsMarketing from "@/data/services/sms-marketing";
 import whatsappMarketing from "@/data/services/whatsapp-marketing";
 
 // AI & Automation Solutions
-import aiAutomationSolutions from "@/data/services/ai-automation-solutions";
 import aiChatbotDevelopment from "@/data/services/ai-chatbot-development";
 import aiAgentDevelopment from "@/data/services/ai-agent-development";
 import aiWorkflowAutomation from "@/data/services/ai-workflow-automation";
@@ -206,14 +205,6 @@ export const serviceCategories: ServiceCategoryMeta[] = [
         icon: "✨",
         template: "aiautomation",
         data: customAiSolutions,
-      },
-      {
-        slug: "ai-automation-solutions",
-        label: "AI & Automation Solutions",
-        desc: "Automate workflows, CRM sync & enterprise intelligence.",
-        icon: "⚡",
-        template: "aiautomation",
-        data: aiAutomationSolutions,
       },
     ],
   },

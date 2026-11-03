@@ -2568,13 +2568,52 @@ Quickupp Softech LLC`;
 
               <label className="crm-field">
                 <span className="crm-label">Service *</span>
-                <input className="crm-input" value={form.service} onChange={set("service")} required placeholder="e.g. AI-Powered Digital Marketing Services" />
+                <select
+                  className="crm-input crm-select"
+                  value={form.service}
+                  onChange={(e) => {
+                    const srv = e.target.value;
+                    const match = SERVICES_DATA.find((s) => s.service === srv);
+                    const firstCat = match && match.categories.length > 0 ? match.categories[0] : "";
+                    setForm((prev) => ({ ...prev, service: srv, category: firstCat }));
+                  }}
+                  required
+                >
+                  <option value="">Select Service...</option>
+                  {SERVICES_DATA.map((s) => (
+                    <option key={s.service} value={s.service}>{s.service}</option>
+                  ))}
+                  <option value="Other">Other</option>
+                </select>
                 {err("service")}
               </label>
 
               <label className="crm-field">
-                <span className="crm-label">Category / Package (Single or Multiple)</span>
-                <input className="crm-input" value={form.category} onChange={set("category")} placeholder="e.g. AI UGC Video, AI Avatar Video (comma-separated)" />
+                <span className="crm-label">Category / Scope</span>
+                {(() => {
+                  const match = SERVICES_DATA.find((s) => s.service === form.service);
+                  if (match && match.categories.length > 0) {
+                    return (
+                      <select
+                        className="crm-input crm-select"
+                        value={form.category}
+                        onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
+                      >
+                        {match.categories.map((cat) => (
+                          <option key={cat} value={cat}>{cat}</option>
+                        ))}
+                      </select>
+                    );
+                  }
+                  return (
+                    <input
+                      className="crm-input"
+                      value={form.category}
+                      onChange={set("category")}
+                      placeholder="Category or scope"
+                    />
+                  );
+                })()}
               </label>
 
               <label className="crm-field">

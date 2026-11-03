@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS contact_enquiries (
   industry        VARCHAR(100) NULL,
   other_industry  VARCHAR(150) NULL,
   project_type    VARCHAR(150) NOT NULL COMMENT 'Service interested in',
+  category        VARCHAR(500) NULL COMMENT 'Category / scope selected',
   budget          VARCHAR(60)  NULL,
   timeline        VARCHAR(60)  NULL,
   message         TEXT         NULL,
