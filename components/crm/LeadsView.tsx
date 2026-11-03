@@ -295,7 +295,7 @@ export default function LeadsView({
                   </td>
                   <td data-label="Source">
                     <span className={`crm-src crm-src-${r.source === "contact" ? "contact" : r.source === "manual" ? "manual" : "service"}`}>{SOURCE_LABEL[r.source]}</span>
-                    {r.detail && (
+                    {r.source !== "youtube" && r.detail && (
                       <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px" }}>
                         {r.detail.split(",").map((cat, idx) => (
                           <span
@@ -448,31 +448,35 @@ export default function LeadsView({
                   </dd>
                 </>
               )}
-              <dt>{open.source === "contact" ? "Service" : "Service Category / Scope"}</dt>
-              <dd>
-                {open.interest ? (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "2px" }}>
-                    {open.interest.split(",").map((cat, idx) => (
-                      <span
-                        key={idx}
-                        style={{
-                          fontSize: "12px",
-                          lineHeight: "1.3",
-                          padding: "3px 9px",
-                          background: "#ede9fe",
-                          color: "#5b21b6",
-                          borderRadius: "5px",
-                          fontWeight: 600,
-                        }}
-                      >
-                        {cat.trim()}
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  "—"
-                )}
-              </dd>
+              {open.source !== "youtube" && (
+                <>
+                  <dt>{open.source === "contact" ? "Service" : "Service Category / Scope"}</dt>
+                  <dd>
+                    {open.interest ? (
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "2px" }}>
+                        {open.interest.split(",").map((cat, idx) => (
+                          <span
+                            key={idx}
+                            style={{
+                              fontSize: "12px",
+                              lineHeight: "1.3",
+                              padding: "3px 9px",
+                              background: "#ede9fe",
+                              color: "#5b21b6",
+                              borderRadius: "5px",
+                              fontWeight: 600,
+                            }}
+                          >
+                            {cat.trim()}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      "—"
+                    )}
+                  </dd>
+                </>
+              )}
               <dt>Budget</dt>
               <dd>{open.budget || "—"}</dd>
               {open.timeline && (
@@ -591,10 +595,11 @@ export default function LeadsView({
                 </select>
                 {err("service")}
               </label>
-              <div className="crm-field" ref={leadCategoryRef} style={{ position: "relative" }}>
-                <span className="crm-label">
-                  Service Categories * {selectedLeadCategories.length > 0 && <span style={{ color: "#7c3aed", fontWeight: 700 }}>({selectedLeadCategories.length} selected)</span>}
-                </span>
+              {serviceOptions.length > 0 && (
+                <div className="crm-field" ref={leadCategoryRef} style={{ position: "relative" }}>
+                  <span className="crm-label">
+                    Service Categories * {selectedLeadCategories.length > 0 && <span style={{ color: "#7c3aed", fontWeight: 700 }}>({selectedLeadCategories.length} selected)</span>}
+                  </span>
 
                 <button
                   type="button"
@@ -718,6 +723,7 @@ export default function LeadsView({
                 )}
                 {err("category")}
               </div>
+            )}
               <label className="crm-field">
                 <span className="crm-label">Industry</span>
                 <select className="crm-input crm-select" value={form.industry} onChange={set("industry")}>

@@ -68,7 +68,7 @@ const PAGE_SIZE = 25;
 /* one SELECT per source with the same columns, so they can be listed together */
 const UNION_SQL = (Object.keys(SOURCES) as EnquirySource[])
   .map((k) => {
-    const detail = k === "contact" ? "project_type" : "category";
+    const detail = k === "contact" ? "project_type" : k === "youtube" ? "''" : "category";
     const service = k === "contact" ? "NULL" : "service";
     return `SELECT '${k}' AS src, id, full_name, email, phone, company_name, ${detail} AS detail, ${service} AS service, status, created_at FROM \`${SOURCES[k].table}\``;
   })
@@ -185,7 +185,7 @@ export async function getLead(source: EnquirySource, id: number): Promise<Enquir
     industry: String(r.industry ?? ""),
     otherIndustry: (r.other_industry as string) || null,
     service: isContact ? null : ((r.service as string) || SOURCES[source].label),
-    interest: String((isContact ? r.project_type : r.category) ?? ""),
+    interest: String((isContact ? r.project_type : source === "youtube" ? "" : r.category) ?? ""),
     budget: (r.budget as string) || null,
     youtubeLink: (r.youtube_link as string) || null,
     message: String(r.message ?? ""),

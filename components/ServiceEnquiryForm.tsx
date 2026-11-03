@@ -30,10 +30,11 @@ const EMPTY = {
 export default function ServiceEnquiryForm({ service, current }: { service: ServiceFormKey; current?: string }) {
   const form = SERVICE_FORMS[service];
   const options: readonly string[] = form.options;
+  const hasCategories = service !== "youtube" && options.length > 0;
   const initialPreset =
-    current && options.some((o) => o.toLowerCase() === current.toLowerCase())
+    hasCategories && current && options.some((o) => o.toLowerCase() === current.toLowerCase())
       ? options.find((o) => o.toLowerCase() === current.toLowerCase()) || current
-      : options.length > 0
+      : hasCategories
       ? options[0]
       : "";
   const idp = `sef-${service}`;
@@ -86,7 +87,7 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (selectedCategories.length === 0) {
+    if (hasCategories && selectedCategories.length === 0) {
       setCategoryError(true);
       return;
     }
@@ -112,8 +113,12 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
           country: formData.country,
           industry: formData.industry,
           otherIndustry: formData.otherIndustry,
-          category: selectedCategories.join(", "),
-          categories: selectedCategories,
+          ...(hasCategories
+            ? {
+                category: selectedCategories.join(", "),
+                categories: selectedCategories,
+              }
+            : {}),
           budget: formData.budget,
           timeline: formData.timeline,
           youtubeLink: formData.youtubeLink,
@@ -292,7 +297,8 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
               )}
 
               {/* Row 3: Service (fixed), Category, Industry */}
-              <div className="sef-row">
+              {/* Row 3: Service (fixed), Category (if applicable), Industry */}
+              <div className={`sef-row ${hasCategories ? "" : "sef-row-2"}`}>
                 <div className="su-field-group">
                   <label htmlFor={`${idp}-service`} className="su-field-label">
                     Service Interested In*
@@ -313,133 +319,136 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
                     </svg>
                   </div>
                 </div>
-                <div className="su-field-group sef-category-group" ref={categoryRef}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-                    <label htmlFor={`${idp}-category`} className="su-field-label" style={{ margin: 0 }}>
-                      Category <span style={{ color: "#ef4444" }}>*</span>
-                    </label>
-                    <span style={{ fontSize: "11px", color: "#64748b", fontWeight: 500 }}>
-                      Select multiple
-                    </span>
-                  </div>
 
-                  <div className="sef-custom-select-wrap">
-                    <button
-                      id={`${idp}-category`}
-                      type="button"
-                      className={`su-select-input sef-multi-trigger ${categoryError ? "has-error" : ""} ${isCategoryOpen ? "is-active" : ""}`}
-                      onClick={() => setIsCategoryOpen((v) => !v)}
-                      aria-expanded={isCategoryOpen}
-                      aria-haspopup="listbox"
-                    >
-                      <div className="sef-trigger-text">
-                        {selectedCategories.length === 0 ? (
-                          <span className="sef-placeholder">Select one or more categories...</span>
-                        ) : selectedCategories.length === 1 ? (
-                          <span className="sef-trigger-names">{selectedCategories[0]}</span>
-                        ) : (
-                          <>
-                            <span className="sef-count-pill">{selectedCategories.length} selected</span>
-                            <span className="sef-trigger-names">
-                              {selectedCategories[0]}, +{selectedCategories.length - 1} more
-                            </span>
-                          </>
-                        )}
-                      </div>
+                {hasCategories && (
+                  <div className="su-field-group sef-category-group" ref={categoryRef}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                      <label htmlFor={`${idp}-category`} className="su-field-label" style={{ margin: 0 }}>
+                        Category <span style={{ color: "#ef4444" }}>*</span>
+                      </label>
+                      <span style={{ fontSize: "11px", color: "#64748b", fontWeight: 500 }}>
+                        Select multiple
+                      </span>
+                    </div>
 
-                      <svg
-                        className={`sef-arrow ${isCategoryOpen ? "is-open" : ""}`}
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                    <div className="sef-custom-select-wrap">
+                      <button
+                        id={`${idp}-category`}
+                        type="button"
+                        className={`su-select-input sef-multi-trigger ${categoryError ? "has-error" : ""} ${isCategoryOpen ? "is-active" : ""}`}
+                        onClick={() => setIsCategoryOpen((v) => !v)}
+                        aria-expanded={isCategoryOpen}
+                        aria-haspopup="listbox"
                       >
-                        <path d="M6 9l6 6 6-6" />
-                      </svg>
-                    </button>
+                        <div className="sef-trigger-text">
+                          {selectedCategories.length === 0 ? (
+                            <span className="sef-placeholder">Select one or more categories...</span>
+                          ) : selectedCategories.length === 1 ? (
+                            <span className="sef-trigger-names">{selectedCategories[0]}</span>
+                          ) : (
+                            <>
+                              <span className="sef-count-pill">{selectedCategories.length} selected</span>
+                              <span className="sef-trigger-names">
+                                {selectedCategories[0]}, +{selectedCategories.length - 1} more
+                              </span>
+                            </>
+                          )}
+                        </div>
 
-                    {/* Dropdown panel */}
-                    {isCategoryOpen && (
-                      <div className="sef-dropdown-panel" role="listbox" aria-multiselectable="true">
-                        <div className="sef-dropdown-header">
-                          <span className="sef-dropdown-avail">{options.length} Available</span>
-                          <div className="sef-dropdown-actions">
-                            <button
-                              type="button"
-                              className="sef-quick-btn"
-                              onClick={selectAllCategories}
-                            >
-                              Select All
-                            </button>
-                            <span style={{ color: "#cbd5e1" }}>•</span>
-                            <button
-                              type="button"
-                              className="sef-quick-btn sef-clear-btn"
-                              onClick={clearCategories}
-                            >
-                              Clear
-                            </button>
+                        <svg
+                          className={`sef-arrow ${isCategoryOpen ? "is-open" : ""}`}
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M6 9l6 6 6-6" />
+                        </svg>
+                      </button>
+
+                      {/* Dropdown panel */}
+                      {isCategoryOpen && (
+                        <div className="sef-dropdown-panel" role="listbox" aria-multiselectable="true">
+                          <div className="sef-dropdown-header">
+                            <span className="sef-dropdown-avail">{options.length} Available</span>
+                            <div className="sef-dropdown-actions">
+                              <button
+                                type="button"
+                                className="sef-quick-btn"
+                                onClick={selectAllCategories}
+                              >
+                                Select All
+                              </button>
+                              <span style={{ color: "#cbd5e1" }}>•</span>
+                              <button
+                                type="button"
+                                className="sef-quick-btn sef-clear-btn"
+                                onClick={clearCategories}
+                              >
+                                Clear
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="sef-options-scroll">
+                            {options.map((opt) => {
+                              const isChecked = selectedCategories.includes(opt);
+                              return (
+                                <div
+                                  key={opt}
+                                  className={`sef-option-item ${isChecked ? "is-checked" : ""}`}
+                                  onClick={() => toggleCategory(opt)}
+                                  role="option"
+                                  aria-selected={isChecked}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={isChecked}
+                                    onChange={() => {}}
+                                    className="sef-checkbox"
+                                    tabIndex={-1}
+                                  />
+                                  <span className="sef-option-text">{opt}</span>
+                                  {isChecked && <span className="sef-checkmark">✓</span>}
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
+                      )}
+                    </div>
 
-                        <div className="sef-options-scroll">
-                          {options.map((opt) => {
-                            const isChecked = selectedCategories.includes(opt);
-                            return (
-                              <div
-                                key={opt}
-                                className={`sef-option-item ${isChecked ? "is-checked" : ""}`}
-                                onClick={() => toggleCategory(opt)}
-                                role="option"
-                                aria-selected={isChecked}
-                              >
-                                <input
-                                  type="checkbox"
-                                  checked={isChecked}
-                                  onChange={() => {}}
-                                  className="sef-checkbox"
-                                  tabIndex={-1}
-                                />
-                                <span className="sef-option-text">{opt}</span>
-                                {isChecked && <span className="sef-checkmark">✓</span>}
-                              </div>
-                            );
-                          })}
-                        </div>
+                    {categoryError && (
+                      <span style={{ color: "#dc2626", fontSize: "12px", marginTop: "4px", display: "block" }}>
+                        Please select at least one category.
+                      </span>
+                    )}
+
+                    {/* Selected category pill tags */}
+                    {selectedCategories.length > 0 && (
+                      <div className="sef-tags-wrap">
+                        {selectedCategories.map((cat) => (
+                          <span key={cat} className="sef-tag">
+                            {cat}
+                            <button
+                              type="button"
+                              className="sef-tag-remove"
+                              onClick={() => toggleCategory(cat)}
+                              title={`Remove ${cat}`}
+                              aria-label={`Remove ${cat}`}
+                            >
+                              ×
+                            </button>
+                          </span>
+                        ))}
                       </div>
                     )}
                   </div>
-
-                  {categoryError && (
-                    <span style={{ color: "#dc2626", fontSize: "12px", marginTop: "4px", display: "block" }}>
-                      Please select at least one category.
-                    </span>
-                  )}
-
-                  {/* Selected category pill tags */}
-                  {selectedCategories.length > 0 && (
-                    <div className="sef-tags-wrap">
-                      {selectedCategories.map((cat) => (
-                        <span key={cat} className="sef-tag">
-                          {cat}
-                          <button
-                            type="button"
-                            className="sef-tag-remove"
-                            onClick={() => toggleCategory(cat)}
-                            title={`Remove ${cat}`}
-                            aria-label={`Remove ${cat}`}
-                          >
-                            ×
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                )}
                 <div className="su-field-group">
                   <label htmlFor={`${idp}-industry`} className="su-field-label">
                     Industry*

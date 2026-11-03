@@ -34,8 +34,8 @@ export async function POST(request: Request) {
     const isYoutube = form.table === "service_youtube_promotion";
     const insertSql = isYoutube
       ? `INSERT INTO ${form.table}
-          (full_name, email, phone, company_name, company_website, country, industry, other_industry, service, category, budget, timeline, youtube_link, message)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+          (full_name, email, phone, company_name, company_website, country, industry, other_industry, service, budget, timeline, youtube_link, message)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       : `INSERT INTO ${form.table}
           (full_name, email, phone, company_name, company_website, country, industry, other_industry, service, category, budget, timeline, message)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
@@ -51,7 +51,6 @@ export async function POST(request: Request) {
           d.industry,
           d.otherIndustry,
           form.label,
-          d.category,
           d.budget,
           d.timeline,
           d.youtubeLink || null,
@@ -82,7 +81,11 @@ export async function POST(request: Request) {
       const rows = [
         ["Lead ID", `#${insertId}`],
         ["Service", form.label],
-        ["Selected Categories", d.category || "—"],
+      ];
+      if (!isYoutube) {
+        rows.push(["Selected Categories", d.category || "—"]);
+      }
+      rows.push(
         ["Full Name", d.fullName],
         ["Business Email", d.email],
         ["Phone Number", d.phone],
@@ -91,8 +94,8 @@ export async function POST(request: Request) {
         ["Country", d.country],
         ["Industry", d.industry === "Other" && d.otherIndustry ? `Other (${d.otherIndustry})` : d.industry],
         ["Estimated Project Budget", d.budget],
-        ["Project Timeline", d.timeline],
-      ];
+        ["Project Timeline", d.timeline]
+      );
       if (d.youtubeLink) {
         rows.push(["YouTube Video / Channel Link", d.youtubeLink]);
       }

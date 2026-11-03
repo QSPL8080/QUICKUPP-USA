@@ -95,7 +95,7 @@ export function validateManualLead(body: Record<string, unknown>): { ok: true; d
   let finalCategory = "";
   if (!group) {
     errors.service = "Please choose a service.";
-  } else {
+  } else if (group.options.length > 0) {
     let catList: string[] = [];
     if (Array.isArray(body.categories)) {
       catList = body.categories.map((c) => String(c).trim()).filter(Boolean);
@@ -114,6 +114,8 @@ export function validateManualLead(body: Record<string, unknown>): { ok: true; d
       });
       finalCategory = validCanonical.join(", ").slice(0, 1000);
     }
+  } else {
+    finalCategory = "";
   }
 
   if (industry && !(LEAD_INDUSTRIES as readonly string[]).includes(industry)) errors.industry = "Please choose an industry.";

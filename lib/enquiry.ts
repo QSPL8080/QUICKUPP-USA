@@ -176,25 +176,29 @@ export function validateServiceEnquiry(
   // De-duplicate categories
   categoryList = Array.from(new Set(categoryList));
 
-  if (categoryList.length === 0) {
-    errors.category = "Please select at least one category.";
-  } else {
-    // Validate each category against options, matching case-insensitively
-    const validCanonical: string[] = [];
-    for (const cat of categoryList) {
-      const match = options.find((o) => o.toLowerCase() === cat.toLowerCase());
-      if (match) {
-        validCanonical.push(match);
+  if (options.length > 0) {
+    if (categoryList.length === 0) {
+      errors.category = "Please select at least one category.";
+    } else {
+      // Validate each category against options, matching case-insensitively
+      const validCanonical: string[] = [];
+      for (const cat of categoryList) {
+        const match = options.find((o) => o.toLowerCase() === cat.toLowerCase());
+        if (match) {
+          validCanonical.push(match);
+        } else {
+          // Fallback for custom/other entries
+          validCanonical.push(cat.slice(0, 100));
+        }
+      }
+      if (validCanonical.length === 0) {
+        errors.category = "Please select a valid category.";
       } else {
-        // Fallback for custom/other entries
-        validCanonical.push(cat.slice(0, 100));
+        categoryList = validCanonical;
       }
     }
-    if (validCanonical.length === 0) {
-      errors.category = "Please select a valid category.";
-    } else {
-      categoryList = validCanonical;
-    }
+  } else {
+    categoryList = [];
   }
 
   const category = categoryList.join(", ").slice(0, 1000);

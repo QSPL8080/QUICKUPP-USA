@@ -100,17 +100,7 @@ export const SERVICE_FORMS = {
   youtube: {
     label: "YouTube Video Promotion",
     table: "service_youtube_promotion",
-    options: [
-      "YouTube In-Stream Ads",
-      "YouTube In-Feed Ads",
-      "YouTube Shorts Ads",
-      "YouTube Search Promotion",
-      "Channel Growth & Optimization",
-      "Video SEO & Ranking",
-      "Targeted YouTube Views Campaign",
-      "Custom Strategy / Retainer",
-      "Other",
-    ],
+    options: [],
   },
 } as const satisfies Record<string, { label: string; table: string; options: readonly string[] }>;
 
