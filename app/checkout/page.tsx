@@ -26,12 +26,18 @@ function CheckoutContent() {
   const payAmount = isPartial ? Math.round(numTotal * 0.5 * 100) / 100 : numTotal;
   const remainingAmount = isPartial ? Math.max(0, Math.round((numTotal - payAmount) * 100) / 100) : 0;
 
+  const [step, setStep] = useState<"summary" | "payment">("summary");
   const [error, setError] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const paypalContainerRef = useRef<HTMLDivElement>(null);
   const paypalRenderedRef = useRef<boolean>(false);
 
   useEffect(() => {
+    if (step !== "payment") {
+      paypalRenderedRef.current = false;
+      return;
+    }
+
     const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "";
     if (!clientId) {
       setError("PayPal is not configured yet. Please verify NEXT_PUBLIC_PAYPAL_CLIENT_ID in your environment.");
@@ -51,7 +57,7 @@ function CheckoutContent() {
             color: "gold",
             shape: "rect",
             label: "pay",
-            height: 48,
+            height: 46,
           },
           createOrder: async () => {
             setError("");
@@ -168,6 +174,7 @@ function CheckoutContent() {
       }
     }
   }, [
+    step,
     clientName,
     clientEmail,
     clientPhone,
@@ -188,36 +195,44 @@ function CheckoutContent() {
 
   return (
     <div className="ck-page">
-      {/* Header */}
+      {/* Header - Transparent without white card background */}
       <header className="ck-topbar">
         <Link href="/" className="ck-logo-link" aria-label="Quickupp Softech LLC">
           <Image
             src="/images/logo-black.png"
             alt="Quickupp Softech LLC"
-            width={160}
-            height={38}
+            width={155}
+            height={36}
             className="ck-logo-img"
             priority
           />
         </Link>
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <div className="ck-security-badge">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-              <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-            </svg>
-            <span>256-Bit SSL Encrypted</span>
-          </div>
-          <Link href="/" className="ck-back-link">
-            <span>← Back to Website</span>
-          </Link>
-        </div>
+        <Link href="/" className="ck-back-link">
+          <span>← Back to Website</span>
+        </Link>
       </header>
 
-      {/* Main Checkout Grid */}
-      <main className="ck-container">
-        <div className="ck-grid">
-          {/* Left Column: Order Summary */}
+      {/* Stepper Navigation */}
+      <div className="ck-stepper">
+        <button
+          type="button"
+          onClick={() => setStep("summary")}
+          className={`ck-step ${step === "summary" ? "is-active" : "is-completed"}`}
+        >
+          <span className="ck-step-num">{step === "payment" ? "✓" : "1"}</span>
+          <span className="ck-step-label">Order Summary</span>
+        </button>
+        <div className={`ck-step-divider ${step === "payment" ? "is-active" : ""}`} />
+        <div className={`ck-step ${step === "payment" ? "is-active" : ""}`}>
+          <span className="ck-step-num">2</span>
+          <span className="ck-step-label">Payment</span>
+        </div>
+      </div>
+
+      {/* Main Container */}
+      <main className={`ck-container ${step === "payment" ? "is-payment" : ""}`}>
+        {step === "summary" && (
+          /* Step 1: Order Summary */
           <div className="ck-card">
             <h1 className="ck-card-title">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -312,65 +327,101 @@ function CheckoutContent() {
             {/* Trust and Assurance Box */}
             <div className="ck-trust-box">
               <div className="ck-trust-item">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
                   <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                 </svg>
                 <span>SSL 256-Bit Secure</span>
               </div>
               <div className="ck-trust-item">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
                 </svg>
                 <span>PayPal Buyer Protection</span>
               </div>
               <div className="ck-trust-item">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                   <polyline points="14 2 14 8 20 8" />
                 </svg>
                 <span>PDF Receipt Emailed</span>
               </div>
               <div className="ck-trust-item">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="10" />
                   <polyline points="12 6 12 12 14 14" />
                 </svg>
                 <span>Instant Confirmation</span>
               </div>
             </div>
+
+            {/* Proceed to Payment CTA */}
+            <button
+              type="button"
+              onClick={() => {
+                setError("");
+                setStep("payment");
+              }}
+              className="ck-proceed-btn"
+            >
+              <span>Proceed to Payment (${payAmount.toFixed(2)} USD)</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12h14" />
+                <path d="m12 5 7 7-7 7" />
+              </svg>
+            </button>
           </div>
+        )}
 
-          {/* Right Column: Payment Processing */}
-          <div className="ck-pay-card">
-            <h2 className="ck-pay-title">Choose Payment Method</h2>
-            <p className="ck-pay-subtitle">
-              Complete your payment securely with PayPal or any major Debit or Credit Card.
-            </p>
-
-            {error && (
-              <div className="ck-error-banner" role="alert">
-                ⚠️ {error}
+        {step === "payment" && (
+          /* Step 2: Payment Processing (Centered, compact, no scrolling needed) */
+          <div>
+            <div className="ck-compact-bar">
+              <button
+                type="button"
+                onClick={() => setStep("summary")}
+                className="ck-compact-back"
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m15 18-6-6 6-6" />
+                </svg>
+                <span>Edit Order</span>
+              </button>
+              <div className="ck-compact-info">
+                <span className="ck-compact-service">{service}</span>
+                <span className="ck-compact-amount">${payAmount.toFixed(2)} USD</span>
               </div>
-            )}
+            </div>
 
-            {isProcessing ? (
-              <div className="ck-processing-msg">
-                <div className="ck-spinner" />
-                <span>Confirming your payment with PayPal... Please do not refresh.</span>
-              </div>
-            ) : (
-              <div className="ck-paypal-wrapper">
-                <div ref={paypalContainerRef} id="paypal-checkout-container" />
-              </div>
-            )}
+            <div className="ck-pay-card">
+              <h2 className="ck-pay-title">Choose Payment Method</h2>
+              <p className="ck-pay-subtitle">
+                Complete your payment securely with PayPal or Debit / Credit Card.
+              </p>
 
-            <div className="ck-footer-note">
-              Payments are processed by <strong>Quickupp Softech LLC</strong>.<br />
-              Need help? Contact <a href="mailto:info@quickuppsoftech.us">info@quickuppsoftech.us</a> or call <a href="tel:+13027545679">+1 (302) 754-5679</a>.
+              {error && <div className="ck-error-banner">{error}</div>}
+
+              {isProcessing && (
+                <div className="ck-processing-msg">
+                  <div className="ck-spinner" />
+                  <span>Processing & verifying payment with PayPal...</span>
+                </div>
+              )}
+
+              {/* PayPal Smart Buttons Container */}
+              <div
+                ref={paypalContainerRef}
+                className="ck-paypal-wrapper"
+                style={{ display: isProcessing ? "none" : "block" }}
+              />
+
+              <div className="ck-footer-note">
+                Payments processed securely by Quickupp Softech LLC via PayPal. Need assistance?{" "}
+                <a href="mailto:info@quickuppsoftech.us">info@quickuppsoftech.us</a>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </main>
     </div>
   );
@@ -380,8 +431,8 @@ export default function CheckoutPage() {
   return (
     <Suspense
       fallback={
-        <div style={{ minHeight: "100vh", background: "#0b0f17", display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8" }}>
-          Loading checkout portal...
+        <div style={{ minHeight: "100vh", display: "grid", placeItems: "center", color: "#64748b", fontFamily: "sans-serif" }}>
+          Loading secure checkout...
         </div>
       }
     >
