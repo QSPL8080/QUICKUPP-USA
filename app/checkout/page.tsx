@@ -192,7 +192,7 @@ function CheckoutContent() {
       <header className="ck-topbar">
         <Link href="/" className="ck-logo-link" aria-label="Quickupp Softech LLC">
           <Image
-            src="/images/logo-white.png"
+            src="/images/logo-black.png"
             alt="Quickupp Softech LLC"
             width={160}
             height={38}
@@ -282,7 +282,7 @@ function CheckoutContent() {
                 <span
                   className="ck-detail-val"
                   style={{
-                    color: isPartial ? "#c084fc" : "#34d399",
+                    color: isPartial ? "#7c3aed" : "#059669",
                     fontWeight: 700,
                   }}
                 >
@@ -299,8 +299,8 @@ function CheckoutContent() {
               </div>
               {isPartial && (
                 <div className="ck-breakdown-row">
-                  <span style={{ color: "#f87171" }}>Remaining 50% Due Later</span>
-                  <strong style={{ color: "#f87171" }}>${remainingAmount.toFixed(2)} USD</strong>
+                  <span style={{ color: "#dc2626" }}>Remaining 50% Due Later</span>
+                  <strong style={{ color: "#dc2626" }}>${remainingAmount.toFixed(2)} USD</strong>
                 </div>
               )}
               <div className="ck-breakdown-row is-total">

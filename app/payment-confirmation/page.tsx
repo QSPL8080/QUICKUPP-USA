@@ -72,7 +72,7 @@ export default async function PaymentConfirmationPage({ searchParams }: Props) {
       <header className="pc-topbar">
         <Link href="/" className="pc-logo-link" aria-label="Quickupp Softech LLC Home">
           <Image
-            src="/images/logo-white.png"
+            src="/images/logo-black.png"
             alt="Quickupp Softech LLC"
             width={160}
             height={36}
