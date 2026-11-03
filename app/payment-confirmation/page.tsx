@@ -66,8 +66,6 @@ export default async function PaymentConfirmationPage({ searchParams }: Props) {
   const isPending = paymentRecord?.status === "pending" || sp.status === "pending";
   const isPartial = paymentType === "partial";
 
-  const downloadReceiptUrl = `/api/payments/receipt?order=${encodeURIComponent(orderNumber)}`;
-
   return (
     <div className="pc-page-wrap">
       {/* Top Header with Quickupp Logo */}
@@ -197,16 +195,8 @@ export default async function PaymentConfirmationPage({ searchParams }: Props) {
                 <span className="pc-info-email">{clientEmail}</span>
               </p>
               <p className="pc-info-note">
-                Please check your inbox, and your spam/junk folder if you don&apos;t see it shortly.
+                Your official payment receipt is attached to that email as a PDF. Please check your inbox (and spam/junk folder) to view and download your receipt.
               </p>
-              <a href={downloadReceiptUrl} className="pc-download-btn">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="7 10 12 15 17 10" />
-                  <line x1="12" x2="12" y1="15" y2="3" />
-                </svg>
-                <span>Download PDF Receipt</span>
-              </a>
             </div>
           </div>
 

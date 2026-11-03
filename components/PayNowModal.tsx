@@ -1063,28 +1063,9 @@ export default function PayNowModal() {
                     {clientEmail}
                   </strong>
                 </p>
-                <p style={{ fontSize: "12px", color: "#166534", margin: "0 0 10px" }}>
-                  Please check your inbox, and your spam/junk folder if you don&apos;t see it shortly.
+                <p style={{ fontSize: "12px", color: "#166534", margin: "0" }}>
+                  Your official payment receipt is attached to that email as a PDF. Please check your inbox (and spam/junk folder) to view and download your receipt.
                 </p>
-                <a
-                  href={`/api/payments/receipt?order=${encodeURIComponent(receipt.orderNumber)}`}
-                  className="pm-btn-secondary"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "6px",
-                    fontSize: "12.5px",
-                    padding: "7px 14px",
-                    textDecoration: "none",
-                  }}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="7 10 12 15 17 10" />
-                    <line x1="12" x2="12" y1="15" y2="3" />
-                  </svg>
-                  <span>Download PDF Receipt</span>
-                </a>
               </div>
 
               {/* What's Next? Card */}
