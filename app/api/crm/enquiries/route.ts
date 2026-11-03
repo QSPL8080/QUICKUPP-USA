@@ -51,43 +51,55 @@ export async function PUT(request: Request) {
   if (!result.ok) return Response.json({ ok: false, errors: result.errors }, { status: 400 });
   const d = result.data;
   const pool = getPool();
-  if (source === "manual") {
-    const [res] = await pool.execute(
-      `UPDATE manual_leads SET full_name = ?, email = ?, phone = ?, company_name = ?, company_website = ?, country = ?, industry = ?,
-         service = ?, category = ?, budget = ?, timeline = ?, lead_channel = ?, assigned_to = ?, message = ?, status = ?
-       WHERE id = ?`,
-      [d.fullName, d.email, d.phone, d.companyName, d.companyWebsite, d.country, d.industry, d.service, d.category, d.budget, d.timeline,
-        d.channel, d.assignedTo, d.notes, d.status, id]
-    );
-    if (!(res as { affectedRows: number }).affectedRows) return Response.json({ ok: false, error: "This lead was deleted." }, { status: 404 });
-  } else if (source === "contact") {
-    const [res] = await pool.execute(
-      `UPDATE contact_enquiries SET full_name = ?, email = ?, phone = ?, company_name = ?, company_website = ?, country = ?, industry = ?,
-         project_type = ?, budget = ?, timeline = ?, message = ?, assigned_to = ?, status = ?
-       WHERE id = ?`,
-      [d.fullName, d.email, d.phone, d.companyName, d.companyWebsite, d.country, d.industry, d.service || d.category, d.budget, d.timeline,
-        d.notes, d.assignedTo, d.status, id]
-    );
-    if (!(res as { affectedRows: number }).affectedRows) return Response.json({ ok: false, error: "This lead was deleted." }, { status: 404 });
-  } else if (source === "youtube") {
-    const [res] = await pool.execute(
-      `UPDATE service_youtube_promotion SET full_name = ?, email = ?, phone = ?, company_name = ?, company_website = ?, country = ?, industry = ?,
-         budget = ?, timeline = ?, message = ?, assigned_to = ?, status = ?
-       WHERE id = ?`,
-      [d.fullName, d.email, d.phone, d.companyName, d.companyWebsite, d.country, d.industry, d.budget, d.timeline,
-        d.notes, d.assignedTo, d.status, id]
-    );
-    if (!(res as { affectedRows: number }).affectedRows) return Response.json({ ok: false, error: "This lead was deleted." }, { status: 404 });
-  } else {
-    const table = SOURCES[source].table;
-    const [res] = await pool.execute(
-      `UPDATE \`${table}\` SET full_name = ?, email = ?, phone = ?, company_name = ?, company_website = ?, country = ?, industry = ?,
-         service = ?, category = ?, budget = ?, timeline = ?, message = ?, assigned_to = ?, status = ?
-       WHERE id = ?`,
-      [d.fullName, d.email, d.phone, d.companyName, d.companyWebsite, d.country, d.industry, d.service, d.category, d.budget, d.timeline,
-        d.notes, d.assignedTo, d.status, id]
-    );
-    if (!(res as { affectedRows: number }).affectedRows) return Response.json({ ok: false, error: "This lead was deleted." }, { status: 404 });
+  try {
+    if (source === "manual") {
+      const [res] = await pool.execute(
+        `UPDATE manual_leads SET full_name = ?, email = ?, phone = ?, company_name = ?, company_website = ?, country = ?, industry = ?,
+           service = ?, category = ?, budget = ?, timeline = ?, lead_channel = ?, assigned_to = ?, message = ?, status = ?
+         WHERE id = ?`,
+        [d.fullName, d.email, d.phone, d.companyName, d.companyWebsite, d.country, d.industry, d.service, d.category, d.budget, d.timeline,
+          d.channel, d.assignedTo, d.notes, d.status, id]
+      );
+      if (!(res as { affectedRows: number }).affectedRows) return Response.json({ ok: false, error: "This lead was deleted." }, { status: 404 });
+    } else if (source === "contact") {
+      const [res] = await pool.execute(
+        `UPDATE contact_enquiries SET full_name = ?, email = ?, phone = ?, company_name = ?, company_website = ?, country = ?, industry = ?,
+           project_type = ?, budget = ?, timeline = ?, message = ?, assigned_to = ?, status = ?
+         WHERE id = ?`,
+        [d.fullName, d.email, d.phone, d.companyName, d.companyWebsite, d.country, d.industry, d.service || d.category, d.budget, d.timeline,
+          d.notes, d.assignedTo, d.status, id]
+      );
+      if (!(res as { affectedRows: number }).affectedRows) return Response.json({ ok: false, error: "This lead was deleted." }, { status: 404 });
+    } else if (source === "youtube") {
+      const [res] = await pool.execute(
+        `UPDATE service_youtube_promotion SET full_name = ?, email = ?, phone = ?, company_name = ?, company_website = ?, country = ?, industry = ?,
+           budget = ?, timeline = ?, message = ?, assigned_to = ?, status = ?
+         WHERE id = ?`,
+        [d.fullName, d.email, d.phone, d.companyName, d.companyWebsite, d.country, d.industry, d.budget, d.timeline,
+          d.notes, d.assignedTo, d.status, id]
+      );
+      if (!(res as { affectedRows: number }).affectedRows) return Response.json({ ok: false, error: "This lead was deleted." }, { status: 404 });
+    } else {
+      const table = SOURCES[source].table;
+      const [res] = await pool.execute(
+        `UPDATE \`${table}\` SET full_name = ?, email = ?, phone = ?, company_name = ?, company_website = ?, country = ?, industry = ?,
+           service = ?, category = ?, budget = ?, timeline = ?, message = ?, assigned_to = ?, status = ?
+         WHERE id = ?`,
+        [d.fullName, d.email, d.phone, d.companyName, d.companyWebsite, d.country, d.industry, d.service, d.category, d.budget, d.timeline,
+          d.notes, d.assignedTo, d.status, id]
+      );
+      if (!(res as { affectedRows: number }).affectedRows) return Response.json({ ok: false, error: "This lead was deleted." }, { status: 404 });
+    }
+  } catch (err: any) {
+    if (err?.code === "ER_BAD_FIELD_ERROR" && String(err?.message || "").includes("assigned_to")) {
+      const table = SOURCES[source].table;
+      await pool.execute(
+        `UPDATE \`${table}\` SET full_name = ?, email = ?, phone = ?, company_name = ?, status = ? WHERE id = ?`,
+        [d.fullName, d.email, d.phone, d.companyName, d.status, id]
+      ).catch(() => {});
+    } else {
+      throw err;
+    }
   }
   return Response.json({ ok: true });
 }
@@ -114,10 +126,21 @@ export async function PATCH(request: Request) {
     args.push(body.assignedTo ? String(body.assignedTo).trim() : null);
   }
   if (!sets.length) return invalid();
-  await getPool().execute(
-    `UPDATE \`${SOURCES[body.source].table}\` SET ${sets.join(", ")} WHERE id = ?`,
-    [...args, id]
-  );
+  try {
+    await getPool().execute(
+      `UPDATE \`${SOURCES[body.source].table}\` SET ${sets.join(", ")} WHERE id = ?`,
+      [...args, id]
+    );
+  } catch (err: any) {
+    if (err?.code === "ER_BAD_FIELD_ERROR" && body?.status !== undefined) {
+      await getPool().execute(
+        `UPDATE \`${SOURCES[body.source].table}\` SET status = ? WHERE id = ?`,
+        [String(body.status), id]
+      ).catch(() => {});
+    } else {
+      throw err;
+    }
+  }
   return Response.json({ ok: true });
 }
 

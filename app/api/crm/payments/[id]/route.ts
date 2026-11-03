@@ -38,8 +38,11 @@ export async function DELETE(_request: Request, ctx: Ctx) {
   const id = await parseId(ctx);
   if (!id) return Response.json({ ok: false, error: "Invalid request." }, { status: 400 });
   // permanently removed from the database (no hidden "deleted" copies are kept)
-  const [res] = await getPool().execute("DELETE FROM payments WHERE id = ?", [id]);
-  if (!(res as { affectedRows: number }).affectedRows) {
+  const pool = getPool();
+  const [res1] = await pool.execute("DELETE FROM payment_links WHERE id = ?", [id]).catch(() => [{ affectedRows: 0 }]);
+  const [res2] = await pool.execute("DELETE FROM payments WHERE id = ?", [id]).catch(() => [{ affectedRows: 0 }]);
+  const totalDeleted = Number((res1 as any)?.affectedRows || 0) + Number((res2 as any)?.affectedRows || 0);
+  if (!totalDeleted) {
     return Response.json({ ok: false, error: "This payment was already deleted." }, { status: 404 });
   }
   return Response.json({ ok: true });

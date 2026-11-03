@@ -15,14 +15,29 @@ export async function GET(req: Request) {
     let rows: any[] = [];
 
     if (token) {
-      const [res] = await pool.query("SELECT * FROM payments WHERE token = ? LIMIT 1", [token]);
-      rows = res as any[];
+      try {
+        const [plRes] = await pool.query("SELECT * FROM payment_links WHERE token = ? LIMIT 1", [token]);
+        rows = plRes as any[];
+      } catch {}
+      if (!rows.length) {
+        const [res] = await pool.query("SELECT * FROM payments WHERE token = ? LIMIT 1", [token]).catch(() => [[]]);
+        rows = res as any[];
+      }
     } else if (orderNumber) {
-      const [res] = await pool.query("SELECT * FROM payments WHERE invoice_number = ? OR id = ? LIMIT 1", [
-        orderNumber,
-        Number(orderNumber) || 0,
-      ]);
-      rows = res as any[];
+      try {
+        const [plRes] = await pool.query("SELECT * FROM payment_links WHERE invoice_number = ? OR id = ? LIMIT 1", [
+          orderNumber,
+          Number(orderNumber) || 0,
+        ]);
+        rows = plRes as any[];
+      } catch {}
+      if (!rows.length) {
+        const [res] = await pool.query("SELECT * FROM payments WHERE invoice_number = ? OR id = ? LIMIT 1", [
+          orderNumber,
+          Number(orderNumber) || 0,
+        ]).catch(() => [[]]);
+        rows = res as any[];
+      }
     }
 
     if (!rows || rows.length === 0) {

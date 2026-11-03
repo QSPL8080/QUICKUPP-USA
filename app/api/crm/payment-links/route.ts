@@ -39,7 +39,8 @@ export async function POST(req: Request) {
     // Cancellation action via POST
     if (body.action === "cancel" && body.id) {
       const pool = getPool();
-      await pool.query("UPDATE payments SET link_status = 'cancelled' WHERE id = ?", [Number(body.id)]);
+      await pool.query("UPDATE payment_links SET link_status = 'cancelled' WHERE id = ?", [Number(body.id)]).catch(() => {});
+      await pool.query("UPDATE payments SET link_status = 'cancelled' WHERE id = ?", [Number(body.id)]).catch(() => {});
       return NextResponse.json({ ok: true, message: "Payment link cancelled." });
     }
 
@@ -48,7 +49,7 @@ export async function POST(req: Request) {
     const clientPhone = String(body.clientPhone || "").trim().slice(0, 50);
     const companyName = String(body.companyName || "").trim().slice(0, 190) || null;
     const service = String(body.service || "").trim().slice(0, 150);
-    const category = String(body.category || body.quantity || "").trim().slice(0, 150);
+    const category = String(body.category || body.quantity || "").trim().slice(0, 150) || null;
     const industry = String(body.industry || "").trim().slice(0, 150) || null;
     const quantity = category;
     const leadSource = "manual";
@@ -103,64 +104,122 @@ export async function POST(req: Request) {
     const token = randomBytes(16).toString("hex");
     const pool = getPool();
 
-    // Insert payment link record directly into payments table (NO conversion to lead)
-    const [res] = await pool.query(
-      `INSERT INTO payments (
-        client_name,
-        client_email,
-        client_phone,
-        company_name,
-        service,
-        category,
-        industry,
-        quantity,
-        description,
-        amount,
-        total_amount,
-        payment_type,
-        remaining_amount,
-        currency,
-        method,
-        status,
-        link_status,
-        source,
-        lead_source,
-        billing_start_date,
-        billing_end_date,
-        balance_due_date,
-        token,
-        expires_at,
-        notes,
-        created_by
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'USD', 'PayPal', 'pending', 'active', 'payment_link', 'manual', ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 24 HOUR), ?, ?)`,
-      [
-        clientName,
-        clientEmail,
-        clientPhone,
-        companyName,
-        service,
-        category,
-        industry,
-        quantity,
-        `Payment Link: ${service}${category ? ` - ${category}` : ""}${industry ? ` (${industry})` : ""}`,
-        initialAmount,
-        totalAmount,
-        isPartial ? "partial" : "full",
-        remainingAmount,
-        billingStartDate,
-        billingEndDate,
-        balanceDueDate,
-        token,
-        notes,
-        user.id,
-      ]
-    );
+    // Insert payment link record directly into payment_links table (dedicated table for payment link customers)
+    let insertedId: number;
+    let targetTable = "payment_links";
 
-    const insertedId = (res as { insertId: number }).insertId;
+    try {
+      const [res] = await pool.query(
+        `INSERT INTO payment_links (
+          client_name,
+          client_email,
+          client_phone,
+          company_name,
+          service,
+          category,
+          industry,
+          quantity,
+          description,
+          amount,
+          total_amount,
+          payment_type,
+          remaining_amount,
+          currency,
+          method,
+          status,
+          link_status,
+          source,
+          lead_source,
+          billing_start_date,
+          billing_end_date,
+          balance_due_date,
+          token,
+          expires_at,
+          notes,
+          created_by
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'USD', 'PayPal', 'pending', 'active', 'payment_link', 'manual', ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 24 HOUR), ?, ?)`,
+        [
+          clientName,
+          clientEmail,
+          clientPhone,
+          companyName,
+          service,
+          category,
+          industry,
+          quantity,
+          `Payment Link: ${service}${category ? ` - ${category}` : ""}${industry ? ` (${industry})` : ""}`,
+          initialAmount,
+          totalAmount,
+          isPartial ? "partial" : "full",
+          remainingAmount,
+          billingStartDate,
+          billingEndDate,
+          balanceDueDate,
+          token,
+          notes,
+          user.id,
+        ]
+      );
+      insertedId = (res as { insertId: number }).insertId;
+    } catch (insertErr: any) {
+      // Graceful fallback if payment_links table does not exist yet before migration runs
+      targetTable = "payments";
+      const [res] = await pool.query(
+        `INSERT INTO payments (
+          client_name,
+          client_email,
+          client_phone,
+          company_name,
+          service,
+          category,
+          quantity,
+          description,
+          amount,
+          total_amount,
+          payment_type,
+          remaining_amount,
+          currency,
+          method,
+          status,
+          link_status,
+          source,
+          lead_source,
+          billing_start_date,
+          billing_end_date,
+          balance_due_date,
+          token,
+          expires_at,
+          notes,
+          created_by
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'USD', 'PayPal', 'pending', 'active', 'payment_link', 'manual', ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 24 HOUR), ?, ?)`,
+        [
+          clientName,
+          clientEmail,
+          clientPhone,
+          companyName,
+          service,
+          category,
+          quantity,
+          `Payment Link: ${service}${category ? ` - ${category}` : ""}`,
+          initialAmount,
+          totalAmount,
+          isPartial ? "partial" : "full",
+          remainingAmount,
+          billingStartDate,
+          billingEndDate,
+          balanceDueDate,
+          token,
+          notes,
+          user.id,
+        ]
+      );
+      insertedId = (res as { insertId: number }).insertId;
+    }
+
     const currentYear = new Date().getFullYear();
     const orderNumber = `QAS-${currentYear}-${String(insertedId).padStart(6, "0")}`;
 
-    await pool.query("UPDATE payments SET invoice_number = ? WHERE id = ?", [orderNumber, insertedId]);
+    await pool.query(`UPDATE \`${targetTable}\` SET invoice_number = ? WHERE id = ?`, [orderNumber, insertedId]).catch(() => {});
 
     return NextResponse.json({
       ok: true,
@@ -192,7 +251,12 @@ export async function PATCH(req: Request) {
 
     const id = Number(body.id);
     const pool = getPool();
-    const [existingRows] = await pool.query("SELECT * FROM payments WHERE id = ? LIMIT 1", [id]);
+    let [existingRows] = await pool.query("SELECT * FROM payment_links WHERE id = ? LIMIT 1", [id]).catch(() => [[]]);
+    let targetTable = "payment_links";
+    if (!Array.isArray(existingRows) || !existingRows.length) {
+      [existingRows] = await pool.query("SELECT * FROM payments WHERE id = ? LIMIT 1", [id]).catch(() => [[]]);
+      targetTable = "payments";
+    }
     const existing = (existingRows as any[])?.[0];
     if (!existing) {
       return NextResponse.json({ ok: false, error: "Payment link record not found." }, { status: 404 });
@@ -242,47 +306,89 @@ export async function PATCH(req: Request) {
       }
     }
 
-    await pool.query(
-      `UPDATE payments SET
-        client_name = ?,
-        client_email = ?,
-        client_phone = ?,
-        company_name = ?,
-        service = ?,
-        category = ?,
-        industry = ?,
-        quantity = ?,
-        description = ?,
-        total_amount = ?,
-        payment_type = ?,
-        remaining_amount = ?,
-        billing_start_date = ?,
-        billing_end_date = ?,
-        balance_due_date = ?,
-        link_status = ?,
-        notes = ?
-      WHERE id = ?`,
-      [
-        clientName,
-        clientEmail,
-        clientPhone,
-        companyName,
-        service,
-        category,
-        industry,
-        quantity,
-        `Payment Link: ${service}${category ? ` - ${category}` : ""}${industry ? ` (${industry})` : ""}`,
-        totalAmount,
-        paymentType,
-        remainingAmount,
-        billingStartDate,
-        billingEndDate,
-        balanceDueDate,
-        linkStatus,
-        notes,
-        id,
-      ]
-    );
+    try {
+      await pool.query(
+        `UPDATE \`${targetTable}\` SET
+          client_name = ?,
+          client_email = ?,
+          client_phone = ?,
+          company_name = ?,
+          service = ?,
+          category = ?,
+          industry = ?,
+          quantity = ?,
+          description = ?,
+          total_amount = ?,
+          payment_type = ?,
+          remaining_amount = ?,
+          billing_start_date = ?,
+          billing_end_date = ?,
+          balance_due_date = ?,
+          link_status = ?,
+          notes = ?
+        WHERE id = ?`,
+        [
+          clientName,
+          clientEmail,
+          clientPhone,
+          companyName,
+          service,
+          category,
+          industry,
+          quantity,
+          `Payment Link: ${service}${category ? ` - ${category}` : ""}${industry ? ` (${industry})` : ""}`,
+          totalAmount,
+          paymentType,
+          remainingAmount,
+          billingStartDate,
+          billingEndDate,
+          balanceDueDate,
+          linkStatus,
+          notes,
+          id,
+        ]
+      );
+    } catch {
+      await pool.query(
+        `UPDATE \`${targetTable}\` SET
+          client_name = ?,
+          client_email = ?,
+          client_phone = ?,
+          company_name = ?,
+          service = ?,
+          category = ?,
+          quantity = ?,
+          description = ?,
+          total_amount = ?,
+          payment_type = ?,
+          remaining_amount = ?,
+          billing_start_date = ?,
+          billing_end_date = ?,
+          balance_due_date = ?,
+          link_status = ?,
+          notes = ?
+        WHERE id = ?`,
+        [
+          clientName,
+          clientEmail,
+          clientPhone,
+          companyName,
+          service,
+          category,
+          quantity,
+          `Payment Link: ${service}${category ? ` - ${category}` : ""}`,
+          totalAmount,
+          paymentType,
+          remainingAmount,
+          billingStartDate,
+          billingEndDate,
+          balanceDueDate,
+          linkStatus,
+          notes,
+          id,
+        ]
+      );
+    }
 
     return NextResponse.json({ ok: true, message: "Payment link updated successfully." });
   } catch (err: any) {

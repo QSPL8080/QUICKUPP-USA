@@ -16,16 +16,23 @@ async function handleBalanceReminders(req: Request) {
     const pool = getPool();
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://quickuppsoftech.us";
 
-    // Find all partially paid records with outstanding balance
-    const [rows] = await pool.query(`
-      SELECT * FROM payments 
+    const [plRows] = await pool.query(`
+      SELECT *, 'payment_links' AS _table FROM payment_links 
       WHERE status = 'partially_paid' 
         AND remaining_amount > 0 
         AND client_email IS NOT NULL 
         AND client_email != ''
-    `);
+    `).catch(() => [[]]);
 
-    const payments = rows as any[];
+    const [pRows] = await pool.query(`
+      SELECT *, 'payments' AS _table FROM payments 
+      WHERE status = 'partially_paid' 
+        AND remaining_amount > 0 
+        AND client_email IS NOT NULL 
+        AND client_email != ''
+    `).catch(() => [[]]);
+
+    const payments = [...(plRows as any[]), ...(pRows as any[])];
     const now = new Date();
     const todayStr = now.toISOString().slice(0, 10);
     const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -175,7 +182,7 @@ async function handleBalanceReminders(req: Request) {
           text: `Hi ${firstName}, balance payment reminder for order #${orderNumber}. Outstanding balance: $${remainingAmount.toFixed(2)} USD. Due: ${dueDateFormatted}. Pay here: ${balanceUrl}`,
         });
 
-        await pool.query("UPDATE payments SET balance_reminder_sent_at = NOW() WHERE id = ?", [p.id]);
+        await pool.query(`UPDATE \`${p._table || "payments"}\` SET balance_reminder_sent_at = NOW() WHERE id = ?`, [p.id]).catch(() => {});
         sentCount++;
         details.push({ id: p.id, orderNumber, clientEmail, diffDays, status: "sent" });
       } catch (sendErr: any) {

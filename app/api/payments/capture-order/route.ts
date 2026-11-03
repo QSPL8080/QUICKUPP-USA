@@ -96,25 +96,47 @@ export async function POST(req: Request) {
     try {
       const pool = getPool();
       let existingRecord: any = null;
+      let targetTable = "payments";
 
-      // Check for existing record by token, invoiceNumber, or ID
+      // Check for existing record by token, invoiceNumber, or ID (checking payment_links first)
       if (token) {
-        const [rows] = await pool.query("SELECT * FROM payments WHERE token = ? LIMIT 1", [token]);
-        if (Array.isArray(rows) && rows.length > 0) existingRecord = rows[0];
+        let [rows] = await pool.query("SELECT * FROM payment_links WHERE token = ? LIMIT 1", [token]).catch(() => [[]]);
+        if (Array.isArray(rows) && rows.length > 0) {
+          existingRecord = rows[0];
+          targetTable = "payment_links";
+        } else {
+          [rows] = await pool.query("SELECT * FROM payments WHERE token = ? LIMIT 1", [token]).catch(() => [[]]);
+          if (Array.isArray(rows) && rows.length > 0) {
+            existingRecord = rows[0];
+            targetTable = "payments";
+          }
+        }
       }
       if (!existingRecord && (invoiceNumber || existingPaymentId)) {
-        const [rows] = await pool.query("SELECT * FROM payments WHERE invoice_number = ? OR id = ? LIMIT 1", [
+        let [rows] = await pool.query("SELECT * FROM payment_links WHERE invoice_number = ? OR id = ? LIMIT 1", [
           invoiceNumber || null,
           Number(existingPaymentId) || 0,
-        ]);
-        if (Array.isArray(rows) && rows.length > 0) existingRecord = rows[0];
+        ]).catch(() => [[]]);
+        if (Array.isArray(rows) && rows.length > 0) {
+          existingRecord = rows[0];
+          targetTable = "payment_links";
+        } else {
+          [rows] = await pool.query("SELECT * FROM payments WHERE invoice_number = ? OR id = ? LIMIT 1", [
+            invoiceNumber || null,
+            Number(existingPaymentId) || 0,
+          ]).catch(() => [[]]);
+          if (Array.isArray(rows) && rows.length > 0) {
+            existingRecord = rows[0];
+            targetTable = "payments";
+          }
+        }
       }
 
       if (existingRecord) {
         // MATCH FOUND: UPDATE THE EXACT SAME ROW IN-PLACE!
         insertedId = Number(existingRecord.id);
         orderNumber = existingRecord.invoice_number || `QAS-${new Date().getFullYear()}-${String(insertedId).padStart(6, "0")}`;
-        isPaymentLink = existingRecord.source === "payment_link";
+        isPaymentLink = targetTable === "payment_links" || existingRecord.source === "payment_link";
         effectiveClientName = existingRecord.client_name || clientName || "Valued Client";
         effectiveClientEmail = existingRecord.client_email || clientEmail || "";
         effectiveClientPhone = existingRecord.client_phone || clientPhone || "";
@@ -137,7 +159,7 @@ export async function POST(req: Request) {
             : `Initial: ${previouslyPaid} | Balance: ${captureID}`;
 
           await pool.query(
-            `UPDATE payments SET
+            `UPDATE \`${targetTable}\` SET
               amount = ?,
               total_amount = ?,
               remaining_amount = 0,
@@ -166,7 +188,7 @@ export async function POST(req: Request) {
           if (paymentStatus === "failed") {
             const failNote = `[PAYMENT FAILED / DECLINED]: ${failureReason}${notes ? ` | Note: ${notes}` : ""}`;
             await pool.query(
-              `UPDATE payments SET
+              `UPDATE \`${targetTable}\` SET
                 status = 'failed',
                 notes = CONCAT(COALESCE(notes, ''), ' | ', ?)
               WHERE id = ?`,
@@ -179,7 +201,7 @@ export async function POST(req: Request) {
             const currentStatus = isPartial ? "partially_paid" : paymentStatus;
 
             await pool.query(
-              `UPDATE payments SET
+              `UPDATE \`${targetTable}\` SET
                 amount = ?,
                 total_amount = ?,
                 remaining_amount = ?,

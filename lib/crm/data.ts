@@ -75,6 +75,15 @@ const UNION_SQL = (Object.keys(SOURCES) as EnquirySource[])
   })
   .join(" UNION ALL ");
 
+const UNION_SQL_SAFE = (Object.keys(SOURCES) as EnquirySource[])
+  .map((k) => {
+    const detail = k === "contact" ? "project_type" : k === "youtube" ? "''" : "category";
+    const service = k === "contact" ? "NULL" : "service";
+    const assigned = k === "manual" ? "assigned_to" : "NULL AS assigned_to";
+    return `SELECT '${k}' AS src, id, full_name, email, phone, company_name, ${detail} AS detail, ${service} AS service, ${assigned}, status, created_at FROM \`${SOURCES[k].table}\``;
+  })
+  .join(" UNION ALL ");
+
 export type LeadFilters = { q?: string; source?: string; status?: string; from?: string; to?: string };
 
 function leadWhere(f: LeadFilters) {
@@ -127,18 +136,43 @@ export async function listLeads(f: LeadFilters & { page?: number }) {
   const { sql, args } = leadWhere(f);
   const page = Math.max(1, Math.floor(f.page || 1));
   const pool = getPool();
-  const [countRows] = await pool.query(`SELECT COUNT(*) AS n FROM (${UNION_SQL}) t ${sql}`, args);
+  let currentUnion = UNION_SQL;
+
+  let countRows: any;
+  try {
+    [countRows] = await pool.query(`SELECT COUNT(*) AS n FROM (${currentUnion}) t ${sql}`, args);
+  } catch (err: any) {
+    if (err?.code === "ER_BAD_FIELD_ERROR" || String(err?.message || "").includes("assigned_to")) {
+      currentUnion = UNION_SQL_SAFE;
+      [countRows] = await pool.query(`SELECT COUNT(*) AS n FROM (${currentUnion}) t ${sql}`, args);
+    } else {
+      throw err;
+    }
+  }
   const total = Number((countRows as { n: number }[])[0]?.n || 0);
 
-  const [tabCounts] = await pool.query(`
-    SELECT
-      COUNT(*) AS all_count,
-      SUM(CASE WHEN src = 'contact' THEN 1 ELSE 0 END) AS contact_count,
-      SUM(CASE WHEN src IN ('digital-marketing', 'ai-automation', 'it-services', 'staff-augmentation') THEN 1 ELSE 0 END) AS services_count,
-      SUM(CASE WHEN src = 'youtube' THEN 1 ELSE 0 END) AS youtube_count,
-      SUM(CASE WHEN src = 'manual' THEN 1 ELSE 0 END) AS manual_count
-    FROM (${UNION_SQL}) t
-  `);
+  let tabCounts: any;
+  try {
+    [tabCounts] = await pool.query(`
+      SELECT
+        COUNT(*) AS all_count,
+        SUM(CASE WHEN src = 'contact' THEN 1 ELSE 0 END) AS contact_count,
+        SUM(CASE WHEN src IN ('digital-marketing', 'ai-automation', 'it-services', 'staff-augmentation') THEN 1 ELSE 0 END) AS services_count,
+        SUM(CASE WHEN src = 'youtube' THEN 1 ELSE 0 END) AS youtube_count,
+        SUM(CASE WHEN src = 'manual' THEN 1 ELSE 0 END) AS manual_count
+      FROM (${currentUnion}) t
+    `);
+  } catch {
+    [tabCounts] = await pool.query(`
+      SELECT
+        COUNT(*) AS all_count,
+        SUM(CASE WHEN src = 'contact' THEN 1 ELSE 0 END) AS contact_count,
+        SUM(CASE WHEN src IN ('digital-marketing', 'ai-automation', 'it-services', 'staff-augmentation') THEN 1 ELSE 0 END) AS services_count,
+        SUM(CASE WHEN src = 'youtube' THEN 1 ELSE 0 END) AS youtube_count,
+        SUM(CASE WHEN src = 'manual' THEN 1 ELSE 0 END) AS manual_count
+      FROM (${UNION_SQL_SAFE}) t
+    `);
+  }
   const tc = (tabCounts as Record<string, unknown>[])?.[0] || {};
   const counts = {
     all: Number(tc.all_count || 0),
@@ -148,18 +182,31 @@ export async function listLeads(f: LeadFilters & { page?: number }) {
     manual: Number(tc.manual_count || 0),
   };
 
-  const [rows] = await pool.query(
-    `SELECT * FROM (${UNION_SQL}) t ${sql} ORDER BY created_at DESC, id DESC LIMIT ${PAGE_SIZE} OFFSET ${(page - 1) * PAGE_SIZE}`,
-    args
-  );
+  let rows: any;
+  try {
+    [rows] = await pool.query(
+      `SELECT * FROM (${currentUnion}) t ${sql} ORDER BY created_at DESC, id DESC LIMIT ${PAGE_SIZE} OFFSET ${(page - 1) * PAGE_SIZE}`,
+      args
+    );
+  } catch {
+    [rows] = await pool.query(
+      `SELECT * FROM (${UNION_SQL_SAFE}) t ${sql} ORDER BY created_at DESC, id DESC LIMIT ${PAGE_SIZE} OFFSET ${(page - 1) * PAGE_SIZE}`,
+      args
+    );
+  }
   return { items: (rows as Record<string, unknown>[]).map(toLead), total, page, pages: Math.max(1, Math.ceil(total / PAGE_SIZE)), pageSize: PAGE_SIZE, counts };
 }
 
 /** The same list without paging, for the CSV export (capped) */
 export async function exportLeads(f: LeadFilters) {
   const { sql, args } = leadWhere(f);
-  const [rows] = await getPool().query(`SELECT * FROM (${UNION_SQL}) t ${sql} ORDER BY created_at DESC, id DESC LIMIT 10000`, args);
-  return (rows as Record<string, unknown>[]).map(toLead);
+  try {
+    const [rows] = await getPool().query(`SELECT * FROM (${UNION_SQL}) t ${sql} ORDER BY created_at DESC, id DESC LIMIT 10000`, args);
+    return (rows as Record<string, unknown>[]).map(toLead);
+  } catch {
+    const [rows] = await getPool().query(`SELECT * FROM (${UNION_SQL_SAFE}) t ${sql} ORDER BY created_at DESC, id DESC LIMIT 10000`, args);
+    return (rows as Record<string, unknown>[]).map(toLead);
+  }
 }
 
 /** One lead with every field its form collected */
@@ -261,26 +308,52 @@ export async function listPayments(opts: {
   const currentTab = opts.tab || "all";
 
   // Tab counts
-  const [tabCounts] = await pool.query(`
-    SELECT
-      SUM(CASE WHEN source IN ('website', 'online') THEN 1 ELSE 0 END) AS website_count,
-      SUM(CASE WHEN source IN ('payment_link', 'manual') THEN 1 ELSE 0 END) AS payment_link_count,
-      COUNT(*) AS all_count
-    FROM payments
-  `);
-  const counts = (tabCounts as any[])?.[0] || {};
-  const websiteCount = Number(counts.website_count || 0);
-  const paymentLinkCount = Number(counts.payment_link_count || 0);
-  const allCount = Number(counts.all_count || 0);
+  let websiteCount = 0;
+  let paymentLinkCount = 0;
+
+  try {
+    const [wRows] = await pool.query("SELECT COUNT(*) AS c FROM payments WHERE source IN ('website', 'online')");
+    websiteCount = Number((wRows as any[])?.[0]?.c || 0);
+  } catch {}
+
+  try {
+    const [pRows] = await pool.query("SELECT COUNT(*) AS c FROM payment_links");
+    paymentLinkCount = Number((pRows as any[])?.[0]?.c || 0);
+  } catch {
+    try {
+      const [fallbackRows] = await pool.query("SELECT COUNT(*) AS c FROM payments WHERE source IN ('payment_link', 'manual')");
+      paymentLinkCount = Number((fallbackRows as any[])?.[0]?.c || 0);
+    } catch {}
+  }
+
+  const allCount = websiteCount + paymentLinkCount;
+  const counts = {
+    website: websiteCount,
+    paymentLink: paymentLinkCount,
+    all: allCount,
+  };
+
+  const PAY_COLS = `id, client_name, client_email, client_phone, company_name, category, service, industry,
+    description, amount, total_amount, payment_type, remaining_amount, currency, method, status,
+    source, reference, paypal_order_id, billing_start_date, billing_end_date,
+    balance_due_date, invoice_number, paid_at, notes, created_by, created_at, token, expires_at,
+    link_status, lead_source, quantity, balance_reminder_sent_at`;
+
+  let baseQuery = "";
+  if (currentTab === "website") {
+    baseQuery = `SELECT ${PAY_COLS} FROM payments WHERE source IN ('website', 'online')`;
+  } else if (currentTab === "payment_link") {
+    baseQuery = `SELECT ${PAY_COLS} FROM payment_links`;
+  } else {
+    baseQuery = `
+      SELECT ${PAY_COLS} FROM payments WHERE source IN ('website', 'online')
+      UNION ALL
+      SELECT ${PAY_COLS} FROM payment_links
+    `;
+  }
 
   const where: string[] = [];
   const args: (string | number)[] = [];
-
-  if (currentTab === "website") {
-    where.push("p.source IN ('website', 'online')");
-  } else if (currentTab === "payment_link") {
-    where.push("p.source IN ('payment_link', 'manual')");
-  }
 
   if (opts.status && (PAYMENT_STATUSES as readonly string[]).includes(opts.status as any)) {
     where.push("p.status = ?");
@@ -296,13 +369,29 @@ export async function listPayments(opts: {
   }
   const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : "";
   const page = Math.max(1, Math.floor(opts.page || 1));
-  const [countRows] = await pool.query(`SELECT COUNT(*) AS n FROM payments p ${whereSql}`, args);
+
+  let countRows: any;
+  let rows: any;
+
+  try {
+    [countRows] = await pool.query(`SELECT COUNT(*) AS n FROM (${baseQuery}) p ${whereSql}`, args);
+    [rows] = await pool.query(
+      `SELECT p.*, u.name AS created_by_name FROM (${baseQuery}) p LEFT JOIN crm_users u ON u.id = p.created_by
+       ${whereSql} ORDER BY COALESCE(p.paid_at, DATE(p.created_at)) DESC, p.id DESC LIMIT ${PAGE_SIZE} OFFSET ${(page - 1) * PAGE_SIZE}`,
+      args
+    );
+  } catch (err: any) {
+    // Graceful fallback if payment_links table has not been created yet in the DB
+    const fallbackBase = `SELECT * FROM payments WHERE ${currentTab === "payment_link" ? "source IN ('payment_link', 'manual')" : currentTab === "website" ? "source IN ('website', 'online')" : "1=1"}`;
+    [countRows] = await pool.query(`SELECT COUNT(*) AS n FROM (${fallbackBase}) p ${whereSql}`, args);
+    [rows] = await pool.query(
+      `SELECT p.*, u.name AS created_by_name FROM (${fallbackBase}) p LEFT JOIN crm_users u ON u.id = p.created_by
+       ${whereSql} ORDER BY COALESCE(p.paid_at, DATE(p.created_at)) DESC, p.id DESC LIMIT ${PAGE_SIZE} OFFSET ${(page - 1) * PAGE_SIZE}`,
+      args
+    );
+  }
+
   const total = Number((countRows as { n: number }[])[0]?.n || 0);
-  const [rows] = await pool.query(
-    `SELECT p.*, u.name AS created_by_name FROM payments p LEFT JOIN crm_users u ON u.id = p.created_by
-     ${whereSql} ORDER BY COALESCE(p.paid_at, DATE(p.created_at)) DESC, p.id DESC LIMIT ${PAGE_SIZE} OFFSET ${(page - 1) * PAGE_SIZE}`,
-    args
-  );
   const items: PaymentRow[] = (rows as Record<string, unknown>[]).map((r) => ({
     id: Number(r.id),
     clientName: String(r.client_name ?? ""),

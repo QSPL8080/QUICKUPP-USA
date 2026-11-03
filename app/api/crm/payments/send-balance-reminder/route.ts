@@ -19,7 +19,12 @@ export async function POST(req: Request) {
 
     const id = Number(body.id);
     const pool = getPool();
-    const [rows] = await pool.query("SELECT * FROM payments WHERE id = ? LIMIT 1", [id]);
+    let [rows] = await pool.query("SELECT * FROM payment_links WHERE id = ? LIMIT 1", [id]).catch(() => [[]]);
+    let targetTable = "payment_links";
+    if (!Array.isArray(rows) || !rows.length) {
+      [rows] = await pool.query("SELECT * FROM payments WHERE id = ? LIMIT 1", [id]).catch(() => [[]]);
+      targetTable = "payments";
+    }
     const p = (rows as any[])?.[0];
 
     if (!p) {
@@ -36,7 +41,7 @@ export async function POST(req: Request) {
     let token = p.token;
     if (!token) {
       token = randomBytes(16).toString("hex");
-      await pool.query("UPDATE payments SET token = ?, link_status = 'active' WHERE id = ?", [token, id]);
+      await pool.query(`UPDATE \`${targetTable}\` SET token = ?, link_status = 'active' WHERE id = ?`, [token, id]);
     }
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://quickuppsoftech.us";
@@ -187,7 +192,7 @@ Quickupp Softech LLC`;
       text: `Hi ${firstName}, this is a reminder regarding your remaining balance of $${remainingAmount.toFixed(2)} USD for order #${orderNumber}. Pay here: ${balanceUrl}`,
     });
 
-    await pool.query("UPDATE payments SET balance_reminder_sent_at = NOW() WHERE id = ?", [id]);
+    await pool.query(`UPDATE \`${targetTable}\` SET balance_reminder_sent_at = NOW() WHERE id = ?`, [id]).catch(() => {});
 
     return NextResponse.json({
       ok: true,

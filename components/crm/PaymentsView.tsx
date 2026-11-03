@@ -228,14 +228,9 @@ export default function PaymentsView({
   const [listError, setListError] = useState("");
   const sel = useSelection(rows.map((p) => p.id));
 
-  // Toggle tab: Clicking active tab toggles back to default "all"
-  const handleTabChange = (t: "website" | "payment_link") => {
+  const handleTabChange = (t: "all" | "website" | "payment_link") => {
     const params = new URLSearchParams(window.location.search);
-    if (currentTab === t) {
-      params.set("tab", "all");
-    } else {
-      params.set("tab", t);
-    }
+    params.set("tab", t);
     params.set("page", "1");
     router.push(`/crm/payments?${params.toString()}`);
   };
@@ -605,8 +600,18 @@ Quickupp Softech LLC`;
         {headerActions}
       </PageHead>
 
-      {/* Tabs: ONLY Website and Payment Link (All Payments button hidden by user request, default view displays All Payments) */}
+      {/* Tabs: All Payments, Website Payments, and Payment Links */}
       <div className="crm-payments-tabs">
+        <button
+          type="button"
+          className={`crm-payments-tab ${!currentTab || currentTab === "all" ? "is-active" : ""}`}
+          onClick={() => handleTabChange("all")}
+          title="All payments and links"
+        >
+          <span>All Payments</span>
+          <span className="crm-tab-badge">{counts?.all ?? 0}</span>
+        </button>
+
         <button
           type="button"
           className={`crm-payments-tab ${currentTab === "website" ? "is-active" : ""}`}
@@ -618,7 +623,7 @@ Quickupp Softech LLC`;
             <line x1="2" y1="12" x2="22" y2="12" />
             <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
           </svg>
-          <span>Website</span>
+          <span>Website Payments</span>
           <span className="crm-tab-badge">{counts?.website ?? 0}</span>
         </button>
 
@@ -632,7 +637,7 @@ Quickupp Softech LLC`;
             <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
             <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
           </svg>
-          <span>Payment Link</span>
+          <span>Payment Links</span>
           <span className="crm-tab-badge">{counts?.paymentLink ?? 0}</span>
         </button>
       </div>
@@ -1796,19 +1801,44 @@ Quickupp Softech LLC`;
 
                   <label className="crm-field">
                     <span className="crm-label">Custom total amount ($ USD) *</span>
-                    <div style={{ position: "relative" }}>
-                      <span style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", fontWeight: 700, color: "#64748b" }}>
+                    <div style={{ display: "flex", alignItems: "stretch", width: "100%" }}>
+                      <span
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          padding: "0 14px",
+                          background: "#1e293b",
+                          border: "1px solid #334155",
+                          borderRight: "none",
+                          borderTopLeftRadius: "6px",
+                          borderBottomLeftRadius: "6px",
+                          fontWeight: 700,
+                          color: "#f8fafc",
+                          fontSize: "15px",
+                          userSelect: "none",
+                        }}
+                      >
                         $
                       </span>
                       <input
                         className="crm-input"
-                        type="number"
-                        step="any"
-                        min="1"
-                        style={{ paddingLeft: "26px" }}
+                        type="text"
+                        inputMode="decimal"
+                        style={{
+                          borderTopLeftRadius: 0,
+                          borderBottomLeftRadius: 0,
+                          fontSize: "14px",
+                          fontWeight: 600,
+                        }}
                         value={linkForm.totalAmount}
-                        onChange={(e) => setLinkForm((f) => ({ ...f, totalAmount: e.target.value }))}
-                        placeholder="e.g. 1000.00"
+                        onChange={(e) => {
+                          const clean = e.target.value.replace(/[^0-9.]/g, "");
+                          const parts = clean.split(".");
+                          const sanitized = parts.length > 2 ? `${parts[0]}.${parts.slice(1).join("")}` : clean;
+                          setLinkForm((f) => ({ ...f, totalAmount: sanitized }));
+                        }}
+                        placeholder="0.00"
                         required
                       />
                     </div>
@@ -2181,14 +2211,48 @@ Quickupp Softech LLC`;
                   </label>
                   <label className="crm-field">
                     <span className="crm-label">Total amount ($ USD)</span>
-                    <input
-                      className="crm-input"
-                      type="number"
-                      step="any"
-                      value={editLinkForm.totalAmount}
-                      onChange={(e) => setEditLinkForm((f) => ({ ...f, totalAmount: e.target.value }))}
-                      disabled={editingLink.status === "paid"}
-                    />
+                    <div style={{ display: "flex", alignItems: "stretch", width: "100%" }}>
+                      <span
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          padding: "0 14px",
+                          background: "#1e293b",
+                          border: "1px solid #334155",
+                          borderRight: "none",
+                          borderTopLeftRadius: "6px",
+                          borderBottomLeftRadius: "6px",
+                          fontWeight: 700,
+                          color: "#f8fafc",
+                          fontSize: "15px",
+                          userSelect: "none",
+                        }}
+                      >
+                        $
+                      </span>
+                      <input
+                        className="crm-input"
+                        type="text"
+                        inputMode="decimal"
+                        style={{
+                          borderTopLeftRadius: 0,
+                          borderBottomLeftRadius: 0,
+                          fontSize: "14px",
+                          fontWeight: 600,
+                        }}
+                        value={editLinkForm.totalAmount}
+                        onChange={(e) => {
+                          const clean = e.target.value.replace(/[^0-9.]/g, "");
+                          const parts = clean.split(".");
+                          const sanitized = parts.length > 2 ? `${parts[0]}.${parts.slice(1).join("")}` : clean;
+                          setEditLinkForm((f) => ({ ...f, totalAmount: sanitized }));
+                        }}
+                        placeholder="0.00"
+                        disabled={editingLink.status === "paid"}
+                        required
+                      />
+                    </div>
                   </label>
                   <label className="crm-field">
                     <span className="crm-label">Payment option</span>
