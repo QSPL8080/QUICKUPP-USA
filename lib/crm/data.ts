@@ -46,6 +46,8 @@ export type EnquiryRow = {
   assignedTo: string | null; // manual leads
   createdBy: string | null; // manual leads
   status: EnquiryStatus;
+  projectStatus: string;
+  attachments?: any[];
   createdAt: string;
 };
 
@@ -62,6 +64,7 @@ export type LeadRow = {
   detail: string;
   assignedTo?: string | null;
   status: EnquiryStatus;
+  projectStatus: string;
   createdAt: string;
 };
 
@@ -72,7 +75,7 @@ const UNION_SQL = (Object.keys(SOURCES) as EnquirySource[])
   .map((k) => {
     const detail = k === "contact" ? "COALESCE(category, project_type)" : k === "youtube" ? "''" : "category";
     const service = k === "contact" ? "project_type" : "service";
-    return `SELECT '${k}' AS src, id, full_name, email, phone, company_name, ${detail} AS detail, ${service} AS service, assigned_to, status, created_at FROM \`${SOURCES[k].table}\``;
+    return `SELECT '${k}' AS src, id, full_name, email, phone, company_name, ${detail} AS detail, ${service} AS service, assigned_to, status, COALESCE(project_status, 'Not Started') AS project_status, created_at FROM \`${SOURCES[k].table}\``;
   })
   .join(" UNION ALL ");
 
@@ -81,7 +84,7 @@ const UNION_SQL_SAFE = (Object.keys(SOURCES) as EnquirySource[])
     const detail = k === "contact" ? "COALESCE(category, project_type)" : k === "youtube" ? "''" : "category";
     const service = k === "contact" ? "project_type" : "service";
     const assigned = k === "manual" ? "assigned_to" : "NULL AS assigned_to";
-    return `SELECT '${k}' AS src, id, full_name, email, phone, company_name, ${detail} AS detail, ${service} AS service, ${assigned}, status, created_at FROM \`${SOURCES[k].table}\``;
+    return `SELECT '${k}' AS src, id, full_name, email, phone, company_name, ${detail} AS detail, ${service} AS service, ${assigned}, status, 'Not Started' AS project_status, created_at FROM \`${SOURCES[k].table}\``;
   })
   .join(" UNION ALL ");
 
@@ -129,6 +132,7 @@ const toLead = (r: Record<string, unknown>): LeadRow => ({
   detail: String(r.detail ?? ""),
   assignedTo: (r.assigned_to as string) || null,
   status: ((ENQUIRY_STATUSES as readonly string[]).includes(String(r.status)) ? r.status : "new") as EnquiryStatus,
+  projectStatus: String(r.project_status || "Not Started"),
   createdAt: new Date(r.created_at as string).toISOString(),
 });
 
@@ -246,6 +250,18 @@ export async function getLead(source: EnquirySource, id: number): Promise<Enquir
     assignedTo: (r.assigned_to as string) || null,
     createdBy: isManual ? ((r.created_by_name as string) || null) : null,
     status: ((ENQUIRY_STATUSES as readonly string[]).includes(String(r.status)) ? r.status : "new") as EnquiryStatus,
+    projectStatus: String(r.project_status || "Not Started"),
+    attachments: (() => {
+      if (typeof r.attachments === "string") {
+        try {
+          const parsed = JSON.parse(r.attachments);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch {
+          return [];
+        }
+      }
+      return Array.isArray(r.attachments) ? r.attachments : [];
+    })(),
     createdAt: new Date(r.created_at as string).toISOString(),
   };
 }

@@ -19,25 +19,8 @@ export async function GET(request: Request) {
 
   const pool = getPool();
 
-  // 1. Fetch attachments
-  const [attRows] = await pool.query(
-    `SELECT id, lead_source, lead_id, file_name, file_type, file_size, uploaded_by_name, created_at
-     FROM lead_attachments
-     WHERE lead_source = ? AND lead_id = ?
-     ORDER BY id DESC`,
-    [source, id]
-  ).catch(() => [[]]);
-
-  const attachments = (attRows as any[]).map((r) => ({
-    id: r.id,
-    leadSource: r.lead_source,
-    leadId: r.lead_id,
-    fileName: r.file_name,
-    fileType: r.file_type,
-    fileSize: r.file_size,
-    uploadedByName: r.uploaded_by_name,
-    createdAt: r.created_at,
-  }));
+  // 1. Fetch attachments (stored directly on lead record in MySQL)
+  const attachments = Array.isArray(lead.attachments) ? lead.attachments : [];
 
   // 2. Fetch payment links matching this lead
   const email = (lead.email || "").trim().toLowerCase();
@@ -127,10 +110,10 @@ export async function POST(request: Request) {
   const [res] = await getPool().execute(
     `INSERT INTO manual_leads
       (full_name, email, phone, company_name, company_website, country, industry, service, category, budget, timeline,
-       lead_channel, assigned_to, message, status, created_by)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       lead_channel, assigned_to, message, status, project_status, created_by)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [d.fullName, d.email, d.phone, d.companyName, d.companyWebsite, d.country, d.industry, d.service, d.category, d.budget, d.timeline,
-      d.channel, assignedTo, d.notes, d.status, user.id]
+      d.channel, assignedTo, d.notes, d.status, d.projectStatus || "Not Started", user.id]
   );
   return Response.json({ ok: true, id: (res as { insertId: number }).insertId });
 }
@@ -150,43 +133,43 @@ export async function PUT(request: Request) {
     if (source === "manual") {
       const [res] = await pool.execute(
         `UPDATE manual_leads SET full_name = ?, email = ?, phone = ?, company_name = ?, company_website = ?, country = ?, industry = ?,
-           service = ?, category = ?, budget = ?, timeline = ?, lead_channel = ?, assigned_to = ?, message = ?, status = ?
+           service = ?, category = ?, budget = ?, timeline = ?, lead_channel = ?, assigned_to = ?, message = ?, status = ?, project_status = ?
          WHERE id = ?`,
         [d.fullName, d.email, d.phone, d.companyName, d.companyWebsite, d.country, d.industry, d.service, d.category, d.budget, d.timeline,
-          d.channel, d.assignedTo, d.notes, d.status, id]
+          d.channel, d.assignedTo, d.notes, d.status, d.projectStatus || "Not Started", id]
       );
       if (!(res as { affectedRows: number }).affectedRows) return Response.json({ ok: false, error: "This lead was deleted." }, { status: 404 });
     } else if (source === "contact") {
       const [res] = await pool.execute(
         `UPDATE contact_enquiries SET full_name = ?, email = ?, phone = ?, company_name = ?, company_website = ?, country = ?, industry = ?,
-           project_type = ?, budget = ?, timeline = ?, message = ?, assigned_to = ?, status = ?
+           project_type = ?, budget = ?, timeline = ?, message = ?, assigned_to = ?, status = ?, project_status = ?
          WHERE id = ?`,
         [d.fullName, d.email, d.phone, d.companyName, d.companyWebsite, d.country, d.industry, d.service || d.category, d.budget, d.timeline,
-          d.notes, d.assignedTo, d.status, id]
+          d.notes, d.assignedTo, d.status, d.projectStatus || "Not Started", id]
       );
       if (!(res as { affectedRows: number }).affectedRows) return Response.json({ ok: false, error: "This lead was deleted." }, { status: 404 });
     } else if (source === "youtube") {
       const [res] = await pool.execute(
         `UPDATE service_youtube_promotion SET full_name = ?, email = ?, phone = ?, company_name = ?, company_website = ?, country = ?, industry = ?,
-           budget = ?, timeline = ?, message = ?, assigned_to = ?, status = ?
+           budget = ?, timeline = ?, message = ?, assigned_to = ?, status = ?, project_status = ?
          WHERE id = ?`,
         [d.fullName, d.email, d.phone, d.companyName, d.companyWebsite, d.country, d.industry, d.budget, d.timeline,
-          d.notes, d.assignedTo, d.status, id]
+          d.notes, d.assignedTo, d.status, d.projectStatus || "Not Started", id]
       );
       if (!(res as { affectedRows: number }).affectedRows) return Response.json({ ok: false, error: "This lead was deleted." }, { status: 404 });
     } else {
       const table = SOURCES[source].table;
       const [res] = await pool.execute(
         `UPDATE \`${table}\` SET full_name = ?, email = ?, phone = ?, company_name = ?, company_website = ?, country = ?, industry = ?,
-           service = ?, category = ?, budget = ?, timeline = ?, message = ?, assigned_to = ?, status = ?
+           service = ?, category = ?, budget = ?, timeline = ?, message = ?, assigned_to = ?, status = ?, project_status = ?
          WHERE id = ?`,
         [d.fullName, d.email, d.phone, d.companyName, d.companyWebsite, d.country, d.industry, d.service, d.category, d.budget, d.timeline,
-          d.notes, d.assignedTo, d.status, id]
+          d.notes, d.assignedTo, d.status, d.projectStatus || "Not Started", id]
       );
       if (!(res as { affectedRows: number }).affectedRows) return Response.json({ ok: false, error: "This lead was deleted." }, { status: 404 });
     }
   } catch (err: any) {
-    if (err?.code === "ER_BAD_FIELD_ERROR" && String(err?.message || "").includes("assigned_to")) {
+    if (err?.code === "ER_BAD_FIELD_ERROR") {
       const table = SOURCES[source].table;
       await pool.execute(
         `UPDATE \`${table}\` SET full_name = ?, email = ?, phone = ?, company_name = ?, status = ? WHERE id = ?`,
@@ -211,7 +194,7 @@ export async function PUT(request: Request) {
   return Response.json({ ok: true });
 }
 
-/* PATCH { source, id, status, assignedTo } → change a lead's status or assignedTo (any CRM user) */
+/* PATCH { source, id, status, projectStatus, assignedTo } → change a lead's status, projectStatus, or assignedTo (any CRM user) */
 export async function PATCH(request: Request) {
   if (!(await getCurrentUser())) return unauthorized();
   const body = await readJson(request);
@@ -227,6 +210,10 @@ export async function PATCH(request: Request) {
     }
     sets.push("status = ?");
     args.push(String(body.status));
+  }
+  if (body?.projectStatus !== undefined) {
+    sets.push("project_status = ?");
+    args.push(body.projectStatus ? String(body.projectStatus).trim() : "Not Started");
   }
   if (body?.assignedTo !== undefined) {
     sets.push("assigned_to = ?");
@@ -269,8 +256,6 @@ export async function DELETE(request: Request) {
   }
   let deleted = 0;
   for (const [src, ids] of bySource) {
-    // delete attachments for these leads
-    await getPool().query(`DELETE FROM lead_attachments WHERE lead_source = ? AND lead_id IN (?)`, [src, ids]).catch(() => {});
     // permanently removed (no hidden "deleted" copies are kept)
     const [res] = await getPool().query(`DELETE FROM \`${SOURCES[src].table}\` WHERE id IN (?)`, [ids]);
     deleted += (res as { affectedRows: number }).affectedRows;

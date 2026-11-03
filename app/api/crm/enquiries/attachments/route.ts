@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getPool } from "@/lib/db";
 import { getCurrentUser } from "@/lib/crm/auth";
-import { isEnquirySource } from "@/lib/crm/data";
+import { isEnquirySource, SOURCES, type EnquirySource } from "@/lib/crm/data";
 import fs from "node:fs/promises";
 import path from "node:path";
 
@@ -18,7 +18,33 @@ function getFileExt(fileName: string): string {
   return parts.length > 1 ? parts.pop()!.toLowerCase() : "";
 }
 
-/* GET → Download single file (?id=) or list files (?source=&id=) */
+export type StoredAttachment = {
+  id: string;
+  leadSource?: string;
+  leadId?: number;
+  fileName: string;
+  fileType: string;
+  fileSize: number;
+  filePath: string;
+  uploadedByName: string;
+  createdAt: string;
+};
+
+function parseAttachments(raw: unknown): StoredAttachment[] {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw;
+  if (typeof raw === "string") {
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
+
+/* GET → Download single file or list files stored directly on the lead */
 export async function GET(request: Request) {
   const user = await getCurrentUser();
   if (!user) {
@@ -26,70 +52,70 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url);
-  const fileId = searchParams.get("id");
+  const source = searchParams.get("source") as EnquirySource;
+  const leadId = Number(searchParams.get("leadId") || searchParams.get("id"));
+  const fileId = searchParams.get("fileId") || searchParams.get("attId");
   const download = searchParams.get("download") === "1";
+  const directFile = searchParams.get("file");
 
-  // Mode 1: Serve a specific attachment
-  if (fileId && !searchParams.has("source")) {
-    const id = Number(fileId);
-    if (!Number.isInteger(id) || id < 1) {
-      return new Response("Not found", { status: 404 });
+  // Mode 1: Serve/download a specific file
+  if (fileId || directFile) {
+    let targetFileName = directFile;
+    let mimeType = "application/octet-stream";
+    let displayName = directFile || "attachment";
+
+    if (fileId && isEnquirySource(source) && Number.isInteger(leadId) && leadId >= 1) {
+      const [rows] = await getPool().query(
+        `SELECT attachments FROM \`${SOURCES[source].table}\` WHERE id = ?`,
+        [leadId]
+      );
+      const row = (rows as Record<string, unknown>[])[0];
+      const list = parseAttachments(row?.attachments);
+      const found = list.find((a) => String(a.id) === String(fileId));
+      if (found) {
+        targetFileName = path.basename(found.filePath);
+        mimeType = found.fileType || mimeType;
+        displayName = found.fileName || displayName;
+      }
     }
 
-    const [rows] = await getPool().query(
-      "SELECT file_name, file_type, file_data FROM lead_attachments WHERE id = ?",
-      [id]
-    );
-    const r = (rows as Record<string, unknown>[])[0];
-    if (!r) return new Response("Not found", { status: 404 });
+    if (!targetFileName) return new Response("File not found", { status: 404 });
+    const cleanBasename = path.basename(targetFileName);
+    const diskPath = path.join(process.cwd(), "public", "uploads", "attachments", cleanBasename);
 
-    const data = r.file_data as Buffer;
-    const name = String(r.file_name);
-    const disposition = download ? "attachment" : "inline";
-
-    return new Response(new Uint8Array(data), {
-      headers: {
-        "Content-Type": String(r.file_type || "application/octet-stream"),
-        "Content-Length": String(data.length),
-        "Content-Disposition": `${disposition}; filename="${name.replace(/"/g, "")}"; filename*=UTF-8''${encodeURIComponent(name)}`,
-        "Cache-Control": "private, max-age=3600",
-        "X-Content-Type-Options": "nosniff",
-      },
-    });
+    try {
+      const fileBuffer = await fs.readFile(diskPath);
+      const disposition = download ? "attachment" : "inline";
+      return new Response(new Uint8Array(fileBuffer), {
+        headers: {
+          "Content-Type": mimeType,
+          "Content-Length": String(fileBuffer.length),
+          "Content-Disposition": `${disposition}; filename="${displayName.replace(/"/g, "")}"; filename*=UTF-8''${encodeURIComponent(displayName)}`,
+          "Cache-Control": "private, max-age=3600",
+          "X-Content-Type-Options": "nosniff",
+        },
+      });
+    } catch {
+      return new Response("File not found on server", { status: 404 });
+    }
   }
 
-  // Mode 2: List attachments for a lead
-  const source = searchParams.get("source");
-  const leadId = Number(searchParams.get("id"));
-
+  // Mode 2: List attachments for a lead (?source=&id=)
   if (!isEnquirySource(source) || !Number.isInteger(leadId) || leadId < 1) {
     return NextResponse.json({ ok: false, error: "Invalid lead parameters." }, { status: 400 });
   }
 
   const [rows] = await getPool().query(
-    `SELECT id, lead_source, lead_id, file_name, file_type, file_size, uploaded_by_name, created_at
-     FROM lead_attachments
-     WHERE lead_source = ? AND lead_id = ?
-     ORDER BY id DESC`,
-    [source, leadId]
+    `SELECT attachments FROM \`${SOURCES[source].table}\` WHERE id = ?`,
+    [leadId]
   );
+  const row = (rows as Record<string, unknown>[])[0];
+  const attachments = parseAttachments(row?.attachments);
 
-  return NextResponse.json({
-    ok: true,
-    attachments: (rows as any[]).map((r) => ({
-      id: r.id,
-      leadSource: r.lead_source,
-      leadId: r.lead_id,
-      fileName: r.file_name,
-      fileType: r.file_type,
-      fileSize: r.file_size,
-      uploadedByName: r.uploaded_by_name,
-      createdAt: r.created_at,
-    })),
-  });
+  return NextResponse.json({ ok: true, attachments });
 }
 
-/* POST → Upload files to a lead */
+/* POST → Upload files directly to a lead (stored in manual_leads or other lead table) */
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user) {
@@ -103,14 +129,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "Invalid multipart form data." }, { status: 400 });
   }
 
-  const source = String(form.get("leadSource") || form.get("source") || "").trim();
+  const source = String(form.get("leadSource") || form.get("source") || "").trim() as EnquirySource;
   const leadId = Number(form.get("leadId") || form.get("id"));
 
   if (!isEnquirySource(source) || !Number.isInteger(leadId) || leadId < 1) {
     return NextResponse.json({ ok: false, error: "Invalid lead details." }, { status: 400 });
   }
 
-  // Collect all files from formData
   const uploadedFiles: File[] = [];
   for (const entry of form.getAll("files")) {
     if (entry instanceof File && entry.size > 0) uploadedFiles.push(entry);
@@ -126,70 +151,69 @@ export async function POST(request: Request) {
   }
 
   const pool = getPool();
-  const savedAttachments: any[] = [];
+  const [rows] = await pool.query(
+    `SELECT attachments FROM \`${SOURCES[source].table}\` WHERE id = ?`,
+    [leadId]
+  );
+  const row = (rows as Record<string, unknown>[])[0];
+  if (!row) {
+    return NextResponse.json({ ok: false, error: "Lead not found." }, { status: 404 });
+  }
 
-  // Optional disk directory backup
+  const existing = parseAttachments(row.attachments);
   const uploadsDir = path.join(process.cwd(), "public", "uploads", "attachments");
   try {
     await fs.mkdir(uploadsDir, { recursive: true });
   } catch {}
 
+  const newlyAdded: StoredAttachment[] = [];
+
   for (const file of uploadedFiles) {
     if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json(
-        { ok: false, error: `File "${file.name}" exceeds the 15 MB size limit.` },
-        { status: 400 }
-      );
+      return NextResponse.json({ ok: false, error: `File "${file.name}" exceeds the 15 MB limit.` }, { status: 400 });
     }
-
     const ext = getFileExt(file.name);
     if (!ALLOWED_EXTS.has(ext)) {
-      return NextResponse.json(
-        { ok: false, error: `File type .${ext} is not supported.` },
-        { status: 400 }
-      );
+      return NextResponse.json({ ok: false, error: `File type .${ext} is not supported.` }, { status: 400 });
     }
 
+    const attId = `att_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const cleanName = file.name.replace(/[^\w.\- ()]+/g, "_").slice(0, 200) || `file_${Date.now()}.${ext}`;
+    const diskFilename = `${source}_${leadId}_${attId}_${cleanName}`;
+    const diskPath = path.join(uploadsDir, diskFilename);
+
     const buffer = Buffer.from(await file.arrayBuffer());
-    const cleanName = file.name.replace(/[^\w.\- ()]+/g, "_").slice(0, 200) || `attachment_${Date.now()}.${ext}`;
-    const mimeType = file.type || "application/octet-stream";
+    await fs.writeFile(diskPath, buffer);
 
-    // 1. Insert into MySQL lead_attachments
-    const [res] = await pool.query(
-      `INSERT INTO lead_attachments
-        (lead_source, lead_id, file_name, file_type, file_size, file_data, uploaded_by, uploaded_by_name)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [source, leadId, cleanName, mimeType, file.size, buffer, user.id, user.name]
-    );
-
-    const insertId = (res as { insertId: number }).insertId;
-
-    // 2. Write file to public/uploads/attachments/ as physical disk cache
-    try {
-      const diskFilename = `${insertId}_${cleanName}`;
-      await fs.writeFile(path.join(uploadsDir, diskFilename), buffer);
-    } catch {}
-
-    savedAttachments.push({
-      id: insertId,
+    const item: StoredAttachment = {
+      id: attId,
       leadSource: source,
       leadId,
       fileName: cleanName,
-      fileType: mimeType,
+      fileType: file.type || "application/octet-stream",
       fileSize: file.size,
-      uploadedByName: user.name,
+      filePath: `/uploads/attachments/${diskFilename}`,
+      uploadedByName: user.name || "User",
       createdAt: new Date().toISOString(),
-    });
+    };
+    existing.unshift(item);
+    newlyAdded.push(item);
   }
+
+  // Update attachments directly in this lead's own table
+  await pool.query(
+    `UPDATE \`${SOURCES[source].table}\` SET attachments = ? WHERE id = ?`,
+    [JSON.stringify(existing), leadId]
+  );
 
   return NextResponse.json({
     ok: true,
-    message: `${savedAttachments.length} file(s) uploaded successfully.`,
-    attachments: savedAttachments,
+    message: `${newlyAdded.length} file(s) attached to ${SOURCES[source].short} lead #${leadId}.`,
+    attachments: existing,
   });
 }
 
-/* DELETE → Delete an attachment (?id=) */
+/* DELETE → Delete an attachment from a lead (stored directly in the lead table) */
 export async function DELETE(request: Request) {
   const user = await getCurrentUser();
   if (!user) {
@@ -197,36 +221,54 @@ export async function DELETE(request: Request) {
   }
 
   const { searchParams } = new URL(request.url);
-  let id = Number(searchParams.get("id"));
+  const source = searchParams.get("source") as EnquirySource;
+  const leadId = Number(searchParams.get("leadId") || searchParams.get("id"));
+  const fileId = searchParams.get("fileId") || searchParams.get("attId");
 
-  if (!id) {
+  let bodyData: any = null;
+  if (!fileId || !source || !leadId) {
     try {
-      const body = await request.json();
-      id = Number(body?.id);
+      bodyData = await request.json();
     } catch {}
   }
 
-  if (!Number.isInteger(id) || id < 1) {
-    return NextResponse.json({ ok: false, error: "Invalid attachment ID." }, { status: 400 });
+  const finalSource = (source || bodyData?.source || bodyData?.leadSource) as EnquirySource;
+  const finalLeadId = leadId || Number(bodyData?.leadId || bodyData?.id);
+  const finalFileId = fileId || String(bodyData?.fileId || bodyData?.attId || bodyData?.id || "");
+
+  if (!isEnquirySource(finalSource) || !Number.isInteger(finalLeadId) || finalLeadId < 1 || !finalFileId) {
+    return NextResponse.json({ ok: false, error: "Invalid parameters." }, { status: 400 });
   }
 
   const pool = getPool();
-
-  // Find attachment file_name for optional disk cleanup
-  const [rows] = await pool.query("SELECT file_name FROM lead_attachments WHERE id = ?", [id]);
-  const row = (rows as any[])[0];
-
-  const [res] = await pool.query("DELETE FROM lead_attachments WHERE id = ?", [id]);
-  if (!(res as { affectedRows: number }).affectedRows) {
-    return NextResponse.json({ ok: false, error: "Attachment not found or already deleted." }, { status: 404 });
+  const [rows] = await pool.query(
+    `SELECT attachments FROM \`${SOURCES[finalSource].table}\` WHERE id = ?`,
+    [finalLeadId]
+  );
+  const row = (rows as Record<string, unknown>[])[0];
+  if (!row) {
+    return NextResponse.json({ ok: false, error: "Lead not found." }, { status: 404 });
   }
 
-  if (row?.file_name) {
+  const existing = parseAttachments(row.attachments);
+  const target = existing.find((a) => String(a.id) === String(finalFileId) || a.filePath.includes(finalFileId));
+  const remaining = existing.filter((a) => a !== target);
+
+  if (target?.filePath) {
     try {
-      const diskPath = path.join(process.cwd(), "public", "uploads", "attachments", `${id}_${row.file_name}`);
+      const diskPath = path.join(process.cwd(), "public", target.filePath.replace(/^\//, ""));
       await fs.unlink(diskPath);
     } catch {}
   }
 
-  return NextResponse.json({ ok: true, message: "Attachment deleted successfully." });
+  await pool.query(
+    `UPDATE \`${SOURCES[finalSource].table}\` SET attachments = ? WHERE id = ?`,
+    [remaining.length ? JSON.stringify(remaining) : null, finalLeadId]
+  );
+
+  return NextResponse.json({
+    ok: true,
+    message: "Attachment deleted successfully.",
+    attachments: remaining,
+  });
 }

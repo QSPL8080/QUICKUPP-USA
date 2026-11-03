@@ -7,6 +7,7 @@ import type { EnquiryRow, LeadRow } from "@/lib/crm/data";
 import {
   ENQUIRY_STATUSES,
   ENQUIRY_STATUS_LABEL,
+  PROJECT_STATUSES,
   LEAD_BUDGETS,
   LEAD_CHANNELS,
   LEAD_INDUSTRIES,
@@ -14,6 +15,7 @@ import {
   LEAD_TIMELINES,
   SOURCE_LABEL,
   type EnquiryStatus,
+  type ProjectStatus,
 } from "@/lib/crm/leadOptions";
 import { BulkBar, SelectBox, useSelection } from "@/components/crm/Selection";
 import { SERVICES_DATA } from "@/components/PayNowModal";
@@ -21,12 +23,13 @@ import { CRM_INDUSTRIES } from "@/components/crm/PaymentsView";
 import { formatFileSize, money } from "@/lib/crm/format";
 
 export type AttachmentItem = {
-  id: number;
-  leadSource: string;
-  leadId: number;
+  id: string | number;
+  leadSource?: string;
+  leadId?: number;
   fileName: string;
   fileType: string;
   fileSize: number;
+  filePath?: string;
   uploadedByName: string | null;
   createdAt: string;
 };
@@ -86,6 +89,7 @@ type LeadForm = {
   assignedTo: string;
   notes: string;
   status: EnquiryStatus;
+  projectStatus: string;
 };
 
 const blankForm = (): LeadForm => ({
@@ -104,6 +108,7 @@ const blankForm = (): LeadForm => ({
   assignedTo: "",
   notes: "",
   status: "new",
+  projectStatus: "Not Started",
 });
 
 const formFrom = (l: EnquiryRow): LeadForm => ({
@@ -122,6 +127,7 @@ const formFrom = (l: EnquiryRow): LeadForm => ({
   assignedTo: l.assignedTo || "",
   notes: l.message || "",
   status: l.status,
+  projectStatus: l.projectStatus || "Not Started",
 });
 
 function StatusSelect({ value, busy, label, onChange }: { value: EnquiryStatus; busy: boolean; label: string; onChange: (s: string) => void }) {
@@ -130,6 +136,19 @@ function StatusSelect({ value, busy, label, onChange }: { value: EnquiryStatus; 
       {ENQUIRY_STATUSES.map((s) => (
         <option key={s} value={s}>
           {ENQUIRY_STATUS_LABEL[s]}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+function ProjectStatusSelect({ value, busy, label, onChange }: { value: string; busy: boolean; label: string; onChange: (s: string) => void }) {
+  const slug = (value || "Not Started").toLowerCase().replace(/\s+/g, "-");
+  return (
+    <select className={`crm-status crm-project-status crm-project-status-${slug}`} value={value || "Not Started"} disabled={busy} onChange={(e) => onChange(e.target.value)} aria-label={label}>
+      {PROJECT_STATUSES.map((s) => (
+        <option key={s} value={s}>
+          {s}
         </option>
       ))}
     </select>
@@ -249,6 +268,21 @@ export default function LeadsView({
     if (!res?.ok) return setError("Couldn't update the status. Please try again.");
     toast("Status updated");
     if (open && open.source === source && open.id === id) setOpen({ ...open, status: status as EnquiryStatus });
+    router.refresh();
+  };
+
+  const setProjectStatus = async (source: string, id: number, projectStatus: string) => {
+    setBusy(true);
+    setError("");
+    const res = await fetch("/api/crm/enquiries", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ source, id, projectStatus }),
+    }).catch(() => null);
+    setBusy(false);
+    if (!res?.ok) return setError("Couldn't update project status. Please try again.");
+    toast(`Project status: ${projectStatus}`);
+    if (open && open.source === source && open.id === id) setOpen({ ...open, projectStatus });
     router.refresh();
   };
 
@@ -437,18 +471,18 @@ export default function LeadsView({
     }
   };
 
-  const handleRemoveAttachment = async (id: number, fileName: string) => {
+  const handleRemoveAttachment = async (id: number | string, fileName: string) => {
     if (!open) return;
     if (
       !(await confirm({
         title: "Delete attachment?",
-        message: `"${fileName}" will be permanently removed from this lead and the database.`,
+        message: `"${fileName}" will be permanently removed from this lead.`,
       }))
     )
       return;
 
     try {
-      const res = await fetch(`/api/crm/enquiries/attachments?id=${id}`, {
+      const res = await fetch(`/api/crm/enquiries/attachments?source=${open.source}&leadId=${open.id}&fileId=${id}`, {
         method: "DELETE",
       });
       const data = await res.json().catch(() => null);
@@ -456,7 +490,11 @@ export default function LeadsView({
         toast(data?.error || "Failed to delete file", "error");
       } else {
         toast("File removed");
-        setAttachments((prev) => prev.filter((a) => a.id !== id));
+        if (Array.isArray(data?.attachments)) {
+          setAttachments(data.attachments);
+        } else {
+          setAttachments((prev) => prev.filter((a) => String(a.id) !== String(id)));
+        }
       }
     } catch {
       toast("Error deleting file. Please try again.", "error");
@@ -670,7 +708,8 @@ export default function LeadsView({
                 <th>Source</th>
                 <th>Assigned To</th>
                 <th>Received</th>
-                <th>Status</th>
+                <th>Lead Status</th>
+                <th>Project Status</th>
                 <th style={{ width: "115px", textAlign: "center" }}>Actions</th>
               </tr>
             </thead>
@@ -739,8 +778,11 @@ export default function LeadsView({
                   <td data-label="Received" className="crm-nowrap">
                     {fmtDate(r.createdAt)}
                   </td>
-                  <td data-label="Status" onClick={(e) => e.stopPropagation()}>
-                    <StatusSelect value={r.status} busy={busy} label={`Status for ${r.name}`} onChange={(s) => setStatus(r.source, r.id, s)} />
+                  <td data-label="Lead Status" onClick={(e) => e.stopPropagation()}>
+                    <StatusSelect value={r.status} busy={busy} label={`Lead status for ${r.name}`} onChange={(s) => setStatus(r.source, r.id, s)} />
+                  </td>
+                  <td data-label="Project Status" onClick={(e) => e.stopPropagation()}>
+                    <ProjectStatusSelect value={r.projectStatus || "Not Started"} busy={busy} label={`Project status for ${r.name}`} onChange={(s) => setProjectStatus(r.source, r.id, s)} />
                   </td>
                   <td data-label="Actions" className="crm-nowrap" onClick={(e) => e.stopPropagation()} style={{ textAlign: "center" }}>
                     <div className="crm-tbl-actions">
@@ -915,15 +957,16 @@ export default function LeadsView({
                 <span className="crm-mgmt-label">Project Status</span>
                 <select
                   className="crm-mgmt-select crm-mgmt-project-select"
-                  defaultValue="Not Started"
+                  value={open.projectStatus || "Not Started"}
+                  disabled={busy}
+                  onChange={(e) => setProjectStatus(open.source, open.id, e.target.value)}
                   aria-label="Project status"
                 >
-                  <option value="Not Started">Not Started</option>
-                  <option value="Discovery">Discovery</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Review">Review</option>
-                  <option value="Completed">Completed</option>
-                  <option value="On Hold">On Hold</option>
+                  {PROJECT_STATUSES.map((ps) => (
+                    <option key={ps} value={ps}>
+                      {ps}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -1114,7 +1157,7 @@ export default function LeadsView({
                       </div>
                       <div className="crm-attachment-actions">
                         <a
-                          href={`/api/crm/enquiries/attachments?id=${att.id}`}
+                          href={`/api/crm/enquiries/attachments?source=${open.source}&leadId=${open.id}&fileId=${att.id}`}
                           target="_blank"
                           rel="noreferrer"
                           className="crm-att-btn"
@@ -1124,7 +1167,7 @@ export default function LeadsView({
                           View
                         </a>
                         <a
-                          href={`/api/crm/enquiries/attachments?id=${att.id}&download=1`}
+                          href={`/api/crm/enquiries/attachments?source=${open.source}&leadId=${open.id}&fileId=${att.id}&download=1`}
                           download={att.fileName}
                           className="crm-att-btn"
                           title="Download attachment"
@@ -1598,7 +1641,18 @@ export default function LeadsView({
                 </select>
                 {err("status")}
               </label>
-              <label className="crm-field crm-span-2">
+              <label className="crm-field">
+                <span className="crm-label">Project status</span>
+                <select className="crm-input crm-select" value={form.projectStatus} onChange={set("projectStatus")}>
+                  {PROJECT_STATUSES.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </select>
+                {err("projectStatus")}
+              </label>
+              <label className="crm-field">
                 <span className="crm-label">Assigned to</span>
                 <input className="crm-input" list="crm-team" value={form.assignedTo} onChange={set("assignedTo")} placeholder="Select a team member or type a name" />
                 <datalist id="crm-team">

@@ -1582,6 +1582,13 @@ a.crm-link-btn {
 .crm-root select.crm-lead-status-on_hold { background-color: #f8fafc; color: #475569; border-color: #e2e8f0; }
 .crm-root select.crm-lead-status-closed { background-color: #ecfdf5; color: #047857; border-color: #d1fae5; }
 
+.crm-root select.crm-project-status-not-started { background-color: #f1f5f9; color: #475569; border-color: #e2e8f0; }
+.crm-root select.crm-project-status-discovery { background-color: #f3e8ff; color: #7e22ce; border-color: #e9d5ff; }
+.crm-root select.crm-project-status-in-progress { background-color: #e0f2fe; color: #0284c7; border-color: #bae6fd; }
+.crm-root select.crm-project-status-review { background-color: #fff7ed; color: #ea580c; border-color: #ffedd5; }
+.crm-root select.crm-project-status-completed { background-color: #ecfdf5; color: #047857; border-color: #d1fae5; }
+.crm-root select.crm-project-status-on-hold { background-color: #fef2f2; color: #dc2626; border-color: #fee2e2; }
+
 .crm-filters-wrap .crm-search {
   flex-basis: 260px;
 }

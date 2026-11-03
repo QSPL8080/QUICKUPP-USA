@@ -14,6 +14,16 @@ export const ENQUIRY_STATUS_LABEL: Record<EnquiryStatus, string> = {
   closed: "Closed",
 };
 
+export const PROJECT_STATUSES = [
+  "Not Started",
+  "Discovery",
+  "In Progress",
+  "Review",
+  "Completed",
+  "On Hold",
+] as const;
+export type ProjectStatus = (typeof PROJECT_STATUSES)[number];
+
 export type EnquirySource = "contact" | ServiceFormKey | "manual";
 export const SOURCE_KEYS: EnquirySource[] = [
   "contact",
@@ -64,6 +74,7 @@ export type ManualLeadInput = {
   assignedTo: string | null;
   notes: string | null;
   status: EnquiryStatus;
+  projectStatus: string;
 };
 
 const text = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
@@ -86,6 +97,8 @@ export function validateManualLead(body: Record<string, unknown>): { ok: true; d
   const assignedTo = text(body.assignedTo, 120);
   const notes = text(body.notes, 5000);
   const status = text(body.status, 20) || "new";
+  const rawProjectStatus = text(body.projectStatus, 60) || "Not Started";
+  const projectStatus = (PROJECT_STATUSES as readonly string[]).includes(rawProjectStatus) ? rawProjectStatus : "Not Started";
 
   if (!fullName) errors.fullName = "Please enter the client's name.";
   if (!/^[0-9+()\-.\s]{5,40}$/.test(phone)) errors.phone = "Please enter a valid phone number.";
@@ -143,6 +156,7 @@ export function validateManualLead(body: Record<string, unknown>): { ok: true; d
       assignedTo: assignedTo || null,
       notes: notes || null,
       status: status as EnquiryStatus,
+      projectStatus,
     },
   };
 }
