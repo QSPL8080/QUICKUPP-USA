@@ -921,11 +921,15 @@
   margin-bottom: 4px !important;
 }
 
-.crm-root .crm-drawer-title {
+.crm-root .crm-drawer-title,
+.crm-drawer-title,
+div.crm-drawer-title,
+h2.crm-drawer-title {
   margin: 0 !important;
-  font-size: 22px !important;
+  font-size: 16px !important;
   line-height: 1.25 !important;
   font-weight: 700 !important;
+  color: var(--crm-ink) !important;
 }
 
 .crm-drawer-actions {
@@ -2467,14 +2471,19 @@ a.crm-link-btn {
   flex-shrink: 0;
 }
 
-.crm-view-modal-title {
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--crm-ink);
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.crm-view-modal-title,
+div.crm-view-modal-title,
+h2.crm-view-modal-title {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1.35 !important;
+  color: var(--crm-ink) !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+  letter-spacing: normal !important;
 }
 
 .crm-view-modal-sub {

@@ -82,6 +82,9 @@ export async function GET(req: Request) {
         currency: p.currency || "USD",
         notes: p.notes,
         source: p.source,
+        balanceDueDate: p.balance_due_date ? String(p.balance_due_date).slice(0, 10) : null,
+        billingStartDate: p.billing_start_date ? String(p.billing_start_date).slice(0, 10) : null,
+        billingEndDate: p.billing_end_date ? String(p.billing_end_date).slice(0, 10) : null,
       },
     });
   } catch (err: any) {

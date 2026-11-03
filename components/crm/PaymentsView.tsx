@@ -623,7 +623,7 @@ Quickupp Softech LLC`;
             <span style={{ fontSize: "22px" }}>🔗</span>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 800, color: "#0f172a" }}>Payment Links</h3>
+                <div style={{ margin: 0, fontSize: "16px", fontWeight: 800, color: "#0f172a" }}>Payment Links</div>
                 <span className="crm-tab-badge" style={{ background: "#f3e8ff", color: "#7c3aed", fontWeight: 700 }}>
                   {counts?.paymentLink ?? 0} links
                 </span>
@@ -804,8 +804,17 @@ Quickupp Softech LLC`;
 
                         {/* Payment */}
                         <td data-label="Payment">
-                          {p.amount === 0 ? (
+                          {Number(p.amount) === 0 ? (
                             <span style={{ color: "#64748b", fontWeight: 700, fontSize: "13px" }}>Not Paid</span>
+                          ) : p.status === "failed" ? (
+                            <div>
+                              <span className="crm-pill crm-pill-failed" style={{ marginBottom: "2px", display: "inline-block" }}>
+                                Payment Failed
+                              </span>
+                              <span style={{ display: "block", fontSize: "12px", color: "#dc2626", fontWeight: 700 }}>
+                                Failed
+                              </span>
+                            </div>
                           ) : p.status === "paid" ? (
                             <div>
                               <span className="crm-pill crm-pill-paid" style={{ marginBottom: "2px", display: "inline-block" }}>
@@ -815,13 +824,22 @@ Quickupp Softech LLC`;
                                 Paid ${p.amount.toFixed(2)}
                               </span>
                             </div>
-                          ) : isPartial ? (
+                          ) : p.status === "partially_paid" || (isPartial && Number(p.amount) > 0 && remAmt > 0) ? (
                             <div>
                               <span className="crm-pill crm-pill-partially_paid" style={{ marginBottom: "2px", display: "inline-block" }}>
                                 Partially Paid
                               </span>
                               <span style={{ display: "block", fontSize: "12px", color: "#2563eb", fontWeight: 700 }}>
                                 Paid ${p.amount.toFixed(2)} · Due ${remAmt.toFixed(2)}
+                              </span>
+                            </div>
+                          ) : p.status === "pending" && Number(p.amount) > 0 ? (
+                            <div>
+                              <span className="crm-pill crm-pill-pending" style={{ marginBottom: "2px", display: "inline-block" }}>
+                                Pending Clearing
+                              </span>
+                              <span style={{ display: "block", fontSize: "12px", color: "#d97706", fontWeight: 700 }}>
+                                ${p.amount.toFixed(2)} clearing
                               </span>
                             </div>
                           ) : (
@@ -1096,22 +1114,41 @@ Quickupp Softech LLC`;
                         {p.status === "failed" ? (
                           <>
                             <span className="crm-pill crm-pill-failed" style={{ marginBottom: "4px", display: "inline-block" }}>
-                              Failed
+                              Payment Failed
                             </span>
                             <span style={{ display: "block", fontSize: "12px", color: "#dc2626", fontWeight: 600 }}>
-                              {money(p.amount, p.currency)} attempted
+                              {money(p.amount || totAmt, p.currency)} attempted
                             </span>
                           </>
-                        ) : p.status === "pending" ? (
+                        ) : Number(p.amount) === 0 ? (
                           <>
-                            <span className="crm-pill crm-pill-pending" style={{ marginBottom: "4px", display: "inline-block" }}>
-                              Pending Clearing
+                            <span
+                              className="crm-pill"
+                              style={{
+                                marginBottom: "4px",
+                                display: "inline-block",
+                                background: "#f1f5f9",
+                                color: "#475569",
+                                border: "1px solid #cbd5e1",
+                                fontWeight: 700,
+                              }}
+                            >
+                              Not Paid
                             </span>
-                            <span style={{ display: "block", fontSize: "12px", color: "#d97706", fontWeight: 600 }}>
-                              {money(p.amount, p.currency)} processing
+                            <span style={{ display: "block", fontSize: "12px", color: "#64748b", fontWeight: 600 }}>
+                              $0.00 received · {money(totAmt, p.currency)} due
                             </span>
                           </>
-                        ) : isPartial ? (
+                        ) : p.status === "paid" ? (
+                          <>
+                            <span className="crm-pill crm-pill-paid" style={{ marginBottom: "4px", display: "inline-block" }}>
+                              Fully Paid
+                            </span>
+                            <span style={{ display: "block", fontSize: "12px", color: "#15803d", fontWeight: 600 }}>
+                              {money(p.amount, p.currency)} received
+                            </span>
+                          </>
+                        ) : p.status === "partially_paid" || (isPartial && Number(p.amount) > 0 && remAmt > 0) ? (
                           <>
                             <span className="crm-pill crm-pill-partially_paid" style={{ marginBottom: "4px", display: "inline-block" }}>
                               Partially Paid
@@ -1120,13 +1157,32 @@ Quickupp Softech LLC`;
                               {money(p.amount, p.currency)} received · {money(remAmt, p.currency)} due
                             </span>
                           </>
+                        ) : p.status === "pending" && Number(p.amount) > 0 ? (
+                          <>
+                            <span className="crm-pill crm-pill-pending" style={{ marginBottom: "4px", display: "inline-block" }}>
+                              Pending Clearing
+                            </span>
+                            <span style={{ display: "block", fontSize: "12px", color: "#d97706", fontWeight: 600 }}>
+                              {money(p.amount, p.currency)} in PayPal clearing
+                            </span>
+                          </>
                         ) : (
                           <>
-                            <span className="crm-pill crm-pill-paid" style={{ marginBottom: "4px", display: "inline-block" }}>
-                              Fully Paid
+                            <span
+                              className="crm-pill"
+                              style={{
+                                marginBottom: "4px",
+                                display: "inline-block",
+                                background: "#f1f5f9",
+                                color: "#475569",
+                                border: "1px solid #cbd5e1",
+                                fontWeight: 700,
+                              }}
+                            >
+                              Not Paid
                             </span>
-                            <span style={{ display: "block", fontSize: "12px", color: "#15803d", fontWeight: 600 }}>
-                              {money(p.amount, p.currency)} received
+                            <span style={{ display: "block", fontSize: "12px", color: "#64748b", fontWeight: 600 }}>
+                              $0.00 received · {money(totAmt, p.currency)} due
                             </span>
                           </>
                         )}
@@ -1243,17 +1299,52 @@ Quickupp Softech LLC`;
             {/* Header */}
             <div className="crm-view-modal-head">
               <div>
-                <h2 className="crm-view-modal-title" style={{ fontSize: "17px" }}>
-                  <span>{viewing.clientName}</span>
-                  <span style={{ color: "#64748b" }}>•</span>
-                  <span>{viewing.service}</span>
-                  {viewing.quantity && <span>– {viewing.quantity}</span>}
-                  <span style={{ color: "#64748b" }}>•</span>
-                  <span style={{ color: "#7c3aed" }}>
-                    ${(viewing.totalAmount != null ? viewing.totalAmount : viewing.amount).toFixed(2)}
+                <div
+                  className="crm-view-modal-title"
+                  style={{
+                    fontSize: "15px",
+                    fontWeight: 700,
+                    color: "#0f172a",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    flexWrap: "wrap",
+                    lineHeight: "1.4",
+                  }}
+                >
+                  <span style={{ color: "#0f172a", fontWeight: 800 }}>{viewing.clientName}</span>
+                  <span style={{ color: "#94a3b8" }}>•</span>
+                  <span style={{ color: "#334155", fontWeight: 600 }}>{viewing.service}</span>
+                  {viewing.quantity && (
+                    <span
+                      style={{
+                        background: "#faf5ff",
+                        color: "#7c3aed",
+                        border: "1px solid #f3e8ff",
+                        padding: "1px 7px",
+                        borderRadius: "4px",
+                        fontSize: "12px",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {viewing.quantity}
+                    </span>
+                  )}
+                  <span style={{ color: "#94a3b8" }}>•</span>
+                  <span
+                    style={{
+                      background: "#f5f3ff",
+                      color: "#6d28d9",
+                      fontWeight: 800,
+                      padding: "2px 8px",
+                      borderRadius: "6px",
+                      fontSize: "13px",
+                    }}
+                  >
+                    ${(viewing.totalAmount != null ? viewing.totalAmount : viewing.amount).toFixed(2)} USD
                   </span>
-                </h2>
-                <p className="crm-view-modal-sub" style={{ fontSize: "12px" }}>
+                </div>
+                <p className="crm-view-modal-sub" style={{ fontSize: "12px", marginTop: "4px" }}>
                   Generated by {viewing.createdBy || "Admin"} on {fmtDate(viewing.createdAt, true)}
                   {viewing.expiresAt && ` · expires ${fmtDate(viewing.expiresAt, true)}`}
                 </p>
@@ -1360,10 +1451,14 @@ Quickupp Softech LLC`;
                           </span>
                         </td>
                         <td>
-                          {viewing.amount === 0 ? (
+                          {Number(viewing.amount) === 0 ? (
                             <span style={{ color: "#64748b", fontWeight: 700 }}>Not Paid</span>
+                          ) : viewing.status === "failed" ? (
+                            <span className="crm-pill crm-pill-failed">Payment Failed</span>
                           ) : viewing.status === "paid" ? (
                             <span className="crm-pill crm-pill-paid">Fully Paid</span>
+                          ) : viewing.status === "pending" && Number(viewing.amount) > 0 ? (
+                            <span className="crm-pill crm-pill-pending">Pending Clearing</span>
                           ) : (
                             <span className="crm-pill crm-pill-partially_paid">Partially Paid</span>
                           )}
@@ -1539,7 +1634,7 @@ Quickupp Softech LLC`;
               <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                 <span style={{ fontSize: "24px" }}>🔗</span>
                 <div>
-                  <h2 className="crm-drawer-title" style={{ fontSize: "17px" }}>Generate Payment Link</h2>
+                  <div className="crm-drawer-title" style={{ fontSize: "16px", fontWeight: 800 }}>Generate Payment Link</div>
                   <p style={{ margin: "2px 0 0", fontSize: "12px", color: "#64748b" }}>
                     The customer pays this custom total through PayPal / Card. Valid for 24 hours, single use, no coupons.
                   </p>
@@ -1806,9 +1901,9 @@ Quickupp Softech LLC`;
           <div className="crm-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "560px", padding: "28px" }}>
             <div style={{ textAlign: "center", marginBottom: "16px" }}>
               <div style={{ fontSize: "40px", marginBottom: "10px" }}>🎉</div>
-              <h2 style={{ fontSize: "19px", fontWeight: 800, color: "#0f172a", margin: "0 0 6px" }}>
+              <div style={{ fontSize: "18px", fontWeight: 800, color: "#0f172a", margin: "0 0 6px" }}>
                 Payment Link Generated!
-              </h2>
+              </div>
               <p style={{ margin: 0, fontSize: "13px", color: "#64748b" }}>
                 Order <strong style={{ color: "#7c3aed" }}>#{createdLink.orderNumber}</strong> is ready. Share this link with the client:
               </p>
@@ -1873,7 +1968,7 @@ Quickupp Softech LLC`;
               <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                 <span style={{ fontSize: "24px" }}>✏️</span>
                 <div>
-                  <h2 className="crm-drawer-title" style={{ fontSize: "17px" }}>Edit Payment Link</h2>
+                  <div className="crm-drawer-title" style={{ fontSize: "16px", fontWeight: 800 }}>Edit Payment Link</div>
                   <p style={{ margin: "2px 0 0", fontSize: "12px", color: "#64748b" }}>
                     Order #{editingLink.invoiceNumber || `QS-${editingLink.id}`}
                   </p>
@@ -2090,7 +2185,7 @@ Quickupp Softech LLC`;
             <div className="crm-drawer-head">
               <div>
                 <p className="crm-drawer-kicker">{editing === "new" ? "Manual entry" : `Payment #${editing.id}`}</p>
-                <h2 className="crm-drawer-title">{editing === "new" ? "Add payment" : "Edit payment"}</h2>
+                <div className="crm-drawer-title" style={{ fontSize: "16px", fontWeight: 800 }}>{editing === "new" ? "Add payment" : "Edit payment"}</div>
               </div>
               <button type="button" className="crm-icon-act" onClick={close} aria-label="Close">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
