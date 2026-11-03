@@ -77,6 +77,7 @@ ${escapeHtml(d.message || "—").replace(/\n/g, "<br>")}
       const text = `New Contact Lead Received\n\n${rows.map(([k, v]) => `${k}: ${v}`).join("\n")}\n\nProject Requirements / Message:\n${d.message || "—"}\n\nSaved in CRM (#${insertId}). Reply to this email to contact the lead.`;
 
       await sendMail({
+        channel: "info",
         to: LEADS_NOTIFICATION_EMAIL,
         fromName: "Quickupp Softech Website",
         replyTo: `${d.fullName} <${d.email}>`,

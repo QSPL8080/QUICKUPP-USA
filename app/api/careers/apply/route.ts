@@ -102,6 +102,7 @@ export async function POST(request: Request) {
     // sent after the reply so the candidate never waits on the mail server
     after(async () => {
       await sendMail({
+        channel: "hr",
         to: HR_EMAIL,
         fromName: "Quickupp Softech Careers",
         replyTo: `${d.fullName} <${d.email}>`,

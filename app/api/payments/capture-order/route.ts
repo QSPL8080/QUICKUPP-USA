@@ -247,6 +247,7 @@ export async function POST(req: Request) {
         `;
 
         await sendMail({
+          channel: "info",
           to: LEADS_NOTIFICATION_EMAIL,
           subject: adminSubject,
           html: adminHtml,
@@ -456,7 +457,9 @@ export async function POST(req: Request) {
           `;
 
           await sendMail({
+            channel: "info",
             to: clientEmail,
+            fromName: "Quickupp Softech LLC",
             subject: clientSubject,
             html: clientHtml,
             text: `${clientSubject}\n\nHi ${firstName},\n\nThank you for choosing Quickupp Softech LLC. Order Number: ${orderNumber}. Amount: $${capturedAmount.toFixed(2)} ${currency}. Status: ${statusBannerValue}. Download receipt: ${receiptDownloadUrl}\n\nQuickupp Softech LLC`,
