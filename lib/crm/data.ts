@@ -229,7 +229,7 @@ export type PaymentRow = {
   remainingAmount?: number | null;
   currency: string;
   method: string;
-  status: (typeof PAYMENT_STATUSES)[number];
+  status: string;
   source: "website" | "payment_link" | "manual" | "online";
   reference: string | null;
   paypalOrderId?: string | null;
@@ -240,6 +240,11 @@ export type PaymentRow = {
   notes: string | null;
   createdBy: string | null;
   createdAt: string;
+  token?: string | null;
+  expiresAt?: string | null;
+  linkStatus?: string | null;
+  leadSource?: string | null;
+  quantity?: string | null;
 };
 
 export async function listPayments(opts: {
@@ -249,7 +254,7 @@ export async function listPayments(opts: {
   page?: number;
 }) {
   const pool = getPool();
-  const currentTab = opts.tab || "website";
+  const currentTab = opts.tab || "all";
 
   // Tab counts
   const [tabCounts] = await pool.query(`
@@ -273,17 +278,17 @@ export async function listPayments(opts: {
     where.push("p.source IN ('payment_link', 'manual')");
   }
 
-  if (opts.status && (PAYMENT_STATUSES as readonly string[]).includes(opts.status)) {
+  if (opts.status && (PAYMENT_STATUSES as readonly string[]).includes(opts.status as any)) {
     where.push("p.status = ?");
     args.push(opts.status);
   }
   const q = (opts.q || "").trim().slice(0, 100);
   if (q) {
     where.push(
-      "(p.client_name LIKE ? OR p.client_email LIKE ? OR p.client_phone LIKE ? OR p.company_name LIKE ? OR p.invoice_number LIKE ? OR p.reference LIKE ? OR p.paypal_order_id LIKE ? OR p.service LIKE ? OR p.category LIKE ?)"
+      "(p.client_name LIKE ? OR p.client_email LIKE ? OR p.client_phone LIKE ? OR p.company_name LIKE ? OR p.invoice_number LIKE ? OR p.reference LIKE ? OR p.paypal_order_id LIKE ? OR p.service LIKE ? OR p.category LIKE ? OR p.token LIKE ?)"
     );
     const like = `%${q}%`;
-    args.push(like, like, like, like, like, like, like, like, like);
+    args.push(like, like, like, like, like, like, like, like, like, like);
   }
   const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : "";
   const page = Math.max(1, Math.floor(opts.page || 1));
@@ -309,7 +314,7 @@ export async function listPayments(opts: {
     remainingAmount: r.remaining_amount != null ? Number(r.remaining_amount) : null,
     currency: String(r.currency ?? "USD"),
     method: String(r.method ?? ""),
-    status: r.status as PaymentRow["status"],
+    status: (r.status as string) || "paid",
     source: (r.source as PaymentRow["source"]) || "website",
     reference: (r.reference as string) || null,
     paypalOrderId: (r.paypal_order_id as string) || null,
@@ -320,6 +325,11 @@ export async function listPayments(opts: {
     notes: (r.notes as string) || null,
     createdBy: (r.created_by_name as string) || null,
     createdAt: new Date(r.created_at as string).toISOString(),
+    token: (r.token as string) || null,
+    expiresAt: r.expires_at ? new Date(r.expires_at as string).toISOString() : null,
+    linkStatus: (r.link_status as string) || null,
+    leadSource: (r.lead_source as string) || null,
+    quantity: (r.quantity as string) || null,
   }));
   return {
     items,

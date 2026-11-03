@@ -10,21 +10,41 @@ function CheckoutContent() {
   const router = useRouter();
   const sp = useSearchParams();
 
-  const clientName = sp.get("name") || "Valued Client";
-  const clientEmail = sp.get("email") || "";
-  const clientPhone = sp.get("phone") || "";
-  const companyName = sp.get("company") || "";
-  const service = sp.get("service") || "AI-Powered Digital Marketing Services";
-  const category = sp.get("category") || "Social Media Marketing";
+  const [existingOrder, setExistingOrder] = useState<any>(null);
+  const orderParam = sp.get("order") || sp.get("invoice") || "";
+
+  useEffect(() => {
+    if (!orderParam) return;
+    fetch(`/api/payments/lookup?order=${encodeURIComponent(orderParam)}`)
+      .then(async (res) => {
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.ok && data.order) setExistingOrder(data.order);
+      })
+      .catch(() => {});
+  }, [orderParam]);
+
+  const clientName = existingOrder?.clientName || sp.get("name") || "Valued Client";
+  const clientEmail = existingOrder?.clientEmail || sp.get("email") || "";
+  const clientPhone = existingOrder?.clientPhone || sp.get("phone") || "";
+  const companyName = existingOrder?.companyName || sp.get("company") || "";
+  const service = existingOrder?.service || sp.get("service") || "AI-Powered Digital Marketing Services";
+  const category = existingOrder?.category || sp.get("category") || "Social Media Marketing";
   const billingStartDate = sp.get("from") || "";
   const billingEndDate = sp.get("to") || "";
-  const notes = sp.get("notes") || "";
-  const paymentType = (sp.get("type") as "full" | "partial") || "full";
+  const notes = existingOrder?.notes || sp.get("notes") || "";
 
-  const numTotal = Math.max(1, Number(sp.get("amount") || 79));
+  const isBalancePayment = existingOrder && Number(existingOrder.amountPaid) > 0 && Number(existingOrder.remainingAmount) > 0;
+  const paymentType = isBalancePayment ? "full" : (existingOrder?.paymentType || (sp.get("type") as "full" | "partial") || "full");
+
+  const numTotal = existingOrder ? Number(existingOrder.totalAmount) : Math.max(1, Number(sp.get("amount") || 79));
   const isPartial = paymentType === "partial";
-  const payAmount = isPartial ? Math.round(numTotal * 0.5 * 100) / 100 : numTotal;
-  const remainingAmount = isPartial ? Math.max(0, Math.round((numTotal - payAmount) * 100) / 100) : 0;
+  const payAmount = isBalancePayment
+    ? Number(existingOrder.remainingAmount)
+    : isPartial
+    ? Math.round(numTotal * 0.5 * 100) / 100
+    : numTotal;
+  const remainingAmount = isBalancePayment ? 0 : isPartial ? Math.max(0, Math.round((numTotal - payAmount) * 100) / 100) : 0;
 
   const [error, setError] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
@@ -58,6 +78,7 @@ function CheckoutContent() {
           paymentType,
           remainingAmount,
           notes,
+          invoiceNumber: orderParam || undefined,
         }),
       });
 
@@ -90,6 +111,7 @@ function CheckoutContent() {
             paymentType,
             remainingAmount,
             notes,
+            invoiceNumber: orderParam || undefined,
           }),
         });
 
@@ -232,7 +254,7 @@ function CheckoutContent() {
     router,
   ]);
 
-  const categories = category ? category.split(",").map((c) => c.trim()).filter(Boolean) : [];
+  const categories: string[] = typeof category === "string" ? category.split(",").map((c: string) => c.trim()).filter(Boolean) : [];
 
   return (
     <div className="ck-page">
@@ -309,7 +331,7 @@ function CheckoutContent() {
                 <div className="ck-detail-row">
                   <span className="ck-detail-label">Scope</span>
                   <div className="ck-cat-tags">
-                    {categories.map((cat, i) => (
+                    {categories.map((cat: string, i: number) => (
                       <span key={i} className="ck-cat-tag">
                         {cat}
                       </span>

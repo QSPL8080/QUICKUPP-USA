@@ -22,6 +22,8 @@ export async function POST(req: Request) {
       paymentType,
       remainingAmount,
       notes,
+      token,
+      invoiceNumber,
     } = body;
 
     if (!clientName || !clientEmail || !clientPhone) {
@@ -41,7 +43,9 @@ export async function POST(req: Request) {
 
     const isPartial = paymentType === "partial";
     const parsedTotal = Number(totalAmount) || parsedAmount;
-    const prefix = isPartial
+    const prefix = invoiceNumber
+      ? `Order #${invoiceNumber} ${isPartial ? "Deposit" : "Balance/Full"}`
+      : isPartial
       ? `Partial Payment ($${parsedAmount.toFixed(2)} of $${parsedTotal.toFixed(2)} USD)`
       : `Full Payment ($${parsedAmount.toFixed(2)} USD)`;
 
@@ -56,10 +60,12 @@ export async function POST(req: Request) {
       currency: "USD",
       description: desc.slice(0, 127) || "Quickupp Softech Service Payment",
       customId: JSON.stringify({
-        n: clientName.slice(0, 30),
-        e: clientEmail.slice(0, 40),
-        p: clientPhone.slice(0, 20),
+        n: clientName.slice(0, 25),
+        e: clientEmail.slice(0, 35),
+        p: clientPhone.slice(0, 18),
         t: isPartial ? "partial" : "full",
+        inv: invoiceNumber || undefined,
+        tok: token || undefined,
       }),
     });
 

@@ -11,6 +11,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing orderID in request" }, { status: 400 });
     }
 
+    const currentYear = new Date().getFullYear();
+
     const {
       orderID,
       clientName,
@@ -26,12 +28,16 @@ export async function POST(req: Request) {
       paymentType,
       remainingAmount,
       notes,
+      token,
+      invoiceNumber,
+      existingPaymentId,
     } = body;
 
-    const isPartial = paymentType === "partial";
+    const isPartialParam = paymentType === "partial";
     const parsedAmount = Number(amount) || 0;
-    const finalTotal = Number(totalAmount) || parsedAmount;
-    const finalRemaining = isPartial
+    let finalTotal = Number(totalAmount) || parsedAmount;
+    let isPartial = isPartialParam;
+    let finalRemaining = isPartial
       ? Math.max(0, Number(remainingAmount ?? (finalTotal - parsedAmount)))
       : 0;
 
@@ -74,91 +80,204 @@ export async function POST(req: Request) {
         `PayPal returned status: ${captureData?.status || "DECLINED"}`;
     }
 
-    // 2. Save payment record in MySQL database (real payment attempt)
+    // 2. Database Handling: In-place row update vs new insertion
     let insertedId = 0;
+    let orderNumber = "";
+    let isPaymentLink = false;
+    let isBalancePayment = false;
+    let effectiveClientName = clientName || "Valued Client";
+    let effectiveClientEmail = clientEmail || "";
+    let effectiveClientPhone = clientPhone || "";
+    let effectiveCompany = companyName || "";
+    let effectiveService = service || "Quickupp Softech Service";
+    let effectiveCategory = categoryStr || "";
+
     try {
       const pool = getPool();
-      let paymentDesc = "";
-      if (paymentStatus === "failed") {
-        paymentDesc = `Payment Failed (${isPartial ? "Partial Deposit" : "Full Payment"}) - ${service || ""} (${categoryStr || ""})`.trim();
-      } else if (paymentStatus === "pending") {
-        paymentDesc = `Website Payment Pending (${isPartial ? "Partial Deposit" : "Full Payment"}) - ${service || ""} (${categoryStr || ""})`.trim();
-      } else {
-        paymentDesc = `Website PayPal Payment (${isPartial ? "Partial Deposit" : "Full Payment"}) - ${service || ""} (${categoryStr || ""})`.trim();
+      let existingRecord: any = null;
+
+      // Check for existing record by token, invoiceNumber, or ID
+      if (token) {
+        const [rows] = await pool.query("SELECT * FROM payments WHERE token = ? LIMIT 1", [token]);
+        if (Array.isArray(rows) && rows.length > 0) existingRecord = rows[0];
+      }
+      if (!existingRecord && (invoiceNumber || existingPaymentId)) {
+        const [rows] = await pool.query("SELECT * FROM payments WHERE invoice_number = ? OR id = ? LIMIT 1", [
+          invoiceNumber || null,
+          Number(existingPaymentId) || 0,
+        ]);
+        if (Array.isArray(rows) && rows.length > 0) existingRecord = rows[0];
       }
 
-      const paymentNotes =
-        paymentStatus === "failed"
-          ? `[PAYMENT FAILED / DECLINED]: ${failureReason}${notes ? ` | Client Note: ${notes}` : ""}`
-          : paymentStatus === "pending"
-          ? `[PAYMENT PENDING CLEARING]: ${pendingReason}${notes ? ` | Client Note: ${notes}` : ""}`
-          : notes || null;
+      if (existingRecord) {
+        // MATCH FOUND: UPDATE THE EXACT SAME ROW IN-PLACE!
+        insertedId = Number(existingRecord.id);
+        orderNumber = existingRecord.invoice_number || `QAS-${new Date().getFullYear()}-${String(insertedId).padStart(6, "0")}`;
+        isPaymentLink = existingRecord.source === "payment_link";
+        effectiveClientName = existingRecord.client_name || clientName || "Valued Client";
+        effectiveClientEmail = existingRecord.client_email || clientEmail || "";
+        effectiveClientPhone = existingRecord.client_phone || clientPhone || "";
+        effectiveCompany = existingRecord.company_name || companyName || "";
+        effectiveService = existingRecord.service || service || "Quickupp Softech Service";
+        effectiveCategory = existingRecord.category || categoryStr || "";
+        finalTotal = Number(existingRecord.total_amount || totalAmount || capturedAmount);
 
-      const [insertRes] = await pool.query(
-        `INSERT INTO payments (
-          client_name,
-          client_email,
-          client_phone,
-          company_name,
-          category,
-          service,
-          description,
-          amount,
-          total_amount,
-          payment_type,
-          remaining_amount,
-          currency,
-          method,
-          status,
-          source,
-          reference,
-          paypal_order_id,
-          billing_start_date,
-          billing_end_date,
-          paid_at,
-          notes
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PayPal', ?, 'website', ?, ?, ?, ?, CURDATE(), ?)`,
-        [
-          clientName || "Valued Client",
-          clientEmail || null,
-          clientPhone || null,
-          companyName || null,
-          categoryStr || null,
-          service || "General Consultation",
-          paymentDesc,
-          capturedAmount,
-          finalTotal,
-          isPartial ? "partial" : "full",
-          finalRemaining,
-          currency,
-          paymentStatus,
-          captureID,
-          orderID,
-          billingStartDate || null,
-          billingEndDate || null,
-          paymentNotes,
-        ]
-      );
-      insertedId = (insertRes as any).insertId || 0;
-    } catch (dbErr) {
-      console.error("[Database Save Payment Error]", dbErr);
-    }
+        const previouslyPaid = Number(existingRecord.amount || 0);
 
-    const currentYear = new Date().getFullYear();
-    const orderNumber = insertedId
-      ? `QS-${currentYear}-${String(insertedId).padStart(6, "0")}`
-      : `QS-${currentYear}-${String(Math.floor(100000 + Math.random() * 900000))}`;
+        if (previouslyPaid > 0 && paymentStatus !== "failed") {
+          // Paying remaining balance!
+          isBalancePayment = true;
+          isPartial = false;
+          finalRemaining = 0;
+          paymentStatus = "paid";
+          const newTotalPaid = finalTotal;
+          const updatedRef = existingRecord.reference
+            ? `${existingRecord.reference} | Balance: ${captureID}`
+            : `Initial: ${previouslyPaid} | Balance: ${captureID}`;
 
-    if (insertedId) {
-      try {
-        const pool = getPool();
+          await pool.query(
+            `UPDATE payments SET
+              amount = ?,
+              total_amount = ?,
+              remaining_amount = 0,
+              payment_type = 'full',
+              status = 'paid',
+              link_status = 'used',
+              reference = ?,
+              paypal_order_id = ?,
+              paid_at = CURDATE()
+            WHERE id = ?`,
+            [newTotalPaid, finalTotal, updatedRef, orderID, insertedId]
+          );
+
+          // If from website, update existing lead without creating duplicate row
+          if (!isPaymentLink && effectiveClientEmail) {
+            await pool.query(
+              `UPDATE contact_enquiries 
+               SET status = 'closed',
+                   message = CONCAT(COALESCE(message, ''), ' | Balance of $', ?, ' USD fully paid via PayPal (Ref: ', ?, ')')
+               WHERE email = ? ORDER BY id DESC LIMIT 1`,
+              [capturedAmount.toFixed(2), captureID, effectiveClientEmail]
+            ).catch(() => {});
+          }
+        } else {
+          // First payment on this record (e.g. initial payment via Payment Link)
+          if (paymentStatus === "failed") {
+            const failNote = `[PAYMENT FAILED / DECLINED]: ${failureReason}${notes ? ` | Note: ${notes}` : ""}`;
+            await pool.query(
+              `UPDATE payments SET
+                status = 'failed',
+                notes = CONCAT(COALESCE(notes, ''), ' | ', ?)
+              WHERE id = ?`,
+              [failNote, insertedId]
+            );
+          } else {
+            isPartial = isPartialParam;
+            finalRemaining = isPartial ? Math.max(0, finalTotal - capturedAmount) : 0;
+            const linkStatus = isPartial ? "active" : "used";
+            const currentStatus = isPartial ? "partially_paid" : paymentStatus;
+
+            await pool.query(
+              `UPDATE payments SET
+                amount = ?,
+                total_amount = ?,
+                remaining_amount = ?,
+                payment_type = ?,
+                status = ?,
+                link_status = ?,
+                reference = ?,
+                paypal_order_id = ?,
+                method = 'PayPal',
+                paid_at = CURDATE()
+              WHERE id = ?`,
+              [
+                capturedAmount,
+                finalTotal,
+                finalRemaining,
+                isPartial ? "partial" : "full",
+                currentStatus,
+                linkStatus,
+                captureID,
+                orderID,
+                insertedId,
+              ]
+            );
+          }
+        }
+      } else {
+        // NO EXISTING RECORD: Create new website checkout payment record
+        let paymentDesc = "";
+        if (paymentStatus === "failed") {
+          paymentDesc = `Payment Failed (${isPartial ? "Partial Deposit" : "Full Payment"}) - ${service || ""} (${categoryStr || ""})`.trim();
+        } else if (paymentStatus === "pending") {
+          paymentDesc = `Website Payment Pending (${isPartial ? "Partial Deposit" : "Full Payment"}) - ${service || ""} (${categoryStr || ""})`.trim();
+        } else {
+          paymentDesc = `Website PayPal Payment (${isPartial ? "Partial Deposit" : "Full Payment"}) - ${service || ""} (${categoryStr || ""})`.trim();
+        }
+
+        const paymentNotes =
+          paymentStatus === "failed"
+            ? `[PAYMENT FAILED / DECLINED]: ${failureReason}${notes ? ` | Client Note: ${notes}` : ""}`
+            : paymentStatus === "pending"
+            ? `[PAYMENT PENDING CLEARING]: ${pendingReason}${notes ? ` | Client Note: ${notes}` : ""}`
+            : notes || null;
+
+        const [insertRes] = await pool.query(
+          `INSERT INTO payments (
+            client_name,
+            client_email,
+            client_phone,
+            company_name,
+            category,
+            service,
+            description,
+            amount,
+            total_amount,
+            payment_type,
+            remaining_amount,
+            currency,
+            method,
+            status,
+            source,
+            reference,
+            paypal_order_id,
+            billing_start_date,
+            billing_end_date,
+            paid_at,
+            notes
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PayPal', ?, 'website', ?, ?, ?, ?, CURDATE(), ?)`,
+          [
+            effectiveClientName,
+            effectiveClientEmail || null,
+            effectiveClientPhone || null,
+            effectiveCompany || null,
+            effectiveCategory || null,
+            effectiveService,
+            paymentDesc,
+            capturedAmount,
+            finalTotal,
+            isPartial ? "partial" : "full",
+            finalRemaining,
+            currency,
+            paymentStatus,
+            captureID,
+            orderID,
+            billingStartDate || null,
+            billingEndDate || null,
+            paymentNotes,
+          ]
+        );
+        insertedId = (insertRes as any).insertId || 0;
+
+        const currentYear = new Date().getFullYear();
+        orderNumber = `QS-${currentYear}-${String(insertedId).padStart(6, "0")}`;
         await pool.query(`UPDATE payments SET invoice_number = ? WHERE id = ?`, [orderNumber, insertedId]);
 
-        // Also save customer into CRM enquiries so they appear in Leads
+        // Save customer into CRM enquiries so they appear in Leads (Website payments only)
         const leadStatus = paymentStatus === "failed" ? "contacted" : paymentStatus === "pending" ? "new" : "closed";
         const leadMsg =
           paymentStatus === "failed"
-            ? `[PAYMENT FAILED]: Order #${orderNumber}. Attempted: $${capturedAmount.toFixed(2)} USD. Failure reason: ${failureReason}. Client phone: ${clientPhone || "None"}.`
+            ? `[PAYMENT FAILED]: Order #${orderNumber}. Attempted: $${capturedAmount.toFixed(2)} USD. Failure reason: ${failureReason}. Client phone: ${effectiveClientPhone || "None"}.`
             : paymentStatus === "pending"
             ? `[PAYMENT PENDING]: Order #${orderNumber}. Amount: $${capturedAmount.toFixed(2)} USD (Pending clearing in PayPal). Reason: ${pendingReason}.`
             : `Website Pay Now Payment. Order #${orderNumber}. PayPal Capture ID: ${captureID}. Total Amount: $${finalTotal.toFixed(2)}, Paid: $${capturedAmount.toFixed(2)}${isPartial ? `, Due: $${finalRemaining.toFixed(2)}` : ""}. Notes: ${notes || "None"}`;
@@ -176,20 +295,20 @@ export async function POST(req: Request) {
             status
           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
-            clientName,
-            clientEmail || "customer@payment.quickupp.com",
-            clientPhone || null,
-            companyName || null,
+            effectiveClientName,
+            effectiveClientEmail || "customer@payment.quickupp.com",
+            effectiveClientPhone || null,
+            effectiveCompany || null,
             "Other",
-            `${service}${categoryStr ? ` – ${categoryStr}` : ""}`,
+            `${effectiveService}${effectiveCategory ? ` – ${effectiveCategory}` : ""}`,
             `$${capturedAmount.toFixed(2)} USD (${isPartial ? "Partial Deposit" : "Full Payment"})`,
             leadMsg,
             leadStatus,
           ]
         );
-      } catch (updErr) {
-        console.error("[Database Update Invoice / Lead Sync Error]", updErr);
       }
+    } catch (dbErr) {
+      console.error("[Database Save / Update Payment Error]", dbErr);
     }
 
     // 3. Dispatch emails asynchronously via after()
@@ -201,16 +320,16 @@ export async function POST(req: Request) {
         let statusTag = "PAYMENT RECEIVED";
 
         if (paymentStatus === "failed") {
-          adminSubject = `⚠️ Failed Payment Attempt: $${capturedAmount.toFixed(2)} USD from ${clientName} (#${orderNumber})`;
+          adminSubject = `⚠️ Failed Payment Attempt: $${capturedAmount.toFixed(2)} USD from ${effectiveClientName} (#${orderNumber})`;
           headerColor = "#991b1b";
           statusTag = "PAYMENT FAILED / DECLINED";
         } else if (paymentStatus === "pending") {
-          adminSubject = `⏳ Payment Pending Clearing: $${capturedAmount.toFixed(2)} USD from ${clientName} (#${orderNumber})`;
+          adminSubject = `⏳ Payment Pending Clearing: $${capturedAmount.toFixed(2)} USD from ${effectiveClientName} (#${orderNumber})`;
           headerColor = "#d97706";
           statusTag = "PAYMENT PENDING CLEARING";
         } else {
-          const typeLabel = isPartial ? "Partial Payment (50% Deposit)" : "Full Payment";
-          adminSubject = `${typeLabel} Received: $${capturedAmount.toFixed(2)} USD from ${clientName} (#${orderNumber})`;
+          const typeLabel = isBalancePayment ? "Balance Payment" : isPartial ? "Partial Payment (Deposit)" : "Full Payment";
+          adminSubject = `${typeLabel} Received: $${capturedAmount.toFixed(2)} USD from ${effectiveClientName} (#${orderNumber})`;
           headerColor = "#065f46";
           statusTag = "PAYMENT CONFIRMED";
         }
@@ -219,7 +338,7 @@ export async function POST(req: Request) {
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px;">
             <div style="background: ${headerColor}; padding: 18px 24px; border-radius: 8px; margin-bottom: 24px;">
               <h2 style="color: #ffffff; margin: 0; font-size: 20px;">${statusTag}</h2>
-              <p style="color: #cbd5e1; margin: 4px 0 0; font-size: 13px;">Quickupp Softech LLC Online Checkout</p>
+              <p style="color: #cbd5e1; margin: 4px 0 0; font-size: 13px;">Quickupp Softech LLC ${isPaymentLink ? "Payment Link Checkout" : "Online Checkout"}</p>
             </div>
             
             <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
@@ -228,12 +347,12 @@ export async function POST(req: Request) {
               <tr><td style="padding: 8px 0; color: #64748b;">Amount:</td><td style="padding: 8px 0; font-weight: bold; color: ${paymentStatus === "failed" ? "#dc2626" : "#10b981"}; font-size: 18px;">$${capturedAmount.toFixed(2)} ${currency}</td></tr>
               ${isPartial ? `<tr><td style="padding: 8px 0; color: #64748b;">Total Service Amount:</td><td style="padding: 8px 0; font-weight: 600; color: #0f172a;">$${finalTotal.toFixed(2)} ${currency}</td></tr>` : ""}
               ${isPartial ? `<tr><td style="padding: 8px 0; color: #64748b;">Remaining Balance Due:</td><td style="padding: 8px 0; font-weight: bold; color: #ef4444;">$${finalRemaining.toFixed(2)} ${currency}</td></tr>` : ""}
-              <tr><td style="padding: 8px 0; color: #64748b;">Client Name:</td><td style="padding: 8px 0; font-weight: bold; color: #0f172a;">${clientName}</td></tr>
-              <tr><td style="padding: 8px 0; color: #64748b;">Client Email:</td><td style="padding: 8px 0; color: #0f172a;"><a href="mailto:${clientEmail}">${clientEmail}</a></td></tr>
-              <tr><td style="padding: 8px 0; color: #64748b;">Client Phone:</td><td style="padding: 8px 0; color: #0f172a;"><a href="tel:${clientPhone}">${clientPhone}</a></td></tr>
-              ${companyName ? `<tr><td style="padding: 8px 0; color: #64748b;">Company:</td><td style="padding: 8px 0; color: #0f172a;">${companyName}</td></tr>` : ""}
-              ${categoryStr ? `<tr><td style="padding: 8px 0; color: #64748b;">Category:</td><td style="padding: 8px 0; color: #0f172a;">${categoryStr}</td></tr>` : ""}
-              ${service ? `<tr><td style="padding: 8px 0; color: #64748b;">Service:</td><td style="padding: 8px 0; color: #0f172a;">${service}</td></tr>` : ""}
+              <tr><td style="padding: 8px 0; color: #64748b;">Client Name:</td><td style="padding: 8px 0; font-weight: bold; color: #0f172a;">${effectiveClientName}</td></tr>
+              <tr><td style="padding: 8px 0; color: #64748b;">Client Email:</td><td style="padding: 8px 0; color: #0f172a;"><a href="mailto:${effectiveClientEmail}">${effectiveClientEmail}</a></td></tr>
+              <tr><td style="padding: 8px 0; color: #64748b;">Client Phone:</td><td style="padding: 8px 0; color: #0f172a;"><a href="tel:${effectiveClientPhone}">${effectiveClientPhone}</a></td></tr>
+              ${effectiveCompany ? `<tr><td style="padding: 8px 0; color: #64748b;">Company:</td><td style="padding: 8px 0; color: #0f172a;">${effectiveCompany}</td></tr>` : ""}
+              ${effectiveCategory ? `<tr><td style="padding: 8px 0; color: #64748b;">Category:</td><td style="padding: 8px 0; color: #0f172a;">${effectiveCategory}</td></tr>` : ""}
+              ${effectiveService ? `<tr><td style="padding: 8px 0; color: #64748b;">Service:</td><td style="padding: 8px 0; color: #0f172a;">${effectiveService}</td></tr>` : ""}
               ${billingStartDate || billingEndDate ? `<tr><td style="padding: 8px 0; color: #64748b;">Billing Period:</td><td style="padding: 8px 0; color: #0f172a;">${billingStartDate || "—"} to ${billingEndDate || "—"}</td></tr>` : ""}
               <tr><td style="padding: 8px 0; color: #64748b;">Transaction / Order ID:</td><td style="padding: 8px 0; color: #0f172a; font-family: monospace;">${captureID}</td></tr>
               ${paymentStatus === "failed" ? `<tr><td style="padding: 8px 0; color: #dc2626; font-weight: bold;">Failure Reason:</td><td style="padding: 8px 0; color: #dc2626;">${failureReason}</td></tr>` : ""}
@@ -251,17 +370,17 @@ export async function POST(req: Request) {
           to: LEADS_NOTIFICATION_EMAIL,
           subject: adminSubject,
           html: adminHtml,
-          text: `${adminSubject} - ${clientName} (${clientEmail}, ${clientPhone}) for ${service || categoryStr || "service"}. Order Number: ${orderNumber}. Reference: ${captureID}`,
-          replyTo: clientEmail || undefined,
+          text: `${adminSubject} - ${effectiveClientName} (${effectiveClientEmail}, ${effectiveClientPhone}) for ${effectiveService || effectiveCategory || "service"}. Order Number: ${orderNumber}. Reference: ${captureID}`,
+          replyTo: effectiveClientEmail || undefined,
         });
       } catch (mailErr) {
         console.error("[Payment Notification Email Error]", mailErr);
       }
 
       // Customer Confirmation & Receipt Email (for paid or pending)
-      if (paymentStatus !== "failed" && clientEmail && clientEmail.includes("@")) {
+      if (paymentStatus !== "failed" && effectiveClientEmail && effectiveClientEmail.includes("@")) {
         try {
-          const firstName = clientName.trim().split(" ")[0] || "Valued Client";
+          const firstName = effectiveClientName.trim().split(" ")[0] || "Valued Client";
           const clientSubject = paymentStatus === "pending"
             ? `Payment Processing (Pending Clearing) — Quickupp Softech LLC | Order #${orderNumber}`
             : `Payment Confirmed — Quickupp Softech LLC | Order #${orderNumber}`;
@@ -286,12 +405,12 @@ export async function POST(req: Request) {
           // Generate PDF Receipt buffer
           const pdfBuffer = await generateReceiptPdf({
             orderNumber,
-            clientName,
-            clientEmail,
-            clientPhone,
-            companyName,
-            service,
-            category: categoryStr,
+            clientName: effectiveClientName,
+            clientEmail: effectiveClientEmail,
+            clientPhone: effectiveClientPhone,
+            companyName: effectiveCompany,
+            service: effectiveService,
+            category: effectiveCategory,
             amountPaid: capturedAmount,
             totalAmount: finalTotal,
             paymentType: isPartial ? "partial" : "full",
@@ -458,7 +577,7 @@ export async function POST(req: Request) {
 
           await sendMail({
             channel: "info",
-            to: clientEmail,
+            to: effectiveClientEmail,
             fromName: "Quickupp Softech LLC",
             subject: clientSubject,
             html: clientHtml,

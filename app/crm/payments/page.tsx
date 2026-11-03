@@ -13,16 +13,17 @@ type Props = {
 };
 
 export default async function PaymentsPage({ searchParams }: Props) {
-  await requireUser();
+  const user = await requireUser();
   const sp = await searchParams;
   const q = sp.q || "";
   const status = sp.status || "";
-  const tab = (sp.tab as "website" | "payment_link" | "all") || "website";
+  const tab = (sp.tab as "website" | "payment_link" | "all") || "all";
   const data = await listPayments({ q, status, tab, page: Number(sp.page) || 1 });
   return (
     <PaymentsView
       rows={data.items}
       openNew={sp.new === "1"}
+      userRole={user.role}
       options={{ services: PAYMENT_SERVICES, methods: PAYMENT_METHODS, currencies: CURRENCIES, statuses: PAYMENT_STATUSES }}
       q={q}
       status={status}

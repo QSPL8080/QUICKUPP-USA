@@ -98,13 +98,40 @@ const fromRow = (p: PaymentRow): FormState => ({
   notes: p.notes || "",
 });
 
+export const PAYMENT_LINK_SERVICES = [
+  "AI UGC Video",
+  "AI Avatar Video",
+  "AI Explainer Video",
+  "AI Commercial Video",
+  "AI-Powered Digital Marketing Services",
+  "AI & Automation Solutions",
+  "Information Technology Services",
+  "Custom Web Development",
+  "Staff Augmentation",
+  "YouTube Video Promotion",
+  "General Consultation / Custom Scope",
+] as const;
+
+export const PAYMENT_LINK_QUANTITIES = [
+  "Single Reel",
+  "1 Video",
+  "3 Videos Package",
+  "5 Videos Package",
+  "10 Videos Package",
+  "Monthly Retainer",
+  "Starter Scope",
+  "Growth Scope",
+  "Custom Scope",
+] as const;
+
 export default function PaymentsView({
   rows,
   options,
   openNew,
+  userRole = "admin",
   q = "",
   status = "",
-  currentTab = "website",
+  currentTab = "all",
   counts,
   total = 0,
   page = 1,
@@ -114,6 +141,7 @@ export default function PaymentsView({
   rows: PaymentRow[];
   options: Options;
   openNew: boolean;
+  userRole?: "super_admin" | "admin";
   q?: string;
   status?: string;
   currentTab?: "website" | "payment_link" | "all";
@@ -127,6 +155,25 @@ export default function PaymentsView({
   const { confirm, toast } = useFeedback();
   const [editing, setEditing] = useState<PaymentRow | "new" | null>(openNew ? "new" : null);
   const [viewing, setViewing] = useState<PaymentRow | null>(null);
+  const [modalSubtab, setModalSubtab] = useState<"orders" | "payments">("orders");
+
+  // Generate Payment Link State
+  const [generatingLink, setGeneratingLink] = useState(false);
+  const [createdLink, setCreatedLink] = useState<{ url: string; token: string; orderNumber: string } | null>(null);
+  const [linkForm, setLinkForm] = useState({
+    leadSource: "Manual",
+    clientName: "",
+    clientPhone: "",
+    clientEmail: "",
+    companyName: "",
+    service: "AI UGC Video",
+    quantity: "Single Reel",
+    totalAmount: "",
+    paymentOption: "full" as "full" | "partial",
+    depositAmount: "",
+    notes: "",
+  });
+
   const [form, setForm] = useState<FormState>(blank());
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
@@ -134,11 +181,22 @@ export default function PaymentsView({
   const [listError, setListError] = useState("");
   const sel = useSelection(rows.map((p) => p.id));
 
-  const handleTabChange = (t: "website" | "payment_link" | "all") => {
+  // Toggle tab: Clicking active tab toggles back to default "all"
+  const handleTabChange = (t: "website" | "payment_link") => {
     const params = new URLSearchParams(window.location.search);
-    params.set("tab", t);
+    if (currentTab === t) {
+      params.set("tab", "all");
+    } else {
+      params.set("tab", t);
+    }
     params.set("page", "1");
     router.push(`/crm/payments?${params.toString()}`);
+  };
+
+  const copyLink = (tokenOrUrl: string) => {
+    const fullUrl = tokenOrUrl.startsWith("http") ? tokenOrUrl : `${window.location.origin}/pay/${tokenOrUrl}`;
+    navigator.clipboard.writeText(fullUrl);
+    toast("Payment link copied to clipboard!");
   };
 
   const openForm = (p: PaymentRow | "new") => {
@@ -175,6 +233,31 @@ export default function PaymentsView({
     }
     close();
     toast(editing === "new" ? "Payment added" : "Changes saved");
+    router.refresh();
+  };
+
+  const savePaymentLink = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    setError("");
+    const res = await fetch("/api/crm/payment-links", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(linkForm),
+    }).catch(() => null);
+    setBusy(false);
+    const json = res ? await res.json().catch(() => ({})) : {};
+    if (!res?.ok || !json.ok) {
+      setError(json.error || "Failed to generate payment link.");
+      return;
+    }
+    setGeneratingLink(false);
+    setCreatedLink({
+      url: `${window.location.origin}${json.url}`,
+      token: json.token,
+      orderNumber: json.orderNumber,
+    });
+    toast("Payment link generated!");
     router.refresh();
   };
 
@@ -229,22 +312,31 @@ export default function PaymentsView({
     router.refresh();
   };
 
-  const addButton = (
-    <button type="button" className="crm-act crm-act-dark" onClick={() => openForm("new")}>
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-        aria-hidden="true"
+  const headerActions = (
+    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+      <button
+        type="button"
+        className="crm-act crm-act-purple"
+        onClick={() => {
+          setError("");
+          setGeneratingLink(true);
+        }}
+        title="Generate client payment link"
       >
-        <path d="M12 5v14M5 12h14" />
-      </svg>
-      Add payment
-    </button>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+        </svg>
+        + Generate Payment Link
+      </button>
+
+      <button type="button" className="crm-act crm-act-dark" onClick={() => openForm("new")}>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+        Add payment
+      </button>
+    </div>
   );
 
   const err = (k: string) => (errors[k] ? <span className="crm-field-error">{errors[k]}</span> : null);
@@ -252,15 +344,16 @@ export default function PaymentsView({
   return (
     <>
       <PageHead title="Payments" sub="Track customer payments, invoices, balance dues, and official receipts.">
-        {addButton}
+        {headerActions}
       </PageHead>
 
-      {/* 2 Tabs: Website vs Payment Link */}
+      {/* Tabs: ONLY Website and Payment Link (All Payments button hidden by user request, default view displays All Payments) */}
       <div className="crm-payments-tabs">
         <button
           type="button"
           className={`crm-payments-tab ${currentTab === "website" ? "is-active" : ""}`}
           onClick={() => handleTabChange("website")}
+          title="Filter to website checkout payments"
         >
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="12" cy="12" r="10" />
@@ -275,6 +368,7 @@ export default function PaymentsView({
           type="button"
           className={`crm-payments-tab ${currentTab === "payment_link" ? "is-active" : ""}`}
           onClick={() => handleTabChange("payment_link")}
+          title="Filter to admin-generated payment links"
         >
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
@@ -283,16 +377,48 @@ export default function PaymentsView({
           <span>Payment Link</span>
           <span className="crm-tab-badge">{counts?.paymentLink ?? 0}</span>
         </button>
-
-        <button
-          type="button"
-          className={`crm-payments-tab ${currentTab === "all" ? "is-active" : ""}`}
-          onClick={() => handleTabChange("all")}
-        >
-          <span>All Payments</span>
-          <span className="crm-tab-badge">{counts?.all ?? 0}</span>
-        </button>
       </div>
+
+      {/* Payment Link Subheader (Screenshot 2) */}
+      {currentTab === "payment_link" && (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#ffffff", padding: "14px 20px", borderRadius: "12px", border: "1px solid #e2e8f0", margin: "10px 0 14px", flexWrap: "wrap", gap: "10px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <span style={{ fontSize: "22px" }}>🔗</span>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 800, color: "#0f172a" }}>Payment Links</h3>
+                <span className="crm-tab-badge" style={{ background: "#f3e8ff", color: "#7c3aed", fontWeight: 700 }}>
+                  {counts?.paymentLink ?? 0} links
+                </span>
+              </div>
+              <p style={{ margin: "2px 0 0", fontSize: "12px", color: "#64748b" }}>
+                Customer payment links generated by Admins and Super Admin · valid 24 hours · single use
+              </p>
+            </div>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <button
+              type="button"
+              className="crm-act crm-act-ghost"
+              onClick={() => router.refresh()}
+              style={{ fontSize: "13px" }}
+            >
+              🔄 Refresh
+            </button>
+            <button
+              type="button"
+              className="crm-act crm-act-purple"
+              onClick={() => {
+                setError("");
+                setGeneratingLink(true);
+              }}
+              style={{ fontSize: "13px" }}
+            >
+              + Generate Payment Link
+            </button>
+          </div>
+        </div>
+      )}
 
       <Filters
         q={q}
@@ -314,26 +440,50 @@ export default function PaymentsView({
         {rows.length ? (
           <div className="crm-table-wrap">
             <table className="crm-table crm-stack crm-selectable">
-              <thead>
-                <tr>
-                  <th className="crm-col-check">
-                    <SelectBox
-                      checked={sel.all}
-                      mixed={sel.some}
-                      onChange={sel.toggleAll}
-                      label="Select all on this page"
-                    />
-                  </th>
-                  <th style={{ width: "50px" }}>Sr No</th>
-                  <th>Source</th>
-                  <th>Timestamp</th>
-                  <th>Client &amp; Business</th>
-                  <th>Service &amp; Category</th>
-                  <th>Amount &amp; Status</th>
-                  <th>Invoice / Ref</th>
-                  <th style={{ textAlign: "right", paddingRight: "18px" }}>Actions</th>
-                </tr>
-              </thead>
+              {currentTab === "payment_link" ? (
+                /* Payment Link Specialized Table Header (Matching Screenshot 2) */
+                <thead>
+                  <tr>
+                    <th className="crm-col-check">
+                      <SelectBox
+                        checked={sel.all}
+                        mixed={sel.some}
+                        onChange={sel.toggleAll}
+                        label="Select all on this page"
+                      />
+                    </th>
+                    <th>CUSTOMER &amp; LEAD</th>
+                    <th>VIDEO / TOTAL</th>
+                    <th>PAYMENT</th>
+                    <th>LINK STATUS</th>
+                    <th>GENERATED · EXPIRES</th>
+                    <th style={{ textAlign: "right", paddingRight: "18px" }}>Actions</th>
+                  </tr>
+                </thead>
+              ) : (
+                /* Unified Table Header (Website & All Payments) */
+                <thead>
+                  <tr>
+                    <th className="crm-col-check">
+                      <SelectBox
+                        checked={sel.all}
+                        mixed={sel.some}
+                        onChange={sel.toggleAll}
+                        label="Select all on this page"
+                      />
+                    </th>
+                    <th style={{ width: "50px" }}>Sr No</th>
+                    <th>Source</th>
+                    <th>Timestamp</th>
+                    <th>Client &amp; Business</th>
+                    <th>Service &amp; Category</th>
+                    <th>Amount &amp; Status</th>
+                    <th>Invoice / Ref</th>
+                    <th style={{ textAlign: "right", paddingRight: "18px" }}>Actions</th>
+                  </tr>
+                </thead>
+              )}
+
               <tbody>
                 {rows.map((p, idx) => {
                   const srNo = (page - 1) * pageSize + idx + 1;
@@ -341,11 +491,188 @@ export default function PaymentsView({
                   const totAmt = p.totalAmount != null ? p.totalAmount : p.amount;
                   const remAmt = p.remainingAmount != null ? p.remainingAmount : Math.max(0, totAmt - p.amount);
 
+                  // Link status check
+                  const isLinkExpired = p.expiresAt && new Date(p.expiresAt) < new Date() && p.status !== "paid";
+                  const linkStatusBadge =
+                    p.status === "paid"
+                      ? "used"
+                      : isLinkExpired
+                      ? "expired"
+                      : p.linkStatus || "active";
+
+                  if (currentTab === "payment_link") {
+                    /* Row Format for Payment Link Tab (Screenshot 2) */
+                    return (
+                      <tr
+                        key={p.id}
+                        className={`crm-row${sel.has(p.id) ? " is-picked" : ""}`}
+                        onClick={() => {
+                          setViewing(p);
+                          setModalSubtab("orders");
+                        }}
+                        style={{ cursor: "pointer" }}
+                      >
+                        <td className="crm-col-check" onClick={(e) => e.stopPropagation()}>
+                          <SelectBox
+                            checked={sel.has(p.id)}
+                            onChange={(on) => sel.toggle(p.id, on)}
+                            label={`Select payment link for ${p.clientName}`}
+                          />
+                        </td>
+
+                        {/* Customer & Lead */}
+                        <td data-label="Customer & Lead" className="crm-cell-main">
+                          <span className="crm-strong" style={{ fontSize: "14px", color: "#0f172a" }}>
+                            {p.clientName}
+                          </span>
+                          <span className="crm-cell-sub" style={{ color: "#475569", fontWeight: 500 }}>
+                            {p.clientPhone || "—"}
+                          </span>
+                          <span className="crm-cell-sub" style={{ color: "#2563eb" }}>
+                            {p.clientEmail || "—"}
+                          </span>
+                          <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "4px" }}>
+                            <span
+                              style={{
+                                fontSize: "10.5px",
+                                fontWeight: 800,
+                                textTransform: "uppercase",
+                                padding: "1px 6px",
+                                borderRadius: "4px",
+                                background: "#f1f5f9",
+                                color: "#475569",
+                                border: "1px solid #e2e8f0",
+                              }}
+                            >
+                              {p.leadSource || "MANUAL"}
+                            </span>
+                            <span style={{ fontSize: "11px", color: "#7c3aed", fontFamily: "monospace", fontWeight: 700 }}>
+                              {p.invoiceNumber || `QAS-${p.id}`}
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* Video / Total */}
+                        <td data-label="Video / Total">
+                          <span className="crm-strong" style={{ color: "#0f172a", fontSize: "13.5px" }}>
+                            {p.service}
+                          </span>
+                          <span style={{ display: "block", fontSize: "12px", color: "#64748b", marginTop: "2px" }}>
+                            {p.quantity || p.category || "Single Reel"}
+                          </span>
+                          <span style={{ display: "block", fontSize: "14px", fontWeight: 800, color: "#0f172a", marginTop: "4px" }}>
+                            ${totAmt.toFixed(2)}
+                          </span>
+                        </td>
+
+                        {/* Payment */}
+                        <td data-label="Payment">
+                          {p.amount === 0 ? (
+                            <span style={{ color: "#64748b", fontWeight: 700, fontSize: "13px" }}>Not Paid</span>
+                          ) : p.status === "paid" ? (
+                            <div>
+                              <span className="crm-pill crm-pill-paid" style={{ marginBottom: "2px", display: "inline-block" }}>
+                                Fully Paid
+                              </span>
+                              <span style={{ display: "block", fontSize: "12px", color: "#16a34a", fontWeight: 700 }}>
+                                Paid ${p.amount.toFixed(2)}
+                              </span>
+                            </div>
+                          ) : isPartial ? (
+                            <div>
+                              <span className="crm-pill crm-pill-partially_paid" style={{ marginBottom: "2px", display: "inline-block" }}>
+                                Partially Paid
+                              </span>
+                              <span style={{ display: "block", fontSize: "12px", color: "#2563eb", fontWeight: 700 }}>
+                                Paid ${p.amount.toFixed(2)} · Due ${remAmt.toFixed(2)}
+                              </span>
+                            </div>
+                          ) : (
+                            <span style={{ color: "#64748b", fontWeight: 700, fontSize: "13px" }}>Not Paid</span>
+                          )}
+                        </td>
+
+                        {/* Link Status */}
+                        <td data-label="Link Status">
+                          <span
+                            className={`crm-link-pill crm-link-pill-${linkStatusBadge}`}
+                            style={{ textTransform: "capitalize" }}
+                          >
+                            {linkStatusBadge}
+                          </span>
+                          {p.paidAt && p.status === "paid" && (
+                            <span style={{ display: "block", fontSize: "11px", color: "#64748b", marginTop: "3px" }}>
+                              Paid {fmtDate(p.paidAt, true)}
+                            </span>
+                          )}
+                        </td>
+
+                        {/* Generated · Expires */}
+                        <td data-label="Generated · Expires" style={{ fontSize: "12.5px" }}>
+                          <span style={{ fontWeight: 700, color: "#0f172a", display: "block" }}>
+                            {p.createdBy || "Admin"}
+                          </span>
+                          <span style={{ color: "#64748b", display: "block", fontSize: "11.5px" }}>
+                            {fmtDate(p.createdAt, true)}
+                          </span>
+                          {p.expiresAt && (
+                            <span style={{ color: isLinkExpired ? "#dc2626" : "#64748b", display: "block", fontSize: "11px", marginTop: "2px" }}>
+                              Expires {fmtDate(p.expiresAt, true)}
+                            </span>
+                          )}
+                        </td>
+
+                        {/* Actions */}
+                        <td data-label="Actions" onClick={(e) => e.stopPropagation()} style={{ textAlign: "right" }}>
+                          <div style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+                            <button
+                              type="button"
+                              className="crm-act crm-act-ghost crm-act-sm"
+                              onClick={() => {
+                                setViewing(p);
+                                setModalSubtab("orders");
+                              }}
+                              style={{ fontSize: "12px", padding: "4px 10px" }}
+                            >
+                              Details
+                            </button>
+                            {p.token && (
+                              <button
+                                type="button"
+                                className="crm-action-btn is-view"
+                                title="Copy Payment Link"
+                                onClick={() => copyLink(p.token!)}
+                              >
+                                📋
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              className="crm-action-btn is-delete"
+                              title="Delete Link"
+                              onClick={() => deleteSingle(p)}
+                            >
+                              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M3 6h18" />
+                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                              </svg>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  }
+
+                  /* Unified Table Row Format (Website & All Payments) */
                   return (
                     <tr
                       key={p.id}
                       className={`crm-row${sel.has(p.id) ? " is-picked" : ""}`}
-                      onClick={() => setViewing(p)}
+                      onClick={() => {
+                        setViewing(p);
+                        setModalSubtab("orders");
+                      }}
                       style={{ cursor: "pointer" }}
                     >
                       <td className="crm-col-check" onClick={(e) => e.stopPropagation()}>
@@ -395,12 +722,8 @@ export default function PaymentsView({
                           </span>
                         )}
                         <span className="crm-cell-sub" style={{ display: "flex", flexDirection: "column", gap: "2px", marginTop: "3px" }}>
-                          {p.clientEmail && (
-                            <span style={{ color: "#2563eb" }}>✉ {p.clientEmail}</span>
-                          )}
-                          {p.clientPhone && (
-                            <span style={{ color: "#0f172a", fontWeight: 500 }}>📞 {p.clientPhone}</span>
-                          )}
+                          {p.clientEmail && <span style={{ color: "#2563eb" }}>✉ {p.clientEmail}</span>}
+                          {p.clientPhone && <span style={{ color: "#0f172a", fontWeight: 500 }}>📞 {p.clientPhone}</span>}
                         </span>
                       </td>
 
@@ -409,39 +732,32 @@ export default function PaymentsView({
                         <span className="crm-strong" style={{ color: "#0f172a", fontSize: "13.5px" }}>
                           {p.service}
                         </span>
-                        {p.category && (
+                        {(p.quantity || p.category) && (
                           <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px" }}>
-                            {p.category.split(",").map((cat, idx) => (
-                              <span
-                                key={idx}
-                                className="crm-cell-sub"
-                                style={{
-                                  display: "inline-block",
-                                  color: "#7c3aed",
-                                  fontWeight: 600,
-                                  background: "#faf5ff",
-                                  padding: "2px 7px",
-                                  borderRadius: "4px",
-                                  fontSize: "11.5px",
-                                  border: "1px solid #f3e8ff",
-                                  lineHeight: "1.3",
-                                }}
-                              >
-                                {cat.trim()}
-                              </span>
-                            ))}
+                            <span
+                              className="crm-cell-sub"
+                              style={{
+                                display: "inline-block",
+                                color: "#7c3aed",
+                                fontWeight: 600,
+                                background: "#faf5ff",
+                                padding: "2px 7px",
+                                borderRadius: "4px",
+                                fontSize: "11.5px",
+                                border: "1px solid #f3e8ff",
+                              }}
+                            >
+                              {p.quantity || p.category}
+                            </span>
                           </div>
                         )}
                       </td>
 
-                      {/* Amount & Status (Fully Paid vs Partial Paid vs Pending vs Failed) */}
+                      {/* Amount & Status */}
                       <td data-label="Amount" className="crm-nowrap">
                         {p.status === "failed" ? (
                           <>
-                            <span
-                              className="crm-pill crm-pill-failed"
-                              style={{ marginBottom: "4px", display: "inline-block" }}
-                            >
+                            <span className="crm-pill crm-pill-failed" style={{ marginBottom: "4px", display: "inline-block" }}>
                               Failed
                             </span>
                             <span style={{ display: "block", fontSize: "12px", color: "#dc2626", fontWeight: 600 }}>
@@ -450,10 +766,7 @@ export default function PaymentsView({
                           </>
                         ) : p.status === "pending" ? (
                           <>
-                            <span
-                              className="crm-pill crm-pill-pending"
-                              style={{ marginBottom: "4px", display: "inline-block" }}
-                            >
+                            <span className="crm-pill crm-pill-pending" style={{ marginBottom: "4px", display: "inline-block" }}>
                               Pending Clearing
                             </span>
                             <span style={{ display: "block", fontSize: "12px", color: "#d97706", fontWeight: 600 }}>
@@ -462,10 +775,7 @@ export default function PaymentsView({
                           </>
                         ) : isPartial ? (
                           <>
-                            <span
-                              className="crm-pill crm-pill-partially_paid"
-                              style={{ marginBottom: "4px", display: "inline-block" }}
-                            >
+                            <span className="crm-pill crm-pill-partially_paid" style={{ marginBottom: "4px", display: "inline-block" }}>
                               Partially Paid
                             </span>
                             <span style={{ display: "block", fontSize: "12px", color: "#2563eb", fontWeight: 600 }}>
@@ -474,10 +784,7 @@ export default function PaymentsView({
                           </>
                         ) : (
                           <>
-                            <span
-                              className="crm-pill crm-pill-paid"
-                              style={{ marginBottom: "4px", display: "inline-block" }}
-                            >
+                            <span className="crm-pill crm-pill-paid" style={{ marginBottom: "4px", display: "inline-block" }}>
                               Fully Paid
                             </span>
                             <span style={{ display: "block", fontSize: "12px", color: "#15803d", fontWeight: 600 }}>
@@ -502,48 +809,38 @@ export default function PaymentsView({
                         )}
                       </td>
 
-                      {/* 3 Action Icons: View, Edit, Delete */}
-                      <td
-                        data-label="Actions"
-                        onClick={(e) => e.stopPropagation()}
-                        style={{ textAlign: "right" }}
-                      >
+                      {/* Actions */}
+                      <td data-label="Actions" onClick={(e) => e.stopPropagation()} style={{ textAlign: "right" }}>
                         <div className="crm-row-actions">
-                          {/* 1. View Icon */}
                           <button
                             type="button"
                             className="crm-action-btn is-view"
-                            title="View complete payment details"
-                            onClick={() => setViewing(p)}
-                            aria-label="View Details"
+                            title="View Details"
+                            onClick={() => {
+                              setViewing(p);
+                              setModalSubtab("orders");
+                            }}
                           >
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                               <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
                               <circle cx="12" cy="12" r="3" />
                             </svg>
                           </button>
-
-                          {/* 2. Edit Icon */}
-                          <button
-                            type="button"
-                            className="crm-action-btn is-edit"
-                            title="Edit payment"
-                            onClick={() => openForm(p)}
-                            aria-label="Edit Payment"
-                          >
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                              <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-                              <path d="m15 5 4 4" />
-                            </svg>
-                          </button>
-
-                          {/* 3. Delete Icon */}
+                          {p.token && (
+                            <button
+                              type="button"
+                              className="crm-action-btn is-edit"
+                              title="Copy Payment Link"
+                              onClick={() => copyLink(p.token!)}
+                            >
+                              📋
+                            </button>
+                          )}
                           <button
                             type="button"
                             className="crm-action-btn is-delete"
-                            title="Delete payment permanently"
+                            title="Delete Payment"
                             onClick={() => deleteSingle(p)}
-                            aria-label="Delete Payment"
                           >
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                               <path d="M3 6h18" />
@@ -562,109 +859,74 @@ export default function PaymentsView({
         ) : (
           <div className="crm-empty">
             <div className="crm-empty-icon">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="2" y="5" width="20" height="14" rx="2" />
                 <line x1="2" y1="10" x2="22" y2="10" />
               </svg>
             </div>
             <p className="crm-empty-title">
-              {currentTab === "website" ? "No website payments found" : "No payment link payments found"}
+              {currentTab === "website" ? "No website payments found" : currentTab === "payment_link" ? "No payment links found" : "No payments found"}
             </p>
             <p className="crm-empty-sub">
               {currentTab === "website"
-                ? "Payments completed via the website Pay Now button will automatically appear here."
-                : "Transactions recorded manually or via payment links will appear here."}
+                ? "Payments completed via the website checkout will automatically appear here."
+                : currentTab === "payment_link"
+                ? "Generate your first customer payment link using the button below."
+                : "All payments and links will appear here."}
             </p>
-            <button type="button" className="crm-act crm-act-dark" onClick={() => openForm("new")}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
-                <path d="M12 5v14M5 12h14" />
-              </svg>
-              Add payment
-            </button>
+            <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
+              <button
+                type="button"
+                className="crm-act crm-act-purple"
+                onClick={() => {
+                  setError("");
+                  setGeneratingLink(true);
+                }}
+              >
+                + Generate Payment Link
+              </button>
+              <button type="button" className="crm-act crm-act-dark" onClick={() => openForm("new")}>
+                Add payment
+              </button>
+            </div>
           </div>
         )}
         <Pager page={page} pages={pages} total={total} pageSize={pageSize} q={q} status={status} />
       </div>
 
-      {/* ---- FULL DETAILS VIEW MODAL (Matching Screenshot 4 & 5) ---- */}
+      {/* ---- DETAILS MODAL (Matching Screenshot 4 & 5) ---- */}
       {viewing && (
         <div className="crm-modal-wrap" onClick={() => setViewing(null)}>
-          <div className="crm-view-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="crm-view-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "860px" }}>
             {/* Header */}
             <div className="crm-view-modal-head">
-              <div className="crm-view-modal-head-left">
-                <div className="crm-view-avatar">
-                  {viewing.clientName
-                    .split(" ")
-                    .map((w) => w[0])
-                    .filter(Boolean)
-                    .slice(0, 2)
-                    .join("")
-                    .toUpperCase() || "QS"}
-                </div>
-                <div>
-                  <h2 className="crm-view-modal-title">
-                    <span>{viewing.clientName}</span>
-                    <span
-                      style={{
-                        fontSize: "11.5px",
-                        fontWeight: 700,
-                        padding: "2px 8px",
-                        borderRadius: "6px",
-                        background: viewing.source === "website" ? "#f3e8ff" : "#eff6ff",
-                        color: viewing.source === "website" ? "#7c3aed" : "#2563eb",
-                        border: `1px solid ${viewing.source === "website" ? "#e9d5ff" : "#bfdbfe"}`,
-                      }}
-                    >
-                      {viewing.source === "website" ? "Website Pay Now" : "Payment Link"}
-                    </span>
-                  </h2>
-                  <p className="crm-view-modal-sub">
-                    {viewing.companyName || "No Company"} • Received {fmtDate(viewing.paidAt || viewing.createdAt, true)}
-                  </p>
-                </div>
+              <div>
+                <h2 className="crm-view-modal-title" style={{ fontSize: "17px" }}>
+                  <span>{viewing.clientName}</span>
+                  <span style={{ color: "#64748b" }}>•</span>
+                  <span>{viewing.service}</span>
+                  {viewing.quantity && <span>– {viewing.quantity}</span>}
+                  <span style={{ color: "#64748b" }}>•</span>
+                  <span style={{ color: "#7c3aed" }}>
+                    ${(viewing.totalAmount != null ? viewing.totalAmount : viewing.amount).toFixed(2)}
+                  </span>
+                </h2>
+                <p className="crm-view-modal-sub" style={{ fontSize: "12px" }}>
+                  Generated by {viewing.createdBy || "Admin"} on {fmtDate(viewing.createdAt, true)}
+                  {viewing.expiresAt && ` · expires ${fmtDate(viewing.expiresAt, true)}`}
+                </p>
               </div>
 
-              {/* Action Buttons in Head */}
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                {viewing.clientPhone && (
-                  <a
-                    href={`tel:${viewing.clientPhone.replace(/[^\d+]/g, "")}`}
-                    className="crm-act crm-act-ghost crm-act-sm"
-                    title="Call Client"
+                {viewing.token && (
+                  <button
+                    type="button"
+                    className="crm-act crm-act-purple crm-act-sm"
+                    onClick={() => copyLink(viewing.token!)}
                   >
-                    📞 Call
-                  </a>
+                    📋 Copy Link
+                  </button>
                 )}
-                {viewing.clientPhone && (
-                  <a
-                    href={`https://wa.me/${viewing.clientPhone.replace(/[^\d]/g, "")}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="crm-act crm-act-sm"
-                    style={{ background: "#22c55e", color: "#fff", borderColor: "#22c55e" }}
-                    title="Chat on WhatsApp"
-                  >
-                    💬 WhatsApp
-                  </a>
-                )}
-                <a
-                  href={`/api/payments/receipt?order=${encodeURIComponent(viewing.invoiceNumber || String(viewing.id))}`}
-                  className="crm-act crm-act-ghost crm-act-sm"
-                  title="Download Branded PDF Receipt"
-                >
-                  📄 Receipt PDF
-                </a>
-                <button
-                  type="button"
-                  className="crm-act crm-act-ghost crm-act-sm"
-                  onClick={() => {
-                    openForm(viewing);
-                    setViewing(null);
-                  }}
-                >
-                  ✏️ Edit
-                </button>
                 <button
                   type="button"
                   className="crm-icon-act"
@@ -678,251 +940,478 @@ export default function PaymentsView({
               </div>
             </div>
 
-            {/* Modal Body */}
-            <div className="crm-view-modal-body">
-              {/* Grid 1: Client Info & Lead Info */}
-              <div className="crm-view-grid">
-                {/* Client Information */}
-                <div className="crm-view-card">
-                  <h3 className="crm-view-card-title">
-                    <span>👤</span>
-                    <span>Client Information</span>
-                  </h3>
-                  <div className="crm-view-list">
-                    <span className="crm-view-list-label">Client Name:</span>
-                    <span className="crm-view-list-val">{viewing.clientName}</span>
-
-                    <span className="crm-view-list-label">Company / Brand:</span>
-                    <span className="crm-view-list-val">{viewing.companyName || "—"}</span>
-
-                    <span className="crm-view-list-label">Phone / WhatsApp:</span>
-                    <span className="crm-view-list-val">{viewing.clientPhone || "—"}</span>
-
-                    <span className="crm-view-list-label">Email:</span>
-                    <span className="crm-view-list-val" style={{ color: "#2563eb" }}>
-                      {viewing.clientEmail || "—"}
-                    </span>
-
-                    <span className="crm-view-list-label">Billing Period:</span>
-                    <span className="crm-view-list-val">
-                      {viewing.billingStartDate
-                        ? `${viewing.billingStartDate} to ${viewing.billingEndDate || "—"}`
-                        : "Active Retainer"}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Lead & Transaction Information */}
-                <div className="crm-view-card">
-                  <h3 className="crm-view-card-title">
-                    <span>💳</span>
-                    <span>Payment &amp; Transaction Information</span>
-                  </h3>
-                  <div className="crm-view-list">
-                    <span className="crm-view-list-label">Source:</span>
-                    <span className="crm-view-list-val">
-                      {viewing.source === "website" ? "Website Pay Now Button" : "Payment Link"}
-                    </span>
-
-                    <span className="crm-view-list-label">Order Number:</span>
-                    <span className="crm-view-list-val" style={{ fontFamily: "monospace", color: "#7c3aed" }}>
-                      {viewing.invoiceNumber || `QS-${viewing.id}`}
-                    </span>
-
-                    <span className="crm-view-list-label">Transaction ID:</span>
-                    <span className="crm-view-list-val" style={{ fontFamily: "monospace", wordBreak: "break-all" }}>
-                      {viewing.reference || "—"}
-                    </span>
-
-                    <span className="crm-view-list-label">PayPal Order ID:</span>
-                    <span className="crm-view-list-val" style={{ fontFamily: "monospace" }}>
-                      {viewing.paypalOrderId || "—"}
-                    </span>
-
-                    <span className="crm-view-list-label">Payment Method:</span>
-                    <span className="crm-view-list-val">{viewing.method || "PayPal"}</span>
-
-                    <span className="crm-view-list-label">Payment Date:</span>
-                    <span className="crm-view-list-val">{fmtDate(viewing.paidAt || viewing.createdAt, true)}</span>
-                  </div>
-                </div>
+            {/* Modal Subtabs (Orders (1) vs Payments) */}
+            <div style={{ padding: "16px 24px 0" }}>
+              <div className="crm-modal-subtabs">
+                <button
+                  type="button"
+                  className={`crm-modal-subtab ${modalSubtab === "orders" ? "is-active" : ""}`}
+                  onClick={() => setModalSubtab("orders")}
+                >
+                  Orders (1)
+                </button>
+                <button
+                  type="button"
+                  className={`crm-modal-subtab ${modalSubtab === "payments" ? "is-active" : ""}`}
+                  onClick={() => setModalSubtab("payments")}
+                >
+                  Payments ({viewing.amount > 0 ? 1 : 0})
+                </button>
               </div>
+            </div>
 
-              {/* Requirement & Service Scope */}
-              <div className="crm-view-card">
-                <h3 className="crm-view-card-title">
-                  <span>🎯</span>
-                  <span>Project &amp; Service Requirement</span>
-                </h3>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", fontSize: "13px" }}>
-                  <div>
-                    <span style={{ color: "#64748b", display: "block", marginBottom: "2px" }}>Primary Service:</span>
-                    <span style={{ fontWeight: 700, color: "#0f172a" }}>{viewing.service}</span>
-                  </div>
-                  <div>
-                    <span style={{ color: "#64748b", display: "block", marginBottom: "4px" }}>Category / Package:</span>
-                    {viewing.category ? (
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
-                        {viewing.category.split(",").map((cat, idx) => (
-                          <span
-                            key={idx}
-                            style={{
-                              fontWeight: 600,
-                              color: "#7c3aed",
-                              background: "#faf5ff",
-                              border: "1px solid #f3e8ff",
-                              padding: "2px 8px",
-                              borderRadius: "4px",
-                              fontSize: "12px",
-                            }}
-                          >
-                            {cat.trim()}
+            {/* Modal Body */}
+            <div className="crm-view-modal-body" style={{ paddingTop: "10px" }}>
+              {modalSubtab === "orders" ? (
+                /* Orders Subtab Table (Screenshot 4) */
+                <div className="crm-table-wrap" style={{ border: "1px solid #e2e8f0", borderRadius: "10px" }}>
+                  <table className="crm-table" style={{ fontSize: "12.5px" }}>
+                    <thead>
+                      <tr style={{ background: "#f8fafc" }}>
+                        <th>ORDER</th>
+                        <th>CUSTOMER</th>
+                        <th>VIDEO</th>
+                        <th>AMOUNT</th>
+                        <th>PAYMENT STATUS</th>
+                        <th>LINK</th>
+                        <th style={{ textAlign: "right" }}>ACTIONS</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <span style={{ fontWeight: 800, fontFamily: "monospace", color: "#0f172a" }}>
+                            {viewing.invoiceNumber || `QAS-${viewing.id}`}
                           </span>
-                        ))}
-                      </div>
-                    ) : (
-                      <span style={{ fontWeight: 700, color: "#64748b" }}>Standard</span>
+                          <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>
+                            {fmtDate(viewing.createdAt, true)}
+                          </span>
+                          <span style={{ display: "block", fontSize: "10.5px", color: "#7c3aed", fontWeight: 700 }}>
+                            Source: {viewing.leadSource || "Manual"}
+                          </span>
+                        </td>
+                        <td>
+                          <span style={{ fontWeight: 700, color: "#0f172a", display: "block" }}>
+                            {viewing.clientName}
+                          </span>
+                          <span style={{ color: "#64748b", fontSize: "11.5px" }}>
+                            {viewing.clientPhone || "—"}
+                          </span>
+                        </td>
+                        <td>
+                          <span style={{ fontWeight: 600, color: "#0f172a", display: "block" }}>
+                            {viewing.service}
+                          </span>
+                          <span style={{ color: "#64748b", fontSize: "11.5px" }}>
+                            Qty {viewing.quantity || "1"}
+                          </span>
+                        </td>
+                        <td>
+                          <span style={{ display: "block", fontWeight: 700, color: "#0f172a" }}>
+                            Total ${(viewing.totalAmount != null ? viewing.totalAmount : viewing.amount).toFixed(2)}
+                          </span>
+                          <span style={{ display: "block", color: "#16a34a", fontSize: "11.5px", fontWeight: 600 }}>
+                            Paid ${viewing.amount.toFixed(2)}
+                          </span>
+                          <span style={{ display: "block", color: "#ef4444", fontSize: "11.5px", fontWeight: 600 }}>
+                            Remaining ${(viewing.remainingAmount != null ? viewing.remainingAmount : 0).toFixed(2)}
+                          </span>
+                        </td>
+                        <td>
+                          {viewing.amount === 0 ? (
+                            <span style={{ color: "#64748b", fontWeight: 700 }}>Not Paid</span>
+                          ) : viewing.status === "paid" ? (
+                            <span className="crm-pill crm-pill-paid">Fully Paid</span>
+                          ) : (
+                            <span className="crm-pill crm-pill-partially_paid">Partially Paid</span>
+                          )}
+                        </td>
+                        <td>
+                          <span className={`crm-link-pill crm-link-pill-${viewing.status === "paid" ? "used" : viewing.linkStatus || "active"}`}>
+                            {viewing.status === "paid" ? "Used" : viewing.linkStatus || "Active"}
+                          </span>
+                        </td>
+                        <td style={{ textAlign: "right" }}>
+                          <button
+                            type="button"
+                            className="crm-act crm-act-danger crm-act-sm"
+                            onClick={() => deleteSingle(viewing)}
+                            style={{ fontSize: "11.5px", padding: "3px 8px" }}
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                /* Payments Subtab Table (Screenshot 5) */
+                viewing.amount > 0 ? (
+                  <div className="crm-table-wrap" style={{ border: "1px solid #e2e8f0", borderRadius: "10px" }}>
+                    <table className="crm-table" style={{ fontSize: "12.5px" }}>
+                      <thead>
+                        <tr style={{ background: "#f8fafc" }}>
+                          <th>TRANSACTION</th>
+                          <th>TYPE</th>
+                          <th>AMOUNT</th>
+                          <th>PAID SO FAR</th>
+                          <th>STATUS</th>
+                          <th>DATE · PAYPAL REF</th>
+                          <th>RECEIPT</th>
+                          <th>OUTSTANDING</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>
+                            <span style={{ fontWeight: 800, fontFamily: "monospace", color: "#0f172a" }}>
+                              {viewing.reference ? viewing.reference.split("|")[0].replace("Initial:", "").trim() : `TX-${viewing.id}`}
+                            </span>
+                            <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>
+                              Order {viewing.invoiceNumber || `QAS-${viewing.id}`}
+                            </span>
+                          </td>
+                          <td>
+                            <span style={{ fontWeight: 600, color: "#0f172a", display: "block" }}>
+                              {viewing.paymentType === "partial" ? "Deposit payment" : "Full payment"}
+                            </span>
+                            <span style={{ color: "#64748b", fontSize: "11.5px" }}>
+                              PayPal / Payment link
+                            </span>
+                          </td>
+                          <td>
+                            <span style={{ fontWeight: 700, color: "#0f172a", display: "block" }}>
+                              ${viewing.amount.toFixed(2)}
+                            </span>
+                            <span style={{ color: "#64748b", fontSize: "11.5px" }}>
+                              of ${(viewing.totalAmount || viewing.amount).toFixed(2)}
+                            </span>
+                          </td>
+                          <td>
+                            <span style={{ fontWeight: 700, color: "#16a34a", display: "block" }}>
+                              ${viewing.amount.toFixed(2)}
+                            </span>
+                            <span style={{ color: "#64748b", fontSize: "11.5px" }}>
+                              Remaining ${(viewing.remainingAmount || 0).toFixed(2)}
+                            </span>
+                          </td>
+                          <td>
+                            <span className={`crm-pill crm-pill-${viewing.status === "paid" ? "paid" : "partially_paid"}`}>
+                              {viewing.status === "paid" ? "Fully Paid" : "Partially Paid"}
+                            </span>
+                          </td>
+                          <td>
+                            <span style={{ fontWeight: 600, color: "#0f172a", display: "block" }}>
+                              {fmtDate(viewing.paidAt, true)}
+                            </span>
+                            <span style={{ color: "#64748b", fontSize: "11px", fontFamily: "monospace", wordBreak: "break-all" }}>
+                              {viewing.reference || viewing.paypalOrderId || "PayPal"}
+                            </span>
+                          </td>
+                          <td>
+                            <a
+                              href={`/api/payments/receipt?order=${encodeURIComponent(viewing.invoiceNumber || String(viewing.id))}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              style={{ color: "#7c3aed", fontWeight: 700, textDecoration: "none" }}
+                            >
+                              📄 PDF
+                            </a>
+                            <span style={{ display: "block", fontSize: "10.5px", color: "#16a34a" }}>Email: sent</span>
+                          </td>
+                          <td style={{ fontWeight: 700, color: viewing.remainingAmount && viewing.remainingAmount > 0 ? "#dc2626" : "#64748b" }}>
+                            {viewing.remainingAmount && viewing.remainingAmount > 0
+                              ? `$${viewing.remainingAmount.toFixed(2)}`
+                              : "—"}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div style={{ padding: "30px 20px", textAlign: "center", background: "#f8fafc", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
+                    <p style={{ margin: "0 0 10px", color: "#64748b", fontSize: "14px" }}>
+                      No payments recorded yet for this order. Share the link with the client:
+                    </p>
+                    {viewing.token && (
+                      <button
+                        type="button"
+                        className="crm-act crm-act-purple"
+                        onClick={() => copyLink(viewing.token!)}
+                      >
+                        📋 Copy Payment Link
+                      </button>
                     )}
                   </div>
-                </div>
-                {viewing.notes && (
-                  <div style={{ marginTop: "12px", paddingTop: "10px", borderTop: "1px solid #e2e8f0" }}>
-                    <span style={{ color: "#64748b", fontSize: "12px", display: "block", marginBottom: "4px" }}>
-                      Notes / Instructions:
-                    </span>
-                    <p style={{ margin: 0, fontSize: "13px", color: "#334155" }}>{viewing.notes}</p>
-                  </div>
-                )}
-              </div>
+                )
+              )}
 
-              {/* Financial Summary Card (Matching screenshot) */}
-              <div className="crm-fin-summary-box">
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: "12px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em", color: "#6d28d9" }}>
-                    Financial Summary (USD)
-                  </span>
-                  <span
-                    className={`crm-pill crm-pill-${
-                      viewing.status === "failed"
-                        ? "failed"
-                        : viewing.status === "pending"
-                        ? "pending"
-                        : viewing.paymentType === "partial"
-                        ? "partially_paid"
-                        : "paid"
-                    }`}
-                  >
-                    {viewing.status === "failed"
-                      ? "Failed"
-                      : viewing.status === "pending"
-                      ? "Pending Clearing"
-                      : viewing.paymentType === "partial"
-                      ? "Partially Paid"
-                      : "Fully Paid"}
-                  </span>
-                </div>
-
-                <div className="crm-fin-grid">
-                  <div className="crm-fin-stat">
-                    <div className="crm-fin-stat-label">Payment Status</div>
-                    <div
-                      className="crm-fin-stat-val"
-                      style={{
-                        fontSize: "14px",
-                        color:
-                          viewing.status === "failed"
-                            ? "#dc2626"
-                            : viewing.status === "pending"
-                            ? "#d97706"
-                            : viewing.paymentType === "partial"
-                            ? "#2563eb"
-                            : "#15803d",
-                      }}
-                    >
-                      {viewing.status === "failed"
-                        ? "Declined / Failed"
-                        : viewing.status === "pending"
-                        ? "Pending Clearing"
-                        : viewing.paymentType === "partial"
-                        ? "Deposit Received"
-                        : "100% Cleared"}
-                    </div>
-                  </div>
-
-                  <div className="crm-fin-stat">
-                    <div className="crm-fin-stat-label">Deal / Total Amount</div>
-                    <div className="crm-fin-stat-val">
-                      {money(viewing.totalAmount != null ? viewing.totalAmount : viewing.amount, viewing.currency)}
-                    </div>
-                  </div>
-
-                  <div className="crm-fin-stat">
-                    <div className="crm-fin-stat-label">Amount Received</div>
-                    <div className="crm-fin-stat-val" style={{ color: "#16a34a" }}>
-                      {money(viewing.amount, viewing.currency)}
-                    </div>
-                  </div>
-
-                  <div className="crm-fin-stat">
-                    <div className="crm-fin-stat-label">Balance Due</div>
-                    <div
-                      className="crm-fin-stat-val"
-                      style={{
-                        color:
-                          (viewing.remainingAmount || 0) > 0 || (viewing.totalAmount && viewing.totalAmount > viewing.amount)
-                            ? "#ef4444"
-                            : "#64748b",
-                      }}
-                    >
-                      {money(
-                        viewing.remainingAmount != null
-                          ? viewing.remainingAmount
-                          : Math.max(0, (viewing.totalAmount || viewing.amount) - viewing.amount),
-                        viewing.currency
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Footer Actions */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "4px" }}>
-                <a
-                  href={`/api/payments/receipt?order=${encodeURIComponent(viewing.invoiceNumber || String(viewing.id))}`}
-                  className="crm-act crm-act-dark"
-                  style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
-                >
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="7 10 12 15 17 10" />
-                    <line x1="12" x2="12" y1="15" y2="3" />
-                  </svg>
-                  <span>Download Official PDF Receipt</span>
-                </a>
-
-                <div style={{ display: "flex", gap: "8px" }}>
-                  <button
-                    type="button"
-                    className="crm-act crm-act-danger"
-                    onClick={() => deleteSingle(viewing)}
-                  >
-                    Delete Payment
-                  </button>
-                  <button
-                    type="button"
-                    className="crm-act crm-act-ghost"
-                    onClick={() => setViewing(null)}
-                  >
-                    Close
-                  </button>
-                </div>
+              {/* Close Button in Footer */}
+              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "12px" }}>
+                <button type="button" className="crm-act crm-act-ghost" onClick={() => setViewing(null)}>
+                  Close
+                </button>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* ---- ADD / EDIT PAYMENT MODAL ---- */}
+      {/* ---- GENERATE PAYMENT LINK MODAL (Screenshot 3) ---- */}
+      {generatingLink && (
+        <div className="crm-modal-wrap" onClick={() => setGeneratingLink(false)}>
+          <div className="crm-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "620px" }}>
+            <div className="crm-drawer-head" style={{ padding: "18px 22px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <span style={{ fontSize: "24px" }}>🔗</span>
+                <div>
+                  <h2 className="crm-drawer-title" style={{ fontSize: "17px" }}>Generate Payment Link</h2>
+                  <p style={{ margin: "2px 0 0", fontSize: "12px", color: "#64748b" }}>
+                    The customer pays this custom total through PayPal / Card. Valid for 24 hours, single use, no coupons.
+                  </p>
+                </div>
+              </div>
+              <button type="button" className="crm-icon-act" onClick={() => setGeneratingLink(false)} aria-label="Close">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <form onSubmit={savePaymentLink} style={{ padding: "20px 22px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                {/* Lead Source */}
+                <div>
+                  <label className="crm-label" style={{ marginBottom: "6px" }}>Lead source *</label>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    {["Manual", "Meta (Facebook / Instagram)", "Direct Referral"].map((src) => (
+                      <button
+                        key={src}
+                        type="button"
+                        onClick={() => setLinkForm((f) => ({ ...f, leadSource: src }))}
+                        style={{
+                          flex: 1,
+                          padding: "8px 12px",
+                          borderRadius: "8px",
+                          fontSize: "12.5px",
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          border: `1.5px solid ${linkForm.leadSource === src ? "#7c3aed" : "#cbd5e1"}`,
+                          background: linkForm.leadSource === src ? "#faf5ff" : "#ffffff",
+                          color: linkForm.leadSource === src ? "#7c3aed" : "#475569",
+                        }}
+                      >
+                        {src}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Name & Mobile */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <label className="crm-field">
+                    <span className="crm-label">Customer full name *</span>
+                    <input
+                      className="crm-input"
+                      value={linkForm.clientName}
+                      onChange={(e) => setLinkForm((f) => ({ ...f, clientName: e.target.value }))}
+                      placeholder="e.g. Michael Smith"
+                      required
+                    />
+                  </label>
+
+                  <label className="crm-field">
+                    <span className="crm-label">Mobile number (WhatsApp) *</span>
+                    <input
+                      className="crm-input"
+                      value={linkForm.clientPhone}
+                      onChange={(e) => setLinkForm((f) => ({ ...f, clientPhone: e.target.value }))}
+                      placeholder="+1 (555) 234-5678"
+                      required
+                    />
+                  </label>
+                </div>
+
+                {/* Email & Company */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <label className="crm-field">
+                    <span className="crm-label">Email address *</span>
+                    <input
+                      className="crm-input"
+                      type="email"
+                      value={linkForm.clientEmail}
+                      onChange={(e) => setLinkForm((f) => ({ ...f, clientEmail: e.target.value }))}
+                      placeholder="customer@example.com"
+                      required
+                    />
+                  </label>
+
+                  <label className="crm-field">
+                    <span className="crm-label">Company / brand name</span>
+                    <input
+                      className="crm-input"
+                      value={linkForm.companyName}
+                      onChange={(e) => setLinkForm((f) => ({ ...f, companyName: e.target.value }))}
+                      placeholder="Optional — customer name is used if blank"
+                    />
+                  </label>
+                </div>
+
+                {/* Service & Quantity */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <label className="crm-field">
+                    <span className="crm-label">Video / Service type *</span>
+                    <select
+                      className="crm-input crm-select"
+                      value={linkForm.service}
+                      onChange={(e) => setLinkForm((f) => ({ ...f, service: e.target.value }))}
+                    >
+                      {PAYMENT_LINK_SERVICES.map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label className="crm-field">
+                    <span className="crm-label">Quantity / Scope *</span>
+                    <select
+                      className="crm-input crm-select"
+                      value={linkForm.quantity}
+                      onChange={(e) => setLinkForm((f) => ({ ...f, quantity: e.target.value }))}
+                    >
+                      {PAYMENT_LINK_QUANTITIES.map((q) => (
+                        <option key={q} value={q}>{q}</option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+
+                {/* Amount ($ USD) */}
+                <label className="crm-field">
+                  <span className="crm-label">Custom total amount ($ USD) *</span>
+                  <div style={{ position: "relative" }}>
+                    <span style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", fontWeight: 700, color: "#64748b" }}>
+                      $
+                    </span>
+                    <input
+                      className="crm-input"
+                      type="number"
+                      step="any"
+                      min="1"
+                      style={{ paddingLeft: "26px" }}
+                      value={linkForm.totalAmount}
+                      onChange={(e) => setLinkForm((f) => ({ ...f, totalAmount: e.target.value }))}
+                      placeholder="e.g. 999.00"
+                      required
+                    />
+                  </div>
+                  <span style={{ fontSize: "11px", color: "#64748b", marginTop: "4px" }}>
+                    The customer will pay in USD via PayPal or Card.
+                  </span>
+                </label>
+
+                {/* Payment Option (Full vs 50% Deposit) */}
+                <label className="crm-field">
+                  <span className="crm-label">Payment option</span>
+                  <select
+                    className="crm-input crm-select"
+                    value={linkForm.paymentOption}
+                    onChange={(e) => setLinkForm((f) => ({ ...f, paymentOption: e.target.value as "full" | "partial" }))}
+                  >
+                    <option value="full">Full Payment (100% upfront)</option>
+                    <option value="partial">Allow 50% Deposit / Partial Payment</option>
+                  </select>
+                </label>
+
+                {/* Notes for Team */}
+                <label className="crm-field">
+                  <span className="crm-label">Notes for the team (not shown to customer)</span>
+                  <textarea
+                    className="crm-textarea"
+                    rows={2}
+                    value={linkForm.notes}
+                    onChange={(e) => setLinkForm((f) => ({ ...f, notes: e.target.value }))}
+                    placeholder="Internal reference, agreed deliverables, etc."
+                  />
+                </label>
+              </div>
+
+              {error && (
+                <p className="crm-alert crm-alert-inset" style={{ marginTop: "12px" }}>
+                  {error}
+                </p>
+              )}
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "20px" }}>
+                <button
+                  type="button"
+                  className="crm-act crm-act-ghost"
+                  onClick={() => setGeneratingLink(false)}
+                  disabled={busy}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="crm-act crm-act-purple"
+                  disabled={busy}
+                >
+                  {busy ? "Generating…" : "Generate Payment Link"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ---- CREATED LINK SUCCESS MODAL ---- */}
+      {createdLink && (
+        <div className="crm-modal-wrap" onClick={() => setCreatedLink(null)}>
+          <div className="crm-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "540px", padding: "28px" }}>
+            <div style={{ textAlign: "center", marginBottom: "16px" }}>
+              <div style={{ fontSize: "40px", marginBottom: "10px" }}>🎉</div>
+              <h2 style={{ fontSize: "19px", fontWeight: 800, color: "#0f172a", margin: "0 0 6px" }}>
+                Payment Link Generated!
+              </h2>
+              <p style={{ margin: 0, fontSize: "13px", color: "#64748b" }}>
+                Order <strong style={{ color: "#7c3aed" }}>#{createdLink.orderNumber}</strong> is ready. Share this link with the client:
+              </p>
+            </div>
+
+            <div style={{ background: "#f8fafc", padding: "12px 14px", borderRadius: "10px", border: "1px solid #e2e8f0", wordBreak: "break-all", fontFamily: "monospace", fontSize: "13px", color: "#2563eb", marginBottom: "18px" }}>
+              {createdLink.url}
+            </div>
+
+            <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
+              <button
+                type="button"
+                className="crm-act crm-act-purple"
+                onClick={() => copyLink(createdLink.url)}
+              >
+                📋 Copy Link
+              </button>
+              <a
+                href={createdLink.url}
+                target="_blank"
+                rel="noreferrer"
+                className="crm-act crm-act-ghost"
+              >
+                🔗 Open Link
+              </a>
+              <button
+                type="button"
+                className="crm-act crm-act-dark"
+                onClick={() => setCreatedLink(null)}
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ---- MANUAL ADD / EDIT PAYMENT MODAL ---- */}
       {editing && (
         <div className="crm-modal-wrap" onClick={close}>
           <form
@@ -1007,9 +1496,7 @@ export default function PaymentsView({
                 <span className="crm-label">Currency</span>
                 <select className="crm-input crm-select" value={form.currency} onChange={set("currency")}>
                   {options.currencies.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
+                    <option key={c} value={c}>{c}</option>
                   ))}
                 </select>
               </label>
@@ -1024,9 +1511,7 @@ export default function PaymentsView({
                 <span className="crm-label">Status</span>
                 <select className="crm-input crm-select" value={form.status} onChange={set("status")}>
                   {options.statuses.map((s) => (
-                    <option key={s} value={s}>
-                      {PAYMENT_STATUS_LABEL[s] || s}
-                    </option>
+                    <option key={s} value={s}>{PAYMENT_STATUS_LABEL[s] || s}</option>
                   ))}
                 </select>
               </label>
