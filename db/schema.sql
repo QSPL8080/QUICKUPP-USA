@@ -221,3 +221,22 @@ CREATE TABLE IF NOT EXISTS job_applications (
   KEY idx_status (status, created_at),
   CONSTRAINT fk_applications_job FOREIGN KEY (job_id) REFERENCES job_openings (id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Lead attachments (CRM files uploaded to enquiries/leads) -------------------
+CREATE TABLE IF NOT EXISTS lead_attachments (
+  id               INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  lead_source      VARCHAR(60)  NOT NULL,
+  lead_id          INT UNSIGNED NOT NULL,
+  file_name        VARCHAR(255) NOT NULL,
+  file_type        VARCHAR(100) NOT NULL,
+  file_size        INT UNSIGNED NOT NULL,
+  file_data        MEDIUMBLOB   NOT NULL,
+  uploaded_by      INT UNSIGNED NULL,
+  uploaded_by_name VARCHAR(150) NULL,
+  created_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_lead (lead_source, lead_id),
+  KEY idx_created (created_at),
+  CONSTRAINT fk_lead_attachments_user FOREIGN KEY (uploaded_by) REFERENCES crm_users (id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+

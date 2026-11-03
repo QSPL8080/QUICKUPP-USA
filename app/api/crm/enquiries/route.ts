@@ -7,7 +7,7 @@ import { readJson } from "@/lib/enquiry";
 const unauthorized = () => Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
 const invalid = () => Response.json({ ok: false, error: "Invalid request." }, { status: 400 });
 
-/* GET ?source=&id= → one lead with all its details */
+/* GET ?source=&id= → one lead with all its details, attachments, and payment links */
 export async function GET(request: Request) {
   if (!(await getCurrentUser())) return unauthorized();
   const url = new URL(request.url);
@@ -16,7 +16,102 @@ export async function GET(request: Request) {
   if (!isEnquirySource(source) || !Number.isInteger(id) || id < 1) return invalid();
   const lead = await getLead(source, id);
   if (!lead) return Response.json({ ok: false, error: "This lead was deleted." }, { status: 404 });
-  return Response.json({ ok: true, lead });
+
+  const pool = getPool();
+
+  // 1. Fetch attachments
+  const [attRows] = await pool.query(
+    `SELECT id, lead_source, lead_id, file_name, file_type, file_size, uploaded_by_name, created_at
+     FROM lead_attachments
+     WHERE lead_source = ? AND lead_id = ?
+     ORDER BY id DESC`,
+    [source, id]
+  ).catch(() => [[]]);
+
+  const attachments = (attRows as any[]).map((r) => ({
+    id: r.id,
+    leadSource: r.lead_source,
+    leadId: r.lead_id,
+    fileName: r.file_name,
+    fileType: r.file_type,
+    fileSize: r.file_size,
+    uploadedByName: r.uploaded_by_name,
+    createdAt: r.created_at,
+  }));
+
+  // 2. Fetch payment links matching this lead
+  const email = (lead.email || "").trim().toLowerCase();
+  const phone = (lead.phone || "").trim();
+  const conditions: string[] = ["(lead_source = ? AND lead_id = ?)"];
+  const args: any[] = [source, id];
+  if (email) {
+    conditions.push("(client_email = ? AND client_email != '')");
+    args.push(email);
+  }
+  if (phone) {
+    conditions.push("(client_phone = ? AND client_phone != '')");
+    args.push(phone);
+  }
+
+  let linkRows: any[] = [];
+  try {
+    const [res] = await pool.query(
+      `SELECT id, client_name, client_email, client_phone, company_name, service, category,
+              industry, quantity, description, amount, total_amount, payment_type, remaining_amount,
+              currency, method, status, link_status, invoice_number, token, billing_start_date,
+              billing_end_date, balance_due_date, created_at, paid_at, notes, lead_source, lead_id
+       FROM payment_links
+       WHERE ${conditions.join(" OR ")}
+       ORDER BY id DESC`,
+      args
+    );
+    linkRows = res as any[];
+  } catch {
+    const [res] = await pool.query(
+      `SELECT id, client_name, client_email, client_phone, company_name, service, category,
+              industry, quantity, description, amount, total_amount, payment_type, remaining_amount,
+              currency, method, status, link_status, invoice_number, token, billing_start_date,
+              billing_end_date, balance_due_date, created_at, paid_at, notes
+       FROM payments
+       WHERE token IS NOT NULL AND (${conditions.join(" OR ")})
+       ORDER BY id DESC`,
+      args
+    ).catch(() => [[]]);
+    linkRows = res as any[];
+  }
+
+  const paymentLinks = linkRows.map((r) => ({
+    id: r.id,
+    clientName: r.client_name,
+    clientEmail: r.client_email,
+    clientPhone: r.client_phone,
+    companyName: r.company_name,
+    service: r.service,
+    category: r.category || r.quantity,
+    industry: r.industry,
+    amount: Number(r.amount || 0),
+    totalAmount: Number(r.total_amount || r.amount || 0),
+    paymentType: r.payment_type || "full",
+    remainingAmount: Number(r.remaining_amount || 0),
+    currency: r.currency || "USD",
+    method: r.method,
+    status: r.status,
+    linkStatus: r.link_status || "active",
+    invoiceNumber: r.invoice_number,
+    orderNumber: r.invoice_number,
+    paymentOption: r.payment_type || "full",
+    token: r.token,
+    billingStartDate: r.billing_start_date ? String(r.billing_start_date).slice(0, 10) : null,
+    billingEndDate: r.billing_end_date ? String(r.billing_end_date).slice(0, 10) : null,
+    balanceDueDate: r.balance_due_date ? String(r.balance_due_date).slice(0, 10) : null,
+    createdAt: r.created_at,
+    paidAt: r.paid_at,
+    notes: r.notes,
+    leadSource: r.lead_source,
+    leadId: r.lead_id,
+  }));
+
+  return Response.json({ ok: true, lead, attachments, paymentLinks });
 }
 
 /* POST → add a lead by hand */
@@ -101,6 +196,18 @@ export async function PUT(request: Request) {
       throw err;
     }
   }
+
+  // Keep linked payment links updated with latest customer info
+  await pool.execute(
+    `UPDATE payment_links SET
+       client_name = ?,
+       client_email = COALESCE(NULLIF(?, ''), client_email),
+       client_phone = COALESCE(NULLIF(?, ''), client_phone),
+       company_name = ?
+     WHERE (lead_source = ? AND lead_id = ?)`,
+    [d.fullName, d.email, d.phone, d.companyName, source, id]
+  ).catch(() => {});
+
   return Response.json({ ok: true });
 }
 
@@ -162,6 +269,8 @@ export async function DELETE(request: Request) {
   }
   let deleted = 0;
   for (const [src, ids] of bySource) {
+    // delete attachments for these leads
+    await getPool().query(`DELETE FROM lead_attachments WHERE lead_source = ? AND lead_id IN (?)`, [src, ids]).catch(() => {});
     // permanently removed (no hidden "deleted" copies are kept)
     const [res] = await getPool().query(`DELETE FROM \`${SOURCES[src].table}\` WHERE id IN (?)`, [ids]);
     deleted += (res as { affectedRows: number }).affectedRows;

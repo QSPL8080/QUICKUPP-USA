@@ -52,7 +52,8 @@ export async function POST(req: Request) {
     const category = String(body.category || body.quantity || "").trim().slice(0, 150) || null;
     const industry = String(body.industry || "").trim().slice(0, 150) || null;
     const quantity = category;
-    const leadSource = "manual";
+    const leadSource = body.leadSource ? String(body.leadSource).trim() : "manual";
+    const leadId = body.leadId ? Number(body.leadId) : null;
     const notes = String(body.notes || "").trim().slice(0, 2000) || null;
 
     const defaults = getDefaultDates();
@@ -130,6 +131,7 @@ export async function POST(req: Request) {
           link_status,
           source,
           lead_source,
+          lead_id,
           billing_start_date,
           billing_end_date,
           balance_due_date,
@@ -137,7 +139,7 @@ export async function POST(req: Request) {
           expires_at,
           notes,
           created_by
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'USD', 'PayPal', 'pending', 'active', 'payment_link', 'manual', ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 24 HOUR), ?, ?)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'USD', 'PayPal', 'pending', 'active', 'payment_link', ?, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 24 HOUR), ?, ?)`,
         [
           clientName,
           clientEmail,
@@ -152,6 +154,8 @@ export async function POST(req: Request) {
           totalAmount,
           isPartial ? "partial" : "full",
           remainingAmount,
+          leadSource,
+          leadId,
           billingStartDate,
           billingEndDate,
           balanceDueDate,
@@ -399,3 +403,102 @@ export async function PATCH(req: Request) {
     );
   }
 }
+
+/* GET → List payment links (can filter by leadSource & leadId, or email, phone) */
+export async function GET(req: Request) {
+  const user = await getCurrentUser();
+  if (!user) {
+    return NextResponse.json({ ok: false, error: "Please sign in again." }, { status: 401 });
+  }
+
+  const { searchParams } = new URL(req.url);
+  const email = searchParams.get("email")?.trim().toLowerCase();
+  const phone = searchParams.get("phone")?.trim();
+  const leadSource = searchParams.get("leadSource")?.trim();
+  const leadId = searchParams.get("leadId") ? Number(searchParams.get("leadId")) : null;
+
+  const pool = getPool();
+  const conditions: string[] = [];
+  const args: any[] = [];
+
+  if (leadSource && leadId) {
+    conditions.push("(lead_source = ? AND lead_id = ?)");
+    args.push(leadSource, leadId);
+  }
+
+  if (email) {
+    conditions.push("(client_email = ? AND client_email != '')");
+    args.push(email);
+  }
+
+  if (phone) {
+    conditions.push("(client_phone = ? AND client_phone != '')");
+    args.push(phone);
+  }
+
+  if (conditions.length === 0) {
+    return NextResponse.json({ ok: true, links: [] });
+  }
+
+  const whereClause = conditions.join(" OR ");
+  let rows: any[] = [];
+  try {
+    const [res] = await pool.query(
+      `SELECT id, client_name, client_email, client_phone, company_name, service, category,
+              industry, quantity, description, amount, total_amount, payment_type, remaining_amount,
+              currency, method, status, link_status, invoice_number, token, billing_start_date,
+              billing_end_date, balance_due_date, created_at, paid_at, notes, lead_source, lead_id
+       FROM payment_links
+       WHERE ${whereClause}
+       ORDER BY id DESC`,
+      args
+    );
+    rows = res as any[];
+  } catch {
+    const [res] = await pool.query(
+      `SELECT id, client_name, client_email, client_phone, company_name, service, category,
+              industry, quantity, description, amount, total_amount, payment_type, remaining_amount,
+              currency, method, status, link_status, invoice_number, token, billing_start_date,
+              billing_end_date, balance_due_date, created_at, paid_at, notes
+       FROM payments
+       WHERE token IS NOT NULL AND (${whereClause})
+       ORDER BY id DESC`,
+      args
+    ).catch(() => [[]]);
+    rows = res as any[];
+  }
+
+  const links = rows.map((r) => ({
+    id: r.id,
+    clientName: r.client_name,
+    clientEmail: r.client_email,
+    clientPhone: r.client_phone,
+    companyName: r.company_name,
+    service: r.service,
+    category: r.category || r.quantity,
+    industry: r.industry,
+    amount: Number(r.amount || 0),
+    totalAmount: Number(r.total_amount || r.amount || 0),
+    paymentType: r.payment_type || "full",
+    remainingAmount: Number(r.remaining_amount || 0),
+    currency: r.currency || "USD",
+    method: r.method,
+    status: r.status,
+    linkStatus: r.link_status || "active",
+    invoiceNumber: r.invoice_number,
+    orderNumber: r.invoice_number,
+    paymentOption: r.payment_type || "full",
+    token: r.token,
+    billingStartDate: r.billing_start_date ? String(r.billing_start_date).slice(0, 10) : null,
+    billingEndDate: r.billing_end_date ? String(r.billing_end_date).slice(0, 10) : null,
+    balanceDueDate: r.balance_due_date ? String(r.balance_due_date).slice(0, 10) : null,
+    createdAt: r.created_at,
+    paidAt: r.paid_at,
+    notes: r.notes,
+    leadSource: r.lead_source,
+    leadId: r.lead_id,
+  }));
+
+  return NextResponse.json({ ok: true, links, paymentLinks: links });
+}
+

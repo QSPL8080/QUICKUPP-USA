@@ -36,6 +36,7 @@ export type EnquiryRow = {
   otherIndustry: string | null;
   service: string | null; // service forms / manual: the service group
   interest: string; // contact: service chosen; service forms / manual: the service page
+  category?: string | null;
   budget: string | null;
   youtubeLink?: string | null;
   message: string;
@@ -235,6 +236,7 @@ export async function getLead(source: EnquirySource, id: number): Promise<Enquir
     otherIndustry: (r.other_industry as string) || null,
     service: isContact ? null : ((r.service as string) || SOURCES[source].label),
     interest: String((isContact ? r.project_type : source === "youtube" ? "" : r.category) ?? ""),
+    category: (r.category as string) || (r.project_type as string) || null,
     budget: (r.budget as string) || null,
     youtubeLink: (r.youtube_link as string) || null,
     message: String(r.message ?? ""),
