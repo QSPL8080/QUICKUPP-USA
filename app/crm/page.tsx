@@ -1,63 +1,135 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/crm/auth";
-import { SOURCES, dashboardStats } from "@/lib/crm/data";
+import { crmOverview, paymentStats } from "@/lib/crm/stats";
+import { ENQUIRY_STATUS_LABEL, type EnquiryStatus } from "@/lib/crm/leadOptions";
+import { APPLICATION_STATUS_LABEL, type ApplicationStatus } from "@/lib/applications";
+import { PAYMENT_STATUS_LABEL, money } from "@/lib/crm/format";
 import { PageHead } from "@/components/crm/ListTools";
-import { money } from "@/lib/crm/format";
+import { ColumnChart, RankList, Ring, StackBar } from "@/components/crm/DashCharts";
 
-const fmt = (iso: string) => new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+/*
+ * CRM Dashboard: one view of the whole CRM — leads, project progress,
+ * payments, careers, team and the latest activity.
+ */
+
+const LEAD_COLORS: Record<string, string> = {
+  new: "#6366f1",
+  contacted: "#f59e0b",
+  in_progress: "#06b6d4",
+  on_hold: "#94a3b8",
+  closed: "#10b981",
+};
+const CHANNEL_COLORS: Record<string, string> = { Website: "#4f46e5", Manual: "#0ea5e9", Meta: "#a855f7" };
+const APP_COLORS: Record<string, string> = {
+  new: "#6366f1",
+  reviewing: "#f59e0b",
+  shortlisted: "#06b6d4",
+  rejected: "#94a3b8",
+  hired: "#10b981",
+};
+
+const ago = (iso: string) => {
+  const mins = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const h = Math.round(mins / 60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.round(h / 24);
+  if (d < 7) return `${d}d ago`;
+  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+};
+
+const TYPE_LABEL = { lead: "Lead", application: "Application", payment: "Payment" } as const;
+
+function statusLabel(type: "lead" | "application" | "payment", s: string) {
+  if (type === "lead") return ENQUIRY_STATUS_LABEL[s as EnquiryStatus] || s;
+  if (type === "application") return APPLICATION_STATUS_LABEL[s as ApplicationStatus] || s;
+  return PAYMENT_STATUS_LABEL[s] || s;
+}
 
 export default async function CrmDashboard() {
   const user = await requireUser();
-  const { perSource, recent, payments } = await dashboardStats();
-  const totalNew = perSource.reduce((a, s) => a + s.fresh, 0);
-  const totalAll = perSource.reduce((a, s) => a + s.total, 0);
-  const totalMonth = perSource.reduce((a, s) => a + s.month, 0);
-  const max = Math.max(1, ...perSource.map((s) => s.total));
-  const main = payments[0];
+  const [o, p] = await Promise.all([crmOverview(), paymentStats()]);
+  const cur = p.currency;
+  const maxSource = Math.max(1, ...o.perSource.map((s) => s.total));
+  const projectTotal = o.byProject.reduce((a, b) => a + b.count, 0);
 
   return (
     <>
-      <PageHead title={`Welcome back, ${user.name.split(" ")[0]}`} sub="Here’s what’s happening across your enquiries and payments." />
+      <PageHead title={`Welcome back, ${user.name.split(" ")[0]}`} sub="An overview of leads, projects, payments, careers and your team." />
 
-      <section className="crm-kpis">
-        <div className="crm-kpi crm-kpi-accent">
-          <p className="crm-kpi-label">New enquiries</p>
-          <p className="crm-kpi-value">{totalNew}</p>
-          <p className="crm-kpi-note">Waiting for a reply</p>
+      {/* headline numbers */}
+      <section className="crm-kpis crm-dash-kpis">
+        <Link href="/crm/enquiries" className="crm-kpi crm-kpi-accent crm-dash-kpi">
+          <p className="crm-kpi-label">Total leads</p>
+          <p className="crm-kpi-value">{o.totals.leads}</p>
+          <p className="crm-kpi-note">
+            {o.totals.week} this week · {o.totals.month} this month
+          </p>
+        </Link>
+        <Link href="/crm/enquiries?status=new" className="crm-kpi crm-dash-kpi">
+          <p className="crm-kpi-label">Awaiting reply</p>
+          <p className="crm-kpi-value">{o.totals.fresh}</p>
+          <p className="crm-kpi-note">New leads not yet contacted</p>
+        </Link>
+        <Link href="/crm/payments" className="crm-kpi crm-dash-kpi">
+          <p className="crm-kpi-label">Collected this month</p>
+          <p className="crm-kpi-value">{money(p.month, cur)}</p>
+          <p className="crm-kpi-note">{money(p.due, cur)} outstanding</p>
+        </Link>
+        <Link href="/crm/applications" className="crm-kpi crm-dash-kpi">
+          <p className="crm-kpi-label">Job applications</p>
+          <p className="crm-kpi-value">{o.applications.total}</p>
+          <p className="crm-kpi-note">
+            {o.applications.week} this week · {o.jobs.live} live {o.jobs.live === 1 ? "opening" : "openings"}
+          </p>
+        </Link>
+      </section>
+
+      {/* leads */}
+      <section className="crm-dash-row">
+        <div className="crm-card">
+          <div className="crm-card-head">
+            <h2 className="crm-card-title">New leads · last 6 months</h2>
+            <span className="crm-muted">{o.leadTrend.reduce((a, t) => a + t.value, 0)} leads</span>
+          </div>
+          <ColumnChart data={o.leadTrend} empty="No leads in the last 6 months." />
         </div>
-        <div className="crm-kpi">
-          <p className="crm-kpi-label">This month</p>
-          <p className="crm-kpi-value">{totalMonth}</p>
-          <p className="crm-kpi-note">Enquiries received</p>
-        </div>
-        <div className="crm-kpi">
-          <p className="crm-kpi-label">Received this month</p>
-          <p className="crm-kpi-value">{main ? money(main.month, main.currency) : money(0, "USD")}</p>
-          <p className="crm-kpi-note">{main ? `${main.currency} payments` : "No payments yet"}</p>
-        </div>
-        <div className="crm-kpi">
-          <p className="crm-kpi-label">Pending payments</p>
-          <p className="crm-kpi-value">{main ? money(main.pending, main.currency) : money(0, "USD")}</p>
-          <p className="crm-kpi-note">Awaiting payment</p>
+        <div className="crm-card">
+          <div className="crm-card-head">
+            <h2 className="crm-card-title">Lead pipeline</h2>
+            <Link href="/crm/enquiries" className="crm-dash-more">
+              All enquiries
+            </Link>
+          </div>
+          <StackBar
+            parts={o.byStatus.map((b) => ({
+              key: b.status,
+              label: ENQUIRY_STATUS_LABEL[b.status],
+              color: LEAD_COLORS[b.status],
+              count: b.count,
+              href: `/crm/enquiries?status=${b.status}`,
+            }))}
+          />
         </div>
       </section>
 
-      <section className="crm-grid-2">
+      <section className="crm-dash-row crm-dash-row-3">
         <div className="crm-card">
           <div className="crm-card-head">
-            <h2 className="crm-card-title">Enquiries by form</h2>
-            <span className="crm-muted">{totalAll} total</span>
+            <h2 className="crm-card-title">Leads by form</h2>
+            <span className="crm-muted">{o.totals.leads} total</span>
           </div>
-          <ul className="crm-bars">
-            {perSource.map((s) => (
+          <ul className="crm-bars crm-dash-bars">
+            {o.perSource.map((s) => (
               <li key={s.key}>
                 <Link href={s.href} className="crm-bar-row">
                   <span className="crm-bar-label">{s.label}</span>
                   <span className="crm-bar-track">
-                    <span className="crm-bar-fill" style={{ width: `${(s.total / max) * 100}%` }} />
+                    <span className="crm-bar-fill" style={{ width: `${(s.total / maxSource) * 100}%` }} />
                   </span>
                   <span className="crm-bar-num">{s.total}</span>
-                  {s.fresh > 0 && <span className="crm-nav-badge">{s.fresh} new</span>}
+                  {s.fresh > 0 ? <span className="crm-nav-badge">{s.fresh} new</span> : <span />}
                 </Link>
               </li>
             ))}
@@ -66,63 +138,173 @@ export default async function CrmDashboard() {
 
         <div className="crm-card">
           <div className="crm-card-head">
-            <h2 className="crm-card-title">Latest enquiries</h2>
+            <h2 className="crm-card-title">Lead source</h2>
           </div>
-          {recent.length ? (
-            <ul className="crm-recent">
-              {recent.map((r) => (
-                <li key={`${r.source}-${r.id}`}>
-                  <Link href={SOURCES[r.source].href} className="crm-recent-row">
-                    <span className="crm-avatar crm-avatar-soft" aria-hidden="true">{r.name.slice(0, 1).toUpperCase()}</span>
-                    <span className="crm-recent-text">
-                      <span className="crm-strong">{r.name}</span>
-                      <span className="crm-cell-sub">{SOURCES[r.source].short} · {fmt(r.createdAt)}</span>
-                    </span>
-                    <span className={`crm-pill crm-pill-${r.status}`}>{r.status[0].toUpperCase() + r.status.slice(1)}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="crm-muted">No enquiries yet.</p>
+          <StackBar parts={o.byChannel.map((c) => ({ key: c.label, label: c.label, color: CHANNEL_COLORS[c.label], count: c.count }))} />
+        </div>
+
+        <div className="crm-card">
+          <div className="crm-card-head">
+            <h2 className="crm-card-title">Project status</h2>
+            <span className="crm-muted">{projectTotal} leads</span>
+          </div>
+          <RankList items={o.byProject.map((b) => ({ label: b.status, value: b.count }))} empty="No projects yet." />
+        </div>
+      </section>
+
+      {/* payments, careers, team */}
+      <section className="crm-dash-row crm-dash-row-3">
+        <div className="crm-card crm-dash-panel">
+          <div className="crm-card-head">
+            <h2 className="crm-card-title">Payments</h2>
+            <Link href="/crm/payments" className="crm-dash-more">
+              Open payments
+            </Link>
+          </div>
+          <div className="crm-dash-pay">
+            <Ring value={p.collectionRate} label="Collection rate" tone="green" />
+            <div>
+              <p className="crm-dash-big">{money(p.received, cur)}</p>
+              <p className="crm-cell-sub">collected · {p.collectionRate}% of {money(p.invoiced, cur)} invoiced</p>
+            </div>
+          </div>
+          <dl className="crm-dash-facts">
+            <div>
+              <dt>Outstanding</dt>
+              <dd>{money(p.due, cur)}</dd>
+            </div>
+            <div>
+              <dt>Open invoices</dt>
+              <dd>{p.openCount}</dd>
+            </div>
+            <div>
+              <dt>Active links</dt>
+              <dd>{p.links.active}</dd>
+            </div>
+            <div>
+              <dt>This month</dt>
+              <dd>{money(p.month, cur)}</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div className="crm-card crm-dash-panel">
+          <div className="crm-card-head">
+            <h2 className="crm-card-title">Careers</h2>
+            <Link href="/crm/jobs" className="crm-dash-more">
+              Job openings
+            </Link>
+          </div>
+          <dl className="crm-dash-facts crm-dash-facts-3">
+            <div>
+              <dt>Live</dt>
+              <dd>{o.jobs.live}</dd>
+            </div>
+            <div>
+              <dt>Closed</dt>
+              <dd>{o.jobs.closed}</dd>
+            </div>
+            <div>
+              <dt>Expired</dt>
+              <dd>{o.jobs.expired}</dd>
+            </div>
+          </dl>
+          <StackBar
+            parts={o.applications.byStatus.map((b) => ({
+              key: b.status,
+              label: APPLICATION_STATUS_LABEL[b.status],
+              color: APP_COLORS[b.status],
+              count: b.count,
+              href: `/crm/applications?status=${b.status}`,
+            }))}
+          />
+        </div>
+
+        <div className="crm-card crm-dash-panel">
+          <div className="crm-card-head">
+            <h2 className="crm-card-title">Team &amp; content</h2>
+            {user.role === "super_admin" && (
+              <Link href="/crm/users" className="crm-dash-more">
+                Manage team
+              </Link>
+            )}
+          </div>
+          <dl className="crm-dash-facts">
+            <div>
+              <dt>Active users</dt>
+              <dd>
+                {o.team.active}
+                <span className="crm-dash-of"> / {o.team.total}</span>
+              </dd>
+            </div>
+            <div>
+              <dt>Signed in this week</dt>
+              <dd>{o.team.recent}</dd>
+            </div>
+            <div>
+              <dt>Super admins</dt>
+              <dd>{o.team.supers}</dd>
+            </div>
+            <div>
+              <dt>Published blogs</dt>
+              <dd>
+                {o.blogs.live}
+                <span className="crm-dash-of"> / {o.blogs.total}</span>
+              </dd>
+            </div>
+          </dl>
+          {o.topJobs.length > 0 && (
+            <>
+              <p className="crm-dash-subhead">Most applied roles</p>
+              <RankList items={o.topJobs.map((j) => ({ label: j.label, value: j.count }))} />
+            </>
           )}
         </div>
       </section>
 
+      {/* latest activity */}
       <section className="crm-card">
         <div className="crm-card-head">
-          <h2 className="crm-card-title">Payments overview</h2>
-          <Link href="/crm/payments?new=1" className="crm-act crm-act-dark crm-act-sm">
-            Add payment
-          </Link>
+          <h2 className="crm-card-title">Recent activity</h2>
+          <span className="crm-muted">Leads, applications and payments</span>
         </div>
-        {payments.length ? (
-          <div className="crm-table-wrap">
-            <table className="crm-table">
-              <thead>
-                <tr>
-                  <th>Currency</th>
-                  <th className="crm-right">Received</th>
-                  <th className="crm-right">This month</th>
-                  <th className="crm-right">Pending</th>
-                  <th className="crm-right">Entries</th>
-                </tr>
-              </thead>
-              <tbody>
-                {payments.map((p) => (
-                  <tr key={p.currency}>
-                    <td className="crm-strong">{p.currency}</td>
-                    <td className="crm-right">{money(p.received, p.currency)}</td>
-                    <td className="crm-right">{money(p.month, p.currency)}</td>
-                    <td className="crm-right">{money(p.pending, p.currency)}</td>
-                    <td className="crm-right">{p.count}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        {o.activity.length ? (
+          <ul className="crm-dash-feed">
+            {o.activity.map((a) => (
+              <li key={a.key}>
+                <Link href={a.href} className="crm-dash-feed-row">
+                  <span className={`crm-dash-feed-icon is-${a.type}`} aria-hidden="true">
+                    {a.type === "lead" ? (
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M4 4h16v12H5.2L4 17.2V4z" />
+                      </svg>
+                    ) : a.type === "application" ? (
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="7" width="18" height="13" rx="2" />
+                        <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                      </svg>
+                    ) : (
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="2" y="5" width="20" height="14" rx="2" />
+                        <path d="M2 10h20" />
+                      </svg>
+                    )}
+                  </span>
+                  <span className="crm-recent-text">
+                    <span className="crm-strong">{a.title}</span>
+                    <span className="crm-cell-sub">
+                      {TYPE_LABEL[a.type]} · {a.sub}
+                      {"amount" in a && a.amount ? ` · ${money(a.amount, a.currency)}` : ""}
+                    </span>
+                  </span>
+                  <span className={`crm-pill crm-pill-${a.status}`}>{statusLabel(a.type, a.status)}</span>
+                  <span className="crm-dash-feed-time">{ago(a.at)}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
         ) : (
-          <p className="crm-muted">No payments recorded yet.</p>
+          <p className="crm-muted">No activity yet.</p>
         )}
       </section>
     </>

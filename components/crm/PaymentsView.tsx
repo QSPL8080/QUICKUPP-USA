@@ -146,6 +146,7 @@ export default function PaymentsView({
   page = 1,
   pages = 1,
   pageSize = 20,
+  overview,
 }: {
   rows: PaymentRow[];
   options: Options;
@@ -159,6 +160,7 @@ export default function PaymentsView({
   page?: number;
   pages?: number;
   pageSize?: number;
+  overview?: React.ReactNode;
 }) {
   const router = useRouter();
   const { confirm, toast } = useFeedback();
@@ -631,6 +633,8 @@ Quickupp Softech LLC`;
       <PageHead title="Payments" sub="Track customer payments, invoices, balance dues, and official receipts.">
         {headerActions}
       </PageHead>
+
+      {overview}
 
       {/* Tabs: All Payments, Website Payments, and Payment Links */}
       <div className="crm-payments-tabs">

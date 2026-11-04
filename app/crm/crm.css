@@ -3270,3 +3270,756 @@ h2.crm-view-modal-title {
 }
 
 
+
+/* ==========================================================================
+   DASHBOARDS — chart pieces shared by the CRM Dashboard and the Payments
+   overview (components/crm/DashCharts.tsx), then each page's own layout.
+   ========================================================================== */
+.crm-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.crm-dash-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 16px;
+}
+
+.crm-dash-row-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.crm-dash-more {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--crm-accent) !important;
+  white-space: nowrap;
+}
+
+.crm-dash-more:hover {
+  text-decoration: underline !important;
+}
+
+/* columns */
+.crm-dash-cols {
+  position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  align-items: end;
+  gap: clamp(8px, 1.6vw, 18px);
+  height: 210px;
+  padding-top: 4px;
+  background-image: linear-gradient(#eef0f6 1px, transparent 1px);
+  background-size: 100% 25%;
+  background-position: 0 4px;
+}
+
+.crm-dash-col {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  justify-items: center;
+  align-items: end;
+  height: 100%;
+  min-width: 0;
+}
+
+.crm-dash-col-value {
+  margin-bottom: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--crm-ink);
+  white-space: nowrap;
+}
+
+.crm-dash-col-bar {
+  display: block;
+  width: min(100%, 42px);
+  border-radius: 6px 6px 2px 2px;
+  background: #c7d2fe;
+  transition: background 0.2s ease;
+}
+
+.crm-dash-col.is-current .crm-dash-col-bar,
+.crm-dash-col:hover .crm-dash-col-bar {
+  background: var(--crm-accent);
+}
+
+.crm-dash-col-label {
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--crm-muted);
+}
+
+.crm-dash-cols.is-empty .crm-dash-col-bar {
+  background: #e2e8f0;
+}
+
+.crm-dash-empty {
+  position: absolute;
+  inset: 0 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--crm-muted);
+}
+
+/* ring */
+.crm-dash-ring {
+  position: relative;
+  flex: none;
+  width: 76px;
+  height: 76px;
+}
+
+.crm-dash-ring circle {
+  fill: none;
+  stroke-width: 8;
+}
+
+.crm-dash-ring-track {
+  stroke: #eef0f6;
+}
+
+.crm-dash-ring-fill {
+  stroke: var(--crm-accent);
+  stroke-linecap: round;
+}
+
+.crm-dash-ring-green .crm-dash-ring-fill {
+  stroke: #10b981;
+}
+
+.crm-dash-ring-num {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading, sans-serif);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--crm-ink);
+}
+
+/* stacked share bar + legend */
+.crm-dash-stack-bar {
+  display: flex;
+  gap: 3px;
+  height: 12px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.crm-dash-stack-seg {
+  display: block;
+  min-width: 6px;
+  height: 100%;
+}
+
+.crm-dash-stack-seg.is-empty {
+  background: #eef0f6;
+}
+
+.crm-dash-legend {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+}
+
+.crm-dash-legend li + li {
+  border-top: 1px solid #f1f3f8;
+}
+
+.crm-dash-legend-row {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) auto auto 40px;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 6px;
+  border-radius: 8px;
+}
+
+a.crm-dash-legend-row:hover {
+  background: #f8fafc;
+}
+
+.crm-dash-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.crm-dash-legend-label {
+  color: var(--crm-ink);
+  font-weight: 500;
+}
+
+.crm-dash-legend-note {
+  font-size: 12.5px;
+  color: var(--crm-muted);
+}
+
+.crm-dash-legend-num {
+  font-weight: 700;
+  color: var(--crm-ink);
+  text-align: right;
+  grid-column: 4;
+}
+
+.crm-dash-legend-pct {
+  font-size: 12px;
+  color: var(--crm-muted);
+  text-align: right;
+}
+
+/* ranked list */
+.crm-dash-rank {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.crm-dash-rank-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.crm-dash-rank-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--crm-ink);
+  font-weight: 500;
+}
+
+.crm-dash-rank-num {
+  flex: none;
+  font-weight: 700;
+  color: var(--crm-ink);
+}
+
+.crm-dash-rank-note {
+  font-weight: 500;
+  color: var(--crm-muted);
+}
+
+.crm-dash-rank-track {
+  display: block;
+  height: 6px;
+  border-radius: 999px;
+  background: #eef0f6;
+  overflow: hidden;
+}
+
+.crm-dash-rank-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #818cf8, var(--crm-accent));
+}
+
+/* ---- Main dashboard ---------------------------------------------------------- */
+.crm-dash-kpi {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.crm-dash-kpi:hover {
+  border-color: #c7d2fe;
+  box-shadow: 0 8px 22px rgba(79, 70, 229, 0.08);
+  transform: translateY(-2px);
+}
+
+.crm-dash-bars .crm-bar-row {
+  grid-template-columns: 118px minmax(0, 1fr) 30px auto;
+  gap: 10px;
+  padding: 7px 6px;
+}
+
+.crm-dash-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.crm-dash-panel .crm-card-head {
+  margin-bottom: 0;
+}
+
+.crm-dash-pay {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.crm-root .crm-dash-big {
+  font-family: var(--font-heading, sans-serif);
+  font-size: 24px !important;
+  line-height: 1.15 !important;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--crm-ink);
+}
+
+.crm-dash-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0;
+  border: 1px solid var(--crm-line);
+  border-radius: 10px;
+  background: var(--crm-line);
+  overflow: hidden;
+}
+
+.crm-dash-facts-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.crm-dash-facts > div {
+  padding: 12px 14px;
+  background: #fafbfd;
+}
+
+.crm-dash-facts dt {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--crm-muted);
+}
+
+.crm-dash-facts dd {
+  margin: 4px 0 0;
+  font-family: var(--font-heading, sans-serif);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--crm-ink);
+}
+
+.crm-dash-of {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--crm-muted);
+}
+
+.crm-root .crm-dash-subhead {
+  margin-top: 2px;
+  font-size: 12px !important;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--crm-muted);
+}
+
+.crm-dash-feed {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 24px;
+}
+
+.crm-dash-feed li {
+  border-top: 1px solid #f1f3f8;
+}
+
+.crm-dash-feed li:nth-child(-n + 2) {
+  border-top: 0;
+}
+
+.crm-dash-feed-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 6px;
+  border-radius: 10px;
+}
+
+.crm-dash-feed-row:hover {
+  background: #f8fafc;
+}
+
+.crm-dash-feed-icon {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+}
+
+.crm-dash-feed-icon.is-lead { background: #eef2ff; color: #4f46e5; }
+.crm-dash-feed-icon.is-application { background: #ecfeff; color: #0e7490; }
+.crm-dash-feed-icon.is-payment { background: #ecfdf5; color: #047857; }
+
+.crm-dash-feed-time {
+  flex: none;
+  min-width: 54px;
+  text-align: right;
+  font-size: 12px;
+  color: var(--crm-muted);
+}
+
+.crm-pill-in_progress { background: #ecfeff; color: #0e7490; }
+.crm-pill-on_hold { background: #f1f5f9; color: #475569; }
+.crm-pill-reviewing { background: #fffbeb; color: #b45309; }
+.crm-pill-shortlisted { background: #ecfeff; color: #0e7490; }
+.crm-pill-rejected { background: #f1f5f9; color: #475569; }
+.crm-pill-hired { background: #ecfdf5; color: #047857; }
+
+/* ---- Payments overview (top of the Payments page) ----------------------------- */
+.crm-pdash {
+  border: 1px solid var(--crm-line);
+  border-radius: 14px;
+  background:
+    radial-gradient(ellipse 50% 120% at 100% 0%, rgba(16, 185, 129, 0.06), transparent 70%),
+    #fbfcfe;
+}
+
+.crm-pdash-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.crm-pdash-summary::-webkit-details-marker {
+  display: none;
+}
+
+.crm-pdash-summary-title {
+  font-family: var(--font-heading, sans-serif);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--crm-ink);
+}
+
+.crm-pdash-summary-note {
+  font-size: 12.5px;
+  color: var(--crm-muted);
+}
+
+.crm-pdash-toggle {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--crm-line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--crm-muted);
+  transition: transform 0.25s ease;
+}
+
+.crm-pdash[open] .crm-pdash-toggle {
+  transform: rotate(180deg);
+}
+
+.crm-pdash-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 18px 18px;
+}
+
+.crm-pdash-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 1px solid var(--crm-line);
+  border-radius: 12px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.crm-pdash-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 20px;
+  min-width: 0;
+}
+
+.crm-pdash-cell + .crm-pdash-cell {
+  border-left: 1px solid var(--crm-line);
+}
+
+.crm-pdash-cell-ring {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.crm-pdash-cell-ring > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.crm-root .crm-pdash-label {
+  font-size: 12px !important;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--crm-muted);
+}
+
+.crm-root .crm-pdash-value {
+  font-family: var(--font-heading, sans-serif);
+  font-size: clamp(21px, 1.8vw, 26px) !important;
+  line-height: 1.15 !important;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--crm-ink);
+  overflow-wrap: anywhere;
+}
+
+.crm-root .crm-pdash-note {
+  font-size: 12.5px !important;
+  color: var(--crm-muted);
+}
+
+.crm-pdash-delta {
+  display: block;
+  margin-top: 2px;
+  font-weight: 600;
+}
+
+.crm-pdash-delta.is-up { color: #047857; }
+.crm-pdash-delta.is-down { color: #b91c1c; }
+
+.crm-pdash-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.crm-pdash-chip {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.crm-pdash-chip.is-active { background: #eef2ff; color: #4f46e5; }
+.crm-pdash-chip.is-paid { background: #ecfdf5; color: #047857; }
+.crm-pdash-chip.is-expired { background: #f1f5f9; color: #475569; }
+
+.crm-pdash-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 16px;
+}
+
+.crm-pdash-row-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.crm-pdash-split {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #f1f3f8;
+}
+
+.crm-pdash-split-bar {
+  display: flex;
+  gap: 3px;
+  height: 8px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.crm-pdash-split-bar span {
+  display: block;
+  min-width: 6px;
+}
+
+.crm-pdash-split .is-web { background: #4f46e5; }
+.crm-pdash-split .is-link { background: #10b981; }
+
+.crm-pdash-split-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 12.5px;
+  color: var(--crm-text);
+}
+
+.crm-pdash-split-legend i {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 6px;
+  border-radius: 3px;
+  vertical-align: 0;
+}
+
+.crm-pdash-due {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.crm-pdash-due li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.crm-pdash-due li + li {
+  border-top: 1px solid #f1f3f8;
+}
+
+.crm-pdash-due-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.crm-pdash-due-amt {
+  flex: none;
+  font-weight: 700;
+  color: var(--crm-ink);
+}
+
+.crm-pdash-overdue {
+  color: #b91c1c !important;
+}
+
+.crm-root .crm-pdash-foot {
+  font-size: 12.5px !important;
+  color: var(--crm-muted);
+}
+
+/* ---- Dashboards: responsive -------------------------------------------------- */
+@media (max-width: 1200px) {
+  .crm-dash-row-3,
+  .crm-pdash-row-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .crm-dash-row-3 > :last-child:nth-child(odd),
+  .crm-pdash-row-3 > :last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  .crm-pdash-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .crm-pdash-cell:nth-child(3) {
+    border-left: 0;
+  }
+
+  .crm-pdash-cell:nth-child(n + 3) {
+    border-top: 1px solid var(--crm-line);
+  }
+}
+
+@media (max-width: 1000px) {
+  .crm-dash-row,
+  .crm-pdash-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .crm-dash-feed {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .crm-dash-feed li:nth-child(2) {
+    border-top: 1px solid #f1f3f8;
+  }
+}
+
+@media (max-width: 700px) {
+  .crm-dash-row-3,
+  .crm-pdash-row-3 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .crm-pdash-summary {
+    flex-wrap: wrap;
+    padding: 12px 14px;
+  }
+
+  .crm-pdash-summary-note {
+    order: 3;
+    width: 100%;
+  }
+
+  .crm-pdash-body {
+    padding: 0 12px 12px;
+  }
+
+  .crm-dash-cols {
+    height: 180px;
+  }
+
+  .crm-dash-col-value {
+    font-size: 10.5px;
+  }
+}
+
+@media (max-width: 560px) {
+  .crm-pdash-strip {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .crm-pdash-cell + .crm-pdash-cell {
+    border-left: 0;
+    border-top: 1px solid var(--crm-line);
+  }
+
+  .crm-pdash-cell {
+    padding: 14px 16px;
+  }
+
+  .crm-dash-feed-time {
+    display: none;
+  }
+
+  .crm-dash-feed-row .crm-pill {
+    font-size: 11px !important;
+    padding: 2px 8px;
+  }
+
+  .crm-dash-legend-row {
+    grid-template-columns: 10px minmax(0, 1fr) auto 36px;
+  }
+
+  .crm-dash-legend-note {
+    display: none;
+  }
+
+  .crm-dash-legend-num {
+    grid-column: 3;
+  }
+
+  .crm-dash-facts-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

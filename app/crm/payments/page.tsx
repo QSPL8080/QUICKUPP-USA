@@ -1,6 +1,8 @@
 import { requireUser } from "@/lib/crm/auth";
 import { CURRENCIES, PAYMENT_METHODS, PAYMENT_SERVICES, PAYMENT_STATUSES, listPayments } from "@/lib/crm/data";
 import PaymentsView from "@/components/crm/PaymentsView";
+import PaymentsDashboard from "@/components/crm/PaymentsDashboard";
+import { paymentStats } from "@/lib/crm/stats";
 
 type Props = {
   searchParams: Promise<{
@@ -18,7 +20,7 @@ export default async function PaymentsPage({ searchParams }: Props) {
   const q = sp.q || "";
   const status = sp.status || "";
   const tab = (sp.tab as "website" | "payment_link" | "all") || "all";
-  const data = await listPayments({ q, status, tab, page: Number(sp.page) || 1 });
+  const [data, stats] = await Promise.all([listPayments({ q, status, tab, page: Number(sp.page) || 1 }), paymentStats()]);
   return (
     <PaymentsView
       rows={data.items}
@@ -33,6 +35,7 @@ export default async function PaymentsPage({ searchParams }: Props) {
       page={data.page}
       pages={data.pages}
       pageSize={data.pageSize}
+      overview={<PaymentsDashboard s={stats} />}
     />
   );
 }
