@@ -216,7 +216,9 @@ export function validateServiceEnquiry(
   if (!country) errors.country = "Please enter your country.";
   if (!(INDUSTRIES as readonly string[]).includes(industry)) errors.industry = "Please select your industry.";
   if (industry === "Other" && !otherIndustry) errors.otherIndustry = "Please specify your industry.";
-  if (!category && !errors.category) errors.category = "Please select at least one category.";
+  if (options.length > 0 && !category && !errors.category) {
+    errors.category = "Please select at least one category.";
+  }
   if (!(CONTACT_BUDGETS as readonly string[]).includes(budget)) errors.budget = "Please select an estimated budget.";
   if (!(CONTACT_TIMELINES as readonly string[]).includes(timeline)) errors.timeline = "Please select a project timeline.";
   if (body.agreed !== true && body.agreed !== "true") errors.agreed = "Please accept the Privacy Policy and Terms & Conditions.";
@@ -233,7 +235,7 @@ export function validateServiceEnquiry(
       country,
       industry,
       otherIndustry: industry === "Other" ? otherIndustry : null,
-      category,
+      category: options.length > 0 ? category : (category || "Not Applicable"),
       budget,
       timeline,
       youtubeLink: youtubeLink || null,

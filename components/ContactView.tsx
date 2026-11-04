@@ -8,6 +8,7 @@ import ContactMotion from "@/components/ContactMotion";
 import LucideIcon, { type LucideIconName } from "@/components/LucideIcon";
 import { AI_AUTOMATION_CATEGORIES, CONTACT_BUDGETS, CONTACT_SERVICES, CONTACT_TIMELINES, INDUSTRIES as INDUSTRY_OPTIONS } from "@/lib/formOptions";
 import { SERVICES_DATA } from "@/components/PayNowModal";
+import CountrySelect from "@/components/CountrySelect";
 import "@/app/contact.css";
 
 const getCategoriesForService = (service: string): readonly string[] => {
@@ -222,7 +223,19 @@ function InquiryForm() {
           <input id="ct-companyWebsite" type="url" className="ct-input" placeholder=" " value={form.companyWebsite} onChange={set("companyWebsite")} />
         </Field>
         <Field id="ct-country" label="Country" required error={errors.country} filled={!!form.country}>
-          <input id="ct-country" className="ct-input" autoComplete="country-name" placeholder=" " value={form.country} onChange={set("country")} />
+          <CountrySelect
+            id="ct-country"
+            name="country"
+            required
+            autoComplete="country-name"
+            placeholder=" "
+            className="ct-input"
+            value={form.country}
+            onChange={(country) => {
+              setForm((f) => ({ ...f, country }));
+              if (errors.country) setErrors((x) => ({ ...x, country: "" }));
+            }}
+          />
         </Field>
         <Field id="ct-industry" label="Industry" required error={errors.industry} filled={!!form.industry}>
           <select id="ct-industry" className="ct-input ct-select" value={form.industry} onChange={set("industry")}>

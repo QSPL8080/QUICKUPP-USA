@@ -21,6 +21,7 @@ import { BulkBar, SelectBox, useSelection } from "@/components/crm/Selection";
 import { SERVICES_DATA } from "@/components/PayNowModal";
 import { CRM_INDUSTRIES } from "@/components/crm/PaymentsView";
 import { formatFileSize, money } from "@/lib/crm/format";
+import CountrySelect from "@/components/CountrySelect";
 
 export type AttachmentItem = {
   id: string | number;
@@ -1603,8 +1604,18 @@ export default function LeadsView({
                 {err("industry")}
               </label>
               <label className="crm-field">
-                <span className="crm-label">Location / city</span>
-                <input className="crm-input" value={form.country} onChange={set("country")} placeholder="e.g. Dover, Delaware" />
+                <span className="crm-label">Country / Location</span>
+                <CountrySelect
+                  id="lead-country"
+                  name="country"
+                  placeholder="Select or type country"
+                  className="crm-input"
+                  value={form.country}
+                  onChange={(val) => {
+                    setForm((f) => ({ ...f, country: val }));
+                    if (errors.country) setErrors((p) => ({ ...p, country: "" }));
+                  }}
+                />
               </label>
               <label className="crm-field">
                 <span className="crm-label">Budget</span>

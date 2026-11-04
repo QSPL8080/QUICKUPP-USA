@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import CountrySelect from "@/components/CountrySelect";
 import { CONTACT_BUDGETS, CONTACT_TIMELINES, INDUSTRIES, SERVICE_FORMS, type ServiceFormKey } from "@/lib/formOptions";
 
 /*
@@ -257,14 +258,14 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
                   <label htmlFor={`${idp}-country`} className="su-field-label">
                     Country*
                   </label>
-                  <input
+                  <CountrySelect
                     id={`${idp}-country`}
-                    type="text"
+                    name="country"
                     required
-                    placeholder="United States"
+                    placeholder="Select or type country"
                     className="su-text-input"
                     value={formData.country}
-                    onChange={(e) => set({ country: e.target.value })}
+                    onChange={(country) => set({ country })}
                   />
                 </div>
               </div>
