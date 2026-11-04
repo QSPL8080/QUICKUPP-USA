@@ -344,6 +344,29 @@ export default function LeadsView({
     setEditing(lead);
   };
 
+  const closeEditModal = () => {
+    setEditing(null);
+    if (typeof window !== "undefined" && window.location.search.includes("new=1")) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("new");
+      window.history.replaceState({}, "", url.pathname + (url.search ? url.search : ""));
+    }
+  };
+
+  useEffect(() => {
+    if (openNew) {
+      openForm("new");
+    }
+  }, [openNew]);
+
+  useEffect(() => {
+    const handleOpenNew = () => {
+      openForm("new");
+    };
+    window.addEventListener("crm:open-new-lead", handleOpenNew);
+    return () => window.removeEventListener("crm:open-new-lead", handleOpenNew);
+  }, [currentUser, team]);
+
   const editLead = async (r: LeadRow | EnquiryRow) => {
     if ("source" in r && "detail" in r && !("interest" in r)) {
       setError("");
@@ -433,7 +456,7 @@ export default function LeadsView({
         if (fresh.paymentLinks) setPaymentLinks(fresh.paymentLinks);
       }
     }
-    setEditing(null);
+    closeEditModal();
     toast(isNew ? "Lead added" : "Changes saved");
     router.refresh();
   };
@@ -1399,14 +1422,14 @@ export default function LeadsView({
 
       {/* ---- add / edit lead ---- */}
       {editing && (
-        <div className="crm-modal-wrap" onClick={() => setEditing(null)}>
+        <div className="crm-modal-wrap" onClick={closeEditModal}>
           <form className="crm-modal crm-modal-wide" onClick={(e) => e.stopPropagation()} onSubmit={save} noValidate role="dialog" aria-label={editing === "new" ? "Add lead" : "Edit lead"}>
             <div className="crm-drawer-head">
               <div>
                 <p className="crm-drawer-kicker">{editing === "new" ? "All Enquiries" : `Lead #${editing.id}`}</p>
                 <h2 className="crm-drawer-title">{editing === "new" ? "Add new lead" : `Edit lead — ${editing.name}`}</h2>
               </div>
-              <button type="button" className="crm-icon-act" onClick={() => setEditing(null)} aria-label="Close">
+              <button type="button" className="crm-icon-act" onClick={closeEditModal} aria-label="Close">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
                   <path d="M18 6L6 18M6 6l12 12" />
                 </svg>
@@ -1687,7 +1710,7 @@ export default function LeadsView({
             <div className="crm-modal-foot">
               <span />
               <span className="crm-modal-foot-end">
-                <button type="button" className="crm-act crm-act-ghost" onClick={() => setEditing(null)}>
+                <button type="button" className="crm-act crm-act-ghost" onClick={closeEditModal}>
                   Cancel
                 </button>
                 <button type="submit" className="crm-act crm-act-dark" disabled={busy}>

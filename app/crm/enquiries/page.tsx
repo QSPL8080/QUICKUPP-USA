@@ -4,6 +4,7 @@ import { listLeads } from "@/lib/crm/data";
 import { listTeamNames } from "@/lib/crm/users";
 import { ENQUIRY_STATUSES, ENQUIRY_STATUS_LABEL, SOURCE_KEYS, SOURCE_LABEL } from "@/lib/crm/leadOptions";
 import LeadsView from "@/components/crm/LeadsView";
+import AddLeadButton from "@/components/crm/AddLeadButton";
 import { PageHead, Pager } from "@/components/crm/ListTools";
 
 type Props = { searchParams: Promise<{ q?: string; source?: string; status?: string; from?: string; to?: string; page?: string; new?: string }> };
@@ -63,12 +64,7 @@ export default async function EnquiriesPage({ searchParams }: Props) {
           </svg>
           Export CSV
         </a>
-        <Link href="?new=1" className="crm-act crm-act-dark">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-          Add lead
-        </Link>
+        <AddLeadButton />
       </PageHead>
 
       {/* Quick source tabs: All, Contact Form, Service Forms (4), YouTube Promotion, Manual */}

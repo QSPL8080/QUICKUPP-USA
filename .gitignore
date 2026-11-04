@@ -27,6 +27,7 @@
 *.bak
 *.doc
 *.docx
+/_to_delete
 *next.config.*.ts
 *next.config.*.js
 *next.config.*.mjs
