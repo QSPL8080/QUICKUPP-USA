@@ -8,6 +8,9 @@ export async function GET() {
   const me = await getCurrentUser();
   if (!me) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
 
+  // Ensure legacy blog_images table is dropped if still present on Hostinger
+  getPool().query("DROP TABLE IF EXISTS blog_images").catch(() => {});
+
   const rows = await getCrmBlogs();
   return Response.json({ ok: true, rows });
 }
