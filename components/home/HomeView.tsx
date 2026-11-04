@@ -3,6 +3,7 @@ import type { CSSProperties, ReactNode } from "react";
 import HomeIcon, { type HomeIconName } from "@/components/home/HomeIcon";
 import HomeMotion from "@/components/home/HomeMotion";
 import ServiceExplorer from "@/components/home/ServiceExplorer";
+import HomeHero from "@/components/home/HomeHero";
 import { ABOUT, FINAL, HERO, INDUSTRIES, INSIGHTS, PROCESS, SERVICES, TECH, TRUST, VOICES, WHY, WORK } from "@/data/home-content";
 import "@/app/home.css";
 
@@ -77,209 +78,16 @@ export default function HomeView() {
     <main className="hx-page">
       <HomeMotion />
 
-      {/* 1. Hero: Luminous Hybrid Canvas with Realistic Photography Mosaic & Sliced Capability Slats */}
-      <section className="hx-hero">
-        <div className="hx-hero-ambient" aria-hidden="true">
-          <span className="hx-glow hx-glow-1" />
-          <span className="hx-glow hx-glow-2" />
-          <span className="hx-hero-mesh-grid" />
-        </div>
-
-        <div className="hx-wrap">
-          {/* Top Status & Quick-Pill Bar */}
-          <div className="hx-hero-topbar" data-hx="fade">
-            <div className="hx-hero-badge">
-              <span className="hx-live-dot" aria-hidden="true" />
-              <span className="hx-badge-text">Your Trusted AI &amp; Digital Growth Partner</span>
-            </div>
-            <nav className="hx-hero-nav" aria-label="Core services navigation">
-              <a href="#services" className="hx-pill-link">Digital Marketing</a>
-              <span className="hx-pill-dot" aria-hidden="true">·</span>
-              <a href="#services" className="hx-pill-link">AI Automation</a>
-              <span className="hx-pill-dot" aria-hidden="true">·</span>
-              <a href="#services" className="hx-pill-link">Custom IT</a>
-              <span className="hx-pill-dot" aria-hidden="true">·</span>
-              <a href="#services" className="hx-pill-link">Staff Augmentation</a>
-            </nav>
-          </div>
-
-          {/* Main Hero Asymmetric Grid */}
-          <div className="hx-hero-grid">
-            {/* Left Column: Value Proposition & High-Contrast CTAs */}
-            <div className="hx-hero-copy">
-              <p className="hx-hero-eyebrow" data-hx="fade">
-                {HERO.eyebrow.map((w, i) => (
-                  <span key={w} className="hx-eyebrow-word" style={d(0.1 + i * 0.1)}>
-                    {w}
-                  </span>
-                ))}
-              </p>
-
-              <h1 className="hx-hero-title">
-                {HERO.title.map((l, i) => (
-                  <span key={l} className="hx-line" data-hx="line" style={d(0.15 + i * 0.14)}>
-                    <span className={i === HERO.title.length - 1 ? "hx-line-in qs-gradient-text" : "hx-line-in"}>{l}</span>
-                  </span>
-                ))}
-              </h1>
-
-              <p className="hx-hero-text" data-hx="rise" style={d(0.55)}>
-                {HERO.text}
-              </p>
-
-              {/* Action Buttons: Solid Dark & White Outline */}
-              <div className="hx-actions" data-hx="rise" style={d(0.7)}>
-                <Button cta={HERO.primary} tone="dark" />
-                <Button cta={HERO.secondary} tone="light" />
-              </div>
-
-              {/* Trust Checkmarks */}
-              <ul className="hx-support" data-hx="rise" style={d(0.85)}>
-                {HERO.supporting.map((s) => (
-                  <li key={s}>
-                    <HomeIcon name="check" size={14} strokeWidth={2.8} />
-                    <span>{s}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Right Column: Realistic 3D Photo Mosaic with Floating Glass Metric Pods */}
-            <div className="hx-hero-art" data-hx="zoom" style={d(0.3)}>
-              <div className="hx-mosaic">
-                {/* Primary High-Resolution Real Photograph */}
-                <div className="hx-mosaic-card hx-mosaic-primary">
-                  <img
-                    src="/images/contact-team-collaboration.jpg"
-                    alt="Quickupp Softech team collaborating on strategy"
-                    loading="eager"
-                  />
-                  <div className="hx-mosaic-overlay" />
-                  <div className="hx-mosaic-caption">
-                    <span className="hx-mosaic-tag">Enterprise Strategy</span>
-                    <span className="hx-mosaic-heading">Designing Scalable Digital Solutions</span>
-                  </div>
-                </div>
-
-                {/* Secondary Real Image: Consultation Boardroom */}
-                <div className="hx-mosaic-card hx-mosaic-secondary">
-                  <img
-                    src="/images/slider-01-01.jpg"
-                    alt="Modern executive strategy discussion"
-                    loading="lazy"
-                  />
-                  <div className="hx-mosaic-overlay" />
-                </div>
-
-                {/* Floating Glass Metric Pod 1: Dark Glass Lead Velocity */}
-                <div className="hx-pod hx-pod-dark" data-hx="lift">
-                  <div className="hx-pod-icon-wrap">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-                      <polyline points="16 7 22 7 22 13" />
-                    </svg>
-                  </div>
-                  <div className="hx-pod-text">
-                    <span className="hx-pod-val">+340%</span>
-                    <span className="hx-pod-sub">Lead Velocity Growth</span>
-                  </div>
-                </div>
-
-                {/* Floating Glass Metric Pod 2: Crystal White Client Retention */}
-                <div className="hx-pod hx-pod-crystal" data-hx="lift">
-                  <div className="hx-avatar-stack">
-                    <img src="/images/team-img-01.jpg" alt="Verified client partner" />
-                    <img src="/images/team-img-02.jpg" alt="Verified client partner" />
-                    <img src="/images/team-img-03.jpg" alt="Verified client partner" />
-                  </div>
-                  <div className="hx-pod-text">
-                    <div className="hx-pod-rating">
-                      <span className="hx-pod-val">98%</span>
-                      <span className="hx-pod-stars" aria-label="5 stars rating">★★★★★</span>
-                    </div>
-                    <span className="hx-pod-sub">Client Retention Rate</span>
-                  </div>
-                </div>
-
-                {/* Floating Mini Live Pod: Deployments */}
-                <div className="hx-pod hx-pod-pill" data-hx="lift">
-                  <span className="hx-stat-pulse-dot" aria-hidden="true" />
-                  <span className="hx-pod-val-sm">1,000+ Worldwide Deployments</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Sliced 4-Pillar Interactive Photography Slats */}
-          <div className="hx-slats-wrap" data-hx="rise" style={d(0.4)}>
-            <div className="hx-slats-intro">
-              <span className="hx-slats-tag">STRATEGIC VERTICALS</span>
-              <h2 className="hx-slats-title">Core Execution Pillars</h2>
-            </div>
-            <div className="hx-slats-grid">
-              <Link href="/services/ai-powered-digital-marketing-services" className="hx-slat-card">
-                <div className="hx-slat-bg">
-                  <img src="/images/service-img-01.jpg" alt="AI-Powered Digital Marketing" loading="lazy" />
-                  <div className="hx-slat-gradient" />
-                </div>
-                <div className="hx-slat-content">
-                  <span className="hx-slat-num">01.</span>
-                  <div className="hx-slat-info">
-                    <h3 className="hx-slat-name">AI Digital Marketing</h3>
-                    <p className="hx-slat-desc">SEO, Paid Ads &amp; High-Converting Funnels</p>
-                  </div>
-                  <span className="hx-slat-arrow" aria-hidden="true">→</span>
-                </div>
-              </Link>
-
-              <Link href="/services/ai-automation-solutions" className="hx-slat-card">
-                <div className="hx-slat-bg">
-                  <img src="/images/service-img-02.jpg" alt="AI & Automation Solutions" loading="lazy" />
-                  <div className="hx-slat-gradient" />
-                </div>
-                <div className="hx-slat-content">
-                  <span className="hx-slat-num">02.</span>
-                  <div className="hx-slat-info">
-                    <h3 className="hx-slat-name">AI &amp; Automation</h3>
-                    <p className="hx-slat-desc">AI Agents, Chatbots &amp; Workflow Systems</p>
-                  </div>
-                  <span className="hx-slat-arrow" aria-hidden="true">→</span>
-                </div>
-              </Link>
-
-              <Link href="/services/information-technology-services" className="hx-slat-card">
-                <div className="hx-slat-bg">
-                  <img src="/images/service-img-03.jpg" alt="Custom IT Services" loading="lazy" />
-                  <div className="hx-slat-gradient" />
-                </div>
-                <div className="hx-slat-content">
-                  <span className="hx-slat-num">03.</span>
-                  <div className="hx-slat-info">
-                    <h3 className="hx-slat-name">Custom IT &amp; Web Apps</h3>
-                    <p className="hx-slat-desc">Modern Web Platforms &amp; Software Solutions</p>
-                  </div>
-                  <span className="hx-slat-arrow" aria-hidden="true">→</span>
-                </div>
-              </Link>
-
-              <Link href="/services/staff-augmentation" className="hx-slat-card">
-                <div className="hx-slat-bg">
-                  <img src="/images/service-img-04.jpg" alt="Staff Augmentation" loading="lazy" />
-                  <div className="hx-slat-gradient" />
-                </div>
-                <div className="hx-slat-content">
-                  <span className="hx-slat-num">04.</span>
-                  <div className="hx-slat-info">
-                    <h3 className="hx-slat-name">Staff Augmentation</h3>
-                    <p className="hx-slat-desc">Dedicated Specialized Technical Talent</p>
-                  </div>
-                  <span className="hx-slat-arrow" aria-hidden="true">→</span>
-                </div>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* 1. Hero: the growth dial */}
+      <HomeHero
+        hero={HERO}
+        actions={
+          <>
+            <Button cta={HERO.primary} tone="dark" />
+            <Button cta={HERO.secondary} tone="light" />
+          </>
+        }
+      />
 
       {/* 2. Trust strip */}
       <section className="hx-trust">
