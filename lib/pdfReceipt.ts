@@ -149,7 +149,12 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
   const finalTotal = totalAmount != null && Number(totalAmount) > 0 ? Number(totalAmount) : Number(amountPaid);
   const formattedDate = formatReceiptDate(paymentDate);
 
-  // 1. Logo
+  // 1. Logo — the logo PNG already contains the "Quickupp Softech" wordmark,
+  // so the text block below it must start clear of the logo's actual bottom
+  // edge (computed from its real aspect ratio), not a hardcoded guess, or
+  // the two overlap/collide for any logo whose proportions change.
+  const logoTopY = 775;
+  let logoBottomY = logoTopY - 40; // sane fallback if the logo can't be embedded
   const logoPath = path.join(process.cwd(), "public", "images", "logo-black.png");
   if (fs.existsSync(logoPath)) {
     try {
@@ -160,10 +165,11 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
       const logoH = logo.height * logoScale;
       page.drawImage(logo, {
         x: leftX,
-        y: 775 - logoH,
+        y: logoTopY - logoH,
         width: logoW,
         height: logoH,
       });
+      logoBottomY = logoTopY - logoH;
     } catch {
       // Fallback text if logo load fails
       page.drawText("QUICKUPP", {
@@ -173,6 +179,7 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
         font: fontBold,
         color: deepPurple,
       });
+      logoBottomY = 752;
     }
   } else {
     page.drawText("QUICKUPP", {
@@ -182,10 +189,17 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
       font: fontBold,
       color: deepPurple,
     });
+    logoBottomY = 752;
   }
 
-  // Under Logo text - Official Company Details
-  let curY = 724;
+  // Under Logo text - Official Company Details (always clear of the logo,
+  // with a fixed 12pt gap below its real bottom edge). Every fixed
+  // coordinate below this block (the divider, BILL TO, the customer rows,
+  // the PAYMENT DETAILS heading and the table) is nudged by the same
+  // amount, so the header shifting to clear a taller/shorter logo never
+  // compresses the spacing further down the page.
+  const headerShift = (logoBottomY - 12) - 724;
+  let curY = 724 + headerShift;
   page.drawText("Quickupp Softech LLC", {
     x: leftX,
     y: curY,
@@ -280,35 +294,39 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
   drawCheckmark(page, pillX + 16 + badgeTextW, pillY + 9, badgeFontColor, 0.9);
 
   // Top Divider Line
+  const dividerY = 668 + headerShift;
   page.drawLine({
-    start: { x: leftX, y: 668 },
-    end: { x: rightX, y: 668 },
+    start: { x: leftX, y: dividerY },
+    end: { x: rightX, y: dividerY },
     thickness: 1,
     color: borderLight,
   });
 
   // BILL TO
+  const billToY = 648 + headerShift;
   page.drawText("BILL TO", {
     x: leftX,
-    y: 648,
+    y: billToY,
     size: 11,
     font: fontBold,
     color: primaryPurple,
   });
 
-  page.drawText("Customer Name: ", { x: leftX, y: 630, size: 9, font, color: slateMid });
+  const custNameY = 630 + headerShift;
+  page.drawText("Customer Name: ", { x: leftX, y: custNameY, size: 9, font, color: slateMid });
   page.drawText(clientName || "Valued Client", {
     x: leftX + 80,
-    y: 630,
+    y: custNameY,
     size: 9,
     font: fontBold,
     color: darkNavy,
   });
 
-  page.drawText("Email: ", { x: leftX, y: 615, size: 9, font, color: slateMid });
+  const custEmailY = 615 + headerShift;
+  page.drawText("Email: ", { x: leftX, y: custEmailY, size: 9, font, color: slateMid });
   page.drawText(clientEmail || "info@quickuppsoftech.us", {
     x: leftX + 32,
-    y: 615,
+    y: custEmailY,
     size: 9,
     font,
     color: linkBlue,
@@ -318,10 +336,11 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
     billingAddress ||
     companyName ||
     (clientPhone ? `Phone: ${clientPhone}` : "United States");
-  page.drawText("Billing Address: ", { x: leftX, y: 600, size: 9, font, color: slateMid });
+  const custAddrY = 600 + headerShift;
+  page.drawText("Billing Address: ", { x: leftX, y: custAddrY, size: 9, font, color: slateMid });
   page.drawText(addressVal, {
     x: leftX + 74,
-    y: 600,
+    y: custAddrY,
     size: 9,
     font: fontBold,
     color: darkNavy,
@@ -330,7 +349,7 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
   // PAYMENT DETAILS
   page.drawText("PAYMENT DETAILS", {
     x: leftX,
-    y: 575,
+    y: 575 + headerShift,
     size: 11,
     font: fontBold,
     color: primaryPurple,
@@ -340,7 +359,7 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
   const tblX = leftX;
   const tblW = contentWidth;
   const tblH = isPartial ? 160 : 138;
-  const tblY = isPartial ? 400 : 422;
+  const tblY = (isPartial ? 400 : 422) + headerShift;
 
   drawRoundedRect(page, tblX, tblY, tblW, tblH, 6, rgb(1, 1, 1), borderLight);
 
