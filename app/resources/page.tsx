@@ -3,6 +3,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ResourceCtaBanner from "@/components/ResourceCtaBanner";
+import ResourceMotion from "@/components/ResourceMotion";
 import { getPublishedBlogs } from "@/lib/blogs";
 
 export const revalidate = 60;
@@ -159,6 +160,7 @@ export default async function ResourcesPage() {
         secondaryLabel="Explore Case Studies"
       />
 
+      <ResourceMotion variant="hub" />
       <Footer />
     </div>
   );

@@ -5,6 +5,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ResourceCtaBanner from "@/components/ResourceCtaBanner";
+import ResourceMotion from "@/components/ResourceMotion";
 
 const filterTabs = ["All Reviews", "Healthcare", "SaaS & Tech", "eCommerce & D2C", "Real Estate", "Enterprise"];
 
@@ -233,6 +234,7 @@ export default function TestimonialsPage() {
           secondaryLabel="Explore All Resources"
           secondaryHref="/resources"
         />
+      <ResourceMotion variant="testimonials" />
       </main>
       <Footer />
     </>

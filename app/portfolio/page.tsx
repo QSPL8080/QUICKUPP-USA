@@ -5,6 +5,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ResourceCtaBanner from "@/components/ResourceCtaBanner";
+import ResourceMotion from "@/components/ResourceMotion";
 
 const categories = ["All Projects", "AI & Automation", "SaaS & Web Apps", "Performance Marketing", "eCommerce & D2C", "Real Estate"];
 
@@ -217,6 +218,7 @@ export default function PortfolioPage() {
           secondaryLabel="Explore Case Studies"
           secondaryHref="/case-studies"
         />
+      <ResourceMotion variant="portfolio" />
       </main>
       <Footer />
     </>

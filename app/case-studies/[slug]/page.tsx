@@ -3,591 +3,169 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ResourceCtaBanner from "@/components/ResourceCtaBanner";
-import CaseStudyShare from "@/components/CaseStudyShare";
-import CaseStudyDiagramCard from "@/components/CaseStudyDiagramCard";
-import { getAllCaseStudySlugs, getCaseStudyBySlug, CASE_STUDIES } from "@/data/case-studies";
+import type { CsBlock } from "@/data/case-study-docs";
+import { CASE_STUDY_ORDER, getCaseStudyDoc } from "@/lib/caseStudies";
 import "@/app/case-study-detail.css";
 
-export const dynamicParams = true;
+/*
+ * One case study, exactly as its document is written: the same headings,
+ * text, results, tables, charts and closing box, in the same order.
+ */
 
-export async function generateStaticParams() {
-  const slugs = getAllCaseStudySlugs();
-  return slugs.map((slug) => ({ slug }));
+export function generateStaticParams() {
+  return CASE_STUDY_ORDER.map((slug) => ({ slug }));
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
-  const { slug } = await params;
-  const study = getCaseStudyBySlug(slug);
-  if (!study) {
-    return { title: "Case Study | Quickupp Softech" };
-  }
+type Props = { params: Promise<{ slug: string }> };
 
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const doc = getCaseStudyDoc(slug);
+  if (!doc) return { title: "Case Study | Quickupp Softech" };
   return {
-    title: `${study.title} | Quickupp Softech`,
-    description: study.desc,
-    openGraph: {
-      title: `${study.title} - ${study.client}`,
-      description: study.desc,
-      images: [{ url: study.img, width: 1200, height: 630, alt: study.title }],
-      type: "article",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: study.title,
-      description: study.desc,
-      images: [study.img],
-    },
+    title: `${doc.title} | Quickupp Softech`,
+    description: doc.intro,
+    openGraph: { title: doc.title, description: doc.intro, type: "article" },
   };
 }
 
-function renderGradientHeading(text?: string) {
-  if (!text) return null;
-  const words = text.split(" ");
-  if (words.length <= 2) {
-    return <span className="qs-gradient-text">{text}</span>;
+/* the document's sections start at each small uppercase label (THE CHALLENGE, RESULTS · …) */
+function toSections(blocks: CsBlock[]) {
+  const sections: CsBlock[][] = [];
+  for (const b of blocks) {
+    if (b.type === "kicker" || b.type === "cta" || !sections.length) sections.push([b]);
+    else sections[sections.length - 1].push(b);
   }
-  const splitIndex = Math.ceil(words.length / 2);
-  const firstHalf = words.slice(0, splitIndex).join(" ");
-  const secondHalf = words.slice(splitIndex).join(" ");
-
-  return (
-    <>
-      {firstHalf} <span className="qs-gradient-text">{secondHalf}</span>
-    </>
-  );
+  return sections;
 }
 
-export default async function CaseStudyDetailPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
-  const study = getCaseStudyBySlug(slug);
-
-  if (!study) {
-    notFound();
+function Block({ b, headline }: { b: CsBlock; headline: boolean }) {
+  switch (b.type) {
+    case "kicker":
+      return <p className="csx-kicker">{b.text}</p>;
+    case "h2":
+      return <h2 className="csx-h2">{b.text}</h2>;
+    case "p":
+      return <p className="csx-text">{b.text}</p>;
+    case "caption":
+      return <p className="csx-caption">{b.text}</p>;
+    case "list":
+      return (
+        <ul className="csx-list">
+          {b.items.map((it, i) => (
+            <li key={i}>
+              {it.lead && <strong>{it.lead} </strong>}
+              {it.text}
+            </li>
+          ))}
+        </ul>
+      );
+    case "img":
+      return (
+        <figure className="csx-figure">
+          <img src={b.src} alt="" loading="lazy" />
+        </figure>
+      );
+    case "stats":
+      return (
+        <dl className={`csx-stats${headline ? " is-headline" : ""}`} style={{ ["--csx-cols" as string]: Math.min(b.cols, 4) }}>
+          {b.items.map((s, i) => (
+            <div key={i} className="csx-stat">
+              <dt>{s.val}</dt>
+              <dd>{s.lbl}</dd>
+            </div>
+          ))}
+        </dl>
+      );
+    case "table":
+      return (
+        <div className="csx-table-wrap">
+          <table className="csx-table">
+            <thead>
+              <tr>
+                {b.headers.map((h, i) => (
+                  <th key={i}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {b.rows.map((r, i) => (
+                <tr key={i} className={b.total && i === b.rows.length - 1 ? "is-total" : undefined}>
+                  {r.map((c, j) => (
+                    <td key={j}>{c}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    case "cta":
+      return (
+        <div className="csx-cta">
+          <p className="csx-kicker">{b.kicker}</p>
+          {b.title && <h2 className="csx-h2">{b.title}</h2>}
+          {b.text && <p className="csx-text">{b.text}</p>}
+          <Link href="/contact" className="csx-btn">
+            <span>Contact Us</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </div>
+      );
   }
+}
 
-  // Related studies: prefer same category, fallback to others
-  const otherStudies = CASE_STUDIES.filter((c) => c.slug !== study.slug);
-  const sameCat = otherStudies.filter((c) => c.category === study.category);
-  const diffCat = otherStudies.filter((c) => c.category !== study.category);
-  const relatedStudies = [...sameCat, ...diffCat].slice(0, 3);
+export default async function CaseStudyDetailPage({ params }: Props) {
+  const { slug } = await params;
+  const doc = getCaseStudyDoc(slug);
+  if (!doc) notFound();
+
+  const sections = toSections(doc.blocks);
 
   return (
     <>
       <Header />
-      <main className="csd-page">
-        {/* Hero Section */}
-        <section className="csd-hero">
-          <div className="csd-container">
-            {/* Breadcrumb */}
-            <div className="csd-breadcrumbs">
+      <main className="csx-page">
+        <section className="csx-hero">
+          <div className="csx-container">
+            <div className="asx-breadcrumb">
               <Link href="/">Home</Link>
-              <span className="csd-breadcrumbs-sep">/</span>
+              <span>/</span>
               <Link href="/resources">Resources</Link>
-              <span className="csd-breadcrumbs-sep">/</span>
+              <span>/</span>
               <Link href="/case-studies">Case Studies</Link>
-              <span className="csd-breadcrumbs-sep">/</span>
-              <span className="csd-breadcrumbs-current">{study.client}</span>
             </div>
-
-            {/* Badges */}
-            <div className="csd-header-badges">
-              <span className="csd-badge-pill">{study.category}</span>
-              <span className="csd-badge-pill csd-badge-pill-dark">{study.highlight}</span>
-              <span
-                style={{
-                  fontSize: "12px",
-                  fontWeight: 600,
-                  color: "#64748b",
-                  marginLeft: "auto",
-                }}
-              >
-                {study.timeline}
-              </span>
-            </div>
-
-            {/* Title */}
-            <h1 className="csd-title">{renderGradientHeading(study.title)}</h1>
-
-            {/* Lead Description */}
-            <p className="csd-lead">{study.desc}</p>
-
-            {/* Meta Bar */}
-            <div className="csd-meta-bar">
-              <div className="csd-meta-item">
-                <span className="csd-meta-label">Client</span>
-                <span className="csd-meta-value">{study.client}</span>
-              </div>
-              <div className="csd-meta-item">
-                <span className="csd-meta-label">Industry</span>
-                <span className="csd-meta-value">{study.industry}</span>
-              </div>
-              <div className="csd-meta-item">
-                <span className="csd-meta-label">Location</span>
-                <span className="csd-meta-value">{study.location}</span>
-              </div>
-              <div className="csd-meta-item">
-                <span className="csd-meta-label">Timeline / Period</span>
-                <span className="csd-meta-value">{study.timeline}</span>
-              </div>
-            </div>
-
-            {/* Headline Metrics Ribbon */}
-            <div className="csd-metrics-ribbon">
-              {study.metrics.map((m, idx) => (
-                <div key={idx} className="csd-metric-card">
-                  <div className="csd-metric-val">{m.val || "—"}</div>
-                  <div className="csd-metric-lbl">{m.lbl}</div>
+            <p className="csx-kicker">{doc.kicker}</p>
+            <h1 className="csx-h1">{doc.title}</h1>
+            <p className="csx-intro">{doc.intro}</p>
+            <dl className="csx-info">
+              {doc.info.labels.map((l, i) => (
+                <div key={l} className="csx-info-item">
+                  <dt>{l}</dt>
+                  <dd>{doc.info.values[i]}</dd>
                 </div>
               ))}
-            </div>
-
-            {/* Hero Visual Showcase */}
-            <div className="csd-hero-visual">
-              <img src={study.img} alt={study.title} />
-              <div className="csd-hero-visual-overlay">
-                <div>
-                  <div
-                    style={{
-                      fontSize: "12px",
-                      fontWeight: 800,
-                      color: "#93c5fd",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.08em",
-                      marginBottom: "4px",
-                    }}
-                  >
-                    Verified Performance Case Analysis
-                  </div>
-                  <div style={{ fontSize: "20px", fontWeight: 800, color: "#ffffff" }}>
-                    {study.client} &bull; {study.location}
-                  </div>
-                </div>
-                <div
-                  style={{
-                    background: "rgba(15, 23, 42, 0.8)",
-                    backdropFilter: "blur(8px)",
-                    border: "1px solid rgba(222, 242, 92, 0.4)",
-                    color: "#7c3aed",
-                    fontSize: "14px",
-                    fontWeight: 800,
-                    padding: "8px 16px",
-                    borderRadius: "14px",
-                  }}
-                >
-                  {study.highlight}
-                </div>
-              </div>
-            </div>
+            </dl>
           </div>
         </section>
 
-        {/* 2-Column Main Layout */}
-        <section className="csd-layout-section">
-          <div className="csd-container">
-            <div className="csd-layout-grid">
-              {/* Left Column: Full Case Details */}
-              <div className="csd-main-col">
-                {/* 1. The Challenge */}
-                <article className="csd-card-block">
-                  <div className="csd-eyebrow">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="12" r="10" />
-                      <circle cx="12" cy="12" r="6" />
-                      <circle cx="12" cy="12" r="2" />
-                    </svg>
-                    The Challenge
-                  </div>
-                  <h2 className="csd-section-title">{study.challenge.heading}</h2>
-                  <div className="csd-prose">
-                    {study.challenge.paragraphs.map((para, idx) => (
-                      <p key={idx}>{para}</p>
-                    ))}
-                  </div>
-                </article>
-
-                {/* 2. What We Did */}
-                <article className="csd-card-block">
-                  <div className="csd-eyebrow">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="4" y="4" width="16" height="16" rx="2" />
-                      <rect x="9" y="9" width="6" height="6" />
-                      <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3" />
-                    </svg>
-                    What We Did
-                  </div>
-                  <h2 className="csd-section-title">{study.whatWeDid.heading}</h2>
-
-                  {/* Strategy Steps */}
-                  <div className="csd-steps-grid">
-                    {study.whatWeDid.steps.map((step, idx) => (
-                      <div key={idx} className="csd-step-item">
-                        <div className="csd-step-number">
-                          {String(idx + 1).padStart(2, "0")}
-                        </div>
-                        <div className="csd-step-content">
-                          {step.title && <h3 className="csd-step-title">{step.title}</h3>}
-                          <p className="csd-step-desc">{step.desc}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </article>
-
-                {/* 3. The Results Sections (With Exact Diagrams & Tables) */}
-                {study.resultsSections.map((sec, secIdx) => (
-                  <article key={secIdx} className="csd-card-block csd-results-card">
-                    <div className="csd-eyebrow">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-                        <polyline points="17 6 23 6 23 12" />
-                      </svg>
-                      {sec.title}
-                    </div>
-
-                    {sec.subtitle && (
-                      <h2 className="csd-section-title">{sec.subtitle}</h2>
-                    )}
-
-                    {/* Paragraphs */}
-                    {sec.paragraphs.length > 0 && (
-                      <div className="csd-prose" style={{ marginBottom: "24px" }}>
-                        {sec.paragraphs.map((p, pIdx) => (
-                          <p key={pIdx}>{p}</p>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Extracted Diagrams from Docx */}
-                    {sec.diagrams.length > 0 && (
-                      <div className="csd-diagrams-grid">
-                        {sec.diagrams.map((diag, dIdx) => (
-                          <CaseStudyDiagramCard
-                            key={dIdx}
-                            src={diag.src}
-                            caption={diag.caption}
-                            title={`${study.client} - ${sec.subtitle || sec.title} (Diagram ${dIdx + 1})`}
-                          />
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Data Tables */}
-                    {sec.tables.length > 0 && (
-                      <div className="csd-tables-wrap">
-                        {sec.tables.map((tbl, tIdx) => (
-                          <div key={tIdx} className="csd-table-container">
-                            <table className="csd-data-table">
-                              <thead>
-                                <tr>
-                                  {tbl.headers.map((h, hIdx) => (
-                                    <th key={hIdx}>{h}</th>
-                                  ))}
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {tbl.rows.map((row, rIdx) => (
-                                  <tr key={rIdx}>
-                                    {row.map((cell, cIdx) => {
-                                      const isHighlight =
-                                        cell.includes("#1") ||
-                                        cell.includes("#2") ||
-                                        cell.includes("#3") ||
-                                        cell.includes("100%") ||
-                                        cell.includes("→");
-                                      return (
-                                        <td key={cIdx} className={isHighlight ? "csd-cell-highlight" : ""}>
-                                          {cell}
-                                        </td>
-                                      );
-                                    })}
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Mini Stat Card Grids */}
-                    {sec.statCards.length > 0 && (
-                      <div className="csd-stat-cards-wrap">
-                        {sec.statCards.map((grid, gIdx) => (
-                          <div key={gIdx} className="csd-mini-metrics-grid">
-                            {grid.map((c, cIdx) => (
-                              <div key={cIdx} className="csd-mini-metric-box">
-                                <div className="csd-mini-metric-val">{c.val || c.lbl}</div>
-                                {c.val && <div className="csd-mini-metric-lbl">{c.lbl}</div>}
-                              </div>
-                            ))}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </article>
-                ))}
-
-                {/* 4. What's Next */}
-                <article className="csd-card-block">
-                  <div className="csd-eyebrow">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="12" r="10" />
-                      <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
-                    </svg>
-                    What&apos;s Next
-                  </div>
-                  <h2 className="csd-section-title">{study.whatsNext.heading}</h2>
-                  <div className="csd-prose">
-                    {study.whatsNext.paragraphs.map((para, idx) => (
-                      <p key={idx}>{para}</p>
-                    ))}
-                  </div>
-                </article>
-
-                {/* 5. Client Callout CTA Box from Docx */}
-                {study.ctaBox && (
-                  <div className="csd-client-cta-block">
-                    <div className="csd-client-cta-glow" />
-                    <div className="csd-client-cta-inner">
-                      <div className="csd-client-cta-badge">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-                        </svg>
-                        {study.ctaBox.title}
-                      </div>
-                      <p className="csd-client-cta-text">{study.ctaBox.text}</p>
-                      <div style={{ marginTop: "16px" }}>
-                        <Link href="/contact" className="csd-cta-btn" style={{ display: "inline-flex" }}>
-                          Get Your Free Audit &amp; Strategy
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M5 12h14" />
-                            <path d="M12 5l7 7-7 7" />
-                          </svg>
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* 6. Data Sources Transparency */}
-                <div className="csd-audit-note">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                    <path d="m9 12 2 2 4-4" />
-                  </svg>
-                  <span>
-                    <strong>Data Sources &amp; Verification Note:</strong> {study.dataSources}
-                  </span>
-                </div>
-              </div>
-
-              {/* Right Column: Sticky Sidebar */}
-              <aside className="csd-sidebar">
-                {/* Project Specs */}
-                <div className="csd-side-card">
-                  <h3 className="csd-side-title">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
-                      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-                    </svg>
-                    Case Snapshot
-                  </h3>
-                  <div className="csd-spec-row">
-                    <span className="csd-spec-key">Client</span>
-                    <span className="csd-spec-val">{study.client}</span>
-                  </div>
-                  <div className="csd-spec-row">
-                    <span className="csd-spec-key">Industry</span>
-                    <span className="csd-spec-val">{study.industry}</span>
-                  </div>
-                  <div className="csd-spec-row">
-                    <span className="csd-spec-key">Geography</span>
-                    <span className="csd-spec-val">{study.location}</span>
-                  </div>
-                  <div className="csd-spec-row">
-                    <span className="csd-spec-key">Duration</span>
-                    <span className="csd-spec-val">{study.timeline}</span>
-                  </div>
-
-                  <div style={{ marginTop: "18px" }}>
-                    <span className="csd-meta-label">Delivered Capabilities</span>
-                    <div className="csd-services-pills">
-                      {study.services.map((srv, idx) => (
-                        <span key={idx} className="csd-srv-pill">
-                          {srv}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Conversion Card */}
-                <div className="csd-cta-card">
-                  <div
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "6px",
-                      color: "#7c3aed",
-                      fontSize: "12px",
-                      fontWeight: 800,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.06em",
-                      marginBottom: "10px",
-                    }}
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-                    </svg>
-                    Ready for Similar Impact?
-                  </div>
-                  <h3 className="csd-cta-title">
-                    Engineer Your Next Growth Sprint
-                  </h3>
-                  <p className="csd-cta-desc">
-                    Get an in-depth performance audit and a tailored growth roadmap built for your industry.
-                  </p>
-                  <Link href="/contact" className="csd-cta-btn">
-                    Schedule Strategy Session
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M5 12h14" />
-                      <path d="M12 5l7 7-7 7" />
-                    </svg>
-                  </Link>
-
-                  <div
-                    style={{
-                      marginTop: "16px",
-                      fontSize: "12px",
-                      color: "#94a3b8",
-                      textAlign: "center",
-                    }}
-                  >
-                    Confidential &bull; No obligation &bull; 48-hr turnaround
-                  </div>
-                </div>
-
-                {/* Social Share Component */}
-                <div className="csd-side-card">
-                  <CaseStudyShare
-                    title={study.title}
-                    url={`https://quickuppsoftech.us/case-studies/${study.slug}`}
-                  />
-                </div>
-              </aside>
-            </div>
+        <div className="csx-body">
+          <div className="csx-container">
+            {sections.map((sec, i) => {
+              const isCta = sec[0].type === "cta";
+              const headline = sec[0].type === "kicker" && /^HEADLINE RESULTS/i.test(sec[0].text);
+              return (
+                <section key={i} className={isCta ? "csx-section csx-section-cta" : `csx-section${headline ? " csx-section-headline" : ""}`}>
+                  {sec.map((b, j) => (
+                    <Block key={j} b={b} headline={headline} />
+                  ))}
+                </section>
+              );
+            })}
           </div>
-        </section>
-
-        {/* Related Case Studies */}
-        <section className="csd-related-section">
-          <div className="csd-container">
-            <div className="csd-related-header">
-              <div>
-                <span className="csd-badge-pill">Explore More Proven Results</span>
-                <h2 className="csd-section-title" style={{ marginTop: "10px" }}>
-                  Related Client Breakthroughs
-                </h2>
-              </div>
-              <Link href="/case-studies" className="csd-related-viewall">
-                View All 16 Case Studies &rarr;
-              </Link>
-            </div>
-
-            <div className="csd-related-grid">
-              {relatedStudies.map((item, idx) => (
-                <article key={idx} className="res-card">
-                  <Link href={`/case-studies/${item.slug}`} className="res-card-img-wrap">
-                    <img src={item.img} alt={item.title} />
-                    <span className="res-card-badge">{item.category}</span>
-                    <span
-                      style={{
-                        position: "absolute",
-                        top: "14px",
-                        right: "14px",
-                        background: "#0f172a",
-                        color: "#7c3aed",
-                        fontSize: "12px",
-                        fontWeight: 800,
-                        padding: "4px 10px",
-                        borderRadius: "14px",
-                        border: "1px solid rgba(222, 242, 92, 0.3)",
-                      }}
-                    >
-                      {item.highlight}
-                    </span>
-                  </Link>
-
-                  <div className="res-card-body">
-                    <div
-                      style={{
-                        fontSize: "12px",
-                        fontWeight: 700,
-                        color: "#64748b",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.04em",
-                        marginBottom: "6px",
-                      }}
-                    >
-                      {item.client} &bull; {item.location}
-                    </div>
-
-                    <h3 className="res-card-title">
-                      <Link href={`/case-studies/${item.slug}`}>
-                        {item.title}
-                      </Link>
-                    </h3>
-
-                    <p className="res-card-desc">{item.desc}</p>
-
-                    <div className="res-card-metrics">
-                      {item.metrics.slice(0, 3).map((m, mIdx) => (
-                        <div key={mIdx} className="res-card-metric-col">
-                          <span className="res-card-metric-val">{m.val || "—"}</span>
-                          <span className="res-card-metric-lbl">{m.lbl}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="res-card-footer">
-                      <Link
-                        href={`/case-studies/${item.slug}`}
-                        className="res-card-readmore"
-                      >
-                        Read Full Case Study
-                        <svg
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M5 12h14"></path>
-                          <path d="M12 5l7 7-7 7"></path>
-                        </svg>
-                      </Link>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Global Resource CTA */}
-        <ResourceCtaBanner />
+        </div>
       </main>
       <Footer />
     </>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ResourceCtaBanner from "@/components/ResourceCtaBanner";
+import ResourceMotion from "@/components/ResourceMotion";
 import type { BlogPost } from "@/data/blogs";
 
 export default function BlogListView({ initialPosts }: { initialPosts: BlogPost[] }) {
@@ -175,6 +176,7 @@ export default function BlogListView({ initialPosts }: { initialPosts: BlogPost[
         secondaryLabel="Explore Case Studies"
       />
 
+      <ResourceMotion variant="blog" />
       <Footer />
     </div>
   );
