@@ -22,9 +22,11 @@ export async function generateMetadata({
   const post = await getPublishedBlogBySlug(slug);
   if (!post) return { title: "Blog Article | Quickupp Softech" };
 
+  const title = post.content.metaTitle || `${post.title} | Quickupp Softech`;
   return {
-    title: `${post.title} | Quickupp Softech Blog`,
+    title,
     description: post.desc,
+    openGraph: { title, description: post.desc, type: "article", images: post.img ? [post.img] : undefined },
   };
 }
 
@@ -41,7 +43,10 @@ export default async function SingleBlogPage({
   }
 
   const allPosts = await getPublishedBlogs();
-  const relatedPosts = allPosts.filter((p) => p.slug !== slug).slice(0, 3);
+  // the next three blogs in order, wrapping around to the start
+  const at = allPosts.findIndex((p) => p.slug === slug);
+  const others = at >= 0 ? [...allPosts.slice(at + 1), ...allPosts.slice(0, at)] : allPosts.filter((p) => p.slug !== slug);
+  const relatedPosts = others.slice(0, 3);
 
   return (
     <>

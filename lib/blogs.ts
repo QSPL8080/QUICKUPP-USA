@@ -52,6 +52,7 @@ function parseContent(raw: unknown): BlogPost["content"] {
   if (typeof raw === "object" && raw !== null) {
     const c = raw as Record<string, unknown>;
     return {
+      ...(typeof c.metaTitle === "string" && c.metaTitle ? { metaTitle: c.metaTitle } : {}),
       intro: typeof c.intro === "string" ? c.intro : "",
       keyTakeaways: Array.isArray(c.keyTakeaways) ? c.keyTakeaways.filter((x) => typeof x === "string") : [],
       sections: Array.isArray(c.sections)

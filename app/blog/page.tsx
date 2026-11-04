@@ -2,7 +2,7 @@ import BlogListView from "@/components/BlogListView";
 import { getPublishedBlogs } from "@/lib/blogs";
 
 export const metadata = {
-  title: "Blogs & Strategic Insights | Quickupp Softech",
+  title: "Blogs | Quickupp Softech",
   description: "Explore industry-leading perspectives on AI, digital marketing, search visibility, web engineering, and enterprise growth.",
 };
 

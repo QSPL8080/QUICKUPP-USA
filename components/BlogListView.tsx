@@ -1,183 +1,67 @@
-"use client";
-
-import React, { useState } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ResourceCtaBanner from "@/components/ResourceCtaBanner";
 import ResourceMotion from "@/components/ResourceMotion";
 import type { BlogPost } from "@/data/blogs";
+import "@/app/blogs-list.css";
 
+/*
+ * Blogs list: every published blog, each with its image, title and the
+ * description from its document. Nothing else.
+ */
 export default function BlogListView({ initialPosts }: { initialPosts: BlogPost[] }) {
-  const [selectedCategory, setSelectedCategory] = useState("All");
-
-  const categories = [
-    "All",
-    ...Array.from(new Set(initialPosts.map((p) => p.category))),
-  ];
-
-  const filteredPosts =
-    selectedCategory === "All"
-      ? initialPosts
-      : initialPosts.filter((post) => post.category === selectedCategory);
-
-  const featuredPost = filteredPosts[0] || initialPosts[0];
-
-  const gridPosts =
-    selectedCategory === "All"
-      ? initialPosts.slice(1)
-      : filteredPosts;
-
-  if (!featuredPost) {
-    return (
-      <div className="res-page-wrap">
-        <Header />
-        <div className="res-container" style={{ padding: "100px 0", textAlign: "center" }}>
-          <h2>No blog articles published yet.</h2>
-          <p>Please check back soon for our latest updates and insights.</p>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
-
   return (
-    <div className="res-page-wrap">
+    <>
       <Header />
-
-      {/* 1. Featured Article Split Hero */}
-      <section className="res-featured-hero">
-        <div className="res-container">
-          <div className="asx-breadcrumb" style={{ marginBottom: "24px" }}>
-            <Link href="/">Home</Link>
-            <span>/</span>
-            <Link href="/resources">Resources</Link>
-            <span>/</span>
-            <span className="asx-breadcrumb-current">Blogs</span>
-          </div>
-
-          <div className="res-featured-grid">
-            <Link
-              href={`/blog/${featuredPost.slug}`}
-              className="res-featured-img-wrap"
-            >
-              <img
-                src={featuredPost.img}
-                alt={featuredPost.title}
-                className="res-featured-img"
-              />
-            </Link>
-
-            <div className="res-featured-content">
-              <div className="res-tag">
-                <span className="res-tag-dot"></span>
-                {featuredPost.category}
-              </div>
-
-              <Link
-                href={`/blog/${featuredPost.slug}`}
-                className="res-featured-title"
-              >
-                {featuredPost.title}
-              </Link>
-
-              <p className="res-featured-desc">{featuredPost.desc}</p>
-
-              <div className="res-author-row">
-                <img
-                  src="/images/home-two-about-p-500.jpg"
-                  alt={featuredPost.author}
-                  className="res-author-avatar"
-                />
-                <div className="res-author-info">
-                  <div className="res-author-name">{featuredPost.author}</div>
-                  <div className="res-author-meta">
-                    {featuredPost.date} • {featuredPost.readTime}
-                  </div>
-                </div>
-              </div>
+      <main className="bls-page">
+        <section className="bls-hero">
+          <div className="bls-container">
+            <div className="asx-breadcrumb">
+              <Link href="/">Home</Link>
+              <span>/</span>
+              <Link href="/resources">Resources</Link>
+              <span>/</span>
+              <span className="asx-breadcrumb-current">Blogs</span>
             </div>
+            <h1 className="bls-h1">
+              <span className="qs-gradient-text">Blogs</span>
+            </h1>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* 2. All Articles Grid Section */}
-      <section style={{ padding: "30px 0 60px" }}>
-        <div className="res-container">
-          <div className="res-section-head">
-            <div className="res-tag">
-              <span className="res-tag-dot"></span>
-              READ WITH US
-            </div>
-            <h2 className="res-section-title">
-              A quiet place to learn and{" "}
-              <span className="qs-gradient-text">reflect</span>
-            </h2>
+        <section className="bls-list-section">
+          <div className="bls-container">
+            {initialPosts.length ? (
+              <div className="bls-grid">
+                {initialPosts.map((post, i) => (
+                  <article key={post.slug} className="bls-card">
+                    <Link href={`/blog/${post.slug}`} className="bls-media" tabIndex={-1} aria-hidden="true">
+                      <img src={post.img} alt="" loading={i < 3 ? "eager" : "lazy"} />
+                      <span className="bls-num">{String(i + 1).padStart(2, "0")}</span>
+                    </Link>
+                    <div className="bls-body">
+                      <h2 className="bls-title">
+                        <Link href={`/blog/${post.slug}`}>{post.title}</Link>
+                      </h2>
+                      <p className="bls-desc">{post.desc}</p>
+                      <Link href={`/blog/${post.slug}`} className="bls-more">
+                        <span>Read Article</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                      </Link>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <p className="bls-empty">No blogs published yet.</p>
+            )}
           </div>
-
-          {/* Category Filter Pills */}
-          <div className="res-filter-bar">
-            {categories.map((cat) => {
-              const isActive = selectedCategory === cat;
-              return (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`res-filter-btn ${isActive ? "is-active" : ""}`}
-                >
-                  {cat}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* 3-Column Card Grid */}
-          <div className="res-grid-3">
-            {gridPosts.map((post, idx) => (
-              <Link
-                key={idx}
-                href={`/blog/${post.slug}`}
-                className="res-card"
-              >
-                <div className="res-card-img-wrap">
-                  <img
-                    src={post.img}
-                    alt={post.title}
-                    className="res-card-img"
-                  />
-                  <div className="res-card-pill">
-                    <span className="res-card-pill-dot"></span>
-                    {post.category}
-                  </div>
-                </div>
-
-                <div className="res-card-meta">
-                  {post.date} • {post.readTime}
-                </div>
-
-                <h3 className="res-card-title">{post.title}</h3>
-
-                <p className="res-card-desc">{post.desc}</p>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 3. Bottom CTA Banner */}
-      <ResourceCtaBanner
-        tag="GET STARTED"
-        title="Your First Step Toward Scalable Growth"
-        titleAccent="Starts Here"
-        primaryHref="/contact"
-        primaryLabel="Schedule a Strategy Call"
-        secondaryHref="/case-studies"
-        secondaryLabel="Explore Case Studies"
-      />
-
-      <ResourceMotion variant="blog" />
+        </section>
+        <ResourceMotion variant="blog" />
+      </main>
       <Footer />
-    </div>
+    </>
   );
 }
