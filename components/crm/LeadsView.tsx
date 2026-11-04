@@ -22,7 +22,7 @@ import { SERVICES_DATA } from "@/components/PayNowModal";
 import { CRM_INDUSTRIES } from "@/components/crm/PaymentsView";
 import { formatFileSize, money } from "@/lib/crm/format";
 import CountrySelect from "@/components/CountrySelect";
-import ActivityTimeline, { fmtWhen, type ActivityEntry } from "@/components/crm/ActivityTimeline";
+import ActivityTimeline, { fmtWhen, sameEntries, type ActivityEntry } from "@/components/crm/ActivityTimeline";
 
 type LeadAudit = {
   createdBy: string;
@@ -261,7 +261,7 @@ export default function LeadsView({
     setOpen((prev) => (prev && prev.source === src && prev.id === lid ? { ...prev, ...data.lead } : prev));
     if (Array.isArray(data.attachments)) setAttachments(data.attachments);
     if (Array.isArray(data.paymentLinks)) setPaymentLinks(data.paymentLinks);
-    if (Array.isArray(data.activity)) setActivity(data.activity);
+    if (Array.isArray(data.activity)) setActivity((cur) => (sameEntries(cur, data.activity) ? cur : data.activity));
     if (data.audit) setAudit(data.audit);
   };
 
@@ -279,7 +279,7 @@ export default function LeadsView({
           setOpen((prev) => (prev ? { ...prev, ...data.lead } : null));
           if (Array.isArray(data.attachments)) setAttachments(data.attachments);
           if (Array.isArray(data.paymentLinks)) setPaymentLinks(data.paymentLinks);
-          if (Array.isArray(data.activity)) setActivity(data.activity);
+          if (Array.isArray(data.activity)) setActivity((cur) => (sameEntries(cur, data.activity) ? cur : data.activity));
           if (data.audit) setAudit(data.audit);
         }
       } catch {}

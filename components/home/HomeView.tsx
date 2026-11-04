@@ -84,8 +84,8 @@ export default function HomeView() {
         hero={HERO}
         actions={
           <>
-            <Button cta={HERO.primary} tone="dark" />
-            <Button cta={HERO.secondary} tone="light" />
+            <Button cta={HERO.primary} tone="white" />
+            <Button cta={HERO.secondary} tone="ghost" />
           </>
         }
       />

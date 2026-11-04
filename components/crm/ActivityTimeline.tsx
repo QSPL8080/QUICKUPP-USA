@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 /*
  * Activity History & Audit Trail: one timeline used on the lead details and
@@ -118,9 +118,26 @@ export default function ActivityTimeline({
   loading?: boolean;
   emptyText?: string;
 }) {
-  const [all, setAll] = useState(false);
-  const LIMIT = 12;
-  const list = all ? entries : entries.slice(0, LIMIT);
+  // the latest 3 entries are shown; older ones are reached by scrolling the list
+  const VISIBLE = 3;
+  const listRef = useRef<HTMLDivElement>(null);
+  const [maxH, setMaxH] = useState<number | null>(null);
+  useLayoutEffect(() => {
+    const el = listRef.current;
+    if (!el) return;
+    const measure = () => {
+      const items = el.querySelectorAll<HTMLElement>(":scope > .crm-timeline-item");
+      if (items.length <= VISIBLE) return setMaxH(null);
+      const cut = items[VISIBLE];
+      setMaxH(cut.offsetTop - el.offsetTop - 2);
+    };
+    measure();
+    if (typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [entries]);
+  const list = entries;
 
   return (
     <div className="crm-drawer-card crm-activity-card">
@@ -140,7 +157,13 @@ export default function ActivityTimeline({
       ) : entries.length === 0 ? (
         <p className="crm-timeline-desc">{emptyText}</p>
       ) : (
-        <div className="crm-timeline">
+        <div
+          ref={listRef}
+          className={`crm-timeline crm-activity-list${maxH ? " is-scroll" : ""}`}
+          style={maxH ? { maxHeight: `${maxH}px` } : undefined}
+          tabIndex={maxH ? 0 : undefined}
+          aria-label={maxH ? "Activity history (scroll for older entries)" : undefined}
+        >
           {list.map((a) => {
             const dot = DOTS[a.actorType] || DOTS.user;
             const showChange = (a.oldValue || a.newValue) && short(a.oldValue) && short(a.newValue) && a.action !== "created" && a.action !== "payment" && a.action !== "payment_failed" && a.action !== "reminder" && a.action !== "payment_link" && a.action !== "attachment";
@@ -173,13 +196,16 @@ export default function ActivityTimeline({
         </div>
       )}
 
-      {entries.length > LIMIT && (
-        <button type="button" className="crm-activity-more" onClick={() => setAll((v) => !v)}>
-          {all ? "Show fewer" : `Show all ${entries.length} activities`}
-        </button>
+      {maxH !== null && entries.length > VISIBLE && (
+        <p className="crm-activity-hint">Scroll for {entries.length - VISIBLE} older {entries.length - VISIBLE === 1 ? "entry" : "entries"}</p>
       )}
     </div>
   );
+}
+
+/** true when two histories hold the same entries (nothing new to show) */
+export function sameEntries(a: ActivityEntry[], b: ActivityEntry[]) {
+  return a.length === b.length && a.every((x, i) => x.id === b[i].id);
 }
 
 /** Loads a payment's / payment link's history when the details open */
@@ -196,7 +222,9 @@ export function usePaymentActivity(entity: "payment" | "payment_link" | null, id
     fetch(`/api/crm/activity?entity=${entity}&id=${id}`, { cache: "no-store" })
       .then((r) => r.json())
       .then((j) => {
-        if (live) setEntries(Array.isArray(j?.activity) ? j.activity : []);
+        if (!live) return;
+        const next: ActivityEntry[] = Array.isArray(j?.activity) ? j.activity : [];
+        setEntries((cur) => (sameEntries(cur, next) ? cur : next));
       })
       .catch(() => live && setEntries([]))
       .finally(() => live && setLoading(false));
