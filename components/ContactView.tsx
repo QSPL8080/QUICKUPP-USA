@@ -134,7 +134,27 @@ function InquiryForm() {
   const [submitError, setSubmitError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [countdown, setCountdown] = useState(3);
   const [trap, setTrap] = useState(""); // hidden spam trap
+
+  useEffect(() => {
+    if (!submitted) return;
+    setCountdown(3);
+    const interval = setInterval(() => {
+      setCountdown((c) => (c > 1 ? c - 1 : 1));
+    }, 1000);
+    const timer = setTimeout(() => {
+      setForm(EMPTY);
+      setErrors({});
+      setSubmitError("");
+      setTrap("");
+      setSubmitted(false);
+    }, 3000);
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timer);
+    };
+  }, [submitted]);
 
   const set =
     (k: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -180,11 +200,21 @@ function InquiryForm() {
         </span>
         <h3 className="ct-success-title">Thank You! Your Inquiry Has Been Received.</h3>
         <p className="ct-note">Our team will review your details and contact you to discuss your requirements.</p>
+        <p style={{ fontSize: "13px", color: "#64748b", marginTop: "12px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ animation: "spin 1s linear infinite" }}>
+            <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+          </svg>
+          Returning to original form in {countdown}s...
+        </p>
         <button
           type="button"
           className="ct-btn ct-btn-dark"
+          style={{ marginTop: "14px" }}
           onClick={() => {
             setForm(EMPTY);
+            setErrors({});
+            setSubmitError("");
+            setTrap("");
             setSubmitted(false);
           }}
         >

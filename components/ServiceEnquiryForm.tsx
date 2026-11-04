@@ -42,11 +42,34 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
 
   const [website, setWebsite] = useState(""); // hidden spam trap
   const [submitted, setSubmitted] = useState(false);
+  const [countdown, setCountdown] = useState(3);
   const [submitting, setSubmitting] = useState(false);
   const [agreedError, setAgreedError] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
   const set = (patch: Partial<typeof EMPTY>) => setFormData((f) => ({ ...f, ...patch }));
+
+  // Auto-reset form back to original state after 3 seconds
+  useEffect(() => {
+    if (!submitted) return;
+    setCountdown(3);
+    const interval = setInterval(() => {
+      setCountdown((c) => (c > 1 ? c - 1 : 1));
+    }, 1000);
+    const timer = setTimeout(() => {
+      setSubmitted(false);
+      setFormData(EMPTY);
+      setSelectedCategories([]);
+      setCategoryError(false);
+      setAgreedError(false);
+      setSubmitError("");
+      setWebsite("");
+    }, 3000);
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timer);
+    };
+  }, [submitted]);
 
   // Close category dropdown on outside click
   useEffect(() => {
@@ -149,14 +172,24 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
               <p className="sef-success-text">
                 Our team will review your details and contact you to discuss your requirements.
               </p>
+              <p style={{ fontSize: "13.5px", color: "#64748b", marginTop: "12px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ animation: "spin 1s linear infinite" }}>
+                  <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                </svg>
+                Returning to original form in {countdown}s...
+              </p>
               <button
                 type="button"
                 className="su-submit-btn"
+                style={{ marginTop: "16px" }}
                 onClick={() => {
                   setSubmitted(false);
                   setFormData(EMPTY);
                   setSelectedCategories([]);
                   setCategoryError(false);
+                  setAgreedError(false);
+                  setSubmitError("");
+                  setWebsite("");
                 }}
               >
                 Send Another Inquiry
