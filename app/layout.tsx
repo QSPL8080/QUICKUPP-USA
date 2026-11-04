@@ -6,6 +6,7 @@ import "./site-type.css";
 import QuickuppEngineReinit from "@/components/QuickuppEngineReinit";
 import ButtonTone from "@/components/ButtonTone";
 import PayNowModal from "@/components/PayNowModal";
+import DynamicEmailModal from "@/components/DynamicEmailModal";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.quickuppsoftech.us"),
@@ -113,6 +114,7 @@ export default function RootLayout({
         <QuickuppEngineReinit />
         <ButtonTone />
         <PayNowModal />
+        <DynamicEmailModal />
       </body>
     </html>
   );

@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { openDynamicEmailModal } from "@/components/DynamicEmailModal";
 
 export default function Footer() {
   const year = new Date().getFullYear();
@@ -96,6 +97,17 @@ export default function Footer() {
                     key={m.label}
                     href={m.href}
                     className="qs-ft-mail"
+                    data-email-label={m.href.startsWith("mailto:") ? m.label : undefined}
+                    onClick={(e) => {
+                      if (m.href.startsWith("mailto:")) {
+                        e.preventDefault();
+                        openDynamicEmailModal({
+                          email: m.value,
+                          label: m.label,
+                          subject: `Inquiry regarding Quickupp Softech (${m.label})`,
+                        });
+                      }
+                    }}
                     {...(m.href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                   >
                     <span className="qs-ft-mail-icon" aria-hidden="true">

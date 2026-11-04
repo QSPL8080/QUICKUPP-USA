@@ -9,6 +9,7 @@ import LucideIcon, { type LucideIconName } from "@/components/LucideIcon";
 import { AI_AUTOMATION_CATEGORIES, CONTACT_BUDGETS, CONTACT_SERVICES, CONTACT_TIMELINES, INDUSTRIES as INDUSTRY_OPTIONS } from "@/lib/formOptions";
 import { SERVICES_DATA } from "@/components/PayNowModal";
 import CountrySelect from "@/components/CountrySelect";
+import { openDynamicEmailModal } from "@/components/DynamicEmailModal";
 import "@/app/contact.css";
 
 const getCategoriesForService = (service: string): readonly string[] => {
@@ -508,6 +509,15 @@ export default function ContactView() {
                     className="ct-dock-item"
                     title="Send an email to info@quickuppsoftech.us"
                     aria-label="Email Inquiries: info@quickuppsoftech.us"
+                    data-email-label="Inquiries"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      openDynamicEmailModal({
+                        email: "info@quickuppsoftech.us",
+                        label: "Inquiries",
+                        subject: "Quickupp Softech Inquiry",
+                      });
+                    }}
                   >
                     <span className="ct-dock-icon" aria-hidden="true">
                       <LucideIcon name="mail" size={19} />
@@ -525,6 +535,15 @@ export default function ContactView() {
                     className="ct-dock-item"
                     title="Send an email to support@quickuppsoftech.us"
                     aria-label="Email Help & Support: support@quickuppsoftech.us"
+                    data-email-label="Help & Support"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      openDynamicEmailModal({
+                        email: "support@quickuppsoftech.us",
+                        label: "Help & Support",
+                        subject: "Quickupp Softech Support Request",
+                      });
+                    }}
                   >
                     <span className="ct-dock-icon" aria-hidden="true">
                       <LucideIcon name="headset" size={19} />
