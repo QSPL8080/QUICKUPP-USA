@@ -3,7 +3,6 @@ import type { CSSProperties, ReactNode } from "react";
 import HomeIcon, { type HomeIconName } from "@/components/home/HomeIcon";
 import HomeMotion from "@/components/home/HomeMotion";
 import ServiceExplorer from "@/components/home/ServiceExplorer";
-import HeroNetwork from "@/components/home/HeroNetwork";
 import { ABOUT, FINAL, HERO, INDUSTRIES, INSIGHTS, PROCESS, SERVICES, TECH, TRUST, VOICES, WHY, WORK } from "@/data/home-content";
 import "@/app/home.css";
 
@@ -15,7 +14,7 @@ import "@/app/home.css";
 
 type Cta = { label: string; href: string; external?: boolean };
 
-function Button({ cta, tone = "dark", className = "" }: { cta: Cta; tone?: "dark" | "light" | "ghost"; className?: string }) {
+function Button({ cta, tone = "dark", className = "" }: { cta: Cta; tone?: "dark" | "light" | "ghost" | "white"; className?: string }) {
   const cls = `hx-cta hx-cta-${tone}${className ? ` ${className}` : ""}`;
   const inner = (
     <>
@@ -78,50 +77,187 @@ export default function HomeView() {
     <main className="hx-page">
       <HomeMotion />
 
-      {/* 1. Hero */}
+      {/* 1. Hero: Dark Stage (inspired by Contact page) + Layered Realistic Photo Composite */}
       <section className="hx-hero">
-        <div className="hx-hero-bg" aria-hidden="true">
-          <span className="hx-orb hx-orb-a" />
-          <span className="hx-orb hx-orb-b" />
-          <span className="hx-orb hx-orb-c" />
-          <span className="hx-grid" />
-        </div>
-        <div className="hx-wrap hx-hero-grid">
-          <div className="hx-hero-copy">
-            <p className="hx-eyebrow" data-hx="fade">
-              {HERO.eyebrow.map((w, i) => (
-                <span key={w} className="hx-eyebrow-word" style={d(0.1 + i * 0.12)}>
-                  {w}
-                </span>
-              ))}
-            </p>
-            <h1 className="hx-hero-title">
-              {HERO.title.map((l, i) => (
-                <span key={l} className="hx-line" data-hx="line" style={d(0.15 + i * 0.14)}>
-                  <span className={i === HERO.title.length - 1 ? "hx-line-in qs-gradient-text" : "hx-line-in"}>{l}</span>
-                </span>
-              ))}
-            </h1>
-            <p className="hx-hero-text" data-hx="rise" style={d(0.55)}>
-              {HERO.text}
-            </p>
-            <div className="hx-actions" data-hx="rise" style={d(0.7)}>
-              <Button cta={HERO.primary} />
-              <Button cta={HERO.secondary} tone="light" />
-            </div>
-            <ul className="hx-support" data-hx="rise" style={d(0.85)}>
-              {HERO.supporting.map((s) => (
-                <li key={s}>
-                  <HomeIcon name="check" size={14} strokeWidth={2.6} />
-                  <span>{s}</span>
-                </li>
-              ))}
-            </ul>
+        <div className="hx-stage">
+          {/* Ambient Radar & Grid (Contact Page Style) */}
+          <div className="hx-radar" aria-hidden="true">
+            <span className="hx-radar-ring" />
+            <span className="hx-radar-ring" />
+            <span className="hx-radar-ring" />
+            <span className="hx-radar-sweep" />
+            <i className="hx-blip hx-blip-1" />
+            <i className="hx-blip hx-blip-2" />
+            <i className="hx-blip hx-blip-3" />
+            <i className="hx-blip hx-blip-4" />
           </div>
+          <div className="hx-stage-grid" aria-hidden="true" />
 
-          <div className="hx-hero-art" data-hx="zoom" style={d(0.3)}>
-            <HeroNetwork coreLabel={HERO.eyebrow[3]} />
+          <div className="hx-wrap hx-stage-inner">
+            <div className="hx-hero-grid">
+              {/* Left Column: Value Proposition */}
+              <div className="hx-hero-copy">
+                {/* Live Status Badge */}
+                <div className="hx-live-badge" data-hx="fade">
+                  <span className="hx-live-dot" aria-hidden="true" />
+                  <span className="hx-live-text">Your Trusted AI &amp; Digital Growth Partner</span>
+                </div>
+
+                {/* Eyebrow Track */}
+                <p className="hx-hero-eyebrow" data-hx="fade">
+                  {HERO.eyebrow.map((w, i) => (
+                    <span key={w} className="hx-eyebrow-word" style={d(0.1 + i * 0.12)}>
+                      {w}
+                    </span>
+                  ))}
+                </p>
+
+                {/* Main Headline */}
+                <h1 className="hx-hero-title">
+                  {HERO.title.map((l, i) => (
+                    <span key={l} className="hx-line" data-hx="line" style={d(0.15 + i * 0.14)}>
+                      <span className={i === HERO.title.length - 1 ? "hx-line-in qs-gradient-text" : "hx-line-in"}>{l}</span>
+                    </span>
+                  ))}
+                </h1>
+
+                <p className="hx-hero-text" data-hx="rise" style={d(0.55)}>
+                  {HERO.text}
+                </p>
+
+                {/* High Contrast Actions */}
+                <div className="hx-actions" data-hx="rise" style={d(0.7)}>
+                  <Button cta={HERO.primary} tone="white" />
+                  <Button cta={HERO.secondary} tone="ghost" />
+                </div>
+
+                {/* Trust Points */}
+                <ul className="hx-support" data-hx="rise" style={d(0.85)}>
+                  {HERO.supporting.map((s) => (
+                    <li key={s}>
+                      <HomeIcon name="check" size={14} strokeWidth={2.6} />
+                      <span>{s}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Right Column: Layered Realistic Photo Composite */}
+              <div className="hx-hero-art" data-hx="zoom" style={d(0.3)}>
+                <div className="hx-hero-composite">
+                  {/* Primary Realistic Team Photo */}
+                  <div className="hx-photo-card hx-photo-main">
+                    <img
+                      src="/images/contact-team-collaboration.jpg"
+                      alt="Quickupp Softech strategy & execution team"
+                      loading="eager"
+                    />
+                    <div className="hx-photo-overlay" />
+                    <div className="hx-photo-caption">
+                      <span className="hx-photo-tag">Strategy &amp; Innovation</span>
+                      <span className="hx-photo-title">Building Scalable Digital Futures</span>
+                    </div>
+                  </div>
+
+                  {/* Secondary Overlapping Realistic Photo */}
+                  <div className="hx-photo-card hx-photo-secondary">
+                    <img
+                      src="/images/contact-boardroom.jpg"
+                      alt="Executive strategic planning meeting"
+                      loading="lazy"
+                    />
+                    <div className="hx-photo-overlay" />
+                  </div>
+
+                  {/* Floating Glass Stat Badge 1: Lead Velocity */}
+                  <div className="hx-stat-chip hx-stat-roi" data-hx="lift">
+                    <div className="hx-stat-icon">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+                        <polyline points="16 7 22 7 22 13" />
+                      </svg>
+                    </div>
+                    <div className="hx-stat-info">
+                      <span className="hx-stat-val">+340%</span>
+                      <span className="hx-stat-lbl">Lead Velocity Growth</span>
+                    </div>
+                  </div>
+
+                  {/* Floating Glass Stat Badge 2: Client Retention + Avatars */}
+                  <div className="hx-stat-chip hx-stat-retention" data-hx="lift">
+                    <div className="hx-avatar-stack">
+                      <img src="/images/team-img-01.jpg" alt="Client partner 1" />
+                      <img src="/images/team-img-02.jpg" alt="Client partner 2" />
+                      <img src="/images/team-img-03.jpg" alt="Client partner 3" />
+                    </div>
+                    <div className="hx-stat-info">
+                      <div className="hx-stat-rating">
+                        <span className="hx-stat-val">98%</span>
+                        <span className="hx-stars" aria-label="5 stars">★★★★★</span>
+                      </div>
+                      <span className="hx-stat-lbl">Client Retention Rate</span>
+                    </div>
+                  </div>
+
+                  {/* Floating Glass Stat Badge 3: Active Deployments */}
+                  <div className="hx-stat-chip hx-stat-tech" data-hx="lift">
+                    <span className="hx-stat-pulse-dot" aria-hidden="true" />
+                    <div className="hx-stat-info">
+                      <span className="hx-stat-val">250+</span>
+                      <span className="hx-stat-lbl">Systems Deployed</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
+        </div>
+
+        {/* Overlapping Capabilities Dock (Contact Page Dock style for Home Verticals) */}
+        <div className="hx-wrap">
+          <aside className="hx-dock" aria-label="Core Capabilities">
+            <div className="hx-dock-intro">
+              <span className="hx-dock-tag">ENTERPRISE SOLUTIONS</span>
+              <h2 className="hx-dock-title">Strategic Execution Across 4 Core Verticals</h2>
+              <p className="hx-dock-text">
+                Explore our specialized departments working in synergy to acquire customers, automate operations, and scale technology.
+              </p>
+            </div>
+            <div className="hx-dock-grid">
+              <Link href="/services/ai-powered-digital-marketing-services" className="hx-dock-card">
+                <div className="hx-dock-card-top">
+                  <span className="hx-dock-card-icon"><HomeIcon name="megaphone" size={20} /></span>
+                  <span className="hx-dock-card-arrow" aria-hidden="true">→</span>
+                </div>
+                <h3 className="hx-dock-card-title">AI Digital Marketing</h3>
+                <p className="hx-dock-card-sub">SEO, Google/Meta Ads &amp; Lead Generation</p>
+              </Link>
+              <Link href="/services/ai-automation-solutions" className="hx-dock-card">
+                <div className="hx-dock-card-top">
+                  <span className="hx-dock-card-icon"><HomeIcon name="bot" size={20} /></span>
+                  <span className="hx-dock-card-arrow" aria-hidden="true">→</span>
+                </div>
+                <h3 className="hx-dock-card-title">AI &amp; Automation</h3>
+                <p className="hx-dock-card-sub">AI Agents, Chatbots &amp; Workflow Systems</p>
+              </Link>
+              <Link href="/services/information-technology-services" className="hx-dock-card">
+                <div className="hx-dock-card-top">
+                  <span className="hx-dock-card-icon"><HomeIcon name="code-xml" size={20} /></span>
+                  <span className="hx-dock-card-arrow" aria-hidden="true">→</span>
+                </div>
+                <h3 className="hx-dock-card-title">Custom IT &amp; Web Apps</h3>
+                <p className="hx-dock-card-sub">Next.js, Cloud Architectures &amp; Software</p>
+              </Link>
+              <Link href="/services/staff-augmentation" className="hx-dock-card">
+                <div className="hx-dock-card-top">
+                  <span className="hx-dock-card-icon"><HomeIcon name="users" size={20} /></span>
+                  <span className="hx-dock-card-arrow" aria-hidden="true">→</span>
+                </div>
+                <h3 className="hx-dock-card-title">Staff Augmentation</h3>
+                <p className="hx-dock-card-sub">Dedicated Technical &amp; Growth Specialists</p>
+              </Link>
+            </div>
+          </aside>
         </div>
       </section>
 
@@ -163,6 +299,10 @@ export default function HomeView() {
             <figure className="hx-about-side" data-hx="wipe" style={d(0.2)}>
               <img src="/images/contact-team-collaboration.jpg" alt="" loading="lazy" />
             </figure>
+            <div className="hx-about-badge" data-hx="lift">
+              <span className="hx-about-badge-num">10+</span>
+              <span className="hx-about-badge-text">Years Of Digital Excellence</span>
+            </div>
             <span className="hx-about-dots" />
           </div>
           <div className="hx-about-copy">

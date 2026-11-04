@@ -63,8 +63,9 @@ export default function HomeMotion() {
       counters.forEach((el) => io.observe(el));
     }
 
-    // scroll-linked progress (process line, why-us line)
+    // scroll-linked progress (process line, why-us line, section lighting)
     const tracks = Array.from(root.querySelectorAll<HTMLElement>("[data-hx-track]"));
+    const sections = Array.from(root.querySelectorAll<HTMLElement>(".hx-section"));
     let frame = 0;
     const update = () => {
       frame = 0;
@@ -73,6 +74,10 @@ export default function HomeMotion() {
         const r = el.getBoundingClientRect();
         const p = reduce ? 1 : Math.min(1, Math.max(0, (vh * 0.75 - r.top) / Math.max(1, r.height)));
         el.style.setProperty("--hx-p", p.toFixed(3));
+      });
+      const line = vh * 0.55;
+      sections.forEach((sec) => {
+        sec.classList.toggle("is-lit", sec.getBoundingClientRect().top < line);
       });
     };
     const onScroll = () => {
