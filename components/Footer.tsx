@@ -210,7 +210,11 @@ export default function Footer() {
             &copy; {year} <strong>Quickupp Softech LLC</strong>. All rights reserved.
           </div>
 
-          <div className="qs-scalient-btm-right">
+          <div className="qs-scalient-btm-right" style={{ display: "inline-flex", gap: "16px", alignItems: "center" }}>
+            <Link href="/cookie-policy" className="qs-scalient-btm-link">
+              Cookie Policy
+            </Link>
+            <span style={{ opacity: 0.3 }} aria-hidden="true">•</span>
             <Link href="/privacy-policy" className="qs-scalient-btm-link">
               Privacy Policy
             </Link>

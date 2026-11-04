@@ -64,7 +64,7 @@ function Linked({ text }: { text: string }) {
   );
 }
 
-const LABEL_RE = /^([A-Z][A-Za-z &-]{1,32}):(?:\s(.*))?$/;
+const LABEL_RE = /^([A-Z][A-Za-z &\/-]{1,32}):(?:\s(.*))?$/;
 
 /** "Label: text" → [label, text] (text may be empty, e.g. "US Mailing Address:") */
 const splitLabel = (text: string) => {
