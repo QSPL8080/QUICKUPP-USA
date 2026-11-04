@@ -87,6 +87,18 @@ export default function NotifyCenter({
   const knownKeysRef = useRef<Set<string>>(new Set(data.items.map((i) => i.key)));
   const initialMountRef = useRef<boolean>(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const profileDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Profile dropdown state & logout
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [leaving, setLeaving] = useState(false);
+
+  const handleLogout = async () => {
+    setLeaving(true);
+    await fetch("/api/crm/logout", { method: "POST" }).catch(() => null);
+    router.push("/login");
+    router.refresh();
+  };
 
   // Load sound setting from localStorage
   useEffect(() => {
@@ -108,18 +120,33 @@ export default function NotifyCenter({
     });
   };
 
-  // Close dropdown on outside click
+  // Close dropdowns on outside click or Escape key
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setOpen(false);
       }
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(e.target as Node)) {
+        setProfileOpen(false);
+      }
     };
-    if (open) {
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+        setProfileOpen(false);
+      }
+    };
+
+    if (open || profileOpen) {
       document.addEventListener("mousedown", handleOutsideClick);
+      window.addEventListener("keydown", handleKeyDown);
     }
-    return () => document.removeEventListener("mousedown", handleOutsideClick);
-  }, [open]);
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open, profileOpen]);
 
   // Dismiss toast
   const dismissToast = useCallback((key: string) => {
@@ -415,10 +442,140 @@ export default function NotifyCenter({
           )}
         </div>
 
-        {/* User profile avatar circle matching Image 2 */}
-        <Link href="/crm/profile" className="crm-top-avatar" title={`Signed in as ${user?.name || "Admin"}`}>
-          {initial}
-        </Link>
+        {/* User Profile Avatar with Setting Dropdown */}
+        <div className="crm-profile-wrap" ref={profileDropdownRef}>
+          <button
+            type="button"
+            className={`crm-top-avatar-btn${profileOpen ? " is-active" : ""}`}
+            onClick={() => {
+              setProfileOpen((prev) => !prev);
+              setOpen(false); // close notifications if open
+            }}
+            aria-expanded={profileOpen}
+            aria-haspopup="menu"
+            aria-label={`User menu for ${user?.name || "Admin"}`}
+            title={`Signed in as ${user?.name || "Admin"}`}
+          >
+            <span className="crm-top-avatar">{initial}</span>
+          </button>
+
+          {profileOpen && (
+            <div className="crm-profile-dropdown" role="menu">
+              {/* Profile Header */}
+              <div className="crm-profile-dropdown-head">
+                <div className="crm-profile-dropdown-avatar" aria-hidden="true">
+                  {initial}
+                </div>
+                <div className="crm-profile-dropdown-info">
+                  <span className="crm-profile-dropdown-name">{user?.name || "Administrator"}</span>
+                  <span className="crm-profile-dropdown-email">{user?.email || "admin@quickuppsoftech.us"}</span>
+                  <span className="crm-profile-dropdown-role">
+                    {user?.role === "super_admin" ? "Super Admin" : user?.role === "admin" ? "Admin" : "Staff"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Menu Items */}
+              <div className="crm-profile-menu">
+                {/* 1. Profile Settings -> goes to /crm/profile */}
+                <Link
+                  href="/crm/profile"
+                  className="crm-profile-item"
+                  onClick={() => setProfileOpen(false)}
+                  role="menuitem"
+                >
+                  <span className="crm-profile-item-icon" aria-hidden="true">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="3" />
+                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                    </svg>
+                  </span>
+                  <div className="crm-profile-item-text">
+                    <span className="crm-profile-item-title">Profile Settings</span>
+                    <span className="crm-profile-item-sub">Name, password &amp; account details</span>
+                  </div>
+                  <svg className="crm-profile-item-arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                </Link>
+
+                {/* 2. Team & User Access (for super_admin) */}
+                {user?.role === "super_admin" && (
+                  <Link
+                    href="/crm/users"
+                    className="crm-profile-item"
+                    onClick={() => setProfileOpen(false)}
+                    role="menuitem"
+                  >
+                    <span className="crm-profile-item-icon" aria-hidden="true">
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                      </svg>
+                    </span>
+                    <div className="crm-profile-item-text">
+                      <span className="crm-profile-item-title">User Management</span>
+                      <span className="crm-profile-item-sub">Manage CRM team members &amp; roles</span>
+                    </div>
+                    <svg className="crm-profile-item-arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                  </Link>
+                )}
+
+                {/* 3. View Public Website */}
+                <a
+                  href="/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="crm-profile-item"
+                  onClick={() => setProfileOpen(false)}
+                  role="menuitem"
+                >
+                  <span className="crm-profile-item-icon" aria-hidden="true">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="2" y1="12" x2="22" y2="12" />
+                      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                    </svg>
+                  </span>
+                  <div className="crm-profile-item-text">
+                    <span className="crm-profile-item-title">View Website</span>
+                    <span className="crm-profile-item-sub">quickuppsoftech.us</span>
+                  </div>
+                  <svg className="crm-profile-item-arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M7 17L17 7M8 7h9v9" />
+                  </svg>
+                </a>
+
+                <div className="crm-profile-divider" />
+
+                {/* 4. Log out */}
+                <button
+                  type="button"
+                  className="crm-profile-item crm-profile-logout"
+                  onClick={handleLogout}
+                  disabled={leaving}
+                  role="menuitem"
+                >
+                  <span className="crm-profile-item-icon" aria-hidden="true">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                      <polyline points="16 17 21 12 16 7" />
+                      <line x1="21" y1="12" x2="9" y2="12" />
+                    </svg>
+                  </span>
+                  <div className="crm-profile-item-text">
+                    <span className="crm-profile-item-title">{leaving ? "Signing out…" : "Sign Out"}</span>
+                    <span className="crm-profile-item-sub">End your active CRM session</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Floating Bottom-Right Toast Stack matching Image 1 */}
