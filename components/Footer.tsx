@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { openDynamicEmailModal } from "@/components/DynamicEmailModal";
+import "@/app/footer-rays.css";
 
 export default function Footer() {
   const year = new Date().getFullYear();
