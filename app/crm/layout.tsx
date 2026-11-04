@@ -24,8 +24,15 @@ export default async function CrmLayout({ children }: { children: React.ReactNod
     <div className="crm-root">
       <FeedbackProvider>
         <CrmSidebar user={user} newCounts={newCounts} />
-        <main className="crm-main">{children}</main>
-        <NotifyCenter data={notifications} user={{ name: user.name, email: user.email, role: user.role }} />
+        <div className="crm-body">
+          <header className="crm-header-bar">
+            <div className="crm-header-bar-start">
+              <span className="crm-header-portal">Quickupp Softech &middot; CRM</span>
+            </div>
+            <NotifyCenter data={notifications} user={{ name: user.name, email: user.email, role: user.role }} />
+          </header>
+          <main className="crm-main">{children}</main>
+        </div>
         <TableFit />
         <IdleLogout idleMinutes={IDLE_MINUTES} />
       </FeedbackProvider>

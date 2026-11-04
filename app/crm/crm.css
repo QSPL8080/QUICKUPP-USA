@@ -55,12 +55,62 @@
   background: linear-gradient(90deg, var(--crm-side) 264px, var(--crm-bg) 264px);
 }
 
+.crm-body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--crm-bg);
+}
+
+.crm-header-bar {
+  position: sticky;
+  top: 0;
+  z-index: 80;
+  height: 60px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--crm-line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(20px, 3vw, 40px);
+  gap: 16px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+
+.crm-header-bar-start {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.crm-header-portal {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+}
+
+.crm-header-portal::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--crm-accent, #6366f1);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
 .crm-main {
-  padding: 32px clamp(20px, 3vw, 40px) 48px;
+  padding: 28px clamp(20px, 3vw, 40px) 48px;
   min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  flex: 1;
 }
 
 /* ---- Sidebar ------------------------------------------------------------------ */
@@ -345,6 +395,7 @@
   justify-content: space-between;
   gap: 16px 24px;
   flex-wrap: wrap;
+  width: 100%;
 }
 
 .crm-head-text {
@@ -357,6 +408,7 @@
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
+  margin-left: auto;
 }
 
 .crm-root .crm-title {
@@ -1841,13 +1893,12 @@ a.crm-link-btn {
 
 /* ---- Top Action Cluster & Notifications (Live Sync, Audio, Dropdown & Toasts) ---- */
 .crm-top-actions {
-  position: fixed;
-  top: 16px;
-  right: 28px;
+  position: relative;
   z-index: 90;
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-left: auto;
 }
 
 .crm-live-pill {
@@ -2309,22 +2360,17 @@ a.crm-link-btn {
   }
 }
 
-/* page titles keep clear of the top actions on desktop */
-.crm-root .crm-head {
-  padding-right: 320px;
-}
-
-@media (max-width: 1200px) {
-  .crm-root .crm-head {
-    padding-right: 0;
-    margin-top: 36px;
-  }
-}
-
 @media (max-width: 900px) {
+  .crm-header-bar {
+    height: 52px;
+    padding: 0 16px;
+  }
+
+  .crm-header-portal {
+    font-size: 12px;
+  }
+
   .crm-top-actions {
-    top: 10px;
-    right: 12px;
     gap: 6px;
   }
 
@@ -2338,11 +2384,6 @@ a.crm-link-btn {
   .crm-top-avatar {
     width: 32px;
     height: 32px;
-  }
-
-  .crm-root .crm-head {
-    padding-right: 0;
-    margin-top: 0;
   }
 
   .crm-toast-stack {
