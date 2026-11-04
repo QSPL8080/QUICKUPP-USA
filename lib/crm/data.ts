@@ -476,7 +476,8 @@ export async function listPayments(opts: {
   };
 }
 
-function toDateOnly(v: unknown): string {
+/** A DATE column (mysql2 gives a Date at local midnight) as YYYY-MM-DD */
+export function toDateOnly(v: unknown): string {
   if (v instanceof Date) {
     const y = v.getFullYear(), m = String(v.getMonth() + 1).padStart(2, "0"), d = String(v.getDate()).padStart(2, "0");
     return `${y}-${m}-${d}`;

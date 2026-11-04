@@ -1,5 +1,8 @@
 import "server-only";
 import { getPool } from "@/lib/db";
+import { hashPassword } from "@/lib/crm/auth";
+import { decryptSecret, encryptSecret } from "@/lib/crm/secret.mjs";
+import { SOURCES } from "@/lib/crm/data";
 
 /* CRM team accounts (Team & Users page, profile, Assigned to lists) */
 
@@ -12,12 +15,23 @@ export type TeamUser = {
   isActive: boolean;
   lastLoginAt: string | null;
   createdAt: string;
+  /** current password — only filled in for the super admin's Team & Users page */
+  password?: string | null;
+  passwordChangedAt?: string | null;
 };
 
-export async function listUsers(): Promise<TeamUser[]> {
-  const [rows] = await getPool().query(
-    "SELECT id, name, username, email, role, is_active, last_login_at, created_at FROM crm_users ORDER BY role = 'super_admin' DESC, name"
-  );
+export async function listUsers(opts: { withPasswords?: boolean } = {}): Promise<TeamUser[]> {
+  let rows: unknown;
+  try {
+    [rows] = await getPool().query(
+      "SELECT id, name, username, email, role, is_active, last_login_at, created_at, password_view, password_changed_at FROM crm_users ORDER BY role = 'super_admin' DESC, name"
+    );
+  } catch {
+    // before the password columns exist
+    [rows] = await getPool().query(
+      "SELECT id, name, username, email, role, is_active, last_login_at, created_at FROM crm_users ORDER BY role = 'super_admin' DESC, name"
+    );
+  }
   return (rows as Record<string, unknown>[]).map((r) => ({
     id: Number(r.id),
     name: String(r.name ?? ""),
@@ -27,7 +41,44 @@ export async function listUsers(): Promise<TeamUser[]> {
     isActive: Number(r.is_active) === 1,
     lastLoginAt: r.last_login_at ? new Date(r.last_login_at as string).toISOString() : null,
     createdAt: new Date(r.created_at as string).toISOString(),
+    ...(opts.withPasswords
+      ? {
+          password: decryptSecret(r.password_view),
+          passwordChangedAt: r.password_changed_at ? new Date(r.password_changed_at as string).toISOString() : null,
+        }
+      : {}),
   }));
+}
+
+/** Account as stored now (for comparing before / after an edit) */
+export async function getAccount(id: number) {
+  const [rows] = await getPool().query("SELECT id, name, username, email, role FROM crm_users WHERE id = ?", [id]);
+  const r = (rows as Record<string, unknown>[])[0];
+  return r ? { id: Number(r.id), name: String(r.name ?? ""), username: String(r.username ?? ""), email: String(r.email ?? ""), role: String(r.role) } : null;
+}
+
+/**
+ * Sets a new password: the scrypt hash used for sign-in, plus an encrypted
+ * copy the super admin can view on Team & Users.
+ */
+export async function savePassword(userId: number, password: string) {
+  const hash = await hashPassword(password);
+  try {
+    await getPool().execute(
+      "UPDATE crm_users SET password_hash = ?, password_view = ?, password_changed_at = NOW(), failed_attempts = 0 WHERE id = ?",
+      [hash, encryptSecret(password), userId]
+    );
+  } catch {
+    await getPool().execute("UPDATE crm_users SET password_hash = ?, failed_attempts = 0 WHERE id = ?", [hash, userId]);
+  }
+}
+
+/** A renamed team member keeps their leads: "Assigned to" follows the new name */
+export async function renameAssignee(oldName: string, newName: string) {
+  if (!oldName || !newName || oldName === newName) return;
+  for (const { table } of Object.values(SOURCES)) {
+    await getPool().execute(`UPDATE \`${table}\` SET assigned_to = ? WHERE assigned_to = ?`, [newName, oldName]).catch(() => {});
+  }
 }
 
 /** Names of active team members, for "Assigned to" */

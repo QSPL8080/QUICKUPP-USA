@@ -3,6 +3,8 @@ import { getCurrentUser } from "@/lib/crm/auth";
 import { validatePayment } from "@/lib/crm/payments";
 import { readJson } from "@/lib/enquiry";
 import { parseIds } from "@/lib/crm/ids";
+import { actorOf, logActivity, money } from "@/lib/crm/activity";
+import { statusLabel } from "@/lib/crm/paymentActivity";
 
 /* POST → add a payment entered by hand */
 export async function POST(request: Request) {
@@ -20,7 +22,16 @@ export async function POST(request: Request) {
     [d.clientName, d.clientEmail, d.clientPhone, d.companyName, d.category, d.service, d.description, d.amount, d.totalAmount, d.paymentType, d.remainingAmount, d.currency, d.method, d.status,
       d.reference, d.invoiceNumber, d.paidAt, d.notes, user.id]
   );
-  return Response.json({ ok: true, id: (res as { insertId: number }).insertId });
+  const newId = (res as { insertId: number }).insertId;
+  await logActivity({
+    entity: "payment",
+    id: newId,
+    action: "created",
+    newValue: money(d.amount),
+    text: `Payment of ${money(d.amount)}${Number(d.totalAmount) > Number(d.amount) ? ` (of ${money(d.totalAmount)})` : ""} recorded manually via ${d.method} — ${statusLabel(d.status)}`,
+    actor: actorOf(user),
+  });
+  return Response.json({ ok: true, id: newId });
 }
 
 /* DELETE { ids: [...] } → permanently remove several payments (any CRM user) */

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { toDateOnly } from "@/lib/crm/data";
 import { getPool } from "@/lib/db";
 
 export async function GET(req: Request) {
@@ -102,9 +103,9 @@ export async function GET(req: Request) {
         currency: p.currency || "USD",
         notes: p.notes,
         source: p.source,
-        balanceDueDate: p.balance_due_date ? String(p.balance_due_date).slice(0, 10) : null,
-        billingStartDate: p.billing_start_date ? String(p.billing_start_date).slice(0, 10) : null,
-        billingEndDate: p.billing_end_date ? String(p.billing_end_date).slice(0, 10) : null,
+        balanceDueDate: p.balance_due_date ? toDateOnly(p.balance_due_date) : null,
+        billingStartDate: p.billing_start_date ? toDateOnly(p.billing_start_date) : null,
+        billingEndDate: p.billing_end_date ? toDateOnly(p.billing_end_date) : null,
       },
     });
   } catch (err: any) {

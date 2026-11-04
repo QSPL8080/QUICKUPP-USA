@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import BookingSection from "@/components/BookingSection";
 
 function ArrowDownRightSvg({ size = 14 }: { size?: number }) {
   return (
@@ -179,7 +180,11 @@ export default function IndustriesOverviewHub() {
             </div>
           </div>
         </section>
+
+        {/* Book a call (live Calendly) */}
+        <BookingSection eyebrow="Schedule a Consultation" title={["Let’s Talk About", "Your Industry’s Growth"]} text={["Choose a convenient date and time for a free consultation call. We\u2019ll discuss your goals and the right next steps for your business."]} tone="white" icon="calendar" />
       </main>
+
 
       <Footer />
     </div>

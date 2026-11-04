@@ -11,6 +11,51 @@ const fmtDate = (iso: string | null) =>
 
 type Form = { name: string; username: string; email: string; password: string; isActive: boolean };
 
+/* current password, hidden until the eye is pressed (super admin only) */
+function PasswordCell({ value }: { value: string | null | undefined }) {
+  const [shown, setShown] = useState(false);
+  if (!value) {
+    return (
+      <span className="crm-pw-none" title="This password was set before passwords could be viewed. Set a new one in Edit to see it here.">
+        Set a new password to view
+      </span>
+    );
+  }
+  return (
+    <span className="crm-pw">
+      <span className="crm-pw-text">{shown ? value : "••••••••"}</span>
+      <button type="button" className="crm-pw-btn" onClick={() => setShown((v) => !v)} aria-label={shown ? "Hide password" : "Show password"} title={shown ? "Hide password" : "Show password"}>
+        {shown ? (
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+            <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+            <line x1="1" y1="1" x2="23" y2="23" />
+          </svg>
+        ) : (
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+        )}
+      </button>
+      {shown && (
+        <button
+          type="button"
+          className="crm-pw-btn"
+          onClick={() => navigator.clipboard?.writeText(value)}
+          aria-label="Copy password"
+          title="Copy password"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <rect x="9" y="9" width="13" height="13" rx="2" />
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+          </svg>
+        </button>
+      )}
+    </span>
+  );
+}
+
 export default function UsersView({ users, meId }: { users: TeamUser[]; meId: number }) {
   const router = useRouter();
   const { confirm, toast } = useFeedback();
@@ -87,7 +132,7 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
     <>
       <PageHead
         title="Team & Users"
-        sub="Add admins, change names, usernames, emails, or passwords, and activate, deactivate or delete accounts."
+        sub="Add admins, change names, usernames, emails, or passwords, and activate, deactivate or delete accounts. Changes to an admin account are emailed to info@quickuppsoftech.us."
       >
         <button type="button" className="crm-act crm-act-dark" onClick={() => openForm("new")}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
@@ -119,6 +164,7 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
               <th>Username</th>
               <th>Email</th>
               <th>Role</th>
+              <th>Password</th>
               <th>Last sign-in</th>
               <th>Account</th>
               <th>Actions</th>
@@ -146,6 +192,10 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
                   </td>
                   <td data-label="Role">
                     <span className={`crm-pill ${locked ? "crm-pill-paid" : "crm-pill-pending"}`}>{locked ? "Super Admin" : "Admin"}</span>
+                  </td>
+                  <td data-label="Password" className="crm-nowrap" onClick={(e) => e.stopPropagation()}>
+                    <PasswordCell value={u.password} />
+                    {u.passwordChangedAt && <span className="crm-cell-sub">Changed {fmtDate(u.passwordChangedAt)}</span>}
                   </td>
                   <td data-label="Last sign-in" className="crm-nowrap">
                     {fmtDate(u.lastLoginAt)}
@@ -247,6 +297,12 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
                 <input className="crm-input" type="email" value={form.email} onChange={set("email")} autoComplete="off" />
                 {err("email")}
               </label>
+              {editing !== "new" && (
+                <div className="crm-field crm-span-2">
+                  <span className="crm-label">Current password</span>
+                  <PasswordCell value={editing.password} />
+                </div>
+              )}
               <label className="crm-field crm-span-2">
                 <span className="crm-label">{editing === "new" ? "Password *" : "New password (leave empty to keep the current one)"}</span>
                 <input className="crm-input" type="text" value={form.password} onChange={set("password")} autoComplete="new-password" placeholder="At least 8 characters" />

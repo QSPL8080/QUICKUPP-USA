@@ -4,6 +4,7 @@ import HomeIcon, { type HomeIconName } from "@/components/home/HomeIcon";
 import HomeMotion from "@/components/home/HomeMotion";
 import ServiceExplorer from "@/components/home/ServiceExplorer";
 import HomeHero from "@/components/home/HomeHero";
+import BookingSection from "@/components/BookingSection";
 import { ABOUT, FINAL, HERO, INDUSTRIES, INSIGHTS, PROCESS, SERVICES, TECH, TRUST, VOICES, WHY, WORK } from "@/data/home-content";
 import "@/app/home.css";
 
@@ -374,6 +375,14 @@ export default function HomeView() {
           </div>
         </div>
       </Section>
+
+      {/* Book a call (live Calendly) */}
+      <BookingSection
+        eyebrow={HERO.primary.label}
+        title={["Schedule Your Discovery Call", "with Our Team"]}
+        text={["Choose a convenient date and time, and let\u2019s talk about your goals and how we can help your business grow."]}
+        tone="soft"
+      />
 
       {/* 12. Contact & Final CTA */}
       <section className="hx-final">

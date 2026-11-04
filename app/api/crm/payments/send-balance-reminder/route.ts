@@ -4,6 +4,9 @@ import { getPool } from "@/lib/db";
 import { getCurrentUser } from "@/lib/crm/auth";
 import { sendMail } from "@/lib/mailer";
 import { readJson } from "@/lib/enquiry";
+import { toDateOnly } from "@/lib/crm/data";
+import { actorOf, logActivity, money } from "@/lib/crm/activity";
+import { entityOf } from "@/lib/crm/paymentActivity";
 
 export async function POST(req: Request) {
   try {
@@ -57,7 +60,7 @@ export async function POST(req: Request) {
     const paidAmount = Number(p.amount || 0);
     const remainingAmount = Number(p.remaining_amount || totalAmount - paidAmount);
     const orderNumber = p.invoice_number || `QS-${p.id}`;
-    const dueDate = p.balance_due_date || (p.billing_end_date ? p.billing_end_date.slice(0, 10) : "Due Shortly");
+    const dueDate = p.balance_due_date ? toDateOnly(p.balance_due_date) : p.billing_end_date ? toDateOnly(p.billing_end_date) : "Due Shortly";
 
     const whatsappMessage = `Hello ${clientName},
 
@@ -184,7 +187,7 @@ Quickupp Softech LLC`;
 </body>
 </html>`;
 
-    await sendMail({
+    const sent = await sendMail({
       channel: "info",
       to: clientEmail,
       subject,
@@ -194,10 +197,21 @@ Quickupp Softech LLC`;
 
     await pool.query(`UPDATE \`${targetTable}\` SET balance_reminder_sent_at = NOW() WHERE id = ?`, [id]).catch(() => {});
 
+    await logActivity({
+      entity: entityOf(targetTable),
+      id,
+      action: "reminder",
+      newValue: money(remainingAmount),
+      text: sent
+        ? `Balance reminder for ${money(remainingAmount)} emailed to ${clientEmail}`
+        : `Balance reminder for ${money(remainingAmount)} could not be emailed to ${clientEmail} (mail server not available)`,
+      actor: actorOf(user),
+    });
+
     return NextResponse.json({
       ok: true,
-      emailSent: true,
-      message: `Balance reminder email sent to ${clientEmail}.`,
+      emailSent: sent,
+      message: sent ? `Balance reminder email sent to ${clientEmail}.` : `The reminder could not be emailed right now. Share the link on WhatsApp instead.`,
       balanceUrl,
       whatsappMessage,
     });

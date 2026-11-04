@@ -9,6 +9,7 @@ import type { YouTubePromotionContent } from "@/data/services/youtube-video-prom
 import LucideIcon, { type LucideIconName } from "@/components/LucideIcon";
 import ServiceEnquiryForm from "@/components/ServiceEnquiryForm";
 import { setupScrollMotion, type MotionPreset } from "@/lib/scrollMotion";
+import BookingSection from "@/components/BookingSection";
 
 /*
  * YouTube Video Promotion page — "video studio" design, used only here:
@@ -602,6 +603,9 @@ export default function YouTubePromotionPage({ content }: { content: YouTubeProm
             </div>
           </div>
         </section>
+
+        {/* Book a call (live Calendly) */}
+        <BookingSection eyebrow="Book a Strategy Call" title={["Plan Your YouTube Growth", "with Our Team"]} text={["Choose a convenient date and time for a free consultation call. We\u2019ll discuss your goals and the right next steps for your business."]} tone="soft" icon="calendar" />
 
         {/* 11. Request form */}
         <div id="promotion-plan">

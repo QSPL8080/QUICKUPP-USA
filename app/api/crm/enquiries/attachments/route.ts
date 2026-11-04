@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { actorOf, logMany } from "@/lib/crm/activity";
 import { getPool } from "@/lib/db";
 import { getCurrentUser } from "@/lib/crm/auth";
 import { isEnquirySource, SOURCES, type EnquirySource } from "@/lib/crm/data";
@@ -206,6 +207,19 @@ export async function POST(request: Request) {
     [JSON.stringify(existing), leadId]
   );
 
+  await logMany(
+    newlyAdded.map((a: { fileName: string }) => ({
+      entity: "lead" as const,
+      source,
+      id: leadId,
+      action: "attachment",
+      field: "attachments",
+      newValue: a.fileName,
+      text: `Attachment ${a.fileName} added`,
+      actor: actorOf(user),
+    }))
+  );
+
   return NextResponse.json({
     ok: true,
     message: `${newlyAdded.length} file(s) attached to ${SOURCES[source].short} lead #${leadId}.`,
@@ -265,6 +279,21 @@ export async function DELETE(request: Request) {
     `UPDATE \`${SOURCES[finalSource].table}\` SET attachments = ? WHERE id = ?`,
     [remaining.length ? JSON.stringify(remaining) : null, finalLeadId]
   );
+
+  if (target) {
+    await logMany([
+      {
+        entity: "lead",
+        source: finalSource,
+        id: finalLeadId,
+        action: "attachment",
+        field: "attachments",
+        oldValue: target.fileName,
+        text: `Attachment ${target.fileName} removed`,
+        actor: actorOf(user),
+      },
+    ]);
+  }
 
   return NextResponse.json({
     ok: true,

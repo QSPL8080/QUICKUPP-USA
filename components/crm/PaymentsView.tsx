@@ -10,6 +10,7 @@ import { BulkBar, SelectBox, useSelection } from "@/components/crm/Selection";
 import { PageHead, Filters, Pager } from "@/components/crm/ListTools";
 import { SERVICES_DATA } from "@/components/PayNowModal";
 import { SOURCE_LABEL, isEnquirySource } from "@/lib/crm/leadOptions";
+import ActivityTimeline, { usePaymentActivity } from "@/components/crm/ActivityTimeline";
 
 /* a payment link made from an enquiry shows which form that enquiry came from */
 function EnquiryOrigin({ p }: { p: PaymentRow }) {
@@ -195,6 +196,14 @@ export default function PaymentsView({
   const { confirm, toast } = useFeedback();
   const [editing, setEditing] = useState<PaymentRow | "new" | null>(openNew ? "new" : null);
   const [viewing, setViewing] = useState<PaymentRow | null>(null);
+  const viewEntity = viewing ? (viewing.source === "payment_link" ? "payment_link" : "payment") : null;
+  const { entries: payActivity, loading: payActivityLoading } = usePaymentActivity(
+    viewEntity,
+    viewing?.id ?? null,
+    viewing
+      ? [viewing.status, viewing.amount, viewing.totalAmount, viewing.remainingAmount, viewing.linkStatus, viewing.paymentType, viewing.clientName, viewing.clientEmail, viewing.clientPhone, viewing.notes, viewing.paidAt].join("|")
+      : ""
+  );
   const [modalSubtab, setModalSubtab] = useState<"orders" | "payments">("orders");
 
   // Generate Payment Link State
@@ -1797,6 +1806,11 @@ Quickupp Softech LLC`;
                   </div>
                 )
               )}
+
+              {/* Activity History & Audit Trail (newest first) */}
+              <div style={{ marginTop: "16px" }}>
+                <ActivityTimeline entries={payActivity} kind="payment" loading={payActivityLoading} emptyText="No activity has been recorded for this payment yet." />
+              </div>
 
               {/* Actions in Footer */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "16px", paddingTop: "12px", borderTop: "1px solid #e2e8f0", flexWrap: "wrap", gap: "8px" }}>

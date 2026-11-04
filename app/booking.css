@@ -1,0 +1,292 @@
+/* ==========================================================================
+   BOOK A CALL (components/BookingSection.tsx) — the Contact page's
+   Calendly app-window, as a section for the service, industry, about and
+   home pages. Site fonts and type scale; heading gradient from the site.
+   ========================================================================== */
+.bk-section {
+  --bk-ink: #0b0f17;
+  --bk-body: #475569;
+  --bk-muted: #64748b;
+  --bk-line: #e6e8f0;
+  --bk-indigo: #4f46e5;
+  --bk-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  padding: clamp(72px, 7vw, 112px) 0;
+  background: #ffffff;
+  color: var(--bk-ink);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.bk-section.bk-soft {
+  background:
+    radial-gradient(ellipse 50% 60% at 100% 0%, rgba(99, 102, 241, 0.07), transparent 70%),
+    radial-gradient(ellipse 40% 50% at 0% 100%, rgba(0, 210, 255, 0.06), transparent 70%),
+    #f7f8fc;
+}
+
+.bk-container {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.bk-split {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  align-items: start;
+  gap: clamp(32px, 5vw, 72px);
+}
+
+.bk-copy {
+  position: sticky;
+  top: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  padding-top: 8px;
+}
+
+.bk-section .bk-chip:not(#_):not(#__) {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px 6px 10px;
+  border-radius: 999px;
+  background: #eef2ff;
+  border: 1px solid #e0e7ff;
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif) !important;
+  font-size: 12px !important;
+  line-height: 1.4 !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase;
+  color: var(--bk-indigo);
+}
+
+.bk-section h2.bk-h2:not(#_):not(#__):not(#___) {
+  margin: 0;
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif) !important;
+  font-size: var(--qs-t-h2, clamp(26px, 2.4vw, 34px)) !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.022em !important;
+  font-weight: 700 !important;
+  text-transform: none !important;
+  color: var(--bk-ink);
+}
+
+.bk-section p.bk-text:not(#_):not(#__):not(#___) {
+  max-width: 480px;
+  margin: 0;
+  font-family: var(--font-body, "Inter", sans-serif) !important;
+  font-size: 16px !important;
+  line-height: 1.7 !important;
+  color: var(--bk-body);
+}
+
+/* Calendly inside an app window (same frame as the Contact page) */
+.bk-window {
+  border-radius: 22px;
+  background: #ffffff;
+  border: 1px solid var(--bk-line);
+  box-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.8) inset,
+    0 30px 60px rgba(15, 23, 42, 0.1);
+  overflow: hidden;
+}
+
+.bk-window-bar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--bk-line);
+  background: linear-gradient(180deg, #fbfbfe, #f4f5fa);
+}
+
+.bk-window-bar span {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #ff5f57;
+}
+
+.bk-window-bar span:nth-child(2) {
+  background: #febc2e;
+}
+
+.bk-window-bar span:nth-child(3) {
+  background: #28c840;
+}
+
+.bk-window-bar i {
+  flex: 1;
+  max-width: 260px;
+  height: 22px;
+  margin-left: 14px;
+  border-radius: 999px;
+  background: #e9ebf3;
+}
+
+.bk-window-body {
+  padding: 16px 12px 4px;
+}
+
+.bk-window .su-calendly-scroll.bk-cal-scroll {
+  flex: 0 0 auto !important;
+  height: auto !important;
+  min-height: 560px;
+  max-height: 760px !important;
+}
+
+.bk-cal-wait {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 100%;
+  min-height: 420px;
+}
+
+.bk-cal-wait span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #c7d2fe;
+  animation: bk-wait 1.2s ease-in-out infinite;
+}
+
+.bk-cal-wait span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.bk-cal-wait span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.bk-section p.bk-window-note:not(#_):not(#__):not(#___) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0;
+  padding: 14px 18px 18px;
+  border-top: 1px solid var(--bk-line);
+  text-align: center;
+  font-size: 14px !important;
+  line-height: 1.55 !important;
+  color: var(--bk-muted);
+}
+
+.bk-live-dot {
+  position: relative;
+  flex: 0 0 auto;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #22c55e;
+}
+
+.bk-live-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #22c55e;
+  animation: bk-ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* entrance: copy rises, the window lifts in */
+.bk-section .bk-copy > * {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.7s var(--bk-ease),
+    transform 0.7s var(--bk-ease);
+}
+
+.bk-section .bk-copy > *:nth-child(2) {
+  transition-delay: 0.08s;
+}
+
+.bk-section .bk-copy > *:nth-child(3) {
+  transition-delay: 0.16s;
+}
+
+.bk-section .bk-copy > *:nth-child(4) {
+  transition-delay: 0.22s;
+}
+
+.bk-section .bk-window {
+  opacity: 0;
+  transform: translateY(28px) scale(0.98);
+  transition:
+    opacity 0.9s var(--bk-ease) 0.1s,
+    transform 0.9s var(--bk-ease) 0.1s;
+}
+
+.bk-section.is-in .bk-copy > *,
+.bk-section.is-in .bk-window {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes bk-ping {
+  75%,
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+@keyframes bk-wait {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-4px);
+  }
+}
+
+@media (max-width: 991px) {
+  .bk-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .bk-copy {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .bk-container {
+    padding: 0 16px;
+  }
+
+  .bk-window-body {
+    padding: 10px 4px 4px;
+  }
+
+  .bk-window {
+    border-radius: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bk-section .bk-copy > *,
+  .bk-section .bk-window {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .bk-live-dot::after,
+  .bk-cal-wait span {
+    animation: none;
+  }
+}

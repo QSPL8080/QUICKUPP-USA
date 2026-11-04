@@ -2,6 +2,8 @@ import { getPool } from "@/lib/db";
 import { getCurrentUser } from "@/lib/crm/auth";
 import { validatePayment } from "@/lib/crm/payments";
 import { readJson } from "@/lib/enquiry";
+import { actorOf } from "@/lib/crm/activity";
+import { logPaymentChanges, paymentSnapshot } from "@/lib/crm/paymentActivity";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -20,6 +22,8 @@ export async function PATCH(request: Request, ctx: Ctx) {
   const result = validatePayment(body);
   if (!result.ok) return Response.json({ ok: false, errors: result.errors }, { status: 400 });
   const d = result.data;
+  const before = await paymentSnapshot("payments", id);
+  if (!before) return Response.json({ ok: false, error: "This payment was deleted." }, { status: 404 });
   await getPool().execute(
     `UPDATE payments SET client_name = ?, client_email = ?, client_phone = ?, company_name = ?, category = ?, service = ?, description = ?, amount = ?,
        total_amount = ?, payment_type = ?, remaining_amount = ?, currency = ?, method = ?, status = ?, reference = ?, invoice_number = ?, paid_at = ?, notes = ?
@@ -28,6 +32,8 @@ export async function PATCH(request: Request, ctx: Ctx) {
       d.totalAmount, d.paymentType, d.remainingAmount, d.currency, d.method, d.status,
       d.reference, d.invoiceNumber, d.paidAt, d.notes, id]
   );
+  const after = await paymentSnapshot("payments", id);
+  if (after) await logPaymentChanges("payments", id, before, after, actorOf(user));
   return Response.json({ ok: true });
 }
 

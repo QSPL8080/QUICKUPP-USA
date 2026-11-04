@@ -1,6 +1,6 @@
 import { getPool } from "@/lib/db";
 import { getCurrentUser, hashPassword, isSuperAdmin } from "@/lib/crm/auth";
-import { EMAIL_RE, USERNAME_RE, readAccountFields, uniqueErrors } from "@/lib/crm/users";
+import { EMAIL_RE, USERNAME_RE, readAccountFields, savePassword, uniqueErrors } from "@/lib/crm/users";
 import { readJson } from "@/lib/enquiry";
 
 /* POST { name, username, email, password } → super admin adds an admin account */
@@ -24,5 +24,8 @@ export async function POST(request: Request) {
     "INSERT INTO crm_users (name, username, email, password_hash, role, is_active, notified_at) VALUES (?, ?, ?, ?, 'admin', ?, NOW())",
     [f.name, f.username, f.email, await hashPassword(f.password), body.isActive === false ? 0 : 1]
   );
-  return Response.json({ ok: true, id: (res as { insertId: number }).insertId });
+  const id = (res as { insertId: number }).insertId;
+  // also keeps the copy the super admin can view
+  await savePassword(id, f.password);
+  return Response.json({ ok: true, id });
 }

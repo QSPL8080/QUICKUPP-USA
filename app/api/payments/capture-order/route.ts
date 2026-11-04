@@ -4,6 +4,8 @@ import { capturePayPalOrder } from "@/lib/paypal";
 import { getPool } from "@/lib/db";
 import { sendMail, LEADS_NOTIFICATION_EMAIL } from "@/lib/mailer";
 import { generateReceiptPdf } from "@/lib/pdfReceipt";
+import { logActivity } from "@/lib/crm/activity";
+import { logGatewayResult, paymentSnapshot, type PaymentSnapshot, type PaymentTable } from "@/lib/crm/paymentActivity";
 
 export async function POST(req: Request) {
   try {
@@ -97,6 +99,7 @@ export async function POST(req: Request) {
       const pool = getPool();
       let existingRecord: any = null;
       let targetTable = "payments";
+      let beforeSnap: PaymentSnapshot | null = null;
 
       // Check for existing record by token, invoiceNumber, or ID (checking payment_links first)
       if (token) {
@@ -135,6 +138,7 @@ export async function POST(req: Request) {
       if (existingRecord) {
         // MATCH FOUND: UPDATE THE EXACT SAME ROW IN-PLACE!
         insertedId = Number(existingRecord.id);
+        beforeSnap = await paymentSnapshot(targetTable as PaymentTable, insertedId);
         orderNumber = existingRecord.invoice_number || `QAS-${new Date().getFullYear()}-${String(insertedId).padStart(6, "0")}`;
         isPaymentLink = targetTable === "payment_links" || existingRecord.source === "payment_link";
         effectiveClientName = existingRecord.client_name || clientName || "Valued Client";
@@ -333,7 +337,7 @@ export async function POST(req: Request) {
             ? `[PAYMENT PENDING]: Order #${orderNumber}. Amount: $${capturedAmount.toFixed(2)} USD (Pending clearing in PayPal). Reason: ${pendingReason}.`
             : `Website Pay Now Payment. Order #${orderNumber}. PayPal Capture ID: ${captureID}. Total Amount: $${finalTotal.toFixed(2)}, Paid: $${capturedAmount.toFixed(2)}${isPartial ? `, Due: $${finalRemaining.toFixed(2)}` : ""}. Notes: ${notes || "None"}`;
 
-        if (!fromPaymentLink) await pool.query(
+        const leadInsert = fromPaymentLink ? null : await pool.query(
           `INSERT INTO contact_enquiries (
             full_name,
             email,
@@ -357,6 +361,34 @@ export async function POST(req: Request) {
             leadStatus,
           ]
         );
+        const leadId = leadInsert ? Number((leadInsert[0] as { insertId?: number }).insertId || 0) : 0;
+        if (leadId) {
+          await logActivity({
+            entity: "lead",
+            source: "contact",
+            id: leadId,
+            action: "created",
+            text: `New enquiry received from Website Pay Now checkout (order ${orderNumber})`,
+            actor: { type: "website", label: "Website Pay Now" },
+            eventKey: `paypal:${captureID}:newlead`,
+          });
+        }
+      }
+
+      if (insertedId) {
+        await logGatewayResult({
+          table: (existingRecord ? targetTable : "payments") as PaymentTable,
+          id: insertedId,
+          before: beforeSnap,
+          status: paymentStatus,
+          amount: capturedAmount,
+          captureId: String(captureID),
+          orderId: String(orderID),
+          orderNumber,
+          isNewWebsitePayment: !existingRecord,
+          isBalancePayment,
+          reason: failureReason || pendingReason || undefined,
+        });
       }
     } catch (dbErr) {
       console.error("[Database Save / Update Payment Error]", dbErr);

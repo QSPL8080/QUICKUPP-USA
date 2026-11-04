@@ -1,6 +1,8 @@
+import { after } from "next/server";
 import { getPool } from "@/lib/db";
-import { endUserSessions, getCurrentUser, hashPassword, isSuperAdmin } from "@/lib/crm/auth";
-import { EMAIL_RE, USERNAME_RE, readAccountFields, uniqueErrors } from "@/lib/crm/users";
+import { endUserSessions, getCurrentUser, isSuperAdmin } from "@/lib/crm/auth";
+import { EMAIL_RE, USERNAME_RE, getAccount, readAccountFields, renameAssignee, savePassword, uniqueErrors } from "@/lib/crm/users";
+import { notifyAccountChange } from "@/lib/crm/accountMail";
 import { readJson } from "@/lib/enquiry";
 
 type Ctx = { params: Promise<{ id: string }> };
@@ -46,11 +48,10 @@ export async function PATCH(request: Request, ctx: Ctx) {
   Object.assign(errors, await uniqueErrors({ username: errors.username ? "" : f.username, email: errors.email ? "" : f.email }, t.id));
   if (Object.keys(errors).length) return Response.json({ ok: false, errors }, { status: 400 });
 
+  const before = await getAccount(t.id);
   if (self) {
     await getPool().execute("UPDATE crm_users SET name = ?, username = ?, email = ? WHERE id = ?", [f.name, f.username, f.email, t.id]);
-    if (f.password) {
-      await getPool().execute("UPDATE crm_users SET password_hash = ?, failed_attempts = 0 WHERE id = ?", [await hashPassword(f.password), t.id]);
-    }
+    if (f.password) await savePassword(t.id, f.password);
   } else {
     await getPool().execute("UPDATE crm_users SET name = ?, username = ?, email = ?, is_active = ? WHERE id = ?", [
       f.name,
@@ -59,10 +60,19 @@ export async function PATCH(request: Request, ctx: Ctx) {
       body.isActive === false ? 0 : 1,
       t.id,
     ]);
-    if (f.password) {
-      await getPool().execute("UPDATE crm_users SET password_hash = ?, failed_attempts = 0 WHERE id = ?", [await hashPassword(f.password), t.id]);
-    }
+    if (f.password) await savePassword(t.id, f.password);
     if (f.password || body.isActive === false) await endUserSessions(t.id);
+  }
+  if (before) await renameAssignee(before.name, f.name);
+
+  // email info@quickuppsoftech.us about changes to an admin account
+  const afterAcc = await getAccount(t.id);
+  if (before && afterAcc && !self) {
+    after(async () => {
+      await notifyAccountChange({ before, after: afterAcc, passwordChanged: Boolean(f.password), changedBy: me }).catch((err) =>
+        console.error("[crm-users] change email failed:", err)
+      );
+    });
   }
   return Response.json({ ok: true });
 }

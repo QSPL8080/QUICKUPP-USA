@@ -3,6 +3,9 @@ import { randomBytes } from "node:crypto";
 import { getPool } from "@/lib/db";
 import { getCurrentUser } from "@/lib/crm/auth";
 import { readJson } from "@/lib/enquiry";
+import { toDateOnly } from "@/lib/crm/data";
+import { actorOf, logMany, money, type ActivityInput } from "@/lib/crm/activity";
+import { entityOf, leadEcho, logPaymentChanges, paymentSnapshot, type PaymentTable } from "@/lib/crm/paymentActivity";
 
 function getDefaultDates() {
   const now = new Date();
@@ -39,8 +42,14 @@ export async function POST(req: Request) {
     // Cancellation action via POST
     if (body.action === "cancel" && body.id) {
       const pool = getPool();
-      await pool.query("UPDATE payment_links SET link_status = 'cancelled' WHERE id = ?", [Number(body.id)]).catch(() => {});
-      await pool.query("UPDATE payments SET link_status = 'cancelled' WHERE id = ?", [Number(body.id)]).catch(() => {});
+      const cid = Number(body.id);
+      const beforeLink = await paymentSnapshot("payment_links", cid);
+      const table: PaymentTable = beforeLink ? "payment_links" : "payments";
+      const before = beforeLink || (await paymentSnapshot("payments", cid));
+      await pool.query("UPDATE payment_links SET link_status = 'cancelled' WHERE id = ?", [cid]).catch(() => {});
+      await pool.query("UPDATE payments SET link_status = 'cancelled' WHERE id = ?", [cid]).catch(() => {});
+      const after = await paymentSnapshot(table, cid);
+      if (before && after) await logPaymentChanges(table, cid, before, after, actorOf(user));
       return NextResponse.json({ ok: true, message: "Payment link cancelled." });
     }
 
@@ -225,6 +234,17 @@ export async function POST(req: Request) {
 
     await pool.query(`UPDATE \`${targetTable}\` SET invoice_number = ? WHERE id = ?`, [orderNumber, insertedId]).catch(() => {});
 
+    {
+      const actor = actorOf(user);
+      const text = `Payment link ${orderNumber} created for ${money(totalAmount)} (${isPartial ? "partial" : "full"} payment)`;
+      const items: ActivityInput[] = [
+        { entity: entityOf(targetTable), id: insertedId, action: "created", newValue: money(totalAmount), text, actor, meta: { orderNumber, service } },
+      ];
+      const echo = leadEcho({ leadSource, leadId: leadId ? String(leadId) : "" }, { action: "payment_link", newValue: money(totalAmount), text, actor });
+      if (echo) items.push(echo);
+      await logMany(items);
+    }
+
     return NextResponse.json({
       ok: true,
       id: insertedId,
@@ -265,6 +285,7 @@ export async function PATCH(req: Request) {
     if (!existing) {
       return NextResponse.json({ ok: false, error: "Payment link record not found." }, { status: 404 });
     }
+    const beforeSnap = await paymentSnapshot(targetTable as PaymentTable, id);
 
     const clientName = body.clientName !== undefined ? String(body.clientName).trim().slice(0, 150) : existing.client_name;
     const clientEmail = body.clientEmail !== undefined ? String(body.clientEmail).trim().toLowerCase().slice(0, 190) : existing.client_email;
@@ -294,13 +315,13 @@ export async function PATCH(req: Request) {
 
     const billingStartDate = typeof body.billingStartDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(body.billingStartDate)
       ? body.billingStartDate
-      : (existing.billing_start_date ? String(existing.billing_start_date).slice(0, 10) : null);
+      : (existing.billing_start_date ? toDateOnly(existing.billing_start_date) : null);
     const billingEndDate = typeof body.billingEndDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(body.billingEndDate)
       ? body.billingEndDate
-      : (existing.billing_end_date ? String(existing.billing_end_date).slice(0, 10) : null);
+      : (existing.billing_end_date ? toDateOnly(existing.billing_end_date) : null);
     let balanceDueDate = typeof body.balanceDueDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(body.balanceDueDate)
       ? body.balanceDueDate
-      : (existing.balance_due_date ? String(existing.balance_due_date).slice(0, 10) : null);
+      : (existing.balance_due_date ? toDateOnly(existing.balance_due_date) : null);
 
     if (paymentType === "partial" && !balanceDueDate && billingEndDate) {
       const d = new Date(billingEndDate);
@@ -393,6 +414,9 @@ export async function PATCH(req: Request) {
         ]
       );
     }
+
+    const afterSnap = await paymentSnapshot(targetTable as PaymentTable, id);
+    if (beforeSnap && afterSnap) await logPaymentChanges(targetTable as PaymentTable, id, beforeSnap, afterSnap, actorOf(user));
 
     return NextResponse.json({ ok: true, message: "Payment link updated successfully." });
   } catch (err: any) {
@@ -489,9 +513,9 @@ export async function GET(req: Request) {
     orderNumber: r.invoice_number,
     paymentOption: r.payment_type || "full",
     token: r.token,
-    billingStartDate: r.billing_start_date ? String(r.billing_start_date).slice(0, 10) : null,
-    billingEndDate: r.billing_end_date ? String(r.billing_end_date).slice(0, 10) : null,
-    balanceDueDate: r.balance_due_date ? String(r.balance_due_date).slice(0, 10) : null,
+    billingStartDate: r.billing_start_date ? toDateOnly(r.billing_start_date) : null,
+    billingEndDate: r.billing_end_date ? toDateOnly(r.billing_end_date) : null,
+    balanceDueDate: r.balance_due_date ? toDateOnly(r.balance_due_date) : null,
     createdAt: r.created_at,
     paidAt: r.paid_at,
     notes: r.notes,

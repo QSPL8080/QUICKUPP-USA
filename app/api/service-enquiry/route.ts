@@ -3,6 +3,7 @@ import { getPool } from "@/lib/db";
 import { SERVICE_FORMS, isServiceFormKey } from "@/lib/formOptions";
 import { readJson, validateServiceEnquiry } from "@/lib/enquiry";
 import { LEADS_NOTIFICATION_EMAIL, escapeHtml, sendMail } from "@/lib/mailer";
+import { logLeadReceived } from "@/lib/crm/leadActivity";
 
 /*
  * Service page forms → one table per service:
@@ -75,6 +76,8 @@ export async function POST(request: Request) {
     const [res] = await getPool().execute(insertSql, insertParams);
 
     const insertId = (res as { insertId: number }).insertId;
+
+    await logLeadReceived(body.service, insertId);
 
     // Send email notification to info@quickuppsoftech.us (asynchronously, so client does not wait)
     after(async () => {

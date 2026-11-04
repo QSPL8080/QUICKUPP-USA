@@ -17,6 +17,7 @@ import type {
   WhyChooseBlock,
 } from "@/lib/servicePageTypes";
 import LucideIcon, { type LucideIconName } from "@/components/LucideIcon";
+import BookingSection from "@/components/BookingSection";
 
 /*
  * AI & Automation Solutions service page — "acx-" design, used only here:
@@ -428,6 +429,9 @@ export default function AIAutomationServicePage({
         )}
 
         <ServiceEnquiryForm service="ai-automation" current={data.crumb} />
+
+        {/* Book a call (live Calendly) */}
+        <BookingSection eyebrow="Book a Strategy Call" title={["Explore What AI Can Do", "for Your Business"]} text={["Choose a convenient date and time for a free consultation call. We\u2019ll discuss your goals and the right next steps for your business."]} tone="soft" icon="calendar" />
 
         {/* Closing */}
         <section className="acx-close-sec">

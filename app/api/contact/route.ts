@@ -2,6 +2,7 @@ import { after } from "next/server";
 import { getPool } from "@/lib/db";
 import { readJson, validateContactEnquiry } from "@/lib/enquiry";
 import { LEADS_NOTIFICATION_EMAIL, escapeHtml, sendMail } from "@/lib/mailer";
+import { logLeadReceived } from "@/lib/crm/leadActivity";
 
 /* Contact page form → contact_enquiries (shown in CRM > All Enquiries as "Contact Form") */
 export async function POST(request: Request) {
@@ -63,6 +64,8 @@ export async function POST(request: Request) {
       );
       insertId = (res as { insertId: number }).insertId;
     }
+
+    await logLeadReceived("contact", insertId);
 
     // Send email notification to info@quickuppsoftech.us (asynchronously, so client does not wait)
     after(async () => {

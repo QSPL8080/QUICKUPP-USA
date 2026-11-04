@@ -18,6 +18,7 @@ import type {
   WhyChooseBlock,
 } from "@/lib/servicePageTypes";
 import "@/app/it-services.css";
+import BookingSection from "@/components/BookingSection";
 
 /*
  * Information Technology Services subpages — "itx-" design, used only here:
@@ -477,6 +478,9 @@ export default function CoporaServicePage({ data, categoryLabel, categorySlug }:
         })}
 
         <ServiceEnquiryForm service="it-services" current={data.crumb} />
+
+        {/* Book a call (live Calendly) */}
+        <BookingSection eyebrow="Book a Strategy Call" title={["Talk Through Your Project", "with Our Tech Team"]} text={["Choose a convenient date and time for a free consultation call. We\u2019ll discuss your goals and the right next steps for your business."]} tone="soft" icon="calendar" />
 
         <section className="itx-close-sec">
           <div className="itx-container">

@@ -1,8 +1,10 @@
 import { getPool } from "@/lib/db";
 import { getCurrentUser } from "@/lib/crm/auth";
-import { ENQUIRY_STATUSES, SOURCES, getLead, isEnquirySource, type EnquirySource } from "@/lib/crm/data";
+import { ENQUIRY_STATUSES, SOURCES, getLead, isEnquirySource, toDateOnly, type EnquirySource } from "@/lib/crm/data";
 import { validateManualLead } from "@/lib/crm/leadOptions";
 import { readJson } from "@/lib/enquiry";
+import { actorOf } from "@/lib/crm/activity";
+import { leadHistory, leadSnapshot, logLeadChanges, logLeadCreated } from "@/lib/crm/leadActivity";
 
 const unauthorized = () => Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
 const invalid = () => Response.json({ ok: false, error: "Invalid request." }, { status: 400 });
@@ -84,9 +86,9 @@ export async function GET(request: Request) {
     orderNumber: r.invoice_number,
     paymentOption: r.payment_type || "full",
     token: r.token,
-    billingStartDate: r.billing_start_date ? String(r.billing_start_date).slice(0, 10) : null,
-    billingEndDate: r.billing_end_date ? String(r.billing_end_date).slice(0, 10) : null,
-    balanceDueDate: r.balance_due_date ? String(r.balance_due_date).slice(0, 10) : null,
+    billingStartDate: r.billing_start_date ? toDateOnly(r.billing_start_date) : null,
+    billingEndDate: r.billing_end_date ? toDateOnly(r.billing_end_date) : null,
+    balanceDueDate: r.balance_due_date ? toDateOnly(r.balance_due_date) : null,
     createdAt: r.created_at,
     paidAt: r.paid_at,
     notes: r.notes,
@@ -94,7 +96,9 @@ export async function GET(request: Request) {
     leadId: r.lead_id,
   }));
 
-  return Response.json({ ok: true, lead, attachments, paymentLinks });
+  const { activity, audit } = await leadHistory(source, id, lead);
+
+  return Response.json({ ok: true, lead, attachments, paymentLinks, activity, audit });
 }
 
 /* POST → add a lead by hand */
@@ -106,7 +110,8 @@ export async function POST(request: Request) {
   const result = validateManualLead(body);
   if (!result.ok) return Response.json({ ok: false, errors: result.errors }, { status: 400 });
   const d = result.data;
-  const assignedTo = d.assignedTo || user.name || "Super Admin";
+  // only who was actually chosen; the person adding the lead is not assumed to be the assignee
+  const assignedTo = d.assignedTo ? d.assignedTo : null;
   const [res] = await getPool().execute(
     `INSERT INTO manual_leads
       (full_name, email, phone, company_name, company_website, country, industry, service, category, budget, timeline,
@@ -115,12 +120,15 @@ export async function POST(request: Request) {
     [d.fullName, d.email, d.phone, d.companyName, d.companyWebsite, d.country, d.industry, d.service, d.category, d.budget, d.timeline,
       d.channel, assignedTo, d.notes, d.status, d.projectStatus || "Not Started", user.id]
   );
-  return Response.json({ ok: true, id: (res as { insertId: number }).insertId });
+  const newId = (res as { insertId: number }).insertId;
+  await logLeadCreated(newId, actorOf(user), assignedTo || "", d.channel || "Manual");
+  return Response.json({ ok: true, id: newId });
 }
 
 /* PUT { id, source, ...fields } → edit a lead */
 export async function PUT(request: Request) {
-  if (!(await getCurrentUser())) return unauthorized();
+  const user = await getCurrentUser();
+  if (!user) return unauthorized();
   const body = await readJson(request);
   const id = Number(body?.id);
   const source: EnquirySource = isEnquirySource(body?.source) ? body.source : "manual";
@@ -129,6 +137,7 @@ export async function PUT(request: Request) {
   if (!result.ok) return Response.json({ ok: false, errors: result.errors }, { status: 400 });
   const d = result.data;
   const pool = getPool();
+  const before = await leadSnapshot(source, id);
   try {
     if (source === "manual") {
       const [res] = await pool.execute(
@@ -191,17 +200,23 @@ export async function PUT(request: Request) {
     [d.fullName, d.email, d.phone, d.companyName, source, id]
   ).catch(() => {});
 
+  // history: only the fields that really changed (saving an unchanged lead logs nothing)
+  const after = await leadSnapshot(source, id);
+  if (before && after) await logLeadChanges(source, id, before, after, actorOf(user));
+
   return Response.json({ ok: true });
 }
 
 /* PATCH { source, id, status, projectStatus, assignedTo } → change a lead's status, projectStatus, or assignedTo (any CRM user) */
 export async function PATCH(request: Request) {
-  if (!(await getCurrentUser())) return unauthorized();
+  const user = await getCurrentUser();
+  if (!user) return unauthorized();
   const body = await readJson(request);
   const id = Number(body?.id);
   if (!isEnquirySource(body?.source) || !Number.isInteger(id) || id < 1) {
     return invalid();
   }
+  const source: EnquirySource = body.source;
   const sets: string[] = [];
   const args: (string | null)[] = [];
   if (body?.status !== undefined) {
@@ -220,6 +235,8 @@ export async function PATCH(request: Request) {
     args.push(body.assignedTo ? String(body.assignedTo).trim() : null);
   }
   if (!sets.length) return invalid();
+  const before = await leadSnapshot(source, id);
+  if (!before) return Response.json({ ok: false, error: "This lead was deleted." }, { status: 404 });
   try {
     await getPool().execute(
       `UPDATE \`${SOURCES[body.source].table}\` SET ${sets.join(", ")} WHERE id = ?`,
@@ -235,6 +252,8 @@ export async function PATCH(request: Request) {
       throw err;
     }
   }
+  const after = await leadSnapshot(source, id);
+  if (after) await logLeadChanges(source, id, before, after, actorOf(user));
   return Response.json({ ok: true });
 }
 

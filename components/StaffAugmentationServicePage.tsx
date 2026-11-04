@@ -15,6 +15,7 @@ import type {
   ServicePageData,
   WhyChooseBlock,
 } from "@/lib/servicePageTypes";
+import BookingSection from "@/components/BookingSection";
 
 /*
  * Staff Augmentation subpages (Marketing & Design / IT) — "tlx-" design, used
@@ -420,6 +421,9 @@ export default function StaffAugmentationServicePage({
         <ServiceEnquiryForm service="staff-augmentation" current={data.crumb} />
 
         {/* 7. Closing */}
+        {/* Book a call (live Calendly) */}
+        <BookingSection eyebrow="Book a Strategy Call" title={["Find the Right Talent", "for Your Team"]} text={["Choose a convenient date and time for a free consultation call. We\u2019ll discuss your goals and the right next steps for your business."]} tone="soft" icon="calendar" />
+
         <section className="tlx-sec tlx-closing-sec">
           <div className="tlx-container">
             <div className="tlx-closing">

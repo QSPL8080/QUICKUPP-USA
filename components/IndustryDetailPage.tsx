@@ -15,6 +15,7 @@ import type {
   AiBlock,
   FaqBlock,
 } from "@/lib/servicePageTypes";
+import BookingSection from "@/components/BookingSection";
 
 /*
  * Industries subpages — "inx-" sector design, used only here.
@@ -766,6 +767,9 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
           if (block.type === "faq") return <FaqSection key={i} block={block as FaqBlock} />;
           return null;
         })}
+
+        {/* Book a call (live Calendly) */}
+        <BookingSection eyebrow="Schedule a Consultation" title={["Let’s Grow Your", `${data.crumb} Business`]} text={["Choose a convenient date and time for a free consultation call. We\u2019ll discuss your goals and the right next steps for your business."]} tone="soft" icon="calendar" />
 
         <section className="inx-close-sec">
           <div className="inx-container">

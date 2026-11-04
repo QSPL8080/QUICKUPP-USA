@@ -22,6 +22,17 @@ import { SERVICES_DATA } from "@/components/PayNowModal";
 import { CRM_INDUSTRIES } from "@/components/crm/PaymentsView";
 import { formatFileSize, money } from "@/lib/crm/format";
 import CountrySelect from "@/components/CountrySelect";
+import ActivityTimeline, { fmtWhen, type ActivityEntry } from "@/components/crm/ActivityTimeline";
+
+type LeadAudit = {
+  createdBy: string;
+  createdAt: string | null;
+  assignedTo: string;
+  assignedBy: string;
+  assignedAt: string | null;
+  lastUpdatedBy: string;
+  lastUpdatedAt: string | null;
+};
 
 export type AttachmentItem = {
   id: string | number;
@@ -186,6 +197,10 @@ export default function LeadsView({
   const [uploadingFiles, setUploadingFiles] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  /* ---- Activity history (from the server) ---- */
+  const [activity, setActivity] = useState<ActivityEntry[]>([]);
+  const [audit, setAudit] = useState<LeadAudit | null>(null);
+
   /* ---- Payment Links State ---- */
   const [paymentLinks, setPaymentLinks] = useState<LeadPaymentLinkItem[]>([]);
   const [generatingLink, setGeneratingLink] = useState(false);
@@ -230,6 +245,24 @@ export default function LeadsView({
     setOpen(json.lead);
     setAttachments(json.attachments || []);
     setPaymentLinks(json.paymentLinks || []);
+    setActivity(Array.isArray(json.activity) ? json.activity : []);
+    setAudit(json.audit || null);
+  };
+
+  /* reload the open lead (details, files, links and history) right after a change */
+  const refreshOpen = async (source?: string, id?: number) => {
+    const src = source ?? open?.source;
+    const lid = id ?? open?.id;
+    if (!src || !lid) return;
+    const data = await fetch(`/api/crm/enquiries?source=${src}&id=${lid}`, { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .catch(() => null);
+    if (!data?.ok || !data.lead) return;
+    setOpen((prev) => (prev && prev.source === src && prev.id === lid ? { ...prev, ...data.lead } : prev));
+    if (Array.isArray(data.attachments)) setAttachments(data.attachments);
+    if (Array.isArray(data.paymentLinks)) setPaymentLinks(data.paymentLinks);
+    if (Array.isArray(data.activity)) setActivity(data.activity);
+    if (data.audit) setAudit(data.audit);
   };
 
   /* ---- Polling: Keep specific lead, attachments, & payment links live and in-sync ---- */
@@ -246,6 +279,8 @@ export default function LeadsView({
           setOpen((prev) => (prev ? { ...prev, ...data.lead } : null));
           if (Array.isArray(data.attachments)) setAttachments(data.attachments);
           if (Array.isArray(data.paymentLinks)) setPaymentLinks(data.paymentLinks);
+          if (Array.isArray(data.activity)) setActivity(data.activity);
+          if (data.audit) setAudit(data.audit);
         }
       } catch {}
     };
@@ -268,7 +303,10 @@ export default function LeadsView({
     setBusy(false);
     if (!res?.ok) return setError("Couldn't update the status. Please try again.");
     toast("Status updated");
-    if (open && open.source === source && open.id === id) setOpen({ ...open, status: status as EnquiryStatus });
+    if (open && open.source === source && open.id === id) {
+      setOpen({ ...open, status: status as EnquiryStatus });
+      void refreshOpen(source, id);
+    }
     router.refresh();
   };
 
@@ -283,7 +321,10 @@ export default function LeadsView({
     setBusy(false);
     if (!res?.ok) return setError("Couldn't update project status. Please try again.");
     toast(`Project status: ${projectStatus}`);
-    if (open && open.source === source && open.id === id) setOpen({ ...open, projectStatus });
+    if (open && open.source === source && open.id === id) {
+      setOpen({ ...open, projectStatus });
+      void refreshOpen(source, id);
+    }
     router.refresh();
   };
 
@@ -300,6 +341,7 @@ export default function LeadsView({
     toast(assignedTo ? `Assigned to ${assignedTo}` : "Unassigned");
     if (open && open.source === source && open.id === id) {
       setOpen({ ...open, assignedTo: assignedTo || null });
+      void refreshOpen(source, id);
     }
     router.refresh();
   };
@@ -334,7 +376,6 @@ export default function LeadsView({
   const openForm = (lead: "new" | EnquiryRow) => {
     if (lead === "new") {
       const bf = blankForm();
-      bf.assignedTo = currentUser?.name || team[0] || "";
       setForm(bf);
     } else {
       setForm(formFrom(lead));
@@ -454,6 +495,8 @@ export default function LeadsView({
         setOpen(fresh.lead);
         if (fresh.attachments) setAttachments(fresh.attachments);
         if (fresh.paymentLinks) setPaymentLinks(fresh.paymentLinks);
+        if (Array.isArray(fresh.activity)) setActivity(fresh.activity);
+        if (fresh.audit) setAudit(fresh.audit);
       }
     }
     closeEditModal();
@@ -486,6 +529,7 @@ export default function LeadsView({
         if (Array.isArray(data.attachments)) {
           setAttachments(data.attachments);
         }
+        void refreshOpen();
       }
     } catch {
       toast("Error uploading file(s). Please try again.", "error");
@@ -519,6 +563,7 @@ export default function LeadsView({
         } else {
           setAttachments((prev) => prev.filter((a) => String(a.id) !== String(id)));
         }
+        void refreshOpen();
       }
     } catch {
       toast("Error deleting file. Please try again.", "error");
@@ -605,6 +650,7 @@ export default function LeadsView({
         if (pData?.ok && Array.isArray(pData.paymentLinks)) {
           setPaymentLinks(pData.paymentLinks);
         }
+        void refreshOpen();
       }
     } catch {
       toast("Error generating payment link", "error");
@@ -636,6 +682,7 @@ export default function LeadsView({
         setPaymentLinks((prev) =>
           prev.map((pl) => (pl.id === id ? { ...pl, status: "cancelled" } : pl))
         );
+        void refreshOpen();
       }
     } catch {
       toast("Error cancelling payment link", "error");
@@ -1341,14 +1388,25 @@ export default function LeadsView({
                     <dd>{open.timeline}</dd>
                   </>
                 )}
-                <dt>Handled by</dt>
-                <dd><strong>{open.assignedTo || "Not assigned yet"}</strong></dd>
-                {open.createdBy && (
+                <dt>Created by</dt>
+                <dd>{audit?.createdBy || open.createdBy || "—"}</dd>
+                <dt>Created</dt>
+                <dd>{fmtWhen(audit?.createdAt || open.createdAt)}</dd>
+                <dt>Assigned to</dt>
+                <dd><strong>{audit?.assignedTo || open.assignedTo || "Not Assigned"}</strong></dd>
+                {(open.assignedTo || audit?.assignedTo !== "Not Assigned") && audit?.assignedBy && audit.assignedBy !== "—" && (
                   <>
-                    <dt>Added by</dt>
-                    <dd>{open.createdBy}</dd>
+                    <dt>Assigned by</dt>
+                    <dd>
+                      {audit.assignedBy}
+                      {audit.assignedAt ? <span className="crm-cell-sub">{fmtWhen(audit.assignedAt)}</span> : null}
+                    </dd>
                   </>
                 )}
+                <dt>Last updated by</dt>
+                <dd>{audit?.lastUpdatedBy || "—"}</dd>
+                <dt>Last updated</dt>
+                <dd>{audit?.lastUpdatedAt ? fmtWhen(audit.lastUpdatedAt) : "—"}</dd>
                 {open.sourcePage && (
                   <>
                     <dt>Sent from</dt>
@@ -1364,58 +1422,8 @@ export default function LeadsView({
               </dl>
             </div>
 
-            {/* Activity History & Audit Trail */}
-            <div className="crm-drawer-card">
-              <div className="crm-drawer-card-head">
-                <span className="crm-drawer-card-title">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <circle cx="12" cy="12" r="10" />
-                    <polyline points="12 6 12 12 16 14" />
-                  </svg>
-                  Activity History &amp; Audit Trail
-                </span>
-              </div>
-              <div className="crm-timeline">
-                <div className="crm-timeline-item">
-                  <div className="crm-timeline-dot" />
-                  <div className="crm-timeline-body">
-                    <div className="crm-timeline-top">
-                      <span className="crm-timeline-title">Lead received</span>
-                      <span className="crm-timeline-time">{fmtDate(open.createdAt, true)}</span>
-                    </div>
-                    <p className="crm-timeline-desc">
-                      Submitted via {SOURCE_LABEL[open.source]}{open.sourcePage ? ` (${open.sourcePage})` : ""}.
-                    </p>
-                  </div>
-                </div>
-
-                {open.assignedTo && (
-                  <div className="crm-timeline-item">
-                    <div className="crm-timeline-dot" style={{ background: "#10b981", borderColor: "#d1fae5" }} />
-                    <div className="crm-timeline-body">
-                      <div className="crm-timeline-top">
-                        <span className="crm-timeline-title">Handled by</span>
-                      </div>
-                      <p className="crm-timeline-desc">
-                        Assigned to <strong>{open.assignedTo}</strong>
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                <div className="crm-timeline-item">
-                  <div className="crm-timeline-dot" style={{ background: "#3b82f6", borderColor: "#dbeafe" }} />
-                  <div className="crm-timeline-body">
-                    <div className="crm-timeline-top">
-                      <span className="crm-timeline-title">Pipeline Status: {ENQUIRY_STATUS_LABEL[open.status]}</span>
-                    </div>
-                    <p className="crm-timeline-desc">
-                      Lead is currently marked as {ENQUIRY_STATUS_LABEL[open.status]}.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            {/* Activity History & Audit Trail (newest first, from the server) */}
+            <ActivityTimeline entries={activity} kind="lead" emptyText="No activity has been recorded for this lead yet." />
           </aside>
         </div>
       )}

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { randomBytes } from "node:crypto";
 import { getPool } from "@/lib/db";
 import { sendMail } from "@/lib/mailer";
+import { logActivity, money } from "@/lib/crm/activity";
+import { entityOf } from "@/lib/crm/paymentActivity";
 
 export async function GET(req: Request) {
   return handleBalanceReminders(req);
@@ -183,6 +185,14 @@ async function handleBalanceReminders(req: Request) {
         });
 
         await pool.query(`UPDATE \`${p._table || "payments"}\` SET balance_reminder_sent_at = NOW() WHERE id = ?`, [p.id]).catch(() => {});
+        await logActivity({
+          entity: entityOf(p._table || "payments"),
+          id: Number(p.id),
+          action: "reminder",
+          newValue: money(remainingAmount),
+          text: `Automatic balance reminder for ${money(remainingAmount)} emailed to ${clientEmail}`,
+          actor: { type: "system", label: "System (scheduled reminder)" },
+        });
         sentCount++;
         details.push({ id: p.id, orderNumber, clientEmail, diffDays, status: "sent" });
       } catch (sendErr: any) {

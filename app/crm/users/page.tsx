@@ -6,6 +6,6 @@ import UsersView from "@/components/crm/UsersView";
 export default async function UsersPage() {
   const me = await requireUser();
   if (!isSuperAdmin(me)) redirect("/crm/profile");
-  const users = await listUsers();
+  const users = await listUsers({ withPasswords: true });
   return <UsersView users={users} meId={me.id} />;
 }

@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import AboutMotion from "@/components/AboutMotion";
 import "@/app/about-folio.css";
 import { ABOUT_NAV, type AboutCta, type AboutPageData, type AboutSection, type AboutTitle } from "@/data/about/pages";
+import BookingSection from "@/components/BookingSection";
 
 /*
  * About subpages — "abx-" folio design, used only here.
@@ -566,6 +567,9 @@ export default function AboutPage({ data }: { data: AboutPageData }) {
           if (s.kind === "route") return <Route key={i} s={s} soft={soft} backdrop={backdrop} />;
           return null;
         })}
+
+        {/* Book a call (live Calendly) */}
+        <BookingSection eyebrow="Meet Our Team" title={["Have a Conversation", "with Our Team"]} text={["Pick a time that suits you and talk with our team about your goals, challenges and how we can help your business move forward."]} tone="soft" icon="users" />
 
         <section className="abx-close-sec">
           <div className="abx-container">

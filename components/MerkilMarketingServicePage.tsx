@@ -20,6 +20,7 @@ import type {
   CardsBlock,
   StepsBlock,
 } from "@/lib/servicePageTypes";
+import BookingSection from "@/components/BookingSection";
 
 /*
  * AI-Powered Digital Marketing service pages (all 9 subpages).
@@ -585,6 +586,9 @@ export default function MerkilMarketingServicePage({
         {data.blocks.map((block, i) => renderBlock(block, i))}
 
         <ServiceEnquiryForm service="digital-marketing" current={data.crumb} />
+
+        {/* Book a call (live Calendly) */}
+        <BookingSection eyebrow="Book a Strategy Call" title={["Plan Your Marketing Growth", "with Our Experts"]} text={["Choose a convenient date and time for a free consultation call. We\u2019ll discuss your goals and the right next steps for your business."]} tone="soft" icon="calendar" />
 
         <section className="mkx-close-sec">
           <div className="mkx-container">
