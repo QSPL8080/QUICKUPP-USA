@@ -1884,14 +1884,20 @@ export default function LeadsView({
 
                   <label className="crm-field">
                     <span className="crm-label">Total Amount (USD) *</span>
-                    <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-                      <span style={{ position: "absolute", left: "12px", fontWeight: 700, color: "#64748b" }}>$</span>
+                    <div className="crm-input-group">
+                      <span className="crm-input-addon">$</span>
                       <input
                         className="crm-input"
-                        style={{ paddingLeft: "26px", fontWeight: 700 }}
+                        type="text"
+                        inputMode="decimal"
                         value={linkForm.totalAmount}
-                        onChange={(e) => setLinkForm({ ...linkForm, totalAmount: e.target.value.replace(/[^0-9.]/g, "") })}
-                        placeholder="2,500.00"
+                        onChange={(e) => {
+                          const clean = e.target.value.replace(/[^0-9.]/g, "");
+                          const parts = clean.split(".");
+                          const sanitized = parts.length > 2 ? `${parts[0]}.${parts.slice(1).join("")}` : clean;
+                          setLinkForm({ ...linkForm, totalAmount: sanitized });
+                        }}
+                        placeholder="0.00"
                         required
                       />
                     </div>

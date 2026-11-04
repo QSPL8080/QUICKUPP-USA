@@ -797,6 +797,41 @@
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15) !important;
 }
 
+.crm-root .crm-input-group,
+.crm-input-group {
+  display: flex !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  position: relative !important;
+}
+
+.crm-root .crm-input-addon,
+.crm-input-addon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 14px !important;
+  height: 42px !important;
+  background: #f8fafc !important;
+  border: 1px solid var(--crm-line, #cbd5e1) !important;
+  border-right: none !important;
+  border-top-left-radius: 9px !important;
+  border-bottom-left-radius: 9px !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  font-weight: 800 !important;
+  color: #0f172a !important;
+  font-size: 15px !important;
+  user-select: none !important;
+  flex-shrink: 0 !important;
+}
+
+.crm-root .crm-input-group .crm-input,
+.crm-input-group .crm-input {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
 .crm-root .crm-textarea {
   height: auto;
   padding: 10px 12px !important;
