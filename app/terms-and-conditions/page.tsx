@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: "Terms and Conditions | Quickupp Softech",
   description:
     "These Terms and Conditions govern your access to and use of the Quickupp Softech LLC website, https://www.quickuppsoftech.us.",
+  alternates: {
+    canonical: "https://www.quickuppsoftech.us/terms-and-conditions",
+  },
 };
 
 export default function TermsAndConditionsPage() {

@@ -23,6 +23,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: `${match.page.h1} | Quickupp Softech`,
     description: pageExcerpt(match.page),
+    alternates: {
+      canonical: `https://www.quickuppsoftech.us/${locSlug}`,
+    },
   };
 }
 

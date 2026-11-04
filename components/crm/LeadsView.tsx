@@ -653,7 +653,7 @@ export default function LeadsView({
   };
 
   const getLeadWhatsAppMessage = (link: LeadPaymentLinkItem | { orderNumber: string; token: string; totalAmount?: number }) => {
-    const fullUrl = `${typeof window !== "undefined" ? window.location.origin : "https://quickuppsoftech.us"}/pay/${link.token}`;
+    const fullUrl = `${typeof window !== "undefined" ? window.location.origin : "https://www.quickuppsoftech.us"}/pay/${link.token}`;
     const orderNo = ("orderNumber" in link && link.orderNumber) || ("invoiceNumber" in link && link.invoiceNumber) || "N/A";
     return encodeURIComponent(
       `Hello ${open?.name || "Client"},\n\nHere is your secure QuickUpp payment link for Order #${orderNo}:\n${fullUrl}\n\nAmount: $${Number(link.totalAmount || 0).toLocaleString()}\n\nThank you for choosing QuickUpp!`

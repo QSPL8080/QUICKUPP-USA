@@ -8,7 +8,10 @@ import ButtonTone from "@/components/ButtonTone";
 import PayNowModal from "@/components/PayNowModal";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://quickuppsoftech.us"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.quickuppsoftech.us"),
+  alternates: {
+    canonical: "https://www.quickuppsoftech.us",
+  },
   generator: "Quickupp Softech",
   applicationName: "Quickupp Softech",
   title: "Quickupp Softech | Marketing. AI. Technology. Built for Growth.",

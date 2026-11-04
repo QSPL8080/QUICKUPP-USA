@@ -220,7 +220,7 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
   });
   curY -= 11;
   page.drawText("Website: ", { x: leftX, y: curY, size: 8.5, font, color: slateMid });
-  page.drawText("https://quickuppsoftech.us/", {
+  page.drawText("https://www.quickuppsoftech.us/", {
     x: leftX + 38,
     y: curY,
     size: 8.5,
@@ -695,7 +695,7 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
   });
   supY -= 13;
   page.drawText("Website: ", { x: leftX, y: supY, size: 8.5, font, color: slateMid });
-  page.drawText("https://quickuppsoftech.us/", {
+  page.drawText("https://www.quickuppsoftech.us/", {
     x: leftX + 38,
     y: supY,
     size: 8.5,

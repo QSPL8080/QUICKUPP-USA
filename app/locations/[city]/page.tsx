@@ -20,6 +20,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: `${c.city} | Our Locations | Quickupp Softech`,
     description: c.pages.map((p) => p.h1).slice(0, 4).join(" · "),
+    alternates: {
+      canonical: `https://www.quickuppsoftech.us/locations/${city}`,
+    },
   };
 }
 

@@ -280,7 +280,7 @@ export default function PaymentsView({
     balanceDueDate?: string | null;
     billingEndDate?: string | null;
   }) => {
-    const origin = typeof window !== "undefined" ? window.location.origin : "https://quickuppsoftech.us";
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://www.quickuppsoftech.us";
     const payUrl = p.token ? `${origin}/pay/${p.token}` : `${origin}/pay`;
     const tot = Number(p.totalAmount || p.amount || 0);
     const isPartial = p.paymentType === "partial" || (p.remainingAmount != null && p.remainingAmount > 0);
@@ -304,7 +304,7 @@ Please complete your balance payment securely via PayPal or Debit/Credit Card us
 
 If you have any questions, feel free to reply directly or contact us at info@quickuppsoftech.us.
 
-Website: https://quickuppsoftech.us/
+Website: https://www.quickuppsoftech.us/
 Email: info@quickuppsoftech.us
 
 Best regards,
@@ -330,7 +330,7 @@ Please complete your secure payment via PayPal or Debit/Credit Card using the li
 
 If you have any questions or need custom assistance, feel free to reply directly or contact us at info@quickuppsoftech.us.
 
-Website: https://quickuppsoftech.us/
+Website: https://www.quickuppsoftech.us/
 Email: info@quickuppsoftech.us
 
 Best regards,

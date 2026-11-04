@@ -1,12 +1,16 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { getPool } from "@/lib/db";
 import PrintReceiptButton from "@/components/PrintReceiptButton";
 import "./confirmation.css";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Payment Confirmation | Quickupp Softech LLC",
   description: "Official payment receipt and order confirmation for Quickupp Softech LLC.",
+  alternates: {
+    canonical: "https://www.quickuppsoftech.us/payment-confirmation",
+  },
 };
 
 type Props = {

@@ -5,6 +5,9 @@ import { data } from "@/data/industries/real-estate";
 export const metadata: Metadata = {
   title: data.metaTitle,
   description: data.metaDescription,
+  alternates: {
+    canonical: "https://www.quickuppsoftech.us/industries/real-estate",
+  },
 };
 
 export default function RealEstateIndustryPage() {

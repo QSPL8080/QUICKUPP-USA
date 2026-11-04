@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   title: "Quickupp Softech | Digital Marketing, AI & IT Solutions",
   description:
     "Quickupp Softech is a digital marketing, AI, and IT solutions agency helping brands grow with performance marketing, web & app development, and AI-driven automation.",
+  alternates: {
+    canonical: "https://www.quickuppsoftech.us",
+  },
 };
 
 export default function Home() {

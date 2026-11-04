@@ -5,6 +5,9 @@ import content from "@/data/services/youtube-video-promotion";
 export const metadata: Metadata = {
   title: content.metaTitle,
   description: content.metaDescription,
+  alternates: {
+    canonical: "https://www.quickuppsoftech.us/services/youtube-video-promotion",
+  },
 };
 
 export default function Page() {

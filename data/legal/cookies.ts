@@ -14,7 +14,7 @@ export const COOKIES: LegalDoc = {
       title: "Introduction",
       blocks: [
         {
-          p: 'Quickupp Softech LLC ("Quickupp Softech," "we," "our," or "us") uses cookies and similar tracking technologies on https://quickuppsoftech.us/ to improve website functionality, understand visitor activity, measure advertising performance, and enhance user experience.',
+          p: 'Quickupp Softech LLC ("Quickupp Softech," "we," "our," or "us") uses cookies and similar tracking technologies on https://www.quickuppsoftech.us/ to improve website functionality, understand visitor activity, measure advertising performance, and enhance user experience.',
         },
         {
           p: "This Cookie Policy explains what cookies are, how we use them, what information they collect, and how you can manage your cookie preferences.",

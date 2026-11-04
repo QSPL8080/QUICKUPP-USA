@@ -5,6 +5,9 @@ export const metadata: Metadata = {
   title: "Who We Are | Your Trusted Digital Growth Partner | Quickupp Softech",
   description:
     "Quickupp Softech is a full-service Marketing, AI & Technology company helping ambitious businesses grow, scale and stay ahead.",
+  alternates: {
+    canonical: "https://www.quickuppsoftech.us/about/who-we-are",
+  },
 };
 
 export default function AboutWhoWeArePage() {

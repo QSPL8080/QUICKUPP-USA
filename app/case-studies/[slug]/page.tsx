@@ -25,6 +25,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${doc.title} | Quickupp Softech`,
     description: doc.intro,
+    alternates: {
+      canonical: `https://www.quickuppsoftech.us/case-studies/${slug}`,
+    },
     openGraph: { title: doc.title, description: doc.intro, type: "article" },
   };
 }

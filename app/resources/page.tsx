@@ -12,6 +12,9 @@ export const metadata: Metadata = {
   title: "Resources & Insights | Quickupp Softech",
   description:
     "Access industry insights, case studies, client testimonials, and featured portfolios from Quickupp Softech.",
+  alternates: {
+    canonical: "https://www.quickuppsoftech.us/resources",
+  },
 };
 
 const hubCategories = [

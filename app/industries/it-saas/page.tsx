@@ -5,6 +5,9 @@ import { data } from "@/data/industries/it-saas";
 export const metadata: Metadata = {
   title: data.metaTitle,
   description: data.metaDescription,
+  alternates: {
+    canonical: "https://www.quickuppsoftech.us/industries/it-saas",
+  },
 };
 
 export default function ItSaasIndustryPage() {

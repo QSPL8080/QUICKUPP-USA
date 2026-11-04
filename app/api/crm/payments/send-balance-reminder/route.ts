@@ -44,7 +44,7 @@ export async function POST(req: Request) {
       await pool.query(`UPDATE \`${targetTable}\` SET token = ?, link_status = 'active' WHERE id = ?`, [token, id]);
     }
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://quickuppsoftech.us";
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.quickuppsoftech.us";
     const balanceUrl = `${siteUrl}/pay/${token}`;
 
     const clientName = p.client_name || "Valued Client";
@@ -52,7 +52,7 @@ export async function POST(req: Request) {
     const clientEmail = p.client_email;
     const clientPhone = p.client_phone || "";
     const service = p.service || "Quickupp Softech Services";
-    const quantity = p.quantity || p.category || "Standard Scope";
+    const quantity = p.category || p.quantity || "Standard Scope";
     const totalAmount = Number(p.total_amount || p.amount || 0);
     const paidAmount = Number(p.amount || 0);
     const remainingAmount = Number(p.remaining_amount || totalAmount - paidAmount);
@@ -74,7 +74,7 @@ Please complete your balance payment securely via PayPal or Debit/Credit Card us
 
 If you have any questions, feel free to reply directly or contact us at info@quickuppsoftech.us.
 
-Website: https://quickuppsoftech.us/
+Website: https://www.quickuppsoftech.us/
 Email: info@quickuppsoftech.us
 
 Best regards,

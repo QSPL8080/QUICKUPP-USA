@@ -1,9 +1,13 @@
+import type { Metadata } from "next";
 import BlogListView from "@/components/BlogListView";
 import { getPublishedBlogs } from "@/lib/blogs";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Blogs | Quickupp Softech",
   description: "Explore industry-leading perspectives on AI, digital marketing, search visibility, web engineering, and enterprise growth.",
+  alternates: {
+    canonical: "https://www.quickuppsoftech.us/blog",
+  },
 };
 
 export const dynamic = "force-dynamic";

@@ -557,7 +557,7 @@ export default function ContactView() {
                 </li>
                 <li>
                   <a
-                    href="https://quickuppsoftech.us/"
+                    href="https://www.quickuppsoftech.us/"
                     className="ct-dock-item"
                     title="Visit Quickupp Softech LLC Official Website"
                     aria-label="Quickupp Softech LLC Official Website"

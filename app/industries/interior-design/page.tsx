@@ -5,6 +5,9 @@ import { data } from "@/data/industries/interior-design";
 export const metadata: Metadata = {
   title: data.metaTitle,
   description: data.metaDescription,
+  alternates: {
+    canonical: "https://www.quickuppsoftech.us/industries/interior-design",
+  },
 };
 
 export default function InteriorDesignIndustryPage() {

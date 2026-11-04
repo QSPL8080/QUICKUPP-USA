@@ -14,7 +14,7 @@ export async function POST(req: Request) {
 async function handleBalanceReminders(req: Request) {
   try {
     const pool = getPool();
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://quickuppsoftech.us";
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.quickuppsoftech.us";
 
     const [plRows] = await pool.query(`
       SELECT *, 'payment_links' AS _table FROM payment_links 
