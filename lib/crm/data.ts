@@ -1,15 +1,15 @@
 import "server-only";
 import { getPool } from "@/lib/db";
 import { SERVICE_FORMS } from "@/lib/formOptions";
-import { ENQUIRY_STATUSES, isEnquirySource, type EnquirySource, type EnquiryStatus } from "@/lib/crm/leadOptions";
+import { ENQUIRY_STATUSES, PROJECT_STATUSES, isEnquirySource, type EnquirySource, type EnquiryStatus, type ProjectStatus } from "@/lib/crm/leadOptions";
 
 /*
  * Reading enquiries and payments for the CRM. Table names only ever come
  * from the fixed lists below, never from the request.
  */
 
-export { ENQUIRY_STATUSES, isEnquirySource } from "@/lib/crm/leadOptions";
-export type { EnquiryStatus, EnquirySource } from "@/lib/crm/leadOptions";
+export { ENQUIRY_STATUSES, PROJECT_STATUSES, isEnquirySource } from "@/lib/crm/leadOptions";
+export type { EnquiryStatus, ProjectStatus, EnquirySource } from "@/lib/crm/leadOptions";
 
 export const SOURCES: Record<EnquirySource, { table: string; label: string; short: string; href: string }> = {
   contact: { table: "contact_enquiries", label: "Contact Enquiries", short: "Contact", href: "/crm/enquiries?source=contact" },
@@ -75,7 +75,7 @@ const UNION_SQL = (Object.keys(SOURCES) as EnquirySource[])
   .map((k) => {
     const detail = k === "contact" ? "COALESCE(category, project_type)" : k === "youtube" ? "''" : "category";
     const service = k === "contact" ? "project_type" : "service";
-    return `SELECT '${k}' AS src, id, full_name, email, phone, company_name, ${detail} AS detail, ${service} AS service, assigned_to, status, COALESCE(project_status, 'Not Started') AS project_status, created_at FROM \`${SOURCES[k].table}\``;
+    return `SELECT '${k}' AS src, id, full_name, email, phone, company_name, ${detail} AS detail, ${service} AS service, assigned_to, status, COALESCE(NULLIF(TRIM(project_status), ''), 'Not Started') AS project_status, created_at FROM \`${SOURCES[k].table}\``;
   })
   .join(" UNION ALL ");
 
@@ -88,7 +88,7 @@ const UNION_SQL_SAFE = (Object.keys(SOURCES) as EnquirySource[])
   })
   .join(" UNION ALL ");
 
-export type LeadFilters = { q?: string; source?: string; status?: string; from?: string; to?: string };
+export type LeadFilters = { q?: string; source?: string; status?: string; projectStatus?: string; from?: string; to?: string };
 
 function leadWhere(f: LeadFilters) {
   const where: string[] = [];
@@ -102,6 +102,10 @@ function leadWhere(f: LeadFilters) {
   if (f.status && (ENQUIRY_STATUSES as readonly string[]).includes(f.status)) {
     where.push("status = ?");
     args.push(f.status);
+  }
+  if (f.projectStatus && (PROJECT_STATUSES as readonly string[]).includes(f.projectStatus)) {
+    where.push("project_status = ?");
+    args.push(f.projectStatus);
   }
   if (f.from && /^\d{4}-\d{2}-\d{2}$/.test(f.from)) {
     where.push("created_at >= ?");

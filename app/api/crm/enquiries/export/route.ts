@@ -16,12 +16,25 @@ export async function GET(request: Request) {
     q: sp.get("q") || "",
     source: sp.get("source") || "",
     status: sp.get("status") || "",
+    projectStatus: sp.get("projectStatus") || "",
     from: sp.get("from") || "",
     to: sp.get("to") || "",
   });
-  const head = ["Sr. No", "Name", "Email", "Phone", "Company", "Source", "Service", "Service type", "Status", "Received"];
+  const head = ["Sr. No", "Name", "Email", "Phone", "Company", "Source", "Service", "Service type", "Lead Status", "Project Status", "Received"];
   const lines = rows.map((r, i) =>
-    [i + 1, r.name, r.email, r.phone, r.company, SOURCE_LABEL[r.source], r.service, r.detail, ENQUIRY_STATUS_LABEL[r.status], new Date(r.createdAt).toISOString().replace("T", " ").slice(0, 16)]
+    [
+      i + 1,
+      r.name,
+      r.email,
+      r.phone,
+      r.company,
+      SOURCE_LABEL[r.source],
+      r.service,
+      r.detail,
+      ENQUIRY_STATUS_LABEL[r.status] || r.status,
+      r.projectStatus || "Not Started",
+      new Date(r.createdAt).toISOString().replace("T", " ").slice(0, 16),
+    ]
       .map(cell)
       .join(",")
   );
