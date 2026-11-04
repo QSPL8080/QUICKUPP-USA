@@ -161,6 +161,35 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
     }));
   };
 
+  const handleReplaceImage = (oldUrl: string, newUrl: string) => {
+    const swap = (text: string) => text.split(`](${oldUrl})`).join(`](${newUrl})`);
+    setForm((f) => ({
+      ...f,
+      img: f.img === oldUrl ? newUrl : f.img,
+      intro: swap(f.intro),
+      sections: f.sections.map((sec) => ({ ...sec, paragraphs: swap(sec.paragraphs) })),
+      conclusion: swap(f.conclusion),
+    }));
+  };
+
+  const handleRemoveImage = (url: string) => {
+    const strip = (text: string) => {
+      const lines = text.split("\n");
+      const filtered = lines.filter((l) => {
+        const trimmed = l.trim();
+        return !(trimmed.startsWith("![") && trimmed.includes(`](${url})`));
+      });
+      return filtered.join("\n").replace(/\n{3,}/g, "\n\n").replace(/^\n+|\n+$/g, "");
+    };
+    setForm((f) => ({
+      ...f,
+      img: f.img === url ? "" : f.img,
+      intro: strip(f.intro),
+      sections: f.sections.map((sec) => ({ ...sec, paragraphs: strip(sec.paragraphs) })),
+      conclusion: strip(f.conclusion),
+    }));
+  };
+
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
@@ -557,7 +586,7 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />
                       </svg>
-                      <span>{coverBusy ? "Uploading…" : "Upload cover"}</span>
+                      <span>{coverBusy ? "Processing…" : form.img ? "Replace cover" : "Upload cover"}</span>
                       <input
                         type="file"
                         accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
@@ -575,7 +604,7 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
                         }}
                       />
                     </label>
-                    <span className="crm-btf-hint">JPG, PNG, WebP, GIF or AVIF · up to 4 MB. Shown at the top of the blog and on the Blogs page.</span>
+                    <span className="crm-btf-hint">JPG, PNG, WebP, GIF or AVIF · up to 4 MB. Saved directly on this specific blog.</span>
                     {form.img && (
                       <button type="button" className="crm-btf-add" onClick={() => setForm((f) => ({ ...f, img: "" }))}>
                         Remove cover
@@ -602,6 +631,8 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
                 <BlogImageLibrary
                   cover={form.img}
                   onCover={(url) => setForm((f) => ({ ...f, img: url }))}
+                  onReplace={handleReplaceImage}
+                  onRemove={handleRemoveImage}
                   onError={setError}
                   targets={[
                     { key: "intro", label: "Introduction", text: form.intro },

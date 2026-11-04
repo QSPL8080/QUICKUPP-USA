@@ -180,7 +180,7 @@ export async function validateBlog(
   const author = text(body.author, 150) || "Quickupp Team";
   const authorRole = text(body.authorRole, 150) || "Strategy Lead";
   const readTime = text(body.readTime, 50) || "5 min read";
-  const img = text(body.img, 255) || "/images/blog-img-01.jpg";
+  const img = typeof body.img === "string" && body.img.trim() ? body.img.trim() : "/images/blog-img-01.jpg";
   const isPublished = body.isPublished !== false;
 
   if (!title) errors.title = "Please enter a blog title.";

@@ -84,27 +84,8 @@ export async function DELETE(_request: Request, ctx: Ctx) {
   if (!id) return Response.json({ ok: false, error: "Blog not found." }, { status: 404 });
 
   const pool = getPool();
-  // images uploaded for this blog go with it, unless another blog uses them too
-  let imageIds: number[] = [];
-  try {
-    const [rows] = await pool.query("SELECT img, content FROM blogs WHERE id = ?", [id]);
-    const r = (rows as { img: string; content: string }[])[0];
-    if (r) imageIds = [...new Set([...`${r.img} ${r.content}`.matchAll(/\/api\/blog-images\/(\d+)/g)].map((m) => Number(m[1])))];
-  } catch {
-    /* blog already gone */
-  }
-
   await pool.execute("DELETE FROM blogs WHERE id = ?", [id]);
 
-  for (const imageId of imageIds) {
-    try {
-      const pattern = `%/api/blog-images/${imageId})%`;
-      const [used] = await pool.query("SELECT id FROM blogs WHERE img = ? OR content LIKE ? LIMIT 1", [`/api/blog-images/${imageId}`, pattern]);
-      if (!(used as unknown[]).length) await pool.query("DELETE FROM blog_images WHERE id = ?", [imageId]);
-    } catch {
-      /* keep the image if it can't be checked */
-    }
-  }
   revalidatePath("/blog", "layout");
   return Response.json({ ok: true });
 }
