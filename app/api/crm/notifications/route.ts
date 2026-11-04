@@ -1,8 +1,16 @@
 import { getCurrentUser } from "@/lib/crm/auth";
-import { clearAll, markAllRead, markOneRead } from "@/lib/crm/notifications";
+import { clearAll, getNotifications, markAllRead, markOneRead } from "@/lib/crm/notifications";
 import { readJson } from "@/lib/enquiry";
 
 const TIME_RE = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
+
+/* GET → fetch latest unread count and notification items for polling */
+export async function GET() {
+  const me = await getCurrentUser();
+  if (!me) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
+  const data = await getNotifications(me.id);
+  return Response.json({ ok: true, ...data });
+}
 
 /*
  * POST { action: "read", key }          → one notification read

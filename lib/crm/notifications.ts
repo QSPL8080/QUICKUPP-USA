@@ -13,7 +13,18 @@ import { SOURCE_LABEL, type EnquirySource } from "@/lib/crm/leadOptions";
  */
 
 export type NotifyKind = "lead" | "payment" | "application";
-export type NotifyItem = { key: string; kind: NotifyKind; title: string; sub: string; at: string; href: string; unread: boolean };
+export type NotifyItem = {
+  key: string;
+  kind: NotifyKind;
+  title: string;
+  sub: string;
+  at: string;
+  href: string;
+  unread: boolean;
+  categoryLabel?: string;
+  clientName?: string;
+  detail?: string;
+};
 export type Notifications = { asOf: string; unread: number; items: NotifyItem[] };
 
 const LIST = 40;
@@ -29,8 +40,14 @@ function unionSql() {
   };
   for (const k of Object.keys(SOURCES) as EnquirySource[]) {
     const mine = k === "manual" ? " AND (created_by IS NULL OR created_by <> ?)" : "";
+    const detail =
+      k === "contact"
+        ? "COALESCE(NULLIF(category, ''), NULLIF(project_type, ''), 'Contact Form')"
+        : k === "youtube"
+          ? "'YouTube Video Promotion'"
+          : "COALESCE(NULLIF(category, ''), NULLIF(service, ''), 'Service Form')";
     parts.push(
-      `SELECT 'lead' AS kind, CONCAT('${k}:', id) AS item_key, '${k}' AS src, full_name AS title, NULL AS extra, created_at FROM \`${SOURCES[k].table}\` WHERE created_at > ? AND created_at <= ?${mine}`
+      `SELECT 'lead' AS kind, CONCAT('${k}:', id) AS item_key, '${k}' AS src, full_name AS title, ${detail} AS extra, created_at FROM \`${SOURCES[k].table}\` WHERE created_at > ? AND created_at <= ?${mine}`
     );
   }
   parts.push(
@@ -71,19 +88,37 @@ export async function getNotifications(userId: number): Promise<Notifications> {
     const kind = r.kind as NotifyKind;
     const key = String(r.item_key);
     const src = r.src as EnquirySource | null;
+    const clientName = String(r.title ?? "Client");
+    const detail = String(r.extra ?? "");
+    let title = "New notification";
+    let sub = "";
+    let categoryLabel = "NEW NOTIFICATION";
+
+    if (kind === "lead") {
+      title = src === "contact" ? "New website enquiry" : src === "youtube" ? "New YouTube order" : "New website order";
+      categoryLabel = src === "contact" ? "NEW WEBSITE ENQUIRY" : src === "youtube" ? "NEW YOUTUBE ORDER" : "NEW WEBSITE ORDER";
+      sub = detail ? `${clientName} ordered ${detail}` : `${clientName} submitted an enquiry`;
+    } else if (kind === "payment") {
+      title = "Payment received";
+      categoryLabel = "PAYMENT RECEIVED";
+      sub = `${clientName} - ${money(detail)}`;
+    } else if (kind === "application") {
+      title = "Job application";
+      categoryLabel = "JOB APPLICATION";
+      sub = `${clientName} applied for ${detail || "Open Position"}`;
+    }
+
     return {
       key,
       kind,
-      title: String(r.title ?? ""),
-      sub:
-        kind === "lead"
-          ? `New lead · ${src ? SOURCE_LABEL[src] : "Lead"}`
-          : kind === "payment"
-            ? `New payment · ${money(String(r.extra ?? ""))}`
-            : `Job application · ${String(r.extra ?? "")}`,
+      title,
+      sub,
       at: new Date(r.created_at as string).toISOString(),
       href: kind === "lead" ? `/crm/enquiries${src ? `?source=${src}` : ""}` : kind === "payment" ? "/crm/payments" : "/crm/applications",
       unread: fresh.has(key),
+      categoryLabel,
+      clientName,
+      detail,
     };
   });
 
