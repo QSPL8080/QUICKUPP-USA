@@ -11,6 +11,7 @@ export interface ReceiptData {
   billingAddress?: string | null;
   service: string;
   category?: string | null;
+  quantity?: number | null;
   amountPaid: number;
   totalAmount?: number | null;
   paymentType?: "full" | "partial";
@@ -97,6 +98,38 @@ function drawCheckmark(
   });
 }
 
+type RGB = [number, number, number];
+
+/** Draws a left-to-right multi-stop linear gradient bar as many thin slices. */
+function drawGradientBar(
+  p: PDFPage,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  stops: { at: number; color: RGB }[]
+) {
+  const steps = 100;
+  for (let i = 0; i < steps; i++) {
+    const t = i / (steps - 1);
+    let c0 = stops[0];
+    let c1 = stops[stops.length - 1];
+    for (let s = 0; s < stops.length - 1; s++) {
+      if (t >= stops[s].at && t <= stops[s + 1].at) {
+        c0 = stops[s];
+        c1 = stops[s + 1];
+        break;
+      }
+    }
+    const span = c1.at - c0.at || 1;
+    const lt = Math.min(1, Math.max(0, (t - c0.at) / span));
+    const r = c0.color[0] + (c1.color[0] - c0.color[0]) * lt;
+    const g = c0.color[1] + (c1.color[1] - c0.color[1]) * lt;
+    const b = c0.color[2] + (c1.color[2] - c0.color[2]) * lt;
+    p.drawRectangle({ x: x + i * (w / steps), y, width: w / steps + 0.6, height: h, color: rgb(r, g, b) });
+  }
+}
+
 /**
  * Generate a production-grade PDF receipt matching the Quickupp Softech branding and layout.
  */
@@ -110,6 +143,7 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
     billingAddress,
     service,
     category,
+    quantity,
     amountPaid,
     totalAmount,
     paymentType = "full",
@@ -121,6 +155,7 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
 
   const doc = await PDFDocument.create();
   const page = doc.addPage([595.28, 841.89]); // A4 (595.28 x 841.89 pt)
+  const PAGE_W = 595.28;
 
   const font = await doc.embedFont(StandardFonts.Helvetica);
   const fontBold = await doc.embedFont(StandardFonts.HelveticaBold);
@@ -132,14 +167,19 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
   const slateDark = rgb(0.12, 0.16, 0.23);        // #1e293b
   const slateMid = rgb(0.28, 0.34, 0.42);         // #475569
   const borderLight = rgb(0.88, 0.91, 0.94);      // #e2e8f0
-  const bgCard = rgb(0.97, 0.98, 0.99);           // #f8fafc
   const linkBlue = rgb(0.145, 0.388, 0.922);      // #2563eb
   const greenText = rgb(0.086, 0.502, 0.239);     // #15803d
   const greenBg = rgb(0.863, 0.980, 0.906);       // #dcfce7
   const amberText = rgb(0.706, 0.325, 0.035);     // #b45309
   const amberBg = rgb(0.996, 0.953, 0.780);       // #fef3c7
-  const purpleRowBg = rgb(0.953, 0.914, 0.996);   // #f3e8ff
-  const magentaBar = rgb(0.753, 0.149, 0.827);    // #c026d3
+
+  // The signature brand gradient (indigo -> magenta -> rose) used for the
+  // top/bottom accent bars, matching the Quickupp AI Studio receipt style.
+  const GRADIENT: { at: number; color: RGB }[] = [
+    { at: 0, color: [0.388, 0.4, 0.945] },     // #6366f1
+    { at: 0.5, color: [0.753, 0.149, 0.827] }, // #c026d3
+    { at: 1, color: [0.937, 0.267, 0.388] },   // #ef4463
+  ];
 
   const leftX = 40;
   const rightX = 555;
@@ -148,6 +188,10 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
   const isPartial = paymentType === "partial";
   const finalTotal = totalAmount != null && Number(totalAmount) > 0 ? Number(totalAmount) : Number(amountPaid);
   const formattedDate = formatReceiptDate(paymentDate);
+  const qty = quantity && Number(quantity) > 0 ? Number(quantity) : 1;
+
+  // Top accent bar
+  drawGradientBar(page, 0, 841.89 - 7, PAGE_W, 7, GRADIENT);
 
   // 1. Logo — the logo PNG already contains the "Quickupp Softech" wordmark,
   // so the text block below it must start clear of the logo's actual bottom
@@ -171,110 +215,48 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
       });
       logoBottomY = logoTopY - logoH;
     } catch {
-      // Fallback text if logo load fails
-      page.drawText("QUICKUPP", {
-        x: leftX,
-        y: 755,
-        size: 18,
-        font: fontBold,
-        color: deepPurple,
-      });
+      page.drawText("QUICKUPP", { x: leftX, y: 755, size: 18, font: fontBold, color: deepPurple });
       logoBottomY = 752;
     }
   } else {
-    page.drawText("QUICKUPP", {
-      x: leftX,
-      y: 755,
-      size: 18,
-      font: fontBold,
-      color: deepPurple,
-    });
+    page.drawText("QUICKUPP", { x: leftX, y: 755, size: 18, font: fontBold, color: deepPurple });
     logoBottomY = 752;
   }
 
   // Under Logo text - Official Company Details (always clear of the logo,
   // with a fixed 12pt gap below its real bottom edge). Every fixed
-  // coordinate below this block (the divider, BILL TO, the customer rows,
-  // the PAYMENT DETAILS heading and the table) is nudged by the same
-  // amount, so the header shifting to clear a taller/shorter logo never
-  // compresses the spacing further down the page.
+  // coordinate below this block is nudged by the same amount, so the
+  // header shifting to clear a taller/shorter logo never compresses the
+  // spacing further down the page.
   const headerShift = (logoBottomY - 12) - 724;
   let curY = 724 + headerShift;
-  page.drawText("Quickupp Softech LLC", {
-    x: leftX,
-    y: curY,
-    size: 9.5,
-    font: fontBold,
-    color: darkNavy,
-  });
+  page.drawText("Quickupp Softech LLC", { x: leftX, y: curY, size: 9.5, font: fontBold, color: darkNavy });
   curY -= 12;
-  page.drawText("8 The Green, Suite A, Dover, Delaware - 19901, USA", {
-    x: leftX,
-    y: curY,
-    size: 8,
-    font,
-    color: slateMid,
-  });
+  page.drawText("8 The Green, Suite A, Dover, Delaware - 19901, USA", { x: leftX, y: curY, size: 8, font, color: slateMid });
   curY -= 11;
-  page.drawText("Phone: +1 (302) 754-5679", {
-    x: leftX,
-    y: curY,
-    size: 8,
-    font,
-    color: slateMid,
-  });
+  page.drawText("Phone: +1 (302) 754-5679", { x: leftX, y: curY, size: 8, font, color: slateMid });
   curY -= 11;
   page.drawText("Email: ", { x: leftX, y: curY, size: 8.5, font, color: slateMid });
-  page.drawText("info@quickuppsoftech.us", {
-    x: leftX + 28,
-    y: curY,
-    size: 8.5,
-    font,
-    color: linkBlue,
-  });
+  page.drawText("info@quickuppsoftech.us", { x: leftX + 28, y: curY, size: 8.5, font, color: linkBlue });
   curY -= 11;
   page.drawText("Website: ", { x: leftX, y: curY, size: 8.5, font, color: slateMid });
-  page.drawText("https://www.quickuppsoftech.us/", {
-    x: leftX + 38,
-    y: curY,
-    size: 8.5,
-    font,
-    color: linkBlue,
-  });
+  page.drawText("https://www.quickuppsoftech.us/", { x: leftX + 38, y: curY, size: 8.5, font, color: linkBlue });
 
   // Top Right Header
   const titleText = "PAYMENT RECEIPT";
   const titleW = fontBold.widthOfTextAtSize(titleText, 21);
-  page.drawText(titleText, {
-    x: rightX - titleW,
-    y: 755,
-    size: 21,
-    font: fontBold,
-    color: darkNavy,
-  });
+  page.drawText(titleText, { x: rightX - titleW, y: 755, size: 21, font: fontBold, color: darkNavy });
 
   const rcptText = `Receipt No: ${orderNumber}`;
   const rcptW = fontBold.widthOfTextAtSize(rcptText, 10);
-  page.drawText(rcptText, {
-    x: rightX - rcptW,
-    y: 735,
-    size: 10,
-    font: fontBold,
-    color: slateDark,
-  });
+  page.drawText(rcptText, { x: rightX - rcptW, y: 735, size: 10, font: fontBold, color: slateDark });
 
   const dateText = `Date: ${formattedDate}`;
   const dateW = font.widthOfTextAtSize(dateText, 9.5);
-  page.drawText(dateText, {
-    x: rightX - dateW,
-    y: 720,
-    size: 9.5,
-    font,
-    color: slateMid,
-  });
+  page.drawText(dateText, { x: rightX - dateW, y: 720, size: 9.5, font, color: slateMid });
 
   // Pill Badge (PAID / PARTIALLY PAID)
-  const badgeLabel = isPartial ? "PAYMENT: PARTIALLY PAID" : "PAYMENT: PAID";
+  const badgeLabel = isPartial ? "PARTIALLY PAID" : "PAID";
   const badgeFontColor = isPartial ? amberText : greenText;
   const badgeBgColor = isPartial ? amberBg : greenBg;
   const badgeTextW = fontBold.widthOfTextAtSize(badgeLabel, 8.5);
@@ -284,463 +266,188 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
   const pillY = 692;
 
   drawRoundedRect(page, pillX, pillY, pillW, pillH, 10, badgeBgColor, undefined);
-  page.drawText(badgeLabel, {
-    x: pillX + 12,
-    y: pillY + 6,
-    size: 8.5,
-    font: fontBold,
-    color: badgeFontColor,
-  });
+  page.drawText(badgeLabel, { x: pillX + 12, y: pillY + 6, size: 8.5, font: fontBold, color: badgeFontColor });
   drawCheckmark(page, pillX + 16 + badgeTextW, pillY + 9, badgeFontColor, 0.9);
 
   // Top Divider Line
   const dividerY = 668 + headerShift;
-  page.drawLine({
-    start: { x: leftX, y: dividerY },
-    end: { x: rightX, y: dividerY },
-    thickness: 1,
-    color: borderLight,
-  });
+  page.drawLine({ start: { x: leftX, y: dividerY }, end: { x: rightX, y: dividerY }, thickness: 1, color: borderLight });
 
-  // BILL TO
-  const billToY = 648 + headerShift;
-  page.drawText("BILL TO", {
-    x: leftX,
-    y: billToY,
-    size: 11,
-    font: fontBold,
-    color: primaryPurple,
-  });
+  // ===========================================================================
+  // BILL TO  |  PAYMENT INFORMATION — side-by-side, directly under the divider
+  // ===========================================================================
+  const colStartY = 648 + headerShift;
+  const col2X = leftX + 270;
+  const rowGap = 15.5;
 
-  const custNameY = 630 + headerShift;
-  page.drawText("Customer Name: ", { x: leftX, y: custNameY, size: 9, font, color: slateMid });
-  page.drawText(clientName || "Valued Client", {
-    x: leftX + 80,
-    y: custNameY,
-    size: 9,
-    font: fontBold,
-    color: darkNavy,
-  });
+  page.drawText("BILL TO", { x: leftX, y: colStartY, size: 11, font: fontBold, color: primaryPurple });
+  page.drawText("PAYMENT INFORMATION", { x: col2X, y: colStartY, size: 11, font: fontBold, color: primaryPurple });
 
-  const custEmailY = 615 + headerShift;
-  page.drawText("Email: ", { x: leftX, y: custEmailY, size: 9, font, color: slateMid });
-  page.drawText(clientEmail || "info@quickuppsoftech.us", {
-    x: leftX + 32,
-    y: custEmailY,
-    size: 9,
-    font,
-    color: linkBlue,
-  });
+  // Left column rows (variable count: Name, Email, Company?, Address/Phone)
+  let lY = colStartY - 18;
+  page.drawText("Customer Name: ", { x: leftX, y: lY, size: 9, font, color: slateMid });
+  page.drawText(clientName || "Valued Client", { x: leftX + 80, y: lY, size: 9, font: fontBold, color: darkNavy });
+  lY -= rowGap;
+  page.drawText("Email: ", { x: leftX, y: lY, size: 9, font, color: slateMid });
+  page.drawText(clientEmail || "info@quickuppsoftech.us", { x: leftX + 32, y: lY, size: 9, font, color: linkBlue });
+  if (companyName) {
+    lY -= rowGap;
+    page.drawText("Company: ", { x: leftX, y: lY, size: 9, font, color: slateMid });
+    page.drawText(companyName, { x: leftX + 48, y: lY, size: 9, font: fontBold, color: darkNavy });
+  }
+  const addressVal = billingAddress || (clientPhone ? `Phone: ${clientPhone}` : "United States");
+  lY -= rowGap;
+  page.drawText("Billing Address: ", { x: leftX, y: lY, size: 9, font, color: slateMid });
+  page.drawText(addressVal, { x: leftX + 74, y: lY, size: 9, font: fontBold, color: darkNavy });
 
-  const addressVal =
-    billingAddress ||
-    companyName ||
-    (clientPhone ? `Phone: ${clientPhone}` : "United States");
-  const custAddrY = 600 + headerShift;
-  page.drawText("Billing Address: ", { x: leftX, y: custAddrY, size: 9, font, color: slateMid });
-  page.drawText(addressVal, {
-    x: leftX + 74,
-    y: custAddrY,
-    size: 9,
-    font: fontBold,
-    color: darkNavy,
-  });
+  // Right column rows (fixed 5: Method, Transaction ID, Date, Status, Type)
+  let rY = colStartY - 18;
+  page.drawText("Payment Method: ", { x: col2X, y: rY, size: 9, font, color: slateMid });
+  page.drawText("PayPal", { x: col2X + 92, y: rY, size: 9, font: fontBold, color: darkNavy });
+  rY -= rowGap;
+  page.drawText("Transaction ID: ", { x: col2X, y: rY, size: 9, font, color: slateMid });
+  const txShort = transactionId && transactionId.length > 22 ? `${transactionId.substring(0, 20)}...` : transactionId || "N/A";
+  page.drawText(txShort, { x: col2X + 86, y: rY, size: 9, font: fontBold, color: darkNavy });
+  rY -= rowGap;
+  page.drawText("Payment Date: ", { x: col2X, y: rY, size: 9, font, color: slateMid });
+  page.drawText(`${formattedDate}${paymentTime ? ` · ${paymentTime}` : ""}`, { x: col2X + 80, y: rY, size: 9, font: fontBold, color: darkNavy });
+  rY -= rowGap;
+  const statusStr = isPartial ? "PARTIALLY PAID" : "PAID";
+  const statusColor = isPartial ? amberText : greenText;
+  page.drawText("Payment Status: ", { x: col2X, y: rY, size: 9, font, color: slateMid });
+  page.drawText(statusStr, { x: col2X + 86, y: rY, size: 9, font: fontBold, color: statusColor });
+  rY -= rowGap;
+  const typeDisplay = isPartial ? "Advance Deposit" : "Full Payment";
+  page.drawText("Payment Type: ", { x: col2X, y: rY, size: 9, font, color: slateMid });
+  page.drawText(typeDisplay, { x: col2X + 80, y: rY, size: 9, font: fontBold, color: darkNavy });
 
-  // PAYMENT DETAILS
-  page.drawText("PAYMENT DETAILS", {
-    x: leftX,
-    y: 575 + headerShift,
-    size: 11,
-    font: fontBold,
-    color: primaryPurple,
-  });
+  // The right column always has 5 rows, so it reliably determines the
+  // bottom of this whole section regardless of how many optional left rows
+  // were drawn.
+  const sectionBottomY = colStartY - 18 - 4 * rowGap;
 
-  // Table Card
+  // ===========================================================================
+  // PAYMENT DETAILS table
+  // ===========================================================================
+  const detailsHeadingY = sectionBottomY - 25;
+  page.drawText("PAYMENT DETAILS", { x: leftX, y: detailsHeadingY, size: 11, font: fontBold, color: primaryPurple });
+
   const tblX = leftX;
   const tblW = contentWidth;
-  const tblH = isPartial ? 160 : 138;
-  const tblY = (isPartial ? 400 : 422) + headerShift;
+  const headerRowH = 25.5;
+  const itemRowH = 30;
+  const summaryRowH = 16;
+  const summaryRowCount = isPartial ? 2 : 1;
+  const finalRowH = 32;
+  const tblH = headerRowH + itemRowH + summaryRowCount * summaryRowH + finalRowH + 10;
+  const tableTop = detailsHeadingY - 14;
+  const tblY = tableTop - tblH;
 
   drawRoundedRect(page, tblX, tblY, tblW, tblH, 6, rgb(1, 1, 1), borderLight);
 
   // Table Header Row
-  page.drawRectangle({
-    x: tblX + 0.5,
-    y: tblY + tblH - 26,
-    width: tblW - 1,
-    height: 25.5,
-    color: rgb(0.95, 0.96, 0.98),
-  });
-  page.drawLine({
-    start: { x: tblX, y: tblY + tblH - 26 },
-    end: { x: tblX + tblW, y: tblY + tblH - 26 },
-    thickness: 1,
-    color: borderLight,
-  });
+  page.drawRectangle({ x: tblX + 0.5, y: tblY + tblH - headerRowH, width: tblW - 1, height: headerRowH - 0.5, color: rgb(0.95, 0.96, 0.98) });
+  page.drawLine({ start: { x: tblX, y: tblY + tblH - headerRowH }, end: { x: tblX + tblW, y: tblY + tblH - headerRowH }, thickness: 1, color: borderLight });
 
-  page.drawText("Description", {
-    x: tblX + 16,
-    y: tblY + tblH - 18,
-    size: 9.5,
-    font: fontBold,
-    color: slateDark,
-  });
+  const qtyColX = tblX + tblW - 160;
+  page.drawText("Description", { x: tblX + 16, y: tblY + tblH - 17, size: 9.5, font: fontBold, color: slateDark });
+  const qtyHeaderW = fontBold.widthOfTextAtSize("Qty", 9.5);
+  page.drawText("Qty", { x: qtyColX - qtyHeaderW / 2, y: tblY + tblH - 17, size: 9.5, font: fontBold, color: slateDark });
   const amtHeader = "Amount (USD)";
   const amtHW = fontBold.widthOfTextAtSize(amtHeader, 9.5);
-  page.drawText(amtHeader, {
-    x: tblX + tblW - 20 - amtHW,
-    y: tblY + tblH - 18,
-    size: 9.5,
-    font: fontBold,
-    color: slateDark,
-  });
+  page.drawText(amtHeader, { x: tblX + tblW - 20 - amtHW, y: tblY + tblH - 17, size: 9.5, font: fontBold, color: slateDark });
 
   // Line item row
   const itemDesc = `${service}${category ? ` – ${category}` : ""}`;
-  const truncatedDesc =
-    itemDesc.length > 75 ? `${itemDesc.substring(0, 72)}...` : itemDesc;
-  const itemY = tblY + tblH - 52;
+  const truncatedDesc = itemDesc.length > 62 ? `${itemDesc.substring(0, 59)}...` : itemDesc;
+  const itemY = tblY + tblH - headerRowH - itemRowH / 2 - 3;
 
-  page.drawText(truncatedDesc, {
-    x: tblX + 16,
-    y: itemY,
-    size: 9.5,
-    font: fontBold,
-    color: darkNavy,
-  });
+  page.drawText(truncatedDesc, { x: tblX + 16, y: itemY, size: 9.5, font: fontBold, color: darkNavy });
+  const qtyStr = String(qty);
+  const qtyW = fontBold.widthOfTextAtSize(qtyStr, 9.5);
+  page.drawText(qtyStr, { x: qtyColX - qtyW / 2, y: itemY, size: 9.5, font, color: slateMid });
   const totalStr = `$${finalTotal.toFixed(2)}`;
   const totalStrW = fontBold.widthOfTextAtSize(totalStr, 9.5);
-  page.drawText(totalStr, {
-    x: tblX + tblW - 20 - totalStrW,
-    y: itemY,
-    size: 9.5,
-    font: fontBold,
-    color: darkNavy,
-  });
+  page.drawText(totalStr, { x: tblX + tblW - 20 - totalStrW, y: itemY, size: 9.5, font: fontBold, color: darkNavy });
 
-  // Table summary separator
-  page.drawLine({
-    start: { x: tblX, y: tblY + (isPartial ? 86 : 64) },
-    end: { x: tblX + tblW, y: tblY + (isPartial ? 86 : 64) },
-    thickness: 1,
-    color: borderLight,
-  });
+  // Summary separator (above the non-highlighted summary rows)
+  const summaryTop = tblY + finalRowH + summaryRowCount * summaryRowH;
+  page.drawLine({ start: { x: tblX, y: summaryTop }, end: { x: tblX + tblW, y: summaryTop }, thickness: 1, color: borderLight });
 
-  // Summary lines
+  let sumY = summaryTop - summaryRowH + 4;
+  const summaryRow = (label: string, value: string, color = darkNavy) => {
+    const vW = fontBold.widthOfTextAtSize(value, 9);
+    const lW = font.widthOfTextAtSize(label, 9);
+    page.drawText(label, { x: tblX + tblW - 20 - vW - 10 - lW, y: sumY, size: 9, font, color: slateMid });
+    page.drawText(value, { x: tblX + tblW - 20 - vW, y: sumY, size: 9, font: fontBold, color });
+    sumY -= summaryRowH;
+  };
+
+  summaryRow("Order Total:", totalStr);
   if (isPartial) {
-    // Row 1: Order Total
-    page.drawText("Order Total:", {
-      x: tblX + 270,
-      y: tblY + 68,
-      size: 9,
-      font,
-      color: slateMid,
-    });
-    const otW = fontBold.widthOfTextAtSize(totalStr, 9);
-    page.drawText(totalStr, {
-      x: tblX + tblW - 20 - otW,
-      y: tblY + 68,
-      size: 9,
-      font: fontBold,
-      color: darkNavy,
-    });
-
-    // Row 2: Amount Paid Now (Deposit)
-    const paidDepositStr = `$${Number(amountPaid).toFixed(2)}`;
-    page.drawText("Amount Paid Now (Deposit):", {
-      x: tblX + 225,
-      y: tblY + 52,
-      size: 9,
-      font,
-      color: slateMid,
-    });
-    const pdW = fontBold.widthOfTextAtSize(paidDepositStr, 9);
-    page.drawText(paidDepositStr, {
-      x: tblX + tblW - 20 - pdW,
-      y: tblY + 52,
-      size: 9,
-      font: fontBold,
-      color: greenText,
-    });
-
-    // Row 3: Remaining Balance Due
-    const remStr = `$${Number(remainingAmount).toFixed(2)}`;
-    page.drawText("Remaining Balance Due:", {
-      x: tblX + 233,
-      y: tblY + 36,
-      size: 9,
-      font,
-      color: slateMid,
-    });
-    const remW = fontBold.widthOfTextAtSize(remStr, 9);
-    page.drawText(remStr, {
-      x: tblX + tblW - 20 - remW,
-      y: tblY + 36,
-      size: 9,
-      font: fontBold,
-      color: rgb(0.85, 0.15, 0.15),
-    });
-  } else {
-    // Single summary: Order Total
-    page.drawText("Order Total:", {
-      x: tblX + 280,
-      y: tblY + 45,
-      size: 9,
-      font,
-      color: slateMid,
-    });
-    const otW = fontBold.widthOfTextAtSize(totalStr, 9);
-    page.drawText(totalStr, {
-      x: tblX + tblW - 20 - otW,
-      y: tblY + 45,
-      size: 9,
-      font: fontBold,
-      color: darkNavy,
-    });
+    const paidPct = finalTotal > 0 ? Math.round((Number(amountPaid) / finalTotal) * 100) : 0;
+    summaryRow(`Amount Paid (${paidPct}% Advance):`, `$${Number(amountPaid).toFixed(2)}`, greenText);
   }
 
-  // Highlighted Total Row at bottom of table
-  page.drawRectangle({
-    x: tblX + 0.5,
-    y: tblY + 0.5,
-    width: tblW - 1,
-    height: 31.5,
-    color: purpleRowBg,
-  });
-  page.drawLine({
-    start: { x: tblX, y: tblY + 32 },
-    end: { x: tblX + tblW, y: tblY + 32 },
-    thickness: 1,
-    color: borderLight,
-  });
+  // Highlighted final row: green "Total Paid" when fully paid, amber
+  // "Balance Due" when a balance remains — mirroring the reference receipt.
+  const finalBg = isPartial ? amberBg : greenBg;
+  const finalColor = isPartial ? amberText : greenText;
+  page.drawRectangle({ x: tblX + 0.5, y: tblY + 0.5, width: tblW - 1, height: finalRowH - 0.5, color: finalBg });
+  page.drawLine({ start: { x: tblX, y: tblY + finalRowH }, end: { x: tblX + tblW, y: tblY + finalRowH }, thickness: 1, color: borderLight });
 
-  const totPaidLabel = isPartial
-    ? "Total Paid (Partial Deposit):"
-    : "Total Paid (Fully Paid):";
-  page.drawText(totPaidLabel, {
-    x: tblX + (isPartial ? 150 : 175),
-    y: tblY + 11,
-    size: 10.5,
-    font: fontBold,
-    color: deepPurple,
-  });
-  const finalValStr = `$${Number(amountPaid).toFixed(2)} USD`;
-  const finalValW = fontBold.widthOfTextAtSize(finalValStr, 10.5);
-  page.drawText(finalValStr, {
-    x: tblX + tblW - 20 - finalValW,
-    y: tblY + 11,
-    size: 10.5,
-    font: fontBold,
-    color: deepPurple,
-  });
+  const finalLabel = isPartial ? "Balance Due:" : "Total Paid:";
+  const finalValStr = isPartial ? `$${Number(remainingAmount).toFixed(2)} USD` : `$${Number(amountPaid).toFixed(2)} USD`;
+  const finalValW = fontBold.widthOfTextAtSize(finalValStr, 11);
+  const finalLabelW = fontBold.widthOfTextAtSize(finalLabel, 11);
+  page.drawText(finalLabel, { x: tblX + tblW - 20 - finalValW - 14 - finalLabelW, y: tblY + finalRowH / 2 - 4, size: 11, font: fontBold, color: finalColor });
+  page.drawText(finalValStr, { x: tblX + tblW - 20 - finalValW, y: tblY + finalRowH / 2 - 4, size: 11, font: fontBold, color: finalColor });
 
-  // PAYMENT INFORMATION Card
-  const infoH = 82;
-  const infoY = tblY - infoH - 24;
-  drawRoundedRect(page, leftX, infoY, contentWidth, infoH, 6, bgCard, borderLight);
-
-  page.drawText("PAYMENT INFORMATION", {
-    x: leftX + 16,
-    y: infoY + infoH - 20,
-    size: 10,
-    font: fontBold,
-    color: slateDark,
-  });
-
-  // Left column
-  page.drawText("Payment Method: ", {
-    x: leftX + 16,
-    y: infoY + infoH - 39,
-    size: 9,
-    font,
-    color: slateMid,
-  });
-  page.drawText("PayPal", {
-    x: leftX + 100,
-    y: infoY + infoH - 39,
-    size: 9,
-    font: fontBold,
-    color: darkNavy,
-  });
-
-  page.drawText("Transaction ID: ", {
-    x: leftX + 16,
-    y: infoY + infoH - 55,
-    size: 9,
-    font,
-    color: slateMid,
-  });
-  const txShort =
-    transactionId.length > 24
-      ? `${transactionId.substring(0, 22)}...`
-      : transactionId || "N/A";
-  page.drawText(txShort, {
-    x: leftX + 90,
-    y: infoY + infoH - 55,
-    size: 9,
-    font: fontBold,
-    color: darkNavy,
-  });
-
-  page.drawText("Payment Status: ", {
-    x: leftX + 16,
-    y: infoY + infoH - 71,
-    size: 9,
-    font,
-    color: slateMid,
-  });
-  const statusStr = isPartial ? "PARTIALLY PAID" : "PAID";
-  const statusColor = isPartial ? amberText : greenText;
-  page.drawText(statusStr, {
-    x: leftX + 90,
-    y: infoY + infoH - 71,
-    size: 9,
-    font: fontBold,
-    color: statusColor,
-  });
-  const statusTextW = fontBold.widthOfTextAtSize(statusStr, 9);
-  drawCheckmark(page, leftX + 94 + statusTextW, infoY + infoH - 69, statusColor, 0.85);
-
-  // Right column
-  page.drawText("Payment Date: ", {
-    x: leftX + 270,
-    y: infoY + infoH - 39,
-    size: 9,
-    font,
-    color: slateMid,
-  });
-  page.drawText(formattedDate, {
-    x: leftX + 342,
-    y: infoY + infoH - 39,
-    size: 9,
-    font: fontBold,
-    color: darkNavy,
-  });
-
-  page.drawText("Payment Time: ", {
-    x: leftX + 270,
-    y: infoY + infoH - 55,
-    size: 9,
-    font,
-    color: slateMid,
-  });
-  page.drawText(paymentTime || "EST", {
-    x: leftX + 342,
-    y: infoY + infoH - 55,
-    size: 9,
-    font: fontBold,
-    color: darkNavy,
-  });
-
-  page.drawText("Payment Type: ", {
-    x: leftX + 270,
-    y: infoY + infoH - 71,
-    size: 9,
-    font,
-    color: slateMid,
-  });
-  const typeDisplay = isPartial ? "Advance Deposit" : "Full Payment";
-  page.drawText(typeDisplay, {
-    x: leftX + 342,
-    y: infoY + infoH - 71,
-    size: 9,
-    font: fontBold,
-    color: darkNavy,
-  });
-
-  // THANK YOU FOR YOUR PURCHASE
-  let tyY = infoY - 24;
-  page.drawText("THANK YOU FOR YOUR PURCHASE", {
-    x: leftX,
-    y: tyY,
-    size: 13,
-    font: fontBold,
-    color: darkNavy,
-  });
-  tyY -= 17;
-  page.drawText("Your payment has been successfully received.", {
-    x: leftX,
-    y: tyY,
-    size: 9,
-    font,
-    color: slateMid,
-  });
+  // ===========================================================================
+  // THANK YOU
+  // ===========================================================================
+  let tyY = tblY - 38;
+  page.drawText("THANK YOU FOR YOUR PURCHASE", { x: leftX, y: tyY, size: 13, font: fontBold, color: darkNavy });
+  tyY -= 18;
+  page.drawText("Your payment has been successfully received.", { x: leftX, y: tyY, size: 9, font, color: slateMid });
   tyY -= 16;
   const thankOrderText = isPartial
     ? `Your order ${orderNumber} deposit has been received. Thank you!`
     : `Your order ${orderNumber} is now fully paid. Thank you!`;
-  page.drawText(thankOrderText, {
-    x: leftX,
-    y: tyY,
-    size: 9.5,
-    font: fontBold,
-    color: greenText,
-  });
+  page.drawText(thankOrderText, { x: leftX, y: tyY, size: 9.5, font: fontBold, color: greenText });
+  if (isPartial) {
+    tyY -= 16;
+    page.drawText(
+      `Balance due: $${Number(remainingAmount).toFixed(2)} USD. Pay anytime via the link in your email.`,
+      { x: leftX, y: tyY, size: 9, font: fontBold, color: amberText }
+    );
+  }
 
   // Divider Line
-  const divY = tyY - 18;
-  page.drawLine({
-    start: { x: leftX, y: divY },
-    end: { x: rightX, y: divY },
-    thickness: 1,
-    color: borderLight,
-  });
+  const divY = tyY - 20;
+  page.drawLine({ start: { x: leftX, y: divY }, end: { x: rightX, y: divY }, thickness: 1, color: borderLight });
 
-  // Support / Questions
-  let supY = divY - 20;
-  page.drawText("For questions regarding your order or payment:", {
-    x: leftX,
-    y: supY,
-    size: 8.5,
-    font: fontBold,
-    color: slateDark,
-  });
+  // ===========================================================================
+  // NEED ASSISTANCE?
+  // ===========================================================================
+  let supY = divY - 22;
+  page.drawText("NEED ASSISTANCE?", { x: leftX, y: supY, size: 10.5, font: fontBold, color: primaryPurple });
   supY -= 16;
-  page.drawText("Quickupp Softech LLC", {
-    x: leftX,
-    y: supY,
-    size: 10.5,
-    font: fontBold,
-    color: primaryPurple,
-  });
+  page.drawText("Quickupp Softech LLC", { x: leftX, y: supY, size: 10, font: fontBold, color: darkNavy });
   supY -= 14;
   page.drawText("Email: ", { x: leftX, y: supY, size: 8.5, font, color: slateMid });
-  page.drawText("info@quickuppsoftech.us", {
-    x: leftX + 28,
-    y: supY,
-    size: 8.5,
-    font,
-    color: linkBlue,
-  });
+  page.drawText("info@quickuppsoftech.us", { x: leftX + 28, y: supY, size: 8.5, font, color: linkBlue });
   supY -= 13;
   page.drawText("Website: ", { x: leftX, y: supY, size: 8.5, font, color: slateMid });
-  page.drawText("https://www.quickuppsoftech.us/", {
-    x: leftX + 38,
-    y: supY,
-    size: 8.5,
-    font,
-    color: linkBlue,
-  });
+  page.drawText("https://www.quickuppsoftech.us/", { x: leftX + 38, y: supY, size: 8.5, font, color: linkBlue });
 
   // Fine print
   const finePrint =
     "This document serves as your official payment receipt for the transaction described above. Operated by Quickupp Softech LLC.";
-  page.drawText(finePrint, {
-    x: leftX,
-    y: 42,
-    size: 7.5,
-    font,
-    color: rgb(0.55, 0.6, 0.68),
-  });
+  page.drawText(finePrint, { x: leftX, y: 42, size: 7.5, font, color: rgb(0.55, 0.6, 0.68) });
 
-  // Bottom Vibrant Magenta Bar
-  page.drawRectangle({
-    x: 0,
-    y: 0,
-    width: 595.28,
-    height: 10,
-    color: magentaBar,
-  });
+  // Bottom accent bar (mirrors the top one)
+  drawGradientBar(page, 0, 0, PAGE_W, 7, GRADIENT);
 
   const pdfBytes = await doc.save();
   return Buffer.from(pdfBytes);
