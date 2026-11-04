@@ -6,6 +6,7 @@ import Link from "next/link";
 import { PageHead } from "@/components/crm/ListTools";
 import { useFeedback } from "@/components/crm/Feedback";
 import type { CrmBlog } from "@/lib/blogs";
+import BlogTextField, { uploadBlogImages } from "@/components/crm/BlogTextField";
 
 const INDUSTRIES = [
   "Healthcare",
@@ -104,6 +105,7 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [coverBusy, setCoverBusy] = useState(false);
 
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
@@ -547,8 +549,40 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
               </label>
 
               <div className="crm-field">
-                <span className="crm-label">Featured Image URL</span>
-                <input className="crm-input" value={form.img} onChange={set("img")} placeholder="/images/blog-img-01.jpg" />
+                <span className="crm-label">Cover Image</span>
+                <div className="crm-btf-cover">
+                  {form.img && <img src={form.img} alt="" />}
+                  <div className="crm-btf-cover-side">
+                    <label className="crm-btf-add">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />
+                      </svg>
+                      <span>{coverBusy ? "Uploading…" : "Upload cover"}</span>
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+                        hidden
+                        disabled={coverBusy}
+                        onChange={async (e) => {
+                          const files = e.target.files;
+                          if (!files?.length) return;
+                          setCoverBusy(true);
+                          const r = await uploadBlogImages(files);
+                          setCoverBusy(false);
+                          e.target.value = "";
+                          if (r.ok) setForm((f) => ({ ...f, img: r.urls[0] }));
+                          else setError(r.error);
+                        }}
+                      />
+                    </label>
+                    <span className="crm-btf-hint">JPG, PNG, WebP, GIF or AVIF · up to 4 MB. Shown at the top of the blog and on the Blogs page.</span>
+                    {form.img && (
+                      <button type="button" className="crm-btf-add" onClick={() => setForm((f) => ({ ...f, img: "" }))}>
+                        Remove cover
+                      </button>
+                    )}
+                  </div>
+                </div>
                 <div style={{ display: "flex", gap: "6px", marginTop: "6px", flexWrap: "wrap" }}>
                   {PRESET_IMAGES.map((preset) => (
                     <button
@@ -565,16 +599,21 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
               </div>
 
               {/* Content: Introduction */}
-              <label className="crm-field crm-span-2">
+              <p className="crm-span-2 crm-btf-help">
+                Writing tips: leave an empty line between paragraphs · start a line with <code>- </code> for a bullet · <code>**text**</code> for bold ·{" "}
+                <code>[text](/page-link)</code> for a link · use <strong>Add images</strong> to place pictures between paragraphs.
+              </p>
+
+              <div className="crm-field crm-span-2">
                 <span className="crm-label">Introduction Paragraphs</span>
-                <textarea
-                  className="crm-input"
-                  rows={4}
+                <BlogTextField
+                  rows={5}
                   value={form.intro}
-                  onChange={set("intro")}
-                  placeholder="Opening introduction paragraphs welcoming the reader..."
+                  onChange={(v) => setForm((f) => ({ ...f, intro: v }))}
+                  onError={setError}
+                  placeholder="Opening paragraphs. Leave an empty line between paragraphs."
                 />
-              </label>
+              </div>
 
               {/* Content: Key Takeaways */}
               <label className="crm-field crm-span-2">
@@ -623,12 +662,12 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
                           </button>
                         )}
                       </div>
-                      <textarea
-                        className="crm-input"
-                        rows={3}
+                      <BlogTextField
+                        rows={5}
                         value={sec.paragraphs}
-                        onChange={(e) => setSection(idx, "paragraphs", e.target.value)}
-                        placeholder="Write paragraphs or bullet points for this section (separate paragraphs with empty line)..."
+                        onChange={(v) => setSection(idx, "paragraphs", v)}
+                        onError={setError}
+                        placeholder="Paragraphs and bullet points for this section. Leave an empty line between paragraphs."
                       />
                     </div>
                   ))}
@@ -636,16 +675,16 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
               </div>
 
               {/* Conclusion */}
-              <label className="crm-field crm-span-2">
-                <span className="crm-label">Final Thoughts / Conclusion</span>
-                <textarea
-                  className="crm-input"
+              <div className="crm-field crm-span-2">
+                <span className="crm-label">Final Thoughts / Conclusion (optional)</span>
+                <BlogTextField
                   rows={3}
                   value={form.conclusion}
-                  onChange={set("conclusion")}
-                  placeholder="Summary, final takeaway, or concluding advice for the reader..."
+                  onChange={(v) => setForm((f) => ({ ...f, conclusion: v }))}
+                  onError={setError}
+                  placeholder="Closing paragraphs, if not written as a section above."
                 />
-              </label>
+              </div>
 
               {/* Publish Toggle */}
               <label className="crm-check crm-check-row crm-span-2">

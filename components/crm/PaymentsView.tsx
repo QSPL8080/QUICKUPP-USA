@@ -146,7 +146,6 @@ export default function PaymentsView({
   page = 1,
   pages = 1,
   pageSize = 20,
-  overview,
 }: {
   rows: PaymentRow[];
   options: Options;
@@ -160,7 +159,6 @@ export default function PaymentsView({
   page?: number;
   pages?: number;
   pageSize?: number;
-  overview?: React.ReactNode;
 }) {
   const router = useRouter();
   const { confirm, toast } = useFeedback();
@@ -634,23 +632,25 @@ Quickupp Softech LLC`;
         {headerActions}
       </PageHead>
 
-      {overview}
-
+      <section className="crm-pay-shell">
       {/* Tabs: All Payments, Website Payments, and Payment Links */}
-      <div className="crm-payments-tabs">
+      <div className="crm-pay-tabs" role="tablist" aria-label="Payment type">
         <button
           type="button"
-          className={`crm-payments-tab ${!currentTab || currentTab === "all" ? "is-active" : ""}`}
+          className={`crm-pay-tab ${!currentTab || currentTab === "all" ? "is-active" : ""}`}
           onClick={() => handleTabChange("all")}
           title="All payments and links"
         >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+          </svg>
           <span>All Payments</span>
           <span className="crm-tab-badge">{counts?.all ?? 0}</span>
         </button>
 
         <button
           type="button"
-          className={`crm-payments-tab ${currentTab === "website" ? "is-active" : ""}`}
+          className={`crm-pay-tab ${currentTab === "website" ? "is-active" : ""}`}
           onClick={() => handleTabChange("website")}
           title="Filter to website checkout payments"
         >
@@ -665,7 +665,7 @@ Quickupp Softech LLC`;
 
         <button
           type="button"
-          className={`crm-payments-tab ${currentTab === "payment_link" ? "is-active" : ""}`}
+          className={`crm-pay-tab ${currentTab === "payment_link" ? "is-active" : ""}`}
           onClick={() => handleTabChange("payment_link")}
           title="Filter to admin-generated payment links"
         >
@@ -683,9 +683,10 @@ Quickupp Softech LLC`;
         status={status}
         placeholder="Search client, email, phone, company, invoice or transaction"
         statuses={options.statuses.map((s) => ({ value: s, label: PAYMENT_STATUS_LABEL[s] || s }))}
+        extra={{ tab: currentTab && currentTab !== "all" ? currentTab : "" }}
       />
 
-      <div className="crm-card crm-card-flush">
+      <div className="crm-pay-table">
         {rows.length > 0 && (
           <BulkBar sel={sel} noun={["payment", "payments"]} busy={busy} onDelete={removeSelected} />
         )}
@@ -1326,8 +1327,9 @@ Quickupp Softech LLC`;
             )}
           </div>
         )}
-        <Pager page={page} pages={pages} total={total} pageSize={pageSize} q={q} status={status} />
+        <Pager page={page} pages={pages} total={total} pageSize={pageSize} q={q} status={status} extra={{ tab: currentTab && currentTab !== "all" ? currentTab : "" }} />
       </div>
+      </section>
 
       {/* ---- DETAILS MODAL (Matching Screenshot 4 & 5) ---- */}
       {viewing && (() => {

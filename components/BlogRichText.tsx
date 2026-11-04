@@ -7,6 +7,7 @@ import type { ReactNode } from "react";
  *   "1. text"      numbered item, consecutive items form one numbered list
  *   "**text**"     bold lead-in line
  *   "[text](url)"  hyperlink; "**bold**" inside a sentence
+ *   "![caption](url)"  image on its own line; images next to each other form a gallery
  */
 
 const INLINE = /\[([^\]]+)\]\(([^)\s]+)\)|\*\*([^*]+)\*\*/g;
@@ -44,20 +45,28 @@ export function inline(text: string, keyBase = "i"): ReactNode[] {
 
 /** The plain words of a markup string (for meta tags and search) */
 export function plain(text: string) {
-  return text.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").replace(/\*\*/g, "");
+  return text.replace(/!\[[^\]]*\]\([^)]*\)/g, "").replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").replace(/\*\*/g, "");
 }
 
-type Block = { kind: "p"; text: string } | { kind: "lead"; text: string } | { kind: "ul"; items: string[] } | { kind: "ol"; items: string[]; start: number };
+type Img = { src: string; caption: string };
+type Block = { kind: "img"; images: Img[] } | { kind: "p"; text: string } | { kind: "lead"; text: string } | { kind: "ul"; items: string[] } | { kind: "ol"; items: string[]; start: number };
 
 function toBlocks(lines: string[]): Block[] {
   const blocks: Block[] = [];
-  for (const raw of lines) {
+  // a list or image line typed right under another line still starts its own block
+  const flat = lines.flatMap((l) => l.split(/\n(?=\s*(?:[-•]\s|\d+[.)]\s|!\[))/));
+  for (const raw of flat) {
     const line = raw.trim();
     if (!line) continue;
+    const img = line.match(/^!\[([^\]]*)\]\(([^)\s]+)\)$/);
     const bullet = line.match(/^[-•]\s+(.*)$/);
     const num = line.match(/^(\d+)[.)]\s+(.*)$/);
     const prev = blocks[blocks.length - 1];
-    if (bullet) {
+    if (img) {
+      const one = { src: img[2], caption: img[1].trim() };
+      if (prev && prev.kind === "img") prev.images.push(one);
+      else blocks.push({ kind: "img", images: [one] });
+    } else if (bullet) {
       if (prev && prev.kind === "ul") prev.items.push(bullet[1]);
       else blocks.push({ kind: "ul", items: [bullet[1]] });
     } else if (num) {
@@ -77,6 +86,17 @@ export default function BlogRichText({ lines, firstClass }: { lines: string[]; f
   return (
     <>
       {blocks.map((b, i) => {
+        if (b.kind === "img")
+          return (
+            <div key={i} className={`bld-gallery bld-gallery-${Math.min(b.images.length, 3)}`}>
+              {b.images.map((im, j) => (
+                <figure key={j} className="bld-figure">
+                  <img src={im.src} alt={im.caption} loading="lazy" />
+                  {im.caption && <figcaption>{im.caption}</figcaption>}
+                </figure>
+              ))}
+            </div>
+          );
         if (b.kind === "ul")
           return (
             <ul key={i} className="bld-ul">

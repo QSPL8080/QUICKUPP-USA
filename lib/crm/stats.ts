@@ -157,6 +157,22 @@ export async function paymentStats() {
     due: n(r.due),
   }));
 
+  const recent = (
+    await q(
+      `SELECT p.kind, p.id, p.client_name, p.service, p.status, p.amount, p.total_amount, p.remaining_amount, p.paid_at, p.created_at
+         ${inCur} ORDER BY COALESCE(p.paid_at, p.created_at) DESC, p.created_at DESC LIMIT 5`,
+      [currency]
+    )
+  ).map((r) => ({
+    key: `${r.kind}-${r.id}`,
+    kind: r.kind === "link" ? ("link" as const) : ("website" as const),
+    client: String(r.client_name || "—"),
+    service: r.service ? String(r.service) : null,
+    status: String(r.status || "pending"),
+    amount: n(r.status === "pending" ? r.total_amount || r.amount : r.amount),
+    at: new Date((r.paid_at || r.created_at) as string).toISOString(),
+  }));
+
   const received = n(totals?.received);
   const invoiced = n(totals?.invoiced);
   return {
@@ -185,6 +201,7 @@ export async function paymentStats() {
       cancelled: n(links?.cancelled),
     },
     dueSoon,
+    recent,
   };
 }
 

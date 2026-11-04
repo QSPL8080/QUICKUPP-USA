@@ -1,0 +1,656 @@
+/* ==========================================================================
+   CRM additions: Payments Dashboard page, the Payments group in the sidebar,
+   the payments list panel, and the blog editor's image upload and preview.
+   Loaded after crm.css by the components that use it.
+   ========================================================================== */
+
+/* ---- Payments dashboard (Payments → Payments Dashboard) --------------------- */
+.crm-root .crm-pdash {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+
+.crm-pdash-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.crm-pdash-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.crm-pdash-list li + li {
+  border-top: 1px solid #f1f3f8;
+}
+
+.crm-pdash-list-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.crm-pdash-list-amt {
+  flex: none;
+  font-weight: 700;
+  color: var(--crm-ink);
+}
+
+@media (max-width: 1200px) {
+  .crm-root .crm-pdash-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .crm-root .crm-pdash-cell + .crm-pdash-cell {
+    border-left: 1px solid var(--crm-line);
+    border-top: 0;
+  }
+
+  .crm-root .crm-pdash-cell:nth-child(odd) {
+    border-left: 0;
+  }
+
+  .crm-root .crm-pdash-cell:nth-child(n + 3) {
+    border-top: 1px solid var(--crm-line);
+  }
+}
+
+@media (max-width: 560px) {
+  .crm-root .crm-pdash-cell {
+    padding: 14px;
+  }
+
+  .crm-root .crm-pdash-value {
+    font-size: 19px !important;
+  }
+}
+
+.crm-pdash-row-even {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.crm-pdash-list-side {
+  display: inline-flex;
+  flex: none;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+@media (max-width: 1000px) {
+  .crm-pdash-row-even {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ==========================================================================
+   SIDEBAR — Payments group that opens and closes
+   ========================================================================== */
+.crm-root button.crm-nav-toggle {
+  width: 100%;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.crm-root button.crm-nav-toggle:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.crm-nav-toggle.is-group-on {
+  color: #fff !important;
+}
+
+.crm-nav-chevron {
+  display: inline-flex;
+  margin-left: auto;
+  opacity: 0.7;
+  transition: transform 0.25s ease;
+}
+
+.crm-nav-chevron svg {
+  width: 15px;
+  height: 15px;
+}
+
+.crm-nav-toggle.is-open .crm-nav-chevron {
+  transform: rotate(180deg);
+}
+
+.crm-nav-collapse[hidden] {
+  display: none !important;
+}
+
+.crm-nav-collapse.is-open {
+  animation: crm-nav-open 0.22s ease;
+}
+
+@keyframes crm-nav-open {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ==========================================================================
+   PAYMENTS LIST — tabs, filters and table in one panel
+   ========================================================================== */
+.crm-pay-shell {
+  background: #fff;
+  border: 1px solid var(--crm-line);
+  border-radius: 14px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+  overflow: hidden;
+}
+
+.crm-pay-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--crm-line);
+  background: linear-gradient(180deg, #fbfcfe, #f7f8fc);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.crm-pay-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.crm-root button.crm-pay-tab {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 15px 14px 14px;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--crm-muted);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.crm-root button.crm-pay-tab::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: linear-gradient(90deg, #00d2ff, #6366f1, #a855f7);
+  transform: scaleX(0);
+  transition: transform 0.25s ease;
+}
+
+.crm-root button.crm-pay-tab:hover {
+  color: var(--crm-ink);
+}
+
+.crm-root button.crm-pay-tab.is-active {
+  color: var(--crm-ink);
+}
+
+.crm-root button.crm-pay-tab.is-active::after {
+  transform: scaleX(1);
+}
+
+.crm-pay-tab .crm-tab-badge {
+  background: #eef0f6;
+  color: var(--crm-muted);
+}
+
+.crm-pay-tab.is-active .crm-tab-badge {
+  background: #eef2ff;
+  color: var(--crm-accent);
+}
+
+.crm-pay-shell .crm-filters {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--crm-line);
+}
+
+.crm-pay-table .crm-bulk {
+  border-bottom: 1px solid var(--crm-line);
+}
+
+.crm-pay-table .crm-table th {
+  background: #fafbfd;
+}
+
+.crm-pay-table .crm-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.crm-pay-table .crm-table tbody tr:hover {
+  background: #fafbff;
+}
+
+/* wide screens: tighter cells, and the actions column stays in view */
+@media (min-width: 701px) {
+  .crm-pay-table .crm-table th,
+  .crm-pay-table .crm-table td {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .crm-pay-table .crm-table td.crm-nowrap {
+    min-width: 112px;
+    white-space: normal;
+  }
+
+  .crm-pay-table .crm-table th:last-child,
+  .crm-pay-table .crm-table td:last-child {
+    position: sticky;
+    right: 0;
+    z-index: 1;
+    background: #fff;
+    box-shadow: -10px 0 14px -12px rgba(15, 23, 42, 0.25);
+  }
+
+  .crm-pay-table .crm-table th:last-child {
+    background: #fafbfd;
+  }
+
+  .crm-pay-table .crm-table tbody tr:hover td:last-child {
+    background: #fafbff;
+  }
+}
+
+/* phones: each payment becomes a compact two-column card */
+@media (max-width: 700px) {
+  .crm-pay-tabs {
+    padding: 0 6px;
+  }
+
+  .crm-root button.crm-pay-tab {
+    padding: 13px 10px 12px;
+    font-size: 13px;
+  }
+
+  .crm-pay-shell .crm-filters {
+    padding: 12px;
+  }
+
+  .crm-pay-table .crm-stack tbody tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 16px;
+    padding: 16px;
+  }
+
+  .crm-pay-table .crm-stack td,
+  .crm-pay-table .crm-stack tbody tr:last-child td {
+    min-width: 0;
+    padding: 0 !important;
+    text-align: left !important;
+  }
+
+  .crm-pay-table .crm-stack td::before {
+    float: none;
+    display: block;
+    margin: 0 0 4px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  .crm-pay-table .crm-stack td.crm-cell-main {
+    grid-column: 1 / -1;
+    order: -1;
+    padding: 0 36px 2px 0 !important;
+  }
+
+  .crm-pay-table .crm-stack td.crm-cell-main::before,
+  .crm-pay-table .crm-stack td[data-label="Sr No"] {
+    display: none;
+  }
+
+  .crm-pay-table .crm-stack td[data-label="Amount"],
+  .crm-pay-table .crm-stack td[data-label="Payment"] {
+    order: 1;
+  }
+
+  .crm-pay-table .crm-stack td[data-label="Actions"] {
+    order: 2;
+  }
+
+  .crm-pay-table .crm-stack td[data-label="Amount"],
+  .crm-pay-table .crm-stack td[data-label="Payment"],
+  .crm-pay-table .crm-stack td[data-label="Service / Total"] {
+    grid-column: 1 / -1;
+  }
+
+  .crm-pay-table .crm-stack td[data-label="Actions"] {
+    grid-column: 1 / -1;
+    padding-top: 10px !important;
+    border-top: 1px dashed var(--crm-line) !important;
+    text-align: right !important;
+  }
+
+  .crm-pay-table .crm-stack td[data-label="Actions"]::before {
+    display: none;
+  }
+
+  .crm-pay-table .crm-stack td[data-label="Actions"] > * {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-end !important;
+    gap: 6px !important;
+  }
+
+  .crm-pay-table .crm-stack td.crm-nowrap {
+    white-space: normal;
+  }
+}
+
+/* ==========================================================================
+   BLOG EDITOR — text boxes with image upload and preview
+   ========================================================================== */
+.crm-btf {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.crm-btf textarea.crm-input {
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.6 !important;
+}
+
+.crm-btf-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+}
+
+.crm-root .crm-btf-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  padding: 7px 12px;
+  border: 1px solid var(--crm-line);
+  border-radius: 8px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--crm-ink);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.crm-root .crm-btf-add:hover {
+  border-color: #c7d2fe;
+  background: #f8f9ff;
+}
+
+.crm-root .crm-btf-add:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.crm-root .crm-btf-preview-btn.is-on {
+  border-color: #c7d2fe;
+  background: #eef2ff;
+  color: var(--crm-accent);
+}
+
+.crm-btf-hint {
+  font-size: 12px;
+  color: var(--crm-muted);
+}
+
+.crm-btf-thumbs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.crm-btf-thumbs li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px;
+  border: 1px solid var(--crm-line);
+  border-radius: 10px;
+  background: #fafbfd;
+}
+
+.crm-btf-thumbs img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 7px;
+  background: #eef0f6;
+}
+
+.crm-btf-thumbs .crm-input {
+  height: 32px !important;
+  padding: 4px 8px !important;
+  font-size: 12px !important;
+}
+
+.crm-root .crm-btf-remove {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.75);
+  color: #fff;
+  cursor: pointer;
+}
+
+.crm-root .crm-btf-remove:hover {
+  background: #dc2626;
+}
+
+.crm-btf-cover {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.crm-btf-cover > img {
+  flex: none;
+  width: 120px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--crm-line);
+}
+
+.crm-btf-cover-side {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+
+.crm-btf-cover-side .crm-input {
+  width: 100%;
+}
+
+.crm-root .crm-btf-help {
+  padding: 10px 12px;
+  border: 1px dashed #c7d2fe;
+  border-radius: 10px;
+  background: #f8f9ff;
+  font-size: 12.5px !important;
+  line-height: 1.6 !important;
+  color: var(--crm-text);
+}
+
+.crm-btf-help code {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: #eef2ff;
+  font-size: 12px;
+  color: var(--crm-accent);
+}
+
+/* preview: how the text will look on the blog page */
+.crm-btf-preview {
+  max-height: 420px;
+  overflow-y: auto;
+  padding: 16px 18px;
+  border: 1px solid var(--crm-line);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.crm-btf-preview .bld-p,
+.crm-btf-preview .bld-lead {
+  margin: 0 0 12px !important;
+  font-size: 14.5px !important;
+  line-height: 1.7 !important;
+  color: var(--crm-text);
+}
+
+.crm-btf-preview .bld-lead {
+  font-weight: 700;
+  color: var(--crm-ink);
+}
+
+.crm-root .crm-btf-preview .bld-h3 {
+  margin: 14px 0 8px !important;
+  font-size: 15.5px !important;
+  font-weight: 700 !important;
+  color: var(--crm-ink);
+}
+
+.crm-btf-preview .bld-ul,
+.crm-btf-preview .bld-ol {
+  margin: 0 0 12px;
+  padding-left: 22px;
+}
+
+.crm-btf-preview .bld-ul li,
+.crm-btf-preview .bld-ol li {
+  margin-bottom: 4px;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--crm-text);
+}
+
+.crm-btf-preview .bld-ul {
+  list-style: disc;
+}
+
+.crm-btf-preview .bld-ol {
+  list-style: decimal;
+}
+
+.crm-btf-preview a {
+  color: var(--crm-accent) !important;
+  font-weight: 600;
+  text-decoration: underline !important;
+}
+
+.crm-btf-preview .bld-gallery {
+  display: grid;
+  gap: 8px;
+  margin: 4px 0 12px;
+}
+
+.crm-btf-preview .bld-gallery-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.crm-btf-preview .bld-gallery-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.crm-btf-preview .bld-figure {
+  margin: 0;
+}
+
+.crm-btf-preview .bld-figure img {
+  display: block;
+  width: 100%;
+  border-radius: 8px;
+}
+
+.crm-btf-preview figcaption {
+  margin-top: 4px;
+  font-size: 12px;
+  font-style: italic;
+  text-align: center;
+  color: var(--crm-muted);
+}
+
+@media (max-width: 560px) {
+  .crm-btf-cover {
+    flex-direction: column;
+  }
+
+  .crm-btf-hint {
+    width: 100%;
+  }
+}
+
+@media (max-width: 560px) {
+  .crm-pay-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding: 0;
+  }
+
+  .crm-root button.crm-pay-tab {
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px 6px;
+    padding: 12px 6px 11px;
+    font-size: 12.5px;
+    line-height: 1.3;
+    text-align: center;
+    white-space: normal;
+  }
+
+  .crm-root button.crm-pay-tab svg {
+    display: none;
+  }
+
+  .crm-root button.crm-pay-tab::after {
+    left: 6px;
+    right: 6px;
+  }
+}

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import "@/app/crm/crm-more.css";
 
 type NavUser = { name: string; email: string; role: "super_admin" | "admin" };
 
@@ -15,6 +16,7 @@ const I = {
   users: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75",
   logout: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9",
   menu: "M4 6h16M4 12h16M4 18h16",
+  chevron: "M6 9l6 6 6-6",
   site: "M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3",
 };
 
@@ -31,6 +33,12 @@ export default function CrmSidebar({ user, newCounts }: { user: NavUser; newCoun
   const [open, setOpen] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const on = (href: string) => (href === "/crm" ? pathname === "/crm" : pathname.startsWith(href));
+  const payOn = pathname.startsWith("/crm/payments");
+  const payDash = pathname.startsWith("/crm/payments/dashboard");
+  const [payOpen, setPayOpen] = useState(payOn);
+  useEffect(() => {
+    if (payOn) setPayOpen(true);
+  }, [payOn]);
 
   const logout = async () => {
     setLeaving(true);
@@ -71,10 +79,32 @@ export default function CrmSidebar({ user, newCounts }: { user: NavUser; newCoun
             {badge("leads")}
           </Link>
 
-          <Link href="/crm/payments" className={`crm-nav-link${on("/crm/payments") ? " is-on" : ""}`}>
+          <button
+            type="button"
+            className={`crm-nav-link crm-nav-toggle${payOn ? " is-group-on" : ""}${payOpen ? " is-open" : ""}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              setPayOpen((o) => !o);
+            }}
+            aria-expanded={payOpen}
+            aria-controls="crm-nav-payments"
+          >
             <Icon d={I.payments} />
             <span>Payments</span>
-          </Link>
+            <span className="crm-nav-chevron" aria-hidden="true">
+              <Icon d={I.chevron} />
+            </span>
+          </button>
+          <div id="crm-nav-payments" className={`crm-nav-sub crm-nav-collapse${payOpen ? " is-open" : ""}`} hidden={!payOpen}>
+            <Link href="/crm/payments/dashboard" className={`crm-nav-link crm-nav-sublink${payDash ? " is-on" : ""}`}>
+              <span className="crm-nav-dot" aria-hidden="true" />
+              <span>Payments Dashboard</span>
+            </Link>
+            <Link href="/crm/payments" className={`crm-nav-link crm-nav-sublink${payOn && !payDash ? " is-on" : ""}`}>
+              <span className="crm-nav-dot" aria-hidden="true" />
+              <span>All Payments</span>
+            </Link>
+          </div>
 
           <Link href="/crm/blogs" className={`crm-nav-link${on("/crm/blogs") ? " is-on" : ""}`}>
             <Icon d={I.blogs} />

@@ -6,14 +6,21 @@ export function Filters({
   status,
   statuses,
   placeholder,
+  extra,
 }: {
   q: string;
   status: string;
   statuses: { value: string; label: string }[];
   placeholder: string;
+  /** other filters to keep when searching (e.g. the current tab) */
+  extra?: Record<string, string>;
 }) {
+  const keep = Object.entries(extra || {}).filter(([, v]) => v);
   return (
     <form className="crm-filters" method="get">
+      {keep.map(([k, v]) => (
+        <input key={k} type="hidden" name={k} value={v} />
+      ))}
       <label className="crm-search">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
           <circle cx="11" cy="11" r="7" />
@@ -33,7 +40,7 @@ export function Filters({
         Apply
       </button>
       {(q || status) && (
-        <Link href="?" className="crm-act crm-act-ghost">
+        <Link href={keep.length ? `?${new URLSearchParams(keep).toString()}` : "?"} className="crm-act crm-act-ghost">
           Clear
         </Link>
       )}

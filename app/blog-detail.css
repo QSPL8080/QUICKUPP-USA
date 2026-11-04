@@ -505,3 +505,56 @@
     font-size: 12.5px;
   }
 }
+
+/* images placed in the article from the CRM */
+.bld-gallery {
+  display: grid;
+  gap: 14px;
+  margin: 8px 0 26px;
+}
+
+.bld-gallery-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.bld-gallery-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.bld-figure {
+  margin: 0;
+}
+
+.bld-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  background: var(--bld-mist);
+  box-shadow: 0 18px 40px -26px rgba(15, 23, 42, 0.4);
+}
+
+.bld-gallery-2 .bld-figure img,
+.bld-gallery-3 .bld-figure img {
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.bld-figure figcaption {
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  font-style: italic;
+  text-align: center;
+  color: var(--bld-muted);
+}
+
+@media (max-width: 560px) {
+  .bld-gallery-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bld-gallery-3 .bld-figure:first-child {
+    grid-column: 1 / -1;
+  }
+}
