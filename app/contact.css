@@ -460,6 +460,12 @@
   gap: 10px;
 }
 
+@media (min-width: 641px) {
+  .ct-dock-list li:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
 .ct-dock-item {
   position: relative;
   display: flex;

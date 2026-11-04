@@ -473,7 +473,12 @@ export default function ContactView() {
               </div>
               <ul className="ct-dock-list">
                 <li>
-                  <a href="mailto:info@quickuppsoftech.us" className="ct-dock-item">
+                  <a
+                    href="mailto:info@quickuppsoftech.us"
+                    className="ct-dock-item"
+                    title="Send an email to info@quickuppsoftech.us"
+                    aria-label="Email Inquiries: info@quickuppsoftech.us"
+                  >
                     <span className="ct-dock-icon" aria-hidden="true">
                       <LucideIcon name="mail" size={19} />
                     </span>
@@ -485,7 +490,12 @@ export default function ContactView() {
                   </a>
                 </li>
                 <li>
-                  <a href="mailto:support@quickuppsoftech.us" className="ct-dock-item">
+                  <a
+                    href="mailto:support@quickuppsoftech.us"
+                    className="ct-dock-item"
+                    title="Send an email to support@quickuppsoftech.us"
+                    aria-label="Email Help & Support: support@quickuppsoftech.us"
+                  >
                     <span className="ct-dock-icon" aria-hidden="true">
                       <LucideIcon name="headset" size={19} />
                     </span>
@@ -497,7 +507,12 @@ export default function ContactView() {
                   </a>
                 </li>
                 <li>
-                  <a href="tel:+13027545679" className="ct-dock-item">
+                  <a
+                    href="tel:+13027545679"
+                    className="ct-dock-item"
+                    title="Call Quickupp Softech at +1 (302) 754-5679"
+                    aria-label="Call +1 (302) 754-5679"
+                  >
                     <span className="ct-dock-icon" aria-hidden="true">
                       <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z" />
@@ -511,22 +526,40 @@ export default function ContactView() {
                   </a>
                 </li>
                 <li>
-                  <div className="ct-dock-item">
+                  <a
+                    href="https://quickuppsoftech.us/"
+                    className="ct-dock-item"
+                    title="Visit Quickupp Softech LLC Official Website"
+                    aria-label="Quickupp Softech LLC Official Website"
+                  >
                     <span className="ct-dock-icon" aria-hidden="true">
                       <LucideIcon name="building" size={19} />
                     </span>
                     <span className="ct-dock-label">Business</span>
                     <span className="ct-dock-value">Quickupp Softech LLC</span>
-                  </div>
+                    <span className="ct-dock-go" aria-hidden="true">
+                      <LucideIcon name="arrow-up-right" size={15} strokeWidth={2.2} />
+                    </span>
+                  </a>
                 </li>
                 <li>
-                  <div className="ct-dock-item">
+                  <a
+                    href="https://www.google.com/maps/search/?api=1&query=8+The+Green%2C+Suite+A%2C+Dover%2C+Delaware+19901%2C+USA"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ct-dock-item"
+                    title="Open 8 The Green, Suite A, Dover, Delaware 19901, USA in Google Maps"
+                    aria-label="View office location on Google Maps (opens in a new tab or map app)"
+                  >
                     <span className="ct-dock-icon" aria-hidden="true">
                       <LucideIcon name="map-pin" size={19} />
                     </span>
                     <span className="ct-dock-label">Office Address</span>
                     <span className="ct-dock-value">8 The Green, Suite A, Dover, Delaware 19901, USA</span>
-                  </div>
+                    <span className="ct-dock-go" aria-hidden="true">
+                      <LucideIcon name="arrow-up-right" size={15} strokeWidth={2.2} />
+                    </span>
+                  </a>
                 </li>
               </ul>
             </aside>
