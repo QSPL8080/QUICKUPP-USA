@@ -326,6 +326,8 @@ export async function listPayments(opts: {
   status?: string;
   tab?: "website" | "payment_link" | "all";
   page?: number;
+  from?: string;
+  to?: string;
 }) {
   const pool = getPool();
   const currentTab = opts.tab || "all";
@@ -381,6 +383,14 @@ export async function listPayments(opts: {
   if (opts.status && (PAYMENT_STATUSES as readonly string[]).includes(opts.status as any)) {
     where.push("p.status = ?");
     args.push(opts.status);
+  }
+  if (opts.from && /^\d{4}-\d{2}-\d{2}$/.test(opts.from)) {
+    where.push("COALESCE(p.paid_at, p.created_at) >= ?");
+    args.push(`${opts.from} 00:00:00`);
+  }
+  if (opts.to && /^\d{4}-\d{2}-\d{2}$/.test(opts.to)) {
+    where.push("COALESCE(p.paid_at, p.created_at) < ? + INTERVAL 1 DAY");
+    args.push(`${opts.to} 00:00:00`);
   }
   const q = (opts.q || "").trim().slice(0, 100);
   if (q) {

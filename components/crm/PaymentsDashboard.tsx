@@ -28,32 +28,69 @@ function dueLabel(iso: string | null) {
   return { text: `Due ${day(iso)}`, late: false };
 }
 
-export default function PaymentsDashboard({ s }: { s: PaymentStats }) {
+export default function PaymentsDashboard({
+  s,
+  monthLabel,
+  isCurrentMonth,
+  prevMonthHref,
+  curMonthHref,
+  nextMonthHref,
+}: {
+  s: PaymentStats;
+  monthLabel?: string;
+  isCurrentMonth?: boolean;
+  prevMonthHref?: string;
+  curMonthHref?: string;
+  nextMonthHref?: string;
+}) {
   const cur = s.currency;
   const m = (v: number) => money(v, cur);
   const delta = s.lastMonth > 0 ? Math.round(((s.month - s.lastMonth) / s.lastMonth) * 100) : null;
   const others = s.byCurrency.slice(1);
+  const activeMonthName = monthLabel || s.selectedMonthLabel || "This Month";
 
   return (
     <div className="crm-pdash">
+      {prevMonthHref && (
+        <div className="crm-period" style={{ marginBottom: "1.25rem" }}>
+          <span className="crm-period-label">Period</span>
+          <Link href={prevMonthHref} className="crm-icon-act crm-period-step" aria-label="Previous month">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </Link>
+          <Link href={curMonthHref || "#"} className={`crm-period-month${isCurrentMonth ? " is-on" : ""}`}>
+            {activeMonthName}
+          </Link>
+          <Link href={nextMonthHref || "#"} className="crm-icon-act crm-period-step" aria-label="Next month">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+          </Link>
+          <span className="crm-muted crm-period-count">
+            {s.monthPaymentsCount ?? 0} {(s.monthPaymentsCount ?? 0) === 1 ? "payment" : "payments"} in {activeMonthName} ({m(s.month)} collected)
+          </span>
+        </div>
+      )}
+
       {/* four plain numbers */}
       <section className="crm-pdash-strip">
         <div className="crm-pdash-cell">
           <p className="crm-pdash-label">Total collected</p>
           <p className="crm-pdash-value">{m(s.received)}</p>
           <p className="crm-pdash-note">
-            {s.paidCount} {s.paidCount === 1 ? "payment" : "payments"} received
+            {s.paidCount} {s.paidCount === 1 ? "payment" : "payments"} received overall
           </p>
         </div>
         <div className="crm-pdash-cell">
-          <p className="crm-pdash-label">This month</p>
+          <p className="crm-pdash-label">{isCurrentMonth ? "This month" : activeMonthName}</p>
           <p className="crm-pdash-value">{m(s.month)}</p>
           <p className="crm-pdash-note">
             {delta === null ? (
-              <>Last month {m(s.lastMonth)}</>
+              <>Previous month {m(s.lastMonth)}</>
             ) : (
               <span className={`crm-pdash-delta ${delta >= 0 ? "is-up" : "is-down"}`}>
-                {delta >= 0 ? "▲" : "▼"} {Math.abs(delta)}% vs last month
+                {delta >= 0 ? "▲" : "▼"} {Math.abs(delta)}% vs previous month
               </span>
             )}
           </p>
@@ -79,15 +116,15 @@ export default function PaymentsDashboard({ s }: { s: PaymentStats }) {
       <section className="crm-pdash-row">
         <div className="crm-card">
           <div className="crm-card-head">
-            <h2 className="crm-card-title">Money collected · last 6 months</h2>
+            <h2 className="crm-card-title">Money collected · 6-month trend</h2>
             <span className="crm-muted">{m(s.trend.reduce((a, t) => a + t.value, 0))}</span>
           </div>
-          <ColumnChart data={s.trend} format={(v) => shortMoney(v, cur)} empty="No payments collected in the last 6 months." />
+          <ColumnChart data={s.trend} format={(v) => shortMoney(v, cur)} empty="No payments collected in this period." />
         </div>
         <div className="crm-card">
           <div className="crm-card-head">
-            <h2 className="crm-card-title">Payments by status</h2>
-            <span className="crm-muted">{s.count} total</span>
+            <h2 className="crm-card-title">Payments by status · {activeMonthName}</h2>
+            <span className="crm-muted">{s.monthPaymentsCount ?? s.count} in period</span>
           </div>
           <StackBar
             parts={s.byStatus.map((b) => ({
@@ -95,7 +132,7 @@ export default function PaymentsDashboard({ s }: { s: PaymentStats }) {
               label: STATUS_PARTS[b.status].label,
               color: STATUS_PARTS[b.status].color,
               count: b.count,
-              href: `/crm/payments?status=${b.status}`,
+              href: `/crm/payments?status=${b.status}&from=${s.selectedMonthKey}-01`,
             }))}
           />
         </div>
@@ -129,8 +166,8 @@ export default function PaymentsDashboard({ s }: { s: PaymentStats }) {
 
         <div className="crm-card">
           <div className="crm-card-head">
-            <h2 className="crm-card-title">Latest payments</h2>
-            <Link href="/crm/payments" className="crm-dash-more">
+            <h2 className="crm-card-title">Payments in {activeMonthName}</h2>
+            <Link href={`/crm/payments?from=${s.selectedMonthKey}-01`} className="crm-dash-more">
               View all
             </Link>
           </div>
@@ -153,7 +190,7 @@ export default function PaymentsDashboard({ s }: { s: PaymentStats }) {
               ))}
             </ul>
           ) : (
-            <p className="crm-muted">No payments yet.</p>
+            <p className="crm-muted">No payments in {activeMonthName}.</p>
           )}
         </div>
       </section>

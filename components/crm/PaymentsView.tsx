@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useFeedback } from "@/components/crm/Feedback";
 import type { PaymentRow } from "@/lib/crm/data";
@@ -155,6 +156,14 @@ export default function PaymentsView({
   q = "",
   status = "",
   currentTab = "all",
+  from = "",
+  to = "",
+  monthLabel,
+  isWholeMonth,
+  prevMonthHref,
+  curMonthHref,
+  nextMonthHref,
+  filtered = false,
   counts,
   total = 0,
   page = 1,
@@ -168,6 +177,14 @@ export default function PaymentsView({
   q?: string;
   status?: string;
   currentTab?: "website" | "payment_link" | "all";
+  from?: string;
+  to?: string;
+  monthLabel?: string;
+  isWholeMonth?: boolean;
+  prevMonthHref?: string;
+  curMonthHref?: string;
+  nextMonthHref?: string;
+  filtered?: boolean;
   counts?: { website: number; paymentLink: number; all: number };
   total?: number;
   page?: number;
@@ -692,13 +709,60 @@ Quickupp Softech LLC`;
         </button>
       </div>
 
-      <Filters
-        q={q}
-        status={status}
-        placeholder="Search client, email, phone, company, invoice or transaction"
-        statuses={options.statuses.map((s) => ({ value: s, label: PAYMENT_STATUS_LABEL[s] || s }))}
-        extra={{ tab: currentTab && currentTab !== "all" ? currentTab : "" }}
-      />
+      <form className="crm-filters crm-filters-wrap" method="get">
+        {currentTab && currentTab !== "all" && <input type="hidden" name="tab" value={currentTab} />}
+        <label className="crm-search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <path d="M21 21l-4.3-4.3" />
+          </svg>
+          <input className="crm-input" type="search" name="q" defaultValue={q} placeholder="Search client, email, phone, company, invoice or transaction" aria-label="Search" />
+        </label>
+        <select className="crm-input crm-select" name="status" defaultValue={status} aria-label="Status">
+          <option value="">All statuses</option>
+          {options.statuses.map((s) => (
+            <option key={s} value={s}>
+              {PAYMENT_STATUS_LABEL[s] || s}
+            </option>
+          ))}
+        </select>
+        <span className="crm-date-range">
+          <input className="crm-input" type="date" name="from" defaultValue={from} aria-label="From date" />
+          <span className="crm-muted">to</span>
+          <input className="crm-input" type="date" name="to" defaultValue={to} aria-label="To date" />
+        </span>
+        <button type="submit" className="crm-act crm-act-dark">
+          Apply
+        </button>
+        {filtered && (
+          <Link href={currentTab && currentTab !== "all" ? `?tab=${currentTab}` : "?"} className="crm-act crm-act-ghost">
+            Clear
+          </Link>
+        )}
+      </form>
+
+      {monthLabel && (
+        <div className="crm-period">
+          <span className="crm-period-label">Period</span>
+          <Link href={prevMonthHref || "#"} className="crm-icon-act crm-period-step" aria-label="Previous month">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </Link>
+          <Link href={curMonthHref || "#"} className={`crm-period-month${isWholeMonth ? " is-on" : ""}`}>
+            {monthLabel}
+          </Link>
+          <Link href={nextMonthHref || "#"} className="crm-icon-act crm-period-step" aria-label="Next month">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+          </Link>
+          <span className="crm-muted crm-period-count">
+            {total} {total === 1 ? "payment" : "payments"}
+            {filtered ? " match the filters" : " in total"}
+          </span>
+        </div>
+      )}
 
       <div className="crm-pay-table">
         {rows.length > 0 && (
@@ -1343,7 +1407,7 @@ Quickupp Softech LLC`;
             )}
           </div>
         )}
-        <Pager page={page} pages={pages} total={total} pageSize={pageSize} q={q} status={status} extra={{ tab: currentTab && currentTab !== "all" ? currentTab : "" }} />
+        <Pager page={page} pages={pages} total={total} pageSize={pageSize} q={q} status={status} extra={{ tab: currentTab && currentTab !== "all" ? currentTab : "", from: from || "", to: to || "" }} />
       </div>
       </section>
 

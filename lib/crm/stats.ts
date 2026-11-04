@@ -23,12 +23,11 @@ async function q(sql: string, args: unknown[] = []): Promise<Row[]> {
 
 const n = (v: unknown) => Number(v || 0);
 
-/** The last `count` months, oldest first: { key: "2026-06", label: "Jun" } */
-export function lastMonths(count = 6) {
+/** The last `count` months up to `baseDate`, oldest first: { key: "2026-06", label: "Jun" } */
+export function lastMonths(count = 6, baseDate: Date = new Date()) {
   const out: { key: string; label: string }[] = [];
-  const now = new Date();
   for (let i = count - 1; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const d = new Date(baseDate.getFullYear(), baseDate.getMonth() - i, 1);
     out.push({
       key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`,
       label: d.toLocaleDateString("en-US", { month: "short" }),
@@ -65,11 +64,37 @@ const DUE = `CASE WHEN p.status IN ('pending','partially_paid')
 
 export type PaymentStats = Awaited<ReturnType<typeof paymentStats>>;
 
-export async function paymentStats() {
+export async function paymentStats(opts?: { targetMonth?: string | Date }) {
   // fall back to website payments alone if payment_links is missing
   let set = PAY_SET;
   const probe = await q(`SELECT COUNT(*) AS c FROM (${set}) p`);
   if (!probe.length) set = PAY_WEBSITE_ONLY;
+
+  const now = new Date();
+  let baseDate = new Date();
+  if (opts?.targetMonth) {
+    if (opts.targetMonth instanceof Date) {
+      baseDate = opts.targetMonth;
+    } else if (typeof opts.targetMonth === "string" && /^\d{4}-\d{2}/.test(opts.targetMonth)) {
+      const parts = opts.targetMonth.split("-").map(Number);
+      baseDate = new Date(parts[0], parts[1] - 1, 1);
+    }
+  }
+
+  const curMonthStart = new Date(baseDate.getFullYear(), baseDate.getMonth(), 1);
+  const curMonthEnd = new Date(baseDate.getFullYear(), baseDate.getMonth() + 1, 1);
+  const prevMonthStart = new Date(baseDate.getFullYear(), baseDate.getMonth() - 1, 1);
+  const prevMonthEnd = curMonthStart;
+
+  const ymd = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const curMonthStartStr = `${ymd(curMonthStart)} 00:00:00`;
+  const curMonthEndStr = `${ymd(curMonthEnd)} 00:00:00`;
+  const prevMonthStartStr = `${ymd(prevMonthStart)} 00:00:00`;
+  const prevMonthEndStr = `${ymd(prevMonthEnd)} 00:00:00`;
+
+  const selectedMonthLabel = curMonthStart.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  const selectedMonthKey = `${curMonthStart.getFullYear()}-${String(curMonthStart.getMonth() + 1).padStart(2, "0")}`;
+  const isCurrentMonth = curMonthStart.getFullYear() === now.getFullYear() && curMonthStart.getMonth() === now.getMonth();
 
   // the main currency is the one most records use; totals are shown in it
   const byCurrency = (
@@ -84,30 +109,44 @@ export async function paymentStats() {
   const [totals] = await q(
     `SELECT COUNT(*) AS c,
             SUM(${RECEIVED}) AS received,
-            SUM(CASE WHEN p.status IN ('paid','partially_paid') AND COALESCE(p.paid_at, p.created_at) >= DATE_FORMAT(NOW(), '%Y-%m-01') THEN p.amount ELSE 0 END) AS month,
-            SUM(CASE WHEN p.status IN ('paid','partially_paid') AND COALESCE(p.paid_at, p.created_at) >= DATE_FORMAT(NOW() - INTERVAL 1 MONTH, '%Y-%m-01')
-                      AND COALESCE(p.paid_at, p.created_at) < DATE_FORMAT(NOW(), '%Y-%m-01') THEN p.amount ELSE 0 END) AS last_month,
+            SUM(CASE WHEN p.status IN ('paid','partially_paid') AND COALESCE(p.paid_at, p.created_at) >= ? AND COALESCE(p.paid_at, p.created_at) < ? THEN p.amount ELSE 0 END) AS month,
+            SUM(CASE WHEN p.status IN ('paid','partially_paid') AND COALESCE(p.paid_at, p.created_at) >= ? AND COALESCE(p.paid_at, p.created_at) < ? THEN p.amount ELSE 0 END) AS last_month,
+            SUM(CASE WHEN COALESCE(p.paid_at, p.created_at) >= ? AND COALESCE(p.paid_at, p.created_at) < ? THEN 1 ELSE 0 END) AS month_payments_count,
+            SUM(CASE WHEN p.status IN ('paid','partially_paid') AND COALESCE(p.paid_at, p.created_at) >= ? AND COALESCE(p.paid_at, p.created_at) < ? THEN 1 ELSE 0 END) AS month_paid_count,
+            SUM(CASE WHEN p.status NOT IN ('failed','refunded') AND COALESCE(p.paid_at, p.created_at) >= ? AND COALESCE(p.paid_at, p.created_at) < ? THEN COALESCE(NULLIF(p.total_amount, 0), p.amount) ELSE 0 END) AS month_invoiced,
             SUM(${DUE}) AS due,
             SUM(CASE WHEN p.status IN ('pending','partially_paid') THEN 1 ELSE 0 END) AS open_count,
             SUM(CASE WHEN p.status NOT IN ('failed','refunded') THEN COALESCE(NULLIF(p.total_amount, 0), p.amount) ELSE 0 END) AS invoiced,
             SUM(CASE WHEN p.status = 'refunded' THEN p.amount ELSE 0 END) AS refunded,
             SUM(CASE WHEN p.status IN ('paid','partially_paid') THEN 1 ELSE 0 END) AS paid_count
        ${inCur}`,
-    [currency]
+    [
+      currency,
+      curMonthStartStr, curMonthEndStr,
+      prevMonthStartStr, prevMonthEndStr,
+      curMonthStartStr, curMonthEndStr,
+      curMonthStartStr, curMonthEndStr,
+      curMonthStartStr, curMonthEndStr,
+    ]
   );
 
-  const statusRows = await q(`SELECT p.status, COUNT(*) AS c, SUM(COALESCE(NULLIF(p.total_amount, 0), p.amount)) AS v ${inCur} GROUP BY p.status`, [currency]);
+  const statusRows = await q(
+    `SELECT p.status, COUNT(*) AS c, SUM(COALESCE(NULLIF(p.total_amount, 0), p.amount)) AS v 
+     ${inCur} AND COALESCE(p.paid_at, p.created_at) >= ? AND COALESCE(p.paid_at, p.created_at) < ?
+     GROUP BY p.status`,
+    [currency, curMonthStartStr, curMonthEndStr]
+  );
   const byStatus = ["paid", "partially_paid", "pending", "failed", "refunded"].map((s) => {
     const r = statusRows.find((x) => x.status === s);
     return { status: s, count: n(r?.c), value: n(r?.v) };
   });
 
-  const months = lastMonths(6);
+  const months = lastMonths(6, curMonthStart);
   const trendRows = await q(
     `SELECT DATE_FORMAT(COALESCE(p.paid_at, p.created_at), '%Y-%m') AS m, SUM(p.amount) AS v, COUNT(*) AS c
-       ${inCur} AND p.status IN ('paid','partially_paid') AND COALESCE(p.paid_at, p.created_at) >= ?
+       ${inCur} AND p.status IN ('paid','partially_paid') AND COALESCE(p.paid_at, p.created_at) >= ? AND COALESCE(p.paid_at, p.created_at) < ?
        GROUP BY m`,
-    [currency, `${months[0].key}-01`]
+    [currency, `${months[0].key}-01 00:00:00`, curMonthEndStr]
   );
   const trend = months.map((m) => {
     const r = trendRows.find((x) => x.m === m.key);
@@ -160,8 +199,9 @@ export async function paymentStats() {
   const recent = (
     await q(
       `SELECT p.kind, p.id, p.client_name, p.service, p.status, p.amount, p.total_amount, p.remaining_amount, p.paid_at, p.created_at
-         ${inCur} ORDER BY COALESCE(p.paid_at, p.created_at) DESC, p.created_at DESC LIMIT 5`,
-      [currency]
+         ${inCur} AND COALESCE(p.paid_at, p.created_at) >= ? AND COALESCE(p.paid_at, p.created_at) < ?
+         ORDER BY COALESCE(p.paid_at, p.created_at) DESC, p.created_at DESC LIMIT 10`,
+      [currency, curMonthStartStr, curMonthEndStr]
     )
   ).map((r) => ({
     key: `${r.kind}-${r.id}`,
@@ -179,6 +219,13 @@ export async function paymentStats() {
     currency,
     byCurrency,
     count: n(totals?.c),
+    monthCount: n(totals?.month_payments_count),
+    monthPaymentsCount: n(totals?.month_payments_count),
+    monthPaidCount: n(totals?.month_paid_count),
+    monthInvoiced: n(totals?.month_invoiced),
+    selectedMonthLabel,
+    selectedMonthKey,
+    isCurrentMonth,
     received,
     month: n(totals?.month),
     lastMonth: n(totals?.last_month),
