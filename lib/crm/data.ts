@@ -315,6 +315,7 @@ export type PaymentRow = {
   expiresAt?: string | null;
   linkStatus?: string | null;
   leadSource?: string | null;
+  leadId?: number | null;
   quantity?: string | null;
   balanceDueDate?: string | null;
   balanceReminderSentAt?: string | null;
@@ -359,7 +360,7 @@ export async function listPayments(opts: {
     description, amount, total_amount, payment_type, remaining_amount, currency, method, status,
     source, reference, paypal_order_id, billing_start_date, billing_end_date,
     balance_due_date, invoice_number, paid_at, notes, created_by, created_at, token, expires_at,
-    link_status, lead_source, quantity, balance_reminder_sent_at`;
+    link_status, lead_source, lead_id, quantity, balance_reminder_sent_at`;
 
   let baseQuery = "";
   if (currentTab === "website") {
@@ -445,6 +446,7 @@ export async function listPayments(opts: {
     expiresAt: r.expires_at ? new Date(r.expires_at as string).toISOString() : null,
     linkStatus: (r.link_status as string) || null,
     leadSource: (r.lead_source as string) || null,
+    leadId: r.lead_id ? Number(r.lead_id) : null,
     quantity: (r.quantity as string) || null,
     balanceDueDate: r.balance_due_date ? toDateOnly(r.balance_due_date) : null,
     balanceReminderSentAt: r.balance_reminder_sent_at ? new Date(r.balance_reminder_sent_at as string).toISOString() : null,

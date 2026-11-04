@@ -150,3 +150,104 @@ export default function BlogTextField({
     </div>
   );
 }
+
+/*
+ * All images of one blog in one place. Upload as many as needed; none of them
+ * becomes the cover unless "Set as cover" is chosen. Each image can be placed
+ * at the end of any part of the article (introduction, a section, conclusion)
+ * — or placed exactly at the cursor with the "Add images" button of a text box.
+ */
+export type ImageTarget = { key: string; label: string; text: string };
+
+export function BlogImageLibrary({
+  cover,
+  targets,
+  onCover,
+  onPlace,
+  onError,
+}: {
+  cover: string;
+  targets: ImageTarget[];
+  onCover: (url: string) => void;
+  onPlace: (targetKey: string, url: string) => void;
+  onError?: (msg: string) => void;
+}) {
+  const [uploaded, setUploaded] = useState<string[]>([]);
+  const [busy, setBusy] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  // images already in the article, then this session's uploads
+  const inText = targets.flatMap((t) => Array.from(t.text.matchAll(/!\[[^\]]*\]\(([^)\s]+)\)/g)).map((m) => m[1]));
+  const all = Array.from(new Set([...inText, ...uploaded, ...(cover.startsWith("/api/blog-images/") ? [cover] : [])]));
+
+  const usedIn = (url: string) => targets.filter((t) => t.text.includes(`](${url})`)).map((t) => t.label.split(":")[0]);
+
+  const onFiles = async (files: FileList | null) => {
+    if (!files || !files.length) return;
+    setBusy(true);
+    const r = await uploadBlogImages(files);
+    setBusy(false);
+    if (fileRef.current) fileRef.current.value = "";
+    if (!r.ok) {
+      onError?.(r.error);
+      return;
+    }
+    setUploaded((u) => [...u, ...r.urls]);
+  };
+
+  return (
+    <div className="crm-bil">
+      <div className="crm-bil-head">
+        <div>
+          <span className="crm-label">Blog Images</span>
+          <span className="crm-btf-hint">Upload all the pictures for this blog, then choose where each one goes. Only the one you set as cover is the cover.</span>
+        </div>
+        <button type="button" className="crm-btf-add" onClick={() => fileRef.current?.click()} disabled={busy}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />
+          </svg>
+          <span>{busy ? "Uploading…" : "Upload images"}</span>
+        </button>
+        <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" multiple hidden onChange={(e) => onFiles(e.target.files)} />
+      </div>
+
+      {all.length ? (
+        <ul className="crm-bil-grid">
+          {all.map((url) => {
+            const where = usedIn(url);
+            const isCover = cover === url;
+            return (
+              <li key={url} className={isCover ? "is-cover" : undefined}>
+                <span className="crm-bil-img">
+                  <img src={url} alt="" />
+                  {isCover && <span className="crm-bil-badge">Cover</span>}
+                </span>
+                <span className="crm-bil-where">{where.length ? `In: ${Array.from(new Set(where)).join(", ")}` : isCover ? "Used as cover" : "Not placed yet"}</span>
+                <select
+                  className="crm-input crm-select"
+                  value=""
+                  aria-label="Place this image in"
+                  onChange={(e) => {
+                    if (e.target.value) onPlace(e.target.value, url);
+                  }}
+                >
+                  <option value="">Place in…</option>
+                  {targets.map((t) => (
+                    <option key={t.key} value={t.key}>
+                      {t.label}
+                    </option>
+                  ))}
+                </select>
+                <button type="button" className="crm-btf-add crm-bil-cover-btn" onClick={() => onCover(isCover ? "" : url)}>
+                  {isCover ? "Remove as cover" : "Set as cover"}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <p className="crm-bil-empty">No images yet. Uploaded images appear here.</p>
+      )}
+    </div>
+  );
+}

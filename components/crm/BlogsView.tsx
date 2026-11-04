@@ -6,7 +6,7 @@ import Link from "next/link";
 import { PageHead } from "@/components/crm/ListTools";
 import { useFeedback } from "@/components/crm/Feedback";
 import type { CrmBlog } from "@/lib/blogs";
-import BlogTextField, { uploadBlogImages } from "@/components/crm/BlogTextField";
+import BlogTextField, { BlogImageLibrary, uploadBlogImages } from "@/components/crm/BlogTextField";
 
 const INDUSTRIES = [
   "Healthcare",
@@ -598,10 +598,37 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
                 </div>
               </div>
 
+              <div className="crm-span-2">
+                <BlogImageLibrary
+                  cover={form.img}
+                  onCover={(url) => setForm((f) => ({ ...f, img: url }))}
+                  onError={setError}
+                  targets={[
+                    { key: "intro", label: "Introduction", text: form.intro },
+                    ...form.sections.map((sec, i) => ({
+                      key: `s${i}`,
+                      label: `Section ${i + 1}: ${sec.heading.replace(/^\d+\.\s*/, "").slice(0, 48) || "Untitled"}`,
+                      text: sec.paragraphs,
+                    })),
+                    { key: "conclusion", label: "Conclusion", text: form.conclusion },
+                  ]}
+                  onPlace={(key, url) => {
+                    const add = (t: string) => `${t.replace(/\s+$/, "")}${t.trim() ? "\n\n" : ""}![](${url})`;
+                    setForm((f) => {
+                      if (key === "intro") return { ...f, intro: add(f.intro) };
+                      if (key === "conclusion") return { ...f, conclusion: add(f.conclusion) };
+                      const i = Number(key.slice(1));
+                      const sections = f.sections.map((sec, j) => (j === i ? { ...sec, paragraphs: add(sec.paragraphs) } : sec));
+                      return { ...f, sections };
+                    });
+                  }}
+                />
+              </div>
+
               {/* Content: Introduction */}
               <p className="crm-span-2 crm-btf-help">
                 Writing tips: leave an empty line between paragraphs · start a line with <code>- </code> for a bullet · <code>**text**</code> for bold ·{" "}
-                <code>[text](/page-link)</code> for a link · use <strong>Add images</strong> to place pictures between paragraphs.
+                <code>[text](/page-link)</code> for a link · <strong>Add images</strong> under a text box puts pictures exactly where your cursor is, and each image can be moved by cutting and pasting its <code>![](…)</code> line.
               </p>
 
               <div className="crm-field crm-span-2">

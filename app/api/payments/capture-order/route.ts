@@ -321,7 +321,10 @@ export async function POST(req: Request) {
         orderNumber = `QS-${currentYear}-${String(insertedId).padStart(6, "0")}`;
         await pool.query(`UPDATE payments SET invoice_number = ? WHERE id = ?`, [orderNumber, insertedId]);
 
-        // Save customer into CRM enquiries so they appear in Leads (Website payments only)
+        // Save customer into CRM enquiries so they appear in Leads — only for the
+        // website's own Pay Now checkout. A payment link (token / invoice given)
+        // never creates an enquiry, even if its record could not be found.
+        const fromPaymentLink = Boolean(token || invoiceNumber || existingPaymentId);
         const leadStatus = paymentStatus === "failed" ? "contacted" : paymentStatus === "pending" ? "new" : "closed";
         const leadMsg =
           paymentStatus === "failed"
@@ -330,7 +333,7 @@ export async function POST(req: Request) {
             ? `[PAYMENT PENDING]: Order #${orderNumber}. Amount: $${capturedAmount.toFixed(2)} USD (Pending clearing in PayPal). Reason: ${pendingReason}.`
             : `Website Pay Now Payment. Order #${orderNumber}. PayPal Capture ID: ${captureID}. Total Amount: $${finalTotal.toFixed(2)}, Paid: $${capturedAmount.toFixed(2)}${isPartial ? `, Due: $${finalRemaining.toFixed(2)}` : ""}. Notes: ${notes || "None"}`;
 
-        await pool.query(
+        if (!fromPaymentLink) await pool.query(
           `INSERT INTO contact_enquiries (
             full_name,
             email,

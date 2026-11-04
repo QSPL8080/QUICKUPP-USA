@@ -8,6 +8,20 @@ import { PAYMENT_STATUS_LABEL, money } from "@/lib/crm/format";
 import { BulkBar, SelectBox, useSelection } from "@/components/crm/Selection";
 import { PageHead, Filters, Pager } from "@/components/crm/ListTools";
 import { SERVICES_DATA } from "@/components/PayNowModal";
+import { SOURCE_LABEL, isEnquirySource } from "@/lib/crm/leadOptions";
+
+/* a payment link made from an enquiry shows which form that enquiry came from */
+function EnquiryOrigin({ p }: { p: PaymentRow }) {
+  if (!p.leadId || !isEnquirySource(p.leadSource)) return null;
+  return (
+    <a href={`/crm/enquiries?source=${p.leadSource}`} className="crm-pay-origin" onClick={(e) => e.stopPropagation()} title="Open enquiries from this form">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M4 4h16v12H5.2L4 17.2V4z" />
+      </svg>
+      <span>From enquiry · {SOURCE_LABEL[p.leadSource]}</span>
+    </a>
+  );
+}
 
 const fmtDate = (d: string | null, withTime = false) => {
   if (!d) return "—";
@@ -698,7 +712,7 @@ Quickupp Softech LLC`;
 
         {rows.length ? (
           <div className="crm-table-wrap">
-            <table className="crm-table crm-stack crm-selectable">
+            <table className={`crm-table crm-stack crm-selectable${currentTab === "payment_link" ? " crm-pay-links" : ""}`}>
               {currentTab === "payment_link" ? (
                 /* Payment Link Specialized Table Header (Matching Screenshot 2) */
                 <thead>
@@ -784,6 +798,7 @@ Quickupp Softech LLC`;
                           <span className="crm-strong" style={{ fontSize: "14px", color: "#0f172a" }}>
                             {p.clientName}
                           </span>
+                          <EnquiryOrigin p={p} />
                           <span className="crm-cell-sub" style={{ color: "#475569", fontWeight: 500 }}>
                             {p.clientPhone || "—"}
                           </span>
@@ -1092,6 +1107,7 @@ Quickupp Softech LLC`;
                         <span className="crm-strong" style={{ fontSize: "14px" }}>
                           {p.clientName}
                         </span>
+                        <EnquiryOrigin p={p} />
                         {p.companyName && (
                           <span className="crm-cell-sub" style={{ color: "#475569" }}>
                             {p.companyName}
