@@ -8,6 +8,26 @@ export interface CaseStudyStrategyStep {
   desc: string;
 }
 
+export interface CaseStudyTable {
+  headers: string[];
+  rows: string[][];
+}
+
+export interface CaseStudyDiagram {
+  src: string;
+  caption?: string;
+  title?: string;
+}
+
+export interface CaseStudyResultsSection {
+  title: string;
+  subtitle?: string;
+  paragraphs: string[];
+  diagrams: CaseStudyDiagram[];
+  tables: CaseStudyTable[];
+  statCards: CaseStudyStat[][];
+}
+
 export interface CaseStudyItem {
   slug: string;
   title: string;
@@ -15,6 +35,7 @@ export interface CaseStudyItem {
   location: string;
   industry: string;
   category: string;
+  eyebrow: string;
   tag: string;
   timeline: string;
   desc: string;
@@ -28,16 +49,16 @@ export interface CaseStudyItem {
   };
   whatWeDid: {
     heading: string;
-    summary: string;
     steps: CaseStudyStrategyStep[];
   };
-  results: {
-    heading: string;
-    paragraphs: string[];
-  };
+  resultsSections: CaseStudyResultsSection[];
   whatsNext: {
     heading: string;
     paragraphs: string[];
+  };
+  ctaBox?: {
+    title: string;
+    text: string;
   };
   dataSources: string;
 }
@@ -45,1309 +66,3456 @@ export interface CaseStudyItem {
 export const CASE_STUDIES: CaseStudyItem[] = [
   {
     "slug": "neighbors-emergency-center",
-    "title": "9,196 Patient Calls in 60 Days Across 9 Texas Emergency Centers",
+    "title": "Neighbors Emergency Center: 9,196 patient calls in 60 days across nine Texas ERs",
     "client": "Neighbors Emergency Center",
-    "location": "Amarillo, Baytown, Crosby, Kingwood, Livingston, Lubbock, Pasadena, Pearland, Porter (TX)",
-    "industry": "Emergency Healthcare",
+    "location": "Amarillo, Baytown, Crosby, Kingwood, Livingston, Lubbock, Pasadena, Pearland, Porter",
+    "industry": "Emergency care",
     "category": "Healthcare & Emergency Care",
-    "tag": "HEALTHCARE • MULTI-LOCATION EMERGENCY CARE",
-    "timeline": "60-Day Sprint (Aug 11 – Oct 9, 2026)",
-    "desc": "Operates freestanding emergency rooms across Texas, from the Houston area to Amarillo and Lubbock. We engineered a unified performance engine combining Google Ads, Google Business Profiles, local SEO, and call tracking as one system—delivering 9,196 patient calls and 3,805 verified conversions in 60 days.",
+    "eyebrow": "CASE STUDY · HEALTHCARE · MULTI-LOCATION EMERGENCY CARE",
+    "tag": "CASE STUDY • HEALTHCARE • MULTI-LOCATION EMERGENCY CARE",
+    "timeline": "AUG 11 – OCT 9, 2026",
+    "desc": "Neighbors Emergency Center operates freestanding emergency rooms across Texas, from the Houston area to Amarillo and Lubbock. For nine locations we run Google Ads, Google Business Profiles, local SEO and call tracking as one system, so people searching for emergency care find a Neighbors ER and call.",
     "highlight": "9,196 Patient Calls",
     "img": "/images/blog-img-01.jpg",
     "metrics": [
       {
         "val": "9,196",
-        "lbl": "Tracked Patient Calls"
+        "lbl": "tracked patient calls in 60 days, 5,972 of them first-time callers"
       },
       {
         "val": "95%",
-        "lbl": "Call Answer Rate"
+        "lbl": "of calls answered across all nine locations"
       },
       {
         "val": "3,805",
-        "lbl": "Google Ads Conversions"
+        "lbl": "Google Ads conversions at $23.01 each"
+      },
+      {
+        "val": "90,130",
+        "lbl": "clicks from Google Search, at an average position of 6.9"
       },
       {
         "val": "80",
-        "lbl": "Keywords at #1 on Google"
-      }
-    ],
-    "services": [
-      "Google Ads",
-      "Google Business Profile",
-      "Healthcare SEO",
-      "Call Tracking"
-    ],
-    "challenge": {
-      "heading": "Winning Emergency Discovery Across 9 Distinct Texas Markets",
-      "paragraphs": [
-        "In a medical emergency, patients search on their phones, evaluate the top two or three local options, and immediately call or navigate to the nearest facility.",
-        "Neighbors Emergency Center competes against hospital conglomerates and other freestanding ERs in very different markets—from dense Houston suburbs to West Texas cities like Amarillo and Lubbock. Each facility needed to achieve local search supremacy and maintain an uncompromised call-answer rate.",
-        "Before our intervention, several locations struggled with inefficient ad spend, fragmented profile management, and unmonitored call drop-offs during peak emergency hours."
-      ]
-    },
-    "whatWeDid": {
-      "heading": "Ads, Maps, Search, and 24/7 Call Routing Operating as One System",
-      "summary": "We united performance advertising, organic map visibility, and real-time call tracking into an omnichannel patient acquisition machine.",
-      "steps": [
-        {
-          "title": "Hyper-Localized Google Ads Campaigns",
-          "desc": "Built independent, geo-fenced search ad campaigns for each ER facility, aggressively bidding on high-urgency keywords ('emergency room near me', 'ER open now', pediatric symptoms) and optimizing strictly for phone calls."
-        },
-        {
-          "title": "Google Business Profile Network Optimization",
-          "desc": "Synchronized all 9 location profiles with accurate operating hours, emergency amenities, rapid review response protocols, and dedicated tracking numbers."
-        },
-        {
-          "title": "Symptom & Treatment Local SEO",
-          "desc": "Engineered hundreds of localized clinical service pages targeting acute symptoms (chest pain, trauma, fractures, fever), ranking for over 300 tracked keywords across Texas."
-        },
-        {
-          "title": "Real-Time Call Tracking & Attribution",
-          "desc": "Tied every inbound call directly to its keyword and campaign source, tracking hourly answer rates to ensure staffing matched call volume spikes."
-        }
-      ]
-    },
-    "results": {
-      "heading": "More Than 150 Inbound Patient Calls Every Day",
-      "paragraphs": [
-        "Across the 60-day tracking window, the nine emergency centers handled 9,196 verified patient calls, answering 95% of them. Over 5,972 of these were first-time prospective patients seeking urgent care.",
-        "Google Ads generated 3,805 direct patient conversions at an average cost of $23.01 per patient. Organic search and Google Maps profiles produced an additional 90,130 search clicks at an average Google position of 6.9.",
-        "Neighbors achieved #1 rankings for 'emergency room near me' across Pearland, Baytown, Pasadena, and Livingston, with 80 total keywords securing the coveted #1 organic spot."
-      ]
-    },
-    "whatsNext": {
-      "heading": "Expanding Suburb Dominance and Lowering Patient Acquisition Costs",
-      "paragraphs": [
-        "The ongoing optimization focuses on core 'emergency room' rankings in Porter and Kingwood, while bringing patient acquisition costs in Crosby and Pearland into alignment with the network's top-performing units."
-      ]
-    },
-    "dataSources": "Data sources: Google Search Console, Google Ads Performance, Google Business Profile Insights, and CallRail verified call tracking logs (Aug 11 – Oct 9, 2026)."
-  },
-  {
-    "slug": "exceptional-emergency-center",
-    "title": "6,532 Patient Calls in 60 Days Across Seven Texas Emergency Rooms",
-    "client": "Exceptional Emergency Center",
-    "location": "Amarillo (2), Beaumont, Fort Worth, Orange, Port Arthur, Tyler (TX)",
-    "industry": "Emergency Healthcare",
-    "category": "Healthcare & Emergency Care",
-    "tag": "HEALTHCARE • MULTI-LOCATION EMERGENCY CARE",
-    "timeline": "60-Day Sprint (Aug 11 – Oct 9, 2026)",
-    "desc": "For seven active 24/7 ER locations across Amarillo, Beaumont, Fort Worth, Orange, Port Arthur, and Tyler, we ran synchronized Google Ads, GBP optimization, and local search to win emergency discovery.",
-    "highlight": "6,532 Patient Calls",
-    "img": "/images/contact-boardroom.jpg",
-    "metrics": [
-      {
-        "val": "6,532",
-        "lbl": "Patient Phone Calls"
-      },
-      {
-        "val": "94%",
-        "lbl": "Calls Answered"
-      },
-      {
-        "val": "3,178",
-        "lbl": "Google Ads Conversions"
-      },
-      {
-        "val": "100",
-        "lbl": "Keywords in Google Top 3"
-      }
-    ],
-    "services": [
-      "Google Ads",
-      "GBP Management",
-      "Local ER SEO",
-      "Call Tracking"
-    ],
-    "challenge": {
-      "heading": "Being the First Emergency Facility People Find and Call",
-      "paragraphs": [
-        "In an emergency, people search, choose one of the first results, and call or drive there immediately. For a group of freestanding ERs spread across very different Texas markets—from the Panhandle to the Gulf Coast and DFW—each location must dominate its local search radius.",
-        "Several locations previously suffered from low map pack visibility and inconsistent ad performance, causing high-value emergency patient flow to divert to regional hospital ERs."
-      ]
-    },
-    "whatWeDid": {
-      "heading": "Coordinated Ads, Maps, and Emergency Search Dominance",
-      "summary": "Deployed a centralized patient acquisition architecture customized for the competitive dynamics of each individual Texas city.",
-      "steps": [
-        {
-          "title": "Location-Specific Google Ads",
-          "desc": "Deployed targeted ad groups across all seven facilities, capturing urgent queries with click-to-call extensions and location assets."
-        },
-        {
-          "title": "Google Business Profile Scaling",
-          "desc": "Maintained accurate emergency details, photo updates, and review velocity across all 7 verified profiles."
-        },
-        {
-          "title": "Symptom & Urgent Care SEO",
-          "desc": "Built clinical content targeting adult and pediatric emergencies, CT scan availability, and rapid lab turnaround times."
-        },
-        {
-          "title": "Call Quality Monitoring",
-          "desc": "Implemented dynamic number insertion to measure lead quality and ensure reception desks maintained rapid response rates."
-        }
-      ]
-    },
-    "results": {
-      "heading": "6,532 Patient Calls and 3,178 Paid Search Conversions",
-      "paragraphs": [
-        "In 60 days, Exceptional Emergency Center logged 6,532 patient phone calls across all locations, with 4,394 originating from first-time callers.",
-        "Google Ads generated 3,178 patient conversions at an average cost of $28.77 per patient, with an exceptional 16% conversion rate.",
-        "Organic Google Search generated 30,105 high-intent clicks at an average ranking position of 6.5, with 100 keywords ranking in Google's top 3."
-      ]
-    },
-    "whatsNext": {
-      "heading": "Expanding Regional Share in DFW and East Texas",
-      "paragraphs": [
-        "Ongoing campaigns focus on expanding map coverage across competitive Fort Worth corridors and scaling pediatric symptom campaigns in Tyler and Beaumont."
-      ]
-    },
-    "dataSources": "Data sources: Google Ads Performance Reports, Google Business Profile Insights, and CallRail call logs (Aug 11 – Oct 9, 2026)."
-  },
-  {
-    "slug": "stat-specialty-hospital",
-    "title": "4,405 Patient Calls in 60 Days & #1 for “Emergency Room Near Me” Across South Texas",
-    "client": "STAT Specialty Hospital",
-    "location": "Laredo North, Laredo South, Eagle Pass, Del Rio (TX)",
-    "industry": "Emergency Healthcare",
-    "category": "Healthcare & Emergency Care",
-    "tag": "HEALTHCARE • MULTI-LOCATION EMERGENCY CARE",
-    "timeline": "60-Day Sprint (Aug 11 – Oct 9, 2026)",
-    "desc": "Serving South Texas border communities across Laredo (North & South), Eagle Pass, and Del Rio with targeted bilingual search campaigns, Google Ads, and local GBP authority.",
-    "highlight": "4,405 Patient Calls",
-    "img": "/images/contact-team-conference.jpg",
-    "metrics": [
-      {
-        "val": "4,405",
-        "lbl": "Tracked Patient Calls"
-      },
-      {
-        "val": "94%",
-        "lbl": "Call Answer Rate"
+        "lbl": "tracked keyword rankings at #1 across the locations, with 137 in the top 3"
       },
       {
         "val": "#1",
-        "lbl": "ER Near Me Ranking"
-      },
-      {
-        "val": "1,864",
-        "lbl": "Google Ads Conversions"
+        "lbl": "for “emergency room near me” in Pearland, Baytown, Pasadena and Livingston"
       }
     ],
     "services": [
       "Google Ads",
-      "Local SEO",
-      "GBP Optimization",
-      "Call Tracking"
+      "GBP",
+      "SEO",
+      "call tracking"
     ],
     "challenge": {
-      "heading": "Owning Emergency Search in Fast-Growing Border Markets",
+      "heading": "Being the ER people choose in an emergency",
       "paragraphs": [
-        "Laredo, Eagle Pass, and Del Rio are close-knit border communities where patients seeking emergency care choose between only a handful of facilities. Being the undisputed first result in English and Spanish determines patient destination.",
-        "In late 2025, STAT ranked #7 for 'emergency room near me' in Laredo and was virtually unranked for acute symptom searches like abdominal pain, allergic reactions, and pediatric emergencies."
+        "When someone needs emergency care, they search, pick one of the first results and call or drive there. Neighbors competes with hospital systems and other freestanding ERs in very different markets, from Houston suburbs to West Texas, so each location has to win its own local searches and answer every call.",
+        "The goal: a steady, measurable flow of patient calls at every location at a controlled cost, and top positions for the searches people make in an emergency."
       ]
     },
     "whatWeDid": {
-      "heading": "Bilingual Emergency Strategy Across Four Facilities",
-      "summary": "Integrated bilingual paid search, localized symptom pages, and Google Maps optimization tailored to border market demographics.",
+      "heading": "Ads, maps, search and the phone, working together",
       "steps": [
         {
-          "title": "Bilingual Search Ad Campaigns",
-          "desc": "Structured dual English and Spanish ad campaigns targeting emergency and urgent medical terms across South Texas."
+          "title": "Google Ads by location",
+          "desc": "Separate campaigns for each ER, optimized for calls and conversions in its own service area."
         },
         {
-          "title": "Maps Dominance for 'ER Near Me'",
-          "desc": "Optimized Google Business Profiles for Laredo North, Laredo South, Eagle Pass, and Del Rio to claim top map pack real estate."
+          "title": "Google Business Profile management",
+          "desc": "Optimized profiles for every location with tracked call numbers, regular posts and active review management."
         },
         {
-          "title": "Specialty & Pediatric Landing Pages",
-          "desc": "Created dedicated treatment pages highlighting outpatient observation, 24/7 imaging, and pediatric trauma care."
+          "title": "Local SEO",
+          "desc": "Location pages targeting city, “near me”, pediatric and symptom-based searches, tracked monthly across more than 300 keywords."
         },
         {
-          "title": "24/7 Call Center Integration",
-          "desc": "Tracked all call durations and sources, helping facility administrators verify patient intake numbers in real time."
+          "title": "Call tracking and attribution",
+          "desc": "Every call tied to its source and location, with answer rates monitored by hour."
         }
       ]
     },
-    "results": {
-      "heading": "4,405 Inbound Calls and Clean Sweep of #1 Rankings",
-      "paragraphs": [
-        "Across 60 days, STAT received 4,405 patient calls, with 2,471 coming from first-time callers. Facilities answered 94% of all calls.",
-        "Google Ads delivered 1,864 patient conversions at $26.44 each, while organic search drove 61,702 clicks with an average position of 6.2.",
-        "STAT captured the #1 position for 'emergency room near me' in Laredo, Eagle Pass, and Del Rio, holding 51 keywords at #1 and 75 in the top 3."
-      ]
-    },
-    "whatsNext": {
-      "heading": "Strengthening Specialty Care and Outpatient Visibility",
-      "paragraphs": [
-        "Continuing to expand visibility for scheduled specialty services, imaging appointments, and community health outreach across South Texas."
-      ]
-    },
-    "dataSources": "Data sources: Google Ads, Google Business Profile Insights, and verified call tracking logs."
-  },
-  {
-    "slug": "altus-emergency-centers",
-    "title": "3,145 Patient Calls in 60 Days Across Three Texas ERs & 43% Lower Cost Per Click",
-    "client": "Altus Emergency Centers",
-    "location": "Lake Jackson, Lumberton, and Waxahachie, TX",
-    "industry": "Emergency Healthcare",
-    "category": "Healthcare & Emergency Care",
-    "tag": "HEALTHCARE • MULTI-LOCATION EMERGENCY CARE",
-    "timeline": "60-Day Sprint (Aug 11 – Oct 9, 2026)",
-    "desc": "Operates freestanding emergency rooms in Lake Jackson, Lumberton, and Waxahachie. Replaced fragmented marketing with unified local SEO, Google Ads, and call tracking to capture high-intent patients.",
-    "highlight": "3,145 Patient Calls",
-    "img": "/images/contact-consultation-team.jpg",
-    "metrics": [
+    "resultsSections": [
       {
-        "val": "3,145",
-        "lbl": "Tracked Patient Calls"
+        "title": "RESULTS · PHONE CALLS",
+        "subtitle": "More than 150 patient calls a day",
+        "paragraphs": [
+          "In 60 days the nine locations received 9,196 tracked calls and answered 95% of them. Google Ads and the Business Profiles together drove 87% of all calls."
+        ],
+        "diagrams": [
+          {
+            "src": "/images/case-studies/neighbors-emergency-center/diagram-1.png",
+            "caption": ""
+          }
+        ],
+        "tables": [],
+        "statCards": []
       },
       {
-        "val": "94%",
-        "lbl": "Calls Answered"
+        "title": "RESULTS · BY LOCATION",
+        "subtitle": "Every ER producing patient calls",
+        "paragraphs": [
+          "August 11 – October 9, 2026. Location totals exclude a small number of calls not tied to a single location."
+        ],
+        "diagrams": [],
+        "tables": [
+          {
+            "headers": [
+              "Location",
+              "Calls",
+              "Answered",
+              "First-time",
+              "Ads conv.",
+              "Cost / conv."
+            ],
+            "rows": [
+              [
+                "Lubbock",
+                "1,154",
+                "94.4%",
+                "880",
+                "726",
+                "$14.32"
+              ],
+              [
+                "Pearland",
+                "1,124",
+                "94.3%",
+                "707",
+                "431",
+                "$29.56"
+              ],
+              [
+                "Porter",
+                "1,094",
+                "96.1%",
+                "724",
+                "471",
+                "$24.24"
+              ],
+              [
+                "Baytown",
+                "1,088",
+                "95.6%",
+                "600",
+                "368",
+                "$20.26"
+              ],
+              [
+                "Livingston",
+                "1,026",
+                "94.2%",
+                "612",
+                "302",
+                "$14.54"
+              ],
+              [
+                "Pasadena",
+                "1,016",
+                "96.0%",
+                "715",
+                "502",
+                "$20.31"
+              ],
+              [
+                "Crosby",
+                "944",
+                "97.6%",
+                "552",
+                "357",
+                "$32.12"
+              ],
+              [
+                "Kingwood",
+                "688",
+                "93.9%",
+                "439",
+                "284",
+                "$28.74"
+              ],
+              [
+                "Amarillo",
+                "557",
+                "94.6%",
+                "—",
+                "239",
+                "$26.82"
+              ]
+            ]
+          }
+        ],
+        "statCards": []
       },
       {
-        "val": "−43%",
-        "lbl": "Google Ads Cost/Click"
+        "title": "RESULTS · GOOGLE RANKINGS",
+        "subtitle": "Top positions for emergency searches",
+        "paragraphs": [
+          "Google organic positions from monthly rank tracking. Across all locations, 80 of 306 tracked keyword rankings are #1 and 137 are in the top 3."
+        ],
+        "diagrams": [],
+        "tables": [
+          {
+            "headers": [
+              "“emergency room near me”",
+              "Nov 2025",
+              "Sep 2026"
+            ],
+            "rows": [
+              [
+                "Pearland",
+                "7",
+                "#1"
+              ],
+              [
+                "Baytown",
+                "6",
+                "#1"
+              ],
+              [
+                "Pasadena",
+                "3",
+                "#1"
+              ],
+              [
+                "Livingston",
+                "Not in top 100",
+                "#1"
+              ],
+              [
+                "Amarillo",
+                "7",
+                "#4"
+              ]
+            ]
+          }
+        ],
+        "statCards": []
       },
       {
-        "val": "1,182",
-        "lbl": "Paid Conversions"
+        "title": "RESULTS · GOOGLE ADS, SEARCH AND WEBSITE",
+        "subtitle": "Efficient acquisition at scale",
+        "paragraphs": [
+          "Google Ads, Search Console, Analytics and Business Profile insights, August 11 – October 9, 2026."
+        ],
+        "diagrams": [],
+        "tables": [],
+        "statCards": [
+          [
+            {
+              "val": "20,315",
+              "lbl": "Ad clicks"
+            },
+            {
+              "val": "14%",
+              "lbl": "Ad conversion rate"
+            },
+            {
+              "val": "$4.31",
+              "lbl": "Average cost per click"
+            },
+            {
+              "val": "4,128",
+              "lbl": "Calls from ads"
+            }
+          ],
+          [
+            {
+              "val": "",
+              "lbl": "23.45M Google Search impressions"
+            },
+            {
+              "val": "",
+              "lbl": "108.9K Website visitors"
+            },
+            {
+              "val": "91,029",
+              "lbl": "Visitors from Google organic"
+            },
+            {
+              "val": "4,690",
+              "lbl": "Direction requests"
+            }
+          ]
+        ]
       }
     ],
-    "services": [
-      "Local SEO",
-      "Google Business Profile",
-      "Google Ads",
-      "Call Tracking"
-    ],
-    "challenge": {
-      "heading": "Navigating High Ad Costs and Competitive Suburb ER Markets",
-      "paragraphs": [
-        "Altus Emergency Centers operates in distinct suburban regions: Brazoria County (Lake Jackson), Southeast Texas (Lumberton), and Greater Dallas-Fort Worth (Waxahachie). Each market had fierce competitors inflating Google Ads click costs.",
-        "Altus needed to reduce acquisition costs while ensuring patient call volumes continued to climb."
-      ]
-    },
-    "whatWeDid": {
-      "heading": "Ad Budget Efficiency Paired with Aggressive Maps Expansion",
-      "summary": "Refined keyword targeting to weed out non-emergency wasted spend, while boosting organic local map pack visibility.",
-      "steps": [
-        {
-          "title": "Negative Keyword Pruning",
-          "desc": "Eliminated thousands of dollars in wasted ad spend on generic hospital queries, focusing solely on immediate emergency demand."
-        },
-        {
-          "title": "Local Map Pack Optimization",
-          "desc": "Optimized categories, geotagged assets, and patient reviews across Lake Jackson, Lumberton, and Waxahachie profiles."
-        },
-        {
-          "title": "High-Converting Mobile Funnels",
-          "desc": "Streamlined mobile landing pages with one-touch calling, live wait time indicators, and insurance verification info."
-        },
-        {
-          "title": "Intake Call Auditing",
-          "desc": "Monitored answered call ratios across all shifts, ensuring incoming patient calls were answered within 3 rings."
-        }
-      ]
-    },
-    "results": {
-      "heading": "3,145 Calls and 43% Reduction in Cost Per Click",
-      "paragraphs": [
-        "Altus achieved 3,145 patient phone calls in 60 days, with 2,063 from first-time callers. Facilities maintained a 94% answer rate.",
-        "Google Ads delivered 1,182 conversions at $24.79 each, slashing average cost per click by 43% compared to the previous year.",
-        "Achieved #1 Google rankings for 'emergency room near me' in Lumberton and Waxahachie, with 32 keywords ranking #1 and 59 in the top 3."
-      ]
-    },
     "whatsNext": {
-      "heading": "Scaling Local Brand Awareness and Employer Care Networks",
+      "heading": "Lifting the remaining markets",
       "paragraphs": [
-        "Expanding direct partnerships with local employers and emergency medical services, supported by targeted digital outreach."
+        "The next phase focuses on core “emergency room” searches in Porter and Kingwood, where rankings lag the rest of the network, and on bringing cost per conversion in Crosby and Pearland closer to the network average."
       ]
     },
-    "dataSources": "Data sources: Google Ads, Google Search Console, GBP Insights, and call tracking metrics."
-  },
-  {
-    "slug": "st-michaels-elite-hospital",
-    "title": "From Invisible to Page One for “Emergency Room” & Direction Requests Up 112%",
-    "client": "St. Michael’s Elite Hospital",
-    "location": "Sugar Land / Houston, TX",
-    "industry": "Hospital & Emergency Care",
-    "category": "Healthcare & Emergency Care",
-    "tag": "HEALTHCARE • EMERGENCY HOSPITAL",
-    "timeline": "Year-Over-Year Surge",
-    "desc": "Positioned a premier 24-hour emergency hospital in Sugar Land/Houston at #7 on Google from outside the top 100, driving massive year-over-year increases in patient visits and direction requests.",
-    "highlight": "+112% Direction Requests",
-    "img": "/images/contact-meeting-room.jpg",
-    "metrics": [
-      {
-        "val": "+112%",
-        "lbl": "Direction Requests YoY"
-      },
-      {
-        "val": "843",
-        "lbl": "Patient Calls (60 Days)"
-      },
-      {
-        "val": "#7",
-        "lbl": "\"Emergency Room\" Rank"
-      },
-      {
-        "val": "+57%",
-        "lbl": "Profile Interactions"
-      }
-    ],
-    "services": [
-      "Hospital SEO",
-      "GBP Management",
-      "Google Ads",
-      "Call Tracking"
-    ],
-    "challenge": {
-      "heading": "Breaking Through Against Entrenched Houston Hospital Systems",
-      "paragraphs": [
-        "Greater Houston is home to some of the world's largest hospital networks. For an independent luxury emergency hospital in Sugar Land, competing on general search terms was an uphill battle.",
-        "In late 2025, the hospital did not rank in Google's top 100 for 'emergency room', 'emergency room near me', or 'hospital emergency room'."
-      ]
+    "ctaBox": {
+      "title": "YOUR PRACTICE NEXT",
+      "text": "Want more patients calling your locations first? We help healthcare providers and multi-location businesses rank in Google Search and Maps, run profitable ads, and track every call back to its source. Contact us for a free audit."
     },
-    "whatWeDid": {
-      "heading": "Comprehensive Search, Maps, Ads, and Phone Integration",
-      "summary": "Transformed an unranked hospital website into a first-page destination for local Sugar Land and Fort Bend County patients.",
-      "steps": [
-        {
-          "title": "Clinical Service Page SEO",
-          "desc": "Authored in-depth medical pages for 24-hour emergency care, low-dose CT imaging, 3T MRI diagnostics, and inpatient suites."
-        },
-        {
-          "title": "Google Business Profile Revamp",
-          "desc": "Revitalized the hospital's profile with verified attributes, high-resolution facility tours, and physician credentials."
-        },
-        {
-          "title": "Targeted Paid Search Campaigns",
-          "desc": "Deployed laser-targeted Google Ads to capture patients needing immediate emergency room treatment within a 7-mile radius."
-        },
-        {
-          "title": "Call Intake Optimization",
-          "desc": "Installed call tracking to trace inbound patient inquiries directly back to their originating search query."
-        }
-      ]
-    },
-    "results": {
-      "heading": "Page One Rankings and 112% Surge in Direction Requests",
-      "paragraphs": [
-        "St. Michael’s climbed to #7 on Google for the ultra-competitive query 'emergency room', rising from outside the top 100.",
-        "Physical driving direction requests surged by 112% year-over-year, and total Business Profile customer interactions climbed by 57%.",
-        "The hospital logged 843 verified patient calls and 329 paid search conversions in 60 days, cementing its position in Sugar Land."
-      ]
-    },
-    "whatsNext": {
-      "heading": "Advancing Specialized Imaging and Inpatient Services",
-      "paragraphs": [
-        "Capitalizing on emergency gains to launch dedicated search funnels for physician-referred outpatient imaging and private surgical suites."
-      ]
-    },
-    "dataSources": "Data sources: Google Search Console, Google Business Profile year-over-year analytics, and CallRail tracking."
-  },
-  {
-    "slug": "kim-bruno-law",
-    "title": "From Zero Rankings to 9 #1 Positions on Google & 1,368 Inbound Calls in 60 Days",
-    "client": "Kim Bruno Law",
-    "location": "Houston, TX",
-    "industry": "Personal Injury Law",
-    "category": "Legal & Law Firms",
-    "tag": "LEGAL • BILINGUAL PERSONAL INJURY",
-    "timeline": "9-Month Growth Sprint",
-    "desc": "Built a dominant bilingual English & Spanish search presence across Greater Houston for wrongful death and vehicle accident cases, outcompeting mega-budget personal injury advertisers.",
-    "highlight": "9 #1 Google Positions",
-    "img": "/images/contact-professional-consultant.jpg",
-    "metrics": [
-      {
-        "val": "9",
-        "lbl": "#1 Google Rankings"
-      },
-      {
-        "val": "1,368",
-        "lbl": "Phone Calls (60 Days)"
-      },
-      {
-        "val": "547K",
-        "lbl": "Search Impressions"
-      },
-      {
-        "val": "3:50",
-        "lbl": "Average Call Duration"
-      }
-    ],
-    "services": [
-      "Bilingual Legal SEO",
-      "City Practice Pages",
-      "Google Business Profile",
-      "Call Tracking"
-    ],
-    "challenge": {
-      "heading": "Outmaneuvering Heavyweight Personal Injury Competitors",
-      "paragraphs": [
-        "Houston personal injury is one of the most expensive and fiercely contested legal markets in the United States, dominated by massive firms with multi-million-dollar billboard and TV budgets.",
-        "In January 2026, Attorney Kim Bruno did not rank in Google's top 100 for any of the 94 tracked English or Spanish legal keywords."
-      ]
-    },
-    "whatWeDid": {
-      "heading": "High-Intent Bilingual Suburb and Practice Area Architecture",
-      "summary": "Pioneered a culturally resonant bilingual SEO and local map pack strategy that captured accident victims throughout Houston suburbs.",
-      "steps": [
-        {
-          "title": "Bilingual Practice Architecture",
-          "desc": "Crafted parallel English and authentic Spanish content targeting auto, 18-wheeler, and wrongful death cases ('abogada de accidentes')."
-        },
-        {
-          "title": "Houston Suburb Landing Pages",
-          "desc": "Built targeted landing pages for affluent suburbs (Hunters Creek Village, Memorial, Spring Branch) where big firms lacked localized pages."
-        },
-        {
-          "title": "Google Business Profile Authority",
-          "desc": "Optimized the law firm profile to rank prominently in the local 3-pack for Spanish and English legal queries."
-        },
-        {
-          "title": "Call Intake Tracking",
-          "desc": "Integrated dynamic call tracking that revealed a remarkable 3:50 average call length, indicating high-intent case consultations."
-        }
-      ]
-    },
-    "results": {
-      "heading": "9 #1 Google Rankings and 1,368 Prospective Client Calls",
-      "paragraphs": [
-        "The firm surged from zero rankings to 32 keywords in Google's top 100, 21 on page one, and 9 securing the absolute #1 ranking.",
-        "Over the last 60 days, Kim Bruno Law logged 1,368 inbound phone calls, supported by over 547,000 organic Google Search impressions.",
-        "Bilingual search capture successfully established the firm as a trusted household name for English and Spanish legal representation."
-      ]
-    },
-    "whatsNext": {
-      "heading": "Expanding Across Greater Texas Commercial Vehicle Corridors",
-      "paragraphs": [
-        "Scaling bilingual content hubs into the I-10 and I-45 freight corridors to capture complex commercial trucking accident cases."
-      ]
-    },
-    "dataSources": "Data sources: Google Search Console, Google Business Profile Insights, and verified legal call tracking logs."
-  },
-  {
-    "slug": "jlg-law",
-    "title": "From 1 to 52 Ranking Keywords & 7 at #1 on Google in Ten Months",
-    "client": "JLG Law",
-    "location": "Houston, TX",
-    "industry": "Criminal Defense Law",
-    "category": "Legal & Law Firms",
-    "tag": "LEGAL • CRIMINAL DEFENSE",
-    "timeline": "10-Month Authority Sprint",
-    "desc": "Engineered deep practice-area and suburb search architecture for a premier Houston criminal defense firm, generating #1 Google rankings for high-stakes federal and state defense inquiries.",
-    "highlight": "52 Ranking Keywords",
-    "img": "/images/blog-img-02.jpg",
-    "metrics": [
-      {
-        "val": "1 → 52",
-        "lbl": "Keywords in Top 100"
-      },
-      {
-        "val": "7",
-        "lbl": "#1 Google Rankings"
-      },
-      {
-        "val": "28",
-        "lbl": "Keywords on Page One"
-      },
-      {
-        "val": "583K",
-        "lbl": "Search Impressions"
-      }
-    ],
-    "services": [
-      "Criminal Defense SEO",
-      "Practice Area Pages",
-      "GBP Optimization",
-      "Organic Search"
-    ],
-    "challenge": {
-      "heading": "Gaining Visibility in a Crowded and Regulated Legal Niche",
-      "paragraphs": [
-        "Criminal defense search queries are heavily contested by hundreds of Houston law practices. General terms like 'criminal lawyer Houston' have sky-high competition.",
-        "In November 2025, JLG Law ranked for only 1 tracked keyword in Google's top 100 and had virtually no organic search presence for its core federal and state practice areas."
-      ]
-    },
-    "whatWeDid": {
-      "heading": "Niche-Specific Federal and State Defense Architecture",
-      "summary": "Constructed deep, authoritative legal content focused on specific criminal charges, federal court procedures, and suburban jurisdictions.",
-      "steps": [
-        {
-          "title": "Specialized Charge Content Hubs",
-          "desc": "Created exhaustive legal resources for weapons trafficking, conspiracy, money laundering, DWI defense, and federal forfeiture."
-        },
-        {
-          "title": "Surrounding Suburb Pages",
-          "desc": "Expanded reach into Katy, Sugar Land, The Woodlands, and Pasadena with localized court and defense information."
-        },
-        {
-          "title": "E-E-A-T Authority Building",
-          "desc": "Structured attorney bios, case summaries, and courtroom credentials to establish elite Google search trust signals."
-        },
-        {
-          "title": "Google Business Profile Integration",
-          "desc": "Optimized local map listings for urgent, after-hours arrest and bail hearing searches."
-        }
-      ]
-    },
-    "results": {
-      "heading": "52 Keywords in Top 100, 28 on Page One, and 7 at #1",
-      "paragraphs": [
-        "In ten months, JLG Law scaled from 1 to 52 ranking keywords in Google's top 100, with 28 reaching page one and 7 holding the #1 position.",
-        "Captured dominant #1 rankings for high-intent searches including 'weapon trafficking lawyer Houston' and related federal defense queries.",
-        "Organic impressions reached 583,000 in 60 days, with 70% of all website traffic originating directly from Google organic search."
-      ]
-    },
-    "whatsNext": {
-      "heading": "Broadening Federal White-Collar Defense Dominance",
-      "paragraphs": [
-        "Launching comprehensive content silos for federal grand jury subpoenas, healthcare fraud defense, and appellate advocacy."
-      ]
-    },
-    "dataSources": "Data sources: Google Search Console organic tracking and Google Business Profile insights."
-  },
-  {
-    "slug": "lakhani-mcgrath",
-    "title": "From Zero Rankings to 19 Page-One Positions on Google in Nine Months",
-    "client": "Lakhani & McGrath",
-    "location": "Houston, TX",
-    "industry": "Personal Injury Law",
-    "category": "Legal & Law Firms",
-    "tag": "LEGAL • PERSONAL INJURY",
-    "timeline": "9-Month Local Climb",
-    "desc": "Established hyper-targeted suburb and case-type landing pages across Greater Houston, taking a personal injury firm from zero visibility to 19 page-one positions and 227K organic impressions.",
-    "highlight": "19 Page-One Positions",
-    "img": "/images/contact-corporate-consultation.jpg",
-    "metrics": [
-      {
-        "val": "0 → 19",
-        "lbl": "Page-1 Google Positions"
-      },
-      {
-        "val": "227K",
-        "lbl": "Search Impressions"
-      },
-      {
-        "val": "78%",
-        "lbl": "Organic Traffic Share"
-      },
-      {
-        "val": "#5",
-        "lbl": "Premises Liability Rank"
-      }
-    ],
-    "services": [
-      "Personal Injury SEO",
-      "Case-Type Pages",
-      "Google Business Profile",
-      "Rank Tracking"
-    ],
-    "challenge": {
-      "heading": "Breaking into Houston Personal Injury Search Without a TV Budget",
-      "paragraphs": [
-        "Houston personal injury is dominated by billboard and media giants. For a growing firm, competing head-to-head on broad commercial keywords requires unsustainable ad budgets.",
-        "In December 2025, Lakhani & McGrath did not rank in Google's top 100 for any of their 89 tracked keywords."
-      ]
-    },
-    "whatWeDid": {
-      "heading": "Winning the Suburbs and Specialized Case Types",
-      "summary": "Adopted a surgical local SEO approach targeting specific communities and incident categories where large firms leave gaps.",
-      "steps": [
-        {
-          "title": "Accident & Liability Case Silos",
-          "desc": "Engineered detailed landing pages for 18-wheeler accidents, premises liability, rideshare collisions, and motorcycle crashes."
-        },
-        {
-          "title": "Community Suburb Expansion",
-          "desc": "Authored dedicated local pages for Spring, Cypress, Pearland, and Sugar Land residents."
-        },
-        {
-          "title": "Technical SEO & Speed Optimization",
-          "desc": "Optimized website performance, Core Web Vitals, and mobile responsiveness for instant consultation loading."
-        },
-        {
-          "title": "Review & Map Pack Authority",
-          "desc": "Built continuous review velocity on Google Business Profile to strengthen local pack inclusion."
-        }
-      ]
-    },
-    "results": {
-      "heading": "19 Page-One Positions and 227K Search Impressions",
-      "paragraphs": [
-        "Within nine months, the firm reached 27 keywords in the top 100 and 19 on Google's first page, with 57 keywords reaching page one at least once.",
-        "Achieved a #5 ranking for 'premises liability lawyer Houston' rising from completely unranked.",
-        "Organic search now supplies 78% of all firm website traffic, generating over 227,000 search impressions in 60 days."
-      ]
-    },
-    "whatsNext": {
-      "heading": "Expanding Wrongful Death and Catastrophic Injury Silos",
-      "paragraphs": [
-        "Targeting high-damages litigation queries and expanding localized search coverage into Montgomery and Galveston counties."
-      ]
-    },
-    "dataSources": "Data sources: Google Search Console, Google Analytics 4, and keyword rank tracking audits."
-  },
-  {
-    "slug": "romero-injury-law",
-    "title": "From Zero Rankings to Page One for Accident-Type Searches in Three Months",
-    "client": "Romero Injury Law",
-    "location": "Houston, TX",
-    "industry": "Personal Injury Law",
-    "category": "Legal & Law Firms",
-    "tag": "LEGAL • MOTOR VEHICLE ACCIDENTS",
-    "timeline": "90-Day Rapid Rank",
-    "desc": "Targeted specific high-intent crash queries (T-bone, intersection, multi-vehicle) and Houston suburbs to rank a boutique injury firm on page one within 90 days of launch.",
-    "highlight": "0 → 20 Top-100 Keywords",
-    "img": "/images/contact-client-consultation.jpg",
-    "metrics": [
-      {
-        "val": "0 → 20",
-        "lbl": "Keywords in Top 100"
-      },
-      {
-        "val": "#5",
-        "lbl": "T-Bone Attorney Rank"
-      },
-      {
-        "val": "143",
-        "lbl": "Client Calls (60 Days)"
-      },
-      {
-        "val": "87%",
-        "lbl": "Calls Answered"
-      }
-    ],
-    "services": [
-      "Accident-Type SEO",
-      "Suburb Expansion",
-      "GBP Optimization",
-      "Call Tracking"
-    ],
-    "challenge": {
-      "heading": "Finding Lucrative Openings in a Heavyweight Legal Market",
-      "paragraphs": [
-        "Houston car accident searches are among the most congested in the nation. Large firms buy massive search volume, pricing smaller firms out of broad paid search.",
-        "In January 2026, Romero Injury Law had zero rankings in Google's top 100 across 28 tracked vehicle accident phrases."
-      ]
-    },
-    "whatWeDid": {
-      "heading": "Focusing on How Injured Drivers Actually Search",
-      "summary": "Identified high-conversion search phrases describing specific accident mechanics and localized suburban corridors.",
-      "steps": [
-        {
-          "title": "Accident Mechanics Content",
-          "desc": "Authored dedicated case pages for T-bone accidents, intersection collisions, sideswipe crashes, and rear-end impacts."
-        },
-        {
-          "title": "West Houston Suburb Pages",
-          "desc": "Created localized legal resources for Fulshear, Hedwig Village, Hunters Creek Village, and Manvel."
-        },
-        {
-          "title": "Google Business Profile Setup",
-          "desc": "Optimized the law office profile with verified legal categories, local schema markup, and call tracking."
-        },
-        {
-          "title": "Rapid Lead Routing",
-          "desc": "Connected web and phone leads to an instant notification system ensuring case intake calls were addressed immediately."
-        }
-      ]
-    },
-    "results": {
-      "heading": "Fast Page-One Rankings and 143 Inbound Client Calls",
-      "paragraphs": [
-        "In just three months, Romero Injury Law propelled 20 keywords into Google's top 100, reaching page one for major accident queries.",
-        "Ranked #5 on Google for 'T-bone accident attorney' and #5 for 'Fulshear car accident lawyer' in April 2026.",
-        "Generated 143 verified client phone calls in 60 days (52 from first-time prospective clients), with an 87% answer rate."
-      ]
-    },
-    "whatsNext": {
-      "heading": "Building Out Highway and Commercial Corridor Content",
-      "paragraphs": [
-        "Extending coverage to major Houston transit arteries (I-10 West, Grand Parkway 99, Westpark Tollway) to capture commuter collision cases."
-      ]
-    },
-    "dataSources": "Data sources: Google Search Console, keyword rank tracking, and CallRail inbound call logs."
-  },
-  {
-    "slug": "madtax",
-    "title": "11 City Bookkeeping Pages on Google's First Page Within a Month of Launch",
-    "client": "MadTax",
-    "location": "Houston, TX & Nationwide",
-    "industry": "Bookkeeping & Tax Advisory",
-    "category": "Finance & Professional",
-    "tag": "FINANCE • BOOKKEEPING & TAX SERVICES",
-    "timeline": "30-Day City Launch",
-    "desc": "Constructed targeted city service pages across Houston and nationwide for a boutique bookkeeping and tax consultancy, capturing 11 first-page positions and 7 top-5 rankings in 30 days.",
-    "highlight": "11 Page-1 Rankings",
-    "img": "/images/contact-consulting-planning.jpg",
-    "metrics": [
-      {
-        "val": "0 → 11",
-        "lbl": "Page-1 City Keywords"
-      },
-      {
-        "val": "1 → 23",
-        "lbl": "Keywords in Top 100"
-      },
-      {
-        "val": "#1",
-        "lbl": "Sunrise Manor Rank"
-      },
-      {
-        "val": "7",
-        "lbl": "Keywords in Google Top 5"
-      }
-    ],
-    "services": [
-      "City Service Pages",
-      "On-Page SEO",
-      "Rank Tracking",
-      "Local Search"
-    ],
-    "challenge": {
-      "heading": "A Boutique Consultancy Competing with National Accounting Giants",
-      "paragraphs": [
-        "Small business bookkeeping search results are dominated by multi-billion-dollar accounting software platforms and national franchise networks.",
-        "In January 2026, MadTax ranked in Google's top 100 for only 1 of 23 tracked city keywords, lacking organic visibility to attract local SMB clients."
-      ]
-    },
-    "whatWeDid": {
-      "heading": "A Dedicated High-Relevance Page for Every Target Market",
-      "summary": "Capitalized on localized commercial searches where national software brands possess zero local landing pages.",
-      "steps": [
-        {
-          "title": "Localized Bookkeeping Pages",
-          "desc": "Engineered customized service pages for Houston suburbs (Texas City, Friendswood, Alvin, West University Place) and key national markets."
-        },
-        {
-          "title": "SMB Search Intent Optimization",
-          "desc": "Optimized title tags, schemas, and content around commercial phrases like 'monthly bookkeeping for small business' and 'business tax filing'."
-        },
-        {
-          "title": "Interlinked Service Architecture",
-          "desc": "Connected city pages through an intuitive regional taxonomy that distributed domain authority effectively."
-        },
-        {
-          "title": "Weekly SERP Rank Tracking",
-          "desc": "Monitored keyword movements weekly to make rapid on-page heading and meta tag adjustments."
-        }
-      ]
-    },
-    "results": {
-      "heading": "11 Page-One Positions Within 30 Days of Launch",
-      "paragraphs": [
-        "Within one month of going live, 11 of the 23 tracked city keywords reached Google's first page, and 7 placed in the top 5.",
-        "Captured #1 ranking for 'Sunrise Manor bookkeeping service', #3 for Texas City, #4 for Montpelier, and #5 for Friendswood.",
-        "Total keywords in Google's top 100 jumped from 1 to 23, creating an immediate influx of small business client inquiries."
-      ]
-    },
-    "whatsNext": {
-      "heading": "Rolling Out City Pages Across 50 Additional US Markets",
-      "paragraphs": [
-        "Scaling the proven city-page architecture into high-growth SMB markets across Florida, Georgia, and North Carolina."
-      ]
-    },
-    "dataSources": "Data sources: Google Search Console, Ahrefs keyword position tracking, and client intake reports."
-  },
-  {
-    "slug": "ainsley-heights",
-    "title": "Turning Local Search into 4,199 Renter Actions in 60 Days",
-    "client": "Ainsley Heights",
-    "location": "Houston, TX",
-    "industry": "Multifamily Real Estate",
-    "category": "Real Estate & Multifamily",
-    "tag": "REAL ESTATE • MULTIFAMILY APARTMENTS",
-    "timeline": "60-Day Renter Engine",
-    "desc": "Managed local search and Google Business Profile for a premier Houston luxury apartment community, driving 1,915 physical direction requests and 4,199 total tenant interactions.",
-    "highlight": "4,199 Renter Actions",
-    "img": "/images/blog-img-04.jpg",
-    "metrics": [
-      {
-        "val": "4,199",
-        "lbl": "Renter Google Actions"
-      },
-      {
-        "val": "31%",
-        "lbl": "Action Conversion Rate"
-      },
-      {
-        "val": "1,915",
-        "lbl": "Direction Requests"
-      },
-      {
-        "val": "2,308",
-        "lbl": "Website Clicks from Search"
-      }
-    ],
-    "services": [
-      "Multifamily SEO",
-      "Google Business Profile",
-      "Website Search",
-      "Local Listings"
-    ],
-    "challenge": {
-      "heading": "Competing for Renters in America's Most Saturated Apartment Market",
-      "paragraphs": [
-        "Houston renters have hundreds of luxury apartment communities to choose from, and almost all begin their journey on Google with searches like '2 bedroom apartments Houston' or 'luxury apartments near me'.",
-        "National apartment syndication directories (Apartments.com, Zillow) dominate search results, forcing individual communities to fight for direct renter discovery."
-      ]
-    },
-    "whatWeDid": {
-      "heading": "Transforming the Google Business Profile into a Tour-Booking Engine",
-      "summary": "Maximized direct renter engagement through optimized Google Maps presence, floor plan showcases, and local neighborhood SEO.",
-      "steps": [
-        {
-          "title": "Google Business Profile Dominance",
-          "desc": "Updated unit floor plans, amenities, pet policies, and pricing tags, transforming the profile into an interactive digital brochure."
-        },
-        {
-          "title": "Local Houston Neighborhood SEO",
-          "desc": "Targeted commute-based searches highlighting proximity to major employers, medical hubs, and shopping districts."
-        },
-        {
-          "title": "Tour-Booking CTA Integration",
-          "desc": "Embedded seamless booking links directly within Google search results to allow prospective tenants to schedule walkthroughs in seconds."
-        },
-        {
-          "title": "Review & Reputation Strategy",
-          "desc": "Implemented automated resident review requests that built an immaculate 5-star Google reputation."
-        }
-      ]
-    },
-    "results": {
-      "heading": "4,199 Renter Actions and a 31% Conversion Rate",
-      "paragraphs": [
-        "In 60 days, Ainsley Heights generated 4,199 total renter actions on Google (website visits, phone calls, and direction requests).",
-        "Nearly 1 in 3 people (31%) who viewed the Business Profile took a direct conversion action, yielding 1,915 physical driving direction requests (up 21% YoY).",
-        "Google Search drove 2,308 visits to the community website at a remarkable 17.9% click-through rate, keeping leasing occupancy at peak levels."
-      ]
-    },
-    "whatsNext": {
-      "heading": "Deploying Interactive Virtual Walkthroughs and Seasonal Specials",
-      "paragraphs": [
-        "Integrating 3D virtual tour experiences directly into the Google profile and launching seasonal leasing incentives for summer turnover."
-      ]
-    },
-    "dataSources": "Data sources: Google Business Profile Performance Analytics and Google Search Console (Aug 11 – Oct 9, 2026)."
-  },
-  {
-    "slug": "grandewood-pointe",
-    "title": "4,798 Renter Actions on Google in 60 Days for Orlando Apartment Community",
-    "client": "Grandewood Pointe",
-    "location": "Orlando, FL",
-    "industry": "Multifamily Real Estate",
-    "category": "Real Estate & Multifamily",
-    "tag": "REAL ESTATE • MULTIFAMILY APARTMENTS",
-    "timeline": "60-Day Leasing Surge",
-    "desc": "Elevated an Orlando multifamily apartment community above national listing portals, delivering 2,823 website visits and 1,576 direction requests from local Google Maps searches.",
-    "highlight": "4,798 Renter Actions",
-    "img": "/images/blog-img-03.jpg",
-    "metrics": [
-      {
-        "val": "4,798",
-        "lbl": "Renter Google Actions"
-      },
-      {
-        "val": "2,823",
-        "lbl": "Website Clicks from GBP"
-      },
-      {
-        "val": "1,576",
-        "lbl": "Direction Requests"
-      },
-      {
-        "val": "21%",
-        "lbl": "Action Conversion Rate"
-      }
-    ],
-    "services": [
-      "Apartment Community SEO",
-      "GBP Management",
-      "Website Search",
-      "Tour Booking"
-    ],
-    "challenge": {
-      "heading": "Standing Out in Orlando’s Fast-Paced Rental Market",
-      "paragraphs": [
-        "Orlando renters face an overwhelming supply of new apartment communities. Third-party listing aggregators consume massive organic real estate, charging hefty referral fees.",
-        "Grandewood Pointe needed to drive direct, commission-free tour bookings and phone calls through their own Google presence."
-      ]
-    },
-    "whatWeDid": {
-      "heading": "Optimized Google Profile and Local Floor Plan Search Presence",
-      "summary": "Turned the community's digital presence into an active tour pipeline capturing renters searching for 1, 2, and 3-bedroom Orlando homes.",
-      "steps": [
-        {
-          "title": "Full Business Profile Optimization",
-          "desc": "Showcased high-definition community photos, pool amenities, clubhouse features, and direct tour scheduling buttons."
-        },
-        {
-          "title": "Unit-Type On-Page SEO",
-          "desc": "Optimized website pages for 'apartments near me Orlando', '1 bedroom apartments', and pet-friendly rental phrases."
-        },
-        {
-          "title": "Local Schema & Map Signals",
-          "desc": "Deployed apartment complex structured data to ensure Google recognized all floor plans and leasing office hours."
-        },
-        {
-          "title": "Engagement Tracking",
-          "desc": "Monitored visitor engagement time and bounce rates to optimize the conversion path from Google to tour booking."
-        }
-      ]
-    },
-    "results": {
-      "heading": "4,798 Total Renter Actions and 2,823 Website Clicks",
-      "paragraphs": [
-        "Over 60 days, Grandewood Pointe captured 4,798 renter actions on Google, with approximately 1 in 5 viewers taking immediate action.",
-        "The Google profile drove 2,823 direct clicks to the community website and 1,576 driving direction requests from prospective renters.",
-        "Website visitors maintained an average engagement time of 1:28 with an exceptionally low 34.7% bounce rate, keeping leasing units consistently filled."
-      ]
-    },
-    "whatsNext": {
-      "heading": "Expanding Corporate Relocation and Digital Lease Integration",
-      "paragraphs": [
-        "Targeting out-of-state relocation searches from professionals moving to Central Florida's growing tech and healthcare sectors."
-      ]
-    },
-    "dataSources": "Data sources: Google Business Profile Insights and Google Analytics 4 engagement data (Aug 11 – Oct 9, 2026)."
+    "dataSources": "Google Ads, Google Business Profile insights, Search Console, and verified call tracking for Neighbors Emergency Center (AUG 11 – OCT 9, 2026)."
   },
   {
     "slug": "erics-car-care",
-    "title": "5,067 Customer Calls in 60 Days for Two Houston Auto Repair Shops",
+    "title": "Eric’s Car Care: 5,067 customer calls in 60 days for two Houston auto repair shops",
     "client": "Eric’s Car Care",
-    "location": "Med Center & Rice Village, Houston, TX",
-    "industry": "Automotive Services",
+    "location": "Med Center and Rice Village, Houston, TX",
+    "industry": "Auto repair",
     "category": "Local & Automotive Services",
-    "tag": "AUTOMOTIVE • MULTI-LOCATION AUTO REPAIR",
-    "timeline": "Omnichannel Auto Care",
-    "desc": "Synchronized Google Ads, Local Services Ads (LSA), Business Profiles, and SEO across two Kirby Drive repair shops in Houston, capturing 5,067 customer calls with a 97% answer rate.",
+    "eyebrow": "CASE STUDY · AUTO REPAIR · MULTI-LOCATION",
+    "tag": "CASE STUDY • AUTO REPAIR • MULTI-LOCATION",
+    "timeline": "AUG 11 – OCT 9, 2026",
+    "desc": "Eric’s Car Care runs two auto repair shops on Kirby Drive in Houston, one near the Medical Center and one in Rice Village / West University. We manage their Google Ads, Local Services Ads, Business Profiles, SEO and call tracking as one system, so that drivers searching for repairs nearby find Eric’s and pick up the phone.",
     "highlight": "5,067 Customer Calls",
-    "img": "/images/blog-img-06.jpg",
+    "img": "/images/blog-img-02.jpg",
     "metrics": [
       {
         "val": "5,067",
-        "lbl": "Tracked Customer Calls"
+        "lbl": "tracked customer calls in 60 days, 2,856 of them first-time callers"
       },
       {
         "val": "97%",
-        "lbl": "Calls Answered"
+        "lbl": "of calls answered across both shops"
       },
       {
         "val": "1,402",
-        "lbl": "Google Ads Conversions"
+        "lbl": "Google Ads conversions at $26.33 each"
+      },
+      {
+        "val": "$1.68",
+        "lbl": "average cost per click on Google Ads, with a 3.41% click-through rate"
       },
       {
         "val": "1,278",
-        "lbl": "Direction Requests"
+        "lbl": "direction requests to the two shops from Google Business Profiles"
+      },
+      {
+        "val": "48 → 8",
+        "lbl": "Google position for “car ac repair houston”, Nov 2025 to Sep 2026"
       }
     ],
     "services": [
       "Google Ads",
-      "Local Services Ads (LSA)",
-      "GBP Optimization",
-      "Auto Repair SEO"
+      "LSA",
+      "GBP",
+      "SEO",
+      "call tracking"
     ],
     "challenge": {
-      "heading": "Capturing Drivers with Urgent Breakdown and Maintenance Needs",
+      "heading": "Winning repair calls in a crowded Houston market",
       "paragraphs": [
-        "Drivers searching for auto repair in Houston typically have immediate, urgent needs (check engine lights, brake failure, AC breakdown). They call the first shop with stellar reviews and immediate proximity.",
-        "Eric’s Car Care needed to dominate both paid Google search and organic local map packs across Kirby Drive, Rice Village, and the Texas Medical Center."
+        "Houston has hundreds of auto repair shops, plus dealer service centers and national chains. Drivers with a broken A/C or a brake warning light usually call one of the first shops they see on Google, often from their phone, often the same day.",
+        "Eric’s needed a steady flow of qualified calls into both shops at a cost that works for a repair business, and stronger visibility for high-value services like A/C repair and European car service."
       ]
     },
     "whatWeDid": {
-      "heading": "Google Ads, LSA, Maps, and Phone Routing Working Together",
-      "summary": "Built a multi-channel acquisition funnel designed to catch drivers at the exact moment of mechanical need.",
+      "heading": "Paid, local and organic working together",
       "steps": [
         {
-          "title": "Google Local Services Ads (LSA)",
-          "desc": "Secured Google Screened badges for both shops, capturing top-of-page real estate with pay-per-call pricing."
+          "title": "Google Ads by location",
+          "desc": "Search campaigns for each shop with call extensions and conversion tracking, managed for cost per lead."
         },
         {
-          "title": "High-Intent Google Ads",
-          "desc": "Ran targeted campaigns on 'brake repair near me', 'car AC repair Houston', and emergency transmission diagnostics."
+          "title": "Google Local Services Ads",
+          "desc": "“Google Guaranteed” listings that put Eric’s at the top of results with pay-per-lead pricing."
         },
         {
-          "title": "Dual Business Profile Management",
-          "desc": "Optimized two separate profiles along Kirby Drive, driving high review volumes and accurate operating hours."
+          "title": "Google Business Profile management",
+          "desc": "Optimized profiles for the Med Center and Rice Village shops, with tracked call numbers and website links."
         },
         {
-          "title": "Call Intake Tracking",
-          "desc": "Implemented call recording and routing systems that enabled shop managers to maintain a 97% answer rate."
+          "title": "Service-page SEO",
+          "desc": "Location pages for each service and shop: A/C and heating, brakes, suspension, oil change and European auto repair."
+        },
+        {
+          "title": "Call tracking across every channel",
+          "desc": "Each call attributed to its campaign, profile or ad, with answer rates monitored so no lead slips through."
         }
       ]
     },
-    "results": {
-      "heading": "5,067 Phone Calls and 1,402 Paid Conversions in 60 Days",
-      "paragraphs": [
-        "Over 60 days, Eric’s Car Care received 5,067 verified customer phone calls (2,856 from first-time callers), answering 97% of them.",
-        "Google Ads produced 1,402 conversions at an efficient $26.33 per booked customer, while maintaining a low $1.68 cost per click.",
-        "Google Business Profiles generated 1,278 in-person driving direction requests and climbed from #48 to #8 for 'car AC repair Houston'."
-      ]
-    },
+    "resultsSections": [
+      {
+        "title": "RESULTS · PHONE CALLS",
+        "subtitle": "A steady stream of repair calls",
+        "paragraphs": [
+          "Every call to both shops is tracked to its source. In 60 days Eric’s received 5,067 calls, answered 97% of them, and 2,856 came from people calling for the first time."
+        ],
+        "diagrams": [
+          {
+            "src": "/images/case-studies/erics-car-care/diagram-1.png",
+            "caption": "“Other sources” includes Meta ads, organic search, direct and website calls. Meta ads alone produced 47 calls on $631 of spend."
+          }
+        ],
+        "tables": [],
+        "statCards": []
+      },
+      {
+        "title": "RESULTS · PAID SEARCH",
+        "subtitle": "Efficient lead cost on Google Ads",
+        "paragraphs": [
+          "Over 60 days, $36,935 in Google Ads spend produced 1,402 conversions at an average cost per click of $1.68."
+        ],
+        "diagrams": [],
+        "tables": [],
+        "statCards": [
+          [
+            {
+              "val": "",
+              "lbl": "647K Ad impressions"
+            },
+            {
+              "val": "22,039",
+              "lbl": "Ad clicks"
+            },
+            {
+              "val": "5.83%",
+              "lbl": "Conversion rate"
+            },
+            {
+              "val": "$26.33",
+              "lbl": "Cost per conversion"
+            }
+          ]
+        ]
+      },
+      {
+        "title": "RESULTS · GOOGLE BUSINESS PROFILES",
+        "subtitle": "Two shops, found on the map",
+        "paragraphs": [
+          "Google Business Profile insights, August 11 – October 9, 2026."
+        ],
+        "diagrams": [],
+        "tables": [
+          {
+            "headers": [
+              "Shop",
+              "Impressions",
+              "Directions",
+              "Calls",
+              "Website clicks"
+            ],
+            "rows": [
+              [
+                "Med Center",
+                "11,196",
+                "840",
+                "468",
+                "159"
+              ],
+              [
+                "Rice Village",
+                "7,934",
+                "438",
+                "366",
+                "174"
+              ],
+              [
+                "Total",
+                "19,130",
+                "1,278",
+                "834",
+                "333"
+              ]
+            ]
+          }
+        ],
+        "statCards": []
+      },
+      {
+        "title": "RESULTS · ORGANIC SEARCH",
+        "subtitle": "Climbing for A/C repair and European service",
+        "paragraphs": [
+          "Organic rankings rose sharply for some of the shops’ most valuable services, especially car A/C repair in Houston and European auto repair near the Rice Village shop."
+        ],
+        "diagrams": [
+          {
+            "src": "/images/case-studies/erics-car-care/diagram-2.png",
+            "caption": "Google Search Console and Google Analytics, August 11 – October 9, 2026; rankings from monthly rank tracking."
+          }
+        ],
+        "tables": [],
+        "statCards": [
+          [
+            {
+              "val": "",
+              "lbl": "1.07M Google Search impressions"
+            },
+            {
+              "val": "3,185",
+              "lbl": "Clicks from Google Search"
+            },
+            {
+              "val": "16,933",
+              "lbl": "Website visitors"
+            },
+            {
+              "val": "3,621",
+              "lbl": "Visitors from organic search"
+            }
+          ]
+        ]
+      }
+    ],
     "whatsNext": {
-      "heading": "Seasonal AC Tune-Up Campaigns and Hybrid/EV Service Expansion",
+      "heading": "Lifting brake and suspension rankings",
       "paragraphs": [
-        "Launching targeted campaigns for hybrid vehicle battery maintenance and seasonal pre-summer cooling system inspections."
+        "The next phase focuses on regaining top organic positions for brake, suspension and oil change searches, growing Google Maps visibility around both shops, and keeping lead costs steady as call volume grows."
       ]
     },
-    "dataSources": "Data sources: Google Ads, Google LSA dashboard, GBP Insights, and CallRail tracking (Aug 11 – Oct 9, 2026)."
+    "ctaBox": {
+      "title": "YOUR SHOP NEXT",
+      "text": "Want your phones ringing like this? We help auto repair shops and local service businesses turn Google Search, Maps and Ads into booked jobs, and track every call back to its source. Contact us for a free audit."
+    },
+    "dataSources": "Google Ads, Google Business Profile insights, Search Console, and verified call tracking for Eric’s Car Care (AUG 11 – OCT 9, 2026)."
   },
   {
-    "slug": "afa-movers",
-    "title": "Doubling the Area Where They Rank Top 3 in Google Maps in Four Months",
-    "client": "AFA Movers",
-    "location": "Sugar Land, TX (Houston Area)",
-    "industry": "Moving & Logistics",
-    "category": "Local & Automotive Services",
-    "tag": "HOME SERVICES • MOVING & PACKING",
-    "timeline": "4-Month Map-Pack Scale",
-    "desc": "Expanded Google Maps top-3 radius from 31% to 64% of their 6-mile Sugar Land/Houston service territory, elevating commercial, residential, and piano moving queries into top positions.",
-    "highlight": "2x Maps Top-3 Coverage",
-    "img": "/images/contact-strategy-consultation.jpg",
+    "slug": "stat-specialty-hospital",
+    "title": "STAT Specialty Hospital: 4,405 patient calls in 60 days and #1 for “emergency room near me” across South Texas",
+    "client": "STAT Specialty Hospital",
+    "location": "Laredo North, Laredo South, Eagle Pass, Del Rio (TX)",
+    "industry": "Emergency care",
+    "category": "Healthcare & Emergency Care",
+    "eyebrow": "CASE STUDY · HEALTHCARE · MULTI-LOCATION EMERGENCY CARE",
+    "tag": "CASE STUDY • HEALTHCARE • MULTI-LOCATION EMERGENCY CARE",
+    "timeline": "AUG 11 – OCT 9, 2026",
+    "desc": "STAT Specialty Hospital serves border communities in South Texas from four locations in Laredo (North and South), Eagle Pass and Del Rio. We run Google Ads, Google Business Profiles, local SEO and call tracking so that people searching for emergency or specialty care nearby find STAT and call.",
+    "highlight": "4,405 Patient Calls",
+    "img": "/images/blog-img-03.jpg",
     "metrics": [
       {
-        "val": "2×",
-        "lbl": "Top-3 Maps Coverage (64%)"
+        "val": "4,405",
+        "lbl": "tracked patient calls in 60 days, 2,471 of them first-time callers"
       },
       {
-        "val": "93%",
-        "lbl": "Local Top-10 Coverage"
+        "val": "94%",
+        "lbl": "of calls answered across all four locations"
       },
       {
-        "val": "7.5 → 3.9",
-        "lbl": "Avg Maps Rank Position"
+        "val": "1,864",
+        "lbl": "Google Ads conversions at $26.44 each"
       },
       {
-        "val": "100%",
-        "lbl": "Piano Movers Top-10"
+        "val": "61,702",
+        "lbl": "clicks from Google Search, at an average position of 6.2"
+      },
+      {
+        "val": "#1",
+        "lbl": "for “emergency room near me” in Laredo, Eagle Pass and Del Rio"
+      },
+      {
+        "val": "51",
+        "lbl": "tracked keywords at #1 across the three markets, with 75 in the top 3"
       }
     ],
     "services": [
-      "Maps Pack SEO",
-      "Google Business Profile",
-      "Grid Rank Tracking",
-      "Local Relevance"
+      "Google Ads",
+      "GBP",
+      "SEO",
+      "call tracking"
     ],
     "challenge": {
-      "heading": "Breaking Out Beyond the Immediate Sugar Land Office Perimeter",
+      "heading": "Owning emergency search in border markets",
       "paragraphs": [
-        "Moving is among the most aggressive local categories in Greater Houston. Consumers rarely scroll past the top three map-pack listings before contacting movers for quotes.",
-        "AFA Movers ranked well immediately adjacent to its Sugar Land office, but visibility dropped to near-zero just a few miles out in southwest Houston.",
-        "On high-volume searches like 'cheap movers', AFA appeared in the top 3 across just 2% of their service territory."
+        "Laredo, Eagle Pass and Del Rio are fast-growing markets where people searching for emergency care often choose between a handful of options. Being the first result people see, in English and in the symptom-based searches they use, decides where they go.",
+        "In November 2025 STAT ranked #7 for “emergency room near me” in Laredo and did not appear in Google’s top 100 for many symptom and service searches such as abdominal pain, allergic reactions, seizures and pediatric emergencies."
       ]
     },
     "whatWeDid": {
-      "heading": "Multi-Point Geogrid Optimization and Service Authority",
-      "summary": "Expanded local map authority across a 133-point geogrid covering a 6-mile radius surrounding southwest Houston.",
+      "heading": "Ads, maps, search and the phone",
       "steps": [
         {
-          "title": "Comprehensive GBP Optimization",
-          "desc": "Configured specific service offerings: residential, commercial, furniture, piano, packing, and long-distance moves."
+          "title": "Google Ads by location",
+          "desc": "Campaigns for each hospital, optimized for calls and conversions in its own market."
         },
         {
-          "title": "Service-Led Content Silos",
-          "desc": "Engineered detailed website landing pages addressing price-conscious ('cheap movers') and specialty queries ('piano moving')."
+          "title": "Google Business Profile management",
+          "desc": "Optimized profiles for every location with tracked call numbers, regular updates and review management."
         },
         {
-          "title": "Localized Citation Architecture",
-          "desc": "Strengthened consistent NAP citations and location schema across all regional business directories."
+          "title": "Symptom and service SEO",
+          "desc": "City-specific pages for common emergencies, such as abdominal pain, allergic reactions, seizures and sore throat, plus pediatric, imaging and lab services."
         },
         {
-          "title": "133-Point Geogrid Tracking",
-          "desc": "Ran automated bi-weekly geogrid scans across 13 core moving keywords to pinpoint and elevate weak neighborhoods."
+          "title": "Call tracking",
+          "desc": "Every call attributed to its source and location, with answer rates monitored by hour."
         }
       ]
     },
-    "results": {
-      "heading": "Top-3 Coverage Doubled from 31% to 64% Across the Entire Territory",
-      "paragraphs": [
-        "In four months, AFA Movers doubled its top-3 Google Maps coverage from 31% to 64% across its 6-mile service radius, while 93% of the grid placed AFA in the top 10.",
-        "Average Google Maps ranking position improved from 7.5 to 3.9 across all 13 tracked moving keywords.",
-        "'Cheap movers' top-3 coverage soared from 2% to 77%, commercial moving top-3 coverage hit 89%, and piano moving achieved 100% top-10 coverage."
-      ]
-    },
+    "resultsSections": [
+      {
+        "title": "RESULTS · GOOGLE RANKINGS",
+        "subtitle": "#1 where it matters most",
+        "paragraphs": [
+          "Google organic positions from monthly rank tracking. Several symptom and service keywords were added to tracking during the campaign."
+        ],
+        "diagrams": [],
+        "tables": [
+          {
+            "headers": [
+              "Keyword",
+              "Market",
+              "Nov 2025",
+              "Sep 2026"
+            ],
+            "rows": [
+              [
+                "emergency room near me",
+                "Laredo",
+                "7",
+                "#1"
+              ],
+              [
+                "emergency room near me",
+                "Del Rio",
+                "2",
+                "#1"
+              ],
+              [
+                "emergency room near me",
+                "Eagle Pass",
+                "1",
+                "#1"
+              ],
+              [
+                "emergency room",
+                "Laredo",
+                "Not in top 100",
+                "#4"
+              ],
+              [
+                "emergency room in eagle pass",
+                "Eagle Pass",
+                "Not in top 100",
+                "#1"
+              ],
+              [
+                "er for seizures in laredo",
+                "Laredo",
+                "Not in top 100",
+                "#1"
+              ],
+              [
+                "abdominal pain hospital near me",
+                "Laredo / Del Rio",
+                "Not in top 100",
+                "#1"
+              ],
+              [
+                "emergency room for trauma injury",
+                "Laredo",
+                "Not in top 100",
+                "#1"
+              ],
+              [
+                "emergency room for pediatrics",
+                "Del Rio",
+                "Not in top 100",
+                "#1"
+              ],
+              [
+                "er for back pain in eagle pass",
+                "Eagle Pass",
+                "Not in top 100",
+                "#1"
+              ]
+            ]
+          }
+        ],
+        "statCards": []
+      },
+      {
+        "title": "RESULTS · PHONE CALLS",
+        "subtitle": "A steady stream of patient calls",
+        "paragraphs": [
+          "In 60 days the four locations received 4,405 tracked calls and answered 94% of them. Google Ads and the Business Profiles together drove 92% of all calls."
+        ],
+        "diagrams": [
+          {
+            "src": "/images/case-studies/stat-specialty-hospital/diagram-1.png",
+            "caption": "August 11 – October 9, 2026. Location totals exclude a small number of calls not tied to a single location."
+          }
+        ],
+        "tables": [
+          {
+            "headers": [
+              "Location",
+              "Calls",
+              "Answered",
+              "First-time",
+              "Ads conv.",
+              "Cost / conv."
+            ],
+            "rows": [
+              [
+                "Laredo North",
+                "1,317",
+                "95.6%",
+                "737",
+                "668",
+                "$33.67"
+              ],
+              [
+                "Eagle Pass",
+                "1,090",
+                "91.4%",
+                "568",
+                "364",
+                "$15.82"
+              ],
+              [
+                "Del Rio",
+                "962",
+                "94.7%",
+                "505",
+                "326",
+                "$29.68"
+              ],
+              [
+                "Laredo South",
+                "912",
+                "94.8%",
+                "585",
+                "506",
+                "$22.48"
+              ]
+            ]
+          }
+        ],
+        "statCards": []
+      },
+      {
+        "title": "RESULTS · ADS, SEARCH AND WEBSITE",
+        "subtitle": "Visibility at scale",
+        "paragraphs": [
+          "Google Ads, Search Console and Analytics, August 11 – October 9, 2026. The Business Profiles also generated 1,201 call clicks and 1,067 direction requests."
+        ],
+        "diagrams": [],
+        "tables": [],
+        "statCards": [
+          [
+            {
+              "val": "12,437",
+              "lbl": "Ad clicks"
+            },
+            {
+              "val": "$3.96",
+              "lbl": "Average cost per click"
+            },
+            {
+              "val": "",
+              "lbl": "12.33M Google Search impressions"
+            },
+            {
+              "val": "68,103",
+              "lbl": "Visitors from Google organic"
+            }
+          ]
+        ]
+      }
+    ],
     "whatsNext": {
-      "heading": "Extending Reach Across Fort Bend County and Long-Distance Routes",
+      "heading": "Lifting “emergency room” to #1 everywhere",
       "paragraphs": [
-        "Scaling geogrid dominance toward Katy and Richmond while creating dedicated interstate relocation content."
+        "The next phase focuses on the broad “emergency room” search in Laredo and Eagle Pass, improving answer rates in Eagle Pass, and bringing cost per conversion at Laredo North closer to the network average."
       ]
     },
-    "dataSources": "Data sources: LocalFalcon 133-point geogrid scans, monthly keyword rank audits, and Google Business Profile activity reports."
+    "dataSources": "Google Ads, Google Business Profile insights, Search Console, and verified call tracking for STAT Specialty Hospital (AUG 11 – OCT 9, 2026)."
   },
   {
-    "slug": "eg-elite",
-    "title": "From Invisible to the Google Maps Top 10 for New York Car Shipping Searches",
-    "client": "E&G Elite",
-    "location": "New York, NY",
-    "industry": "Auto Transport & Logistics",
-    "category": "Retail & Transport",
-    "tag": "TRANSPORT • AUTO SHIPPING LOGISTICS",
-    "timeline": "6-Month Grid Expansion",
-    "desc": "Enabled a Manhattan-based vehicle transport carrier to outrank national broker aggregators, scaling top-10 Google Maps coverage from 0% to 59% across a 6-mile NYC grid.",
-    "highlight": "0% → 59% Maps Top-10",
-    "img": "/images/contact-tech-discussion.jpg",
+    "slug": "altus-emergency-centers",
+    "title": "Altus Emergency Centers: 3,145 patient calls in 60 days across three Texas ERs",
+    "client": "Altus Emergency Centers",
+    "location": "Lake Jackson, Lumberton and Waxahachie, TX",
+    "industry": "Emergency care",
+    "category": "Healthcare & Emergency Care",
+    "eyebrow": "CASE STUDY · HEALTHCARE · MULTI-LOCATION EMERGENCY CARE",
+    "tag": "CASE STUDY • HEALTHCARE • MULTI-LOCATION EMERGENCY CARE",
+    "timeline": "Ongoing Partnership",
+    "desc": "Altus Emergency Centers operates freestanding emergency rooms in Lake Jackson, Lumberton and Waxahachie, Texas. We run local SEO, Google Business Profiles, Google Ads and call tracking for all three, so that when someone searches for emergency care nearby, Altus is the first ER they see and call.",
+    "highlight": "3,145 Patient Calls",
+    "img": "/images/blog-img-04.jpg",
     "metrics": [
       {
-        "val": "0% → 59%",
-        "lbl": "Maps Top-10 Coverage"
+        "val": "3,145",
+        "lbl": "tracked patient phone calls in 60 days, 2,063 of them first-time callers"
       },
       {
-        "val": "77%",
-        "lbl": "NYC Grid Top-10 Coverage"
+        "val": "94%",
+        "lbl": "of calls answered across all three emergency rooms"
       },
       {
-        "val": "74%",
-        "lbl": "Calls from Google Profile"
+        "val": "32",
+        "lbl": "tracked Google searches where an Altus ER ranks #1, with 59 in the top 3"
       },
       {
-        "val": "13.5K",
-        "lbl": "Search Impressions"
+        "val": "#1",
+        "lbl": "for “emergency room near me” in Lumberton and Waxahachie, up from #3"
+      },
+      {
+        "val": "1,182",
+        "lbl": "Google Ads conversions in 60 days at $24.79 each"
+      },
+      {
+        "val": "−43%",
+        "lbl": "lower cost per click on Google Ads than the same period last year"
       }
     ],
     "services": [
       "Local SEO",
-      "Google Business Profile",
-      "Call Tracking",
-      "Maps Grid Tracking"
+      "GBP",
+      "Google Ads",
+      "call tracking"
     ],
     "challenge": {
-      "heading": "Competing Against Massive National Broker Websites in NYC",
+      "heading": "Being the first ER people find, and call, in an emergency",
       "paragraphs": [
-        "Car shipping search results are overwhelmed by nationwide lead-generation websites with huge advertising budgets. For an authentic New York-based carrier, competing on national generic terms is cost-prohibitive.",
-        "E&G Elite needed to win local vehicle owners in Manhattan, Brooklyn, Queens, and North Jersey seeking trusted enclosed and open carriers nearby."
+        "When someone needs emergency care, they search, pick one of the first results and call or drive there. There is no second visit to win them back. For a freestanding ER competing with hospital systems and urgent care chains, that makes the top of Google Search and Maps, and a fast phone answer, the whole game.",
+        "In November 2025 the three Altus locations already ranked well for their own names, but sat at #3 to #5 for the most important generic search, “emergency room near me”, and did not appear at all for many symptom- and service-based searches such as pediatric emergencies, fractures, back pain or lab services."
       ]
     },
     "whatWeDid": {
-      "heading": "Establishing Local Trust and Map Pack Dominance in Manhattan",
-      "summary": "Anchored the carrier's digital footprint around local New York car shipping intent and verified customer reviews.",
+      "heading": "One system across search, maps, ads and the phone",
       "steps": [
         {
-          "title": "Google Business Profile Architecture",
-          "desc": "Optimized categories, commercial vehicle photos, service radii, and verified licensing info."
+          "title": "Location-level SEO",
+          "desc": "Dedicated work for each ER, targeting city searches, “near me” searches and the symptoms and services patients look for, such as fractures, flu, pediatric care, imaging and labs."
         },
         {
-          "title": "Luxury & Exotic Vehicle Landing Pages",
-          "desc": "Created dedicated service pages for enclosed classic, exotic, and high-value vehicle transport out of the Tri-State area."
+          "title": "Google Business Profile management",
+          "desc": "Regular, neighborhood-targeted posts for each location covering common emergencies, plus review monitoring across all three profiles."
         },
         {
-          "title": "Tri-State Route Targeting",
-          "desc": "Built localized route content for popular New York to Florida and New York to California transit lanes."
+          "title": "Google Ads by location",
+          "desc": "Separate campaigns for Lake Jackson, Lumberton and Waxahachie, each optimized for calls and conversions in its own service area."
         },
         {
-          "title": "Geogrid Rank Auditing",
-          "desc": "Tracked map rankings across a dense 6-mile Manhattan and Brooklyn grid to pinpoint top-ranking neighborhoods."
+          "title": "Call tracking and attribution",
+          "desc": "Every call is tracked to its source (Business Profile, Ads, organic search or Apple Maps), with answer rates monitored by location and by hour."
+        },
+        {
+          "title": "Monthly rank tracking",
+          "desc": "118 keywords tracked monthly across the three locations, reviewed to decide where to push next."
         }
       ]
     },
-    "results": {
-      "heading": "59% Top-10 Coverage Across NYC and 74% Inbound Call Share",
-      "paragraphs": [
-        "Between January and June 2026, E&G Elite's top-10 Google Maps coverage for 'best car shipping company' grew from 0% to 59% across the NYC grid.",
-        "For 'ship car to New York', 77% of the entire grid placed E&G in the top 10 local pack.",
-        "Over 60 days, 74% of all high-value vehicle shipping quote phone calls came directly from the optimized Google Business Profile."
-      ]
-    },
+    "resultsSections": [
+      {
+        "title": "RESULTS · GOOGLE RANKINGS",
+        "subtitle": "Taking the top spot for “emergency room near me”",
+        "paragraphs": [
+          "All three locations climbed for the most valuable generic search. Lumberton and Waxahachie have held #1 since March 2026; Lake Jackson has ranked #1 or #2 every month since January.",
+          "New service searches added during the campaign",
+          "From spring 2026 we expanded tracking to symptom and service searches. Many now rank at the top, for example in Lumberton “ER for trauma injury” (#1), “urgent care imaging near me” (#1) and “urgent care for back pain” (#3), and in Waxahachie “emergency pediatric care near me” (#1), “urgent care for knee pain” (#1) and “er imaging” (#1)."
+        ],
+        "diagrams": [
+          {
+            "src": "/images/case-studies/altus-emergency-centers/diagram-1.png",
+            "caption": "Google organic positions from monthly rank tracking."
+          }
+        ],
+        "tables": [
+          {
+            "headers": [
+              "Keyword",
+              "Location",
+              "Nov 2025",
+              "Sep 2026"
+            ],
+            "rows": [
+              [
+                "emergency room near me",
+                "Lumberton",
+                "3",
+                "#1"
+              ],
+              [
+                "emergency room near me",
+                "Waxahachie",
+                "3",
+                "#1"
+              ],
+              [
+                "emergency room near me",
+                "Lake Jackson",
+                "5",
+                "#2"
+              ],
+              [
+                "emergency room",
+                "Lumberton",
+                "2",
+                "#1"
+              ],
+              [
+                "emergency room",
+                "Lake Jackson",
+                "Not in top 100",
+                "#2"
+              ],
+              [
+                "er near me",
+                "Waxahachie",
+                "Not in top 100",
+                "#1"
+              ],
+              [
+                "pediatric emergency",
+                "Waxahachie",
+                "Not in top 100",
+                "#1"
+              ],
+              [
+                "emergency room labs",
+                "Waxahachie",
+                "Not in top 100",
+                "#1"
+              ],
+              [
+                "ER lab services in Lake Jackson",
+                "Lake Jackson",
+                "Not in top 100",
+                "#1"
+              ]
+            ]
+          }
+        ],
+        "statCards": []
+      },
+      {
+        "title": "RESULTS · PHONE CALLS",
+        "subtitle": "Search visibility that turns into calls",
+        "paragraphs": [
+          "Call tracking attributes every inbound call to its source. In 60 days the three ERs received 3,145 calls, with an average call length of 1 minute 52 seconds."
+        ],
+        "diagrams": [
+          {
+            "src": "/images/case-studies/altus-emergency-centers/diagram-2.png",
+            "caption": "August 11 – October 9, 2026. Location totals exclude a small number of calls and ad conversions not tied to a single location."
+          }
+        ],
+        "tables": [
+          {
+            "headers": [
+              "Location",
+              "Calls",
+              "Answered",
+              "First-time callers",
+              "Ads conversions",
+              "Cost / conv."
+            ],
+            "rows": [
+              [
+                "Lumberton",
+                "1,305",
+                "94.5%",
+                "771",
+                "423",
+                "$20.25"
+              ],
+              [
+                "Waxahachie",
+                "982",
+                "94.6%",
+                "683",
+                "388",
+                "$25.27"
+              ],
+              [
+                "Lake Jackson",
+                "697",
+                "93.4%",
+                "483",
+                "325",
+                "$28.87"
+              ]
+            ]
+          }
+        ],
+        "statCards": []
+      },
+      {
+        "title": "RESULTS · GOOGLE ADS",
+        "subtitle": "More patients for every dollar",
+        "paragraphs": [
+          "Compared with the same 60 days last year, Google Ads now reaches far more people at a lower cost per click (down 43%) and a higher click-through rate (up 36%), and the cost of each conversion has roughly halved."
+        ],
+        "diagrams": [],
+        "tables": [],
+        "statCards": [
+          [
+            {
+              "val": "1,218",
+              "lbl": "Calls from ads"
+            },
+            {
+              "val": "21.4%",
+              "lbl": "Conversion rate"
+            },
+            {
+              "val": "4.46%",
+              "lbl": "Click-through rate"
+            },
+            {
+              "val": "$5.81",
+              "lbl": "Average cost per click"
+            }
+          ]
+        ]
+      },
+      {
+        "title": "RESULTS · WEBSITE",
+        "subtitle": "A website that keeps visitors engaged",
+        "paragraphs": [
+          "Google Analytics, August 11 – October 9, 2026. Visitor numbers were flat year on year while engaged sessions nearly tripled."
+        ],
+        "diagrams": [],
+        "tables": [],
+        "statCards": [
+          [
+            {
+              "val": "18,806",
+              "lbl": "Website visitors"
+            },
+            {
+              "val": "9,414",
+              "lbl": "Visitors from Google search"
+            },
+            {
+              "val": "9.4%",
+              "lbl": "Bounce rate"
+            },
+            {
+              "val": "+196%",
+              "lbl": "Engaged sessions vs. last year"
+            }
+          ]
+        ]
+      }
+    ],
     "whatsNext": {
-      "heading": "Targeting Snowbird Seasonal Routes to South Florida",
+      "heading": "Owning more symptom searches",
       "paragraphs": [
-        "Launching seasonal campaigns capturing seasonal New York-to-Miami snowbird vehicle transport starting in early autumn."
+        "The next phase focuses on symptom-led searches where Altus is not yet on page one, such as abdominal pain and stomach pain, and on growing Business Profile engagement at all three locations."
       ]
     },
-    "dataSources": "Data sources: Google Maps geogrid tracking, Google Search Console, and CallRail inbound call tracking."
+    "ctaBox": {
+      "title": "YOUR PRACTICE NEXT",
+      "text": "Want more patients calling your clinic first? We help healthcare providers and multi-location businesses rank in Google Search and Maps, run profitable ads, and track every call back to its source. Contact us for a free audit."
+    },
+    "dataSources": "Google Ads, Google Business Profile insights, Search Console, and verified call tracking for Altus Emergency Centers (Campaign performance)."
   },
   {
-    "slug": "smoke-it-up",
-    "title": "From Not in the Top 100 to #1 on Google for 14 Local Searches",
-    "client": "Smoke It Up",
-    "location": "Angleton, TX · Cypress, TX",
-    "industry": "Retail & Smoke Shop",
-    "category": "Retail & Transport",
-    "tag": "RETAIL • MULTI-LOCATION LOCAL SEARCH",
-    "timeline": "Multi-Location Retail Climb",
-    "desc": "Transformed visibility for two Texas retail locations (Angleton & Cypress), propelling 14 keywords to #1 on Google and generating 122.4K search impressions and 287 phone calls in 60 days.",
-    "highlight": "14 #1 Google Rankings",
+    "slug": "exceptional-emergency-center",
+    "title": "Exceptional Emergency Center: 6,532 patient calls in 60 days across seven Texas ERs",
+    "client": "Exceptional Emergency Center",
+    "location": "Amarillo (2), Beaumont, Fort Worth, Orange, Port Arthur, Tyler",
+    "industry": "Emergency care",
+    "category": "Healthcare & Emergency Care",
+    "eyebrow": "CASE STUDY · HEALTHCARE · MULTI-LOCATION EMERGENCY CARE",
+    "tag": "CASE STUDY • HEALTHCARE • MULTI-LOCATION EMERGENCY CARE",
+    "timeline": "AUG 11 – OCT 9, 2026",
+    "desc": "Exceptional Emergency Center operates freestanding emergency rooms across Texas. For seven active locations in Amarillo, Beaumont, Fort Worth, Orange, Port Arthur and Tyler, we run Google Ads, Google Business Profiles, local SEO and call tracking as one system, so that people searching for emergency care nearby find an Exceptional ER and call.",
+    "highlight": "6,532 Patient Calls",
     "img": "/images/blog-img-05.jpg",
     "metrics": [
       {
-        "val": "14",
-        "lbl": "Keywords at #1 on Google"
+        "val": "6,532",
+        "lbl": "tracked patient calls in 60 days, 4,394 of them first-time callers"
       },
       {
-        "val": "23 / 27",
-        "lbl": "Keywords in Top-3 Organic"
+        "val": "94%",
+        "lbl": "of calls answered across all locations"
       },
       {
-        "val": "122.4K",
-        "lbl": "Search Impressions (60 Days)"
+        "val": "3,178",
+        "lbl": "Google Ads conversions at $28.77 each"
       },
       {
-        "val": "287",
-        "lbl": "Store Calls in 60 Days"
+        "val": "16%",
+        "lbl": "Google Ads conversion rate, with a 4.34% click-through rate"
+      },
+      {
+        "val": "30,105",
+        "lbl": "clicks from Google Search, at an average position of 6.5"
+      },
+      {
+        "val": "100",
+        "lbl": "tracked keyword rankings in Google’s top 3 across the locations, 27 of them at #1"
+      }
+    ],
+    "services": [
+      "Google Ads",
+      "GBP",
+      "SEO",
+      "call tracking"
+    ],
+    "challenge": {
+      "heading": "Being the ER people find, and call, first",
+      "paragraphs": [
+        "In an emergency, people search, choose one of the first results and call or drive there. For a group of freestanding ERs spread across very different Texas markets, from Amarillo to the Gulf Coast to Fort Worth, each location has to win its own local searches and answer every call.",
+        "The goal was to generate a steady, measurable flow of patient calls at every location at a controlled cost, and to grow organic visibility for the symptom and service searches people use, such as pediatric emergencies, abdominal pain and lab testing."
+      ]
+    },
+    "whatWeDid": {
+      "heading": "One system across ads, maps, search and the phone",
+      "steps": [
+        {
+          "title": "Google Ads by location",
+          "desc": "Separate campaigns for each ER, built for calls and conversions in its own service area."
+        },
+        {
+          "title": "Google Business Profile management",
+          "desc": "Regular posts and review monitoring for every location, with tracked call numbers and website links."
+        },
+        {
+          "title": "Local SEO",
+          "desc": "Location pages targeting city, “near me”, pediatric, symptom and lab-service searches, tracked monthly for more than 300 keywords."
+        },
+        {
+          "title": "Call tracking and attribution",
+          "desc": "Every call attributed to its source and location, with answer rates monitored by hour of day."
+        }
+      ]
+    },
+    "resultsSections": [
+      {
+        "title": "RESULTS · PHONE CALLS",
+        "subtitle": "Thousands of calls, tracked to their source",
+        "paragraphs": [
+          "In 60 days the seven locations received 6,532 tracked calls. Google Ads and the Business Profiles together drove 90% of them."
+        ],
+        "diagrams": [
+          {
+            "src": "/images/case-studies/exceptional-emergency-center/diagram-1.png",
+            "caption": ""
+          },
+          {
+            "src": "/images/case-studies/exceptional-emergency-center/diagram-2.png",
+            "caption": ""
+          }
+        ],
+        "tables": [],
+        "statCards": []
+      },
+      {
+        "title": "RESULTS · BY LOCATION",
+        "subtitle": "Every ER producing patient calls",
+        "paragraphs": [
+          "August 11 – October 9, 2026. Location totals exclude a small number of calls not tied to a single location."
+        ],
+        "diagrams": [],
+        "tables": [
+          {
+            "headers": [
+              "Location",
+              "Calls",
+              "Answered",
+              "First-time",
+              "Ads conv.",
+              "Cost / conv."
+            ],
+            "rows": [
+              [
+                "Fort Worth",
+                "1,392",
+                "95.8%",
+                "1,004",
+                "562",
+                "$30.81"
+              ],
+              [
+                "Beaumont",
+                "1,165",
+                "89.2%",
+                "769",
+                "629",
+                "$26.63"
+              ],
+              [
+                "Amarillo Western",
+                "915",
+                "95.1%",
+                "616",
+                "459",
+                "$24.81"
+              ],
+              [
+                "Port Arthur",
+                "709",
+                "94.4%",
+                "445",
+                "207",
+                "$14.23"
+              ],
+              [
+                "Orange",
+                "693",
+                "94.9%",
+                "405",
+                "269",
+                "$17.80"
+              ],
+              [
+                "Tyler",
+                "643",
+                "95.3%",
+                "465",
+                "262",
+                "$45.37"
+              ],
+              [
+                "Amarillo Coulter",
+                "621",
+                "94.5%",
+                "417",
+                "314",
+                "$26.76"
+              ]
+            ]
+          }
+        ],
+        "statCards": []
+      },
+      {
+        "title": "RESULTS · GOOGLE ADS",
+        "subtitle": "Efficient patient acquisition",
+        "paragraphs": [],
+        "diagrams": [],
+        "tables": [],
+        "statCards": [
+          [
+            {
+              "val": "16,839",
+              "lbl": "Ad clicks"
+            },
+            {
+              "val": "3,356",
+              "lbl": "Calls from ads"
+            },
+            {
+              "val": "$5.43",
+              "lbl": "Average cost per click"
+            },
+            {
+              "val": "$28.77",
+              "lbl": "Cost per conversion"
+            }
+          ]
+        ]
+      },
+      {
+        "title": "RESULTS · SEARCH, MAPS AND WEBSITE",
+        "subtitle": "Visibility that brings people in",
+        "paragraphs": [
+          "Google organic search brought 31,370 visitors to the website in 60 days, 69% of all traffic. Across the Business Profiles, 5,503 people took an action: 2,854 asked for directions, 1,458 called and 1,191 visited the website.",
+          "Organic rankings are strongest in Port Arthur, where 11 tracked searches rank #1 (including “pediatric emergency room near me” and “urgent care for abdominal pain near me”), and in Orange, where 23 of 38 tracked searches rank in the top 3."
+        ],
+        "diagrams": [],
+        "tables": [],
+        "statCards": [
+          [
+            {
+              "val": "",
+              "lbl": "9.48M Google Search impressions"
+            },
+            {
+              "val": "45,529",
+              "lbl": "Website visitors"
+            },
+            {
+              "val": "55,802",
+              "lbl": "Business Profile impressions"
+            },
+            {
+              "val": "2,854",
+              "lbl": "Direction requests"
+            }
+          ]
+        ]
+      }
+    ],
+    "whatsNext": {
+      "heading": "Lifting core “emergency room” rankings",
+      "paragraphs": [
+        "The next phase focuses on pushing core “emergency room near me” searches back into the top 3 in Amarillo and Beaumont, improving answer rates at Beaumont, and bringing cost per conversion down in Tyler."
+      ]
+    },
+    "ctaBox": {
+      "title": "YOUR PRACTICE NEXT",
+      "text": "Want more patients calling your locations first? We help healthcare providers and multi-location businesses rank in Google Search and Maps, run profitable ads, and track every call back to its source. Contact us for a free audit."
+    },
+    "dataSources": "Google Ads, Google Business Profile insights, Search Console, and verified call tracking for Exceptional Emergency Center (AUG 11 – OCT 9, 2026)."
+  },
+  {
+    "slug": "afa-movers",
+    "title": "AFA Movers: doubling the area where they rank top 3 in Google Maps",
+    "client": "AFA Movers",
+    "location": "Sugar Land, TX (Houston area)",
+    "industry": "Moving services",
+    "category": "Local & Automotive Services",
+    "eyebrow": "CASE STUDY · LOCAL SEO · MOVING & PACKING",
+    "tag": "CASE STUDY • LOCAL SEO • MOVING & PACKING",
+    "timeline": "MARCH TO JULY 2026",
+    "desc": "AFA Movers is a residential and commercial moving company based in Sugar Land, Texas, serving the southwest Houston area. In four months of focused map-pack work, their Google Business Profile went from ranking in the top 3 across less than a third of their service area to nearly two thirds of it.",
+    "highlight": "2× Top-3 Maps Coverage",
+    "img": "/images/blog-img-06.jpg",
+    "metrics": [
+      {
+        "val": "2×",
+        "lbl": "Top-3 Google Maps coverage grew from 31% to 64% of the 6-mile service area"
+      },
+      {
+        "val": "93%",
+        "lbl": "of the service area showed AFA Movers in the local top 10 by July, up from 75%"
+      },
+      {
+        "val": "7.5 → 3.9",
+        "lbl": "Average Google Maps position across 13 tracked moving keywords"
+      },
+      {
+        "val": "2% → 77%",
+        "lbl": "Top-3 coverage for “cheap movers” across the service area"
+      },
+      {
+        "val": "2×",
+        "lbl": "“commercial movers” top-3 coverage, from 44% to 89%"
+      },
+      {
+        "val": "100%",
+        "lbl": "of grid points ranked AFA Movers in the top 10 for “piano movers”"
       }
     ],
     "services": [
       "Local SEO",
-      "GBP Management",
-      "Content Optimization",
-      "Store Foot-Traffic"
+      "Google Business Profile",
+      "Maps rankings"
     ],
     "challenge": {
-      "heading": "Overcoming Invisibility in Both Suburban and Metro Markets",
+      "heading": "A crowded Houston moving market",
       "paragraphs": [
-        "Almost every retail smoke and vape shop purchase starts with a mobile search like 'smoke shop near me' or 'vape shop open now'. Local visibility directly dictates in-store foot traffic.",
-        "In November 2025, the Angleton store was missing from results for vape, tobacco, water pipe, and CBD searches (22 of 27 tracked keywords were outside the top 100).",
-        "The Cypress location in the cutthroat Houston metro market did not rank in the top 100 for any of its 19 tracked keywords."
+        "Moving is one of the most competitive local categories in Greater Houston. Customers compare several companies on Google Maps before calling, and they rarely scroll past the first three listings. AFA Movers ranked well right around its Sugar Land office for core terms like “residential movers” and “apartment movers”, but visibility dropped off quickly a few miles out.",
+        "For price- and service-led searches such as “cheap movers”, “commercial movers” and “professional movers”, the company appeared in the top 3 across only a small part of its service area. On “cheap movers” it was in the top 3 at just 2% of the area we measured."
       ]
     },
     "whatWeDid": {
-      "heading": "Ground-Up Reconstruction of Local Search & Map Listings",
-      "summary": "Rebuilt on-page taxonomy, inventory categories, and Google Business Profiles for both storefronts.",
+      "heading": "Building map-pack authority around one office",
       "steps": [
         {
-          "title": "Complete GBP Optimization",
-          "desc": "Configured granular product catalogs, business hours, and geotagged storefront imagery for both locations."
+          "title": "Google Business Profile optimization",
+          "desc": "Categories, services and descriptions aligned with every service AFA offers: residential, apartment, commercial, furniture, piano and long-distance moves, plus packing."
         },
         {
-          "title": "Category Product Hubs",
-          "desc": "Engineered web pages targeting glassware, disposables, hookah accessories, and premium tobacco."
+          "title": "Service-led content",
+          "desc": "Website content and profile updates targeting how customers search, including price-focused and service-specific phrases."
         },
         {
-          "title": "Local Houston & Angleton SEO",
-          "desc": "Optimized geographic signals to pull foot-traffic from neighboring communities in Brazoria and Harris counties."
+          "title": "Local relevance signals",
+          "desc": "Consistent business information and location signals to strengthen ranking beyond the immediate Sugar Land area."
         },
         {
-          "title": "Customer Action Tracking",
-          "desc": "Tracked phone calls, website clicks, and in-person driving direction requests directly from Google."
+          "title": "Grid-based rank tracking",
+          "desc": "Regular scans of a 133-point grid covering a 6-mile radius around the office, for 13 moving keywords, so we could see exactly which neighborhoods were improving."
+        },
+        {
+          "title": "Organic keyword tracking",
+          "desc": "Monthly organic positions for 30+ moving, packing and city keywords, including new Sugar Land targets."
         }
       ]
     },
-    "results": {
-      "heading": "14 Keywords at #1 on Google and 23 of 27 in Top 3",
-      "paragraphs": [
-        "In Angleton, 14 keywords soared to the #1 position on Google, and 23 of 27 tracked keywords reached the top 3 organic results.",
-        "In Cypress, 5 major competitive keywords moved from outside the top 100 straight onto page one of Google.",
-        "The two profiles generated 287 customer phone calls and 251 direct driving navigation requests in 60 days, backed by 122,400 Google Search impressions."
-      ]
-    },
+    "resultsSections": [
+      {
+        "title": "RESULTS · GOOGLE MAPS",
+        "subtitle": "From a third of the map to nearly two thirds",
+        "paragraphs": [
+          "Each scan checks AFA’s position in Google Maps from 133 points spread across a 6-mile radius around the office, for all 13 tracked keywords.",
+          "Average Google Maps position by keyword",
+          "Lower is better. Average position across all 133 grid points; points where AFA was outside the top 20 are counted as 21."
+        ],
+        "diagrams": [
+          {
+            "src": "/images/case-studies/afa-movers/diagram-1.png",
+            "caption": "Top-3 and top-10 coverage across 13 keywords, March 13 to July 5, 2026."
+          },
+          {
+            "src": "/images/case-studies/afa-movers/diagram-2.png",
+            "caption": "Share of grid points where AFA Movers ranks in the Google Maps top 3, first scan vs. July 5, 2026."
+          }
+        ],
+        "tables": [
+          {
+            "headers": [
+              "Keyword",
+              "Mar 2026",
+              "Jul 2026",
+              "Top-10 coverage, Jul"
+            ],
+            "rows": [
+              [
+                "residential movers",
+                "2.7",
+                "1.4",
+                "100%"
+              ],
+              [
+                "commercial movers",
+                "5.4",
+                "1.9",
+                "98%"
+              ],
+              [
+                "apartment movers",
+                "3.2",
+                "2.0",
+                "99%"
+              ],
+              [
+                "movers",
+                "6.3",
+                "2.4",
+                "97%"
+              ],
+              [
+                "cheap movers near me",
+                "7.9",
+                "2.5",
+                "98%"
+              ],
+              [
+                "cheap movers",
+                "9.2",
+                "2.6",
+                "98%"
+              ],
+              [
+                "furniture movers near me",
+                "4.1",
+                "2.7",
+                "97%"
+              ],
+              [
+                "local movers near me",
+                "6.0",
+                "2.9",
+                "95%"
+              ],
+              [
+                "piano movers",
+                "9.4",
+                "4.6",
+                "100%"
+              ],
+              [
+                "best movers",
+                "14.7",
+                "7.5",
+                "83%"
+              ]
+            ]
+          }
+        ],
+        "statCards": []
+      },
+      {
+        "title": "RESULTS · EARLY ORGANIC GAINS",
+        "subtitle": "Moving up in regular search results",
+        "paragraphs": [
+          "In the first months of the campaign, AFA Movers climbed into the top positions for several high-intent searches."
+        ],
+        "diagrams": [],
+        "tables": [
+          {
+            "headers": [
+              "Keyword",
+              "Nov 2025",
+              "Jan 2026"
+            ],
+            "rows": [
+              [
+                "office movers near me",
+                "5",
+                "#2"
+              ],
+              [
+                "apartment movers",
+                "10",
+                "#3"
+              ],
+              [
+                "apartment movers near me",
+                "7",
+                "#3"
+              ],
+              [
+                "movers",
+                "9",
+                "#4"
+              ],
+              [
+                "professional packing services",
+                "Not in top 100",
+                "#6"
+              ],
+              [
+                "packing services",
+                "Not in top 100",
+                "#8"
+              ],
+              [
+                "movers near me",
+                "11",
+                "#8"
+              ]
+            ]
+          }
+        ],
+        "statCards": []
+      },
+      {
+        "title": "RESULTS · CUSTOMER ACTIONS",
+        "subtitle": "Searches that lead to calls and visits",
+        "paragraphs": [
+          "Google Business Profile activity, August 11 to October 9, 2026."
+        ],
+        "diagrams": [],
+        "tables": [],
+        "statCards": [
+          [
+            {
+              "val": "1,981",
+              "lbl": "Profile impressions"
+            },
+            {
+              "val": "139",
+              "lbl": "Customer interactions"
+            },
+            {
+              "val": "90",
+              "lbl": "Direction requests"
+            },
+            {
+              "val": "49",
+              "lbl": "Calls and website visits"
+            }
+          ]
+        ]
+      }
+    ],
     "whatsNext": {
-      "heading": "Expanding Brand Exclusives and In-Store Loyalty Programs",
+      "heading": "Widening the map and rebuilding organic reach",
       "paragraphs": [
-        "Integrating in-store inventory search feeds into Google Merchant Center and promoting loyalty club signups through local search."
+        "The next phase extends AFA’s Maps strength further across Houston and Fort Bend County, adds Sugar Land city pages to win searches like “movers in Sugar Land”, and rebuilds organic rankings for packing and long-distance services."
       ]
     },
-    "dataSources": "Data sources: Google Search Console, Google Business Profile Performance Metrics, and organic keyword tracking."
+    "ctaBox": {
+      "title": "YOUR BUSINESS NEXT",
+      "text": "Want to own the map in your service area? We help local service businesses rank in Google Maps and Search, and turn that visibility into calls and booked jobs. Contact us for a free local SEO audit."
+    },
+    "dataSources": "Google Maps grid scans (133 points, 6-mile radius, 13 keywords), monthly organic rank tracking, and Google Business Profile insights. Map results compare March 13 and July 5, 2026; organic results compare November 2025 and January 2026; profile activity covers August 11 – October 9, 2026."
+  },
+  {
+    "slug": "smoke-it-up",
+    "title": "Smoke It Up: from not in the top 100 to #1 on Google for 14 local searches",
+    "client": "Smoke It Up (smokeitup.co)",
+    "location": "Angleton, TX · Cypress, TX",
+    "industry": "Multi-Location Business",
+    "category": "Retail & Transport",
+    "eyebrow": "CASE STUDY · LOCAL SEO · MULTI-LOCATION RETAIL",
+    "tag": "CASE STUDY • LOCAL SEO • MULTI-LOCATION RETAIL",
+    "timeline": "Nov 2025 – present",
+    "desc": "A two-location smoke and vape retailer in Texas needed customers searching nearby to find them first. We rebuilt their local search presence across the website, Google Business Profiles and map rankings for both stores, Angleton and Cypress (Houston).",
+    "highlight": "#1 on Google for 14 Searches",
+    "img": "/images/blog-img-01.jpg",
+    "metrics": [
+      {
+        "val": "14",
+        "lbl": "Angleton keywords now ranking #1 on Google, up from none at the start"
+      },
+      {
+        "val": "23",
+        "lbl": "/ 27 tracked Angleton keywords in the top 3 organic results"
+      },
+      {
+        "val": "5",
+        "lbl": "Cypress keywords moved from outside the top 100 to page one"
+      },
+      {
+        "val": "287",
+        "lbl": "phone calls from the two Google Business Profiles in 60 days"
+      },
+      {
+        "val": "251",
+        "lbl": "driving-direction requests to the stores in 60 days"
+      },
+      {
+        "val": "",
+        "lbl": "122.4K Google Search impressions for the website in 60 days"
+      }
+    ],
+    "services": [
+      "Local SEO",
+      "GBP management",
+      "content"
+    ],
+    "challenge": {
+      "heading": "Two stores, two very different starting points",
+      "paragraphs": [
+        "Smoke It Up sells vapes, disposables, glass, hookah, loose-leaf tobacco, THCA and CBD from two Texas storefronts. Almost every sale starts with a phone search like “smoke shop near me”, so local visibility drives foot traffic directly.",
+        "In November 2025 the Angleton store ranked for a handful of core “smoke shop” terms but was missing from the results for vape, tobacco, water pipe and THCA searches. 22 of 27 tracked Angleton keywords were not in Google’s top 100.",
+        "The Cypress store, in the far more competitive Houston market, did not appear in the top 100 for any of its 19 tracked keywords."
+      ]
+    },
+    "whatWeDid": {
+      "heading": "A local search system for each storefront",
+      "steps": [
+        {
+          "title": "Location landing pages",
+          "desc": "Dedicated, optimized pages for the Angleton and Cypress stores, each targeting city, neighborhood and road-name searches like “smoke shop 529” and “smoke shop copperfield”."
+        },
+        {
+          "title": "Product category pages",
+          "desc": "Search-focused pages for vape accessories, vape batteries, loose-leaf tobacco, water pipes, THCA flower and detox products, so each product search has a page to rank."
+        },
+        {
+          "title": "Google Business Profile management",
+          "desc": "Regular, neighborhood-targeted posts with call and booking buttons. 86 posts went out across both profiles in the last 60 days alone, plus active review responses."
+        },
+        {
+          "title": "Map-pack grid tracking",
+          "desc": "Monthly heat-map scans on 3-mile and 6-mile grids around each store, tracking up to 19 keywords per location to see exactly where each store shows in Google Maps."
+        },
+        {
+          "title": "Monthly rank tracking",
+          "desc": "Organic positions for every target keyword, mapped to the page meant to rank, reviewed each month to decide where to push next."
+        },
+        {
+          "title": "Clear reporting",
+          "desc": "One live dashboard combining Search Console, Analytics, both Business Profiles, reviews and rankings."
+        }
+      ]
+    },
+    "resultsSections": [
+      {
+        "title": "RESULTS · ORGANIC RANKINGS",
+        "subtitle": "Climbing the ladder, month by month",
+        "paragraphs": [
+          "Google organic position for four target keywords, November 2025 to September 2026. Higher on the chart is better; the bottom lane means the site was not in the top 100.",
+          "Cypress: onto page one",
+          "Positions are Google organic rankings recorded in monthly rank tracking."
+        ],
+        "diagrams": [
+          {
+            "src": "/images/case-studies/smoke-it-up/diagram-1.png",
+            "caption": "Angleton: before and after"
+          }
+        ],
+        "tables": [
+          {
+            "headers": [
+              "Keyword",
+              "Nov 2025",
+              "Sep 2026"
+            ],
+            "rows": [
+              [
+                "smoke shop",
+                "2",
+                "#1"
+              ],
+              [
+                "smoke shops",
+                "2",
+                "#1"
+              ],
+              [
+                "smoke shop near me",
+                "5",
+                "#2"
+              ],
+              [
+                "vape shop near me",
+                "Not in top 100",
+                "#1"
+              ],
+              [
+                "best vape shop near me",
+                "Not in top 100",
+                "#1"
+              ],
+              [
+                "angleton smoke shop",
+                "Not in top 100",
+                "#1"
+              ],
+              [
+                "smoke shop nearby",
+                "Not in top 100",
+                "#1"
+              ],
+              [
+                "loose leaf tobacco near me",
+                "Not in top 100",
+                "#1"
+              ],
+              [
+                "water pipe smoke shop near me",
+                "Not in top 100",
+                "#2"
+              ],
+              [
+                "thca flower smoke shop",
+                "Not in top 100",
+                "#2"
+              ]
+            ]
+          },
+          {
+            "headers": [
+              "Keyword",
+              "Nov 2025",
+              "Sep 2026"
+            ],
+            "rows": [
+              [
+                "smoke shop 529",
+                "Not in top 100",
+                "#2"
+              ],
+              [
+                "cypress smoke shop",
+                "Not in top 100",
+                "#2"
+              ],
+              [
+                "smoke shop copperfield",
+                "Not in top 100",
+                "#2"
+              ],
+              [
+                "smoke shop cypress",
+                "Not in top 100",
+                "#4"
+              ],
+              [
+                "cypress vape shop",
+                "Not in top 100",
+                "#8"
+              ]
+            ]
+          }
+        ],
+        "statCards": []
+      },
+      {
+        "title": "RESULTS · GOOGLE MAPS",
+        "subtitle": "Showing up in the map pack, block by block",
+        "paragraphs": [
+          "We scan a grid of points around each store and record where the listing appears in Google Maps from each one. The figures below show the share of grid points where the store ranks in the local top 10."
+        ],
+        "diagrams": [],
+        "tables": [
+          {
+            "headers": [
+              "Grid and keywords",
+              "When",
+              "Top-10 coverage"
+            ],
+            "rows": [
+              [
+                "Angleton, 6-mile grid · 11 core keywords",
+                "Nov 2025",
+                "86%"
+              ],
+              [
+                "Angleton, 6-mile grid · same keywords",
+                "Oct 2026",
+                "97%"
+              ],
+              [
+                "Angleton, 3-mile grid · all 19 keywords",
+                "Oct 2026",
+                "100%"
+              ],
+              [
+                "Cypress, 3-mile grid · “smoke shop 529”",
+                "Oct 2026",
+                "100%"
+              ],
+              [
+                "Cypress, 3-mile grid · “smoke shop copperfield”",
+                "Oct 2026",
+                "92%"
+              ]
+            ]
+          }
+        ],
+        "statCards": []
+      },
+      {
+        "title": "RESULTS · CUSTOMER ACTIONS",
+        "subtitle": "Searches that turn into store visits",
+        "paragraphs": [
+          "Combined Google Business Profile activity for both stores, August 11 to October 9, 2026.",
+          "Nearly 12% of people who saw a Smoke It Up profile called, asked for directions or visited the website."
+        ],
+        "diagrams": [],
+        "tables": [
+          {
+            "headers": [
+              "Store",
+              "Impressions",
+              "Calls",
+              "Directions",
+              "Website clicks"
+            ],
+            "rows": [
+              [
+                "Angleton",
+                "2,857",
+                "186",
+                "125",
+                "124"
+              ],
+              [
+                "Cypress",
+                "3,457",
+                "101",
+                "126",
+                "74"
+              ]
+            ]
+          }
+        ],
+        "statCards": [
+          [
+            {
+              "val": "6,314",
+              "lbl": "Profile impressions"
+            },
+            {
+              "val": "736",
+              "lbl": "Customer interactions"
+            },
+            {
+              "val": "287",
+              "lbl": "Calls"
+            },
+            {
+              "val": "251",
+              "lbl": "Direction requests"
+            }
+          ]
+        ]
+      },
+      {
+        "title": "RESULTS · WEBSITE",
+        "subtitle": "More of the right visitors",
+        "paragraphs": [
+          "Search Console and Google Analytics, August 11 to October 9, 2026.",
+          "Search-engine visitors include Google (447), Bing (132), DuckDuckGo (87), Yahoo (53) and Ecosia (28). A further 174 visitors arrived through the website links on the two Business Profiles."
+        ],
+        "diagrams": [],
+        "tables": [],
+        "statCards": [
+          [
+            {
+              "val": "551",
+              "lbl": "Clicks from Google Search"
+            },
+            {
+              "val": "8.9",
+              "lbl": "Average search position"
+            },
+            {
+              "val": "1,469",
+              "lbl": "Website visitors"
+            },
+            {
+              "val": "747",
+              "lbl": "Visitors from search engines"
+            }
+          ]
+        ]
+      }
+    ],
+    "whatsNext": {
+      "heading": "Taking Cypress further into Houston",
+      "paragraphs": [
+        "Angleton now leads its market for nearly every search we track. In Cypress, the store owns its immediate neighborhood searches. The next phase focuses on broader Houston terms like “smoke shop near me”, where the competition is heaviest, building on the local authority the campaign has already earned."
+      ]
+    },
+    "dataSources": "Google Ads, Google Business Profile insights, Search Console, and verified call tracking for Smoke It Up (smokeitup.co) (Nov 2025 – present)."
+  },
+  {
+    "slug": "grandewood-pointe",
+    "title": "Grandewood Pointe: 4,798 renter actions on Google in 60 days",
+    "client": "Grandewood Pointe",
+    "location": "Orlando, FL",
+    "industry": "Apartment community",
+    "category": "Real Estate & Multifamily",
+    "eyebrow": "CASE STUDY · LOCAL SEO · MULTIFAMILY / APARTMENTS",
+    "tag": "CASE STUDY • LOCAL SEO • MULTIFAMILY / APARTMENTS",
+    "timeline": "AUG 11 – OCT 9, 2026",
+    "desc": "Grandewood Pointe is an apartment community in Orlando, Florida, offering one-, two- and three-bedroom homes. We manage its Google Business Profile and website search presence so that renters comparing apartments on Google find the community, visit the website and book a tour.",
+    "highlight": "4,798 Renter Actions",
+    "img": "/images/blog-img-02.jpg",
+    "metrics": [
+      {
+        "val": "4,798",
+        "lbl": "renter actions on the Google Business Profile in 60 days"
+      },
+      {
+        "val": "21%",
+        "lbl": "of people who saw the profile took an action, about 1 in 5"
+      },
+      {
+        "val": "2,823",
+        "lbl": "clicks from the profile to the community website"
+      },
+      {
+        "val": "1,576",
+        "lbl": "direction requests to the community"
+      },
+      {
+        "val": "6.2",
+        "lbl": "average position in Google Search, with a 7.9% click-through rate"
+      },
+      {
+        "val": "",
+        "lbl": "1:28 average engaged time per website visitor, with a 34.7% bounce rate"
+      }
+    ],
+    "services": [
+      "Local SEO",
+      "Google Business Profile",
+      "website search"
+    ],
+    "challenge": {
+      "heading": "Standing out in a busy Orlando rental market",
+      "paragraphs": [
+        "Orlando renters can choose from a large and growing supply of apartments, and most start on Google with searches by unit type and area. Listing sites and large operators take up much of the results page, so an individual community has to make its own Google presence work hard.",
+        "For Grandewood Pointe the goal was to turn Google visibility into real leasing activity: website visits to see floor plans, direction requests for tours, and calls to the leasing office."
+      ]
+    },
+    "whatWeDid": {
+      "heading": "A Google presence built for renters",
+      "steps": [
+        {
+          "title": "Google Business Profile management",
+          "desc": "A complete, accurate profile with photos, amenities and leasing details, updated regularly to stay relevant in search."
+        },
+        {
+          "title": "Website search optimization",
+          "desc": "Page titles and content aligned with how renters search by unit type and Orlando location."
+        },
+        {
+          "title": "AI search visibility",
+          "desc": "Consistent, well-structured community information that AI assistants such as ChatGPT can use to recommend the property."
+        },
+        {
+          "title": "Map-pack tracking",
+          "desc": "A 133-point grid scan over a 6-mile radius for 18 unit-type keywords, to measure Maps visibility across Orlando."
+        },
+        {
+          "title": "Full-funnel reporting",
+          "desc": "One dashboard combining Search Console, Analytics and Business Profile data for the leasing team."
+        }
+      ]
+    },
+    "resultsSections": [
+      {
+        "title": "RESULTS · GOOGLE BUSINESS PROFILE",
+        "subtitle": "From search to tour",
+        "paragraphs": [
+          "In 60 days the profile was seen 22,827 times, and 4,798 of those views turned into an action that leads toward a lease."
+        ],
+        "diagrams": [
+          {
+            "src": "/images/case-studies/grandewood-pointe/diagram-1.png",
+            "caption": ""
+          }
+        ],
+        "tables": [],
+        "statCards": []
+      },
+      {
+        "title": "RESULTS · WEBSITE AND SEARCH",
+        "subtitle": "Engaged visitors exploring the community",
+        "paragraphs": [
+          "Visitors spend real time on the site: an average of 1 minute 28 seconds of engaged time, about 11 tracked interactions each, and a bounce rate of just 34.7%. When Grandewood Pointe appears in Google Search it ranks at an average position of 6.2, and 7.9% of searchers click through."
+        ],
+        "diagrams": [
+          {
+            "src": "/images/case-studies/grandewood-pointe/diagram-2.png",
+            "caption": "Google organic search is the largest measured acquisition channel. ChatGPT sent 31 visitors, a new discovery channel for renters."
+          }
+        ],
+        "tables": [],
+        "statCards": [
+          [
+            {
+              "val": "2,705",
+              "lbl": "Website visitors"
+            },
+            {
+              "val": "3,387",
+              "lbl": "Engaged sessions"
+            },
+            {
+              "val": "418",
+              "lbl": "Clicks from Google Search"
+            },
+            {
+              "val": "11.0",
+              "lbl": "Interactions per visitor"
+            }
+          ]
+        ]
+      }
+    ],
+    "whatsNext": {
+      "heading": "Winning more unit-type searches in Google Maps",
+      "paragraphs": [
+        "The next phase focuses on Google Maps rankings for searches such as “1 bedroom apartments orlando” and “3 bedroom apartments orlando fl” across a wider area of the city, and on growing organic and AI-assistant traffic to the website."
+      ]
+    },
+    "ctaBox": {
+      "title": "YOUR PROPERTY NEXT",
+      "text": "Want more renters finding your community first? We help apartment communities and local businesses turn Google Search and Maps into tours, calls and leases. Contact us for a free local SEO audit."
+    },
+    "dataSources": "Google Ads, Google Business Profile insights, Search Console, and verified call tracking for Grandewood Pointe (AUG 11 – OCT 9, 2026)."
+  },
+  {
+    "slug": "ainsley-heights",
+    "title": "Ainsley Heights: turning local search into 4,199 renter actions in 60 days",
+    "client": "Ainsley Heights",
+    "location": "Houston, TX",
+    "industry": "Apartment community",
+    "category": "Real Estate & Multifamily",
+    "eyebrow": "CASE STUDY · LOCAL SEO · MULTIFAMILY / APARTMENTS",
+    "tag": "CASE STUDY • LOCAL SEO • MULTIFAMILY / APARTMENTS",
+    "timeline": "AUG 11 – OCT 9, 2026",
+    "desc": "Ainsley Heights is an apartment community in Houston, Texas, offering studio, one-, two- and three-bedroom homes. We manage its local search presence so that renters comparing apartments on Google find the community, tour it and contact the leasing office.",
+    "highlight": "4,199 Renter Actions",
+    "img": "/images/blog-img-03.jpg",
+    "metrics": [
+      {
+        "val": "4,199",
+        "lbl": "renter actions on Google: website visits, direction requests and calls"
+      },
+      {
+        "val": "31%",
+        "lbl": "of people who saw the Business Profile took an action, nearly 1 in 3"
+      },
+      {
+        "val": "1,915",
+        "lbl": "direction requests to the community, up 21% on the same period last year"
+      },
+      {
+        "val": "2,308",
+        "lbl": "clicks from Google Search to the website"
+      },
+      {
+        "val": "17.9%",
+        "lbl": "click-through rate from Google Search, up 30% on the previous 60 days"
+      },
+      {
+        "val": "4,418",
+        "lbl": "website visitors, 40% of them arriving from the Business Profile"
+      }
+    ],
+    "services": [
+      "Local SEO",
+      "Google Business Profile",
+      "website search"
+    ],
+    "challenge": {
+      "heading": "Standing out in one of the biggest rental markets in the US",
+      "paragraphs": [
+        "Houston renters have hundreds of communities to choose from, and most start on Google with searches like “2 bedroom apartments houston” or “studio apartments near me”. Listing sites and large management companies dominate those results, so an individual community has to earn its place in Maps and Search.",
+        "For Ainsley Heights the goal was simple: when a renter finds the community on Google, make it easy and compelling to take the next step, whether that is visiting the website, getting directions for a tour, or calling the leasing office."
+      ]
+    },
+    "whatWeDid": {
+      "heading": "A search presence built for renters",
+      "steps": [
+        {
+          "title": "Google Business Profile management",
+          "desc": "A complete, accurate profile with floor plans, amenities, photos and leasing details, tagged website links so every profile visit is tracked, and regular updates."
+        },
+        {
+          "title": "Website search optimization",
+          "desc": "Pages and titles aligned with how renters search, by unit type and by Houston location, to earn more clicks from the results page."
+        },
+        {
+          "title": "AI search visibility",
+          "desc": "Consistent, well-structured information about the community, which AI assistants such as ChatGPT now use to recommend it."
+        },
+        {
+          "title": "Map-pack tracking",
+          "desc": "A 133-point grid scan covering a 6-mile radius for 20 unit-type keywords, to measure Maps visibility across Houston neighbourhoods."
+        },
+        {
+          "title": "Full-funnel reporting",
+          "desc": "One dashboard combining Search Console, Analytics and Business Profile data, so leasing teams can see which channels bring renters in."
+        }
+      ]
+    },
+    "resultsSections": [
+      {
+        "title": "RESULTS · GOOGLE BUSINESS PROFILE",
+        "subtitle": "From search to tour",
+        "paragraphs": [
+          "In 60 days the Business Profile was seen 13,342 times. Nearly a third of those views turned into an action that leads toward a lease."
+        ],
+        "diagrams": [
+          {
+            "src": "/images/case-studies/ainsley-heights/diagram-1.png",
+            "caption": "Year-on-year changes from Google Business Profile insights."
+          }
+        ],
+        "tables": [
+          {
+            "headers": [
+              "Metric",
+              "Aug 11 – Oct 9, 2026",
+              "vs. same period 2025"
+            ],
+            "rows": [
+              [
+                "Profile impressions",
+                "13,342",
+                "+2.3%"
+              ],
+              [
+                "Total renter actions",
+                "4,199",
+                "+4.6%"
+              ],
+              [
+                "Direction requests",
+                "1,915",
+                "+21%"
+              ]
+            ]
+          }
+        ],
+        "statCards": []
+      },
+      {
+        "title": "RESULTS · WEBSITE AND SEARCH",
+        "subtitle": "High-intent visitors who engage",
+        "paragraphs": [
+          "Nearly 1 in 5 people who saw Ainsley Heights in Google Search clicked through to the website. Visitors then engaged deeply, with an average of 10 tracked interactions each, such as viewing floor plans and pages."
+        ],
+        "diagrams": [
+          {
+            "src": "/images/case-studies/ainsley-heights/diagram-2.png",
+            "caption": "The Business Profile is the largest single source of website visitors. ChatGPT sent 98 visitors, a new and growing discovery channel for renters."
+          }
+        ],
+        "tables": [],
+        "statCards": [
+          [
+            {
+              "val": "2,308",
+              "lbl": "Clicks from Google Search"
+            },
+            {
+              "val": "17.9%",
+              "lbl": "Search click-through rate"
+            },
+            {
+              "val": "9.7",
+              "lbl": "Average search position"
+            },
+            {
+              "val": "10.2",
+              "lbl": "Interactions per visitor"
+            }
+          ]
+        ]
+      }
+    ],
+    "whatsNext": {
+      "heading": "Winning more unit-type searches across Houston",
+      "paragraphs": [
+        "The next phase focuses on Google Maps rankings for unit-specific searches such as “2 bedroom apartments houston” and “studio apartments houston tx” across a wider area of the city, and on growing organic and AI-assistant traffic heading into the spring leasing season."
+      ]
+    },
+    "ctaBox": {
+      "title": "YOUR PROPERTY NEXT",
+      "text": "Want more renters finding your community first? We help apartment communities and local businesses turn Google Search and Maps into tours, calls and leases. Contact us for a free local SEO audit."
+    },
+    "dataSources": "Google Ads, Google Business Profile insights, Search Console, and verified call tracking for Ainsley Heights (AUG 11 – OCT 9, 2026)."
+  },
+  {
+    "slug": "kim-bruno-law",
+    "title": "Kim Bruno Law: from zero rankings to 9 #1 positions on Google, and 1,368 calls in 60 days",
+    "client": "Kim Bruno Law",
+    "location": "Houston, TX",
+    "industry": "Personal injury",
+    "category": "Legal & Law Firms",
+    "eyebrow": "CASE STUDY · SEO · LEGAL / PERSONAL INJURY",
+    "tag": "CASE STUDY • SEO • LEGAL / PERSONAL INJURY",
+    "timeline": "Ongoing Partnership",
+    "desc": "Attorney Kim Bruno (“Abogada Kim Bruno”) is a Houston-area personal injury lawyer serving English- and Spanish-speaking clients in wrongful death, car, truck and highway accident cases. We built the firm’s search presence in both languages so injured people across Greater Houston find her when they need a lawyer.",
+    "highlight": "1,368 Inbound Calls",
+    "img": "/images/blog-img-04.jpg",
+    "metrics": [
+      {
+        "val": "0 → 32",
+        "lbl": "tracked keywords ranking in Google’s top 100, January to September 2026"
+      },
+      {
+        "val": "0 → 21",
+        "lbl": "tracked keywords on page one of Google"
+      },
+      {
+        "val": "9",
+        "lbl": "keywords at #1, in English and Spanish"
+      },
+      {
+        "val": "1,368",
+        "lbl": "tracked phone calls in the last 60 days"
+      },
+      {
+        "val": "",
+        "lbl": "3:50 average call length, a sign of real case conversations"
+      },
+      {
+        "val": "",
+        "lbl": "547K Google Search impressions in the last 60 days"
+      }
+    ],
+    "services": [
+      "Bilingual SEO",
+      "city pages",
+      "Google Business Profile",
+      "call tracking"
+    ],
+    "challenge": {
+      "heading": "Competing with Houston’s biggest injury firms",
+      "paragraphs": [
+        "Personal injury is one of the most expensive and competitive search categories in the country, and Houston is among its toughest markets. Big-budget firms and lead-generation sites dominate the results for accident and wrongful death searches.",
+        "In January 2026 the firm did not rank in Google’s top 100 for any of the 94 English and Spanish keywords we track, from “Hunters Creek Village wrongful death lawyer” to “abogada de muerte injusta”."
+      ]
+    },
+    "whatWeDid": {
+      "heading": "Local, bilingual and case-specific",
+      "steps": [
+        {
+          "title": "City and suburb pages",
+          "desc": "Wrongful death and car accident pages for communities across Greater Houston, from Friendswood and Missouri City to Willis, Montgomery and Piney Point Village."
+        },
+        {
+          "title": "Spanish-language pages",
+          "desc": "Dedicated pages for Spanish-speaking clients, such as “Abogada de Muerte Injusta” pages for Friendswood and Missouri City."
+        },
+        {
+          "title": "Accident-type and highway pages",
+          "desc": "Pages for intersection, T-bone, multi-vehicle and railroad accidents, and for Houston highways like I-45, Beltway 8 and the Sam Houston Tollway."
+        },
+        {
+          "title": "Google Business Profile management",
+          "desc": "An active profile with regular posts, review responses and a tracked call number."
+        },
+        {
+          "title": "Call tracking and rank tracking",
+          "desc": "Every call attributed to its source, and 94 keywords tracked monthly."
+        }
+      ]
+    },
+    "resultsSections": [
+      {
+        "title": "RESULTS · GOOGLE RANKINGS",
+        "subtitle": "From invisible to the top of page one",
+        "paragraphs": [],
+        "diagrams": [
+          {
+            "src": "/images/case-studies/kim-bruno-law/diagram-1.png",
+            "caption": "Google organic positions from monthly rank tracking."
+          }
+        ],
+        "tables": [
+          {
+            "headers": [
+              "Keyword",
+              "Jan 2026",
+              "Sep 2026"
+            ],
+            "rows": [
+              [
+                "Hunters Creek Village wrongful death attorney",
+                "Not in top 100",
+                "#1"
+              ],
+              [
+                "Friendswood wrongful death attorney",
+                "Not in top 100",
+                "#1"
+              ],
+              [
+                "Piney Point Village wrongful death lawyer",
+                "Not in top 100",
+                "#1"
+              ],
+              [
+                "Willis wrongful death lawyer",
+                "Not in top 100",
+                "#1"
+              ],
+              [
+                "Montgomery wrongful death lawyer",
+                "Not in top 100",
+                "#1"
+              ],
+              [
+                "Abogada de Muerte Injusta",
+                "Not in top 100",
+                "#1"
+              ],
+              [
+                "Abogada de Muerte Injusta en Missouri City",
+                "Not in top 100",
+                "#1"
+              ],
+              [
+                "Southside Place car accident lawyer",
+                "Not in top 100",
+                "#2"
+              ],
+              [
+                "Baytown wrongful death attorney",
+                "Not in top 100",
+                "#4"
+              ],
+              [
+                "Baytown car accident lawyer",
+                "Not in top 100",
+                "#4"
+              ],
+              [
+                "Bellaire wrongful death attorney",
+                "Not in top 100",
+                "#5"
+              ],
+              [
+                "intersection accident attorney",
+                "Not in top 100",
+                "#6"
+              ],
+              [
+                "t bone accident lawyer near me",
+                "Not in top 100",
+                "#7"
+              ]
+            ]
+          }
+        ],
+        "statCards": []
+      },
+      {
+        "title": "RESULTS · CALLS AND VISIBILITY",
+        "subtitle": "Rankings that turn into real conversations",
+        "paragraphs": [
+          "Every inbound call is tracked. In 60 days the firm received 1,368 calls averaging 3 minutes 50 seconds, with 370 people calling for the first time. The Google Business Profile drove 89% of them."
+        ],
+        "diagrams": [
+          {
+            "src": "/images/case-studies/kim-bruno-law/diagram-2.png",
+            "caption": "Call tracking, Google Business Profile insights and Google Analytics 4, August 11 – October 9, 2026."
+          }
+        ],
+        "tables": [],
+        "statCards": [
+          [
+            {
+              "val": "12,021",
+              "lbl": "Business Profile impressions"
+            },
+            {
+              "val": "627",
+              "lbl": "Call clicks from the profile"
+            },
+            {
+              "val": "399",
+              "lbl": "Direction requests"
+            },
+            {
+              "val": "1,767",
+              "lbl": "Website visitors"
+            }
+          ]
+        ]
+      }
+    ],
+    "whatsNext": {
+      "heading": "Holding the gains and widening the map",
+      "paragraphs": [
+        "The next phase focuses on stabilizing city pages that reached the top 10 earlier in the year, such as Katy, Missouri City and Spring Valley Village, growing Google Maps visibility across Houston, and expanding Spanish-language pages."
+      ]
+    },
+    "ctaBox": {
+      "title": "YOUR FIRM NEXT",
+      "text": "Want injured clients to find your firm first? We help law firms rank on Google for the cases and communities they serve, in English and Spanish, and track every call back to its source. Contact us for a free SEO audit."
+    },
+    "dataSources": "Google Ads, Google Business Profile insights, Search Console, and verified call tracking for Kim Bruno Law (Campaign performance)."
+  },
+  {
+    "slug": "jlg-law",
+    "title": "JLG Law: from 1 to 52 ranking keywords, and 7 at #1 on Google, in ten months",
+    "client": "JLG Law",
+    "location": "Houston, TX",
+    "industry": "Criminal defense",
+    "category": "Legal & Law Firms",
+    "eyebrow": "CASE STUDY · SEO · LEGAL / CRIMINAL DEFENSE",
+    "tag": "CASE STUDY • SEO • LEGAL / CRIMINAL DEFENSE",
+    "timeline": "NOV 2025 → SEP 2026",
+    "desc": "JLG Law is a Houston criminal defense firm handling federal and state cases, from weapon trafficking, conspiracy and money laundering to DWI and theft. We built its search presence so that people facing charges across Houston and its suburbs find the firm when they search for a defense lawyer.",
+    "highlight": "28 Page-One Rankings",
+    "img": "/images/blog-img-05.jpg",
+    "metrics": [
+      {
+        "val": "1 → 52",
+        "lbl": "tracked keywords ranking in Google’s top 100"
+      },
+      {
+        "val": "0 → 28",
+        "lbl": "tracked keywords on page one of Google"
+      },
+      {
+        "val": "7",
+        "lbl": "keywords at #1, including six “weapon trafficking lawyer/attorney” searches"
+      },
+      {
+        "val": "",
+        "lbl": "583K Google Search impressions in the last 60 days"
+      },
+      {
+        "val": "70%",
+        "lbl": "of website visitors arrive from Google organic search"
+      },
+      {
+        "val": "8.9",
+        "lbl": "average Google Search position for the website"
+      }
+    ],
+    "services": [
+      "SEO",
+      "practice-area and suburb pages",
+      "Google Business Profile"
+    ],
+    "challenge": {
+      "heading": "Invisible in a crowded legal market",
+      "paragraphs": [
+        "Criminal defense is one of the most competitive search categories in Houston. Large firms and legal directories dominate the results, and people facing charges usually contact one of the first lawyers they find.",
+        "In November 2025 JLG Law ranked in Google’s top 100 for just 1 of the 92 keywords we track, and on page one for none of them. The firm was effectively invisible for the practice areas and Houston-area suburbs it serves."
+      ]
+    },
+    "whatWeDid": {
+      "heading": "A page for every case type and community",
+      "steps": [
+        {
+          "title": "Practice-area pages",
+          "desc": "Dedicated pages for federal and specialty defense, including weapon trafficking, conspiracy, alien smuggling, money laundering, theft, murder and DUI/DWI."
+        },
+        {
+          "title": "Suburb and city pages",
+          "desc": "Location pages for communities across Greater Houston, such as Hunters Creek Village, Spring Valley Village, Friendswood, La Porte, Channelview and Jacinto City."
+        },
+        {
+          "title": "On-page and technical SEO",
+          "desc": "Titles, content and structure built around how people search for a defense lawyer in their area."
+        },
+        {
+          "title": "Google Business Profile",
+          "desc": "An optimized profile for the Houston office with tracked website links."
+        },
+        {
+          "title": "Monthly rank tracking",
+          "desc": "92 keywords tracked every month to measure progress and decide where to push next."
+        }
+      ]
+    },
+    "resultsSections": [
+      {
+        "title": "RESULTS · GOOGLE RANKINGS",
+        "subtitle": "From invisible to page one",
+        "paragraphs": [
+          "Ten months in, more than half of the tracked keywords rank in Google’s top 100, 28 are on page one, and 7 hold the #1 position."
+        ],
+        "diagrams": [
+          {
+            "src": "/images/case-studies/jlg-law/diagram-1.png",
+            "caption": "Google organic positions from monthly rank tracking."
+          }
+        ],
+        "tables": [
+          {
+            "headers": [
+              "Keyword",
+              "Nov 2025",
+              "Sep 2026"
+            ],
+            "rows": [
+              [
+                "weapon trafficking lawyer",
+                "77",
+                "#1"
+              ],
+              [
+                "houston weapon trafficking attorney",
+                "Not in top 100",
+                "#1"
+              ],
+              [
+                "weapon trafficking attorney",
+                "Not in top 100",
+                "#1"
+              ],
+              [
+                "Morgan’s Point Resort criminal defense lawyer",
+                "Not in top 100",
+                "#1"
+              ],
+              [
+                "Hunters Creek Village criminal defense lawyer",
+                "Not in top 100",
+                "#3"
+              ],
+              [
+                "Spring Valley Village criminal defense attorney",
+                "Not in top 100",
+                "#3"
+              ],
+              [
+                "Brookside Village criminal defense attorney",
+                "Not in top 100",
+                "#3"
+              ],
+              [
+                "Jacinto City DUI & DWI attorney",
+                "Not in top 100",
+                "#3"
+              ],
+              [
+                "Channelview criminal defense lawyer",
+                "Not in top 100",
+                "#4"
+              ],
+              [
+                "dui attorney friendswood",
+                "Not in top 100",
+                "#4"
+              ],
+              [
+                "conspiracy attorney",
+                "Not in top 100",
+                "#6"
+              ],
+              [
+                "conspiracy defense lawyer",
+                "Not in top 100",
+                "#6"
+              ],
+              [
+                "houston alien lawyer",
+                "Not in top 100",
+                "#7"
+              ],
+              [
+                "la porte dui defense lawyer",
+                "Not in top 100",
+                "#8"
+              ]
+            ]
+          }
+        ],
+        "statCards": []
+      },
+      {
+        "title": "RESULTS · TRAFFIC",
+        "subtitle": "Search visibility that brings in potential clients",
+        "paragraphs": [
+          "In the last 60 days, the Google Business Profile for the Houston office also generated 104 direction requests, 75 website visits and 74 calls.",
+          "Google Search Console, Google Analytics 4 and Google Business Profile insights, August 11 – October 9, 2026."
+        ],
+        "diagrams": [],
+        "tables": [],
+        "statCards": [
+          [
+            {
+              "val": "",
+              "lbl": "583K Google Search impressions"
+            },
+            {
+              "val": "1,588",
+              "lbl": "Clicks from Google Search"
+            },
+            {
+              "val": "2,301",
+              "lbl": "Website visitors"
+            },
+            {
+              "val": "1,610",
+              "lbl": "Visitors from Google organic"
+            }
+          ]
+        ]
+      }
+    ],
+    "whatsNext": {
+      "heading": "Consolidating suburb and DWI rankings",
+      "paragraphs": [
+        "The next phase focuses on stabilizing suburb and DWI pages that reached the top 10 earlier in the year, such as Tomball, Alvin and Bellaire, and on growing visibility for Houston-wide terms like “houston dui and dwi attorney” and “houston theft lawyer”."
+      ]
+    },
+    "ctaBox": {
+      "title": "YOUR FIRM NEXT",
+      "text": "Want potential clients to find your firm first? We help law firms and local businesses rank on Google for the cases and communities they serve. Contact us for a free SEO audit."
+    },
+    "dataSources": "Google Ads, Google Business Profile insights, Search Console, and verified call tracking for JLG Law (NOV 2025 → SEP 2026)."
+  },
+  {
+    "slug": "lakhani-mcgrath",
+    "title": "Lakhani & McGrath: from zero rankings to 19 page-one positions on Google in nine months",
+    "client": "Lakhani & McGrath",
+    "location": "Houston, TX",
+    "industry": "Personal injury",
+    "category": "Legal & Law Firms",
+    "eyebrow": "CASE STUDY · SEO · LEGAL / PERSONAL INJURY",
+    "tag": "CASE STUDY • SEO • LEGAL / PERSONAL INJURY",
+    "timeline": "DEC 2025 → SEP 2026",
+    "desc": "Lakhani & McGrath is a Houston personal injury law firm handling car, motorcycle, 18-wheeler and premises liability cases. We built a local search presence across Greater Houston so that people injured in an accident find the firm when they search for a lawyer nearby.",
+    "highlight": "Page-One Rankings",
+    "img": "/images/blog-img-06.jpg",
+    "metrics": [
+      {
+        "val": "0 → 27",
+        "lbl": "tracked keywords ranking in Google’s top 100"
+      },
+      {
+        "val": "0 → 19",
+        "lbl": "tracked keywords on page one of Google"
+      },
+      {
+        "val": "#5",
+        "lbl": "for “premises liability lawyer houston”, from outside the top 100"
+      },
+      {
+        "val": "57",
+        "lbl": "of 89 tracked keywords have reached page one at least once"
+      },
+      {
+        "val": "",
+        "lbl": "227K Google Search impressions in the last 60 days"
+      },
+      {
+        "val": "78%",
+        "lbl": "of website visitors arrive from Google organic search"
+      }
+    ],
+    "services": [
+      "SEO",
+      "city and case-type pages",
+      "Google Business Profile"
+    ],
+    "challenge": {
+      "heading": "Breaking into Houston personal injury search",
+      "paragraphs": [
+        "Houston personal injury is dominated by large firms with national advertising budgets. For a smaller firm, the realistic path is to win the searches people make in their own community and for their specific type of accident.",
+        "In December 2025 Lakhani & McGrath did not rank in Google’s top 100 for any of the 89 keywords we track."
+      ]
+    },
+    "whatWeDid": {
+      "heading": "Winning the suburbs, one page at a time",
+      "steps": [
+        {
+          "title": "City and suburb pages",
+          "desc": "Car accident and motor vehicle accident pages for communities across Greater Houston, from Piney Point Village and Hedwig Village to Kemah, Manvel and Dickinson."
+        },
+        {
+          "title": "Case-type pages",
+          "desc": "Pages for motorcycle accidents, premises liability and specific truck accidents such as cement mixer, tow truck and sideswipe collisions."
+        },
+        {
+          "title": "On-page SEO",
+          "desc": "Titles, content and internal links built around how injured people search for a lawyer in their area."
+        },
+        {
+          "title": "Google Business Profile",
+          "desc": "Regular posts and an optimized profile for the Houston office."
+        },
+        {
+          "title": "Monthly rank tracking",
+          "desc": "89 keywords tracked every month to guide where to build next."
+        }
+      ]
+    },
+    "resultsSections": [
+      {
+        "title": "RESULTS · GOOGLE RANKINGS",
+        "subtitle": "From invisible to page one",
+        "paragraphs": [],
+        "diagrams": [
+          {
+            "src": "/images/case-studies/lakhani-mcgrath/diagram-1.png",
+            "caption": "Google organic positions from monthly rank tracking."
+          }
+        ],
+        "tables": [
+          {
+            "headers": [
+              "Keyword",
+              "Dec 2025",
+              "Sep 2026"
+            ],
+            "rows": [
+              [
+                "car accident attorney Spring Valley Village",
+                "Not in top 100",
+                "#2"
+              ],
+              [
+                "motor vehicle accident attorney Piney Point Village",
+                "Not in top 100",
+                "#2"
+              ],
+              [
+                "car accident lawyer Panorama Village, TX",
+                "Not in top 100",
+                "#3"
+              ],
+              [
+                "kemah car accident lawyer",
+                "Not in top 100",
+                "#3"
+              ],
+              [
+                "la marque motorcycle accident attorney",
+                "Not in top 100",
+                "#3"
+              ],
+              [
+                "houston sideswipe accident lawyer",
+                "Not in top 100",
+                "#4"
+              ],
+              [
+                "car accident lawyer Piney Point Village, TX",
+                "Not in top 100",
+                "#4"
+              ],
+              [
+                "premises liability lawyer houston",
+                "Not in top 100",
+                "#5"
+              ],
+              [
+                "car accident lawyer Shenandoah, TX",
+                "Not in top 100",
+                "#5"
+              ],
+              [
+                "hedwig village car accident lawyer",
+                "Not in top 100",
+                "#6"
+              ],
+              [
+                "motor vehicle accident attorney Manvel",
+                "Not in top 100",
+                "#6"
+              ],
+              [
+                "motor vehicle accident attorney Dickinson",
+                "Not in top 100",
+                "#7"
+              ]
+            ]
+          }
+        ],
+        "statCards": []
+      },
+      {
+        "title": "RESULTS · TRAFFIC",
+        "subtitle": "Search visibility that brings in potential clients",
+        "paragraphs": [
+          "Google Search Console and Google Analytics 4, August 11 – October 9, 2026. 505 of 647 visitors came from Google organic search."
+        ],
+        "diagrams": [],
+        "tables": [],
+        "statCards": [
+          [
+            {
+              "val": "",
+              "lbl": "227K Google Search impressions"
+            },
+            {
+              "val": "490",
+              "lbl": "Clicks from Google Search"
+            },
+            {
+              "val": "647",
+              "lbl": "Website visitors"
+            },
+            {
+              "val": "",
+              "lbl": "1:24 Engaged time per visitor"
+            }
+          ]
+        ]
+      }
+    ],
+    "whatsNext": {
+      "heading": "Turning rankings into more consultations",
+      "paragraphs": [
+        "The next phase focuses on bringing back city pages that reached the top 10 earlier in the year, such as Brookside Village, Hunters Creek Village and Fulshear, growing Houston-wide visibility for terms like “personal injury lawyer houston”, and building Google Maps presence for the office."
+      ]
+    },
+    "ctaBox": {
+      "title": "YOUR FIRM NEXT",
+      "text": "Want injured clients to find your firm first? We help law firms rank on Google for the cases and communities they serve. Contact us for a free SEO audit."
+    },
+    "dataSources": "Google Ads, Google Business Profile insights, Search Console, and verified call tracking for Lakhani & McGrath (DEC 2025 → SEP 2026)."
+  },
+  {
+    "slug": "st-michaels-elite-hospital",
+    "title": "St. Michael’s Elite Hospital: from invisible to page one for “emergency room”, and direction requests up 112%",
+    "client": "St. Michael’s Elite Hospital",
+    "location": "Sugar Land / Houston, TX",
+    "industry": "Emergency care",
+    "category": "Healthcare & Emergency Care",
+    "eyebrow": "CASE STUDY · HEALTHCARE · EMERGENCY HOSPITAL",
+    "tag": "CASE STUDY • HEALTHCARE • EMERGENCY HOSPITAL",
+    "timeline": "Ongoing Partnership",
+    "desc": "St. Michael’s Elite Hospital is a 24-hour emergency hospital in the Sugar Land / Houston area offering emergency care, imaging and lab services. We run its SEO, Google Business Profile, Google Ads and call tracking so that people searching for emergency care nearby find the hospital and call.",
+    "highlight": "+112% Direction Requests",
+    "img": "/images/blog-img-01.jpg",
+    "metrics": [
+      {
+        "val": "#7",
+        "lbl": "for “emergency room” on Google, up from outside the top 100 in December 2025"
+      },
+      {
+        "val": "+112%",
+        "lbl": "direction requests from Google Business Profile, year on year"
+      },
+      {
+        "val": "843",
+        "lbl": "tracked patient calls in 60 days, 594 of them first-time callers"
+      },
+      {
+        "val": "+57%",
+        "lbl": "Business Profile interactions year on year"
+      },
+      {
+        "val": "329",
+        "lbl": "Google Ads conversions in 60 days"
+      },
+      {
+        "val": "#1",
+        "lbl": "for the hospital’s brand name on Google"
+      }
+    ],
+    "services": [
+      "SEO",
+      "GBP",
+      "Google Ads",
+      "call tracking"
+    ],
+    "challenge": {
+      "heading": "A new hospital in a competitive market",
+      "paragraphs": [
+        "Greater Houston has dozens of emergency rooms, from large hospital systems to freestanding ERs. A newer, independent hospital needs to appear when people search for emergency care nearby, and turn that visibility into calls and visits.",
+        "In December 2025 the hospital’s website did not rank in Google’s top 100 for any core emergency search, including “emergency room”, “emergency room near me” and “hospital emergency room”."
+      ]
+    },
+    "whatWeDid": {
+      "heading": "Search, maps, ads and the phone",
+      "steps": [
+        {
+          "title": "Service-page SEO",
+          "desc": "Pages for emergency care, imaging (CT and extremity MRI) and laboratory services, optimized for how patients search."
+        },
+        {
+          "title": "Google Business Profile management",
+          "desc": "An optimized profile with tracked call numbers, regular updates and review management."
+        },
+        {
+          "title": "Google Ads",
+          "desc": "Campaigns for emergency searches in the hospital’s service area, optimized for calls."
+        },
+        {
+          "title": "Call tracking",
+          "desc": "Every call attributed to its source, with answer rates monitored around the clock."
+        }
+      ]
+    },
+    "resultsSections": [
+      {
+        "title": "RESULTS · GOOGLE RANKINGS",
+        "subtitle": "Page one for core emergency searches",
+        "paragraphs": [
+          "Google organic positions from monthly rank tracking. “emergency room near me” has ranked between #7 and #11 every month since February 2026."
+        ],
+        "diagrams": [],
+        "tables": [
+          {
+            "headers": [
+              "Keyword",
+              "Dec 2025",
+              "Sep 2026"
+            ],
+            "rows": [
+              [
+                "hospital emergency room",
+                "Not in top 100",
+                "#6"
+              ],
+              [
+                "emergency room",
+                "Not in top 100",
+                "#7"
+              ],
+              [
+                "emergency hospital near me",
+                "Not in top 100",
+                "#7"
+              ],
+              [
+                "emergency hospital room near me",
+                "Not in top 100",
+                "#7"
+              ],
+              [
+                "emergency care",
+                "Not in top 100",
+                "#9"
+              ],
+              [
+                "closest emergency room",
+                "Not in top 100",
+                "#9"
+              ],
+              [
+                "best emergency room near me",
+                "Not in top 100",
+                "#10"
+              ],
+              [
+                "mri extremity",
+                "Not in top 100",
+                "#4"
+              ],
+              [
+                "extremity mri machine",
+                "Not in top 100",
+                "#6"
+              ]
+            ]
+          }
+        ],
+        "statCards": []
+      },
+      {
+        "title": "RESULTS · GOOGLE BUSINESS PROFILE",
+        "subtitle": "More people finding and visiting the hospital",
+        "paragraphs": [],
+        "diagrams": [
+          {
+            "src": "/images/case-studies/st-michaels-elite-hospital/diagram-1.png",
+            "caption": ""
+          }
+        ],
+        "tables": [],
+        "statCards": []
+      },
+      {
+        "title": "RESULTS · PHONE CALLS AND ADS",
+        "subtitle": "Searches that become patient calls",
+        "paragraphs": [
+          "In 60 days the hospital received 843 tracked calls, answered 93% of them, and 594 came from people calling for the first time."
+        ],
+        "diagrams": [
+          {
+            "src": "/images/case-studies/st-michaels-elite-hospital/diagram-2.png",
+            "caption": "Call tracking, Google Ads and Search Console, August 11 – October 9, 2026. Google Ads spend: $11,857."
+          }
+        ],
+        "tables": [],
+        "statCards": [
+          [
+            {
+              "val": "3,095",
+              "lbl": "Ad clicks"
+            },
+            {
+              "val": "3.89%",
+              "lbl": "Ad click-through rate"
+            },
+            {
+              "val": "$3.83",
+              "lbl": "Average cost per click"
+            },
+            {
+              "val": "",
+              "lbl": "372K Google Search impressions"
+            }
+          ]
+        ]
+      }
+    ],
+    "whatsNext": {
+      "heading": "Climbing into the top 3",
+      "paragraphs": [
+        "The next phase focuses on moving core searches like “emergency room near me” and “nearest emergency room” from the bottom of page one into the top 3, and on lowering cost per conversion on Google Ads."
+      ]
+    },
+    "ctaBox": {
+      "title": "YOUR PRACTICE NEXT",
+      "text": "Want more patients finding you first? We help hospitals, ERs and healthcare providers rank in Google Search and Maps, run efficient ads, and track every call back to its source. Contact us for a free audit."
+    },
+    "dataSources": "Google Ads, Google Business Profile insights, Search Console, and verified call tracking for St. Michael’s Elite Hospital (Campaign performance)."
+  },
+  {
+    "slug": "eg-elite",
+    "title": "E&G Elite: from invisible to the Google Maps top 10 for New York car shipping searches",
+    "client": "E&G Elite",
+    "location": "New York, NY",
+    "industry": "Car shipping",
+    "category": "Retail & Transport",
+    "eyebrow": "CASE STUDY · LOCAL SEO · AUTO TRANSPORT",
+    "tag": "CASE STUDY • LOCAL SEO • AUTO TRANSPORT",
+    "timeline": "Ongoing Partnership",
+    "desc": "E&G Elite is a car shipping company based in Manhattan, offering open and enclosed transport for everyday, luxury, exotic and classic vehicles across the US. We manage its Google Business Profile, local SEO and call tracking so that people searching to ship a car from New York find E&G and call.",
+    "highlight": "59% NYC Maps Top-10 Coverage",
+    "img": "/images/blog-img-02.jpg",
+    "metrics": [
+      {
+        "val": "0% → 59%",
+        "lbl": "Maps top-10 coverage for “best car shipping company” across a 6-mile NYC grid, Jan to Jun 2026"
+      },
+      {
+        "val": "77%",
+        "lbl": "of the grid showed E&G in the Maps top 10 for “ship car to new york” in June 2026"
+      },
+      {
+        "val": "72",
+        "lbl": "tracked inbound calls in 60 days, 58 of them first-time callers"
+      },
+      {
+        "val": "74%",
+        "lbl": "of calls came from the Google Business Profile"
+      },
+      {
+        "val": "8.4",
+        "lbl": "average Google Search position for the website"
+      },
+      {
+        "val": "13,583",
+        "lbl": "Google Search impressions in 60 days"
+      }
+    ],
+    "services": [
+      "Local SEO",
+      "Google Business Profile",
+      "call tracking"
+    ],
+    "challenge": {
+      "heading": "Competing with national brokers in New York",
+      "paragraphs": [
+        "Car shipping searches are dominated by large national brokers and lead-generation sites with huge ad budgets. For a New York-based carrier, the opportunity is local: people in Manhattan, Brooklyn, Queens and New Jersey who want a trusted company nearby.",
+        "In January 2026 E&G Elite did not appear in the Google Maps top 20 anywhere within 6 miles of its office for any of 25 tracked car shipping keywords."
+      ]
+    },
+    "whatWeDid": {
+      "heading": "Building local visibility from zero",
+      "steps": [
+        {
+          "title": "Google Business Profile optimization",
+          "desc": "Categories, services and descriptions built around how customers search: enclosed, luxury, exotic, classic and door-to-door car shipping."
+        },
+        {
+          "title": "New York targeting",
+          "desc": "Content and keyword targeting for New York-specific searches such as “car shipping new york” and “ship car to new york”."
+        },
+        {
+          "title": "Grid-based rank tracking",
+          "desc": "Monthly scans of 133 points across a 6-mile radius around the Manhattan office, for up to 35 keywords."
+        },
+        {
+          "title": "Call tracking",
+          "desc": "Every call attributed to its source, so the team knows which channel brings in shipping inquiries."
+        }
+      ]
+    },
+    "resultsSections": [
+      {
+        "title": "RESULTS · GOOGLE MAPS",
+        "subtitle": "From nowhere to the local top 10",
+        "paragraphs": [
+          "By June 2026, E&G Elite was showing in the Google Maps top 10 across large parts of the area around its office, for keywords where it had no visibility at all in January."
+        ],
+        "diagrams": [
+          {
+            "src": "/images/case-studies/eg-elite/diagram-1.png",
+            "caption": "Google Maps grid scans, 133 points over a 6-mile radius. Average position counts points outside the top 20 as 21."
+          }
+        ],
+        "tables": [
+          {
+            "headers": [
+              "Keyword (tracked from May 2026)",
+              "Top-10 coverage, Jun 2026",
+              "Avg. position"
+            ],
+            "rows": [
+              [
+                "ship car to new york",
+                "77%",
+                "8.8"
+              ],
+              [
+                "car shipping new york",
+                "56%",
+                "10.1"
+              ],
+              [
+                "new york car shipping",
+                "47%",
+                "11.3"
+              ],
+              [
+                "classic car shipping",
+                "33%",
+                "13.4"
+              ]
+            ]
+          }
+        ],
+        "statCards": []
+      },
+      {
+        "title": "RESULTS · CALLS AND SEARCH",
+        "subtitle": "Visibility that turns into shipping inquiries",
+        "paragraphs": [],
+        "diagrams": [
+          {
+            "src": "/images/case-studies/eg-elite/diagram-2.png",
+            "caption": "Call tracking and Google Search Console, August 11 – October 9, 2026. Calls came from across the US and Canada, reflecting nationwide shipping demand."
+          }
+        ],
+        "tables": [],
+        "statCards": [
+          [
+            {
+              "val": "72",
+              "lbl": "Inbound calls"
+            },
+            {
+              "val": "58",
+              "lbl": "First-time callers"
+            },
+            {
+              "val": "95",
+              "lbl": "Clicks from Google Search"
+            },
+            {
+              "val": "8.4",
+              "lbl": "Average search position"
+            }
+          ]
+        ]
+      }
+    ],
+    "whatsNext": {
+      "heading": "Defending and widening the map",
+      "paragraphs": [
+        "The next phase focuses on restoring and expanding Google Maps visibility across New York and New Jersey, and on growing organic clicks for high-intent searches like enclosed and luxury car shipping."
+      ]
+    },
+    "ctaBox": {
+      "title": "YOUR BUSINESS NEXT",
+      "text": "Want customers in your area to find you first? We help service businesses rank in Google Maps and Search, and track every call back to its source. Contact us for a free local SEO audit."
+    },
+    "dataSources": "Google Ads, Google Business Profile insights, Search Console, and verified call tracking for E&G Elite (Campaign performance)."
+  },
+  {
+    "slug": "madtax",
+    "title": "MadTax: 11 city bookkeeping pages on Google’s first page within a month of launch",
+    "client": "MadTax",
+    "location": "Houston area and nationwide",
+    "industry": "Bookkeeping & tax",
+    "category": "Finance & Professional",
+    "eyebrow": "CASE STUDY · SEO · BOOKKEEPING & TAX SERVICES",
+    "tag": "CASE STUDY • SEO • BOOKKEEPING & TAX SERVICES",
+    "timeline": "JANUARY → FEBRUARY 2026",
+    "desc": "MadTax provides bookkeeping and tax services for small businesses, serving clients in the Houston area and remotely across the US. We built a network of city-specific service pages so business owners searching for local bookkeeping help could find the firm.",
+    "highlight": "11 Page-One City Pages",
+    "img": "/images/blog-img-03.jpg",
+    "metrics": [
+      {
+        "val": "1 → 23",
+        "lbl": "tracked city keywords ranking in Google’s top 100"
+      },
+      {
+        "val": "0 → 11",
+        "lbl": "tracked keywords on page one of Google"
+      },
+      {
+        "val": "#1",
+        "lbl": "for “sunrise manor bookkeeping service”"
+      },
+      {
+        "val": "7",
+        "lbl": "keywords in the top 5, including Texas City (#3), Montpelier (#4) and Friendswood (#5)"
+      }
+    ],
+    "services": [
+      "SEO",
+      "city service pages",
+      "rank tracking"
+    ],
+    "challenge": {
+      "heading": "A small firm competing with national brands",
+      "paragraphs": [
+        "Bookkeeping and tax search results are crowded with national accounting platforms, franchises and directories. For a small firm, the opportunity lies in specific local searches, such as “bookkeeping service” plus a city name, where national brands have no dedicated page.",
+        "In January 2026 MadTax ranked in Google’s top 100 for just 1 of the 23 city keywords we track."
+      ]
+    },
+    "whatWeDid": {
+      "heading": "A page for every market",
+      "steps": [
+        {
+          "title": "City service pages",
+          "desc": "Dedicated bookkeeping and tax pages for Houston-area communities such as Texas City, Friendswood, Alvin and West University Place, and for markets across the US."
+        },
+        {
+          "title": "On-page SEO",
+          "desc": "Titles, headings and content built around how business owners search for local bookkeeping help."
+        },
+        {
+          "title": "Monthly rank tracking",
+          "desc": "Every city keyword tracked monthly to measure what was working."
+        }
+      ]
+    },
+    "resultsSections": [
+      {
+        "title": "RESULTS · GOOGLE RANKINGS",
+        "subtitle": "Fast first-page visibility",
+        "paragraphs": [
+          "Within a month of the city pages going live, 11 of the 23 tracked keywords reached Google’s first page."
+        ],
+        "diagrams": [
+          {
+            "src": "/images/case-studies/madtax/diagram-1.png",
+            "caption": "Google organic positions from monthly rank tracking, January and February 2026."
+          }
+        ],
+        "tables": [
+          {
+            "headers": [
+              "Keyword",
+              "Jan 2026",
+              "Feb 2026"
+            ],
+            "rows": [
+              [
+                "sunrise manor bookkeeping service",
+                "Not in top 100",
+                "#1"
+              ],
+              [
+                "nassau bay bookkeeping services",
+                "Not in top 100",
+                "#2"
+              ],
+              [
+                "texas city bookkeeping service",
+                "Not in top 100",
+                "#3"
+              ],
+              [
+                "montpelier bookkeeping service",
+                "Not in top 100",
+                "#4"
+              ],
+              [
+                "bookkeeping service friendswood",
+                "Not in top 100",
+                "#5"
+              ],
+              [
+                "alvin bookkeeping service",
+                "Not in top 100",
+                "#5"
+              ],
+              [
+                "brownville bookkeeping service",
+                "Not in top 100",
+                "#5"
+              ],
+              [
+                "west university bookkeeping service",
+                "Not in top 100",
+                "#8"
+              ],
+              [
+                "bookkeeping services tomball",
+                "Not in top 100",
+                "#9"
+              ]
+            ]
+          }
+        ],
+        "statCards": []
+      }
+    ],
+    "whatsNext": {
+      "heading": "Making the gains stick",
+      "paragraphs": [
+        "The next phase focuses on strengthening the city pages so they hold their rankings over time, building Google visibility for the firm’s Houston location, and growing organic leads from small-business owners."
+      ]
+    },
+    "ctaBox": {
+      "title": "YOUR BUSINESS NEXT",
+      "text": "Want local clients to find your firm on Google? We help professional services firms rank for the services and cities they serve. Contact us for a free SEO audit."
+    },
+    "dataSources": "Google Ads, Google Business Profile insights, Search Console, and verified call tracking for MadTax (JANUARY → FEBRUARY 2026)."
+  },
+  {
+    "slug": "romero-injury-law",
+    "title": "Romero Injury Law: from zero rankings to page one for accident-type searches in three months",
+    "client": "Romero Injury Law",
+    "location": "Houston, TX",
+    "industry": "Personal injury",
+    "category": "Legal & Law Firms",
+    "eyebrow": "CASE STUDY · SEO · LEGAL / PERSONAL INJURY",
+    "tag": "CASE STUDY • SEO • LEGAL / PERSONAL INJURY",
+    "timeline": "Ongoing Partnership",
+    "desc": "Romero Injury Law is a Houston personal injury firm focused on motor vehicle accidents. We built pages for specific accident types and Houston-area communities so injured drivers could find the firm when searching for help with their case.",
+    "highlight": "15 Page-One Rankings",
+    "img": "/images/blog-img-04.jpg",
+    "metrics": [
+      {
+        "val": "0 → 20",
+        "lbl": "tracked accident and suburb keywords in Google’s top 100, January to April 2026"
+      },
+      {
+        "val": "#5",
+        "lbl": "for “T-bone accident attorney” and “Fulshear car accident lawyer” (April 2026)"
+      },
+      {
+        "val": "143",
+        "lbl": "tracked phone calls in the last 60 days, 52 from first-time callers"
+      },
+      {
+        "val": "87%",
+        "lbl": "of calls answered, most of them coming from the Google Business Profile"
+      }
+    ],
+    "services": [
+      "SEO",
+      "accident-type and suburb pages",
+      "GBP",
+      "call tracking"
+    ],
+    "challenge": {
+      "heading": "A small firm in a heavyweight market",
+      "paragraphs": [
+        "Houston car accident searches are dominated by firms spending heavily on ads and billboards. For a smaller firm, the opening lies in specific searches: particular accident types and individual communities where big firms have no dedicated page.",
+        "In January 2026 Romero Injury Law did not rank in Google’s top 100 for any of the 28 accident-type and suburb keywords we track."
+      ]
+    },
+    "whatWeDid": {
+      "heading": "Pages for the cases people actually search for",
+      "steps": [
+        {
+          "title": "Accident-type pages",
+          "desc": "Pages for intersection, T-bone, sideswipe and multi-vehicle accidents."
+        },
+        {
+          "title": "Suburb pages",
+          "desc": "Car accident pages for communities such as Fulshear, Hedwig Village, Hunters Creek Village and Manvel."
+        },
+        {
+          "title": "Google Business Profile and call tracking",
+          "desc": "An optimized profile for the Houston office, with every call tracked to its source."
+        }
+      ]
+    },
+    "resultsSections": [
+      {
+        "title": "RESULTS · GOOGLE RANKINGS",
+        "subtitle": "From invisible to the first two pages",
+        "paragraphs": [],
+        "diagrams": [
+          {
+            "src": "/images/case-studies/romero-injury-law/diagram-1.png",
+            "caption": "Google organic positions from monthly rank tracking. Hedwig Village was still #8 in June 2026."
+          }
+        ],
+        "tables": [
+          {
+            "headers": [
+              "Keyword",
+              "Jan 2026",
+              "Apr 2026"
+            ],
+            "rows": [
+              [
+                "t-bone accident attorney",
+                "Not in top 100",
+                "#5"
+              ],
+              [
+                "fulshear car accident lawyer",
+                "Not in top 100",
+                "#5"
+              ],
+              [
+                "intersection accident lawyer",
+                "Not in top 100",
+                "#10"
+              ],
+              [
+                "multi-vehicle accident attorney",
+                "Not in top 100",
+                "#10"
+              ],
+              [
+                "intersection car accident attorney",
+                "Not in top 100",
+                "#11"
+              ],
+              [
+                "Hedwig Village car accident lawyer",
+                "Not in top 100",
+                "#12"
+              ]
+            ]
+          }
+        ],
+        "statCards": []
+      }
+    ],
+    "whatsNext": {
+      "heading": "Making the rankings last",
+      "paragraphs": [
+        "The next phase focuses on strengthening the accident-type pages so they hold their positions, rebuilding suburb visibility and growing calls from the Google Business Profile."
+      ]
+    },
+    "ctaBox": {
+      "title": "YOUR FIRM NEXT",
+      "text": "Want injured clients to find your firm first? We help law firms rank on Google for the cases and communities they serve. Contact us for a free SEO audit."
+    },
+    "dataSources": "Google Ads, Google Business Profile insights, Search Console, and verified call tracking for Romero Injury Law (Campaign performance)."
   }
 ];
 
 export function getAllCaseStudySlugs(): string[] {
-  return CASE_STUDIES.map((c) => c.slug);
+  return CASE_STUDIES.map((study) => study.slug);
 }
 
 export function getCaseStudyBySlug(slug: string): CaseStudyItem | undefined {
-  return CASE_STUDIES.find((c) => c.slug === slug);
+  return CASE_STUDIES.find((study) => study.slug === slug);
 }
