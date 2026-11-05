@@ -344,15 +344,15 @@ export default function HomeView() {
         </div>
       </Section>
 
-      {/* 9. Industries */}
-      <Section className="hx-ind">
+      {/* 9. Industries: one framed panel of modules over a faded photo, the same look as the AI automation service pages */}
+      <Section className="hx-ind qs-backdrop">
         <div className="hx-wrap">
-          <div className="hx-head hx-head-center">
+          <div className="hx-head hx-ind-head">
             <p className="hx-eyebrow hx-eyebrow-solo" data-hx="fade">
               <span className="hx-eyebrow-word">{INDUSTRIES.eyebrow}</span>
             </p>
-            <Title lines={INDUSTRIES.title} className="hx-center" />
-            <p className="hx-body hx-center hx-narrow" data-hx="rise" style={d(0.15)}>
+            <Title lines={INDUSTRIES.title} />
+            <p className="hx-body hx-narrow" data-hx="rise" style={d(0.15)}>
               {INDUSTRIES.text}
             </p>
           </div>
