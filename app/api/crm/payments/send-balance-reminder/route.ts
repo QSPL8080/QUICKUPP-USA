@@ -44,10 +44,11 @@ export async function POST(req: Request) {
     let token = p.token;
     if (!token) {
       token = randomBytes(16).toString("hex");
-      await pool.query(`UPDATE \`${targetTable}\` SET token = ?, link_status = 'active' WHERE id = ?`, [token, id]);
+      await pool.query(`UPDATE payment_links SET token = ?, link_status = 'active' WHERE id = ?`, [token, id]).catch(() => {});
+      await pool.query(`UPDATE payments SET token = ?, link_status = 'active' WHERE id = ?`, [token, id]).catch(() => {});
     }
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.quickuppsoftech.us";
+    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.quickuppsoftech.us").replace(/\/+$/, "");
     const balanceUrl = `${siteUrl}/pay/${token}`;
 
     const clientName = p.client_name || "Valued Client";
@@ -156,16 +157,30 @@ Quickupp Softech LLC`;
           <td style="padding: 8px 0; color: #64748b;">Balance Due Date:</td>
           <td style="padding: 8px 0; font-weight: 700; color: #0f172a;">${dueDate}</td>
         </tr>
+        <tr>
+          <td style="padding: 8px 0; color: #64748b;">Direct Balance Link:</td>
+          <td style="padding: 8px 0; font-weight: 700;">
+            <a href="${balanceUrl}" style="color: #2563eb; text-decoration: underline;">Pay Online &rarr;</a>
+          </td>
+        </tr>
       </table>
 
-      <!-- Pay Button -->
-      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; text-align: center; margin: 24px 0;">
-        <p style="font-size: 14px; color: #334155; margin: 0 0 16px; font-weight: 600;">
-          Click the secure link below to clear your remaining balance via PayPal or Debit/Credit Card:
+      <!-- Pay Button & Link Box -->
+      <div style="background: #f8fafc; border: 2px solid #3b82f6; border-radius: 14px; padding: 26px 20px; text-align: center; margin: 26px 0; box-shadow: 0 4px 14px rgba(59, 130, 246, 0.08);">
+        <p style="font-size: 14px; color: #1e293b; margin: 0 0 14px; font-weight: 700;">
+          Click the button below to clear your remaining balance via PayPal or Debit / Credit Card:
         </p>
-        <a href="${balanceUrl}" style="display: inline-block; background: #7c3aed; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; padding: 13px 32px; border-radius: 8px; letter-spacing: 0.02em;">
-          PAY REMAINING BALANCE ($${remainingAmount.toFixed(2)} USD)
+        <a href="${balanceUrl}" style="display: inline-block; background: linear-gradient(135deg, #2563eb, #7c3aed); color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 800; padding: 14px 34px; border-radius: 8px; letter-spacing: 0.03em; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);">
+          PAY REMAINING BALANCE ($${remainingAmount.toFixed(2)} USD) &rarr;
         </a>
+        <div style="margin-top: 18px; padding-top: 14px; border-top: 1px dashed #cbd5e1; text-align: center;">
+          <p style="font-size: 12px; color: #64748b; margin: 0 0 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;">
+            Or copy &amp; paste this direct payment link:
+          </p>
+          <a href="${balanceUrl}" style="color: #2563eb; font-size: 13px; font-weight: 600; text-decoration: underline; word-break: break-all;">
+            ${balanceUrl}
+          </a>
+        </div>
       </div>
 
       <p style="font-size: 13.5px; color: #475569; line-height: 1.6; margin: 0 0 16px;">
@@ -192,10 +207,11 @@ Quickupp Softech LLC`;
       to: clientEmail,
       subject,
       html,
-      text: `Hi ${firstName}, this is a reminder regarding your remaining balance of $${remainingAmount.toFixed(2)} USD for order #${orderNumber}. Pay here: ${balanceUrl}`,
+      text: `Hi ${firstName}, this is a reminder regarding your remaining balance of $${remainingAmount.toFixed(2)} USD for order #${orderNumber}. Due: ${dueDate}. Direct payment link: ${balanceUrl}`,
     });
 
-    await pool.query(`UPDATE \`${targetTable}\` SET balance_reminder_sent_at = NOW() WHERE id = ?`, [id]).catch(() => {});
+    await pool.query(`UPDATE payment_links SET balance_reminder_sent_at = NOW() WHERE token = ? OR id = ?`, [token, id]).catch(() => {});
+    await pool.query(`UPDATE payments SET balance_reminder_sent_at = NOW() WHERE token = ? OR id = ?`, [token, id]).catch(() => {});
 
     await logActivity({
       entity: entityOf(targetTable),

@@ -319,6 +319,8 @@ export type PaymentRow = {
   quantity?: string | null;
   balanceDueDate?: string | null;
   balanceReminderSentAt?: string | null;
+  balanceReminder10dSentAt?: string | null;
+  balanceReminder2dSentAt?: string | null;
 };
 
 export async function listPayments(opts: {
@@ -362,7 +364,8 @@ export async function listPayments(opts: {
     description, amount, total_amount, payment_type, remaining_amount, currency, method, status,
     source, reference, paypal_order_id, billing_start_date, billing_end_date,
     balance_due_date, invoice_number, paid_at, notes, created_by, created_at, token, expires_at,
-    link_status, lead_source, lead_id, quantity, balance_reminder_sent_at`;
+    link_status, lead_source, lead_id, quantity, balance_reminder_sent_at,
+    balance_reminder_10d_sent_at, balance_reminder_2d_sent_at`;
 
   let baseQuery = "";
   if (currentTab === "website") {
@@ -460,6 +463,8 @@ export async function listPayments(opts: {
     quantity: (r.quantity as string) || null,
     balanceDueDate: r.balance_due_date ? toDateOnly(r.balance_due_date) : null,
     balanceReminderSentAt: r.balance_reminder_sent_at ? new Date(r.balance_reminder_sent_at as string).toISOString() : null,
+    balanceReminder10dSentAt: r.balance_reminder_10d_sent_at ? new Date(r.balance_reminder_10d_sent_at as string).toISOString() : null,
+    balanceReminder2dSentAt: r.balance_reminder_2d_sent_at ? new Date(r.balance_reminder_2d_sent_at as string).toISOString() : null,
   }));
   return {
     items,
