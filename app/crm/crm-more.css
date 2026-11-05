@@ -1045,3 +1045,98 @@
   margin: 14px 0 10px;
   font-size: 12.5px;
 }
+
+.crm-meet-status {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.crm-meet-pill-sub {
+  font-size: 11px !important;
+  padding: 2px 8px;
+  background: #fff7ed;
+  color: #c2410c;
+  border-color: #fed7aa;
+}
+
+.crm-meet-times {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #b45309;
+}
+
+.crm-meet-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.crm-root .crm-meet-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 18px;
+  border-radius: 10px;
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #b91c1c !important;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.crm-root .crm-meet-delete:hover:not(:disabled) {
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+.crm-meet-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 16px;
+}
+
+.crm-root a.crm-meet-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.crm-root a.crm-meet-chip:hover {
+  border-color: #c7d2fe;
+}
+
+.crm-root a.crm-meet-chip.is-on {
+  border-color: #0f172a;
+  background: #0f172a;
+  color: #ffffff;
+}
+
+.crm-meet-chip-n {
+  min-width: 20px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 11.5px;
+  text-align: center;
+}
+
+.crm-root a.crm-meet-chip.is-on .crm-meet-chip-n {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}

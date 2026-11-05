@@ -383,6 +383,24 @@ export function verifyWebhook(raw: string, header: string | null): boolean {
 
 /* ---------------------------------------------------------------- reading for the CRM */
 export const MEETING_STATUSES = ["upcoming", "rescheduled", "completed", "canceled"] as const;
+/** How many meetings each status filter holds (for the chips above the list) */
+export async function meetingCounts(): Promise<Record<string, number>> {
+  try {
+    const [rows] = await getPool().query(
+      `SELECT COUNT(*) AS total,
+              SUM(status = 'scheduled' AND end_time >= UTC_TIMESTAMP()) AS upcoming,
+              SUM(reschedule_count > 0) AS rescheduled,
+              SUM(status <> 'canceled' AND end_time < UTC_TIMESTAMP()) AS completed,
+              SUM(status = 'canceled') AS canceled
+         FROM crm_meetings WHERE deleted_at IS NULL`
+    );
+    const r = (rows as Record<string, unknown>[])[0] || {};
+    return Object.fromEntries(["total", "upcoming", "rescheduled", "completed", "canceled"].map((k) => [k, Number(r[k] || 0)]));
+  } catch {
+    return { total: 0, upcoming: 0, rescheduled: 0, completed: 0, canceled: 0 };
+  }
+}
+
 export const MEETING_STATUS_LABEL: Record<string, string> = {
   upcoming: "Scheduled",
   rescheduled: "Rescheduled",
@@ -437,7 +455,7 @@ export async function listMeetings(opts: { q?: string; status?: string; when?: s
   }
   if (opts.status === "canceled") where.push("status = 'canceled'");
   else if (opts.status === "completed") where.push("status <> 'canceled' AND end_time < UTC_TIMESTAMP()");
-  else if (opts.status === "rescheduled") where.push("status = 'rescheduled' AND end_time >= UTC_TIMESTAMP()");
+  else if (opts.status === "rescheduled") where.push("reschedule_count > 0"); // every meeting that was moved, whatever happened after
   else if (opts.status === "upcoming") where.push("status = 'scheduled' AND end_time >= UTC_TIMESTAMP()");
   if (opts.when === "upcoming") where.push("end_time >= UTC_TIMESTAMP()");
   else if (opts.when === "past") where.push("end_time < UTC_TIMESTAMP()");

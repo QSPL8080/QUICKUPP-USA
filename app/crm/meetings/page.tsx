@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/crm/auth";
-import { listMeetings, meetingsVersion, MEETING_STATUSES, MEETING_STATUS_LABEL, syncMeetings, type SyncResult } from "@/lib/crm/calendly";
+import { listMeetings, meetingCounts, meetingsVersion, MEETING_STATUSES, MEETING_STATUS_LABEL, syncMeetings, type SyncResult } from "@/lib/crm/calendly";
 import MeetingsView from "@/components/crm/MeetingsView";
 import { PageHead, Pager } from "@/components/crm/ListTools";
 
@@ -21,7 +21,15 @@ export default async function MeetingsPage({ searchParams }: Props) {
     syncMeetings(),
     new Promise<SyncResult>((r) => setTimeout(() => r({ ok: true, configured: true }), 7000)),
   ]);
-  const [data, version] = await Promise.all([listMeetings({ ...f, page: Number(sp.page) || 1 }), meetingsVersion().catch(() => "")]);
+  const [data, version, counts] = await Promise.all([listMeetings({ ...f, page: Number(sp.page) || 1 }), meetingsVersion().catch(() => ""), meetingCounts()]);
+  const chipHref = (status: string) => {
+    const q = new URLSearchParams();
+    if (f.q) q.set("q", f.q);
+    if (f.when) q.set("when", f.when);
+    if (status) q.set("status", status);
+    const s = q.toString();
+    return s ? `?${s}` : "?";
+  };
   const filtered = Boolean(f.q || f.status || f.when);
 
   return (
@@ -41,6 +49,15 @@ export default async function MeetingsPage({ searchParams }: Props) {
           Couldn&apos;t reach Calendly just now, so the list may be a little behind. It will try again in a minute.
         </p>
       )}
+
+      <nav className="crm-meet-chips" aria-label="Meeting status">
+        {[["", "All", counts.total], ...MEETING_STATUSES.map((k) => [k, MEETING_STATUS_LABEL[k], counts[k]])].map(([k, label, n]) => (
+          <Link key={String(k)} href={chipHref(String(k))} className={`crm-meet-chip${f.status === k ? " is-on" : ""}`} aria-current={f.status === k ? "page" : undefined}>
+            {label}
+            <span className="crm-meet-chip-n">{n}</span>
+          </Link>
+        ))}
+      </nav>
 
       <form className="crm-filters" method="get">
         <label className="crm-search">

@@ -64,13 +64,28 @@ function JoinButton({ m, small = true }: { m: MeetingItem; small?: boolean }) {
 }
 
 function StatusPill({ m }: { m: MeetingItem }) {
-  return <span className={`crm-pill crm-meet-pill crm-meet-pill-${m.view}`}>{LABEL[m.view]}</span>;
+  return (
+    <span className="crm-meet-status">
+      <span className={`crm-pill crm-meet-pill crm-meet-pill-${m.view}`}>{LABEL[m.view]}</span>
+      {/* a meeting that was moved keeps showing it, even once canceled or completed */}
+      {m.rescheduleCount > 0 && m.view !== "rescheduled" && (
+        <span className="crm-pill crm-meet-pill crm-meet-pill-rescheduled crm-meet-pill-sub">Rescheduled{m.rescheduleCount > 1 ? ` ×${m.rescheduleCount}` : ""}</span>
+      )}
+      {m.rescheduleCount > 1 && m.view === "rescheduled" && <span className="crm-meet-times">×{m.rescheduleCount}</span>}
+    </span>
+  );
 }
+
+/** true when two times are the same minute (a reschedule back to the same slot) */
+const sameTime = (a: string | null | undefined, b: string | null | undefined) => Boolean(a && b && Math.abs(new Date(a).getTime() - new Date(b).getTime()) < 60000);
 
 function historyText(h: MeetingItem["history"][number]) {
   if (h.kind === "booked") return { title: "Meeting booked", text: h.start ? `For ${fmtWhen(h.start)}` : "" };
   if (h.kind === "rescheduled")
-    return { title: "Meeting rescheduled", text: h.from && h.to ? `From ${fmtWhen(h.from)} to ${fmtWhen(h.to)}` : h.to ? `New time ${fmtWhen(h.to)}` : "" };
+    return {
+      title: "Meeting rescheduled",
+      text: h.from && h.to ? (sameTime(h.from, h.to) ? `Rebooked for the same time, ${fmtWhen(h.to)}` : `From ${fmtWhen(h.from)} to ${fmtWhen(h.to)}`) : h.to ? `New time ${fmtWhen(h.to)}` : "",
+    };
   return { title: "Meeting canceled", text: [h.by ? `By ${h.by}` : "", h.reason ? `Reason: ${h.reason}` : ""].filter(Boolean).join(" · ") };
 }
 
@@ -160,7 +175,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
               <th>Date &amp; time</th>
               <th>Location</th>
               <th>Status</th>
-              <th aria-label="Join" />
+              <th aria-label="Actions" />
             </tr>
           </thead>
           <tbody>
@@ -182,14 +197,31 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
                   <span className="crm-cell-sub">
                     {fmtTime(m.startTime)} – {fmtTime(m.endTime)} ({minutes(m.startTime, m.endTime)} min)
                   </span>
-                  {m.previousStartTime && m.rescheduleCount > 0 && <span className="crm-cell-sub crm-meet-was">Was {fmtWhen(m.previousStartTime)}</span>}
+                  {m.previousStartTime && m.rescheduleCount > 0 && (
+                    <span className="crm-cell-sub crm-meet-was">{sameTime(m.previousStartTime, m.startTime) ? "Rebooked for the same time" : `Was ${fmtWhen(m.previousStartTime)}`}</span>
+                  )}
                 </td>
                 <td data-label="Location">{locationName(m)}</td>
                 <td data-label="Status">
                   <StatusPill m={m} />
                 </td>
                 <td data-label="" onClick={(e) => e.stopPropagation()}>
-                  <JoinButton m={m} />
+                  <span className="crm-meet-actions">
+                    <JoinButton m={m} />
+                    <button
+                      type="button"
+                      className="crm-act-btn crm-act-delete"
+                      title="Delete from CRM"
+                      aria-label={`Delete the meeting with ${m.name || m.email}`}
+                      disabled={busy}
+                      onClick={() => removeIds([m.id], `the meeting with ${m.name || m.email}`)}
+                    >
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                      </svg>
+                    </button>
+                  </span>
                 </td>
               </tr>
             ))}
@@ -256,7 +288,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
                   <dt>Rescheduled</dt>
                   <dd>
                     {open.rescheduleCount === 1 ? "Once" : `${open.rescheduleCount} times`}
-                    {open.previousStartTime ? ` · was ${fmtWhen(open.previousStartTime)}` : ""}
+                    {open.previousStartTime ? (sameTime(open.previousStartTime, open.startTime) ? " · rebooked for the same time" : ` · was ${fmtWhen(open.previousStartTime)}`) : ""}
                   </dd>
                 </>
               )}
@@ -342,12 +374,16 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
 
             <button
               type="button"
-              className="crm-act crm-act-danger crm-act-sm"
+              className="crm-act crm-act-danger crm-meet-delete"
               disabled={busy}
               onClick={async () => {
                 if (await removeIds([open.id], `the meeting with ${open.name || open.email}`)) setOpenId(null);
               }}
             >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              </svg>
               Delete from CRM
             </button>
           </aside>
