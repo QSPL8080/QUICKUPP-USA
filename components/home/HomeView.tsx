@@ -118,58 +118,33 @@ export default function HomeView() {
         </div>
       </section>
 
-      {/* 3. About: business and technology slide in from both sides and meet in the middle */}
+      {/* 3. About: laid out like the About pages' opening (title, ruled two
+          columns, one wide photo cut into four slats that rise in turn) */}
       <Section className="hx-about">
+        <span className="hx-about-bg" aria-hidden="true" />
         <div className="hx-wrap">
-          <div className="hx-about-head">
-            <Title lines={ABOUT.title} />
-          </div>
+          <Title lines={ABOUT.title} className="hx-about-title" />
 
-          <div className="hx-about-stage" data-hx-track aria-hidden="true">
-            <svg className="hx-about-beam" viewBox="0 0 1000 120" preserveAspectRatio="none">
-              <defs>
-                <linearGradient id="hx-about-grad" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor="#00d2ff" />
-                  <stop offset="50%" stopColor="#6366f1" />
-                  <stop offset="100%" stopColor="#a855f7" />
-                </linearGradient>
-              </defs>
-              <path className="hx-about-beam-base" d="M0 60 C 250 0, 350 120, 500 60 S 750 0, 1000 60" />
-              <path className="hx-about-beam-flow" d="M0 60 C 250 0, 350 120, 500 60 S 750 0, 1000 60" />
-            </svg>
-
-            <figure className="hx-about-card hx-about-card-a">
-              <img src="/images/home1-about-01.jpg" alt="" loading="lazy" />
-              <span className="hx-about-tag">
-                <HomeIcon name="trending-up" size={18} />
-              </span>
-            </figure>
-
-            <figure className="hx-about-card hx-about-card-b">
-              <img src="/images/project-04.jpg" alt="" loading="lazy" />
-              <span className="hx-about-tag">
-                <HomeIcon name="cpu" size={18} />
-              </span>
-            </figure>
-
-            <div className="hx-about-core">
-              <span className="hx-about-ring hx-about-ring-1" />
-              <span className="hx-about-ring hx-about-ring-2" />
-              <span className="hx-about-core-in">
-                <HomeIcon name="sparkles" size={26} />
-              </span>
+          <div className="hx-about-cols" data-hx="rule">
+            <div className="hx-about-left">
+              <p className="hx-lead" data-hx="rise" style={d(0.1)}>
+                {ABOUT.text[0]}
+              </p>
+              <div className="hx-about-actions" data-hx="rise" style={d(0.22)}>
+                <Button cta={ABOUT.cta} />
+              </div>
+            </div>
+            <div className="hx-about-right">
+              <p className="hx-body" data-hx="rise" style={d(0.18)}>
+                {ABOUT.text[1]}
+              </p>
             </div>
           </div>
 
-          <div className="hx-about-copy">
-            <p className="hx-lead" data-hx="rise">
-              {ABOUT.text[0]}
-            </p>
-            <span className="hx-about-split" aria-hidden="true" />
-            <div className="hx-about-more" data-hx="rise" style={d(0.15)}>
-              <p className="hx-body">{ABOUT.text[1]}</p>
-              <Button cta={ABOUT.cta} />
-            </div>
+          <div className="hx-about-slats" data-hx="slats" aria-hidden="true">
+            {[0, 1, 2, 3].map((i) => (
+              <span key={i} className="hx-about-slat" style={{ "--s": i } as CSSProperties} />
+            ))}
           </div>
         </div>
       </Section>
