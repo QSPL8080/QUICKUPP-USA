@@ -23,14 +23,15 @@ type Hero = {
 
 const UNSPLASH = (id: string) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1600&q=80`;
 
-// the hero's one photo: growth analytics on a laptop (marketing, technology, growth)
-const HERO_PHOTO = UNSPLASH("photo-1551288049-bebda4e38f71");
+// the hero's one photo: a product team building at their screens in a bright
+// studio (technology and delivery), facing toward the words on the left
+const HERO_PHOTO = UNSPLASH("photo-1551434678-e076c223a692");
 
 const PILLARS: { photo: string; icon: HomeIconName }[] = [
   { photo: UNSPLASH("photo-1686061592689-312bbfb5c055"), icon: "megaphone" }, // MARKETING. (analytics dashboard)
   { photo: UNSPLASH("photo-1680783954745-3249be59e527"), icon: "bot" }, // AI. (robot and human hands)
   { photo: UNSPLASH("photo-1498050108023-c5249f4df085"), icon: "code-xml" }, // TECHNOLOGY. (code on a laptop)
-  { photo: "/images/contact-diverse-meeting.jpg", icon: "trending-up" }, // BUILT FOR GROWTH.
+  { photo: UNSPLASH("photo-1758691737124-05c5bffe46f0"), icon: "trending-up" }, // BUILT FOR GROWTH. (team around a laptop)
 ];
 
 const STEP_MS = 5000; // the next pillar every 5 seconds
