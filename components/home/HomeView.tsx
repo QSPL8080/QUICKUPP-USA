@@ -114,9 +114,6 @@ export default function HomeView() {
         </div>
 
         <div className="hx-tapes">
-          <div className="hx-tape hx-tape-logos">
-            <Logos />
-          </div>
           <div className="hx-tape hx-tape-svc">
             <div className="hx-tape-track">
               {[0, 1].map((k) => (
@@ -132,6 +129,9 @@ export default function HomeView() {
                 </ul>
               ))}
             </div>
+          </div>
+          <div className="hx-tape hx-tape-logos">
+            <Logos />
           </div>
         </div>
       </section>

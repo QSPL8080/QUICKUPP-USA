@@ -1261,21 +1261,21 @@
   overflow: hidden;
 }
 
-.hx-tape-svc {
-  z-index: 2;
-  height: clamp(58px, 5vw, 72px);
-  background: linear-gradient(90deg, #00b4e6 0%, #6366f1 50%, #a855f7 100%);
-  box-shadow: 0 24px 50px -24px rgba(99, 102, 241, 0.7);
-  transform: translateY(-50%) rotate(-2.4deg);
-}
-
 .hx-tape-logos {
-  z-index: 1;
+  z-index: 3;
   height: clamp(62px, 5.4vw, 78px);
   background: #ffffff;
   border-block: 1px solid #e2e8f0;
-  box-shadow: 0 24px 50px -30px rgba(15, 23, 42, 0.35);
+  box-shadow: 0 18px 45px -15px rgba(15, 23, 42, 0.28);
   transform: translateY(-50%) rotate(2deg);
+}
+
+.hx-tape-svc {
+  z-index: 1;
+  height: clamp(58px, 5vw, 72px);
+  background: linear-gradient(90deg, #00b4e6 0%, #6366f1 50%, #a855f7 100%);
+  box-shadow: 0 16px 40px -20px rgba(99, 102, 241, 0.5);
+  transform: translateY(-50%) rotate(-2.4deg);
 }
 
 .hx-tape-track {
@@ -1412,16 +1412,16 @@
     margin-top: -48px;
   }
 
-  .hx-tape-svc {
-    top: 32%;
-    height: 50px;
-    transform: translateY(-50%) rotate(-3deg);
-  }
-
   .hx-tape-logos {
-    top: 70%;
+    top: 32%;
     height: 54px;
     transform: translateY(-50%) rotate(2deg);
+  }
+
+  .hx-tape-svc {
+    top: 70%;
+    height: 50px;
+    transform: translateY(-50%) rotate(-3deg);
   }
 
   .hx-tape-star {
