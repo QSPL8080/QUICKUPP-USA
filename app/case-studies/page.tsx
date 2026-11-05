@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ResourceMotion from "@/components/ResourceMotion";
-import { CASE_STUDY_ORDER, caseStudyKickerParts, getCaseStudyDoc, headlineStats, infoValue } from "@/lib/caseStudies";
+import CaseStudiesGrid, { type CaseCard } from "@/components/CaseStudiesGrid";
+import { CASE_STUDY_ORDER, caseStudyArea, caseStudyCover, getCaseStudyDoc, headlineStats, infoValue } from "@/lib/caseStudies";
 import "@/app/case-studies-list.css";
 
 export const metadata: Metadata = {
@@ -15,75 +15,83 @@ export const metadata: Metadata = {
 };
 
 /*
- * Case studies list: one row per case study, using only what its document
- * says (kicker, title, introduction, client, services and the first three
- * headline results).
+ * Case studies list ("cl-"): a hero with a moving reel of each client's
+ * headline result, then category chips, a featured study and a magazine grid.
+ * Every word and number comes from the case study documents.
  */
 export default function CaseStudiesPage() {
-  const studies = CASE_STUDY_ORDER.map((slug) => ({ slug, doc: getCaseStudyDoc(slug) })).filter(
-    (s): s is { slug: (typeof CASE_STUDY_ORDER)[number]; doc: NonNullable<ReturnType<typeof getCaseStudyDoc>> } => Boolean(s.doc)
-  );
+  const cards: CaseCard[] = CASE_STUDY_ORDER.flatMap((slug) => {
+    const doc = getCaseStudyDoc(slug);
+    if (!doc) return [];
+    const { area, sector } = caseStudyArea(doc);
+    return [
+      {
+        slug,
+        title: doc.title,
+        intro: doc.intro,
+        client: infoValue(doc, "Client"),
+        location: infoValue(doc, "Location"),
+        services: infoValue(doc, "Services"),
+        area,
+        sector,
+        stats: headlineStats(doc).slice(0, 3),
+        cover: caseStudyCover(slug),
+      },
+    ];
+  });
+
+  // the reel: each client's first headline result, in two columns moving opposite ways
+  const reel = cards.filter((c) => c.stats[0]).map((c) => ({ slug: c.slug, client: c.client, val: c.stats[0].val, lbl: c.stats[0].lbl }));
+  const half = Math.ceil(reel.length / 2);
+  const cols = [reel.slice(0, half), reel.slice(half)];
 
   return (
     <>
       <Header />
-      <main className="csl-page">
-        <section className="csl-hero">
-          <div className="csl-container">
-            <div className="asx-breadcrumb">
-              <Link href="/">Home</Link>
-              <span>/</span>
-              <Link href="/resources">Resources</Link>
-              <span>/</span>
-              <span className="asx-breadcrumb-current">Case Studies</span>
+      <main className="cl-page">
+        <section className="cl-hero">
+          <div className="cl-container cl-hero-grid">
+            <div className="cl-hero-copy">
+              <div className="asx-breadcrumb">
+                <Link href="/">Home</Link>
+                <span>/</span>
+                <Link href="/resources">Resources</Link>
+                <span>/</span>
+                <span className="asx-breadcrumb-current">Case Studies</span>
+              </div>
+              <h1 className="cl-h1">
+                <span className="cl-h1-line">Case</span>{" "}
+                <span className="cl-h1-line">
+                  <span className="qs-gradient-text">Studies</span>
+                </span>
+              </h1>
             </div>
-            <h1 className="csl-h1">
-              Case <span className="qs-gradient-text">Studies</span>
-            </h1>
+
+            <div className="cl-reel" aria-hidden="true">
+              {cols.map((col, ci) => (
+                <div key={ci} className={`cl-reel-col${ci === 1 ? " is-down" : ""}`}>
+                  {[0, 1].map((rep) => (
+                    <div key={rep} className="cl-reel-track">
+                      {col.map((r) => (
+                        <div key={`${rep}-${r.slug}`} className="cl-reel-card">
+                          <strong>{r.val}</strong>
+                          <span className="cl-reel-lbl">{r.lbl}</span>
+                          <span className="cl-reel-client">{r.client}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
-        <section className="csl-list-section">
-          <div className="csl-container">
-            <div className="csl-list">
-              {studies.map(({ slug, doc }) => {
-                const stats = headlineStats(doc).slice(0, 3);
-                return (
-                  <article key={slug} className="csl-row">
-                    <div className="csl-meta">
-                      <span className="csl-kicker">{caseStudyKickerParts(doc.kicker).join(" · ")}</span>
-                      <span className="csl-client">{infoValue(doc, "Client")}</span>
-                      <span className="csl-services">{infoValue(doc, "Services")}</span>
-                    </div>
-                    <div className="csl-main">
-                      <h2 className="csl-title">
-                        <Link href={`/case-studies/${slug}`}>{doc.title}</Link>
-                      </h2>
-                      <p className="csl-intro">{doc.intro}</p>
-                      {stats.length > 0 && (
-                        <dl className="csl-stats">
-                          {stats.map((s) => (
-                            <div key={s.val + s.lbl} className="csl-stat">
-                              <dt>{s.val}</dt>
-                              <dd>{s.lbl}</dd>
-                            </div>
-                          ))}
-                        </dl>
-                      )}
-                      <Link href={`/case-studies/${slug}`} className="csl-more">
-                        <span>Read Full Case Study</span>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                          <path d="M5 12h14M12 5l7 7-7 7" />
-                        </svg>
-                      </Link>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
+        <section className="cl-list">
+          <div className="cl-container">
+            <CaseStudiesGrid cards={cards} />
           </div>
         </section>
-        <ResourceMotion variant="cases" />
       </main>
       <Footer />
     </>

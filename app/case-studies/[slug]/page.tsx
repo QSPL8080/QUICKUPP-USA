@@ -3,13 +3,16 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import CaseStudyNav from "@/components/CaseStudyNav";
 import type { CsBlock } from "@/data/case-study-docs";
-import { CASE_STUDY_ORDER, getCaseStudyDoc } from "@/lib/caseStudies";
+import { CASE_STUDY_ORDER, caseStudyArea, caseStudyCover, getCaseStudyDoc, headlineStats, sectionLabel } from "@/lib/caseStudies";
 import "@/app/case-study-detail.css";
 
 /*
- * One case study, exactly as its document is written: the same headings,
- * text, results, tables, charts and closing box, in the same order.
+ * One case study ("cd-"), exactly as its document is written — the same
+ * headings, text, results, tables, charts and closing box, in the same order —
+ * presented as: a photo hero with the client facts, the headline results band,
+ * a page navigator beside the numbered sections, and the next case study.
  */
 
 export function generateStaticParams() {
@@ -28,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: {
       canonical: `https://www.quickuppsoftech.us/case-studies/${slug}`,
     },
-    openGraph: { title: doc.title, description: doc.intro, type: "article" },
+    openGraph: { title: doc.title, description: doc.intro, type: "article", images: [caseStudyCover(slug, 1200)] },
   };
 }
 
@@ -42,38 +45,49 @@ function toSections(blocks: CsBlock[]) {
   return sections;
 }
 
-function Block({ b, headline }: { b: CsBlock; headline: boolean }) {
+const Arrow = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M5 12h14M12 5l7 7-7 7" />
+  </svg>
+);
+
+function Block({ b }: { b: CsBlock }) {
   switch (b.type) {
     case "kicker":
-      return <p className="csx-kicker">{b.text}</p>;
+      return null; // shown as the section's label
     case "h2":
-      return <h2 className="csx-h2">{b.text}</h2>;
+      return <h2 className="cd-h2">{b.text}</h2>;
     case "p":
-      return <p className="csx-text">{b.text}</p>;
+      return <p className="cd-text">{b.text}</p>;
     case "caption":
-      return <p className="csx-caption">{b.text}</p>;
+      return <p className="cd-caption">{b.text}</p>;
     case "list":
       return (
-        <ul className="csx-list">
+        <ul className="cd-list">
           {b.items.map((it, i) => (
-            <li key={i}>
-              {it.lead && <strong>{it.lead} </strong>}
-              {it.text}
+            <li key={i} data-cs-reveal="" style={{ ["--d" as string]: `${Math.min(i, 6) * 0.05}s` }}>
+              <span className="cd-list-mark" aria-hidden="true">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span>
+                {it.lead && <strong>{it.lead} </strong>}
+                {it.text}
+              </span>
             </li>
           ))}
         </ul>
       );
     case "img":
       return (
-        <figure className="csx-figure">
+        <figure className="cd-figure" data-cs-reveal="">
           <img src={b.src} alt="" loading="lazy" />
         </figure>
       );
     case "stats":
       return (
-        <dl className={`csx-stats${headline ? " is-headline" : ""}`} style={{ ["--csx-cols" as string]: Math.min(b.cols, 4) }}>
+        <dl className="cd-stats" style={{ ["--cd-cols" as string]: Math.min(b.cols, 4) }}>
           {b.items.map((s, i) => (
-            <div key={i} className="csx-stat">
+            <div key={i} className="cd-stat" data-cs-reveal="" style={{ ["--d" as string]: `${i * 0.06}s` }}>
               <dt>{s.val}</dt>
               <dd>{s.lbl}</dd>
             </div>
@@ -82,8 +96,8 @@ function Block({ b, headline }: { b: CsBlock; headline: boolean }) {
       );
     case "table":
       return (
-        <div className="csx-table-wrap">
-          <table className="csx-table">
+        <div className="cd-table-wrap" data-cs-reveal="">
+          <table className="cd-table">
             <thead>
               <tr>
                 {b.headers.map((h, i) => (
@@ -105,15 +119,14 @@ function Block({ b, headline }: { b: CsBlock; headline: boolean }) {
       );
     case "cta":
       return (
-        <div className="csx-cta">
-          <p className="csx-kicker">{b.kicker}</p>
-          {b.title && <h2 className="csx-h2">{b.title}</h2>}
-          {b.text && <p className="csx-text">{b.text}</p>}
-          <Link href="/contact" className="csx-btn">
+        <div className="cd-cta" data-cs-reveal="">
+          <span className="cd-cta-glow" aria-hidden="true" />
+          <p className="cd-cta-kicker">{b.kicker}</p>
+          {b.title && <h2 className="cd-cta-title">{b.title}</h2>}
+          {b.text && <p className="cd-cta-text">{b.text}</p>}
+          <Link href="/contact" className="cd-btn">
             <span>Contact Us</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
+            <Arrow />
           </Link>
         </div>
       );
@@ -125,50 +138,134 @@ export default async function CaseStudyDetailPage({ params }: Props) {
   const doc = getCaseStudyDoc(slug);
   if (!doc) notFound();
 
+  const { area, sector } = caseStudyArea(doc);
   const sections = toSections(doc.blocks);
+  const headIndex = sections.findIndex((sec) => sec[0].type === "kicker" && /^HEADLINE RESULTS/i.test(sec[0].text));
+  const headline = headIndex >= 0 ? sections[headIndex] : null;
+  const headKicker = headline && headline[0].type === "kicker" ? headline[0].text : "";
+  const headStats = headlineStats(doc);
+  const body = sections
+    .map((sec, i) => ({ sec, i }))
+    .filter(({ i }) => i !== headIndex)
+    .map(({ sec, i }) => ({ sec, i, id: `section-${i + 1}`, isCta: sec[0].type === "cta", label: sec[0].type === "kicker" ? sectionLabel(sec[0].text) : "" }));
+  const nav = body.filter((s) => !s.isCta && s.label).map((s) => ({ id: s.id, label: s.label }));
+  const numberOf = new Map(body.filter((s) => !s.isCta).map((s, k) => [s.id, k + 1]));
+
+  const at = CASE_STUDY_ORDER.indexOf(slug as (typeof CASE_STUDY_ORDER)[number]);
+  const nextSlug = CASE_STUDY_ORDER[(at + 1) % CASE_STUDY_ORDER.length];
+  const next = getCaseStudyDoc(nextSlug);
 
   return (
     <>
       <Header />
-      <main className="csx-page">
-        <section className="csx-hero">
-          <div className="csx-container">
-            <div className="asx-breadcrumb">
-              <Link href="/">Home</Link>
-              <span>/</span>
-              <Link href="/resources">Resources</Link>
-              <span>/</span>
-              <Link href="/case-studies">Case Studies</Link>
+      <main className="cd-page">
+        {/* ---- Hero: the client's world, the title and the facts ---- */}
+        <section className="cd-hero">
+          <div className="cd-hero-stage">
+            <span className="cd-hero-img" style={{ backgroundImage: `url('${caseStudyCover(slug)}')` }} aria-hidden="true" />
+            <span className="cd-hero-shade" aria-hidden="true" />
+            <div className="cd-container cd-hero-inner">
+              <div className="asx-breadcrumb cd-crumbs">
+                <Link href="/">Home</Link>
+                <span>/</span>
+                <Link href="/resources">Resources</Link>
+                <span>/</span>
+                <Link href="/case-studies">Case Studies</Link>
+              </div>
+              <p className="cd-tags">
+                <span className="cd-tag">{area}</span>
+                {sector && <span className="cd-tag cd-tag-ghost">{sector}</span>}
+              </p>
+              <h1 className="cd-h1">{doc.title}</h1>
+              <p className="cd-intro">{doc.intro}</p>
+              <dl className="cd-facts">
+                {doc.info.labels.map((l, i) => (
+                  <div key={l} className="cd-fact">
+                    <dt>{l}</dt>
+                    <dd>{doc.info.values[i]}</dd>
+                  </div>
+                ))}
+              </dl>
             </div>
-            <p className="csx-kicker">{doc.kicker}</p>
-            <h1 className="csx-h1">{doc.title}</h1>
-            <p className="csx-intro">{doc.intro}</p>
-            <dl className="csx-info">
-              {doc.info.labels.map((l, i) => (
-                <div key={l} className="csx-info-item">
-                  <dt>{l}</dt>
-                  <dd>{doc.info.values[i]}</dd>
-                </div>
-              ))}
-            </dl>
           </div>
         </section>
 
-        <div className="csx-body">
-          <div className="csx-container">
-            {sections.map((sec, i) => {
-              const isCta = sec[0].type === "cta";
-              const headline = sec[0].type === "kicker" && /^HEADLINE RESULTS/i.test(sec[0].text);
+        {/* ---- Headline results, lifted over the hero's edge ---- */}
+        {headStats.length > 0 && (
+          <section className="cd-headline">
+            <div className="cd-container">
+              <div className="cd-headline-card" data-cs-reveal="">
+                {headKicker && <p className="cd-headline-kicker">{headKicker}</p>}
+                <dl className="cd-headline-stats" style={{ ["--cd-cols" as string]: Math.min(headStats.length, 4) }}>
+                  {headStats.map((s, i) => (
+                    <div key={i} className="cd-headline-stat">
+                      <dt>{s.val}</dt>
+                      <dd>{s.lbl}</dd>
+                    </div>
+                  ))}
+                </dl>
+                {/* anything else the document puts in this section (rare) */}
+                {headline && headline.slice(1).filter((b) => b.type !== "stats").map((b, j) => <Block key={j} b={b} />)}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* ---- The story: page navigator + numbered sections ---- */}
+        <div className="cd-container cd-layout">
+          <aside className="cd-aside">
+            <CaseStudyNav items={nav} />
+          </aside>
+          <article className="cd-article">
+            {body.map(({ sec, id, isCta, label }) => {
+              if (isCta) {
+                return (
+                  <section key={id} id={id} className="cd-section cd-section-cta">
+                    {sec.map((b, j) => (
+                      <Block key={j} b={b} />
+                    ))}
+                  </section>
+                );
+              }
+              const n = numberOf.get(id) || 0;
               return (
-                <section key={i} className={isCta ? "csx-section csx-section-cta" : `csx-section${headline ? " csx-section-headline" : ""}`}>
+                <section key={id} id={id} className="cd-section">
+                  {label && (
+                    <p className="cd-label" data-cs-reveal="">
+                      <span className="cd-label-n">{String(n).padStart(2, "0")}</span>
+                      <span>{label}</span>
+                    </p>
+                  )}
                   {sec.map((b, j) => (
-                    <Block key={j} b={b} headline={headline} />
+                    <Block key={j} b={b} />
                   ))}
                 </section>
               );
             })}
-          </div>
+          </article>
         </div>
+
+        {/* ---- Next case study ---- */}
+        {next && nextSlug !== slug && (
+          <section className="cd-next">
+            <div className="cd-container">
+              <Link href={`/case-studies/${nextSlug}`} className="cd-next-card" data-cs-reveal="">
+                <span className="cd-next-img" style={{ backgroundImage: `url('${caseStudyCover(nextSlug, 1400)}')` }} aria-hidden="true" />
+                <span className="cd-next-shade" aria-hidden="true" />
+                <span className="cd-next-body">
+                  <span className="cd-next-kicker">Next Case Study</span>
+                  <span className="cd-next-title">{next.title}</span>
+                  <span className="cd-next-go" aria-hidden="true">
+                    <Arrow />
+                  </span>
+                </span>
+              </Link>
+              <Link href="/case-studies" className="cd-all">
+                All Case Studies
+              </Link>
+            </div>
+          </section>
+        )}
       </main>
       <Footer />
     </>
