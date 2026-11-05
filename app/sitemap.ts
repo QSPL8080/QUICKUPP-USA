@@ -5,7 +5,7 @@ import { CASE_STUDY_ORDER } from "@/lib/caseStudies";
 import { getAllBlogSlugs } from "@/lib/blogs";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://quickuppsoftech.us").replace(/\/$/, "");
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.quickuppsoftech.us").replace(/\/$/, "");
   const now = new Date();
 
   const entries: MetadataRoute.Sitemap = [];

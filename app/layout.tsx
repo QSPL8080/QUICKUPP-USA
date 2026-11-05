@@ -10,9 +10,13 @@ import PayNowModal from "@/components/PayNowModal";
 import DynamicEmailModal from "@/components/DynamicEmailModal";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://quickuppsoftech.us"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.quickuppsoftech.us"),
   alternates: {
-    canonical: "https://quickuppsoftech.us",
+    canonical: "https://www.quickuppsoftech.us",
+    languages: {
+      "en-US": "https://www.quickuppsoftech.us",
+      "x-default": "https://quickuppsoftech.us",
+    },
   },
   generator: "Quickupp Softech",
   applicationName: "Quickupp Softech",
@@ -44,17 +48,17 @@ const organizationJsonLd = {
   "@graph": [
     {
       "@type": "Organization",
-      "@id": "https://quickuppsoftech.us/#organization",
+      "@id": "https://www.quickuppsoftech.us/#organization",
       "name": "Quickupp Softech LLC",
       "alternateName": "Quickupp Softech",
-      "url": "https://quickuppsoftech.us",
+      "url": "https://www.quickuppsoftech.us",
       "logo": {
         "@type": "ImageObject",
-        "@id": "https://quickuppsoftech.us/#logo",
-        "url": "https://quickuppsoftech.us/images/logo-white.png",
+        "@id": "https://www.quickuppsoftech.us/#logo",
+        "url": "https://www.quickuppsoftech.us/images/logo-white.png",
         "caption": "Quickupp Softech LLC",
       },
-      "image": "https://quickuppsoftech.us/images/graph.webp",
+      "image": "https://www.quickuppsoftech.us/images/graph.webp",
       "description":
         "Quickupp Softech is a digital marketing, AI automation, and custom technology solutions company helping businesses scale with data-driven growth.",
       "telephone": "+1-302-754-5679",
@@ -68,6 +72,7 @@ const organizationJsonLd = {
         "addressCountry": "US",
       },
       "sameAs": [
+        "https://quickuppsoftech.us",
         "https://twitter.com/QuickuppL57802",
         "https://www.linkedin.com/company/quickupp-softech",
         "https://www.facebook.com/quickuppsoftech",
@@ -92,21 +97,21 @@ const organizationJsonLd = {
     },
     {
       "@type": "WebSite",
-      "@id": "https://quickuppsoftech.us/#website",
-      "url": "https://quickuppsoftech.us",
+      "@id": "https://www.quickuppsoftech.us/#website",
+      "url": "https://www.quickuppsoftech.us",
       "name": "Quickupp Softech",
       "description": "IT & Digital Marketing Services for Growing Businesses",
       "publisher": {
-        "@id": "https://quickuppsoftech.us/#organization",
+        "@id": "https://www.quickuppsoftech.us/#organization",
       },
     },
     {
       "@type": "ProfessionalService",
-      "@id": "https://quickuppsoftech.us/#service",
+      "@id": "https://www.quickuppsoftech.us/#service",
       "name": "Quickupp Softech LLC",
-      "url": "https://quickuppsoftech.us",
+      "url": "https://www.quickuppsoftech.us",
       "parentOrganization": {
-        "@id": "https://quickuppsoftech.us/#organization",
+        "@id": "https://www.quickuppsoftech.us/#organization",
       },
       "priceRange": "$$",
       "telephone": "+1-302-754-5679",

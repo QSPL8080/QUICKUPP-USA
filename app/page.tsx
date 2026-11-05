@@ -8,7 +8,11 @@ export const metadata: Metadata = {
   description:
     "Quickupp Softech delivers web development, SEO, paid marketing and digital solutions for growing businesses. Explore services and book a call.",
   alternates: {
-    canonical: "https://quickuppsoftech.us",
+    canonical: "https://www.quickuppsoftech.us",
+    languages: {
+      "en-US": "https://www.quickuppsoftech.us",
+      "x-default": "https://quickuppsoftech.us",
+    },
   },
 };
 

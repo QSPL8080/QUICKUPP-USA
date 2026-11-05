@@ -7,4 +7,5 @@ Disallow: /checkout
 Disallow: /pay/
 Disallow: /payment-confirmation
 
+Sitemap: https://www.quickuppsoftech.us/sitemap.xml
 Sitemap: https://quickuppsoftech.us/sitemap.xml
