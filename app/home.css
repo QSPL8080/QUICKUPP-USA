@@ -672,7 +672,7 @@
 
 /* ---- Pillar dock across the stage's lower edge --------------------------- */
 /* Four tiles in one white card. The active tile opens onto its photo (the
-   same one as in the dial) with white type and a filling progress line;
+   same one as in the dial) with white type; it moves on every 5 seconds;
    the others stay light and lift on hover. */
 .hxd-dock {
   position: relative;
@@ -699,7 +699,7 @@
   gap: 18px;
   min-height: 128px;
   margin: 0;
-  padding: 18px 20px 22px;
+  padding: 18px 20px 20px;
   border: 1px solid #edf0f6;
   border-radius: 19px !important;
   background: linear-gradient(180deg, #ffffff, #f7f8fc);
@@ -827,37 +827,6 @@
 
 .hxd-pillar.is-on .hxd-pillar-word {
   color: #ffffff;
-}
-
-.hxd-pillar-bar {
-  position: absolute;
-  left: 20px;
-  right: 20px;
-  bottom: 11px;
-  height: 3px;
-  border-radius: 3px;
-  background: #e8ebf3;
-  overflow: hidden;
-}
-
-.hxd-pillar.is-on .hxd-pillar-bar {
-  background: rgba(255, 255, 255, 0.22);
-}
-
-.hxd-pillar-fill {
-  display: block;
-  height: 100%;
-  background: var(--hx-grad);
-  transform: scaleX(0);
-  transform-origin: 0 50%;
-}
-
-.hxd-pillar.is-on .hxd-pillar-fill {
-  transform: scaleX(1);
-}
-
-.hxd-hero.is-running .hxd-pillar.is-on .hxd-pillar-fill {
-  animation: hxd-fill linear both;
 }
 
 /* ---- Keyframes ------------------------------------------------------------ */
@@ -1079,7 +1048,7 @@
   .hxd-hero button.hxd-pillar:not(#_):not(#__):not(#___) {
     min-height: 108px;
     gap: 12px;
-    padding: 14px 14px 20px;
+    padding: 14px 14px 16px;
     border-radius: 16px !important;
   }
 
@@ -1097,12 +1066,6 @@
   .hxd-pillar-word {
     font-size: 12.5px;
     letter-spacing: 0.07em;
-  }
-
-  .hxd-pillar-bar {
-    left: 14px;
-    right: 14px;
-    bottom: 9px;
   }
 
   .hxd-chip {
@@ -1275,99 +1238,299 @@
 /* ==========================================================================
    3. ABOUT
    ========================================================================== */
-.hx-about-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
-  align-items: center;
-  gap: clamp(44px, 6vw, 96px);
-}
-
-.hx-about-art {
-  position: relative;
-  height: clamp(440px, 40vw, 560px);
-}
-
-.hx-about-main,
-.hx-about-side {
-  position: absolute;
-  margin: 0;
+/* business (left) and technology (right) start apart, slightly turned, and
+   slide together as the section scrolls in (--hx-p 0 → 1); where they meet a
+   gradient core lights up and a light runs along the beam between them */
+.hx-about {
   overflow: hidden;
-  border-radius: 26px;
 }
 
-.hx-about-main {
-  top: 0;
-  left: 0;
-  width: 66%;
-  height: 100%;
+.hx-about-head {
+  display: flex;
+  justify-content: center;
+  text-align: center;
 }
 
-.hx-about-side {
-  right: 0;
-  bottom: 8%;
-  width: 52%;
-  height: 46%;
-  border: 8px solid #ffffff;
-  box-shadow: 0 30px 60px -30px rgba(15, 23, 42, 0.5);
+.hx-about-stage {
+  --hx-p: 1;
+  --q: calc(1 - var(--hx-p));
+  position: relative;
+  height: clamp(380px, 34vw, 470px);
+  margin: clamp(36px, 4vw, 56px) auto 0;
+  max-width: 1060px;
 }
 
-.hx-about-main img,
-.hx-about-side img {
+.hx-about-beam {
+  position: absolute;
+  left: -6%;
+  right: -6%;
+  top: 50%;
+  width: 112%;
+  height: 120px;
+  transform: translateY(-50%);
+  overflow: visible;
+}
+
+.hx-about-beam path {
+  fill: none;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.hx-about-beam-base {
+  stroke: #e0e7ff;
+  stroke-width: 2;
+  stroke-dasharray: 2 9;
+}
+
+.hx-about-beam-flow {
+  stroke: url(#hx-about-grad);
+  stroke-width: 2.5;
+  stroke-dasharray: 140 1200;
+  animation: hx-about-flow 4.5s linear infinite;
+  opacity: calc(0.25 + var(--hx-p) * 0.75);
+}
+
+@keyframes hx-about-flow {
+  from {
+    stroke-dashoffset: 1340;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.hx-about-card {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  margin: 0;
+  border-radius: 28px;
+  overflow: hidden;
+  background: #eef2ff;
+  box-shadow: 0 40px 80px -40px rgba(15, 23, 42, 0.45);
+  transition: transform 0.15s linear, box-shadow 0.5s ease;
+  will-change: transform;
+}
+
+.hx-about-card img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transform: scale(calc(1 + var(--q) * 0.12));
+  transition: transform 0.15s linear;
 }
 
-.hx-about-dots {
+.hx-about-card::after {
+  content: "";
   position: absolute;
-  top: 6%;
-  right: 4%;
-  width: 120px;
-  height: 120px;
-  background-image: radial-gradient(#c7d2fe 2px, transparent 2px);
-  background-size: 16px 16px;
-  animation: hx-bob 9s ease-in-out infinite;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  pointer-events: none;
 }
 
-.hx-about-badge {
+.hx-about-card-a {
+  left: 9%;
+  width: 36%;
+  height: 100%;
+  transform: translate(calc(var(--q) * -38%), -50%) rotate(calc(-3deg - var(--q) * 9deg));
+}
+
+.hx-about-card-b {
+  right: 7%;
+  width: 46%;
+  height: 74%;
+  transform: translate(calc(var(--q) * 38%), -50%) rotate(calc(3deg + var(--q) * 9deg));
+}
+
+.hx-about-tag {
   position: absolute;
-  left: 6%;
-  bottom: 4%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  color: #ffffff;
+  background: rgba(11, 15, 23, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.hx-about-card-a .hx-about-tag {
+  left: 18px;
+  top: 18px;
+}
+
+.hx-about-card-b .hx-about-tag {
+  right: 18px;
+  bottom: 18px;
+}
+
+.hx-about-core {
+  position: absolute;
+  left: 49%;
+  top: 50%;
   z-index: 3;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 20px;
-  border-radius: 18px;
-  background: #ffffff;
-  border: 1px solid #e0e7ff;
-  box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.25);
+  width: 112px;
+  height: 112px;
+  transform: translate(-50%, -50%) scale(calc(0.4 + var(--hx-p) * 0.6));
+  opacity: calc(var(--hx-p) * 1.6 - 0.4);
+  transition: transform 0.15s linear, opacity 0.15s linear;
 }
 
-.hx-about-badge-num {
-  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
-  font-size: 26px;
-  font-weight: 800;
-  line-height: 1;
+.hx-about-core-in {
+  position: absolute;
+  inset: 20px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #ffffff;
   background: var(--hx-grad);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  border: 4px solid #ffffff;
+  box-shadow:
+    0 0 0 1px #e0e7ff,
+    0 22px 44px -14px rgba(99, 102, 241, 0.6);
 }
 
-.hx-about-badge-text {
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1.35;
-  color: var(--hx-ink);
-  max-width: 140px;
+.hx-about-core-in svg {
+  animation: hx-about-twinkle 3.2s ease-in-out infinite;
+}
+
+@keyframes hx-about-twinkle {
+  50% {
+    transform: rotate(18deg) scale(1.12);
+  }
+}
+
+.hx-about-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+
+.hx-about-ring-1 {
+  border: 1.5px dashed #a5b4fc;
+  animation: hx-about-spin 14s linear infinite;
+}
+
+.hx-about-ring-2 {
+  inset: 8px;
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  animation: hx-about-pulse 2.8s var(--hx-ease) infinite;
+}
+
+@keyframes hx-about-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes hx-about-pulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.55);
+    opacity: 0;
+  }
+}
+
+.hx-about-stage:hover .hx-about-card-a {
+  transform: translate(-3%, -50%) rotate(-5deg);
+}
+
+.hx-about-stage:hover .hx-about-card-b {
+  transform: translate(3%, -50%) rotate(5deg);
 }
 
 .hx-about-copy {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: clamp(28px, 4vw, 56px);
+  align-items: start;
+  max-width: 1060px;
+  margin: clamp(40px, 4.5vw, 64px) auto 0;
+}
+
+.hx-about-split {
+  align-self: stretch;
+  width: 2px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #00d2ff, #6366f1, #a855f7);
+  opacity: 0.55;
+}
+
+.hx-about-more {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 22px;
+}
+
+.hx-page .hx-about-copy p:not(#_):not(#__):not(#___) {
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .hx-about-stage {
+    height: 300px;
+    margin-top: 30px;
+  }
+
+  .hx-about-card {
+    border-radius: 20px;
+  }
+
+  .hx-about-card-a {
+    left: 2%;
+    width: 46%;
+  }
+
+  .hx-about-card-b {
+    right: 0;
+    width: 54%;
+    height: 66%;
+  }
+
+  .hx-about-tag {
+    width: 36px;
+    height: 36px;
+    border-radius: 11px;
+  }
+
+  .hx-about-card-a .hx-about-tag {
+    left: 12px;
+    top: 12px;
+  }
+
+  .hx-about-card-b .hx-about-tag {
+    right: 12px;
+    bottom: 12px;
+  }
+
+  .hx-about-core {
+    left: 47%;
+    width: 84px;
+    height: 84px;
+  }
+
+  .hx-about-core-in {
+    inset: 14px;
+    border-width: 3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hx-about-beam-flow,
+  .hx-about-ring-1,
+  .hx-about-ring-2,
+  .hx-about-core-in svg {
+    animation: none;
+  }
 }
 
 /* ==========================================================================
@@ -2607,7 +2770,6 @@
 }
 
 @media (max-width: 900px) {
-  .hx-about-grid,
   .hx-work-grid,
   .hx-tech-grid,
   .hx-insights-grid,
@@ -2655,9 +2817,15 @@
     bottom: 7px;
   }
 
-  .hx-about-art {
-    order: 2;
-    height: clamp(340px, 72vw, 480px);
+  .hx-about-copy {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+  }
+
+  .hx-about-split {
+    width: 64px;
+    height: 2px;
+    background: linear-gradient(90deg, #00d2ff, #6366f1, #a855f7);
   }
 
   .hx-work-reel {

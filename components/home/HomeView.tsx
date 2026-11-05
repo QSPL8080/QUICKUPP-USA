@@ -118,30 +118,56 @@ export default function HomeView() {
         </div>
       </section>
 
-      {/* 3. About */}
+      {/* 3. About: business and technology slide in from both sides and meet in the middle */}
       <Section className="hx-about">
-        <div className="hx-wrap hx-about-grid">
-          <div className="hx-about-art" aria-hidden="true">
-            <figure className="hx-about-main" data-hx="wipe">
-              <img src="/images/home1-about-01.jpg" alt="" loading="lazy" />
-            </figure>
-            <figure className="hx-about-side" data-hx="wipe" style={d(0.2)}>
-              <img src="/images/contact-team-collaboration.jpg" alt="" loading="lazy" />
-            </figure>
-            <div className="hx-about-badge" data-hx="lift">
-              <span className="hx-about-badge-num">10+</span>
-              <span className="hx-about-badge-text">Years Of Digital Excellence</span>
-            </div>
-            <span className="hx-about-dots" />
-          </div>
-          <div className="hx-about-copy">
+        <div className="hx-wrap">
+          <div className="hx-about-head">
             <Title lines={ABOUT.title} />
-            {ABOUT.text.map((t, i) => (
-              <p key={i} className={i === 0 ? "hx-lead" : "hx-body"} data-hx="rise" style={d(0.15 + i * 0.1)}>
-                {t}
-              </p>
-            ))}
-            <div data-hx="rise" style={d(0.35)}>
+          </div>
+
+          <div className="hx-about-stage" data-hx-track aria-hidden="true">
+            <svg className="hx-about-beam" viewBox="0 0 1000 120" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="hx-about-grad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#00d2ff" />
+                  <stop offset="50%" stopColor="#6366f1" />
+                  <stop offset="100%" stopColor="#a855f7" />
+                </linearGradient>
+              </defs>
+              <path className="hx-about-beam-base" d="M0 60 C 250 0, 350 120, 500 60 S 750 0, 1000 60" />
+              <path className="hx-about-beam-flow" d="M0 60 C 250 0, 350 120, 500 60 S 750 0, 1000 60" />
+            </svg>
+
+            <figure className="hx-about-card hx-about-card-a">
+              <img src="/images/home1-about-01.jpg" alt="" loading="lazy" />
+              <span className="hx-about-tag">
+                <HomeIcon name="trending-up" size={18} />
+              </span>
+            </figure>
+
+            <figure className="hx-about-card hx-about-card-b">
+              <img src="/images/project-04.jpg" alt="" loading="lazy" />
+              <span className="hx-about-tag">
+                <HomeIcon name="cpu" size={18} />
+              </span>
+            </figure>
+
+            <div className="hx-about-core">
+              <span className="hx-about-ring hx-about-ring-1" />
+              <span className="hx-about-ring hx-about-ring-2" />
+              <span className="hx-about-core-in">
+                <HomeIcon name="sparkles" size={26} />
+              </span>
+            </div>
+          </div>
+
+          <div className="hx-about-copy">
+            <p className="hx-lead" data-hx="rise">
+              {ABOUT.text[0]}
+            </p>
+            <span className="hx-about-split" aria-hidden="true" />
+            <div className="hx-about-more" data-hx="rise" style={d(0.15)}>
+              <p className="hx-body">{ABOUT.text[1]}</p>
               <Button cta={ABOUT.cta} />
             </div>
           </div>

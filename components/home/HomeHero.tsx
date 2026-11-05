@@ -9,7 +9,7 @@ import HomeIcon, { type HomeIconName } from "@/components/home/HomeIcon";
  * The four eyebrow words each own a photo. In the dial the next photo is
  * swept in clockwise like a clock hand while the gradient arc fills and the
  * eyebrow words turn slowly around the edge; the matching pillar in the dock
- * lights up and fills. Hovering or focusing a pillar (or the dial) holds it.
+ * opens onto its photo. It moves on by itself every 5 seconds. Hovering or focusing a pillar (or the dial) holds it.
  * Every word comes from the home page document.
  */
 
@@ -27,7 +27,7 @@ const PILLARS: { photo: string; icon: HomeIconName }[] = [
   { photo: "/images/contact-diverse-meeting.jpg", icon: "trending-up" }, // BUILT FOR GROWTH.
 ];
 
-const STEP_MS = 4200;
+const STEP_MS = 5000; // the next pillar every 5 seconds
 const TICKS = 72;
 const ARC_R = 204;
 const ARC_C = 2 * Math.PI * ARC_R;
@@ -220,9 +220,6 @@ export default function HomeHero({ hero, actions }: { hero: Hero; actions: React
                 </span>
               </span>
               <span className="hxd-pillar-word">{w}</span>
-              <span className="hxd-pillar-bar" aria-hidden="true">
-                <span key={`${active}-${running}`} className="hxd-pillar-fill" style={{ animationDuration: `${STEP_MS}ms` }} />
-              </span>
             </button>
           ))}
         </div>
