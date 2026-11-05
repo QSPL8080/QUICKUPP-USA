@@ -27,6 +27,9 @@ function getDefaultDates() {
   };
 }
 
+/** a one-line summary kept within the description column */
+const clip = (v: string, max = 255) => (v.length > max ? `${v.slice(0, max - 3)}...` : v);
+
 export async function POST(req: Request) {
   try {
     const user = await getCurrentUser();
@@ -58,7 +61,7 @@ export async function POST(req: Request) {
     const clientPhone = String(body.clientPhone || "").trim().slice(0, 50);
     const companyName = String(body.companyName || "").trim().slice(0, 190) || null;
     const service = String(body.service || "").trim().slice(0, 150);
-    const category = String(body.category || body.quantity || "").trim().slice(0, 150) || null;
+    const category = String(body.category || body.quantity || "").trim().slice(0, 1000) || null;
     const industry = String(body.industry || "").trim().slice(0, 150) || null;
     const quantity = category;
     const leadSource = body.leadSource ? String(body.leadSource).trim() : "manual";
@@ -158,7 +161,7 @@ export async function POST(req: Request) {
           category,
           industry,
           quantity,
-          `Payment Link: ${service}${category ? ` - ${category}` : ""}${industry ? ` (${industry})` : ""}`,
+          clip(`Payment Link: ${service}${category ? ` - ${category}` : ""}${industry ? ` (${industry})` : ""}`),
           initialAmount,
           totalAmount,
           isPartial ? "partial" : "full",
@@ -213,7 +216,7 @@ export async function POST(req: Request) {
           service,
           category,
           quantity,
-          `Payment Link: ${service}${category ? ` - ${category}` : ""}`,
+          clip(`Payment Link: ${service}${category ? ` - ${category}` : ""}`),
           initialAmount,
           totalAmount,
           isPartial ? "partial" : "full",
@@ -292,7 +295,7 @@ export async function PATCH(req: Request) {
     const clientPhone = body.clientPhone !== undefined ? String(body.clientPhone).trim().slice(0, 50) : existing.client_phone;
     const companyName = body.companyName !== undefined ? (String(body.companyName).trim().slice(0, 190) || null) : existing.company_name;
     const service = body.service !== undefined ? String(body.service).trim().slice(0, 150) : existing.service;
-    const category = body.category !== undefined ? String(body.category).trim().slice(0, 150) : (existing.category || existing.quantity);
+    const category = body.category !== undefined ? String(body.category).trim().slice(0, 1000) : (existing.category || existing.quantity);
     const industry = body.industry !== undefined ? (String(body.industry).trim().slice(0, 150) || null) : existing.industry;
     const quantity = category;
     const notes = body.notes !== undefined ? (String(body.notes).trim().slice(0, 2000) || null) : existing.notes;
@@ -361,7 +364,7 @@ export async function PATCH(req: Request) {
           category,
           industry,
           quantity,
-          `Payment Link: ${service}${category ? ` - ${category}` : ""}${industry ? ` (${industry})` : ""}`,
+          clip(`Payment Link: ${service}${category ? ` - ${category}` : ""}${industry ? ` (${industry})` : ""}`),
           totalAmount,
           paymentType,
           remainingAmount,
@@ -401,7 +404,7 @@ export async function PATCH(req: Request) {
           service,
           category,
           quantity,
-          `Payment Link: ${service}${category ? ` - ${category}` : ""}`,
+          clip(`Payment Link: ${service}${category ? ` - ${category}` : ""}`),
           totalAmount,
           paymentType,
           remainingAmount,

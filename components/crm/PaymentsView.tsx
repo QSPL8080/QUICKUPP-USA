@@ -963,7 +963,7 @@ Quickupp Softech LLC`;
                           </span>
                           {p.paidAt && p.status === "paid" && (
                             <span style={{ display: "block", fontSize: "11px", color: "#64748b", marginTop: "3px" }}>
-                              Paid {fmtDate(p.paidAt, true)}
+                              Paid {fmtDate(p.paidAt)}
                             </span>
                           )}
                         </td>

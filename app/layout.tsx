@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import ThemeScripts from "@/components/ThemeScripts";
 import "./globals.css";
 import "./assurix-service.css";
 import "./site-type.css";
@@ -107,10 +108,14 @@ export default function RootLayout({
       </head>
       <body>
         {children}
-        <Script src="/js/quickupp.chunk.36b8fb49256177c8.js?v=qs2" strategy="afterInteractive" />
-        <Script src="/js/quickupp.chunk.7bc38d72505cd683.js?v=qs2" strategy="afterInteractive" />
-        <Script src="/js/quickupp.chunk.c62231c40fdafb09.js?v=qs2" strategy="afterInteractive" />
-        <Script src="/js/quickupp-core.js?v=qs2" strategy="afterInteractive" />
+        <ThemeScripts
+          srcs={[
+            "/js/quickupp.chunk.36b8fb49256177c8.js?v=qs2",
+            "/js/quickupp.chunk.7bc38d72505cd683.js?v=qs2",
+            "/js/quickupp.chunk.c62231c40fdafb09.js?v=qs2",
+            "/js/quickupp-core.js?v=qs2",
+          ]}
+        />
         <QuickuppEngineReinit />
         <ButtonTone />
         <PayNowModal />

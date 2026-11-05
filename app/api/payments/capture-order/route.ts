@@ -242,6 +242,9 @@ export async function POST(req: Request) {
           paymentDesc = `Website PayPal Payment (${isPartial ? "Partial Deposit" : "Full Payment"}) - ${service || ""} (${categoryStr || ""})`.trim();
         }
 
+        // keep within the column even on a database that hasn't been updated yet
+        if (paymentDesc.length > 255) paymentDesc = `${paymentDesc.slice(0, 252)}...`;
+
         const paymentNotes =
           paymentStatus === "failed"
             ? `[PAYMENT FAILED / DECLINED]: ${failureReason}${notes ? ` | Client Note: ${notes}` : ""}`
