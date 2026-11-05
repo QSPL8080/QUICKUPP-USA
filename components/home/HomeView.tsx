@@ -4,6 +4,7 @@ import HomeIcon, { type HomeIconName } from "@/components/home/HomeIcon";
 import HomeMotion from "@/components/home/HomeMotion";
 import ServiceExplorer from "@/components/home/ServiceExplorer";
 import HomeHero from "@/components/home/HomeHero";
+import TechStack from "@/components/home/TechStack";
 import BookingSection from "@/components/BookingSection";
 import { ABOUT, FINAL, HERO, INDUSTRIES, INSIGHTS, PROCESS, SERVICES, TECH, TRUST, VOICES, WHY, WORK } from "@/data/home-content";
 import "@/app/home.css";
@@ -373,42 +374,21 @@ export default function HomeView() {
         </div>
       </Section>
 
-      {/* 10. Technology & Capabilities */}
-      <Section className="hx-tech">
-        <div className="hx-wrap hx-tech-grid">
-          <div className="hx-tech-copy">
+      {/* 10. Technology & Capabilities: the groups wired into a glowing hub */}
+      <Section className="hx-tech hx-stack">
+        <div className="hx-wrap">
+          <div className="hx-stack-head">
             <Title lines={TECH.title} />
-            <p className="hx-body" data-hx="rise" style={d(0.15)}>
-              {TECH.text}
-            </p>
-            <div data-hx="rise" style={d(0.25)}>
-              <Button cta={TECH.cta} />
+            <div className="hx-stack-intro">
+              <p className="hx-body" data-hx="rise" style={d(0.15)}>
+                {TECH.text}
+              </p>
+              <div data-hx="rise" style={d(0.25)}>
+                <Button cta={TECH.cta} />
+              </div>
             </div>
           </div>
-          <div className="hx-tech-panel" data-hx="lift">
-            <div className="hx-tech-bar" aria-hidden="true">
-              <span />
-              <span />
-              <span />
-            </div>
-            <dl className="hx-tech-rows">
-              {TECH.rows.map((r, i) => (
-                <div key={r.label} className="hx-tech-row" data-hx="type" style={d(0.1 + i * 0.1)}>
-                  <dt>
-                    <HomeIcon name={r.icon as HomeIconName} size={16} />
-                    <span>{r.label}</span>
-                  </dt>
-                  <dd>
-                    {r.items.map((t, j) => (
-                      <span key={t} className="hx-tech-pill" style={d(0.2 + i * 0.1 + j * 0.06)}>
-                        {t}
-                      </span>
-                    ))}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </div>
+          <TechStack rows={TECH.rows} />
         </div>
       </Section>
 
@@ -447,19 +427,22 @@ export default function HomeView() {
         tone="soft"
       />
 
-      {/* 12. Contact & Final CTA */}
-      <section className="hx-final">
+      {/* 12. Contact & Final CTA: the dark grid card used to close the About
+          pages, with a slow light sweeping across the grid */}
+      <section className="hx-close">
         <div className="hx-wrap">
-          <div className="hx-final-card" data-hx="lift">
-            <span className="hx-final-sun" aria-hidden="true" />
-            <span className="hx-final-floor" aria-hidden="true" />
-            <Title lines={FINAL.title} className="hx-center" />
-            <p className="hx-body hx-center hx-narrow" data-hx="rise" style={d(0.15)}>
-              {FINAL.text}
-            </p>
-            <div className="hx-actions hx-actions-center" data-hx="rise" style={d(0.25)}>
-              <Button cta={FINAL.primary} tone="light" />
-              <Button cta={FINAL.secondary} tone="ghost" />
+          <div className="hx-close-card" data-hx="lift">
+            <span className="hx-close-grid" aria-hidden="true" />
+            <span className="hx-close-sweep" aria-hidden="true" />
+            <div className="hx-close-main">
+              <Title lines={FINAL.title} />
+              <p className="hx-body" data-hx="rise" style={d(0.15)}>
+                {FINAL.text}
+              </p>
+              <div className="hx-actions" data-hx="rise" style={d(0.25)}>
+                <Button cta={FINAL.primary} tone="white" />
+                <Button cta={FINAL.secondary} tone="ghost" />
+              </div>
             </div>
           </div>
         </div>

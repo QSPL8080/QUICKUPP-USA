@@ -1,6 +1,19 @@
+// Shared hosting (Hostinger) caps how many threads one account can start.
+// Next.js normally opens one build worker per CPU core (63 there), and each
+// worker loads native Rust tools that start their own thread pool per core,
+// so the build ran out of threads ("OS can't spawn worker thread", SIGABRT).
+// Keep the native thread pools small; workers started below inherit this.
+process.env.TOKIO_WORKER_THREADS ??= "2";
+process.env.RAYON_NUM_THREADS ??= "2";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   devIndicators: false,
+  experimental: {
+    // only a couple of build workers, so the thread limit is never reached
+    cpus: 2,
+    workerThreads: false,
+  },
   images: {
     unoptimized: true,
   },
