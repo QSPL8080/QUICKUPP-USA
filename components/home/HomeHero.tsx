@@ -4,12 +4,14 @@ import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 
 import HomeIcon, { type HomeIconName } from "@/components/home/HomeIcon";
 
 /*
- * Home hero ("hxd-", used on no other page): a dark stage with a growth
- * dial, and a white pillar dock lying across the stage's lower edge.
- * The four eyebrow words each own a photo. In the dial the next photo is
- * swept in clockwise like a clock hand while the gradient arc fills and the
- * eyebrow words turn slowly around the edge; the matching pillar in the dock
- * opens onto its photo. It moves on by itself every 5 seconds. Hovering or focusing a pillar (or the dial) holds it.
+ * Home hero ("hxd-", used on no other page): a dark stage with the copy on
+ * the left and a photo filling the right side to the stage's edge (the IT
+ * service pages' hero layout), and a white pillar dock lying across the
+ * stage's lower edge. The four eyebrow words each own a photo. Every 5
+ * seconds the next photo slides in behind a diagonal shutter while the
+ * current one drifts; the matching pillar in the dock opens onto the same
+ * photo. Hovering or focusing a pillar shows its photo and holds it;
+ * hovering the photo holds it too.
  * Every word comes from the home page document.
  */
 
@@ -20,19 +22,16 @@ type Hero = {
   supporting: string[];
 };
 
+const UNSPLASH = (id: string) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1600&q=80`;
+
 const PILLARS: { photo: string; icon: HomeIconName }[] = [
-  { photo: "/images/counter-style-three-img-03.jpg", icon: "megaphone" }, // MARKETING.
-  { photo: "/images/contact-tech-discussion.jpg", icon: "bot" }, // AI.
-  { photo: "/images/contact-team-collaboration.jpg", icon: "code-xml" }, // TECHNOLOGY.
+  { photo: UNSPLASH("photo-1686061592689-312bbfb5c055"), icon: "megaphone" }, // MARKETING. (analytics dashboard)
+  { photo: UNSPLASH("photo-1680783954745-3249be59e527"), icon: "bot" }, // AI. (robot and human hands)
+  { photo: UNSPLASH("photo-1498050108023-c5249f4df085"), icon: "code-xml" }, // TECHNOLOGY. (code on a laptop)
   { photo: "/images/contact-diverse-meeting.jpg", icon: "trending-up" }, // BUILT FOR GROWTH.
 ];
 
 const STEP_MS = 5000; // the next pillar every 5 seconds
-const TICKS = 72;
-const ARC_R = 204;
-const ARC_C = 2 * Math.PI * ARC_R;
-const RING_R = 232;
-const RING_C = 2 * Math.PI * RING_R;
 
 const d = (s: number) => ({ "--d": `${s}s` }) as CSSProperties;
 
@@ -70,8 +69,6 @@ export default function HomeHero({ hero, actions }: { hero: Hero; actions: React
   }, [active, held, onScreen, motion, count]);
 
   const running = motion && !held && onScreen;
-  const ringOnce = hero.eyebrow.join("  ·  ");
-  const ringText = `${ringOnce}  ·  ${ringOnce}  ·`;
 
   return (
     <section ref={boxRef} className={`hxd-hero${running ? " is-running" : ""}`}>
@@ -116,75 +113,24 @@ export default function HomeHero({ hero, actions }: { hero: Hero; actions: React
             </ul>
           </div>
 
-          <div className="hxd-art" onMouseEnter={() => setHeld(true)} onMouseLeave={() => setHeld(false)} aria-hidden="true">
-            <div className="hxd-dial">
-              <svg className="hxd-svg" viewBox="0 0 500 500">
-                <defs>
-                  <linearGradient id="hxd-grad" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="#00d2ff" />
-                    <stop offset="50%" stopColor="#818cf8" />
-                    <stop offset="100%" stopColor="#c084fc" />
-                  </linearGradient>
-                  <path id="hxd-ring" d={`M 250 250 m -${RING_R} 0 a ${RING_R} ${RING_R} 0 1 1 ${RING_R * 2} 0 a ${RING_R} ${RING_R} 0 1 1 -${RING_R * 2} 0`} />
-                </defs>
+          <div className="hxd-art" aria-hidden="true" />
+        </div>
 
-                <g className="hxd-ticks">
-                  {Array.from({ length: TICKS }, (_, i) => {
-                    const a = (i / TICKS) * Math.PI * 2 - Math.PI / 2;
-                    const major = i % 6 === 0;
-                    const r1 = major ? 210 : 213;
-                    const r2 = 219;
-                    return (
-                      <line
-                        key={i}
-                        x1={250 + Math.cos(a) * r1}
-                        y1={250 + Math.sin(a) * r1}
-                        x2={250 + Math.cos(a) * r2}
-                        y2={250 + Math.sin(a) * r2}
-                        className={major ? "is-major" : undefined}
-                        style={{ "--i": i } as CSSProperties}
-                      />
-                    );
-                  })}
-                </g>
-
-                <circle className="hxd-track" cx="250" cy="250" r={ARC_R} />
-                <circle
-                  key={`${active}-${running}`}
-                  className="hxd-arc"
-                  cx="250"
-                  cy="250"
-                  r={ARC_R}
-                  style={{ strokeDasharray: ARC_C, "--c": ARC_C, animationDuration: `${STEP_MS}ms` } as CSSProperties}
-                />
-
-                <g className="hxd-ring">
-                  <text className="hxd-ring-text">
-                    <textPath href="#hxd-ring" textLength={RING_C - 12} lengthAdjust="spacing">
-                      {ringText}
-                    </textPath>
-                  </text>
-                </g>
-              </svg>
-
-              <div className="hxd-disc">
-                {PILLARS.slice(0, count).map((p, i) => (
-                  <div key={p.photo} className={`hxd-photo${i === active ? " is-active" : ""}${i === prev && i !== active ? " is-prev" : ""}`}>
-                    <img src={p.photo} alt="" loading={i === 0 ? "eager" : "lazy"} />
-                  </div>
-                ))}
-                {motion && <span key={`hand-${active}`} className="hxd-hand" />}
-                <span className="hxd-disc-shine" />
-              </div>
-
-              <span className="hxd-chip">
-                <span className="hxd-chip-dot" />
-                <span key={active} className="hxd-chip-text">
-                  {hero.eyebrow[active]}
-                </span>
-              </span>
+        {/* the photo filling the right side to the stage's edge */}
+        <div className="hxd-edge" onMouseEnter={() => setHeld(true)} onMouseLeave={() => setHeld(false)} aria-hidden="true">
+          {PILLARS.slice(0, count).map((p, i) => (
+            <div key={p.photo} className={`hxd-shot${i === active ? " is-active" : ""}${i === prev && i !== active ? " is-prev" : ""}`}>
+              <img src={p.photo} alt="" loading={i === 0 ? "eager" : "lazy"} />
             </div>
-          </div>
+          ))}
+          <span className="hxd-edge-fade" />
+          <span className="hxd-edge-grid" />
+          <span className="hxd-chip">
+            <span className="hxd-chip-dot" />
+            <span key={active} className="hxd-chip-text">
+              {hero.eyebrow[active]}
+            </span>
+          </span>
         </div>
       </div>
 
