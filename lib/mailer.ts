@@ -1,4 +1,6 @@
 import "server-only";
+import fs from "node:fs";
+import path from "node:path";
 import nodemailer, { type Transporter } from "nodemailer";
 
 /*
@@ -18,6 +20,24 @@ export const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL || "support@quickuppsofte
 export const CALENDLY_MEETING_EMAIL = "quickuppsoftechmeet@gmail.com";
 
 export type MailChannel = "info" | "hr" | "default";
+
+/*
+ * The logo in email headers is sent inside the email itself (an inline
+ * attachment), so it shows in every inbox without loading anything from the
+ * website. Templates use EMAIL_LOGO_SRC as the <img> src.
+ */
+const LOGO_CID = "qs-logo";
+export const EMAIL_LOGO_SRC = `cid:${LOGO_CID}`;
+let logoBytes: Buffer | null | undefined;
+function emailLogo(): Buffer | null {
+  if (logoBytes !== undefined) return logoBytes;
+  try {
+    logoBytes = fs.readFileSync(path.join(process.cwd(), "public", "images", "logo-white.png"));
+  } catch {
+    logoBytes = null;
+  }
+  return logoBytes;
+}
 
 export type Mail = {
   to: string;
@@ -93,12 +113,24 @@ export async function sendMail(mail: Mail): Promise<boolean> {
   }
   try {
     const { fromName, fromAddress, channel: _ch, ...rest } = mail;
+    const attachments: Record<string, unknown>[] = [...(rest.attachments || [])];
+    if (rest.html.includes(EMAIL_LOGO_SRC)) {
+      const logo = emailLogo();
+      if (logo) {
+        attachments.push({ filename: "quickupp-logo.png", content: logo, contentType: "image/png", cid: LOGO_CID, contentDisposition: "inline" });
+      } else {
+        // no logo file on this server: fall back to the website copy
+        const site = process.env.NEXT_PUBLIC_SITE_URL || "https://www.quickuppsoftech.us";
+        rest.html = rest.html.split(EMAIL_LOGO_SRC).join(`${site}/images/logo-white.png`);
+      }
+    }
     await mailer.transporter.sendMail({
       from: {
         name: fromName || (channel === "hr" ? "Quickupp Careers" : "Quickupp Softech LLC"),
         address: fromAddress || mailer.fromAddress,
       },
       ...rest,
+      attachments,
     });
     return true;
   } catch (err) {

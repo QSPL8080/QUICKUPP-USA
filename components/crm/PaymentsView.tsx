@@ -1172,7 +1172,7 @@ Quickupp Softech LLC`;
 
                       {/* Timestamp */}
                       <td data-label="Timestamp" className="crm-nowrap" style={{ fontSize: "13px" }}>
-                        {fmtDate(p.paidAt || p.createdAt, true)}
+                        {p.paidAt ? fmtDate(p.paidAt) : fmtDate(p.createdAt, true)}
                       </td>
 
                       {/* Client, Phone, Email */}
@@ -1758,7 +1758,7 @@ Quickupp Softech LLC`;
                           </td>
                           <td>
                             <span style={{ fontWeight: 600, color: "#0f172a", display: "block" }}>
-                              {fmtDate(viewing.paidAt, true)}
+                              {fmtDate(viewing.paidAt)}
                             </span>
                             <span style={{ color: "#64748b", fontSize: "11px", fontFamily: "monospace", wordBreak: "break-all" }}>
                               {viewing.reference || viewing.paypalOrderId || "PayPal"}

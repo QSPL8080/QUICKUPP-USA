@@ -2,7 +2,7 @@ import { NextResponse, after } from "next/server";
 import { randomBytes } from "node:crypto";
 import { capturePayPalOrder } from "@/lib/paypal";
 import { getPool } from "@/lib/db";
-import { sendMail, LEADS_NOTIFICATION_EMAIL } from "@/lib/mailer";
+import { sendMail, LEADS_NOTIFICATION_EMAIL, EMAIL_LOGO_SRC } from "@/lib/mailer";
 import { generateReceiptPdf } from "@/lib/pdfReceipt";
 import { logActivity } from "@/lib/crm/activity";
 import { logGatewayResult, paymentSnapshot, type PaymentSnapshot, type PaymentTable } from "@/lib/crm/paymentActivity";
@@ -530,7 +530,7 @@ export async function POST(req: Request) {
                 
                 <!-- Email Header with Quickupp Logo -->
                 <div style="background: #0b0f17; padding: 28px 32px; text-align: center; border-bottom: 2px solid #3b82f6;">
-                  <img src="${siteUrl}/images/logo-white.png" alt="Quickupp Softech LLC" width="170" style="display: block; margin: 0 auto; max-width: 170px; height: auto;" />
+                  <img src="${EMAIL_LOGO_SRC}" alt="Quickupp Softech LLC" width="170" style="display: block; margin: 0 auto; max-width: 170px; height: auto;" />
                   <p style="color: #94a3b8; font-size: 12px; margin: 8px 0 0; letter-spacing: 0.05em; text-transform: uppercase;">Enterprise Marketing • AI • Technology</p>
                 </div>
 

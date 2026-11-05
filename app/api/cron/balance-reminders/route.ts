@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { randomBytes } from "node:crypto";
 import { getPool } from "@/lib/db";
-import { sendMail } from "@/lib/mailer";
+import { sendMail, EMAIL_LOGO_SRC } from "@/lib/mailer";
 import { logActivity, money } from "@/lib/crm/activity";
 import { entityOf } from "@/lib/crm/paymentActivity";
 
@@ -108,7 +108,7 @@ async function handleBalanceReminders(req: Request) {
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 24px 12px; background-color: #f1f5f9; color: #1e293b;">
   <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
     <div style="background: #0b0f17; padding: 28px 32px; text-align: center; border-bottom: 2px solid #3b82f6;">
-      <img src="${siteUrl}/images/logo-white.png" alt="Quickupp Softech LLC" width="170" style="display: block; margin: 0 auto; max-width: 170px; height: auto;" />
+      <img src="${EMAIL_LOGO_SRC}" alt="Quickupp Softech LLC" width="170" style="display: block; margin: 0 auto; max-width: 170px; height: auto;" />
       <p style="color: #94a3b8; font-size: 12px; margin: 8px 0 0; letter-spacing: 0.05em; text-transform: uppercase;">Enterprise Marketing • AI • Technology</p>
     </div>
 
