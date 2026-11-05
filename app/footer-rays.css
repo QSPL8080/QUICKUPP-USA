@@ -1,42 +1,14 @@
 /* ==========================================================================
    FOOTER WORDMARK — the giant "Quickupp" at the bottom of every page, lit in
-   the logo's colours (cyan → blue → violet → magenta) with soft light rays
-   fanning up behind it and a slow beam of light passing across the letters.
+   the logo's colours (cyan → blue → violet → magenta) over a soft coloured
+   glow, with a slow beam of light passing across the letters.
    ========================================================================== */
 .qs-scalient-footer .qs-scalient-watermark-wrap {
   position: relative;
   isolation: isolate;
 }
 
-/* light rays fanning up from below the wordmark */
-.qs-scalient-footer .qs-scalient-watermark-wrap::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: -40%;
-  z-index: -1;
-  width: min(1400px, 130vw);
-  aspect-ratio: 2 / 1;
-  transform: translateX(-50%);
-  background:
-    repeating-conic-gradient(
-      from 0deg at 50% 100%,
-      rgba(0, 198, 255, 0.16) 0deg 2.5deg,
-      transparent 2.5deg 9deg,
-      rgba(139, 92, 246, 0.14) 9deg 11deg,
-      transparent 11deg 18deg,
-      rgba(236, 72, 153, 0.12) 18deg 20deg,
-      transparent 20deg 27deg
-    );
-  -webkit-mask-image: radial-gradient(ellipse 50% 100% at 50% 100%, #000 10%, rgba(0, 0, 0, 0.5) 45%, transparent 75%);
-  mask-image: radial-gradient(ellipse 50% 100% at 50% 100%, #000 10%, rgba(0, 0, 0, 0.5) 45%, transparent 75%);
-  filter: blur(2px);
-  opacity: 0.9;
-  animation: qs-rays-sway 14s ease-in-out infinite alternate;
-  pointer-events: none;
-}
-
-/* a soft coloured glow the rays come from */
+/* a soft coloured glow behind the wordmark */
 .qs-scalient-footer .qs-scalient-watermark-wrap::after {
   content: "";
   position: absolute;
@@ -89,15 +61,6 @@
   }
 }
 
-@keyframes qs-rays-sway {
-  from {
-    transform: translateX(-50%) rotate(-4deg);
-  }
-  to {
-    transform: translateX(-50%) rotate(4deg);
-  }
-}
-
 @keyframes qs-rays-glow {
   0%,
   100% {
@@ -109,7 +72,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .qs-scalient-footer .qs-scalient-watermark-wrap::before,
   .qs-scalient-footer .qs-scalient-watermark-wrap::after,
   .qs-scalient-footer .qs-scalient-watermark-wrap .qs-scalient-watermark-text {
     animation: none;
