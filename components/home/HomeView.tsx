@@ -374,23 +374,37 @@ export default function HomeView() {
         </div>
       </Section>
 
-      {/* 10. Technology & Capabilities: the groups wired into a glowing hub */}
-      <Section className="hx-tech hx-stack">
-        <div className="hx-wrap">
-          <div className="hx-stack-head">
+      {/* 10. Technology & Capabilities: a dark stage with a radar sweeping
+          behind it (the Contact page hero look), the groups as rows */}
+      <section className="hx-radar">
+        <div className="hx-radar-stage">
+          <div className="hx-radar-scope" aria-hidden="true">
+            <span className="hx-radar-ring" />
+            <span className="hx-radar-ring" />
+            <span className="hx-radar-ring" />
+            <span className="hx-radar-sweep" />
+            <i className="hx-radar-blip" />
+            <i className="hx-radar-blip" />
+            <i className="hx-radar-blip" />
+            <i className="hx-radar-blip" />
+          </div>
+          <div className="hx-radar-grid" aria-hidden="true" />
+          <div className="hx-wrap hx-radar-inner">
             <Title lines={TECH.title} />
-            <div className="hx-stack-intro">
-              <p className="hx-body" data-hx="rise" style={d(0.15)}>
-                {TECH.text}
-              </p>
-              <div data-hx="rise" style={d(0.25)}>
-                <Button cta={TECH.cta} />
+            <div className="hx-radar-cols">
+              <div className="hx-radar-lead">
+                <p className="hx-radar-text" data-hx="rise" style={d(0.15)}>
+                  {TECH.text}
+                </p>
+                <div data-hx="rise" style={d(0.25)}>
+                  <Button cta={TECH.cta} tone="white" />
+                </div>
               </div>
+              <TechStack rows={TECH.rows} />
             </div>
           </div>
-          <TechStack rows={TECH.rows} />
         </div>
-      </Section>
+      </section>
 
       {/* 11. Blog & Insights */}
       <Section className="hx-insights">
