@@ -57,7 +57,7 @@ export const SERVICES = {
         "Campaign Tracking, Reporting and Performance Improvement",
       ],
       cta: { label: "Explore Digital Marketing Services", href: "/services/ai-powered-digital-marketing-services" },
-      img: "/images/service-img-01.jpg",
+      img: "https://images.unsplash.com/photo-1686061592689-312bbfb5c055?auto=format&fit=crop&w=1400&q=80",
       icon: "megaphone",
     },
     {
@@ -72,7 +72,7 @@ export const SERVICES = {
         "Workflow Integrations and Business Process Automation",
       ],
       cta: { label: "Explore AI Solutions", href: "/services/ai-automation-solutions" },
-      img: "/images/service-img-02.jpg",
+      img: "https://images.unsplash.com/photo-1680783954745-3249be59e527?auto=format&fit=crop&w=1400&q=80",
       icon: "bot",
     },
     {
@@ -87,7 +87,7 @@ export const SERVICES = {
         "Cloud Solutions, UI/UX Design and Application Improvements",
       ],
       cta: { label: "Explore IT Services", href: "/services/information-technology-services" },
-      img: "/images/service-img-03.jpg",
+      img: "https://images.unsplash.com/photo-1605379399642-870262d3d051?auto=format&fit=crop&w=1400&q=80",
       icon: "code-xml",
     },
     {
@@ -102,7 +102,7 @@ export const SERVICES = {
         "Additional technical or business support roles based on requirements",
       ],
       cta: { label: "Find Your Talent", href: "/services/staff-augmentation" },
-      img: "/images/service-img-04.jpg",
+      img: "https://images.unsplash.com/photo-1758691737124-05c5bffe46f0?auto=format&fit=crop&w=1400&q=80",
       icon: "users",
     },
     {
@@ -117,7 +117,7 @@ export const SERVICES = {
         "Creative Variations for Marketing Campaigns",
       ],
       cta: { label: "Explore AI Video Production Services", href: "https://quickuppaistudio.us/", external: true },
-      img: "/images/service-img-05.jpg",
+      img: "https://images.unsplash.com/photo-1574717025179-0b6d03d4d86f?auto=format&fit=crop&w=1400&q=80",
       icon: "clapperboard",
     },
     {
@@ -131,7 +131,7 @@ export const SERVICES = {
         "Performance Tracking and Reporting",
       ],
       cta: { label: "Explore YouTube Advertising Services", href: "/services/youtube-video-promotion" },
-      img: "/images/service-img-06.jpg",
+      img: "https://images.unsplash.com/photo-1764162051349-7cc989a1399d?auto=format&fit=crop&w=1400&q=80",
       icon: "play",
     },
   ] as HomeService[],
