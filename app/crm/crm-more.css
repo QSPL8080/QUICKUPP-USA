@@ -975,3 +975,73 @@
   color: #94a3b8;
   text-align: center;
 }
+
+/* ---- Calendly meetings (view only) ---------------------------------------------- */
+.crm-meet-pill-upcoming { background: #eef2ff; color: #4f46e5; }
+.crm-meet-pill-rescheduled { background: #fffbeb; color: #b45309; }
+.crm-meet-pill-completed { background: #ecfdf5; color: #047857; }
+.crm-meet-pill-canceled { background: #fef2f2; color: #b91c1c; }
+
+.crm-meet-row-off td:not(.crm-col-check) {
+  color: #94a3b8;
+}
+
+.crm-meet-struck {
+  text-decoration: line-through;
+  text-decoration-color: rgba(185, 28, 28, 0.5);
+}
+
+.crm-meet-was {
+  color: #b45309 !important;
+}
+
+.crm-root .crm-meet-join {
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.crm-meet-note {
+  margin-bottom: 16px;
+}
+
+.crm-meet-note code {
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.06);
+  font-size: 12.5px;
+}
+
+.crm-meet-head-when {
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.crm-meet-cancel {
+  margin: 0 0 14px;
+}
+
+.crm-meet-answers {
+  display: grid;
+  gap: 12px;
+}
+
+.crm-meet-qa {
+  display: grid;
+  gap: 4px;
+}
+
+.crm-root p.crm-meet-q {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.crm-timeline-dot.crm-meet-dot-booked { background: #6366f1; border-color: #e0e7ff; }
+.crm-timeline-dot.crm-meet-dot-rescheduled { background: #f59e0b; border-color: #fef3c7; }
+.crm-timeline-dot.crm-meet-dot-canceled { background: #ef4444; border-color: #fee2e2; }
+
+.crm-meet-readonly {
+  margin: 14px 0 10px;
+  font-size: 12.5px;
+}
