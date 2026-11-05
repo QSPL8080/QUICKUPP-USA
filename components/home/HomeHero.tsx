@@ -88,6 +88,7 @@ export default function HomeHero({ hero, actions }: { hero: Hero; actions: React
         <div className="hxd-wrap hxd-grid">
           <div className="hxd-copy">
             <h1 className="hxd-title">
+              <span className="sr-only">IT &amp; Digital Marketing Services for Growing Businesses | </span>
               {hero.title.map((l, i) => (
                 <span key={l} className="hxd-line" style={d(0.2 + i * 0.13)}>
                   <span className={i === hero.title.length - 1 ? "hxd-line-in qs-gradient-text" : "hxd-line-in"}>{l}</span>

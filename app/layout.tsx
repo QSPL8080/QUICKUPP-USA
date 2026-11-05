@@ -10,20 +10,20 @@ import PayNowModal from "@/components/PayNowModal";
 import DynamicEmailModal from "@/components/DynamicEmailModal";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.quickuppsoftech.us"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://quickuppsoftech.us"),
   alternates: {
-    canonical: "https://www.quickuppsoftech.us",
+    canonical: "https://quickuppsoftech.us",
   },
   generator: "Quickupp Softech",
   applicationName: "Quickupp Softech",
-  title: "Quickupp Softech | Marketing. AI. Technology. Built for Growth.",
+  title: "IT & Digital Marketing Services | Quickupp Softech",
   description:
-    "Quickupp Softech is a full-service digital marketing, AI and technology agency helping businesses grow through social media, SEO, paid marketing, AI automation, web & app development and more.",
+    "Quickupp Softech delivers web development, SEO, paid marketing and digital solutions for growing businesses. Explore services and book a call.",
   verification: {
     google: "LRVDf14TwT0MYqtLiUhSCGZRgMOALA6QyZ8aThDo86s",
   },
   openGraph: {
-    title: "Quickupp Softech | Marketing. AI. Technology. Built for Growth.",
+    title: "IT & Digital Marketing Services | Quickupp Softech",
     description:
       "Digital marketing, AI and technology solutions for businesses across the US.",
     images: ["/images/graph.webp"],
@@ -31,12 +31,96 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Quickupp Softech | Marketing. AI. Technology. Built for Growth.",
+    title: "IT & Digital Marketing Services | Quickupp Softech",
     description:
       "Digital marketing, AI and technology solutions for businesses across the US.",
     images: ["/images/graph.webp"],
     creator: "@QuickuppL57802",
   },
+};
+
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://quickuppsoftech.us/#organization",
+      "name": "Quickupp Softech LLC",
+      "alternateName": "Quickupp Softech",
+      "url": "https://quickuppsoftech.us",
+      "logo": {
+        "@type": "ImageObject",
+        "@id": "https://quickuppsoftech.us/#logo",
+        "url": "https://quickuppsoftech.us/images/logo-white.png",
+        "caption": "Quickupp Softech LLC",
+      },
+      "image": "https://quickuppsoftech.us/images/graph.webp",
+      "description":
+        "Quickupp Softech is a digital marketing, AI automation, and custom technology solutions company helping businesses scale with data-driven growth.",
+      "telephone": "+1-302-754-5679",
+      "email": "info@quickuppsoftech.us",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "8 The Green, Suite A",
+        "addressLocality": "Dover",
+        "addressRegion": "DE",
+        "postalCode": "19901",
+        "addressCountry": "US",
+      },
+      "sameAs": [
+        "https://twitter.com/QuickuppL57802",
+        "https://www.linkedin.com/company/quickupp-softech",
+        "https://www.facebook.com/quickuppsoftech",
+        "https://www.instagram.com/quickuppsoftech",
+      ],
+      "contactPoint": [
+        {
+          "@type": "ContactPoint",
+          "telephone": "+1-302-754-5679",
+          "contactType": "sales",
+          "email": "info@quickuppsoftech.us",
+          "availableLanguage": ["en"],
+        },
+        {
+          "@type": "ContactPoint",
+          "telephone": "+1-302-754-5679",
+          "contactType": "customer service",
+          "email": "support@quickuppsoftech.us",
+          "availableLanguage": ["en"],
+        },
+      ],
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://quickuppsoftech.us/#website",
+      "url": "https://quickuppsoftech.us",
+      "name": "Quickupp Softech",
+      "description": "IT & Digital Marketing Services for Growing Businesses",
+      "publisher": {
+        "@id": "https://quickuppsoftech.us/#organization",
+      },
+    },
+    {
+      "@type": "ProfessionalService",
+      "@id": "https://quickuppsoftech.us/#service",
+      "name": "Quickupp Softech LLC",
+      "url": "https://quickuppsoftech.us",
+      "parentOrganization": {
+        "@id": "https://quickuppsoftech.us/#organization",
+      },
+      "priceRange": "$$",
+      "telephone": "+1-302-754-5679",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "8 The Green, Suite A",
+        "addressLocality": "Dover",
+        "addressRegion": "DE",
+        "postalCode": "19901",
+        "addressCountry": "US",
+      },
+      "areaServed": "US",
+    },
+  ],
 };
 
 export default function RootLayout({
@@ -47,6 +131,14 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Schema.org Organization & WebSite JSON-LD */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationJsonLd),
+          }}
+        />
+
         {/* Google Search Console */}
         <meta name="google-site-verification" content="LRVDf14TwT0MYqtLiUhSCGZRgMOALA6QyZ8aThDo86s" />
 
@@ -76,7 +168,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
         <link rel="stylesheet" href="/css/quickupp.shared.min.css" />
-        <link rel="preload" as="image" href="/images/slider-01-01.jpg" fetchPriority="high" />
+        <link rel="preload" as="image" href="/images/counter-style-three-img-03.jpg" fetchPriority="high" />
         <Script
           id="webfont-script"
           src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"

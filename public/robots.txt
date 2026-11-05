@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /crm/
+Disallow: /api/crm/
+Disallow: /api/cron/
+Disallow: /checkout
+Disallow: /pay/
+Disallow: /payment-confirmation
+
+Sitemap: https://quickuppsoftech.us/sitemap.xml

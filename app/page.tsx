@@ -4,11 +4,11 @@ import Footer from "@/components/Footer";
 import HomeView from "@/components/home/HomeView";
 
 export const metadata: Metadata = {
-  title: "Quickupp Softech | Digital Marketing, AI & IT Solutions",
+  title: "IT & Digital Marketing Services | Quickupp Softech",
   description:
-    "Quickupp Softech is a digital marketing, AI, and IT solutions agency helping brands grow with performance marketing, web & app development, and AI-driven automation.",
+    "Quickupp Softech delivers web development, SEO, paid marketing and digital solutions for growing businesses. Explore services and book a call.",
   alternates: {
-    canonical: "https://www.quickuppsoftech.us",
+    canonical: "https://quickuppsoftech.us",
   },
 };
 
