@@ -90,30 +90,48 @@ export default function HomeView() {
         }
       />
 
-      {/* 2. Trust strip */}
+      {/* 2. Trust strip: a full-width dark band with the count and the promise,
+          then two crossing tapes: the four services one way, client logos the other */}
       <section className="hx-trust">
-        <div className="hx-wrap">
-          <div className="hx-trust-card" data-hx="lift">
-            <div className="hx-trust-top">
-              <h2 className="hx-trust-title">
-                <span className="hx-trust-num">
-                  <span data-hx-count={TRUST.count}>{TRUST.count.toLocaleString("en-US")}</span>
-                  {TRUST.countSuffix}
-                </span>{" "}
-                <span className="hx-trust-rest">{TRUST.titleRest}</span>
-              </h2>
-              <div className="hx-trust-side">
-                <h3 className="hx-trust-sub">{TRUST.subtitle}</h3>
-                <ul className="hx-trust-list">
-                  {TRUST.services.map((s, i) => (
-                    <li key={s} data-hx="pop" style={d(0.1 + i * 0.08)}>
-                      {s}
+        <div className="hx-trust-band">
+          <span className="hx-trust-lines" aria-hidden="true" />
+          <span className="hx-trust-glow" aria-hidden="true" />
+          <div className="hx-wrap hx-trust-row">
+            <h2 className="hx-trust-title" data-hx="rise">
+              <span className="hx-trust-num">
+                <span data-hx-count={TRUST.count}>{TRUST.count.toLocaleString("en-US")}</span>
+                {TRUST.countSuffix}
+              </span>
+              <span className="hx-trust-rest">{TRUST.titleRest}</span>
+            </h2>
+            <span className="hx-trust-bar" aria-hidden="true">
+              <span />
+            </span>
+            <h3 className="hx-trust-sub" data-hx="rise" style={d(0.15)}>
+              {TRUST.subtitle}
+            </h3>
+          </div>
+        </div>
+
+        <div className="hx-tapes">
+          <div className="hx-tape hx-tape-logos">
+            <Logos />
+          </div>
+          <div className="hx-tape hx-tape-svc">
+            <div className="hx-tape-track">
+              {[0, 1].map((k) => (
+                <ul key={k} className="hx-tape-row" aria-hidden={k === 1 ? true : undefined}>
+                  {[...TRUST.services, ...TRUST.services, ...TRUST.services].map((sv, i) => (
+                    <li key={`${k}-${i}`} aria-hidden={k === 0 && i >= TRUST.services.length ? true : undefined}>
+                      <span>{sv}</span>
+                      <svg className="hx-tape-star" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 0c.6 6.6 5.4 11.4 12 12-6.6.6-11.4 5.4-12 12-.6-6.6-5.4-11.4-12-12C6.6 11.4 11.4 6.6 12 0z" />
+                      </svg>
                     </li>
                   ))}
                 </ul>
-              </div>
+              ))}
             </div>
-            <Logos />
           </div>
         </div>
       </section>

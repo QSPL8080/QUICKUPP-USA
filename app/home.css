@@ -1107,101 +1107,230 @@
 /* ==========================================================================
    2. TRUST STRIP
    ========================================================================== */
+/* full width, edge to edge: a dark band carries the count and the promise;
+   below it two tapes cross like a ribbon — the four services run one way on
+   the site gradient, the client logos run the other way on white */
 .hx-trust {
   position: relative;
   z-index: 2;
   margin-top: clamp(48px, 5vw, 72px);
+  padding-bottom: clamp(8px, 1.5vw, 20px);
+  overflow: hidden;
 }
 
-.hx-trust-card {
+.hx-trust-band {
   position: relative;
-  padding: clamp(32px, 4vw, 52px) clamp(24px, 4vw, 56px) clamp(26px, 3vw, 36px);
-  border-radius: 28px;
-  background:
-    radial-gradient(ellipse 40% 90% at 0% 0%, rgba(0, 210, 255, 0.16), transparent 70%),
-    radial-gradient(ellipse 40% 90% at 100% 100%, rgba(168, 85, 247, 0.18), transparent 70%),
-    #0b0f17;
+  padding: clamp(40px, 4.4vw, 64px) 0 clamp(88px, 8vw, 116px);
+  background: #0b0f17;
   color: #ffffff;
   overflow: hidden;
-  box-shadow: 0 40px 80px -40px rgba(11, 15, 23, 0.6);
 }
 
-.hx-trust-top {
+/* thin vertical lines drifting sideways, like a fast-moving ledger */
+.hx-trust-lines {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 88px);
+  mask-image: linear-gradient(180deg, transparent, #000 30%, #000 70%, transparent);
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 30%, #000 70%, transparent);
+  animation: hx-trust-drift 18s linear infinite;
+}
+
+@keyframes hx-trust-drift {
+  to {
+    background-position: 88px 0;
+  }
+}
+
+.hx-trust-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 30% 120% at 8% 50%, rgba(0, 210, 255, 0.2), transparent 70%),
+    radial-gradient(ellipse 30% 120% at 92% 50%, rgba(168, 85, 247, 0.22), transparent 70%);
+  animation: hx-trust-breathe 9s ease-in-out infinite alternate;
+}
+
+@keyframes hx-trust-breathe {
+  to {
+    opacity: 0.55;
+  }
+}
+
+.hx-trust-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: auto auto minmax(0, 1fr);
   align-items: center;
-  gap: 28px clamp(32px, 5vw, 72px);
-  padding-bottom: clamp(26px, 3vw, 36px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  gap: clamp(24px, 4vw, 64px);
 }
 
 .hx-page h2.hx-trust-title:not(#_):not(#__):not(#___) {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: center;
+  gap: clamp(14px, 1.6vw, 22px);
   margin: 0;
   font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif) !important;
-  font-size: clamp(20px, 1.8vw, 26px) !important;
+  font-size: clamp(16px, 1.35vw, 19px) !important;
   line-height: 1.3 !important;
-  letter-spacing: -0.015em !important;
+  letter-spacing: -0.01em !important;
   font-weight: 600 !important;
-  color: rgba(255, 255, 255, 0.86);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .hx-trust-num {
-  font-size: clamp(56px, 6.5vw, 92px);
+  flex: none;
+  font-size: clamp(60px, 7vw, 104px);
   font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.045em;
-  background: linear-gradient(135deg, #67e8f9 0%, #a5b4fc 50%, #d8b4fe 100%);
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(120deg, #67e8f9 0%, #a5b4fc 45%, #d8b4fe 70%, #67e8f9 100%);
+  background-size: 200% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+  animation: hx-trust-sheen 7s linear infinite;
 }
 
-.hx-trust-side {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
+@keyframes hx-trust-sheen {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.hx-trust-rest {
+  max-width: 9.5em;
+}
+
+/* the dividing bar: a light runs down it */
+.hx-trust-bar {
+  position: relative;
+  align-self: stretch;
+  width: 2px;
+  min-height: 64px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.hx-trust-bar span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 45%;
+  background: linear-gradient(180deg, transparent, #00d2ff, #a855f7, transparent);
+  animation: hx-trust-run 3.2s ease-in-out infinite;
+}
+
+@keyframes hx-trust-run {
+  from {
+    top: -45%;
+  }
+  to {
+    top: 100%;
+  }
 }
 
 .hx-page h3.hx-trust-sub:not(#_):not(#__):not(#___) {
   margin: 0;
+  max-width: 560px;
+  justify-self: end;
   font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif) !important;
-  font-size: clamp(20px, 1.9vw, 27px) !important;
-  line-height: 1.3 !important;
-  letter-spacing: -0.02em !important;
+  font-size: clamp(22px, 2.2vw, 32px) !important;
+  line-height: 1.22 !important;
+  letter-spacing: -0.025em !important;
   font-weight: 700 !important;
   color: #ffffff;
+  text-align: right;
 }
 
-.hx-page ul.hx-trust-list:not(#_):not(#__):not(#___) {
+/* ---- the crossing tapes ---------------------------------------------------- */
+.hx-tapes {
+  position: relative;
+  height: clamp(150px, 13vw, 190px);
+  margin-top: clamp(-82px, -6.4vw, -62px);
+}
+
+.hx-tape {
+  position: absolute;
+  left: -4%;
+  right: -4%;
+  top: 50%;
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  align-items: center;
+  overflow: hidden;
+}
+
+.hx-tape-svc {
+  z-index: 2;
+  height: clamp(58px, 5vw, 72px);
+  background: linear-gradient(90deg, #00b4e6 0%, #6366f1 50%, #a855f7 100%);
+  box-shadow: 0 24px 50px -24px rgba(99, 102, 241, 0.7);
+  transform: translateY(-50%) rotate(-2.4deg);
+}
+
+.hx-tape-logos {
+  z-index: 1;
+  height: clamp(62px, 5.4vw, 78px);
+  background: #ffffff;
+  border-block: 1px solid #e2e8f0;
+  box-shadow: 0 24px 50px -30px rgba(15, 23, 42, 0.35);
+  transform: translateY(-50%) rotate(2deg);
+}
+
+.hx-tape-track {
+  display: flex;
+  flex: none;
+}
+
+.hx-tapes:hover .hx-tape-row,
+.hx-tapes:hover .hx-logos-row {
+  animation-play-state: paused;
+}
+
+.hx-page ul.hx-tape-row:not(#_):not(#__):not(#___) {
+  display: flex;
+  flex: none;
+  align-items: center;
   margin: 0;
   padding: 0;
   list-style: none;
+  animation: hx-marquee 30s linear infinite;
 }
 
-.hx-page .hx-trust-list li:not(#_):not(#__):not(#___) {
-  padding: 8px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
+.hx-page .hx-tape-row li:not(#_):not(#__):not(#___) {
+  display: flex;
+  align-items: center;
+  gap: clamp(22px, 2.4vw, 36px);
+  padding-right: clamp(22px, 2.4vw, 36px);
+  white-space: nowrap;
   font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif) !important;
-  font-size: 13.5px !important;
-  line-height: 1.3 !important;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
+  font-size: clamp(18px, 1.7vw, 24px) !important;
+  line-height: 1 !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.015em;
+  color: #ffffff;
 }
 
+.hx-tape-star {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: rgba(255, 255, 255, 0.85);
+  animation: hx-tape-spin 6s linear infinite;
+}
+
+@keyframes hx-tape-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* client logos on the white tape, running the other way */
 .hx-logos {
   display: flex;
-  margin-top: clamp(22px, 2.6vw, 30px);
+  width: 100%;
   overflow: hidden;
-  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
 }
 
 .hx-logos-row {
@@ -1210,18 +1339,13 @@
   align-items: center;
   gap: clamp(48px, 6vw, 88px);
   padding-right: clamp(48px, 6vw, 88px);
-  animation: hx-marquee 36s linear infinite;
-}
-
-.hx-logos:hover .hx-logos-row {
-  animation-play-state: paused;
+  animation: hx-marquee 36s linear infinite reverse;
 }
 
 .hx-logos-row img {
-  height: 30px;
+  height: 28px;
   width: auto;
-  filter: brightness(0) invert(1);
-  opacity: 0.6;
+  opacity: 0.75;
   transition: opacity 0.3s ease;
 }
 
@@ -1232,6 +1356,81 @@
 @keyframes hx-marquee {
   to {
     transform: translateX(-100%);
+  }
+}
+
+@media (max-width: 900px) {
+  .hx-trust-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+  }
+
+  .hx-trust-bar {
+    width: 72px;
+    min-height: 0;
+    height: 2px;
+  }
+
+  .hx-trust-bar span {
+    top: 0;
+    bottom: 0;
+    width: 45%;
+    height: auto;
+    background: linear-gradient(90deg, transparent, #00d2ff, #a855f7, transparent);
+    animation-name: hx-trust-run-x;
+  }
+
+  .hx-page h3.hx-trust-sub:not(#_):not(#__):not(#___) {
+    justify-self: start;
+    text-align: left;
+  }
+}
+
+@keyframes hx-trust-run-x {
+  from {
+    left: -45%;
+  }
+  to {
+    left: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .hx-page h2.hx-trust-title:not(#_):not(#__):not(#___) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .hx-trust-num {
+    font-size: 64px;
+  }
+
+  /* on a narrow screen the tapes would cover each other: one above the other */
+  .hx-tapes {
+    height: 150px;
+    margin-top: -48px;
+  }
+
+  .hx-tape-svc {
+    top: 32%;
+    height: 50px;
+    transform: translateY(-50%) rotate(-3deg);
+  }
+
+  .hx-tape-logos {
+    top: 70%;
+    height: 54px;
+    transform: translateY(-50%) rotate(2deg);
+  }
+
+  .hx-tape-star {
+    width: 14px;
+    height: 14px;
+  }
+
+  .hx-logos-row img {
+    height: 22px;
   }
 }
 
@@ -2624,8 +2823,7 @@
   .hx-tech-grid,
   .hx-insights-grid,
   .hx-why-grid,
-  .hx-head-split,
-  .hx-trust-top {
+  .hx-head-split {
     grid-template-columns: minmax(0, 1fr);
   }
 
@@ -2836,9 +3034,6 @@
     width: 64%;
   }
 
-  .hx-trust-num {
-    font-size: 60px;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
