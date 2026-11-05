@@ -148,7 +148,7 @@ export default async function PaymentConfirmationPage({ searchParams }: Props) {
                   </tr>
                 )}
                 <tr>
-                  <td className="pc-label-cell">Amount Paid:</td>
+                  <td className="pc-label-cell">{isPending ? "Amount (Pending Clearing):" : "Amount Paid:"}</td>
                   <td className="pc-val-cell pc-amount-val">${amountPaid.toFixed(2)} USD</td>
                 </tr>
                 {isPartial && (

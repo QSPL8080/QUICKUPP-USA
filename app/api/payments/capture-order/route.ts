@@ -497,6 +497,7 @@ export async function POST(req: Request) {
             amountPaid: capturedAmount,
             totalAmount: finalTotal,
             paymentType: isPartial ? "partial" : "full",
+            paymentStatus: paymentStatus === "pending" ? "pending" : isPartial ? "partially_paid" : "paid",
             remainingAmount: finalRemaining,
             transactionId: captureID,
             paymentDate: paymentDateFormatted,
@@ -572,8 +573,8 @@ export async function POST(req: Request) {
                       <td style="padding: 9px 0; font-weight: 600; color: #475569;">$${finalTotal.toFixed(2)} ${currency}</td>
                     </tr>` : ""}
                     <tr>
-                      <td style="padding: 9px 0; color: #64748b;">Amount Paid</td>
-                      <td style="padding: 9px 0; font-weight: 800; color: #10b981; font-size: 16px;">$${capturedAmount.toFixed(2)} ${currency}</td>
+                      <td style="padding: 9px 0; color: #64748b;">${paymentStatus === "pending" ? "Amount (Pending Clearing)" : "Amount Paid"}</td>
+                      <td style="padding: 9px 0; font-weight: 800; color: ${paymentStatus === "pending" ? "#b45309" : "#10b981"}; font-size: 16px;">$${capturedAmount.toFixed(2)} ${currency}</td>
                     </tr>
                     ${isPartial ? `
                     <tr>

@@ -64,6 +64,7 @@ export async function GET(req: Request) {
       amountPaid: Number(payment.amount || 0),
       totalAmount: payment.total_amount != null ? Number(payment.total_amount) : Number(payment.amount || 0),
       paymentType: payment.payment_type || "full",
+      paymentStatus: payment.status === "pending" ? "pending" : payment.status === "partially_paid" ? "partially_paid" : "paid",
       remainingAmount: payment.remaining_amount != null ? Number(payment.remaining_amount) : 0,
       transactionId: payment.reference || payment.paypal_order_id || "N/A",
       paymentDate: paidDate,

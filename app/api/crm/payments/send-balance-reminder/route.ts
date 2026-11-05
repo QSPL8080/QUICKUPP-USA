@@ -146,7 +146,7 @@ Quickupp Softech LLC`;
         </tr>
         <tr>
           <td style="padding: 8px 0; color: #64748b;">Deposit Paid So Far:</td>
-          <td style="padding: 8px 0; font-weight: 700; color: #16a34a;">$${paidAmount.toFixed(2)} USD (50%)</td>
+          <td style="padding: 8px 0; font-weight: 700; color: #16a34a;">$${paidAmount.toFixed(2)} USD${totalAmount > 0 ? ` (${Math.round((paidAmount / totalAmount) * 100)}%)` : ""}</td>
         </tr>
         <tr>
           <td style="padding: 8px 0; color: #64748b;">Remaining Balance Due:</td>

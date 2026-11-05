@@ -15,6 +15,8 @@ export interface ReceiptData {
   amountPaid: number;
   totalAmount?: number | null;
   paymentType?: "full" | "partial";
+  /** "pending" while PayPal is still clearing the payment */
+  paymentStatus?: "paid" | "partially_paid" | "pending";
   remainingAmount?: number | null;
   transactionId: string;
   paymentDate: string;
@@ -147,6 +149,7 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
     amountPaid,
     totalAmount,
     paymentType = "full",
+    paymentStatus,
     remainingAmount = 0,
     transactionId,
     paymentDate,
@@ -185,7 +188,9 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
   const rightX = 555;
   const contentWidth = rightX - leftX; // 515
 
-  const isPartial = paymentType === "partial";
+  const isPending = paymentStatus === "pending";
+  const isPartial = paymentType === "partial" && !isPending;
+  const usd = (n: unknown) => `$${Number(n || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   const finalTotal = totalAmount != null && Number(totalAmount) > 0 ? Number(totalAmount) : Number(amountPaid);
   const formattedDate = formatReceiptDate(paymentDate);
   const qty = quantity && Number(quantity) > 0 ? Number(quantity) : 1;
@@ -256,9 +261,9 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
   page.drawText(dateText, { x: rightX - dateW, y: 720, size: 9.5, font, color: slateMid });
 
   // Pill Badge (PAID / PARTIALLY PAID)
-  const badgeLabel = isPartial ? "PARTIALLY PAID" : "PAID";
-  const badgeFontColor = isPartial ? amberText : greenText;
-  const badgeBgColor = isPartial ? amberBg : greenBg;
+  const badgeLabel = isPending ? "PENDING" : isPartial ? "PARTIALLY PAID" : "PAID";
+  const badgeFontColor = isPending || isPartial ? amberText : greenText;
+  const badgeBgColor = isPending || isPartial ? amberBg : greenBg;
   const badgeTextW = fontBold.widthOfTextAtSize(badgeLabel, 8.5);
   const pillW = badgeTextW + 36;
   const pillH = 20;
@@ -267,7 +272,7 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
 
   drawRoundedRect(page, pillX, pillY, pillW, pillH, 10, badgeBgColor, undefined);
   page.drawText(badgeLabel, { x: pillX + 12, y: pillY + 6, size: 8.5, font: fontBold, color: badgeFontColor });
-  drawCheckmark(page, pillX + 16 + badgeTextW, pillY + 9, badgeFontColor, 0.9);
+  if (!isPending) drawCheckmark(page, pillX + 16 + badgeTextW, pillY + 9, badgeFontColor, 0.9);
 
   // Top Divider Line
   const dividerY = 668 + headerShift;
@@ -295,10 +300,16 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
     page.drawText("Company: ", { x: leftX, y: lY, size: 9, font, color: slateMid });
     page.drawText(companyName, { x: leftX + 48, y: lY, size: 9, font: fontBold, color: darkNavy });
   }
-  const addressVal = billingAddress || (clientPhone ? `Phone: ${clientPhone}` : "United States");
-  lY -= rowGap;
-  page.drawText("Billing Address: ", { x: leftX, y: lY, size: 9, font, color: slateMid });
-  page.drawText(addressVal, { x: leftX + 74, y: lY, size: 9, font: fontBold, color: darkNavy });
+  if (clientPhone) {
+    lY -= rowGap;
+    page.drawText("Phone: ", { x: leftX, y: lY, size: 9, font, color: slateMid });
+    page.drawText(clientPhone, { x: leftX + 34, y: lY, size: 9, font: fontBold, color: darkNavy });
+  }
+  if (billingAddress) {
+    lY -= rowGap;
+    page.drawText("Billing Address: ", { x: leftX, y: lY, size: 9, font, color: slateMid });
+    page.drawText(billingAddress, { x: leftX + 74, y: lY, size: 9, font: fontBold, color: darkNavy });
+  }
 
   // Right column rows (fixed 5: Method, Transaction ID, Date, Status, Type)
   let rY = colStartY - 18;
@@ -312,12 +323,12 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
   page.drawText("Payment Date: ", { x: col2X, y: rY, size: 9, font, color: slateMid });
   page.drawText(`${formattedDate}${paymentTime ? ` · ${paymentTime}` : ""}`, { x: col2X + 80, y: rY, size: 9, font: fontBold, color: darkNavy });
   rY -= rowGap;
-  const statusStr = isPartial ? "PARTIALLY PAID" : "PAID";
-  const statusColor = isPartial ? amberText : greenText;
+  const statusStr = isPending ? "PENDING CLEARING" : isPartial ? "PARTIALLY PAID" : "PAID";
+  const statusColor = isPending || isPartial ? amberText : greenText;
   page.drawText("Payment Status: ", { x: col2X, y: rY, size: 9, font, color: slateMid });
   page.drawText(statusStr, { x: col2X + 86, y: rY, size: 9, font: fontBold, color: statusColor });
   rY -= rowGap;
-  const typeDisplay = isPartial ? "Advance Deposit" : "Full Payment";
+  const typeDisplay = paymentType === "partial" ? "Advance Deposit" : "Full Payment";
   page.drawText("Payment Type: ", { x: col2X, y: rY, size: 9, font, color: slateMid });
   page.drawText(typeDisplay, { x: col2X + 80, y: rY, size: 9, font: fontBold, color: darkNavy });
 
@@ -366,7 +377,7 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
   const qtyStr = String(qty);
   const qtyW = fontBold.widthOfTextAtSize(qtyStr, 9.5);
   page.drawText(qtyStr, { x: qtyColX - qtyW / 2, y: itemY, size: 9.5, font, color: slateMid });
-  const totalStr = `$${finalTotal.toFixed(2)}`;
+  const totalStr = usd(finalTotal);
   const totalStrW = fontBold.widthOfTextAtSize(totalStr, 9.5);
   page.drawText(totalStr, { x: tblX + tblW - 20 - totalStrW, y: itemY, size: 9.5, font: fontBold, color: darkNavy });
 
@@ -386,18 +397,18 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
   summaryRow("Order Total:", totalStr);
   if (isPartial) {
     const paidPct = finalTotal > 0 ? Math.round((Number(amountPaid) / finalTotal) * 100) : 0;
-    summaryRow(`Amount Paid (${paidPct}% Advance):`, `$${Number(amountPaid).toFixed(2)}`, greenText);
+    summaryRow(`Amount Paid (${paidPct}% Advance):`, usd(amountPaid), greenText);
   }
 
   // Highlighted final row: green "Total Paid" when fully paid, amber
   // "Balance Due" when a balance remains — mirroring the reference receipt.
-  const finalBg = isPartial ? amberBg : greenBg;
-  const finalColor = isPartial ? amberText : greenText;
+  const finalBg = isPending || isPartial ? amberBg : greenBg;
+  const finalColor = isPending || isPartial ? amberText : greenText;
   page.drawRectangle({ x: tblX + 0.5, y: tblY + 0.5, width: tblW - 1, height: finalRowH - 0.5, color: finalBg });
   page.drawLine({ start: { x: tblX, y: tblY + finalRowH }, end: { x: tblX + tblW, y: tblY + finalRowH }, thickness: 1, color: borderLight });
 
-  const finalLabel = isPartial ? "Balance Due:" : "Total Paid:";
-  const finalValStr = isPartial ? `$${Number(remainingAmount).toFixed(2)} USD` : `$${Number(amountPaid).toFixed(2)} USD`;
+  const finalLabel = isPending ? "Amount Pending:" : isPartial ? "Balance Due:" : "Total Paid:";
+  const finalValStr = isPartial ? `${usd(remainingAmount)} USD` : `${usd(amountPaid)} USD`;
   const finalValW = fontBold.widthOfTextAtSize(finalValStr, 11);
   const finalLabelW = fontBold.widthOfTextAtSize(finalLabel, 11);
   page.drawText(finalLabel, { x: tblX + tblW - 20 - finalValW - 14 - finalLabelW, y: tblY + finalRowH / 2 - 4, size: 11, font: fontBold, color: finalColor });
@@ -409,16 +420,18 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
   let tyY = tblY - 38;
   page.drawText("THANK YOU FOR YOUR PURCHASE", { x: leftX, y: tyY, size: 13, font: fontBold, color: darkNavy });
   tyY -= 18;
-  page.drawText("Your payment has been successfully received.", { x: leftX, y: tyY, size: 9, font, color: slateMid });
+  page.drawText(isPending ? "Your payment has been submitted and PayPal is clearing it." : "Your payment has been successfully received.", { x: leftX, y: tyY, size: 9, font, color: slateMid });
   tyY -= 16;
-  const thankOrderText = isPartial
-    ? `Your order ${orderNumber} deposit has been received. Thank you!`
-    : `Your order ${orderNumber} is now fully paid. Thank you!`;
-  page.drawText(thankOrderText, { x: leftX, y: tyY, size: 9.5, font: fontBold, color: greenText });
+  const thankOrderText = isPending
+    ? `Your order ${orderNumber} will be confirmed by email once the payment clears.`
+    : isPartial
+      ? `Your order ${orderNumber} deposit has been received. Thank you!`
+      : `Your order ${orderNumber} is now fully paid. Thank you!`;
+  page.drawText(thankOrderText, { x: leftX, y: tyY, size: 9.5, font: fontBold, color: isPending ? amberText : greenText });
   if (isPartial) {
     tyY -= 16;
     page.drawText(
-      `Balance due: $${Number(remainingAmount).toFixed(2)} USD. Pay anytime via the link in your email.`,
+      `Balance due: ${usd(remainingAmount)} USD. Pay anytime via the link in your email.`,
       { x: leftX, y: tyY, size: 9, font: fontBold, color: amberText }
     );
   }

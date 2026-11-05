@@ -13,6 +13,9 @@ export async function POST(req: Request) {
   return handleBalanceReminders(req);
 }
 
+/** a date as YYYY-MM-DD in the server's own calendar (DATE columns arrive as local midnight) */
+const ymd = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
 async function handleBalanceReminders(req: Request) {
   try {
     const pool = getPool();
@@ -36,7 +39,7 @@ async function handleBalanceReminders(req: Request) {
 
     const payments = [...(plRows as any[]), ...(pRows as any[])];
     const now = new Date();
-    const todayStr = now.toISOString().slice(0, 10);
+    const todayStr = ymd(now);
     const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
     let sentCount = 0;
@@ -45,7 +48,7 @@ async function handleBalanceReminders(req: Request) {
     for (const p of payments) {
       // Check when reminder was last sent (skip if already reminded today)
       if (p.balance_reminder_sent_at) {
-        const lastSentDate = new Date(p.balance_reminder_sent_at).toISOString().slice(0, 10);
+        const lastSentDate = ymd(new Date(p.balance_reminder_sent_at));
         if (lastSentDate === todayStr) {
           continue;
         }
@@ -91,7 +94,7 @@ async function handleBalanceReminders(req: Request) {
       const paidAmount = Number(p.amount || 0);
       const remainingAmount = Number(p.remaining_amount || totalAmount - paidAmount);
       const orderNumber = p.invoice_number || `QS-${p.id}`;
-      const dueDateFormatted = dueDate.toISOString().slice(0, 10);
+      const dueDateFormatted = ymd(dueDate);
 
       const reminderType = isTwoDaysBefore ? "Urgent Balance Reminder (2 Days Remaining)" : "Tentative Balance Due Reminder (10 Days Notice)";
       const subject = `${isTwoDaysBefore ? "Urgent: " : ""}Balance Payment Due — Quickupp Softech LLC | Order #${orderNumber}`;
