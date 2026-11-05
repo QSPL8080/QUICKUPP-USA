@@ -7,11 +7,10 @@ import HomeIcon, { type HomeIconName } from "@/components/home/HomeIcon";
  * Home hero ("hxd-", used on no other page): a dark stage with the copy on
  * the left and a photo filling the right side to the stage's edge (the IT
  * service pages' hero layout), and a white pillar dock lying across the
- * stage's lower edge. The four eyebrow words each own a photo. Every 5
- * seconds the next photo slides in behind a diagonal shutter while the
- * current one drifts; the matching pillar in the dock opens onto the same
- * photo. Hovering or focusing a pillar shows its photo and holds it;
- * hovering the photo holds it too.
+ * stage's lower edge. The photo slowly drifts and zooms; its label shows the
+ * eyebrow word whose pillar is open. The four pillars take turns every 5
+ * seconds; hovering or focusing a pillar opens it and holds it, and hovering
+ * the photo holds it too.
  * Every word comes from the home page document.
  */
 
@@ -23,6 +22,9 @@ type Hero = {
 };
 
 const UNSPLASH = (id: string) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1600&q=80`;
+
+// the hero's one photo: growth analytics on a laptop (marketing, technology, growth)
+const HERO_PHOTO = UNSPLASH("photo-1551288049-bebda4e38f71");
 
 const PILLARS: { photo: string; icon: HomeIconName }[] = [
   { photo: UNSPLASH("photo-1686061592689-312bbfb5c055"), icon: "megaphone" }, // MARKETING. (analytics dashboard)
@@ -37,7 +39,6 @@ const d = (s: number) => ({ "--d": `${s}s` }) as CSSProperties;
 
 export default function HomeHero({ hero, actions }: { hero: Hero; actions: ReactNode }) {
   const [active, setActive] = useState(0);
-  const [prev, setPrev] = useState<number | null>(null);
   const [held, setHeld] = useState(false);
   const [onScreen, setOnScreen] = useState(true);
   const [motion, setMotion] = useState(true);
@@ -58,7 +59,6 @@ export default function HomeHero({ hero, actions }: { hero: Hero; actions: React
     const cur = activeRef.current;
     if (cur === i) return;
     activeRef.current = i;
-    setPrev(cur);
     setActive(i);
   };
 
@@ -118,11 +118,9 @@ export default function HomeHero({ hero, actions }: { hero: Hero; actions: React
 
         {/* the photo filling the right side to the stage's edge */}
         <div className="hxd-edge" onMouseEnter={() => setHeld(true)} onMouseLeave={() => setHeld(false)} aria-hidden="true">
-          {PILLARS.slice(0, count).map((p, i) => (
-            <div key={p.photo} className={`hxd-shot${i === active ? " is-active" : ""}${i === prev && i !== active ? " is-prev" : ""}`}>
-              <img src={p.photo} alt="" loading={i === 0 ? "eager" : "lazy"} />
-            </div>
-          ))}
+          <div className="hxd-shot is-active is-solo">
+            <img src={HERO_PHOTO} alt="" loading="eager" />
+          </div>
           <span className="hxd-edge-fade" />
           <span className="hxd-edge-grid" />
           <span className="hxd-chip">

@@ -5128,3 +5128,25 @@
   white-space: nowrap !important;
   border: 0 !important;
 }
+
+/* the hero's single photo: a slow, endless drift and zoom */
+.hxd-shot.is-solo {
+  animation: none;
+}
+
+.hxd-shot.is-solo img {
+  animation: hxd-solo-drift 18s ease-in-out infinite alternate;
+}
+
+@keyframes hxd-solo-drift {
+  from {
+    transform: scale(1.04) translate(0, 0);
+  }
+  to {
+    transform: scale(1.14) translate(-2%, -1.5%);
+  }
+}
+
+.hxd-chip-text {
+  min-width: 0;
+}
