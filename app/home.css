@@ -1438,7 +1438,7 @@
    3. ABOUT
    ========================================================================== */
 /* ==========================================================================
-   3. ABOUT SECTION: Refined Content Presentation & 4 Unique Interactive Visual Pillars
+   3. ABOUT SECTION: Scroll-Triggered Content Presentation & 4-Slat Shutter Animation
    ========================================================================== */
 .hx-about {
   position: relative;
@@ -1509,19 +1509,19 @@
   margin-right: 0.26em;
 }
 
-/* Two-column pedestal cards */
+/* Two-column layout */
 .hx-about-cols {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-  gap: clamp(24px, 3.5vw, 40px);
-  align-items: stretch;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(28px, 5vw, 80px);
+  align-items: start;
   margin-top: clamp(28px, 3.5vw, 44px);
   padding-top: clamp(24px, 3vw, 36px);
   border-top: 1px solid var(--hx-line);
 }
 
-/* Glowing traveling rule line */
+/* Glowing Traveling Laser Rule Line */
 .hx-about-cols::before {
   content: "";
   position: absolute;
@@ -1541,431 +1541,164 @@
   opacity: 0;
 }
 
-.hx-about-card {
-  position: relative;
+.hx-about-left,
+.hx-about-right {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: clamp(26px, 2.6vw, 36px);
-  border-radius: 24px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.92) 0%, rgba(246, 247, 251, 0.75) 100%);
-  border: 1px solid rgba(226, 232, 240, 0.9);
-  box-shadow: 0 14px 34px -12px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.02);
-  backdrop-filter: blur(12px);
-  transition:
-    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 0.45s ease;
+  gap: 18px;
 }
 
-.hx-about-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(99, 102, 241, 0.3);
-  box-shadow: 0 24px 48px -12px rgba(99, 102, 241, 0.14), 0 0 0 1px rgba(99, 102, 241, 0.15);
-}
-
-.hx-card-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  align-self: flex-start;
-  margin-bottom: 16px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--hx-indigo);
-}
-
-.hx-card-pill-num {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  background: rgba(79, 70, 229, 0.1);
-  color: var(--hx-indigo);
-  font-weight: 800;
-  font-size: 11px;
-}
-
-.hx-page .hx-about-card .hx-lead {
-  font-size: clamp(16px, 1.2vw, 18px);
-  line-height: 1.65;
-  color: var(--hx-ink);
-  font-weight: 500;
-  margin: 0 0 18px 0;
-}
-
-.hx-page .hx-about-card .hx-body {
-  font-size: clamp(15px, 1.05vw, 16.5px);
-  line-height: 1.68;
-  color: var(--hx-body);
-  margin: 0 0 18px 0;
-}
-
-.hx-about-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 8px 0 20px 0;
-}
-
-.hx-about-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 6px 13px;
-  border-radius: 999px;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  font-size: 12px;
-  font-weight: 600;
-  color: #334155;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
-  transition: all 0.25s ease;
-}
-
-.hx-about-chip:hover {
-  background: #f8fafc;
-  border-color: rgba(99, 102, 241, 0.35);
-  color: var(--hx-indigo);
-  transform: translateY(-1px);
-}
-
-.hx-chip-icon {
-  color: var(--hx-indigo);
-  flex-shrink: 0;
+.hx-page .hx-about-cols p:not(#_):not(#__):not(#___) {
+  margin: 0;
 }
 
 .hx-about-actions {
-  margin-top: 4px;
-}
-
-.hx-about-stat-strip {
-  display: flex;
-  align-items: center;
-  gap: 20px;
   margin-top: 10px;
-  padding-top: 18px;
-  border-top: 1px dashed rgba(226, 232, 240, 0.9);
-}
-
-.hx-about-stat {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.hx-stat-num {
-  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--hx-ink);
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-}
-
-.hx-stat-desc {
-  font-size: 11.5px;
-  font-weight: 500;
-  color: var(--hx-muted);
-}
-
-.hx-about-stat-sep {
-  width: 1px;
-  height: 34px;
-  background: #e2e8f0;
 }
 
 /* ==========================================================================
-   4 UNIQUE VISUAL PILLARS (Gallery with Interactive Desktop Accordion)
+   4 SLATS: The Original Picture with Unique 3D Alternating Shutter Entrance
    ========================================================================== */
-.hx-about-gallery {
-  display: flex;
-  gap: 14px;
-  height: clamp(340px, 28vw, 420px);
-  margin-top: clamp(36px, 4.5vw, 56px);
+.hx-about-slats {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  height: clamp(220px, 28vw, 380px);
+  margin-top: clamp(36px, 4.5vw, 60px);
   perspective: 1200px;
 }
 
-.hx-about-photo-card {
+.hx-about-slat {
   position: relative;
-  flex: 1;
-  border-radius: 22px;
+  display: block;
+  height: 100%;
+  border-radius: 16px;
+  background-color: #e8ebf5;
+  background-image: url("/images/contact-consultancy-meeting.jpg");
+  background-size: calc(400% + 24px) auto;
+  background-repeat: no-repeat;
+  background-position: calc(var(--s) * 33.333%) 50%;
+  box-shadow: 0 12px 30px -10px rgba(11, 15, 23, 0.15);
   overflow: hidden;
   cursor: pointer;
-  background: #0b0f17;
-  box-shadow: 0 14px 34px -10px rgba(11, 15, 23, 0.16);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  transform-origin: center center;
   transition:
-    flex 0.65s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.45s ease,
-    opacity 0.45s ease,
-    border-color 0.45s ease;
+    clip-path 1.15s cubic-bezier(0.16, 1, 0.3, 1) calc(0.1s + var(--s) * 0.12s),
+    transform 1.15s cubic-bezier(0.16, 1, 0.3, 1) calc(0.1s + var(--s) * 0.12s),
+    filter 1s ease calc(0.1s + var(--s) * 0.12s),
+    opacity 0.9s ease calc(0.1s + var(--s) * 0.12s),
+    box-shadow 0.4s ease;
 }
 
-.hx-about-photo-card:first-child {
-  border-radius: 28px 16px 16px 28px;
+.hx-about-slat:first-child {
+  border-radius: 26px 14px 14px 26px;
 }
 
-.hx-about-photo-card:last-child {
-  border-radius: 16px 28px 28px 16px;
+.hx-about-slat:last-child {
+  border-radius: 14px 26px 26px 14px;
 }
 
-/* Staggered Scroll-triggered Entrance Animation */
-.hx-js [data-hx="about-item"] {
-  transition:
-    opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1) var(--d, 0s),
-    transform 1.05s cubic-bezier(0.16, 1, 0.3, 1) var(--d, 0s),
-    clip-path 1.1s cubic-bezier(0.16, 1, 0.3, 1) var(--d, 0s),
-    flex 0.65s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.45s ease;
-}
-
-.hx-js [data-hx="about-item"]:not(.is-in) {
+/* Unique Alternating Kinetic Entrance */
+/* Even slats (slat 1 & slat 3) rise from bottom with angle & clip */
+.hx-js .hx-about-slats:not(.is-in) .hx-about-slat:nth-child(even) {
   opacity: 0;
-  transform: translateY(44px) scale(0.95) rotate(calc((var(--i) - 1.5) * 1.6deg));
-  clip-path: inset(12% 0% 0% 0% round 22px);
+  transform: translateY(64px) rotateX(8deg) scale(0.94);
+  clip-path: inset(100% 0 0 0 round 16px);
+  filter: blur(6px) brightness(0.8);
 }
 
-.hx-js [data-hx="about-item"].is-in {
-  opacity: 1;
-  transform: translateY(0) scale(1) rotate(0deg);
-  clip-path: inset(0 0 0 0 round 22px);
-}
-
-/* Desktop Interactive Accordion expansion */
-@media (min-width: 992px) {
-  .hx-about-gallery:hover .hx-about-photo-card:not(:hover) {
-    flex: 0.82;
-    opacity: 0.78;
-    filter: saturate(0.85);
-  }
-
-  .hx-about-photo-card:hover {
-    flex: 1.6;
-    transform: translateY(-4px);
-    border-color: rgba(99, 102, 241, 0.55);
-    box-shadow:
-      0 26px 54px -14px rgba(99, 102, 241, 0.35),
-      0 0 0 1.5px rgba(0, 210, 255, 0.5);
-  }
-}
-
-.hx-photo-media {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-.hx-photo-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  transform: scale(1.02);
-  transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.hx-about-photo-card:hover .hx-photo-img {
-  transform: scale(1.1);
-}
-
-.hx-photo-scrim {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(7, 10, 18, 0.5) 0%,
-    rgba(7, 10, 18, 0.08) 32%,
-    rgba(7, 10, 18, 0.45) 60%,
-    rgba(7, 10, 18, 0.94) 100%
-  );
-  transition: opacity 0.4s ease;
-}
-
-.hx-about-photo-card:hover .hx-photo-scrim {
-  background: linear-gradient(
-    180deg,
-    rgba(7, 10, 18, 0.4) 0%,
-    rgba(7, 10, 18, 0.04) 30%,
-    rgba(7, 10, 18, 0.4) 55%,
-    rgba(7, 10, 18, 0.96) 100%
-  );
-}
-
-.hx-photo-glow {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
+/* Odd slats (slat 0 & slat 2) cascade from top with opposite angle & clip */
+.hx-js .hx-about-slats:not(.is-in) .hx-about-slat:nth-child(odd) {
   opacity: 0;
-  background: radial-gradient(circle at 50% 100%, rgba(0, 210, 255, 0.32), transparent 70%);
-  transition: opacity 0.5s ease;
+  transform: translateY(-50px) rotateX(-8deg) scale(0.94);
+  clip-path: inset(0 0 100% 0 round 16px);
+  filter: blur(6px) brightness(0.8);
 }
 
-.hx-about-photo-card:hover .hx-photo-glow {
+/* When in view: All 4 slats snap perfectly together to complete the picture */
+.hx-js .hx-about-slats.is-in .hx-about-slat {
   opacity: 1;
+  transform: translateY(0) rotateX(0deg) scale(1);
+  clip-path: inset(0 0 0 0 round 16px);
+  filter: blur(0px) brightness(1);
 }
 
-/* Card Top Pill & Action Button */
-.hx-photo-top {
+/* Subtle interactive hover on slats */
+.hx-about-slat:hover {
+  transform: translateY(-6px) scale(1.02);
+  z-index: 2;
+  box-shadow:
+    0 22px 45px -12px rgba(99, 102, 241, 0.3),
+    0 0 0 1.5px rgba(0, 210, 255, 0.6);
+}
+
+.hx-about-slats:hover .hx-about-slat:not(:hover) {
+  opacity: 0.88;
+  filter: saturate(0.9);
+}
+
+/* Sweeping Light Flare Beam on Entrance */
+.hx-about-slats-beam {
   position: absolute;
-  top: 16px;
-  left: 16px;
-  right: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  z-index: 3;
+  inset: -10% -20%;
   pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 65%
+  );
+  transform: translateX(-120%);
+  transition: transform 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.65s;
 }
 
-.hx-photo-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: rgba(7, 10, 18, 0.65);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #ffffff;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
-  transition: border-color 0.35s ease, background 0.35s ease;
+.hx-js .hx-about-slats.is-in .hx-about-slats-beam {
+  transform: translateX(120%);
 }
 
-.hx-about-photo-card:hover .hx-photo-chip {
-  background: rgba(7, 10, 18, 0.85);
-  border-color: rgba(0, 210, 255, 0.6);
-}
-
-.hx-photo-num {
-  color: #00d2ff;
-  font-weight: 800;
-}
-
-.hx-photo-action-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.16);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.26);
-  color: #ffffff;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.35s ease, color 0.35s ease;
-}
-
-.hx-about-photo-card:hover .hx-photo-action-btn {
-  transform: rotate(45deg) scale(1.08);
-  background: #ffffff;
-  color: #0b0f17;
-  box-shadow: 0 0 16px rgba(255, 255, 255, 0.5);
-}
-
-/* Card Bottom Content */
-.hx-photo-body {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 22px 20px 24px 20px;
-  z-index: 3;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.hx-about-photo-card:hover .hx-photo-body {
-  transform: translateY(-2px);
-}
-
-.hx-photo-title {
-  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
-  font-size: clamp(16px, 1.25vw, 19px);
-  font-weight: 700;
-  color: #ffffff;
-  line-height: 1.25;
-  margin: 0;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
-  letter-spacing: -0.01em;
-}
-
-.hx-photo-desc {
-  font-size: clamp(12px, 0.9vw, 13px);
-  color: rgba(255, 255, 255, 0.85);
-  line-height: 1.45;
-  margin: 0;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
-  transition: color 0.3s ease;
-}
-
-.hx-about-photo-card:hover .hx-photo-desc {
-  color: #ffffff;
-}
-
-/* Responsive Breakpoints */
+/* Responsive */
 @media (max-width: 991px) {
   .hx-about-cols {
     grid-template-columns: minmax(0, 1fr);
-    gap: 20px;
+    gap: 24px;
   }
 
-  .hx-about-gallery {
-    display: grid;
+  .hx-about-slats {
     grid-template-columns: repeat(2, 1fr);
-    height: auto;
-    gap: 14px;
+    height: 220px;
+    gap: 8px;
   }
 
-  .hx-about-photo-card {
-    height: 250px;
-    border-radius: 20px !important;
-  }
-}
-
-@media (max-width: 640px) {
-  .hx-about-gallery {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .hx-about-photo-card {
-    height: 210px;
-  }
-
-  .hx-about-stat-strip {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .hx-about-stat-sep {
+  .hx-about-slat:nth-child(n + 3) {
     display: none;
+  }
+
+  .hx-about-slat {
+    background-size: calc(200% + 8px) auto;
+    background-position: calc(var(--s) * 100%) 50%;
+  }
+
+  .hx-about-slat:first-child {
+    border-radius: 20px 12px 12px 20px;
+  }
+
+  .hx-about-slat:nth-child(2) {
+    border-radius: 12px 20px 20px 12px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hx-about-photo-card,
+  .hx-about-slat,
   .hx-about-cols::before,
-  .hx-photo-img,
-  .hx-photo-action-btn,
+  .hx-about-slats-beam,
   .hx-badge-dot {
     transition: none !important;
     animation: none !important;
     transform: none !important;
+    clip-path: none !important;
+    filter: none !important;
+    opacity: 1 !important;
   }
 }
 

@@ -138,12 +138,12 @@ export default function HomeView() {
 
       {/* 3. About: laid out like the About pages' opening (title, ruled two
           columns, one wide photo cut into four slats that rise in turn) */}
-      {/* 3. About: Laid out with animated pedestal narrative and 4 unique interactive showcase pillars */}
+      {/* 3. About: Laid out with animated content presentation and unique 4-slat parallax shutter entrance */}
       <Section className="hx-about">
         <span className="hx-about-bg" aria-hidden="true" />
         <div className="hx-wrap">
-          <div className="hx-about-header">
-            <div className="hx-about-badge" data-hx="rise" style={d(0.04)}>
+          <div className="hx-about-header" data-hx="rise" style={d(0.04)}>
+            <div className="hx-about-badge">
               <span className="hx-badge-dot" aria-hidden="true" />
               <span>WHO WE ARE &bull; OUR INTEGRATED APPROACH</span>
             </div>
@@ -151,122 +151,29 @@ export default function HomeView() {
           </div>
 
           <div className="hx-about-cols" data-hx="rule">
-            <div className="hx-about-card hx-about-card-left" data-hx="rise" style={d(0.12)}>
-              <div className="hx-card-pill">
-                <span className="hx-card-pill-num">01</span>
-                <span>PURPOSE &amp; VISION</span>
-              </div>
+            <div className="hx-about-col hx-about-left" data-hx="rise" style={d(0.12)}>
               <p className="hx-lead">
                 {ABOUT.text[0]}
               </p>
-              <div className="hx-about-chips">
-                <span className="hx-about-chip">
-                  <HomeIcon name="bot" size={14} className="hx-chip-icon" /> Connected AI &amp; Growth Systems
-                </span>
-                <span className="hx-about-chip">
-                  <HomeIcon name="code-xml" size={14} className="hx-chip-icon" /> Purpose-Built Custom Tech
-                </span>
-              </div>
               <div className="hx-about-actions">
                 <Button cta={ABOUT.cta} />
               </div>
             </div>
-
-            <div className="hx-about-card hx-about-card-right" data-hx="rise" style={d(0.22)}>
-              <div className="hx-card-pill">
-                <span className="hx-card-pill-num">02</span>
-                <span>EXECUTION ROADMAP</span>
-              </div>
+            <div className="hx-about-col hx-about-right" data-hx="rise" style={d(0.22)}>
               <p className="hx-body">
                 {ABOUT.text[1]}
               </p>
-              <div className="hx-about-chips">
-                <span className="hx-about-chip">
-                  <HomeIcon name="sparkles" size={14} className="hx-chip-icon" /> Strategy to Rapid Deployment
-                </span>
-                <span className="hx-about-chip">
-                  <HomeIcon name="check" size={14} className="hx-chip-icon" /> Measurable Enterprise ROI
-                </span>
-              </div>
-              <div className="hx-about-stat-strip">
-                <div className="hx-about-stat">
-                  <span className="hx-stat-num">100%</span>
-                  <span className="hx-stat-desc">Execution-First Delivery</span>
-                </div>
-                <div className="hx-about-stat-sep" aria-hidden="true" />
-                <div className="hx-about-stat">
-                  <span className="hx-stat-num">Full-Stack</span>
-                  <span className="hx-stat-desc">Marketing &amp; AI Integration</span>
-                </div>
-              </div>
             </div>
           </div>
 
-          {/* 4 Unique Visual Pillars with Interactive Accordion & Scroll Unfold */}
-          <div className="hx-about-gallery" data-hx="gallery">
-            {[
-              {
-                num: "01",
-                tag: "Strategy",
-                title: "Executive Roadmapping",
-                desc: "Goal discovery & growth architecture",
-                img: "/images/contact-boardroom.jpg",
-              },
-              {
-                num: "02",
-                tag: "Engineering",
-                title: "Custom Web & Systems",
-                desc: "High-performance scalable platforms",
-                img: "/images/contact-tech-discussion.jpg",
-              },
-              {
-                num: "03",
-                tag: "AI Systems",
-                title: "Intelligent Automations",
-                desc: "Autonomous agents & smart workflows",
-                img: "/images/contact-consultancy-meeting.jpg",
-              },
-              {
-                num: "04",
-                tag: "Enterprise ROI",
-                title: "Performance & Scaling",
-                desc: "Revenue expansion & client success",
-                img: "/images/contact-client-deal.jpg",
-              },
-            ].map((card, i) => (
-              <div
-                key={card.num}
-                className="hx-about-photo-card"
-                data-hx="about-item"
-                style={{ "--i": i, "--d": `${0.1 + i * 0.1}s` } as CSSProperties}
-              >
-                <div className="hx-photo-media">
-                  <img
-                    src={card.img}
-                    alt={card.title}
-                    loading="lazy"
-                    className="hx-photo-img"
-                  />
-                  <div className="hx-photo-scrim" aria-hidden="true" />
-                  <div className="hx-photo-glow" aria-hidden="true" />
-                </div>
-                
-                <div className="hx-photo-top">
-                  <span className="hx-photo-chip">
-                    <span className="hx-photo-num">{card.num}</span>
-                    <span className="hx-photo-tag">{card.tag}</span>
-                  </span>
-                  <span className="hx-photo-action-btn" aria-hidden="true">
-                    <HomeIcon name="arrow-up-right" size={15} strokeWidth={2.4} />
-                  </span>
-                </div>
-
-                <div className="hx-photo-body">
-                  <h3 className="hx-photo-title">{card.title}</h3>
-                  <p className="hx-photo-desc">{card.desc}</p>
-                </div>
-              </div>
+          {/* 4 Slats of the original image with unique shutter & alternating depth transition */}
+          <div className="hx-about-slats" data-hx="slats" aria-hidden="true">
+            {[0, 1, 2, 3].map((i) => (
+              <span key={i} className="hx-about-slat" style={{ "--s": i } as CSSProperties}>
+                <span className="hx-slat-shine" aria-hidden="true" />
+              </span>
             ))}
+            <span className="hx-about-slats-beam" aria-hidden="true" />
           </div>
         </div>
       </Section>
