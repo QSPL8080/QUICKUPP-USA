@@ -4463,3 +4463,98 @@
     display: none;
   }
 }
+
+/* ==========================================================================
+   11. INSIGHTS — words on the left, an offset pair of photos on the right
+   (the About pages' layout, "hx-duo-"). The photos open up from the bottom
+   as they come into view, then drift apart a little as the page scrolls.
+   ========================================================================== */
+.hx-page .hx-duo {
+  padding-top: clamp(72px, 7vw, 110px);
+}
+
+.hx-duo-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: clamp(32px, 5.5vw, 88px);
+  align-items: center;
+}
+
+.hx-duo-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.hx-duo-pics {
+  --hx-p: 0.5;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.hx-duo-pic {
+  overflow: hidden;
+  border-radius: 22px;
+  background: #e8ebf5;
+  box-shadow: 0 30px 60px -44px rgba(15, 23, 42, 0.5);
+}
+
+.hx-duo-pic img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4.2;
+  object-fit: cover;
+  transform: scale(1.08);
+  transition: transform 0.8s var(--hx-ease);
+}
+
+.hx-duo-pic:hover img {
+  transform: scale(1.14);
+}
+
+/* scroll drift: the first photo rises, the second sinks (offset 56px at rest) */
+.hx-duo-pic-a {
+  transform: translateY(calc((0.5 - var(--hx-p)) * 40px));
+}
+
+.hx-duo-pic-b {
+  margin-top: 56px;
+  transform: translateY(calc((var(--hx-p) - 0.5) * 40px));
+}
+
+/* unveil: each photo opens upward from its bottom edge, the second a beat later */
+.hx-duo-pic {
+  clip-path: inset(0 0 0 0 round 22px);
+  transition:
+    clip-path 1.2s var(--hx-ease),
+    opacity 0.6s ease;
+}
+
+.hx-duo-pic-b {
+  transition-delay: 0.15s;
+}
+
+.hx-js [data-hx="unveil"]:not(.is-in) .hx-duo-pic {
+  clip-path: inset(100% 0 0 0 round 22px);
+  opacity: 0.4;
+}
+
+@media (max-width: 991px) {
+  .hx-duo-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hx-duo-pics {
+    max-width: 560px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hx-duo-pic-a,
+  .hx-duo-pic-b {
+    transform: none;
+  }
+}

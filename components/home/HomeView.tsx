@@ -406,28 +406,25 @@ export default function HomeView() {
         </div>
       </section>
 
-      {/* 11. Blog & Insights */}
-      <Section className="hx-insights">
-        <div className="hx-wrap hx-insights-grid">
-          <div className="hx-insights-stack" aria-hidden="true">
-            {["/images/blog-img-02.jpg", "/images/blog-img-04.jpg", "/images/blog-img-01.jpg"].map((src, i) => (
-              <figure key={src} className={`hx-page-card hx-page-card-${i + 1}`} data-hx="fan" style={d(i * 0.12)}>
-                <img src={src} alt="" loading="lazy" />
-                <span className="hx-page-lines">
-                  <i />
-                  <i />
-                  <i />
-                </span>
-              </figure>
-            ))}
-          </div>
-          <div className="hx-insights-copy">
+      {/* 11. Blog & Insights: words on the left, an offset pair of photos on
+          the right (the About pages' layout); the photos drift apart as you scroll */}
+      <Section className="hx-insights hx-duo">
+        <div className="hx-wrap hx-duo-grid">
+          <div className="hx-duo-copy">
             <Title lines={INSIGHTS.title} />
             <p className="hx-body" data-hx="rise" style={d(0.15)}>
               {INSIGHTS.text}
             </p>
             <div data-hx="rise" style={d(0.25)}>
               <Button cta={INSIGHTS.cta} />
+            </div>
+          </div>
+          <div className="hx-duo-pics" aria-hidden="true" data-hx="unveil" data-hx-track="">
+            <div className="hx-duo-pic hx-duo-pic-a">
+              <img src="/images/blog-img-02.jpg" alt="" loading="lazy" />
+            </div>
+            <div className="hx-duo-pic hx-duo-pic-b">
+              <img src="/images/blog-img-04.jpg" alt="" loading="lazy" />
             </div>
           </div>
         </div>
