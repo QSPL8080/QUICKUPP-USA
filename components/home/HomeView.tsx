@@ -327,14 +327,13 @@ export default function HomeView() {
             {PROCESS.steps.map((s, i) => (
               <li key={s.num} className={`hx-stair-step${i === PROCESS.steps.length - 1 ? " is-top" : ""}`} style={{ "--i": i } as CSSProperties}>
                 <div className="hx-stair-block">
-                  <span className="hx-stair-big" aria-hidden="true">
-                    {s.num}
-                  </span>
                   <div className="hx-stair-body">
-                    <span className="hx-stair-icon" aria-hidden="true">
-                      <HomeIcon name={s.icon as HomeIconName} size={20} />
-                    </span>
-                    <span className="hx-stair-num">{s.num}.</span>
+                    <div className="hx-stair-top">
+                      <span className="hx-stair-icon" aria-hidden="true">
+                        <HomeIcon name={s.icon as HomeIconName} size={18} />
+                      </span>
+                      <span className="hx-stair-num">{s.num}.</span>
+                    </div>
                     <h3 className="hx-stair-title">{s.title}</h3>
                     <p className="hx-stair-text">{s.text}</p>
                   </div>

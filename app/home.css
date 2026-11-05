@@ -84,7 +84,7 @@
 }
 
 .hx-head {
-  margin-bottom: clamp(36px, 4vw, 56px);
+  margin-bottom: clamp(28px, 3vw, 40px);
 }
 
 .hx-head-split {
@@ -3439,8 +3439,9 @@
 /* ==========================================================================
    8. OUR PROCESS — the staircase ("hx-stair-")
    ========================================================================== */
-.hx-stair {
-  padding-top: clamp(48px, 5vw, 80px);
+.hx-page .hx-stair {
+  padding-top: clamp(48px, 5vw, 72px);
+  padding-bottom: clamp(48px, 5vw, 72px);
   overflow: hidden;
 }
 
@@ -3450,7 +3451,7 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 24px 40px;
-  margin-bottom: clamp(36px, 4vw, 56px);
+  margin-bottom: clamp(28px, 3vw, 40px);
 }
 
 .hx-page ol.hx-stair-steps:not(#_):not(#__):not(#___) {
@@ -3488,15 +3489,15 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  min-height: calc(340px + var(--i) * 46px);
-  padding: 22px 20px 96px;
+  min-height: calc(200px + var(--i) * 22px);
+  padding: 18px 18px 20px;
   border-radius: 20px 20px 0 0;
   border: 1px solid #e0e7ff;
   border-bottom: 0;
   background: linear-gradient(180deg, color-mix(in srgb, #6366f1 calc(5% + var(--i) * 3.5%), #ffffff), #ffffff 85%);
   overflow: hidden;
   transform-origin: 50% 100%;
-  transform: translateY(calc((1 - var(--t)) * 60px));
+  transform: translateY(calc((1 - var(--t)) * 40px));
   opacity: calc(0.2 + var(--t) * 0.8);
   transition: transform 0.15s linear, opacity 0.15s linear, box-shadow 0.4s ease;
 }
@@ -3505,19 +3506,13 @@
   box-shadow: 0 30px 60px -36px rgba(79, 70, 229, 0.45);
 }
 
-/* a big outlined step number sitting at the foot of each step */
-.hx-stair-big {
-  position: absolute;
-  left: 14px;
-  bottom: -14px;
-  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
-  font-size: clamp(72px, 7vw, 112px);
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.06em;
-  color: transparent;
-  -webkit-text-stroke: 1.5px rgba(99, 102, 241, 0.2);
-  pointer-events: none;
+/* icon and step number share one row to keep the steps short */
+.hx-stair-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 6px;
 }
 
 .hx-stair-body {
@@ -3525,16 +3520,15 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
+  gap: 6px;
 }
 
 .hx-stair-icon {
   display: grid;
   place-items: center;
-  width: 46px;
-  height: 46px;
-  margin-bottom: 8px;
-  border-radius: 14px;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
   background: #ffffff;
   border: 1px solid #e0e7ff;
   color: var(--hx-indigo);
@@ -3556,7 +3550,7 @@
 .hx-page h3.hx-stair-title:not(#_):not(#__):not(#___) {
   margin: 0;
   font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif) !important;
-  font-size: 20px !important;
+  font-size: 18px !important;
   line-height: 1.25 !important;
   letter-spacing: -0.02em !important;
   font-weight: 700 !important;
@@ -3565,8 +3559,8 @@
 
 .hx-page p.hx-stair-text:not(#_):not(#__):not(#___) {
   margin: 0;
-  font-size: 15px !important;
-  line-height: 1.6 !important;
+  font-size: 14.5px !important;
+  line-height: 1.55 !important;
   color: var(--hx-body);
 }
 
@@ -3597,19 +3591,19 @@
   color: rgba(255, 255, 255, 0.74);
 }
 
-.hx-stair-step.is-top .hx-stair-big {
-  -webkit-text-stroke-color: rgba(255, 255, 255, 0.16);
-}
-
 @media (max-width: 1100px) {
   .hx-page ol.hx-stair-steps:not(#_):not(#__):not(#___) {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
     row-gap: 14px;
   }
 
   .hx-stair-block {
+    height: 100%;
+  }
+
+  .hx-stair-block {
     min-height: 0;
-    padding-bottom: 72px;
     border-radius: 20px;
     border-bottom: 1px solid #e0e7ff;
   }
@@ -3627,16 +3621,8 @@
   /* on a phone each step steps in a little further, like stairs seen from above */
   .hx-stair-block {
     margin-left: calc(var(--i) * 10px);
-    padding-bottom: 64px;
     transform: none;
     opacity: 1;
-  }
-
-  .hx-stair-big {
-    left: auto;
-    right: 14px;
-    bottom: -12px;
-    font-size: 64px;
   }
 }
 
