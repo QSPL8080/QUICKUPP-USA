@@ -47,9 +47,9 @@
 
 .cl-page h1.cl-h1:not(#_):not(#__):not(#___) {
   margin: 0;
-  font-size: clamp(48px, 7vw, 104px) !important;
-  line-height: 0.98 !important;
-  letter-spacing: -0.05em !important;
+  font-size: var(--qs-t-h1, clamp(30px, 2.8vw, 40px)) !important;
+  line-height: 1.12 !important;
+  letter-spacing: -0.03em !important;
   color: var(--cl-ink);
 }
 
@@ -81,7 +81,7 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
-  height: clamp(340px, 34vw, 440px);
+  height: clamp(300px, 28vw, 380px);
   overflow: hidden;
   mask-image: linear-gradient(180deg, transparent, #000 16%, #000 84%, transparent);
   -webkit-mask-image: linear-gradient(180deg, transparent, #000 16%, #000 84%, transparent);
@@ -133,7 +133,7 @@
 
 .cl-reel-card strong {
   font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
-  font-size: 30px;
+  font-size: 24px;
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.04em;
@@ -347,8 +347,8 @@
 
 .cl-page h2.cl-lead-title:not(#_):not(#__):not(#___) {
   margin: 0;
-  font-size: clamp(24px, 2.3vw, 32px) !important;
-  line-height: 1.2 !important;
+  font-size: var(--qs-t-h3-lg, clamp(21px, 1.75vw, 26px)) !important;
+  line-height: 1.25 !important;
   color: #ffffff;
 }
 
@@ -359,7 +359,7 @@
 
 .cl-page p.cl-lead-intro:not(#_):not(#__) {
   margin: 0;
-  font-size: 15.5px;
+  font-size: 15px;
   line-height: 1.7;
   color: rgba(255, 255, 255, 0.72);
 }
@@ -381,7 +381,7 @@
 
 .cl-lead-stats dt {
   font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
-  font-size: 26px;
+  font-size: 22px;
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.04em;
@@ -502,7 +502,7 @@
 
 .cl-card-stat strong {
   font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
-  font-size: 34px;
+  font-size: 26px;
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.04em;
@@ -529,7 +529,7 @@
 
 .cl-page h2.cl-card-title:not(#_):not(#__):not(#___) {
   margin: 0;
-  font-size: 18px !important;
+  font-size: var(--qs-t-h3, 17px) !important;
   line-height: 1.35 !important;
   letter-spacing: -0.015em !important;
   font-weight: 700 !important;
@@ -561,7 +561,7 @@
   }
 
   .cl-reel {
-    height: 300px;
+    height: 280px;
   }
 
   .cl-lead-media::after {
@@ -588,7 +588,7 @@
   }
 
   .cl-reel-card strong {
-    font-size: 24px;
+    font-size: 21px;
   }
 
   .cl-lead {

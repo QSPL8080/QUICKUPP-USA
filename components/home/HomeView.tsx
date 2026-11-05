@@ -283,26 +283,39 @@ export default function HomeView() {
         </div>
       </Section>
 
-      {/* 7. Client Testimonials */}
-      <Section className="hx-voices">
-        <div className="hx-wrap">
-          <div className="hx-voices-card" data-hx="lift">
-            <div className="hx-voices-faces" aria-hidden="true">
-              {["testimonial-img-01", "testimonial-img-02", "testimonial-img-03", "testimonial-img-04", "testimonial-03", "team-img-04"].map((f, i) => (
-                <span key={f} className={`hx-face hx-face-${i + 1}`}>
-                  <img src={`/images/${f}.jpg`} alt="" loading="lazy" />
-                </span>
-              ))}
-            </div>
-            <span className="hx-voices-mark" aria-hidden="true">
-              <HomeIcon name="quote" size={30} strokeWidth={1.6} />
-            </span>
-            <Title lines={VOICES.title} className="hx-center" />
-            <p className="hx-body hx-center hx-narrow" data-hx="rise" style={d(0.15)}>
-              {VOICES.text}
-            </p>
-            <div className="hx-center" data-hx="rise" style={d(0.25)}>
-              <Button cta={VOICES.cta} />
+      {/* 7. Client Testimonials: two film strips of client faces cross behind the message */}
+      <Section className="hx-voices hx-reels">
+        <div className="hx-reels-stage">
+          <div className="hx-reels-films" aria-hidden="true">
+            {[0, 1].map((k) => {
+              const faces = ["testimonial-img-01", "team-img-01", "testimonial-img-02", "team-img-02", "testimonial-img-03", "team-img-03", "testimonial-img-04", "team-img-04", "testimonial-01", "team-img-05", "testimonial-03", "team-img-06"];
+              const row = k === 0 ? faces : [...faces].reverse();
+              return (
+                <div key={k} className={`hx-film hx-film-${k === 0 ? "a" : "b"}`}>
+                  <div className="hx-film-track">
+                    {[...row, ...row].map((f, i) => (
+                      <span key={`${f}-${i}`} className="hx-frame">
+                        <img src={`/images/${f}.jpg`} alt="" loading="lazy" />
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="hx-wrap">
+            <div className="hx-reels-panel" data-hx="lift">
+              <span className="hx-voices-mark" aria-hidden="true">
+                <HomeIcon name="quote" size={28} strokeWidth={1.6} />
+              </span>
+              <Title lines={VOICES.title} className="hx-center" />
+              <p className="hx-body hx-center" data-hx="rise" style={d(0.15)}>
+                {VOICES.text}
+              </p>
+              <div className="hx-center" data-hx="rise" style={d(0.25)}>
+                <Button cta={VOICES.cta} />
+              </div>
             </div>
           </div>
         </div>

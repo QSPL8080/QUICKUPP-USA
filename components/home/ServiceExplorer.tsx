@@ -157,8 +157,11 @@ export default function ServiceExplorer({ items }: { items: HomeService[] }) {
                 tabsRef.current?.querySelector<HTMLElement>(`[data-i="${next}"]`)?.focus();
               }}
             >
-              <span className="hx-svc-tab-num">{it.num}.</span>
+              <span className="hx-svc-tab-num">{it.num}</span>
               <span className="hx-svc-tab-title">{it.title}</span>
+              <span className="hx-svc-tab-icon" aria-hidden="true">
+                <HomeIcon name={it.icon} size={17} />
+              </span>
             </button>
           ))}
         </div>
