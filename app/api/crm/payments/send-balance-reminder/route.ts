@@ -73,7 +73,7 @@ This is a courtesy reminder regarding your outstanding balance for ${service} ($
 • Due Date: ${dueDate}
 
 Please complete your balance payment securely via PayPal or Debit/Credit Card using the link below:
-👉 ${balanceUrl}
+Pay here: ${balanceUrl}
 
 If you have any questions, feel free to reply directly or contact us at info@quickuppsoftech.us.
 

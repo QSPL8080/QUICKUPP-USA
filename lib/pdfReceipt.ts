@@ -58,8 +58,9 @@ function drawRoundedRect(
   borderColor?: ReturnType<typeof rgb>,
   borderWidth = 1
 ) {
+  // drawn in SVG space (y grows downward) from the rectangle's top-left corner
   const path =
-    `M ${x + r} ${y} ` +
+    `M ${r} 0 ` +
     `h ${w - 2 * r} ` +
     `a ${r} ${r} 0 0 1 ${r} ${r} ` +
     `v ${h - 2 * r} ` +
@@ -70,33 +71,11 @@ function drawRoundedRect(
     `a ${r} ${r} 0 0 1 ${r} -${r} Z`;
 
   p.drawSvgPath(path, {
+    x,
+    y: y + h,
     color: fillColor,
     borderColor: borderColor,
     borderWidth: borderColor ? borderWidth : 0,
-  });
-}
-
-/**
- * Draw a crisp vector checkmark that bypasses WinAnsi unicode limits
- */
-function drawCheckmark(
-  p: PDFPage,
-  x: number,
-  y: number,
-  color: ReturnType<typeof rgb>,
-  scale = 1
-) {
-  p.drawLine({
-    start: { x: x, y: y + 2 * scale },
-    end: { x: x + 3 * scale, y: y - 2 * scale },
-    thickness: 1.5 * scale,
-    color,
-  });
-  p.drawLine({
-    start: { x: x + 3 * scale, y: y - 2 * scale },
-    end: { x: x + 8 * scale, y: y + 5 * scale },
-    thickness: 1.5 * scale,
-    color,
   });
 }
 
@@ -228,24 +207,23 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
     logoBottomY = 752;
   }
 
-  // Under Logo text - Official Company Details (always clear of the logo,
-  // with a fixed 12pt gap below its real bottom edge). Every fixed
-  // coordinate below this block is nudged by the same amount, so the
-  // header shifting to clear a taller/shorter logo never compresses the
-  // spacing further down the page.
-  const headerShift = (logoBottomY - 12) - 724;
-  let curY = 724 + headerShift;
-  page.drawText("Quickupp Softech LLC", { x: leftX, y: curY, size: 9.5, font: fontBold, color: darkNavy });
-  curY -= 12;
-  page.drawText("8 The Green, Suite A, Dover, Delaware - 19901, USA", { x: leftX, y: curY, size: 8, font, color: slateMid });
-  curY -= 11;
-  page.drawText("Phone: +1 (302) 754-5679", { x: leftX, y: curY, size: 8, font, color: slateMid });
-  curY -= 11;
+  // Under Logo text - Official Company Details: a clear gap below the logo's
+  // real bottom edge and comfortable line spacing, so the header breathes.
+  const LOGO_GAP = 24;
+  const LINE = 13.5;
+  let curY = logoBottomY - LOGO_GAP;
+  page.drawText("Quickupp Softech LLC", { x: leftX, y: curY, size: 10, font: fontBold, color: darkNavy });
+  curY -= LINE + 1.5;
+  page.drawText("8 The Green, Suite A, Dover, Delaware - 19901, USA", { x: leftX, y: curY, size: 8.5, font, color: slateMid });
+  curY -= LINE;
+  page.drawText("Phone: +1 (302) 754-5679", { x: leftX, y: curY, size: 8.5, font, color: slateMid });
+  curY -= LINE;
   page.drawText("Email: ", { x: leftX, y: curY, size: 8.5, font, color: slateMid });
   page.drawText("info@quickuppsoftech.us", { x: leftX + 28, y: curY, size: 8.5, font, color: linkBlue });
-  curY -= 11;
+  curY -= LINE;
   page.drawText("Website: ", { x: leftX, y: curY, size: 8.5, font, color: slateMid });
   page.drawText("https://www.quickuppsoftech.us/", { x: leftX + 38, y: curY, size: 8.5, font, color: linkBlue });
+  const companyBottomY = curY;
 
   // Top Right Header
   const titleText = "PAYMENT RECEIPT";
@@ -254,28 +232,29 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
 
   const rcptText = `Receipt No: ${orderNumber}`;
   const rcptW = fontBold.widthOfTextAtSize(rcptText, 10);
-  page.drawText(rcptText, { x: rightX - rcptW, y: 735, size: 10, font: fontBold, color: slateDark });
+  page.drawText(rcptText, { x: rightX - rcptW, y: 731, size: 10, font: fontBold, color: slateDark });
 
   const dateText = `Date: ${formattedDate}`;
   const dateW = font.widthOfTextAtSize(dateText, 9.5);
-  page.drawText(dateText, { x: rightX - dateW, y: 720, size: 9.5, font, color: slateMid });
+  page.drawText(dateText, { x: rightX - dateW, y: 714, size: 9.5, font, color: slateMid });
 
   // Pill Badge (PAID / PARTIALLY PAID)
   const badgeLabel = isPending ? "PENDING" : isPartial ? "PARTIALLY PAID" : "PAID";
   const badgeFontColor = isPending || isPartial ? amberText : greenText;
   const badgeBgColor = isPending || isPartial ? amberBg : greenBg;
   const badgeTextW = fontBold.widthOfTextAtSize(badgeLabel, 8.5);
-  const pillW = badgeTextW + 36;
+  const pillW = badgeTextW + 24;
   const pillH = 20;
   const pillX = rightX - pillW;
-  const pillY = 692;
+  const pillY = 682;
 
   drawRoundedRect(page, pillX, pillY, pillW, pillH, 10, badgeBgColor, undefined);
   page.drawText(badgeLabel, { x: pillX + 12, y: pillY + 6, size: 8.5, font: fontBold, color: badgeFontColor });
-  if (!isPending) drawCheckmark(page, pillX + 16 + badgeTextW, pillY + 9, badgeFontColor, 0.9);
 
-  // Top Divider Line
-  const dividerY = 668 + headerShift;
+  // Top Divider Line: below whichever header column ends lower, with room to breathe
+  const dividerY = Math.min(companyBottomY, pillY) - 22;
+  // everything below was laid out for a divider at 668; move it with the divider
+  const headerShift = dividerY - 668;
   page.drawLine({ start: { x: leftX, y: dividerY }, end: { x: rightX, y: dividerY }, thickness: 1, color: borderLight });
 
   // ===========================================================================
@@ -354,7 +333,7 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
   const tableTop = detailsHeadingY - 14;
   const tblY = tableTop - tblH;
 
-  drawRoundedRect(page, tblX, tblY, tblW, tblH, 6, rgb(1, 1, 1), borderLight);
+  drawRoundedRect(page, tblX, tblY, tblW, tblH, 2, rgb(1, 1, 1), borderLight);
 
   // Table Header Row
   page.drawRectangle({ x: tblX + 0.5, y: tblY + tblH - headerRowH, width: tblW - 1, height: headerRowH - 0.5, color: rgb(0.95, 0.96, 0.98) });

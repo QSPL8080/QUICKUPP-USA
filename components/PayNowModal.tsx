@@ -476,7 +476,7 @@ export default function PayNowModal() {
         <div className="pm-body">
           {formError && (
             <div className="pm-error-alert" role="alert">
-              ⚠️ {formError}
+              {formError}
             </div>
           )}
 
@@ -929,7 +929,7 @@ export default function PayNowModal() {
                     fontWeight: 700,
                   }}
                 >
-                  ⏳ Processing and confirming payment with PayPal...
+                  Processing and confirming your payment with PayPal…
                 </div>
               )}
 
@@ -960,7 +960,7 @@ export default function PayNowModal() {
               <div className="pm-success-icon">
                 <LucideIcon name="check" size={32} />
               </div>
-              <h3 className="pm-success-title">Payment Successful! 🎉</h3>
+              <h3 className="pm-success-title">Payment Successful</h3>
               <p style={{ fontSize: "15px", fontWeight: 700, color: "#0f172a", margin: "0 0 4px" }}>
                 Thank you for your order.
               </p>
@@ -1073,7 +1073,7 @@ export default function PayNowModal() {
                             fontSize: "12px",
                           }}
                         >
-                          {receipt.paymentType === "partial" ? "✓ PARTIALLY PAID" : "✓ PAID"}
+                          {receipt.paymentType === "partial" ? "PARTIALLY PAID" : "PAID"}
                         </span>
                       </td>
                     </tr>

@@ -406,11 +406,11 @@ export async function POST(req: Request) {
         let statusTag = "PAYMENT RECEIVED";
 
         if (paymentStatus === "failed") {
-          adminSubject = `⚠️ Failed Payment Attempt: $${capturedAmount.toFixed(2)} USD from ${effectiveClientName} (#${orderNumber})`;
+          adminSubject = `Failed Payment Attempt: $${capturedAmount.toFixed(2)} USD from ${effectiveClientName} (#${orderNumber})`;
           headerColor = "#991b1b";
           statusTag = "PAYMENT FAILED / DECLINED";
         } else if (paymentStatus === "pending") {
-          adminSubject = `⏳ Payment Pending Clearing: $${capturedAmount.toFixed(2)} USD from ${effectiveClientName} (#${orderNumber})`;
+          adminSubject = `Payment Pending Clearing: $${capturedAmount.toFixed(2)} USD from ${effectiveClientName} (#${orderNumber})`;
           headerColor = "#d97706";
           statusTag = "PAYMENT PENDING CLEARING";
         } else {
@@ -513,10 +513,10 @@ export async function POST(req: Request) {
 
           const statusBannerTitle = paymentStatus === "pending" ? "PAYMENT PROCESSING (PENDING)" : "PAYMENT CONFIRMED";
           const statusBannerValue = paymentStatus === "pending"
-            ? "Status: PENDING CLEARING ⏳"
+            ? "Status: PENDING CLEARING"
             : isPartial
-            ? "Status: PARTIALLY PAID ✓"
-            : "Status: PAID ✓";
+            ? "Status: PARTIALLY PAID"
+            : "Status: PAID";
 
           const clientHtml = `
             <!DOCTYPE html>
@@ -630,7 +630,7 @@ export async function POST(req: Request) {
                   <!-- PDF Receipt Download Section -->
                   <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; text-align: center; margin: 24px 0 28px;">
                     <p style="font-size: 14px; color: #334155; margin: 0 0 14px; font-weight: 600;">
-                      📎 Your official payment receipt is attached to this email as a PDF.
+                      Your official payment receipt is attached to this email as a PDF.
                     </p>
                     <a href="${receiptDownloadUrl}" style="display: inline-block; background: #0f172a; color: #ffffff; text-decoration: none; font-size: 13.5px; font-weight: 700; padding: 12px 28px; border-radius: 8px; letter-spacing: 0.02em;">
                       DOWNLOAD PAYMENT RECEIPT

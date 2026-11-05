@@ -105,7 +105,7 @@ export default async function PaymentConfirmationPage({ searchParams }: Props) {
               </svg>
             )}
           </div>
-          <h1 className="pc-title">{isPending ? "Payment Received (Processing) ⏳" : "Payment Successful! 🎉"}</h1>
+          <h1 className="pc-title">{isPending ? "Payment Received – Processing" : "Payment Successful"}</h1>
           <p className="pc-subtitle">
             {isPending
               ? "Thank you for your order. Your payment is currently being cleared by PayPal. As soon as clearing completes, your order confirmation will update automatically."
@@ -149,7 +149,7 @@ export default async function PaymentConfirmationPage({ searchParams }: Props) {
                 )}
                 <tr>
                   <td className="pc-label-cell">{isPending ? "Amount (Pending Clearing):" : "Amount Paid:"}</td>
-                  <td className="pc-val-cell pc-amount-val">${amountPaid.toFixed(2)} USD</td>
+                  <td className="pc-val-cell pc-amount-val" style={isPending ? { color: "#b45309" } : undefined}>${amountPaid.toFixed(2)} USD</td>
                 </tr>
                 {isPartial && (
                   <tr>
@@ -176,7 +176,7 @@ export default async function PaymentConfirmationPage({ searchParams }: Props) {
                       className={`pc-status-pill ${isPending ? "is-pending" : isPartial ? "is-partial" : ""}`}
                       style={isPending ? { background: "#fef3c7", color: "#92400e", borderColor: "#fde68a" } : {}}
                     >
-                      {isPending ? "⏳ PENDING CLEARING" : isPartial ? "✓ PARTIALLY PAID" : "✓ PAID"}
+                      {isPending ? "PENDING CLEARING" : isPartial ? "PARTIALLY PAID" : "PAID"}
                     </span>
                   </td>
                 </tr>

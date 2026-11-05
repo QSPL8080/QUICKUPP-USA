@@ -297,7 +297,22 @@ export default function PayTokenPage({ params }: { params: Promise<{ token: stri
 
         <main className="ck-container" style={{ display: "grid", placeItems: "center", minHeight: "70vh" }}>
           <div className="ck-summary-card" style={{ maxWidth: "480px", width: "100%", textAlign: "center", padding: "32px 24px" }}>
-            <div style={{ fontSize: "40px", marginBottom: "14px" }}>{isExpired ? "⏳" : "⚠️"}</div>
+            {isExpired ? (
+              <div style={{ display: "grid", placeItems: "center", width: "60px", height: "60px", margin: "0 auto 16px", borderRadius: "50%", background: "#fef3c7", color: "#b45309" }}>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 15 14" />
+                </svg>
+              </div>
+            ) : (
+              <div style={{ display: "grid", placeItems: "center", width: "60px", height: "60px", margin: "0 auto 16px", borderRadius: "50%", background: "#fef2f2", color: "#b91c1c" }}>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+              </div>
+            )}
             <h3 className="ck-card-title" style={{ justifyContent: "center", fontSize: "16px", marginBottom: "8px" }}>
               {isExpired ? "Payment Link Expired" : "Invalid Payment Link"}
             </h3>
@@ -335,7 +350,11 @@ export default function PayTokenPage({ params }: { params: Promise<{ token: stri
 
         <main className="ck-container" style={{ display: "grid", placeItems: "center", minHeight: "70vh" }}>
           <div className="ck-summary-card" style={{ maxWidth: "500px", width: "100%", textAlign: "center", padding: "32px 24px" }}>
-            <div style={{ fontSize: "40px", marginBottom: "14px" }}>🎉</div>
+            <div style={{ display: "grid", placeItems: "center", width: "60px", height: "60px", margin: "0 auto 16px", borderRadius: "50%", background: "#dcfce7", color: "#15803d" }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+            </div>
             <h3 className="ck-card-title" style={{ justifyContent: "center", fontSize: "16px", marginBottom: "8px" }}>
               Payment Already Completed
             </h3>
