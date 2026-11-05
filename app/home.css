@@ -671,59 +671,106 @@
 }
 
 /* ---- Pillar dock across the stage's lower edge --------------------------- */
+/* Four tiles in one white card. The active tile opens onto its photo (the
+   same one as in the dial) with white type and a filling progress line;
+   the others stay light and lift on hover. */
 .hxd-dock {
   position: relative;
   z-index: 4;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: -96px;
-  padding: 10px;
-  border-radius: 28px;
+  gap: 8px;
+  margin-top: -88px;
+  padding: 8px;
+  border-radius: 26px;
   background: #ffffff;
   border: 1px solid #e6e8f0;
   box-shadow:
-    0 40px 80px rgba(7, 10, 18, 0.18),
-    0 0 0 1px rgba(15, 23, 42, 0.04);
+    0 40px 80px -20px rgba(7, 10, 18, 0.28),
+    0 0 0 1px rgba(15, 23, 42, 0.03);
 }
 
 .hxd-hero button.hxd-pillar:not(#_):not(#__):not(#___) {
   position: relative;
-  display: grid !important;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  justify-content: stretch !important;
-  justify-items: start;
-  align-items: center;
-  gap: 14px;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: space-between !important;
+  gap: 18px;
+  min-height: 128px;
   margin: 0;
-  padding: 18px 18px 22px;
-  border: 1px solid #eceef5;
-  border-radius: 20px !important;
-  background: #f6f7fb;
+  padding: 18px 20px 22px;
+  border: 1px solid #edf0f6;
+  border-radius: 19px !important;
+  background: linear-gradient(180deg, #ffffff, #f7f8fc);
   text-align: left;
   cursor: pointer;
   overflow: hidden;
+  isolation: isolate;
   font: inherit;
   color: #0b0f17;
-  align-items: center !important;
   transition:
-    background 0.35s ease,
-    border-color 0.35s ease,
-    transform 0.35s var(--hx-ease),
-    box-shadow 0.35s ease !important;
+    border-color 0.4s ease,
+    transform 0.4s var(--hx-ease),
+    box-shadow 0.4s ease !important;
   animation: hxd-rise 0.8s var(--hx-ease) var(--d, 0s) both;
 }
 
-.hxd-hero button.hxd-pillar.is-on:not(#_):not(#__):not(#___) {
-  background: #ffffff;
-  border-color: #c7d2fe;
+.hxd-hero button.hxd-pillar:not(.is-on):hover:not(#_):not(#__):not(#___) {
+  border-color: #dfe3f3;
   transform: translateY(-3px);
-  box-shadow: 0 18px 36px -18px rgba(79, 70, 229, 0.45);
+  box-shadow: 0 16px 30px -18px rgba(15, 23, 42, 0.35);
+}
+
+.hxd-hero button.hxd-pillar.is-on:not(#_):not(#__):not(#___) {
+  border-color: transparent;
+  box-shadow: 0 22px 40px -18px rgba(79, 70, 229, 0.6);
 }
 
 .hxd-hero button.hxd-pillar:focus-visible {
   outline: 2px solid var(--hx-indigo);
   outline-offset: 2px;
+}
+
+/* the tile's photo, revealed when it is the active pillar */
+.hxd-pillar-photo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.hxd-pillar-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.14);
+  transition: transform 1.4s var(--hx-ease);
+}
+
+.hxd-pillar-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(0deg, rgba(7, 10, 18, 0.9) 0%, rgba(7, 10, 18, 0.55) 55%, rgba(30, 27, 75, 0.35) 100%),
+    linear-gradient(120deg, rgba(99, 102, 241, 0.35), transparent 60%);
+}
+
+.hxd-pillar.is-on .hxd-pillar-photo {
+  opacity: 1;
+}
+
+.hxd-pillar.is-on .hxd-pillar-photo img {
+  transform: scale(1.02);
+}
+
+.hxd-pillar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .hxd-pillar-icon {
@@ -732,62 +779,69 @@
   width: 44px;
   height: 44px;
   border-radius: 14px;
-  background: #ffffff;
-  border: 1px solid #e6e8f0;
+  background: #eef2ff;
+  border: 1px solid #e0e7ff;
   color: var(--hx-indigo);
-  transition: background 0.35s ease, color 0.35s ease, border-color 0.35s ease;
+  transition: background 0.4s ease, color 0.4s ease, border-color 0.4s ease;
 }
 
 .hxd-pillar.is-on .hxd-pillar-icon {
   background: var(--hx-grad);
-  border-color: transparent;
+  border-color: rgba(255, 255, 255, 0.35);
   color: #ffffff;
+  box-shadow: 0 8px 20px -6px rgba(99, 102, 241, 0.7);
+}
+
+.hxd-pillar-go {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid #e6e8f0;
+  color: #94a3b8;
+  transition: color 0.35s ease, border-color 0.35s ease, background 0.35s ease, transform 0.35s var(--hx-ease);
+}
+
+.hxd-pillar:hover .hxd-pillar-go {
+  color: var(--hx-indigo);
+  border-color: #c7d2fe;
+  transform: rotate(45deg);
+}
+
+.hxd-pillar.is-on .hxd-pillar-go {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .hxd-pillar-word {
   font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 800;
   letter-spacing: 0.1em;
-  line-height: 1.35;
+  line-height: 1.3;
   color: #0b0f17;
+  transition: color 0.4s ease;
 }
 
-.hxd-pillar-thumb {
-  justify-self: end;
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 2px solid #ffffff;
-  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.18);
-  opacity: 0.55;
-  filter: grayscale(0.6);
-  transition: opacity 0.35s ease, filter 0.35s ease, transform 0.35s var(--hx-ease);
-}
-
-.hxd-pillar-thumb img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.hxd-pillar.is-on .hxd-pillar-thumb {
-  opacity: 1;
-  filter: none;
-  transform: scale(1.06);
+.hxd-pillar.is-on .hxd-pillar-word {
+  color: #ffffff;
 }
 
 .hxd-pillar-bar {
   position: absolute;
-  left: 18px;
-  right: 18px;
-  bottom: 10px;
+  left: 20px;
+  right: 20px;
+  bottom: 11px;
   height: 3px;
   border-radius: 3px;
-  background: #e6e8f0;
+  background: #e8ebf3;
   overflow: hidden;
+}
+
+.hxd-pillar.is-on .hxd-pillar-bar {
+  background: rgba(255, 255, 255, 0.22);
 }
 
 .hxd-pillar-fill {
@@ -1016,38 +1070,39 @@
   }
 
   .hxd-dock {
-    margin-top: -72px;
+    margin-top: -68px;
     border-radius: 22px;
-    padding: 8px;
-    gap: 8px;
+    padding: 6px;
+    gap: 6px;
   }
 
   .hxd-hero button.hxd-pillar:not(#_):not(#__):not(#___) {
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: 10px;
-    padding: 14px 12px 18px;
+    min-height: 108px;
+    gap: 12px;
+    padding: 14px 14px 20px;
     border-radius: 16px !important;
   }
 
-  .hxd-pillar-thumb {
-    display: none;
+  .hxd-pillar-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
   }
 
-  .hxd-pillar-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 11px;
+  .hxd-pillar-go {
+    width: 26px;
+    height: 26px;
   }
 
   .hxd-pillar-word {
-    font-size: 11.5px;
-    letter-spacing: 0.06em;
+    font-size: 12.5px;
+    letter-spacing: 0.07em;
   }
 
   .hxd-pillar-bar {
-    left: 12px;
-    right: 12px;
-    bottom: 8px;
+    left: 14px;
+    right: 14px;
+    bottom: 9px;
   }
 
   .hxd-chip {

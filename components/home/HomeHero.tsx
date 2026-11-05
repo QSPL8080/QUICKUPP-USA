@@ -208,13 +208,18 @@ export default function HomeHero({ hero, actions }: { hero: Hero; actions: React
               onBlur={() => setHeld(false)}
               onClick={() => go(i)}
             >
-              <span className="hxd-pillar-icon" aria-hidden="true">
-                <HomeIcon name={PILLARS[i].icon} size={20} />
-              </span>
-              <span className="hxd-pillar-word">{w}</span>
-              <span className="hxd-pillar-thumb" aria-hidden="true">
+              <span className="hxd-pillar-photo" aria-hidden="true">
                 <img src={PILLARS[i].photo} alt="" loading="lazy" />
               </span>
+              <span className="hxd-pillar-top">
+                <span className="hxd-pillar-icon" aria-hidden="true">
+                  <HomeIcon name={PILLARS[i].icon} size={20} />
+                </span>
+                <span className="hxd-pillar-go" aria-hidden="true">
+                  <HomeIcon name="arrow-up-right" size={16} strokeWidth={2.2} />
+                </span>
+              </span>
+              <span className="hxd-pillar-word">{w}</span>
               <span className="hxd-pillar-bar" aria-hidden="true">
                 <span key={`${active}-${running}`} className="hxd-pillar-fill" style={{ animationDuration: `${STEP_MS}ms` }} />
               </span>
