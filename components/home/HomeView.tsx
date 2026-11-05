@@ -286,35 +286,59 @@ export default function HomeView() {
         </div>
       </Section>
 
-      {/* 5. Why choose */}
+      {/* 5. Why choose: a bento of the five reasons, every one fully readable */}
       <Section className="hx-why">
         <div className="hx-why-glow" aria-hidden="true" />
-        <div className="hx-wrap hx-why-grid">
-          <div className="hx-why-intro">
-            <Title lines={WHY.title} />
-            <p className="hx-body" data-hx="rise" style={d(0.15)}>
-              {WHY.text}
-            </p>
-            <div data-hx="rise" style={d(0.25)}>
-              <Button cta={WHY.cta} tone="light" />
+        <div className="hx-wrap">
+          <div className="hx-wb">
+            <div className="hx-wb-intro">
+              <Title lines={WHY.title} />
+              <p className="hx-body" data-hx="rise" style={d(0.15)}>
+                {WHY.text}
+              </p>
+              <div data-hx="rise" style={d(0.25)}>
+                <Button cta={WHY.cta} tone="light" />
+              </div>
             </div>
+
+            {(() => {
+              const [lead, ...rest] = WHY.points;
+              return (
+                <>
+                  <article className="hx-wb-card hx-wb-lead" data-hx="lift" style={d(0.1)}>
+                    <span className="hx-wb-rings" aria-hidden="true">
+                      <span />
+                      <span />
+                      <span />
+                    </span>
+                    <span className="hx-wb-icon hx-wb-icon-lg" aria-hidden="true">
+                      <HomeIcon name={lead.icon as HomeIconName} size={26} />
+                    </span>
+                    <h3 className="hx-wb-title">{lead.title}</h3>
+                    <p className="hx-wb-text">{lead.text}</p>
+                  </article>
+
+                  <ol className="hx-wb-row">
+                    <span className="hx-wb-wire" aria-hidden="true">
+                      <span />
+                    </span>
+                    {rest.map((pt, i) => (
+                      <li key={pt.title} className="hx-wb-card hx-wb-item" data-hx="lift" style={d(0.15 + i * 0.08)}>
+                        <span className="hx-wb-mark" aria-hidden="true">
+                          <HomeIcon name={pt.icon as HomeIconName} size={120} strokeWidth={1.1} />
+                        </span>
+                        <span className="hx-wb-icon" aria-hidden="true">
+                          <HomeIcon name={pt.icon as HomeIconName} size={20} />
+                        </span>
+                        <h3 className="hx-wb-title">{pt.title}</h3>
+                        <p className="hx-wb-text">{pt.text}</p>
+                      </li>
+                    ))}
+                  </ol>
+                </>
+              );
+            })()}
           </div>
-          <ol className="hx-why-list" data-hx-track="">
-            <span className="hx-why-rail" aria-hidden="true">
-              <span className="hx-why-rail-fill" />
-            </span>
-            {WHY.points.map((p, i) => (
-              <li key={p.title} className="hx-why-item" data-hx="slide" style={d(i * 0.05)}>
-                <span className="hx-why-icon" aria-hidden="true">
-                  <HomeIcon name={p.icon as HomeIconName} size={20} />
-                </span>
-                <div>
-                  <h3 className="hx-why-title">{p.title}</h3>
-                  <p className="hx-why-text">{p.text}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
         </div>
       </Section>
 
@@ -377,27 +401,31 @@ export default function HomeView() {
         </div>
       </Section>
 
-      {/* 8. Our Process */}
-      <Section className="hx-flow">
+      {/* 8. Our Process: five steps rising like a staircase, Improve at the top */}
+      <Section className="hx-stair">
         <div className="hx-wrap">
-          <div className="hx-head hx-head-split">
+          <div className="hx-stair-head">
             <Title lines={PROCESS.title} />
             <div data-hx="rise" style={d(0.15)}>
               <Button cta={PROCESS.cta} />
             </div>
           </div>
-          <ol className="hx-flow-steps" data-hx-track="">
-            <span className="hx-flow-line" aria-hidden="true">
-              <span className="hx-flow-line-fill" />
-            </span>
+          <ol className="hx-stair-steps" data-hx-track="">
             {PROCESS.steps.map((s, i) => (
-              <li key={s.num} className="hx-flow-step" data-hx="rise" style={d(i * 0.1)}>
-                <span className="hx-flow-node" aria-hidden="true">
-                  <HomeIcon name={s.icon as HomeIconName} size={20} />
-                </span>
-                <span className="hx-flow-num">{s.num}.</span>
-                <h3 className="hx-flow-title">{s.title}</h3>
-                <p className="hx-flow-text">{s.text}</p>
+              <li key={s.num} className={`hx-stair-step${i === PROCESS.steps.length - 1 ? " is-top" : ""}`} style={{ "--i": i } as CSSProperties}>
+                <div className="hx-stair-block">
+                  <span className="hx-stair-big" aria-hidden="true">
+                    {s.num}
+                  </span>
+                  <div className="hx-stair-body">
+                    <span className="hx-stair-icon" aria-hidden="true">
+                      <HomeIcon name={s.icon as HomeIconName} size={20} />
+                    </span>
+                    <span className="hx-stair-num">{s.num}.</span>
+                    <h3 className="hx-stair-title">{s.title}</h3>
+                    <p className="hx-stair-text">{s.text}</p>
+                  </div>
+                </div>
               </li>
             ))}
           </ol>
