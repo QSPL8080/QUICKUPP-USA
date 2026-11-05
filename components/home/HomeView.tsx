@@ -191,6 +191,17 @@ export default function HomeView() {
 
       {/* 4. Services */}
       <Section id="services" className="hx-svc">
+        {/* a full-width backdrop behind the whole section: the open service's
+            photo, faded right back, cross-fades as the services change */}
+        <div className="hx-svc-bg" aria-hidden="true">
+          <div className="hx-svc-bg-pin">
+            {SERVICES.items.map((it, i) => (
+              <span key={it.num} className="hx-svc-bg-img" style={{ backgroundImage: `url(${it.img})`, "--i": i } as CSSProperties} />
+            ))}
+            <span className="hx-svc-bg-veil" />
+            <span className="hx-svc-bg-dots" />
+          </div>
+        </div>
         <div className="hx-wrap">
           <div className="hx-head hx-head-split">
             <Title lines={SERVICES.title} />

@@ -103,6 +103,12 @@ export default function ServiceExplorer({ items }: { items: HomeService[] }) {
     };
   }, [mode, boxH, n]);
 
+  // tell the section which service is open, so its backdrop can follow
+  useEffect(() => {
+    const sec = wrapRef.current?.closest<HTMLElement>("section");
+    if (sec) sec.dataset.svcActive = String(active);
+  }, [active]);
+
   // keep the open tab in view when the list is a sideways row (phones)
   useEffect(() => {
     const bar = tabsRef.current;

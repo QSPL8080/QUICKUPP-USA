@@ -4871,3 +4871,87 @@
     animation-delay: 0s !important;
   }
 }
+
+/* ==========================================================================
+   4. SERVICES — full-width backdrop: the open service's photo, faded right
+   back behind a white veil and a fine dot grid. It stays on screen while the
+   section scrolls (sticky) and cross-fades with a slow drift as the open
+   service changes.
+   ========================================================================== */
+.hx-page .hx-svc {
+  isolation: isolate;
+  background: #f7f8fc;
+}
+
+.hx-svc > .hx-wrap {
+  position: relative;
+  z-index: 1;
+}
+
+.hx-svc-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 120px, #000 calc(100% - 120px), transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0, #000 120px, #000 calc(100% - 120px), transparent 100%);
+}
+
+.hx-svc-bg-pin {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.hx-svc-bg-img {
+  position: absolute;
+  inset: -4%;
+  background-position: center;
+  background-size: cover;
+  filter: saturate(0.8) blur(1px);
+  opacity: 0;
+  transform: scale(1.08);
+  transition:
+    opacity 1s ease,
+    transform 6s ease-out;
+}
+
+/* no service picked yet (page script not running): show the first */
+.hx-svc:not([data-svc-active]) .hx-svc-bg-img:first-child,
+.hx-svc[data-svc-active="0"] .hx-svc-bg-img:nth-child(1),
+.hx-svc[data-svc-active="1"] .hx-svc-bg-img:nth-child(2),
+.hx-svc[data-svc-active="2"] .hx-svc-bg-img:nth-child(3),
+.hx-svc[data-svc-active="3"] .hx-svc-bg-img:nth-child(4),
+.hx-svc[data-svc-active="4"] .hx-svc-bg-img:nth-child(5),
+.hx-svc[data-svc-active="5"] .hx-svc-bg-img:nth-child(6) {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* the white veil keeps the photo light and the words easy to read; a soft
+   brand tint sits in two corners */
+.hx-svc-bg-veil {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 50% 60% at 100% 0%, rgba(99, 102, 241, 0.12), transparent 70%),
+    radial-gradient(ellipse 45% 55% at 0% 100%, rgba(0, 210, 255, 0.1), transparent 70%),
+    linear-gradient(180deg, rgba(247, 248, 252, 0.86), rgba(247, 248, 252, 0.8) 50%, rgba(247, 248, 252, 0.9));
+}
+
+.hx-svc-bg-dots {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(79, 70, 229, 0.14) 1px, transparent 1.3px);
+  background-size: 24px 24px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, transparent 35%, #000 85%);
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, transparent 35%, #000 85%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hx-svc-bg-img {
+    transition: opacity 0.3s ease;
+    transform: none !important;
+  }
+}
