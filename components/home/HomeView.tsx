@@ -54,6 +54,10 @@ function Title({ lines, as: Tag = "h2", className = "" }: { lines: string[]; as?
 
 const d = (s: number) => ({ "--d": `${s}s` }) as CSSProperties;
 
+// client faces for the testimonials strip (24 cards around the curve)
+const FACES = ["testimonial-img-01", "team-img-01", "testimonial-img-02", "team-img-02", "testimonial-img-03", "team-img-03", "testimonial-img-04", "team-img-04", "testimonial-01", "team-img-05", "testimonial-03", "team-img-06"];
+const CURVE_FACES = [...FACES, ...FACES];
+
 function Logos() {
   const nums = ["01", "02", "03", "04", "05", "06"];
   const row = (k: string) => (
@@ -283,39 +287,28 @@ export default function HomeView() {
         </div>
       </Section>
 
-      {/* 7. Client Testimonials: two film strips of client faces cross behind the message */}
-      <Section className="hx-voices hx-reels">
-        <div className="hx-reels-stage">
-          <div className="hx-reels-films" aria-hidden="true">
-            {[0, 1].map((k) => {
-              const faces = ["testimonial-img-01", "team-img-01", "testimonial-img-02", "team-img-02", "testimonial-img-03", "team-img-03", "testimonial-img-04", "team-img-04", "testimonial-01", "team-img-05", "testimonial-03", "team-img-06"];
-              const row = k === 0 ? faces : [...faces].reverse();
-              return (
-                <div key={k} className={`hx-film hx-film-${k === 0 ? "a" : "b"}`}>
-                  <div className="hx-film-track">
-                    {[...row, ...row].map((f, i) => (
-                      <span key={`${f}-${i}`} className="hx-frame">
-                        <img src={`/images/${f}.jpg`} alt="" loading="lazy" />
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
+      {/* 7. Client Testimonials: the message, then a curved strip of client
+          faces that turns slowly around the viewer like a wraparound screen */}
+      <Section className="hx-voices hx-curve">
+        <div className="hx-wrap">
+          <div className="hx-curve-head">
+            <Title lines={VOICES.title} className="hx-center" />
+            <p className="hx-body hx-center" data-hx="rise" style={d(0.15)}>
+              {VOICES.text}
+            </p>
+            <div className="hx-center" data-hx="rise" style={d(0.25)}>
+              <Button cta={VOICES.cta} />
+            </div>
           </div>
-
-          <div className="hx-wrap">
-            <div className="hx-reels-panel" data-hx="lift">
-              <span className="hx-voices-mark" aria-hidden="true">
-                <HomeIcon name="quote" size={28} strokeWidth={1.6} />
-              </span>
-              <Title lines={VOICES.title} className="hx-center" />
-              <p className="hx-body hx-center" data-hx="rise" style={d(0.15)}>
-                {VOICES.text}
-              </p>
-              <div className="hx-center" data-hx="rise" style={d(0.25)}>
-                <Button cta={VOICES.cta} />
-              </div>
+        </div>
+        <div className="hx-curve-stage" aria-hidden="true" data-hx="rise" style={d(0.2)}>
+          <div className="hx-curve-view">
+            <div className="hx-curve-ring">
+              {CURVE_FACES.map((f, i) => (
+                <span key={`${f}-${i}`} className="hx-curve-card" style={{ "--i": i } as CSSProperties}>
+                  <img src={`/images/${f}.jpg`} alt="" loading="lazy" />
+                </span>
+              ))}
             </div>
           </div>
         </div>
