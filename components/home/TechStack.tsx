@@ -19,11 +19,15 @@ export default function TechStack({ rows }: { rows: Row[] }) {
             <span>{r.label}</span>
           </dt>
           <dd>
-            {r.items.map((t) => (
-              <span key={t} className="hx-radar-pill">
-                {t}
+            <span className="hx-radar-items">
+              <span className="hx-radar-list">
+                {r.items.map((t) => (
+                  <span key={t} className="hx-radar-pill">
+                    {t}
+                  </span>
+                ))}
               </span>
-            ))}
+            </span>
           </dd>
         </div>
       ))}

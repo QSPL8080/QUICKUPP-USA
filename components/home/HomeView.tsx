@@ -55,6 +55,10 @@ function Title({ lines, as: Tag = "h2", className = "" }: { lines: string[]; as?
 
 const d = (s: number) => ({ "--d": `${s}s` }) as CSSProperties;
 
+// the insights paragraph: first sentence as the body, the rest as the quoted note
+const [INSIGHTS_LEAD, ...INSIGHTS_REST] = INSIGHTS.text.split(/(?<=\.)\s+/);
+const INSIGHTS_NOTE = INSIGHTS_REST.join(" ");
+
 // client faces for the testimonials strip (24 cards around the curve)
 const FACES = ["testimonial-img-01", "team-img-01", "testimonial-img-02", "team-img-02", "testimonial-img-03", "team-img-03", "testimonial-img-04", "team-img-04", "testimonial-01", "team-img-05", "testimonial-03", "team-img-06"];
 const CURVE_FACES = [...FACES, ...FACES];
@@ -409,23 +413,41 @@ export default function HomeView() {
       {/* 11. Blog & Insights: words on the left, an offset pair of photos on
           the right (the About pages' layout); the photos drift apart as you scroll */}
       <Section className="hx-insights hx-duo">
-        <div className="hx-wrap hx-duo-grid">
-          <div className="hx-duo-copy">
-            <Title lines={INSIGHTS.title} />
-            <p className="hx-body" data-hx="rise" style={d(0.15)}>
-              {INSIGHTS.text}
-            </p>
-            <div data-hx="rise" style={d(0.25)}>
-              <Button cta={INSIGHTS.cta} />
+        <div className="hx-wrap">
+          <div className="hx-duo-grid">
+            <div className="hx-duo-copy">
+              <Title lines={INSIGHTS.title} />
+              <p className="hx-body" data-hx="rise" style={d(0.15)}>
+                {INSIGHTS_LEAD}
+              </p>
+              <blockquote className="hx-duo-quote" data-hx="rise" style={d(0.25)}>
+                <svg className="hx-duo-quote-mark" viewBox="0 0 34 26" aria-hidden="true">
+                  <defs>
+                    <linearGradient id="hx-duo-q" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0" stopColor="#00d2ff" />
+                      <stop offset="0.5" stopColor="#6366f1" />
+                      <stop offset="1" stopColor="#a855f7" />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    fill="url(#hx-duo-q)"
+                    d="M0 26V15.6C0 6.9 4.2 1.7 12.6 0l1.6 3.4C9.7 5 7.5 7.9 7.3 12h6.2v14H0zm19.8 0V15.6C19.8 6.9 24 1.7 32.4 0L34 3.4c-4.5 1.6-6.7 4.5-6.9 8.6h6.2v14H19.8z"
+                  />
+                </svg>
+                <p>{INSIGHTS_NOTE}</p>
+              </blockquote>
+            </div>
+            <div className="hx-duo-pics" aria-hidden="true" data-hx="unveil" data-hx-track="">
+              <div className="hx-duo-pic hx-duo-pic-a">
+                <img src="/images/blog-img-02.jpg" alt="" loading="lazy" />
+              </div>
+              <div className="hx-duo-pic hx-duo-pic-b">
+                <img src="/images/blog-img-04.jpg" alt="" loading="lazy" />
+              </div>
             </div>
           </div>
-          <div className="hx-duo-pics" aria-hidden="true" data-hx="unveil" data-hx-track="">
-            <div className="hx-duo-pic hx-duo-pic-a">
-              <img src="/images/blog-img-02.jpg" alt="" loading="lazy" />
-            </div>
-            <div className="hx-duo-pic hx-duo-pic-b">
-              <img src="/images/blog-img-04.jpg" alt="" loading="lazy" />
-            </div>
+          <div className="hx-duo-foot" data-hx="rise" style={d(0.1)}>
+            <Button cta={INSIGHTS.cta} />
           </div>
         </div>
       </Section>
