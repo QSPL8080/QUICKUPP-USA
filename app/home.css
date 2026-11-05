@@ -4610,3 +4610,264 @@
     transform: none;
   }
 }
+
+/* ==========================================================================
+   SECTION ENTRANCES — every section has its own entrance, played once when
+   it scrolls into view (HomeMotion adds .is-in to [data-hx="scene"]).
+   The starting state is only applied while the page script runs, so the
+   page is complete without it.
+   ========================================================================== */
+
+/* 2. Trust: the dark band opens out from the centre, then the two tapes
+   unroll from opposite sides */
+.hx-trust-band {
+  clip-path: inset(0 0 0 0 round 0);
+  transition: clip-path 1.2s var(--hx-ease);
+}
+
+.hx-js .hx-trust[data-hx="scene"]:not(.is-in) .hx-trust-band {
+  clip-path: inset(0 50% 0 50% round 40px);
+}
+
+.hx-tape-svc,
+.hx-tape-logos {
+  transition: clip-path 1.3s var(--hx-ease) 0.45s;
+  clip-path: inset(-20px 0 -20px 0);
+}
+
+.hx-js .hx-trust[data-hx="scene"]:not(.is-in) .hx-tape-svc {
+  clip-path: inset(-20px 100% -20px 0);
+}
+
+.hx-js .hx-trust[data-hx="scene"]:not(.is-in) .hx-tape-logos {
+  clip-path: inset(-20px 0 -20px 100%);
+}
+
+/* 4. Services: the whole explorer tips up from the floor, then the six
+   boxes deal in one after another */
+.hx-svc-stage {
+  perspective: 1400px;
+}
+
+.hx-svc-stage > .hx-svc-scroll > .hx-svc-box {
+  transition:
+    opacity 0.9s var(--hx-ease) 0.1s,
+    transform 1.2s var(--hx-ease) 0.1s;
+  transform-origin: 50% 100%;
+}
+
+.hx-js .hx-svc[data-hx="scene"]:not(.is-in) .hx-svc-box {
+  opacity: 0;
+  transform: translateY(70px) rotateX(16deg) scale(0.96);
+}
+
+/* (the tabs use the separate translate property in a one-off animation, so
+   their own hover and active transitions are left untouched) */
+.hx-js .hx-svc[data-hx="scene"]:not(.is-in) .hx-svc-tab {
+  opacity: 0;
+}
+
+.hx-js .hx-svc[data-hx="scene"].is-in .hx-svc-tab {
+  animation: hx-deal-in 0.8s var(--hx-ease) backwards;
+}
+
+.hx-js .hx-svc[data-hx="scene"].is-in .hx-svc-tab:nth-child(1) { animation-delay: 0.35s; }
+.hx-js .hx-svc[data-hx="scene"].is-in .hx-svc-tab:nth-child(2) { animation-delay: 0.43s; }
+.hx-js .hx-svc[data-hx="scene"].is-in .hx-svc-tab:nth-child(3) { animation-delay: 0.51s; }
+.hx-js .hx-svc[data-hx="scene"].is-in .hx-svc-tab:nth-child(4) { animation-delay: 0.59s; }
+.hx-js .hx-svc[data-hx="scene"].is-in .hx-svc-tab:nth-child(5) { animation-delay: 0.67s; }
+.hx-js .hx-svc[data-hx="scene"].is-in .hx-svc-tab:nth-child(6) { animation-delay: 0.75s; }
+
+@keyframes hx-deal-in {
+  from {
+    opacity: 0;
+    translate: -32px 0;
+  }
+}
+
+/* 5. Why: the lead card swings open like a door, the four cards below fall
+   into place like dominoes, and the wire draws across under them */
+.hx-wb {
+  perspective: 1600px;
+}
+
+.hx-js .hx-why[data-hx="scene"]:not(.is-in) .hx-wb-lead,
+.hx-js .hx-why[data-hx="scene"]:not(.is-in) .hx-wb-item {
+  opacity: 0;
+}
+
+.hx-js .hx-why[data-hx="scene"].is-in .hx-wb-lead {
+  transform-origin: 0% 50%;
+  animation: hx-door-in 1.3s var(--hx-ease) 0.15s backwards;
+}
+
+.hx-js .hx-why[data-hx="scene"].is-in .hx-wb-item {
+  transform-origin: 50% 0%;
+  animation: hx-domino-in 1s cubic-bezier(0.34, 1.4, 0.64, 1) backwards;
+  animation-delay: calc(0.5s + var(--i, 0) * 0.13s);
+}
+
+@keyframes hx-door-in {
+  from {
+    opacity: 0;
+    rotate: y -38deg;
+    translate: -30px 0;
+  }
+}
+
+@keyframes hx-domino-in {
+  from {
+    opacity: 0;
+    rotate: x -80deg;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+.hx-wb-wire {
+  transform-origin: 0 50%;
+  transition: transform 1.4s var(--hx-ease) 0.9s;
+}
+
+.hx-js .hx-why[data-hx="scene"]:not(.is-in) .hx-wb-wire {
+  transform: scaleX(0);
+}
+
+/* 6. Work: the two photo columns slide in from opposite ends */
+.hx-js .hx-work[data-hx="scene"]:not(.is-in) .hx-reel-col {
+  opacity: 0;
+}
+
+.hx-js .hx-work[data-hx="scene"].is-in .hx-reel-up {
+  animation: hx-col-up 1.3s var(--hx-ease) 0.2s backwards;
+}
+
+.hx-js .hx-work[data-hx="scene"].is-in .hx-reel-down {
+  animation: hx-col-down 1.3s var(--hx-ease) 0.3s backwards;
+}
+
+@keyframes hx-col-up {
+  from {
+    opacity: 0;
+    translate: 0 120px;
+  }
+}
+
+@keyframes hx-col-down {
+  from {
+    opacity: 0;
+    translate: 0 -120px;
+  }
+}
+
+/* 7. Testimonials: the curved strip comes into focus, growing out of a blur */
+.hx-curve-view {
+  transition:
+    opacity 1s ease 0.3s,
+    transform 1.6s var(--hx-ease) 0.3s,
+    filter 1.2s ease 0.3s;
+}
+
+.hx-js .hx-curve[data-hx="scene"]:not(.is-in) .hx-curve-view {
+  opacity: 0;
+  transform: scale(0.55);
+  filter: blur(14px);
+}
+
+/* 8. Process: the ground line draws from left to right under the steps */
+.hx-page ol.hx-stair-steps:not(#_):not(#__):not(#___)::after {
+  transform-origin: 0 50%;
+  transition: transform 1.6s var(--hx-ease) 0.2s;
+}
+
+.hx-js .hx-stair[data-hx="scene"]:not(.is-in) ol.hx-stair-steps:not(#_):not(#__):not(#___)::after {
+  transform: scaleX(0);
+}
+
+/* 9. Industries: the panel fades in, then the cells light up in a diagonal
+   wave from the top-left corner */
+.hx-page ul.hx-ind-grid:not(#_):not(#__):not(#___) {
+  transition: opacity 0.8s ease 0.1s, transform 1s var(--hx-ease) 0.1s;
+}
+
+.hx-js .hx-ind[data-hx="scene"]:not(.is-in) ul.hx-ind-grid:not(#_):not(#__):not(#___) {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.hx-js .hx-ind[data-hx="scene"]:not(.is-in) .hx-ind-grid > li {
+  opacity: 0;
+}
+
+.hx-js .hx-ind[data-hx="scene"].is-in .hx-ind-grid > li {
+  animation: hx-cell-in 0.8s var(--hx-ease) backwards;
+  animation-delay: calc(0.3s + (var(--r, 0) + var(--c, 0)) * 0.09s);
+}
+
+@keyframes hx-cell-in {
+  from {
+    opacity: 0;
+    translate: 0 16px;
+    scale: 0.97;
+  }
+}
+
+/* 10. Technology: the dark stage opens as a circle from the radar */
+.hx-radar-stage {
+  clip-path: circle(150% at 82% 50%);
+  transition: clip-path 1.5s var(--hx-ease);
+}
+
+.hx-js .hx-radar[data-hx="scene"]:not(.is-in) .hx-radar-stage {
+  clip-path: circle(0% at 82% 50%);
+}
+
+/* 11. Insights: the rule under the section draws out from the centre and
+   the quote mark pops in */
+.hx-duo-grid {
+  position: relative;
+  border-bottom-color: transparent;
+}
+
+.hx-duo-grid::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: var(--hx-line);
+  transition: transform 1.4s var(--hx-ease) 0.4s;
+}
+
+.hx-js .hx-duo[data-hx="scene"]:not(.is-in) .hx-duo-grid::after {
+  transform: scaleX(0);
+}
+
+.hx-duo-quote-mark {
+  transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s, opacity 0.5s ease 0.5s;
+}
+
+.hx-js .hx-duo[data-hx="scene"]:not(.is-in) svg.hx-duo-quote-mark:not(#_):not(#__) {
+  opacity: 0;
+  transform: scale(0.3) rotate(-20deg);
+}
+
+/* 12. Final: the dark card opens like an iris from its centre */
+.hx-close-card {
+  clip-path: inset(0 0 0 0 round 28px);
+  transition: clip-path 1.3s var(--hx-ease);
+}
+
+.hx-js .hx-close[data-hx="scene"]:not(.is-in) .hx-close-card {
+  clip-path: inset(30% 30% 30% 30% round 28px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hx-js [data-hx="scene"] * {
+    transition-duration: 0.01s !important;
+    animation-duration: 0.01s !important;
+    animation-delay: 0s !important;
+  }
+}

@@ -75,9 +75,11 @@ function Logos() {
   return <div className="hx-logos">{[row("a"), row("b")]}</div>;
 }
 
+// every section plays its own entrance once it scrolls into view
+// (HomeMotion adds .is-in; the CSS under "SECTION ENTRANCES" sets each one)
 function Section({ id, className, children }: { id?: string; className: string; children: ReactNode }) {
   return (
-    <section id={id} className={`hx-section ${className}`}>
+    <section id={id} className={`hx-section ${className}`} data-hx="scene">
       {children}
     </section>
   );
@@ -101,7 +103,7 @@ export default function HomeView() {
 
       {/* 2. Trust strip: a full-width dark band with the count and the promise,
           then two crossing tapes: the four services one way, client logos the other */}
-      <section className="hx-trust">
+      <section className="hx-trust" data-hx="scene">
         <div className="hx-trust-band">
           <span className="hx-trust-lines" aria-hidden="true" />
           <span className="hx-trust-glow" aria-hidden="true" />
@@ -196,7 +198,7 @@ export default function HomeView() {
               {SERVICES.text}
             </p>
           </div>
-          <div data-hx="rise" style={d(0.1)}>
+          <div className="hx-svc-stage">
             <ServiceExplorer items={SERVICES.items} />
           </div>
         </div>
@@ -221,7 +223,7 @@ export default function HomeView() {
               const [lead, ...rest] = WHY.points;
               return (
                 <>
-                  <article className="hx-wb-card hx-wb-lead" data-hx="lift" style={d(0.1)}>
+                  <article className="hx-wb-card hx-wb-lead">
                     <span className="hx-wb-rings" aria-hidden="true">
                       <span />
                       <span />
@@ -239,7 +241,7 @@ export default function HomeView() {
                       <span />
                     </span>
                     {rest.map((pt, i) => (
-                      <li key={pt.title} className="hx-wb-card hx-wb-item" data-hx="lift" style={d(0.15 + i * 0.08)}>
+                      <li key={pt.title} className="hx-wb-card hx-wb-item" style={{ "--i": i } as CSSProperties}>
                         <span className="hx-wb-mark" aria-hidden="true">
                           <HomeIcon name={pt.icon as HomeIconName} size={120} strokeWidth={1.1} />
                         </span>
@@ -306,7 +308,7 @@ export default function HomeView() {
             </div>
           </div>
         </div>
-        <div className="hx-curve-stage" aria-hidden="true" data-hx="rise" style={d(0.2)}>
+        <div className="hx-curve-stage" aria-hidden="true">
           <div className="hx-curve-view">
             <div className="hx-curve-ring">
               {CURVE_FACES.map((f, i) => (
@@ -363,7 +365,7 @@ export default function HomeView() {
           </div>
           <ul className="hx-ind-grid">
             {INDUSTRIES.items.map((it, i) => (
-              <li key={it.name} className="hx-ind-card" data-hx="card" style={d((i % 3) * 0.08)}>
+              <li key={it.name} className="hx-ind-card" style={{ "--i": i, "--r": Math.floor(i / 3), "--c": i % 3 } as CSSProperties}>
                 <span className="hx-ind-icon" aria-hidden="true">
                   <HomeIcon name={it.icon as HomeIconName} size={20} />
                 </span>
@@ -371,7 +373,7 @@ export default function HomeView() {
                 <p className="hx-ind-text">{it.text}</p>
               </li>
             ))}
-            <li className="hx-ind-cta" data-hx="card" style={d(0.16)}>
+            <li className="hx-ind-cta" style={{ "--i": INDUSTRIES.items.length, "--r": Math.floor(INDUSTRIES.items.length / 3), "--c": INDUSTRIES.items.length % 3 } as CSSProperties}>
               <Button cta={INDUSTRIES.cta} tone="light" />
             </li>
           </ul>
@@ -380,7 +382,7 @@ export default function HomeView() {
 
       {/* 10. Technology & Capabilities: a dark stage with a radar sweeping
           behind it (the Contact page hero look), the groups as rows */}
-      <section className="hx-radar">
+      <section className="hx-radar" data-hx="scene">
         <div className="hx-radar-stage">
           <div className="hx-radar-scope" aria-hidden="true">
             <span className="hx-radar-ring" />
@@ -462,9 +464,9 @@ export default function HomeView() {
 
       {/* 12. Contact & Final CTA: the dark grid card used to close the About
           pages, with a slow light sweeping across the grid */}
-      <section className="hx-close">
+      <section className="hx-close" data-hx="scene">
         <div className="hx-wrap">
-          <div className="hx-close-card" data-hx="lift">
+          <div className="hx-close-card">
             <span className="hx-close-grid" aria-hidden="true" />
             <span className="hx-close-sweep" aria-hidden="true" />
             <div className="hx-close-main">
