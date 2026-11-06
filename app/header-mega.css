@@ -710,3 +710,83 @@
     flex: 1 1 0;
   }
 }
+
+/* mobile menu: every top-level item (dropdown buttons and plain links)
+   looks the same: left-aligned label, chevron on the right, same rounded
+   row. The site-wide button rule centres buttons, so this restates it. */
+@media screen and (max-width: 991px) {
+  .qs-new-header .qs-nav-list-ul > li {
+    width: 100%;
+  }
+
+  .qs-new-header .qs-nav-list-ul .qs-nav-item-link:not(#_):not(#__),
+  .qs-new-header .qs-nav-list-ul button.qs-nav-item-link:not(#_):not(#__) {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    width: 100% !important;
+    min-height: 52px !important;
+    padding: 14px 18px !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(255, 255, 255, 0.07) !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    color: #ffffff !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+    text-align: left !important;
+    box-shadow: none !important;
+  }
+
+  .qs-new-header .qs-nav-list-ul .qs-nav-item-link.is-active:not(#_):not(#__),
+  .qs-new-header .qs-nav-list-ul .qs-nav-item-link[aria-expanded="true"]:not(#_):not(#__) {
+    border-color: rgba(165, 180, 252, 0.35) !important;
+    background: rgba(99, 102, 241, 0.12) !important;
+  }
+
+  .qs-new-header .qs-nav-list-ul .qs-nav-item-link .qs-chevron {
+    flex: none;
+    width: 12px;
+    height: 8px;
+    margin-left: auto;
+    opacity: 0.8;
+  }
+
+  .qs-new-header .qs-desktop-nav-wrap.qs-mobile-nav-active {
+    padding: 16px !important;
+    max-height: calc(100dvh - 56px) !important;
+  }
+
+  .qs-mobile-drawer-cta {
+    margin-top: 6px;
+  }
+
+  .qs-mobile-drawer-cta .qs-new-cta-btn {
+    min-height: 48px;
+    justify-content: center !important;
+  }
+}
+
+/* small laptops (992–1199px): a tighter menu and buttons so the links never
+   touch Pay Now and Get More Info stays inside the bar */
+@media screen and (min-width: 992px) and (max-width: 1199px) {
+  .qs-new-header .qs-nav-list-ul:not(#_) {
+    gap: 2px !important;
+  }
+
+  .qs-new-header .qs-nav-list-ul .qs-nav-item-link:not(#_) {
+    padding: 6px 8px !important;
+    font-size: 13.5px !important;
+  }
+
+  .qs-new-header .qs-header-right-col:not(#_) {
+    gap: 8px !important;
+  }
+
+  .qs-new-header .qs-header-right-col .qs-new-cta-btn:not(#_) {
+    height: 38px !important;
+    padding: 0 14px !important;
+    font-size: 13px !important;
+  }
+}

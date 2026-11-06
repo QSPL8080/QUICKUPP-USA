@@ -5,12 +5,28 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import "./checkout.css";
+import { errMessage } from "@/lib/err";
+
+// an order already on file, as /api/payments/lookup returns it
+type ExistingOrder = {
+  clientName?: string;
+  clientEmail?: string;
+  clientPhone?: string;
+  companyName?: string;
+  service?: string;
+  category?: string;
+  notes?: string;
+  paymentType?: "full" | "partial";
+  amountPaid?: number | string;
+  remainingAmount?: number | string;
+  totalAmount?: number | string;
+};
 
 function CheckoutContent() {
   const router = useRouter();
   const sp = useSearchParams();
 
-  const [existingOrder, setExistingOrder] = useState<any>(null);
+  const [existingOrder, setExistingOrder] = useState<ExistingOrder | null>(null);
   const orderParam = sp.get("order") || sp.get("invoice") || "";
 
   useEffect(() => {
@@ -55,6 +71,7 @@ function CheckoutContent() {
   useEffect(() => {
     const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "";
     if (!clientId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reports a missing PayPal setup
       setError("PayPal is not configured yet. Please verify NEXT_PUBLIC_PAYPAL_CLIENT_ID in your environment.");
       return;
     }
@@ -135,8 +152,8 @@ function CheckoutContent() {
             "/payment-confirmation?order=" + encodeURIComponent(captureData.orderNumber)
           );
         }
-      } catch (err: any) {
-        setError(err.message || "An error occurred while confirming your payment. Please contact support.");
+      } catch (err) {
+        setError(errMessage(err) || "An error occurred while confirming your payment. Please contact support.");
         setIsProcessing(false);
       }
     };
@@ -166,7 +183,7 @@ function CheckoutContent() {
             },
             createOrder,
             onApprove,
-            onError: (err: any) => {
+            onError: (err: unknown) => {
               console.error("[PayPal Checkout Error]", err);
               setError("PayPal encountered an issue. Please try again or use another payment method.");
               setIsProcessing(false);
@@ -177,7 +194,7 @@ function CheckoutContent() {
           });
 
           if (pBtn.isEligible()) {
-            pBtn.render(pContainer).catch((err: any) => console.error("PayPal render error", err));
+            pBtn.render(pContainer).catch((err: unknown) => console.error("PayPal render error", err));
           }
         }
       } catch (err) {
@@ -198,7 +215,7 @@ function CheckoutContent() {
             },
             createOrder,
             onApprove,
-            onError: (err: any) => {
+            onError: (err: unknown) => {
               console.error("[Card Payment Error]", err);
               setError("Card payment encountered an issue. Please check your card details or try again.");
               setIsProcessing(false);
@@ -209,7 +226,7 @@ function CheckoutContent() {
           });
 
           if (cBtn.isEligible()) {
-            cBtn.render(cContainer).catch((err: any) => console.error("Card render error", err));
+            cBtn.render(cContainer).catch((err: unknown) => console.error("Card render error", err));
           }
         }
       } catch (err) {

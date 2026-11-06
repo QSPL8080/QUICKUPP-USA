@@ -2,7 +2,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/crm/auth";
 import { listLeads } from "@/lib/crm/data";
 import { listTeamNames } from "@/lib/crm/users";
-import { ENQUIRY_STATUSES, ENQUIRY_STATUS_LABEL, PROJECT_STATUSES, SOURCE_KEYS, SOURCE_LABEL } from "@/lib/crm/leadOptions";
+import { ENQUIRY_STATUSES, ENQUIRY_STATUS_LABEL, PROJECT_STATUSES } from "@/lib/crm/leadOptions";
 import LeadsView from "@/components/crm/LeadsView";
 import AddLeadButton from "@/components/crm/AddLeadButton";
 import { PageHead, Pager } from "@/components/crm/ListTools";

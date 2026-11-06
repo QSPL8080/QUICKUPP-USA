@@ -239,7 +239,7 @@ export async function DELETE(request: Request) {
   const leadId = Number(searchParams.get("leadId") || searchParams.get("id"));
   const fileId = searchParams.get("fileId") || searchParams.get("attId");
 
-  let bodyData: any = null;
+  let bodyData: Record<string, unknown> | null = null;
   if (!fileId || !source || !leadId) {
     try {
       bodyData = await request.json();

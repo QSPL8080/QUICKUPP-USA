@@ -1,7 +1,9 @@
 import "server-only";
 import { getPool } from "@/lib/db";
 import { SERVICE_FORMS } from "@/lib/formOptions";
-import { ENQUIRY_STATUSES, PROJECT_STATUSES, isEnquirySource, type EnquirySource, type EnquiryStatus, type ProjectStatus } from "@/lib/crm/leadOptions";
+import { ENQUIRY_STATUSES, PROJECT_STATUSES, isEnquirySource, type EnquirySource, type EnquiryStatus } from "@/lib/crm/leadOptions";
+import type { RowDataPacket } from "mysql2/promise";
+import { errCode, errMessage } from "@/lib/err";
 
 /*
  * Reading enquiries and payments for the CRM. Table names only ever come
@@ -47,7 +49,7 @@ export type EnquiryRow = {
   createdBy: string | null; // manual leads
   status: EnquiryStatus;
   projectStatus: string;
-  attachments?: any[];
+  attachments?: unknown[];
   createdAt: string;
 };
 
@@ -147,22 +149,22 @@ export async function listLeads(f: LeadFilters & { page?: number }) {
   const pool = getPool();
   let currentUnion = UNION_SQL;
 
-  let countRows: any;
+  let countRows: RowDataPacket[];
   try {
-    [countRows] = await pool.query(`SELECT COUNT(*) AS n FROM (${currentUnion}) t ${sql}`, args);
-  } catch (err: any) {
-    if (err?.code === "ER_BAD_FIELD_ERROR" || String(err?.message || "").includes("assigned_to")) {
+    [countRows] = await pool.query<RowDataPacket[]>(`SELECT COUNT(*) AS n FROM (${currentUnion}) t ${sql}`, args);
+  } catch (err) {
+    if (errCode(err) === "ER_BAD_FIELD_ERROR" || String(errMessage(err) || "").includes("assigned_to")) {
       currentUnion = UNION_SQL_SAFE;
-      [countRows] = await pool.query(`SELECT COUNT(*) AS n FROM (${currentUnion}) t ${sql}`, args);
+      [countRows] = await pool.query<RowDataPacket[]>(`SELECT COUNT(*) AS n FROM (${currentUnion}) t ${sql}`, args);
     } else {
       throw err;
     }
   }
   const total = Number((countRows as { n: number }[])[0]?.n || 0);
 
-  let tabCounts: any;
+  let tabCounts: RowDataPacket[];
   try {
-    [tabCounts] = await pool.query(`
+    [tabCounts] = await pool.query<RowDataPacket[]>(`
       SELECT
         COUNT(*) AS all_count,
         SUM(CASE WHEN src = 'contact' THEN 1 ELSE 0 END) AS contact_count,
@@ -172,7 +174,7 @@ export async function listLeads(f: LeadFilters & { page?: number }) {
       FROM (${currentUnion}) t
     `);
   } catch {
-    [tabCounts] = await pool.query(`
+    [tabCounts] = await pool.query<RowDataPacket[]>(`
       SELECT
         COUNT(*) AS all_count,
         SUM(CASE WHEN src = 'contact' THEN 1 ELSE 0 END) AS contact_count,
@@ -191,14 +193,14 @@ export async function listLeads(f: LeadFilters & { page?: number }) {
     manual: Number(tc.manual_count || 0),
   };
 
-  let rows: any;
+  let rows: RowDataPacket[];
   try {
-    [rows] = await pool.query(
+    [rows] = await pool.query<RowDataPacket[]>(
       `SELECT * FROM (${currentUnion}) t ${sql} ORDER BY created_at DESC, id DESC LIMIT ${PAGE_SIZE} OFFSET ${(page - 1) * PAGE_SIZE}`,
       args
     );
   } catch {
-    [rows] = await pool.query(
+    [rows] = await pool.query<RowDataPacket[]>(
       `SELECT * FROM (${UNION_SQL_SAFE}) t ${sql} ORDER BY created_at DESC, id DESC LIMIT ${PAGE_SIZE} OFFSET ${(page - 1) * PAGE_SIZE}`,
       args
     );
@@ -229,7 +231,6 @@ export async function getLead(source: EnquirySource, id: number): Promise<Enquir
   if (!r) return null;
   const isContact = source === "contact";
   const isManual = source === "manual";
-  const hasExtra = isContact || isManual;
   return {
     source,
     id: Number(r.id),
@@ -340,25 +341,19 @@ export async function listPayments(opts: {
 
   try {
     const [wRows] = await pool.query("SELECT COUNT(*) AS c FROM payments WHERE source IN ('website', 'online')");
-    websiteCount = Number((wRows as any[])?.[0]?.c || 0);
+    websiteCount = Number((wRows as RowDataPacket[])?.[0]?.c || 0);
   } catch {}
 
   try {
     const [pRows] = await pool.query("SELECT COUNT(*) AS c FROM payment_links");
-    paymentLinkCount = Number((pRows as any[])?.[0]?.c || 0);
+    paymentLinkCount = Number((pRows as RowDataPacket[])?.[0]?.c || 0);
   } catch {
     try {
       const [fallbackRows] = await pool.query("SELECT COUNT(*) AS c FROM payments WHERE source IN ('payment_link', 'manual')");
-      paymentLinkCount = Number((fallbackRows as any[])?.[0]?.c || 0);
+      paymentLinkCount = Number((fallbackRows as RowDataPacket[])?.[0]?.c || 0);
     } catch {}
   }
 
-  const allCount = websiteCount + paymentLinkCount;
-  const counts = {
-    website: websiteCount,
-    paymentLink: paymentLinkCount,
-    all: allCount,
-  };
 
   const PAY_COLS = `id, client_name, client_email, client_phone, company_name, category, service, industry,
     description, amount, total_amount, payment_type, remaining_amount, currency, method, status,
@@ -383,7 +378,7 @@ export async function listPayments(opts: {
   const where: string[] = [];
   const args: (string | number)[] = [];
 
-  if (opts.status && (PAYMENT_STATUSES as readonly string[]).includes(opts.status as any)) {
+  if (opts.status && (PAYMENT_STATUSES as readonly string[]).includes(opts.status)) {
     where.push("p.status = ?");
     args.push(opts.status);
   }
@@ -406,21 +401,21 @@ export async function listPayments(opts: {
   const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : "";
   const page = Math.max(1, Math.floor(opts.page || 1));
 
-  let countRows: any;
-  let rows: any;
+  let countRows: RowDataPacket[];
+  let rows: RowDataPacket[];
 
   try {
-    [countRows] = await pool.query(`SELECT COUNT(*) AS n FROM (${baseQuery}) p ${whereSql}`, args);
-    [rows] = await pool.query(
+    [countRows] = await pool.query<RowDataPacket[]>(`SELECT COUNT(*) AS n FROM (${baseQuery}) p ${whereSql}`, args);
+    [rows] = await pool.query<RowDataPacket[]>(
       `SELECT p.*, u.name AS created_by_name FROM (${baseQuery}) p LEFT JOIN crm_users u ON u.id = p.created_by
        ${whereSql} ORDER BY COALESCE(p.paid_at, DATE(p.created_at)) DESC, p.id DESC LIMIT ${PAGE_SIZE} OFFSET ${(page - 1) * PAGE_SIZE}`,
       args
     );
-  } catch (err: any) {
+  } catch {
     // Graceful fallback if payment_links table has not been created yet in the DB
     const fallbackBase = `SELECT * FROM payments WHERE ${currentTab === "payment_link" ? "source IN ('payment_link', 'manual')" : currentTab === "website" ? "source IN ('website', 'online')" : "1=1"}`;
-    [countRows] = await pool.query(`SELECT COUNT(*) AS n FROM (${fallbackBase}) p ${whereSql}`, args);
-    [rows] = await pool.query(
+    [countRows] = await pool.query<RowDataPacket[]>(`SELECT COUNT(*) AS n FROM (${fallbackBase}) p ${whereSql}`, args);
+    [rows] = await pool.query<RowDataPacket[]>(
       `SELECT p.*, u.name AS created_by_name FROM (${fallbackBase}) p LEFT JOIN crm_users u ON u.id = p.created_by
        ${whereSql} ORDER BY COALESCE(p.paid_at, DATE(p.created_at)) DESC, p.id DESC LIMIT ${PAGE_SIZE} OFFSET ${(page - 1) * PAGE_SIZE}`,
       args
@@ -476,7 +471,7 @@ export async function listPayments(opts: {
     counts: {
       website: websiteCount,
       paymentLink: paymentLinkCount,
-      all: allCount,
+      all: websiteCount + paymentLinkCount,
     },
   };
 }
@@ -496,7 +491,7 @@ export async function dashboardStats() {
   const pool = getPool();
   const perSource = await Promise.all(
     (Object.keys(SOURCES) as EnquirySource[]).map(async (key) => {
-      const [rows] = await pool.query(
+      const [rows] = await pool.query<RowDataPacket[]>(
         `SELECT COUNT(*) AS total,
                 SUM(status = 'new') AS fresh,
                 SUM(created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')) AS month

@@ -4,6 +4,7 @@ import Image from "next/image";
 import { getPool } from "@/lib/db";
 import PrintReceiptButton from "@/components/PrintReceiptButton";
 import "./confirmation.css";
+import type { RowDataPacket } from "mysql2/promise";
 
 export const metadata: Metadata = {
   title: "Payment Confirmation | Quickupp Softech LLC",
@@ -33,7 +34,7 @@ export default async function PaymentConfirmationPage({ searchParams }: Props) {
   const sp = await searchParams;
   const lookupKey = sp.order || sp.invoice || sp.ref || sp.txn;
 
-  let paymentRecord: any = null;
+  let paymentRecord: RowDataPacket | null = null;
 
   if (lookupKey) {
     try {
@@ -45,7 +46,7 @@ export default async function PaymentConfirmationPage({ searchParams }: Props) {
           : `SELECT * FROM payments WHERE invoice_number = ? OR reference = ? OR paypal_order_id = ? LIMIT 1`,
         isNumeric ? [Number(lookupKey)] : [lookupKey, lookupKey, lookupKey]
       );
-      paymentRecord = (rows as any[])?.[0] || null;
+      paymentRecord = (rows as RowDataPacket[])?.[0] || null;
     } catch (err) {
       console.error("[Payment Confirmation Query Error]", err);
     }
@@ -58,13 +59,12 @@ export default async function PaymentConfirmationPage({ searchParams }: Props) {
     sp.invoice ||
     `QS-${new Date().getFullYear()}-000127`;
 
-  const clientName = paymentRecord?.client_name || sp.name || "Valued Client";
   const clientEmail = paymentRecord?.client_email || sp.email || "your email address";
   const service = paymentRecord?.service || sp.service || "Information Technology Services";
   const category = paymentRecord?.category || sp.category || "AI, Marketing & Technology";
   const amountPaid = Number(paymentRecord?.amount || sp.amount || 79);
   const totalAmount = Number(paymentRecord?.total_amount || paymentRecord?.amount || amountPaid);
-  const paymentType = (paymentRecord?.payment_type as "full" | "partial") || (sp.type as any) || "full";
+  const paymentType = (paymentRecord?.payment_type as "full" | "partial") || (sp.type as "full" | "partial" | undefined) || "full";
   const remainingAmount = Number(paymentRecord?.remaining_amount || 0);
   const transactionId = paymentRecord?.reference || sp.ref || sp.txn || "COMPLETED-PAYPAL";
   const isPending = paymentRecord?.status === "pending" || sp.status === "pending";

@@ -15,12 +15,11 @@ import {
   LEAD_TIMELINES,
   SOURCE_LABEL,
   type EnquiryStatus,
-  type ProjectStatus,
 } from "@/lib/crm/leadOptions";
 import { BulkBar, SelectBox, useSelection } from "@/components/crm/Selection";
 import { SERVICES_DATA } from "@/components/PayNowModal";
 import { CRM_INDUSTRIES } from "@/components/crm/PaymentsView";
-import { formatFileSize, money } from "@/lib/crm/format";
+import { formatFileSize } from "@/lib/crm/format";
 import CountrySelect from "@/components/CountrySelect";
 import ActivityTimeline, { fmtWhen, sameEntries, type ActivityEntry } from "@/components/crm/ActivityTimeline";
 
@@ -396,6 +395,7 @@ export default function LeadsView({
 
   useEffect(() => {
     if (openNew) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- opens the form when the page is reached with ?new
       openForm("new");
     }
   }, [openNew]);

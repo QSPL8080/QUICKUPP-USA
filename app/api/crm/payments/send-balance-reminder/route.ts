@@ -7,6 +7,8 @@ import { readJson } from "@/lib/enquiry";
 import { toDateOnly } from "@/lib/crm/data";
 import { actorOf, logActivity, money } from "@/lib/crm/activity";
 import { entityOf } from "@/lib/crm/paymentActivity";
+import type { RowDataPacket } from "mysql2/promise";
+import { errMessage } from "@/lib/err";
 
 export async function POST(req: Request) {
   try {
@@ -28,7 +30,7 @@ export async function POST(req: Request) {
       [rows] = await pool.query("SELECT * FROM payments WHERE id = ? LIMIT 1", [id]).catch(() => [[]]);
       targetTable = "payments";
     }
-    const p = (rows as any[])?.[0];
+    const p = (rows as RowDataPacket[])?.[0];
 
     if (!p) {
       return NextResponse.json({ ok: false, error: "Payment record not found." }, { status: 404 });
@@ -54,8 +56,7 @@ export async function POST(req: Request) {
     const clientName = p.client_name || "Valued Client";
     const firstName = clientName.trim().split(" ")[0] || "Valued Client";
     const clientEmail = p.client_email;
-    const clientPhone = p.client_phone || "";
-    const service = p.service || "Quickupp Softech Services";
+      const service = p.service || "Quickupp Softech Services";
     const quantity = p.category || p.quantity || "Standard Scope";
     const totalAmount = Number(p.total_amount || p.amount || 0);
     const paidAmount = Number(p.amount || 0);
@@ -231,10 +232,10 @@ Quickupp Softech LLC`;
       balanceUrl,
       whatsappMessage,
     });
-  } catch (err: any) {
+  } catch (err) {
     console.error("[Send Balance Reminder Error]", err);
     return NextResponse.json(
-      { ok: false, error: err.message || "Failed to send balance reminder." },
+      { ok: false, error: errMessage(err) || "Failed to send balance reminder." },
       { status: 500 }
     );
   }

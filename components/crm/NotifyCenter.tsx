@@ -104,6 +104,7 @@ export default function NotifyCenter({
   useEffect(() => {
     try {
       const stored = localStorage.getItem("qs_crm_sound_enabled");
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage is only readable after mount
       if (stored !== null) setSoundEnabled(stored === "1");
     } catch {}
   }, []);

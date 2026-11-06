@@ -48,6 +48,7 @@ export default function HomeHero({ hero, actions }: { hero: Hero; actions: React
   const count = Math.min(hero.eyebrow.length, PILLARS.length);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reads a browser-only setting after mount
     setMotion(!window.matchMedia("(prefers-reduced-motion: reduce)").matches);
     const el = boxRef.current;
     if (!el || typeof IntersectionObserver === "undefined") return;

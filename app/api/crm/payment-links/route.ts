@@ -6,6 +6,8 @@ import { readJson } from "@/lib/enquiry";
 import { toDateOnly } from "@/lib/crm/data";
 import { actorOf, logMany, money, type ActivityInput } from "@/lib/crm/activity";
 import { entityOf, leadEcho, logPaymentChanges, paymentSnapshot, type PaymentTable } from "@/lib/crm/paymentActivity";
+import type { RowDataPacket } from "mysql2/promise";
+import { errMessage } from "@/lib/err";
 
 function getDefaultDates() {
   const now = new Date();
@@ -177,7 +179,7 @@ export async function POST(req: Request) {
         ]
       );
       insertedId = (res as { insertId: number }).insertId;
-    } catch (insertErr: any) {
+    } catch {
       // Graceful fallback if payment_links table does not exist yet before migration runs
       targetTable = "payments";
       const [res] = await pool.query(
@@ -255,10 +257,10 @@ export async function POST(req: Request) {
       orderNumber,
       url: `/pay/${token}`,
     });
-  } catch (err: any) {
+  } catch (err) {
     console.error("[CRM Payment Link Generation Error]", err);
     return NextResponse.json(
-      { ok: false, error: err.message || "Failed to generate payment link. Please try again." },
+      { ok: false, error: errMessage(err) || "Failed to generate payment link. Please try again." },
       { status: 500 }
     );
   }
@@ -284,7 +286,7 @@ export async function PATCH(req: Request) {
       [existingRows] = await pool.query("SELECT * FROM payments WHERE id = ? LIMIT 1", [id]).catch(() => [[]]);
       targetTable = "payments";
     }
-    const existing = (existingRows as any[])?.[0];
+    const existing = (existingRows as RowDataPacket[])?.[0];
     if (!existing) {
       return NextResponse.json({ ok: false, error: "Payment link record not found." }, { status: 404 });
     }
@@ -422,10 +424,10 @@ export async function PATCH(req: Request) {
     if (beforeSnap && afterSnap) await logPaymentChanges(targetTable as PaymentTable, id, beforeSnap, afterSnap, actorOf(user));
 
     return NextResponse.json({ ok: true, message: "Payment link updated successfully." });
-  } catch (err: any) {
+  } catch (err) {
     console.error("[CRM Payment Link Edit Error]", err);
     return NextResponse.json(
-      { ok: false, error: err.message || "Failed to update payment link." },
+      { ok: false, error: errMessage(err) || "Failed to update payment link." },
       { status: 500 }
     );
   }
@@ -446,7 +448,7 @@ export async function GET(req: Request) {
 
   const pool = getPool();
   const conditions: string[] = [];
-  const args: any[] = [];
+  const args: (string | number)[] = [];
 
   if (leadSource && leadId) {
     conditions.push("(lead_source = ? AND lead_id = ?)");
@@ -468,7 +470,7 @@ export async function GET(req: Request) {
   }
 
   const whereClause = conditions.join(" OR ");
-  let rows: any[] = [];
+  let rows: RowDataPacket[] = [];
   try {
     const [res] = await pool.query(
       `SELECT id, client_name, client_email, client_phone, company_name, service, category,
@@ -480,7 +482,7 @@ export async function GET(req: Request) {
        ORDER BY id DESC`,
       args
     );
-    rows = res as any[];
+    rows = res as RowDataPacket[];
   } catch {
     const [res] = await pool.query(
       `SELECT id, client_name, client_email, client_phone, company_name, service, category,
@@ -492,7 +494,7 @@ export async function GET(req: Request) {
        ORDER BY id DESC`,
       args
     ).catch(() => [[]]);
-    rows = res as any[];
+    rows = res as RowDataPacket[];
   }
 
   const links = rows.map((r) => ({

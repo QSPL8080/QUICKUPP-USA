@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getPool } from "@/lib/db";
 import { generateReceiptPdf } from "@/lib/pdfReceipt";
+import type { RowDataPacket } from "mysql2/promise";
 
 export async function GET(req: Request) {
   try {
@@ -21,7 +22,7 @@ export async function GET(req: Request) {
       isNumeric ? [Number(order)] : [order, order, order]
     );
 
-    const payment = (rows as any[])?.[0];
+    const payment = (rows as RowDataPacket[])?.[0];
     if (!payment) {
       return NextResponse.json({ error: "Payment record not found." }, { status: 404 });
     }
@@ -82,7 +83,7 @@ export async function GET(req: Request) {
         "Cache-Control": "private, max-age=3600",
       },
     });
-  } catch (err: any) {
+  } catch (err) {
     console.error("[Receipt Download API Error]", err);
     return NextResponse.json(
       { error: "Unable to generate receipt PDF. Please contact support." },

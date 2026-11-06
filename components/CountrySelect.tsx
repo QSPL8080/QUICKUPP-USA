@@ -57,9 +57,11 @@ export default function CountrySelect({
   }, []);
 
   // Reset highlighted index when filtered list changes
-  useEffect(() => {
+  const [listLen, setListLen] = useState(filteredCountries.length);
+  if (listLen !== filteredCountries.length) {
+    setListLen(filteredCountries.length);
     setHighlightedIndex(0);
-  }, [filteredCountries.length]);
+  }
 
   // Scroll highlighted item into view
   useEffect(() => {

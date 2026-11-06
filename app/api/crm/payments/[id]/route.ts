@@ -4,6 +4,7 @@ import { validatePayment } from "@/lib/crm/payments";
 import { readJson } from "@/lib/enquiry";
 import { actorOf } from "@/lib/crm/activity";
 import { logPaymentChanges, paymentSnapshot } from "@/lib/crm/paymentActivity";
+import type { ResultSetHeader } from "mysql2/promise";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -47,7 +48,7 @@ export async function DELETE(_request: Request, ctx: Ctx) {
   const pool = getPool();
   const [res1] = await pool.execute("DELETE FROM payment_links WHERE id = ?", [id]).catch(() => [{ affectedRows: 0 }]);
   const [res2] = await pool.execute("DELETE FROM payments WHERE id = ?", [id]).catch(() => [{ affectedRows: 0 }]);
-  const totalDeleted = Number((res1 as any)?.affectedRows || 0) + Number((res2 as any)?.affectedRows || 0);
+  const totalDeleted = Number((res1 as ResultSetHeader)?.affectedRows || 0) + Number((res2 as ResultSetHeader)?.affectedRows || 0);
   if (!totalDeleted) {
     return Response.json({ ok: false, error: "This payment was already deleted." }, { status: 404 });
   }

@@ -6,6 +6,8 @@ import { sendMail, LEADS_NOTIFICATION_EMAIL, EMAIL_LOGO_SRC } from "@/lib/mailer
 import { generateReceiptPdf } from "@/lib/pdfReceipt";
 import { logActivity } from "@/lib/crm/activity";
 import { logGatewayResult, paymentSnapshot, type PaymentSnapshot, type PaymentTable } from "@/lib/crm/paymentActivity";
+import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
+import { errMessage } from "@/lib/err";
 
 export async function POST(req: Request) {
   try {
@@ -49,11 +51,11 @@ export async function POST(req: Request) {
       : (typeof category === "string" ? category : "");
 
     // 1. Attempt to capture with PayPal
-    let captureData: any = null;
-    let captureError: any = null;
+    let captureData: Awaited<ReturnType<typeof capturePayPalOrder>> | null = null;
+    let captureError: unknown = null;
     try {
       captureData = await capturePayPalOrder(orderID);
-    } catch (err: any) {
+    } catch (err) {
       captureError = err;
     }
 
@@ -69,7 +71,7 @@ export async function POST(req: Request) {
 
     if (captureError) {
       paymentStatus = "failed";
-      failureReason = captureError.message || "Payment authorization or capture failed.";
+      failureReason = errMessage(captureError) || "Payment authorization or capture failed.";
     } else if (captureData?.status === "COMPLETED") {
       paymentStatus = isPartial ? "partially_paid" : "paid";
     } else if (captureData?.status === "PENDING") {
@@ -97,7 +99,7 @@ export async function POST(req: Request) {
 
     try {
       const pool = getPool();
-      let existingRecord: any = null;
+      let existingRecord: RowDataPacket | null = null;
       let targetTable = "payments";
       let beforeSnap: PaymentSnapshot | null = null;
 
@@ -105,12 +107,12 @@ export async function POST(req: Request) {
       if (token) {
         let [rows] = await pool.query("SELECT * FROM payment_links WHERE token = ? LIMIT 1", [token]).catch(() => [[]]);
         if (Array.isArray(rows) && rows.length > 0) {
-          existingRecord = rows[0];
+          existingRecord = rows[0] as RowDataPacket;
           targetTable = "payment_links";
         } else {
           [rows] = await pool.query("SELECT * FROM payments WHERE token = ? LIMIT 1", [token]).catch(() => [[]]);
           if (Array.isArray(rows) && rows.length > 0) {
-            existingRecord = rows[0];
+            existingRecord = rows[0] as RowDataPacket;
             targetTable = "payments";
           }
         }
@@ -121,7 +123,7 @@ export async function POST(req: Request) {
           Number(existingPaymentId) || 0,
         ]).catch(() => [[]]);
         if (Array.isArray(rows) && rows.length > 0) {
-          existingRecord = rows[0];
+          existingRecord = rows[0] as RowDataPacket;
           targetTable = "payment_links";
         } else {
           [rows] = await pool.query("SELECT * FROM payments WHERE invoice_number = ? OR id = ? LIMIT 1", [
@@ -129,7 +131,7 @@ export async function POST(req: Request) {
             Number(existingPaymentId) || 0,
           ]).catch(() => [[]]);
           if (Array.isArray(rows) && rows.length > 0) {
-            existingRecord = rows[0];
+            existingRecord = rows[0] as RowDataPacket;
             targetTable = "payments";
           }
         }
@@ -322,7 +324,7 @@ export async function POST(req: Request) {
             paymentNotes,
           ]
         );
-        insertedId = (insertRes as any).insertId || 0;
+        insertedId = (insertRes as ResultSetHeader).insertId || 0;
 
         const currentYear = new Date().getFullYear();
         orderNumber = `QS-${currentYear}-${String(insertedId).padStart(6, "0")}`;
@@ -705,10 +707,10 @@ export async function POST(req: Request) {
       remainingAmount: finalRemaining,
       currency,
     });
-  } catch (err: any) {
+  } catch (err) {
     console.error("[Capture Order API Fatal Error]", err);
     return NextResponse.json(
-      { error: err.message || "An unexpected error occurred while capturing payment." },
+      { error: errMessage(err) || "An unexpected error occurred while capturing payment." },
       { status: 500 }
     );
   }

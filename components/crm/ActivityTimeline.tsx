@@ -214,6 +214,7 @@ export function usePaymentActivity(entity: "payment" | "payment_link" | null, id
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     if (!entity || !id) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- clear the list when nothing is selected
       setEntries([]);
       return;
     }

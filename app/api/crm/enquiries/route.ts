@@ -5,6 +5,8 @@ import { validateManualLead } from "@/lib/crm/leadOptions";
 import { readJson } from "@/lib/enquiry";
 import { actorOf } from "@/lib/crm/activity";
 import { leadHistory, leadSnapshot, logLeadChanges, logLeadCreated } from "@/lib/crm/leadActivity";
+import type { RowDataPacket } from "mysql2/promise";
+import { errCode } from "@/lib/err";
 
 const unauthorized = () => Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
 const invalid = () => Response.json({ ok: false, error: "Invalid request." }, { status: 400 });
@@ -28,7 +30,7 @@ export async function GET(request: Request) {
   const email = (lead.email || "").trim().toLowerCase();
   const phone = (lead.phone || "").trim();
   const conditions: string[] = ["(lead_source = ? AND lead_id = ?)"];
-  const args: any[] = [source, id];
+  const args: (string | number)[] = [source, id];
   if (email) {
     conditions.push("(client_email = ? AND client_email != '')");
     args.push(email);
@@ -38,7 +40,7 @@ export async function GET(request: Request) {
     args.push(phone);
   }
 
-  let linkRows: any[] = [];
+  let linkRows: RowDataPacket[] = [];
   try {
     const [res] = await pool.query(
       `SELECT id, client_name, client_email, client_phone, company_name, service, category,
@@ -50,7 +52,7 @@ export async function GET(request: Request) {
        ORDER BY id DESC`,
       args
     );
-    linkRows = res as any[];
+    linkRows = res as RowDataPacket[];
   } catch {
     const [res] = await pool.query(
       `SELECT id, client_name, client_email, client_phone, company_name, service, category,
@@ -62,7 +64,7 @@ export async function GET(request: Request) {
        ORDER BY id DESC`,
       args
     ).catch(() => [[]]);
-    linkRows = res as any[];
+    linkRows = res as RowDataPacket[];
   }
 
   const paymentLinks = linkRows.map((r) => ({
@@ -177,8 +179,8 @@ export async function PUT(request: Request) {
       );
       if (!(res as { affectedRows: number }).affectedRows) return Response.json({ ok: false, error: "This lead was deleted." }, { status: 404 });
     }
-  } catch (err: any) {
-    if (err?.code === "ER_BAD_FIELD_ERROR") {
+  } catch (err) {
+    if (errCode(err) === "ER_BAD_FIELD_ERROR") {
       const table = SOURCES[source].table;
       await pool.execute(
         `UPDATE \`${table}\` SET full_name = ?, email = ?, phone = ?, company_name = ?, status = ? WHERE id = ?`,
@@ -242,8 +244,8 @@ export async function PATCH(request: Request) {
       `UPDATE \`${SOURCES[body.source].table}\` SET ${sets.join(", ")} WHERE id = ?`,
       [...args, id]
     );
-  } catch (err: any) {
-    if (err?.code === "ER_BAD_FIELD_ERROR" && body?.status !== undefined) {
+  } catch (err) {
+    if (errCode(err) === "ER_BAD_FIELD_ERROR" && body?.status !== undefined) {
       await getPool().execute(
         `UPDATE \`${SOURCES[body.source].table}\` SET status = ? WHERE id = ?`,
         [String(body.status), id]

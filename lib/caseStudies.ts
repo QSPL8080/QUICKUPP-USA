@@ -2,7 +2,7 @@ import { CASE_STUDY_DOCS, type CsBlock, type CsDoc } from "@/data/case-study-doc
 
 /* Helpers for the case study pages (content comes from data/case-study-docs.ts) */
 
-/** The same order as the case studies list (data/case-studies.ts) */
+/** The same order as the case studies list (data/case-study-docs.ts) */
 export const CASE_STUDY_ORDER = [
   "neighbors-emergency-center",
   "erics-car-care",

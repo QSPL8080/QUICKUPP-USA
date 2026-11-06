@@ -1,5 +1,5 @@
 import "server-only";
-import { CURRENCIES, PAYMENT_METHODS, PAYMENT_SERVICES, PAYMENT_STATUSES } from "@/lib/crm/data";
+import { CURRENCIES, PAYMENT_STATUSES } from "@/lib/crm/data";
 
 /* Validation for manual payment entries (create and edit) */
 

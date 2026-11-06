@@ -140,7 +140,6 @@ function InquiryForm() {
 
   useEffect(() => {
     if (!submitted) return;
-    setCountdown(3);
     const interval = setInterval(() => {
       setCountdown((c) => (c > 1 ? c - 1 : 1));
     }, 1000);
@@ -185,6 +184,7 @@ function InquiryForm() {
         }
         return;
       }
+      setCountdown(3);
       setSubmitted(true);
     } catch {
       setSubmitError("We couldn't send your inquiry right now. Please check your connection and try again.");

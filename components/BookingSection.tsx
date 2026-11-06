@@ -87,6 +87,7 @@ export default function BookingSection({ eyebrow, title, text, icon = "calendar"
     const el = ref.current;
     if (!el) return;
     if (typeof IntersectionObserver === "undefined" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- no observer or reduced motion: show at once
       setInView(true);
       return;
     }

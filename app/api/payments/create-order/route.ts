@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createPayPalOrder } from "@/lib/paypal";
+import { errMessage } from "@/lib/err";
 
 export async function POST(req: Request) {
   try {
@@ -73,10 +74,10 @@ export async function POST(req: Request) {
       orderID: order.id,
       status: order.status,
     });
-  } catch (err: any) {
+  } catch (err) {
     console.error("[Create Order API Error]", err);
     return NextResponse.json(
-      { error: err.message || "Unable to initiate payment with PayPal. Please try again." },
+      { error: errMessage(err) || "Unable to initiate payment with PayPal. Please try again." },
       { status: 500 }
     );
   }

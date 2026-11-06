@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import "../../checkout/checkout.css";
+import { errMessage } from "@/lib/err";
 
 type OrderData = {
   id: number;
@@ -52,6 +53,7 @@ export default function PayTokenPage({ params }: { params: Promise<{ token: stri
   // Fetch payment link details
   useEffect(() => {
     if (!token) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- shows the loader while the link is looked up
     setLoading(true);
     fetch(`/api/payments/lookup?token=${encodeURIComponent(token)}`)
       .then(async (res) => {
@@ -99,6 +101,7 @@ export default function PayTokenPage({ params }: { params: Promise<{ token: stri
 
     const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "";
     if (!clientId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reports a missing PayPal setup
       setError("PayPal client ID is not configured. Please contact support.");
       return;
     }
@@ -171,8 +174,8 @@ export default function PayTokenPage({ params }: { params: Promise<{ token: stri
             `/payment-confirmation?order=${encodeURIComponent(captureData.orderNumber || order.invoiceNumber)}`
           );
         }
-      } catch (err: any) {
-        setError(err.message || "An error occurred while confirming payment. Please contact support.");
+      } catch (err) {
+        setError(errMessage(err) || "An error occurred while confirming payment. Please contact support.");
         setIsProcessing(false);
       }
     };
@@ -196,7 +199,7 @@ export default function PayTokenPage({ params }: { params: Promise<{ token: stri
             style: { layout: "vertical", color: "gold", shape: "rect", label: "pay", height: 38 },
             createOrder,
             onApprove,
-            onError: (err: any) => {
+            onError: (err: unknown) => {
               console.error("[PayPal Pay Error]", err);
               setError("PayPal encountered an issue. Please try again or use another payment method.");
               setIsProcessing(false);
@@ -205,7 +208,7 @@ export default function PayTokenPage({ params }: { params: Promise<{ token: stri
           });
 
           if (pBtn.isEligible()) {
-            pBtn.render(pContainer).catch((err: any) => console.error("PayPal render error", err));
+            pBtn.render(pContainer).catch((err: unknown) => console.error("PayPal render error", err));
           }
         }
       } catch (err) {
@@ -226,7 +229,7 @@ export default function PayTokenPage({ params }: { params: Promise<{ token: stri
             },
             createOrder,
             onApprove,
-            onError: (err: any) => {
+            onError: (err: unknown) => {
               console.error("[Card Pay Error]", err);
               setError("Card payment encountered an issue. Please check your card details or try again.");
               setIsProcessing(false);
@@ -235,7 +238,7 @@ export default function PayTokenPage({ params }: { params: Promise<{ token: stri
           });
 
           if (cBtn.isEligible()) {
-            cBtn.render(cContainer).catch((err: any) => console.error("Card render error", err));
+            cBtn.render(cContainer).catch((err: unknown) => console.error("Card render error", err));
           }
         }
       } catch (err) {

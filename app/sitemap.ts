@@ -32,7 +32,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   addUrl("/", 1.0, "daily");
   addUrl("/about", 0.9, "monthly");
   addUrl("/contact", 0.9, "weekly");
-  addUrl("/services", 0.9, "weekly");
   addUrl("/industries", 0.8, "monthly");
   addUrl("/locations", 0.8, "monthly");
   addUrl("/portfolio", 0.8, "monthly");

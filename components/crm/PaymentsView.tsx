@@ -7,7 +7,7 @@ import { useFeedback } from "@/components/crm/Feedback";
 import type { PaymentRow } from "@/lib/crm/data";
 import { PAYMENT_STATUS_LABEL, money } from "@/lib/crm/format";
 import { BulkBar, SelectBox, useSelection } from "@/components/crm/Selection";
-import { PageHead, Filters, Pager } from "@/components/crm/ListTools";
+import { PageHead, Pager } from "@/components/crm/ListTools";
 import { SERVICES_DATA } from "@/components/PayNowModal";
 import { SOURCE_LABEL, isEnquirySource } from "@/lib/crm/leadOptions";
 import ActivityTimeline, { usePaymentActivity } from "@/components/crm/ActivityTimeline";
@@ -510,13 +510,6 @@ Quickupp Softech LLC`;
     }
     toast("Balance reminder email sent!");
     router.refresh();
-  };
-
-  const openForm = (p: PaymentRow | "new") => {
-    setForm(p === "new" ? blank() : fromRow(p));
-    setErrors({});
-    setError("");
-    setEditing(p);
   };
 
   const close = () => setEditing(null);

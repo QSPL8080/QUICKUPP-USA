@@ -1,7 +1,7 @@
 import "server-only";
 import { getPool } from "@/lib/db";
 import { SOURCES } from "@/lib/crm/data";
-import { SOURCE_LABEL, type EnquirySource } from "@/lib/crm/leadOptions";
+import { type EnquirySource } from "@/lib/crm/leadOptions";
 
 /*
  * CRM notifications for new leads, payments and job applications.

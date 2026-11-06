@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { toDateOnly } from "@/lib/crm/data";
 import { getPool } from "@/lib/db";
+import type { RowDataPacket } from "mysql2/promise";
 
 export async function GET(req: Request) {
   try {
@@ -13,16 +14,16 @@ export async function GET(req: Request) {
     }
 
     const pool = getPool();
-    let rows: any[] = [];
+    let rows: RowDataPacket[] = [];
 
     if (token) {
       try {
         const [plRes] = await pool.query("SELECT * FROM payment_links WHERE token = ? LIMIT 1", [token]);
-        rows = plRes as any[];
+        rows = plRes as RowDataPacket[];
       } catch {}
       if (!rows.length) {
         const [res] = await pool.query("SELECT * FROM payments WHERE token = ? LIMIT 1", [token]).catch(() => [[]]);
-        rows = res as any[];
+        rows = res as RowDataPacket[];
       }
     } else if (orderNumber) {
       try {
@@ -30,14 +31,14 @@ export async function GET(req: Request) {
           orderNumber,
           Number(orderNumber) || 0,
         ]);
-        rows = plRes as any[];
+        rows = plRes as RowDataPacket[];
       } catch {}
       if (!rows.length) {
         const [res] = await pool.query("SELECT * FROM payments WHERE invoice_number = ? OR id = ? LIMIT 1", [
           orderNumber,
           Number(orderNumber) || 0,
         ]).catch(() => [[]]);
-        rows = res as any[];
+        rows = res as RowDataPacket[];
       }
     }
 
@@ -78,8 +79,7 @@ export async function GET(req: Request) {
 
     const totalAmount = Number(p.total_amount != null ? p.total_amount : p.amount);
     const amountPaid = Number(p.amount || 0);
-    const isPartial = p.payment_type === "partial";
-    const remainingAmount = Number(p.remaining_amount != null ? p.remaining_amount : Math.max(0, totalAmount - amountPaid));
+      const remainingAmount = Number(p.remaining_amount != null ? p.remaining_amount : Math.max(0, totalAmount - amountPaid));
 
     return NextResponse.json({
       ok: true,
@@ -108,7 +108,7 @@ export async function GET(req: Request) {
         billingEndDate: p.billing_end_date ? toDateOnly(p.billing_end_date) : null,
       },
     });
-  } catch (err: any) {
+  } catch (err) {
     console.error("[Payment Lookup Error]", err);
     return NextResponse.json({ ok: false, error: "Failed to look up payment details." }, { status: 500 });
   }

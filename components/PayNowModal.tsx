@@ -4,10 +4,18 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import LucideIcon from "@/components/LucideIcon";
 import "@/app/pay-modal.css";
+import { errMessage } from "@/lib/err";
+
+// the PayPal JS SDK, loaded at runtime from paypal.com
+type PayPalButtons = { render: (el: HTMLElement) => Promise<void>; isEligible: () => boolean };
+type PayPalSdk = {
+  Buttons: (opts: Record<string, unknown>) => PayPalButtons;
+  FUNDING?: Record<string, string>;
+};
 
 declare global {
   interface Window {
-    paypal?: any;
+    paypal?: PayPalSdk;
   }
 }
 
@@ -273,6 +281,7 @@ export default function PayNowModal() {
 
     const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "";
     if (!clientId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reports a missing PayPal setup
       setFormError(
         "PayPal is not configured yet. Please add NEXT_PUBLIC_PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET to your Hostinger environment settings."
       );
@@ -367,13 +376,13 @@ export default function PayNowModal() {
                 }),
               });
               setStep("success");
-            } catch (err: any) {
-              setFormError(err.message || "An error occurred while confirming your payment.");
+            } catch (err) {
+              setFormError(errMessage(err) || "An error occurred while confirming your payment.");
             } finally {
               setIsSubmitting(false);
             }
           },
-          onError: (err: any) => {
+          onError: (err: unknown) => {
             console.error("[PayPal Buttons Error]", err);
             setFormError(
               "PayPal was unable to process your payment. Please check your card or balance and try again."
@@ -384,7 +393,7 @@ export default function PayNowModal() {
         .then(() => {
           paypalRenderedRef.current = true;
         })
-        .catch((err: any) => {
+        .catch((err: unknown) => {
           console.error("[PayPal Render Error]", err);
         });
     }

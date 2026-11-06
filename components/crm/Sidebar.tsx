@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import "@/app/crm/crm-more.css";
@@ -37,9 +37,11 @@ export default function CrmSidebar({ user, newCounts }: { user: NavUser; newCoun
   const payOn = pathname.startsWith("/crm/payments");
   const payDash = pathname.startsWith("/crm/payments/dashboard");
   const [payOpen, setPayOpen] = useState(payOn);
-  useEffect(() => {
+  const [wasPayOn, setWasPayOn] = useState(payOn);
+  if (wasPayOn !== payOn) {
+    setWasPayOn(payOn);
     if (payOn) setPayOpen(true);
-  }, [payOn]);
+  }
 
   const logout = async () => {
     setLeaving(true);

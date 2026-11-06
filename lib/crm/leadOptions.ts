@@ -90,7 +90,6 @@ export function validateManualLead(body: Record<string, unknown>): { ok: true; d
   const country = text(body.country, 100);
   const industry = text(body.industry, 100);
   const service = text(body.service, 150);
-  const category = text(body.category, 150);
   const budget = text(body.budget, 60);
   const timeline = text(body.timeline, 60);
   const channel = text(body.channel, 60);
