@@ -822,3 +822,152 @@ button.pm-multiselect-btn.is-open {
     display: none !important;
   }
 }
+
+/* ==========================================================================
+   RESPONSIVE: the header stays put and only the form scrolls, inside the
+   visible screen (dvh follows the phone's address bar). Phones get a
+   full-screen sheet; tablets and laptops a centred card that never grows
+   past the screen.
+   ========================================================================== */
+@media screen {
+  .pm-modal {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 32px);
+    max-height: calc(100dvh - 32px);
+  }
+
+  .pm-head {
+    flex: none;
+  }
+
+  .pm-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* tablets: a little more room around the fields */
+@media screen and (min-width: 641px) and (max-width: 1024px) {
+  .pm-modal {
+    max-width: min(760px, calc(100vw - 48px));
+  }
+
+  .pm-body {
+    padding: 16px 22px 20px;
+  }
+}
+
+/* phones: full-screen sheet sliding up from the bottom */
+@media screen and (max-width: 640px) {
+  .pm-overlay {
+    padding: 0;
+    align-items: stretch;
+  }
+
+  .pm-modal {
+    max-width: none;
+    height: 100vh;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    animation: pm-sheet-up 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .pm-head {
+    padding: 12px 14px;
+    padding-top: max(12px, env(safe-area-inset-top));
+  }
+
+  .pm-head-title,
+  h2.pm-head-title,
+  h3.pm-head-title {
+    font-size: 14.5px !important;
+  }
+
+  .pm-close-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .pm-body {
+    padding: 14px 14px calc(20px + env(safe-area-inset-bottom));
+  }
+
+  /* 16px text stops iPhones zooming in when a field is tapped */
+  .pm-input,
+  .pm-select,
+  .pm-textarea {
+    height: 44px;
+    font-size: 16px;
+  }
+
+  .pm-textarea {
+    height: auto;
+  }
+
+  /* amount on its own row, billing dates side by side under it */
+  .pm-row-3 {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .pm-row-3 > .pm-field:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .pm-form {
+    gap: 10px;
+  }
+}
+
+@keyframes pm-sheet-up {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* phones: in the deposit breakdown the label takes the free space and the
+   amount stays on one line at the right; the due date row stacks */
+@media screen and (max-width: 640px) {
+  .pm-breakdown-row {
+    gap: 12px;
+    align-items: baseline;
+  }
+
+  .pm-breakdown-row > span:first-child {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .pm-breakdown-row > span:last-child {
+    flex: none;
+    white-space: nowrap;
+    text-align: right;
+  }
+
+  .pm-breakdown-row.is-highlight {
+    font-size: 13.5px;
+  }
+
+  .pm-breakdown-row:last-child:not(.is-balance):not(.is-highlight) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .pm-breakdown-row:last-child:not(.is-balance):not(.is-highlight) > span:last-child {
+    white-space: normal;
+    text-align: left;
+  }
+}
