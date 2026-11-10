@@ -5,12 +5,15 @@ import "./globals.css";
 import "./assurix-service.css";
 import "./site-type.css";
 import QuickuppEngineReinit from "@/components/QuickuppEngineReinit";
+import MetaPixelPageView from "@/components/MetaPixelPageView";
 import ButtonTone from "@/components/ButtonTone";
 import PayNowModal from "@/components/PayNowModal";
 import DynamicEmailModal from "@/components/DynamicEmailModal";
 
 /* Google Tag Manager container for this website */
 const GTM_ID = "GTM-KDJV786R";
+/* Meta (Facebook) Pixel for this website */
+const META_PIXEL_ID = "1916135312886878";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.quickuppsoftech.us"),
@@ -215,6 +218,27 @@ gtag('js', new Date());`,
           }}
         />
         <Script src="/js/jquery.js" strategy="beforeInteractive" />
+
+        {/* Meta Pixel (1916135312886878): last in <head>, as Meta asks */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '${META_PIXEL_ID}');
+fbq('track', 'PageView');`,
+          }}
+        />
+        <noscript
+          dangerouslySetInnerHTML={{
+            __html: `<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1" />`,
+          }}
+        />
       </head>
       <body>
         {/* Google Tag Manager (noscript): straight after the opening <body> */}
@@ -232,6 +256,7 @@ gtag('js', new Date());`,
             "/js/quickupp-core.js?v=qs2",
           ]}
         />
+        <MetaPixelPageView />
         <QuickuppEngineReinit />
         <ButtonTone />
         <PayNowModal />
