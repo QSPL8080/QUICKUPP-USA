@@ -196,6 +196,8 @@ function getCategoryIcon(name: string) {
 }
 
 interface IndustryMedia {
+  /** where the tall hero frame centres a wide photo (CSS object-position) */
+  heroPos?: string;
   hero: string;
   story: string;
   arch: string;
@@ -209,10 +211,12 @@ interface IndustryMedia {
 }
 
 // Industry imagery mapping for high-resolution Assurix-style imagery (Strictly Zero Duplicates - 81 Distinct Images)
+/* hero photos supplied for each industry live in /public/images/industries;
+   where an industry has two, the second is the first photo below the hero */
 const industryImages: Record<string, IndustryMedia> = {
   Healthcare: {
-    hero: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=1600&q=80",
-    story: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=1000&q=80",
+    hero: "/images/industries/healthcare-hero.jpg",
+    story: "/images/industries/healthcare-2.jpg",
     arch: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=800&q=80",
     circle: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=600&q=80",
     video: "/video/Portfolio 1.mp4",
@@ -235,7 +239,7 @@ const industryImages: Record<string, IndustryMedia> = {
     aiBg: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1600&q=80",
   },
   "Real Estate": {
-    hero: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1600&q=80",
+    hero: "/images/industries/real-estate-hero.jpg",
     story: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1000&q=80",
     arch: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
     circle: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80",
@@ -259,8 +263,9 @@ const industryImages: Record<string, IndustryMedia> = {
     aiBg: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1600&q=80",
   },
   "IT & SaaS": {
-    hero: "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1600&q=80",
-    story: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1000&q=80",
+    hero: "/images/industries/it-saas-hero.jpg",
+    heroPos: "78% 50%",
+    story: "/images/industries/it-saas-2.jpg",
     arch: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80",
     circle: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=80",
     video: "/video/Portfolio 1.mp4",
@@ -283,7 +288,7 @@ const industryImages: Record<string, IndustryMedia> = {
     aiBg: "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1600&q=80",
   },
   "Professional Services": {
-    hero: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1600&q=80",
+    hero: "/images/industries/professional-services-hero.jpg",
     story: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1000&q=80",
     arch: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80",
     circle: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=600&q=80",
@@ -295,7 +300,7 @@ const industryImages: Record<string, IndustryMedia> = {
     aiBg: "https://images.unsplash.com/photo-1551836022-4c4c79ecde51?auto=format&fit=crop&w=1600&q=80",
   },
   eCommerce: {
-    hero: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80",
+    hero: "/images/industries/ecommerce-hero.jpg",
     story: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=1000&q=80",
     arch: "https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?auto=format&fit=crop&w=800&q=80",
     circle: "https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&w=600&q=80",
@@ -307,7 +312,8 @@ const industryImages: Record<string, IndustryMedia> = {
     aiBg: "https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=1600&q=80",
   },
   "Travel & Hospitality": {
-    hero: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1600&q=80",
+    hero: "/images/industries/travel-hospitality-hero.jpg",
+    heroPos: "65% 50%",
     story: "https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=1000&q=80",
     arch: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?auto=format&fit=crop&w=800&q=80",
     circle: "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=600&q=80",
@@ -735,7 +741,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
               </div>
               <figure className="inx-hero-media">
                 <span className="inx-frame-plate" aria-hidden="true" />
-                <img src={images.hero} alt={data.crumb} loading="eager" />
+                <img src={images.hero} alt={data.crumb} loading="eager" style={images.heroPos ? { objectPosition: images.heroPos } : undefined} />
                 <span className="inx-mark inx-mark-tl" aria-hidden="true" />
                 <span className="inx-mark inx-mark-tr" aria-hidden="true" />
                 <span className="inx-mark inx-mark-bl" aria-hidden="true" />
