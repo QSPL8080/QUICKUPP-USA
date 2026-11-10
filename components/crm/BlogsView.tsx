@@ -88,6 +88,22 @@ const fromBlog = (b: CrmBlog): FormState => ({
   isPublished: b.isPublished,
 });
 
+/* the editor's steps, in order */
+const STEPS = [
+  { key: "basics", title: "Basics", sub: "Title, link, category and the short summary" },
+  { key: "details", title: "Author & cover", sub: "Who wrote it, read time and the cover photo" },
+  { key: "intro", title: "Introduction", sub: "Opening paragraphs and the key takeaways" },
+  { key: "sections", title: "Sections", sub: "The body of the article, one section at a time" },
+  { key: "finish", title: "Conclusion & images", sub: "Closing words and the pictures in the article" },
+  { key: "review", title: "Review & publish", sub: "Check everything, then publish or save as a draft" },
+] as const;
+const LAST = STEPS.length - 1;
+
+/* which step a field (or server error) belongs to */
+const STEP_OF: Record<string, number> = { title: 0, slug: 0, category: 0, desc: 0, author: 1, authorRole: 1, readTime: 1, img: 1, content: 2 };
+
+const words = (s: string) => s.replace(/!\[[^\]]*\]\([^)]*\)/g, " ").split(/\s+/).filter(Boolean).length;
+
 const slugify = (s: string) =>
   s
     .toLowerCase()
@@ -110,11 +126,17 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
 
+  const [step, setStep] = useState(0);
+  const [reached, setReached] = useState(0); // furthest step opened so far
+
   const openForm = (b: CrmBlog | "new") => {
     setForm(b === "new" ? blankForm() : fromBlog(b));
     setSlugLocked(b !== "new");
     setErrors({});
     setError("");
+    setStep(0);
+    // an existing blog can jump to any step
+    setReached(b === "new" ? 0 : LAST);
     setEditing(b);
   };
 
@@ -190,8 +212,51 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
     }));
   };
 
-  const save = async (e: React.FormEvent) => {
+  /* the required fields of one step; shows their messages and says if the step is complete */
+  const checkStep = (i: number) => {
+    const errs: Record<string, string> = {};
+    if (i === 0) {
+      if (!form.title.trim()) errs.title = "Please enter a blog title.";
+      if (!slugify(form.slug)) errs.slug = "Please enter a valid URL slug.";
+      if (!form.category.trim()) errs.category = "Please select or enter a category.";
+      if (!form.desc.trim()) errs.desc = "Please enter a short description/summary.";
+    }
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
+  const goTo = (i: number) => {
+    if (i === step) return;
+    // forward only through complete steps
+    for (let s = step; s < i; s++) {
+      if (!checkStep(s)) {
+        setStep(s);
+        return;
+      }
+    }
+    setError("");
+    setStep(i);
+    setReached((r) => Math.max(r, i));
+  };
+
+  const takeaways = form.keyTakeaways
+    .split("\n")
+    .map((s) => s.replace(/^[-•*\s]+/, "").trim())
+    .filter(Boolean);
+  const imageCount = [form.intro, ...form.sections.map((s) => s.paragraphs), form.conclusion].join("\n").split("![](").length - 1;
+
+  // Enter or the main button: next step, and on the last step save
+  const submit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (step < LAST) goTo(step + 1);
+    else save();
+  };
+
+  const save = async () => {
+    if (!checkStep(0)) {
+      setStep(0);
+      return;
+    }
     setBusy(true);
     setErrors({});
     setError("");
@@ -234,8 +299,13 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
     const json = res ? await res.json().catch(() => ({})) : {};
 
     if (!res?.ok || !json.ok) {
-      if (json.errors) setErrors(json.errors);
-      else setError(json.error || "Couldn't save the blog. Please try again.");
+      if (json.errors) {
+        setErrors(json.errors);
+        // open the step that holds the first problem
+        const first = Object.keys(json.errors).map((k) => STEP_OF[k] ?? LAST);
+        setStep(Math.min(...first));
+        if (json.errors.content) setError(json.errors.content);
+      } else setError(json.error || "Couldn't save the blog. Please try again.");
       return;
     }
 
@@ -481,22 +551,24 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
         </div>
       </div>
 
-      {/* Blog Editor Modal Drawer */}
+      {/* Blog Editor: one step at a time (Basics → Author & cover → Introduction → Sections → Conclusion & images → Review) */}
       {editing && (
         <div className="crm-modal-wrap" onClick={close}>
           <form
-            className="crm-modal"
-            style={{ maxWidth: "860px", width: "95%" }}
+            className="crm-modal crm-wiz"
             onClick={(e) => e.stopPropagation()}
-            onSubmit={save}
+            onSubmit={submit}
             noValidate
             role="dialog"
             aria-label={editing === "new" ? "Add new blog" : "Edit blog"}
           >
             <div className="crm-drawer-head">
               <div>
-                <p className="crm-drawer-kicker">Content &amp; Blogs</p>
-                <h2 className="crm-drawer-title">{editing === "new" ? "Create New Blog Article" : `Edit: ${form.title}`}</h2>
+                <p className="crm-drawer-kicker">
+                  {editing === "new" ? "Create New Blog Article" : `Edit: ${form.title || "Blog"}`} · Step {step + 1} of {STEPS.length}
+                </p>
+                <h2 className="crm-drawer-title">{STEPS[step].title}</h2>
+                <p className="crm-wiz-sub">{STEPS[step].sub}</p>
               </div>
               <button type="button" className="crm-icon-act" onClick={close} aria-label="Close">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
@@ -505,264 +577,379 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
               </button>
             </div>
 
-            <div className="crm-form-grid" style={{ maxHeight: "calc(88vh - 140px)", overflowY: "auto", paddingRight: "6px" }}>
-              <label className="crm-field crm-span-2">
-                <span className="crm-label">Blog Title *</span>
-                <input
-                  className="crm-input"
-                  value={form.title}
-                  onChange={handleTitleChange}
-                  placeholder="e.g. The Growing Role of AI in Healthcare Marketing"
-                  required
-                />
-                {errors.title && <span className="crm-field-error">{errors.title}</span>}
-              </label>
-
-              <label className="crm-field">
-                <span className="crm-label">URL Slug *</span>
-                <input
-                  className="crm-input"
-                  value={form.slug}
-                  onChange={set("slug")}
-                  placeholder="e.g. role-of-ai-in-healthcare-marketing"
-                  required
-                />
-                <span className="crm-cell-sub">Live URL: /blog/{form.slug || "..."}</span>
-                {errors.slug && <span className="crm-field-error">{errors.slug}</span>}
-              </label>
-
-              <label className="crm-field">
-                <span className="crm-label">Industry Category *</span>
-                <input
-                  className="crm-input"
-                  list="industry-options"
-                  value={form.category}
-                  onChange={set("category")}
-                  placeholder="Select or enter category"
-                  required
-                />
-                <datalist id="industry-options">
-                  {INDUSTRIES.map((ind) => (
-                    <option key={ind} value={ind} />
-                  ))}
-                </datalist>
-                {errors.category && <span className="crm-field-error">{errors.category}</span>}
-              </label>
-
-              <label className="crm-field crm-span-2">
-                <span className="crm-label">Short Description / Meta Summary *</span>
-                <textarea
-                  className="crm-input"
-                  rows={2}
-                  value={form.desc}
-                  onChange={set("desc")}
-                  placeholder="Brief 1-2 sentence overview shown on blog cards and Google search results"
-                  required
-                />
-                {errors.desc && <span className="crm-field-error">{errors.desc}</span>}
-              </label>
-
-              <label className="crm-field">
-                <span className="crm-label">Author Name</span>
-                <input className="crm-input" value={form.author} onChange={set("author")} placeholder="e.g. Healthcare Strategy Team" />
-              </label>
-
-              <label className="crm-field">
-                <span className="crm-label">Author Role</span>
-                <input className="crm-input" value={form.authorRole} onChange={set("authorRole")} placeholder="e.g. HealthTech Lead" />
-              </label>
-
-              <label className="crm-field">
-                <span className="crm-label">Estimated Read Time</span>
-                <input className="crm-input" value={form.readTime} onChange={set("readTime")} placeholder="e.g. 6 min read" />
-              </label>
-
-              <div className="crm-field">
-                <span className="crm-label">Cover Image</span>
-                <div className="crm-btf-cover">
-                  {form.img && <img src={form.img} alt="" />}
-                  <div className="crm-btf-cover-side">
-                    <label className="crm-btf-add">
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />
-                      </svg>
-                      <span>{coverBusy ? "Processing…" : form.img ? "Replace cover" : "Upload cover"}</span>
-                      <input
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
-                        hidden
-                        disabled={coverBusy}
-                        onChange={async (e) => {
-                          const files = e.target.files;
-                          if (!files?.length) return;
-                          setCoverBusy(true);
-                          const r = await uploadBlogImages(files);
-                          setCoverBusy(false);
-                          e.target.value = "";
-                          if (r.ok) setForm((f) => ({ ...f, img: r.urls[0] }));
-                          else setError(r.error);
-                        }}
-                      />
-                    </label>
-                    <span className="crm-btf-hint">JPG, PNG, WebP, GIF or AVIF · up to 4 MB. Saved directly on this specific blog.</span>
-                    {form.img && (
-                      <button type="button" className="crm-btf-add" onClick={() => setForm((f) => ({ ...f, img: "" }))}>
-                        Remove cover
-                      </button>
-                    )}
-                  </div>
-                </div>
-                <div style={{ display: "flex", gap: "6px", marginTop: "6px", flexWrap: "wrap" }}>
-                  {PRESET_IMAGES.map((preset) => (
-                    <button
-                      key={preset.value}
-                      type="button"
-                      className="crm-act crm-act-ghost crm-act-sm"
-                      onClick={() => setForm((f) => ({ ...f, img: preset.value }))}
-                      style={{ fontSize: "11.5px", padding: "4px 8px" }}
-                    >
-                      {preset.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="crm-span-2">
-                <BlogImageLibrary
-                  cover={form.img}
-                  onCover={(url) => setForm((f) => ({ ...f, img: url }))}
-                  onReplace={handleReplaceImage}
-                  onRemove={handleRemoveImage}
-                  onError={setError}
-                  targets={[
-                    { key: "intro", label: "Introduction", text: form.intro },
-                    ...form.sections.map((sec, i) => ({
-                      key: `s${i}`,
-                      label: `Section ${i + 1}: ${sec.heading.replace(/^\d+\.\s*/, "").slice(0, 48) || "Untitled"}`,
-                      text: sec.paragraphs,
-                    })),
-                    { key: "conclusion", label: "Conclusion", text: form.conclusion },
-                  ]}
-                  onPlace={(key, url) => {
-                    const add = (t: string) => `${t.replace(/\s+$/, "")}${t.trim() ? "\n\n" : ""}![](${url})`;
-                    setForm((f) => {
-                      if (key === "intro") return { ...f, intro: add(f.intro) };
-                      if (key === "conclusion") return { ...f, conclusion: add(f.conclusion) };
-                      const i = Number(key.slice(1));
-                      const sections = f.sections.map((sec, j) => (j === i ? { ...sec, paragraphs: add(sec.paragraphs) } : sec));
-                      return { ...f, sections };
-                    });
-                  }}
-                />
-              </div>
-
-              {/* Content: Introduction */}
-              <p className="crm-span-2 crm-btf-help">
-                Writing tips: leave an empty line between paragraphs · start a line with <code>- </code> for a bullet · <code>**text**</code> for bold ·{" "}
-                <code>[text](/page-link)</code> for a link · <strong>Add images</strong> under a text box puts pictures exactly where your cursor is, and each image can be moved by cutting and pasting its <code>![](…)</code> line.
-              </p>
-
-              <div className="crm-field crm-span-2">
-                <span className="crm-label">Introduction Paragraphs</span>
-                <BlogTextField
-                  rows={5}
-                  value={form.intro}
-                  onChange={(v) => setForm((f) => ({ ...f, intro: v }))}
-                  onError={setError}
-                  placeholder="Opening paragraphs. Leave an empty line between paragraphs."
-                />
-              </div>
-
-              {/* Content: Key Takeaways */}
-              <label className="crm-field crm-span-2">
-                <span className="crm-label">Executive Summary / Key Takeaways (one per line)</span>
-                <textarea
-                  className="crm-input"
-                  rows={3}
-                  value={form.keyTakeaways}
-                  onChange={set("keyTakeaways")}
-                  placeholder="Customized Communication with Patients&#10;AI Chatbots for Nonstop Patient Help&#10;Enhanced Medical Promotion with AI"
-                />
-              </label>
-
-              {/* Dynamic Sections */}
-              <div className="crm-span-2" style={{ borderTop: "1px solid #e2e8f0", paddingTop: "16px", marginTop: "8px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-                  <h3 style={{ fontSize: "16px", fontWeight: 700, margin: 0 }}>Article Sub-Sections ({form.sections.length})</h3>
-                  <button type="button" className="crm-act crm-act-ghost crm-act-sm" onClick={addSection}>
-                    + Add Section
+            <ol className="crm-wiz-steps" aria-label="Steps">
+              {STEPS.map((s, i) => (
+                <li key={s.key}>
+                  <button
+                    type="button"
+                    className={`crm-wiz-step${i === step ? " is-on" : ""}${i < step || (i <= reached && i !== step) ? " is-done" : ""}`}
+                    onClick={() => goTo(i)}
+                    disabled={i > reached + 1}
+                    aria-current={i === step ? "step" : undefined}
+                  >
+                    <span className="crm-wiz-num">{i < step || (i <= reached && i !== step) ? "✓" : i + 1}</span>
+                    <span className="crm-wiz-name">{s.title}</span>
                   </button>
-                </div>
+                </li>
+              ))}
+            </ol>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                  {form.sections.map((sec, idx) => (
-                    <div key={idx} style={{ background: "#f8fafc", padding: "14px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-                      <div style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "8px" }}>
-                        <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748b" }}>#{idx + 1}</span>
-                        <input
-                          className="crm-input"
-                          style={{ fontWeight: 600 }}
-                          value={sec.heading}
-                          onChange={(e) => setSection(idx, "heading", e.target.value)}
-                          placeholder="Section Heading (e.g. 1. Customized Communication)"
-                        />
-                        {form.sections.length > 1 && (
-                          <button
-                            type="button"
-                            className="crm-act-btn crm-act-delete"
-                            title="Remove section"
-                            onClick={() => removeSection(idx)}
-                          >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <line x1="18" y1="6" x2="6" y2="18" />
-                              <line x1="6" y1="6" x2="18" y2="18" />
-                            </svg>
+            <div className="crm-wiz-body" key={step}>
+              {step === 0 && (
+                <div className="crm-form-grid">
+                  <label className="crm-field crm-span-2">
+                    <span className="crm-label">Blog Title *</span>
+                    <input
+                      className="crm-input"
+                      value={form.title}
+                      onChange={handleTitleChange}
+                      placeholder="e.g. The Growing Role of AI in Healthcare Marketing"
+                      required
+                    />
+                    {errors.title && <span className="crm-field-error">{errors.title}</span>}
+                  </label>
+
+                  <label className="crm-field">
+                    <span className="crm-label">URL Slug *</span>
+                    <input
+                      className="crm-input"
+                      value={form.slug}
+                      onChange={set("slug")}
+                      placeholder="e.g. role-of-ai-in-healthcare-marketing"
+                      required
+                    />
+                    <span className="crm-cell-sub">Live URL: /blog/{form.slug || "..."}</span>
+                    {errors.slug && <span className="crm-field-error">{errors.slug}</span>}
+                  </label>
+
+                  <label className="crm-field">
+                    <span className="crm-label">Industry Category *</span>
+                    <input
+                      className="crm-input"
+                      list="industry-options"
+                      value={form.category}
+                      onChange={set("category")}
+                      placeholder="Select or enter category"
+                      required
+                    />
+                    <datalist id="industry-options">
+                      {INDUSTRIES.map((ind) => (
+                        <option key={ind} value={ind} />
+                      ))}
+                    </datalist>
+                    {errors.category && <span className="crm-field-error">{errors.category}</span>}
+                  </label>
+
+                  <label className="crm-field crm-span-2">
+                    <span className="crm-label">Short Description / Meta Summary *</span>
+                    <textarea
+                      className="crm-input"
+                      rows={2}
+                      value={form.desc}
+                      onChange={set("desc")}
+                      placeholder="Brief 1-2 sentence overview shown on blog cards and Google search results"
+                      required
+                    />
+                    {errors.desc && <span className="crm-field-error">{errors.desc}</span>}
+                  </label>
+
+                </div>
+              )}
+
+              {step === 1 && (
+                <div className="crm-form-grid">
+                  <label className="crm-field">
+                    <span className="crm-label">Author Name</span>
+                    <input className="crm-input" value={form.author} onChange={set("author")} placeholder="e.g. Healthcare Strategy Team" />
+                  </label>
+
+                  <label className="crm-field">
+                    <span className="crm-label">Author Role</span>
+                    <input className="crm-input" value={form.authorRole} onChange={set("authorRole")} placeholder="e.g. HealthTech Lead" />
+                  </label>
+
+                  <label className="crm-field">
+                    <span className="crm-label">Estimated Read Time</span>
+                    <input className="crm-input" value={form.readTime} onChange={set("readTime")} placeholder="e.g. 6 min read" />
+                  </label>
+
+                  <div className="crm-field crm-span-2">
+                    <span className="crm-label">Cover Image</span>
+                    <div className="crm-btf-cover">
+                      {form.img && <img src={form.img} alt="" />}
+                      <div className="crm-btf-cover-side">
+                        <label className="crm-btf-add">
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />
+                          </svg>
+                          <span>{coverBusy ? "Processing…" : form.img ? "Replace cover" : "Upload cover"}</span>
+                          <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+                            hidden
+                            disabled={coverBusy}
+                            onChange={async (e) => {
+                              const files = e.target.files;
+                              if (!files?.length) return;
+                              setCoverBusy(true);
+                              const r = await uploadBlogImages(files);
+                              setCoverBusy(false);
+                              e.target.value = "";
+                              if (r.ok) setForm((f) => ({ ...f, img: r.urls[0] }));
+                              else setError(r.error);
+                            }}
+                          />
+                        </label>
+                        <span className="crm-btf-hint">JPG, PNG, WebP, GIF or AVIF · up to 4 MB. Saved directly on this specific blog.</span>
+                        {form.img && (
+                          <button type="button" className="crm-btf-add" onClick={() => setForm((f) => ({ ...f, img: "" }))}>
+                            Remove cover
                           </button>
                         )}
                       </div>
-                      <BlogTextField
-                        rows={5}
-                        value={sec.paragraphs}
-                        onChange={(v) => setSection(idx, "paragraphs", v)}
-                        onError={setError}
-                        placeholder="Paragraphs and bullet points for this section. Leave an empty line between paragraphs."
-                      />
                     </div>
-                  ))}
+                    <div style={{ display: "flex", gap: "6px", marginTop: "6px", flexWrap: "wrap" }}>
+                      {PRESET_IMAGES.map((preset) => (
+                        <button
+                          key={preset.value}
+                          type="button"
+                          className="crm-act crm-act-ghost crm-act-sm"
+                          onClick={() => setForm((f) => ({ ...f, img: preset.value }))}
+                          style={{ fontSize: "11.5px", padding: "4px 8px" }}
+                        >
+                          {preset.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                 </div>
-              </div>
+              )}
 
-              {/* Conclusion */}
-              <div className="crm-field crm-span-2">
-                <span className="crm-label">Final Thoughts / Conclusion (optional)</span>
-                <BlogTextField
-                  rows={3}
-                  value={form.conclusion}
-                  onChange={(v) => setForm((f) => ({ ...f, conclusion: v }))}
-                  onError={setError}
-                  placeholder="Closing paragraphs, if not written as a section above."
-                />
-              </div>
+              {step === 2 && (
+                <div className="crm-form-grid">
+                                <p className="crm-span-2 crm-btf-help">
+                    Writing tips: leave an empty line between paragraphs · start a line with <code>- </code> for a bullet · <code>**text**</code> for bold ·{" "}
+                    <code>[text](/page-link)</code> for a link · <strong>Add images</strong> under a text box puts pictures exactly where your cursor is, and each image can be moved by cutting and pasting its <code>![](…)</code> line.
+                  </p>
 
-              {/* Publish Toggle */}
-              <label className="crm-check crm-check-row crm-span-2">
-                <input type="checkbox" checked={form.isPublished} onChange={set("isPublished")} />
-                <span className="crm-check-box" aria-hidden="true">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 6L9 17l-5-5" />
-                  </svg>
-                </span>
-                <span className="crm-check-text">
-                  <span className="crm-strong">Published on website</span>
-                  <span className="crm-cell-sub">
-                    {form.isPublished ? "This article is live and visible to visitors." : "Saved as a draft; hidden from the public website."}
+                  <div className="crm-field crm-span-2">
+                    <span className="crm-label">Introduction Paragraphs</span>
+                    <BlogTextField
+                      rows={5}
+                      value={form.intro}
+                      onChange={(v) => setForm((f) => ({ ...f, intro: v }))}
+                      onError={setError}
+                      placeholder="Opening paragraphs. Leave an empty line between paragraphs."
+                    />
+                  </div>
+
+                  {/* Content: Key Takeaways */}
+                  <label className="crm-field crm-span-2">
+                    <span className="crm-label">Executive Summary / Key Takeaways (one per line)</span>
+                    <textarea
+                      className="crm-input"
+                      rows={3}
+                      value={form.keyTakeaways}
+                      onChange={set("keyTakeaways")}
+                      placeholder="Customized Communication with Patients&#10;AI Chatbots for Nonstop Patient Help&#10;Enhanced Medical Promotion with AI"
+                    />
+                  </label>
+
+                </div>
+              )}
+
+              {step === 3 && (
+                <div className="crm-form-grid">
+                  <p className="crm-span-2 crm-btf-help">
+                    Each section is a heading with its paragraphs. Leave an empty line between paragraphs · <code>- </code> for a bullet · <code>**text**</code> for bold.
+                  </p>
+                  {/* Dynamic Sections */}
+                  <div className="crm-span-2">
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                      <h3 style={{ fontSize: "16px", fontWeight: 700, margin: 0 }}>Article Sub-Sections ({form.sections.length})</h3>
+                      <button type="button" className="crm-act crm-act-ghost crm-act-sm" onClick={addSection}>
+                        + Add Section
+                      </button>
+                    </div>
+
+                    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                      {form.sections.map((sec, idx) => (
+                        <div key={idx} style={{ background: "#f8fafc", padding: "14px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                          <div style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "8px" }}>
+                            <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748b" }}>#{idx + 1}</span>
+                            <input
+                              className="crm-input"
+                              style={{ fontWeight: 600 }}
+                              value={sec.heading}
+                              onChange={(e) => setSection(idx, "heading", e.target.value)}
+                              placeholder="Section Heading (e.g. 1. Customized Communication)"
+                            />
+                            {form.sections.length > 1 && (
+                              <button
+                                type="button"
+                                className="crm-act-btn crm-act-delete"
+                                title="Remove section"
+                                onClick={() => removeSection(idx)}
+                              >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <line x1="18" y1="6" x2="6" y2="18" />
+                                  <line x1="6" y1="6" x2="18" y2="18" />
+                                </svg>
+                              </button>
+                            )}
+                          </div>
+                          <BlogTextField
+                            rows={5}
+                            value={sec.paragraphs}
+                            onChange={(v) => setSection(idx, "paragraphs", v)}
+                            onError={setError}
+                            placeholder="Paragraphs and bullet points for this section. Leave an empty line between paragraphs."
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                </div>
+              )}
+
+              {step === 4 && (
+                <div className="crm-form-grid">
+                  {/* Conclusion */}
+                  <div className="crm-field crm-span-2">
+                    <span className="crm-label">Final Thoughts / Conclusion (optional)</span>
+                    <BlogTextField
+                      rows={3}
+                      value={form.conclusion}
+                      onChange={(v) => setForm((f) => ({ ...f, conclusion: v }))}
+                      onError={setError}
+                      placeholder="Closing paragraphs, if not written as a section above."
+                    />
+                  </div>
+
+                  <div className="crm-span-2">
+                    <BlogImageLibrary
+                      cover={form.img}
+                      onCover={(url) => setForm((f) => ({ ...f, img: url }))}
+                      onReplace={handleReplaceImage}
+                      onRemove={handleRemoveImage}
+                      onError={setError}
+                      targets={[
+                        { key: "intro", label: "Introduction", text: form.intro },
+                        ...form.sections.map((sec, i) => ({
+                          key: `s${i}`,
+                          label: `Section ${i + 1}: ${sec.heading.replace(/^\d+\.\s*/, "").slice(0, 48) || "Untitled"}`,
+                          text: sec.paragraphs,
+                        })),
+                        { key: "conclusion", label: "Conclusion", text: form.conclusion },
+                      ]}
+                      onPlace={(key, url) => {
+                        const add = (t: string) => `${t.replace(/\s+$/, "")}${t.trim() ? "\n\n" : ""}![](${url})`;
+                        setForm((f) => {
+                          if (key === "intro") return { ...f, intro: add(f.intro) };
+                          if (key === "conclusion") return { ...f, conclusion: add(f.conclusion) };
+                          const i = Number(key.slice(1));
+                          const sections = f.sections.map((sec, j) => (j === i ? { ...sec, paragraphs: add(sec.paragraphs) } : sec));
+                          return { ...f, sections };
+                        });
+                      }}
+                    />
+                  </div>
+
+                </div>
+              )}
+
+              {step === 5 && (
+                <div className="crm-wiz-review">
+                  <div className="crm-wiz-card">
+                    <div className="crm-wiz-card-head">
+                      <span className="crm-label">Basics</span>
+                      <button type="button" className="crm-wiz-edit" onClick={() => goTo(0)}>Edit</button>
+                    </div>
+                    <p className="crm-wiz-title">{form.title || "—"}</p>
+                    <p className="crm-cell-sub">/blog/{form.slug || "…"} · {form.category || "No category"}</p>
+                    <p className="crm-wiz-text">{form.desc || "—"}</p>
+                  </div>
+
+                  <div className="crm-wiz-card crm-wiz-card-row">
+                    {form.img ? <img src={form.img} alt="" className="crm-wiz-cover" /> : <span className="crm-wiz-cover crm-wiz-cover-none">No cover</span>}
+                    <div>
+                      <div className="crm-wiz-card-head">
+                        <span className="crm-label">Author &amp; cover</span>
+                        <button type="button" className="crm-wiz-edit" onClick={() => goTo(1)}>Edit</button>
+                      </div>
+                      <p className="crm-wiz-text">
+                        {form.author || "—"}
+                        {form.authorRole ? ` · ${form.authorRole}` : ""}
+                        {form.readTime ? ` · ${form.readTime}` : ""}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="crm-wiz-card">
+                    <div className="crm-wiz-card-head">
+                      <span className="crm-label">Introduction</span>
+                      <button type="button" className="crm-wiz-edit" onClick={() => goTo(2)}>Edit</button>
+                    </div>
+                    <p className="crm-wiz-text">
+                      {words(form.intro)} words · {takeaways.length} key takeaway{takeaways.length === 1 ? "" : "s"}
+                    </p>
+                    {takeaways.length > 0 && (
+                      <ul className="crm-wiz-list">
+                        {takeaways.map((k) => (
+                          <li key={k}>{k}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+
+                  <div className="crm-wiz-card">
+                    <div className="crm-wiz-card-head">
+                      <span className="crm-label">Sections ({form.sections.length})</span>
+                      <button type="button" className="crm-wiz-edit" onClick={() => goTo(3)}>Edit</button>
+                    </div>
+                    <ol className="crm-wiz-list">
+                      {form.sections.map((s, i) => (
+                        <li key={i}>
+                          {s.heading || "Untitled section"} <span className="crm-cell-sub">· {words(s.paragraphs)} words</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+
+                  <div className="crm-wiz-card">
+                    <div className="crm-wiz-card-head">
+                      <span className="crm-label">Conclusion &amp; images</span>
+                      <button type="button" className="crm-wiz-edit" onClick={() => goTo(4)}>Edit</button>
+                    </div>
+                    <p className="crm-wiz-text">
+                      {form.conclusion.trim() ? `${words(form.conclusion)} words of conclusion` : "No separate conclusion"} · {imageCount} image
+                      {imageCount === 1 ? "" : "s"} in the article
+                    </p>
+                  </div>
+
+                {/* Publish Toggle */}
+                <label className="crm-check crm-check-row crm-span-2">
+                  <input type="checkbox" checked={form.isPublished} onChange={set("isPublished")} />
+                  <span className="crm-check-box" aria-hidden="true">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 6L9 17l-5-5" />
+                    </svg>
                   </span>
-                </span>
-              </label>
+                  <span className="crm-check-text">
+                    <span className="crm-strong">Published on website</span>
+                    <span className="crm-cell-sub">
+                      {form.isPublished ? "This article is live and visible to visitors." : "Saved as a draft; hidden from the public website."}
+                    </span>
+                  </span>
+                </label>
+                </div>
+              )}
             </div>
 
             {error && (
-              <p className="crm-alert" role="alert" style={{ margin: "12px 24px 0" }}>
+              <p className="crm-alert" role="alert">
                 {error}
               </p>
             )}
@@ -776,11 +963,22 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
                 <span />
               )}
               <span className="crm-modal-foot-end">
-                <button type="button" className="crm-act crm-act-ghost" onClick={close}>
-                  Cancel
-                </button>
+                {step > 0 ? (
+                  <button type="button" className="crm-act crm-act-ghost" onClick={() => setStep(step - 1)} disabled={busy}>
+                    ← Back
+                  </button>
+                ) : (
+                  <button type="button" className="crm-act crm-act-ghost" onClick={close}>
+                    Cancel
+                  </button>
+                )}
+                {editing !== "new" && step < LAST && (
+                  <button type="button" className="crm-act crm-act-ghost" onClick={() => save()} disabled={busy}>
+                    {busy ? "Saving…" : "Save Changes"}
+                  </button>
+                )}
                 <button type="submit" className="crm-act crm-act-dark" disabled={busy}>
-                  {busy ? "Saving…" : editing === "new" ? "Publish Blog" : "Save Changes"}
+                  {step < LAST ? "Next →" : busy ? "Saving…" : editing !== "new" ? "Save Changes" : form.isPublished ? "Publish Blog" : "Save as Draft"}
                 </button>
               </span>
             </div>
