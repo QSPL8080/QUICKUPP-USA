@@ -1339,7 +1339,7 @@
   align-items: center;
   gap: clamp(40px, 4.6vw, 72px);
   padding-right: clamp(40px, 4.6vw, 72px);
-  animation: hx-marquee 40s linear infinite reverse;
+  animation: hx-marquee 90s linear infinite reverse;
 }
 
 .hx-logos-row img {

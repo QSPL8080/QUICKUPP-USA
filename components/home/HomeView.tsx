@@ -75,17 +75,22 @@ const CLIENT_LOGOS = [
   { src: "client-y", name: "Client logo", h: 40 },
   { src: "us-control-tech", name: "U.S. Control Tech", h: 28 },
   { src: "nms-consulting", name: "NMS Consulting", h: 38 },
+  { src: "westwood-architecture", name: "WestWood Architecture", h: 26 },
 ];
+
+// each moving row carries the set three times so it is always wider than the
+// widest screen: the two rows hand over with no empty gap, round and round
+const LOGO_LOOP = [0, 1, 2].flatMap((n) => CLIENT_LOGOS.map((l) => ({ ...l, n })));
 
 function Logos() {
   const row = (k: string) => (
     <div className="hx-logos-row" aria-hidden={k === "b" ? true : undefined} key={k}>
-      {CLIENT_LOGOS.map((l) => (
+      {LOGO_LOOP.map((l) => (
         <img
-          key={`${k}${l.src}`}
+          key={`${k}${l.n}${l.src}`}
           src={`/images/clients/${l.src}.png`}
-          alt={k === "a" ? l.name : ""}
-          loading="lazy"
+          alt={k === "a" && l.n === 0 ? l.name : ""}
+          decoding="async"
           style={{ "--h": l.h } as CSSProperties}
         />
       ))}
