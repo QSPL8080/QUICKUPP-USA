@@ -45,7 +45,9 @@ function unionSql() {
         ? "COALESCE(NULLIF(category, ''), NULLIF(project_type, ''), 'Contact Form')"
         : k === "youtube"
           ? "'YouTube Video Promotion'"
-          : "COALESCE(NULLIF(category, ''), NULLIF(service, ''), 'Service Form')";
+          : k === "industries"
+            ? "CONCAT(industry, ' · ', COALESCE(NULLIF(category, ''), NULLIF(service, ''), 'Industry Page'))"
+            : "COALESCE(NULLIF(category, ''), NULLIF(service, ''), 'Service Form')";
     parts.push(
       `SELECT 'lead' AS kind, CONCAT('${k}:', id) AS item_key, '${k}' AS src, full_name AS title, ${detail} AS extra, created_at FROM \`${SOURCES[k].table}\` WHERE created_at > ? AND created_at <= ?${mine}`
     );
@@ -95,8 +97,8 @@ export async function getNotifications(userId: number): Promise<Notifications> {
     let categoryLabel = "NEW NOTIFICATION";
 
     if (kind === "lead") {
-      title = src === "contact" ? "New website enquiry" : src === "youtube" ? "New YouTube order" : "New website order";
-      categoryLabel = src === "contact" ? "NEW WEBSITE ENQUIRY" : src === "youtube" ? "NEW YOUTUBE ORDER" : "NEW WEBSITE ORDER";
+      title = src === "contact" ? "New website enquiry" : src === "youtube" ? "New YouTube order" : src === "industries" ? "New industry enquiry" : "New website order";
+      categoryLabel = src === "contact" ? "NEW WEBSITE ENQUIRY" : src === "youtube" ? "NEW YOUTUBE ORDER" : src === "industries" ? "NEW INDUSTRY ENQUIRY" : "NEW WEBSITE ORDER";
       sub = detail ? `${clientName} ordered ${detail}` : `${clientName} submitted an enquiry`;
     } else if (kind === "payment") {
       title = "Payment received";

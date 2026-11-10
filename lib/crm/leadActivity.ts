@@ -130,8 +130,16 @@ export async function logLeadCreated(id: number, actor: Actor, assignedTo: strin
 }
 
 /** A lead that came in through a website form */
+/** "Website Contact Form", "Website Digital Marketing Form", "Website Industry Page Form", ... */
+const formNameOf = (source: EnquirySource) =>
+  source === "contact"
+    ? "Website Contact Form"
+    : source === "industries"
+      ? "Website Industry Page Form"
+      : `Website ${SOURCE_LABEL[source].replace("Service Form · ", "")} Form`;
+
 export async function logLeadReceived(source: EnquirySource, id: number, sourcePage?: string | null) {
-  const formName = source === "contact" ? "Website Contact Form" : `Website ${SOURCE_LABEL[source].replace("Service Form · ", "")} Form`;
+  const formName = formNameOf(source);
   await logMany([
     {
       entity: "lead",
@@ -162,7 +170,7 @@ export async function leadHistory(source: EnquirySource, id: number, lead: { cre
   const assigned = activity.find((a) => a.action === "assigned" || a.action === "reassigned");
   const latest = activity[0];
   const fallbackCreator =
-    source === "manual" ? (lead.createdBy ? `${lead.createdBy}` : "CRM") : `Website ${source === "contact" ? "Contact" : SOURCE_LABEL[source].replace("Service Form · ", "")} Form`;
+    source === "manual" ? (lead.createdBy ? `${lead.createdBy}` : "CRM") : formNameOf(source);
   const audit: LeadAudit = {
     createdBy: created ? created.by : fallbackCreator,
     createdAt: lead.createdAt,

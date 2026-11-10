@@ -24,7 +24,7 @@ export const PROJECT_STATUSES = [
 ] as const;
 export type ProjectStatus = (typeof PROJECT_STATUSES)[number];
 
-export type EnquirySource = "contact" | ServiceFormKey | "manual";
+export type EnquirySource = "contact" | ServiceFormKey | "industries" | "manual";
 export const SOURCE_KEYS: EnquirySource[] = [
   "contact",
   "digital-marketing",
@@ -32,6 +32,7 @@ export const SOURCE_KEYS: EnquirySource[] = [
   "it-services",
   "staff-augmentation",
   "youtube",
+  "industries",
   "manual",
 ];
 
@@ -43,6 +44,7 @@ export const SOURCE_LABEL: Record<EnquirySource, string> = {
   "it-services": "Service Form · IT Services",
   "staff-augmentation": "Service Form · Staff Augmentation",
   youtube: "YouTube Video Promotion",
+  industries: "Industry Page Form",
   manual: "Added Manually",
 };
 

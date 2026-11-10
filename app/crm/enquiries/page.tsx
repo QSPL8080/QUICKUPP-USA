@@ -60,7 +60,7 @@ export default async function EnquiriesPage({ searchParams }: Props) {
 
   return (
     <>
-      <PageHead title="All Enquiries" sub="Every lead in one place — Contact form, the four service forms, YouTube promotion and manual leads. Newest first.">
+      <PageHead title="All Enquiries" sub="Every lead in one place — Contact form, the four service forms, YouTube promotion, industry pages and manual leads. Newest first.">
         <a href={exportHref} className="crm-act crm-act-ghost">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
@@ -70,7 +70,7 @@ export default async function EnquiriesPage({ searchParams }: Props) {
         <AddLeadButton />
       </PageHead>
 
-      {/* Quick source tabs: All, Contact Form, Service Forms (4), YouTube Promotion, Manual */}
+      {/* Quick source tabs: All, Contact Form, Service Forms (4), YouTube Promotion, Industry Pages, Manual */}
       <div className="crm-payments-tabs" style={{ marginBottom: "1rem" }}>
         <Link
           href={sourceHref("")}
@@ -104,6 +104,13 @@ export default async function EnquiriesPage({ searchParams }: Props) {
           <span className="crm-tab-badge">{data.counts?.youtube ?? 0}</span>
         </Link>
         <Link
+          href={sourceHref("industries")}
+          className={`crm-payments-tab ${f.source === "industries" ? "is-active" : ""}`}
+        >
+          <span>Industry Pages</span>
+          <span className="crm-tab-badge">{data.counts?.industries ?? 0}</span>
+        </Link>
+        <Link
           href={sourceHref("manual")}
           className={`crm-payments-tab ${f.source === "manual" ? "is-active" : ""}`}
         >
@@ -125,6 +132,7 @@ export default async function EnquiriesPage({ searchParams }: Props) {
           <option value="contact">Contact Form</option>
           <option value="services">Service Forms (4)</option>
           <option value="youtube">YouTube Video Promotion</option>
+          <option value="industries">Industry Pages</option>
           <option value="manual">Added Manually</option>
           <optgroup label="Individual Service Forms">
             <option value="digital-marketing">Digital Marketing</option>

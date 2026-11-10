@@ -110,5 +110,10 @@ export const SERVICE_FORMS = {
 
 export type ServiceFormKey = keyof typeof SERVICE_FORMS;
 
+/** Lead form on the industry pages (industry fixed, visitor picks the service) → its own table */
+export const INDUSTRY_TABLE = "industry_enquiries";
+export const isIndustry = (v: unknown): v is (typeof INDUSTRIES)[number] =>
+  typeof v === "string" && v !== "Other" && (INDUSTRIES as readonly string[]).includes(v);
+
 export const isServiceFormKey = (v: unknown): v is ServiceFormKey =>
   typeof v === "string" && Object.prototype.hasOwnProperty.call(SERVICE_FORMS, v);

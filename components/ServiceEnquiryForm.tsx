@@ -167,6 +167,7 @@ export default function ServiceEnquiryForm({ service: fixedService, industry: fi
           message: formData.message,
           agreed: formData.agreed,
           service,
+          ...(fixedIndustry ? { industryPage: true } : {}),
           website,
         }),
       });

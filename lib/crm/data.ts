@@ -1,6 +1,6 @@
 import "server-only";
 import { getPool } from "@/lib/db";
-import { SERVICE_FORMS } from "@/lib/formOptions";
+import { INDUSTRY_TABLE, SERVICE_FORMS } from "@/lib/formOptions";
 import { ENQUIRY_STATUSES, PROJECT_STATUSES, isEnquirySource, type EnquirySource, type EnquiryStatus } from "@/lib/crm/leadOptions";
 import type { RowDataPacket } from "mysql2/promise";
 import { errCode, errMessage } from "@/lib/err";
@@ -20,6 +20,7 @@ export const SOURCES: Record<EnquirySource, { table: string; label: string; shor
   "it-services": { table: SERVICE_FORMS["it-services"].table, label: SERVICE_FORMS["it-services"].label, short: "IT Services", href: "/crm/enquiries?source=it-services" },
   "staff-augmentation": { table: SERVICE_FORMS["staff-augmentation"].table, label: SERVICE_FORMS["staff-augmentation"].label, short: "Staff Augmentation", href: "/crm/enquiries?source=staff-augmentation" },
   youtube: { table: SERVICE_FORMS["youtube"].table, label: SERVICE_FORMS["youtube"].label, short: "YouTube", href: "/crm/enquiries?source=youtube" },
+  industries: { table: INDUSTRY_TABLE, label: "Industry Page Enquiries", short: "Industries", href: "/crm/enquiries?source=industries" },
   manual: { table: "manual_leads", label: "Manual Leads", short: "Manual", href: "/crm/enquiries?source=manual" },
 };
 
@@ -75,7 +76,7 @@ const PAGE_SIZE = 25;
 /* one SELECT per source with the same columns, so they can be listed together */
 const UNION_SQL = (Object.keys(SOURCES) as EnquirySource[])
   .map((k) => {
-    const detail = k === "contact" ? "COALESCE(category, project_type)" : k === "youtube" ? "''" : "category";
+    const detail = k === "contact" ? "COALESCE(category, project_type)" : k === "youtube" ? "''" : k === "industries" ? "COALESCE(NULLIF(category, ''), service)" : "category";
     const service = k === "contact" ? "project_type" : "service";
     return `SELECT '${k}' AS src, id, full_name, email, phone, company_name, ${detail} AS detail, ${service} AS service, assigned_to, status, COALESCE(NULLIF(TRIM(project_status), ''), 'Not Started') AS project_status, created_at FROM \`${SOURCES[k].table}\``;
   })
@@ -83,7 +84,7 @@ const UNION_SQL = (Object.keys(SOURCES) as EnquirySource[])
 
 const UNION_SQL_SAFE = (Object.keys(SOURCES) as EnquirySource[])
   .map((k) => {
-    const detail = k === "contact" ? "COALESCE(category, project_type)" : k === "youtube" ? "''" : "category";
+    const detail = k === "contact" ? "COALESCE(category, project_type)" : k === "youtube" ? "''" : k === "industries" ? "COALESCE(NULLIF(category, ''), service)" : "category";
     const service = k === "contact" ? "project_type" : "service";
     const assigned = k === "manual" ? "assigned_to" : "NULL AS assigned_to";
     return `SELECT '${k}' AS src, id, full_name, email, phone, company_name, ${detail} AS detail, ${service} AS service, ${assigned}, status, 'Not Started' AS project_status, created_at FROM \`${SOURCES[k].table}\``;
@@ -170,6 +171,7 @@ export async function listLeads(f: LeadFilters & { page?: number }) {
         SUM(CASE WHEN src = 'contact' THEN 1 ELSE 0 END) AS contact_count,
         SUM(CASE WHEN src IN ('digital-marketing', 'ai-automation', 'it-services', 'staff-augmentation') THEN 1 ELSE 0 END) AS services_count,
         SUM(CASE WHEN src = 'youtube' THEN 1 ELSE 0 END) AS youtube_count,
+        SUM(CASE WHEN src = 'industries' THEN 1 ELSE 0 END) AS industries_count,
         SUM(CASE WHEN src = 'manual' THEN 1 ELSE 0 END) AS manual_count
       FROM (${currentUnion}) t
     `);
@@ -180,6 +182,7 @@ export async function listLeads(f: LeadFilters & { page?: number }) {
         SUM(CASE WHEN src = 'contact' THEN 1 ELSE 0 END) AS contact_count,
         SUM(CASE WHEN src IN ('digital-marketing', 'ai-automation', 'it-services', 'staff-augmentation') THEN 1 ELSE 0 END) AS services_count,
         SUM(CASE WHEN src = 'youtube' THEN 1 ELSE 0 END) AS youtube_count,
+        SUM(CASE WHEN src = 'industries' THEN 1 ELSE 0 END) AS industries_count,
         SUM(CASE WHEN src = 'manual' THEN 1 ELSE 0 END) AS manual_count
       FROM (${UNION_SQL_SAFE}) t
     `);
@@ -190,6 +193,7 @@ export async function listLeads(f: LeadFilters & { page?: number }) {
     contact: Number(tc.contact_count || 0),
     services: Number(tc.services_count || 0),
     youtube: Number(tc.youtube_count || 0),
+    industries: Number(tc.industries_count || 0),
     manual: Number(tc.manual_count || 0),
   };
 

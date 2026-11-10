@@ -1,7 +1,7 @@
 import { after } from "next/server";
 import { getPool } from "@/lib/db";
-import { SERVICE_FORMS, isServiceFormKey } from "@/lib/formOptions";
-import { readJson, validateServiceEnquiry } from "@/lib/enquiry";
+import { INDUSTRY_TABLE, SERVICE_FORMS, isIndustry, isServiceFormKey } from "@/lib/formOptions";
+import { readJson, validateServiceEnquiry, type ServiceEnquiryInput } from "@/lib/enquiry";
 import { LEADS_NOTIFICATION_EMAIL, escapeHtml, sendMail } from "@/lib/mailer";
 import { logLeadReceived } from "@/lib/crm/leadActivity";
 
@@ -11,8 +11,11 @@ import { logLeadReceived } from "@/lib/crm/leadActivity";
  *   ai-automation      → service_ai_automation
  *   it-services        → service_it_services
  *   staff-augmentation → service_staff_augmentation
+ *   youtube            → service_youtube_promotion
+ * Industry page form (industryPage: true) → industry_enquiries, whatever the
+ * service picked (the industry is fixed to the page, the service is chosen).
  * The table name comes only from this fixed list, never from the request.
- * "service" is the fixed service of that form; "category" is the subpage the
+ * "service" is the service of that form; "category" is the subpage the
  * visitor picked.
  */
 export async function POST(request: Request) {
@@ -30,6 +33,8 @@ export async function POST(request: Request) {
   if (!result.ok) return Response.json({ ok: false, errors: result.errors }, { status: 400 });
 
   const d = result.data;
+
+  if (body.industryPage === true) return saveIndustryLead(body.service, d);
 
   try {
     const isYoutube = form.table === "service_youtube_promotion";
@@ -137,6 +142,96 @@ ${escapeHtml(d.message || "—").replace(/\n/g, "<br>")}
     return Response.json({ ok: true, id: insertId });
   } catch (err) {
     console.error(`[api/service-enquiry] insert into ${form.table} failed:`, err);
+    return Response.json({ ok: false, error: "We couldn't send your inquiry right now. Please try again." }, { status: 500 });
+  }
+}
+
+/* Industry pages: the industry is fixed to the page, the visitor picks the service */
+async function saveIndustryLead(service: keyof typeof SERVICE_FORMS, d: ServiceEnquiryInput) {
+  if (!isIndustry(d.industry)) {
+    return Response.json({ ok: false, errors: { industry: "Please choose your industry." } }, { status: 400 });
+  }
+  const form = SERVICE_FORMS[service];
+  const isYoutube = service === "youtube";
+  try {
+    const [res] = await getPool().execute(
+      `INSERT INTO ${INDUSTRY_TABLE}
+        (full_name, email, phone, company_name, company_website, country, industry, other_industry, service, category, budget, timeline, youtube_link, message, source_page)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        d.fullName,
+        d.email,
+        d.phone,
+        d.companyName,
+        d.companyWebsite,
+        d.country,
+        d.industry,
+        null,
+        form.label,
+        isYoutube ? null : d.category,
+        d.budget,
+        d.timeline,
+        isYoutube ? d.youtubeLink || null : null,
+        d.message,
+        `${d.industry} industry page`,
+      ]
+    );
+    const insertId = (res as { insertId: number }).insertId;
+    await logLeadReceived("industries", insertId, `${d.industry} industry page`);
+
+    after(async () => {
+      const rows: [string, string][] = [
+        ["Lead ID", `#${insertId}`],
+        ["Industry Page", d.industry],
+        ["Service", form.label],
+      ];
+      if (!isYoutube) rows.push(["Selected Categories", d.category || "—"]);
+      rows.push(
+        ["Full Name", d.fullName],
+        ["Business Email", d.email],
+        ["Phone Number", d.phone],
+        ["Company Name", d.companyName || "—"],
+        ["Company Website", d.companyWebsite || "—"],
+        ["Country", d.country],
+        ["Estimated Project Budget", d.budget],
+        ["Project Timeline", d.timeline]
+      );
+      if (isYoutube && d.youtubeLink) rows.push(["YouTube Video / Channel Link", d.youtubeLink]);
+
+      const html = `<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.6;color:#111">
+<h2 style="color:#0f172a;margin-bottom:16px;">New Industry Lead: ${escapeHtml(d.industry)}</h2>
+<p>A new inquiry was submitted through the lead form on the ${escapeHtml(d.industry)} industry page.</p>
+<table style="border-collapse:collapse;width:100%;max-width:600px;margin-bottom:20px;">
+${rows
+  .map(
+    ([k, v]) =>
+      `<tr><td style="padding:8px 12px;border:1px solid #e2e8f0;background:#f8fafc;font-weight:bold;width:200px;">${escapeHtml(k)}</td><td style="padding:8px 12px;border:1px solid #e2e8f0;">${escapeHtml(v)}</td></tr>`
+  )
+  .join("")}
+</table>
+<div style="background:#f1f5f9;padding:12px 16px;border-radius:6px;max-width:600px;margin-bottom:20px;">
+<b>Tell Us About Your Requirements:</b><br>
+${escapeHtml(d.message || "—").replace(/\n/g, "<br>")}
+</div>
+<p style="color:#64748b;font-size:13px;">This lead is saved in the CRM under All Enquiries &gt; Industry Pages (#${insertId}).<br>Reply directly to this email to contact the lead.</p>
+</div>`;
+
+      const text = `New Industry Lead: ${d.industry}\n\n${rows.map(([k, v]) => `${k}: ${v}`).join("\n")}\n\nRequirements / Message:\n${d.message || "—"}\n\nSaved in CRM (#${insertId}). Reply to this email to contact the lead.`;
+
+      await sendMail({
+        channel: "info",
+        to: LEADS_NOTIFICATION_EMAIL,
+        fromName: "Quickupp Softech Website",
+        replyTo: `${d.fullName} <${d.email}>`,
+        subject: `New Industry Lead: ${d.fullName} – ${d.industry} · ${form.label}`,
+        html,
+        text,
+      }).catch((err) => console.error(`[api/service-enquiry] notification email failed for ${INDUSTRY_TABLE}:`, err));
+    });
+
+    return Response.json({ ok: true, id: insertId });
+  } catch (err) {
+    console.error(`[api/service-enquiry] insert into ${INDUSTRY_TABLE} failed:`, err);
     return Response.json({ ok: false, error: "We couldn't send your inquiry right now. Please try again." }, { status: 500 });
   }
 }
