@@ -72,7 +72,7 @@ export const SERVICES = {
         "Workflow Integrations and Business Process Automation",
       ],
       cta: { label: "Explore AI Solutions", href: "/services/ai-automation-solutions" },
-      img: "https://images.unsplash.com/photo-1680783954745-3249be59e527?auto=format&fit=crop&w=1400&q=80",
+      img: "https://images.unsplash.com/photo-1697577418970-95d99b5a55cf?auto=format&fit=crop&w=1400&q=80",
       icon: "bot",
     },
     {
