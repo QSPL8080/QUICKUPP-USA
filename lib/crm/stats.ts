@@ -1,6 +1,7 @@
 import "server-only";
 import { getPool } from "@/lib/db";
 import { SOURCES } from "@/lib/crm/data";
+import { ensureLeadTables } from "@/lib/crm/ensureTables";
 import { ENQUIRY_STATUSES, PROJECT_STATUSES, type EnquirySource } from "@/lib/crm/leadOptions";
 import { APPLICATION_STATUSES } from "@/lib/applications";
 
@@ -256,6 +257,7 @@ export async function paymentStats(opts?: { targetMonth?: string | Date }) {
    Whole CRM
    --------------------------------------------------------------------------- */
 export async function crmOverview() {
+  await ensureLeadTables();
   const keys = Object.keys(SOURCES) as EnquirySource[];
   const months = lastMonths(6);
   const since = `${months[0].key}-01`;

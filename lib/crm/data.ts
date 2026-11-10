@@ -4,6 +4,7 @@ import { INDUSTRY_TABLE, SERVICE_FORMS } from "@/lib/formOptions";
 import { ENQUIRY_STATUSES, PROJECT_STATUSES, isEnquirySource, type EnquirySource, type EnquiryStatus } from "@/lib/crm/leadOptions";
 import type { RowDataPacket } from "mysql2/promise";
 import { errCode, errMessage } from "@/lib/err";
+import { ensureLeadTables } from "@/lib/crm/ensureTables";
 
 /*
  * Reading enquiries and payments for the CRM. Table names only ever come
@@ -145,6 +146,7 @@ const toLead = (r: Record<string, unknown>): LeadRow => ({
 
 /** Every lead from every form (and manual ones), newest first */
 export async function listLeads(f: LeadFilters & { page?: number }) {
+  await ensureLeadTables();
   const { sql, args } = leadWhere(f);
   const page = Math.max(1, Math.floor(f.page || 1));
   const pool = getPool();
@@ -214,6 +216,7 @@ export async function listLeads(f: LeadFilters & { page?: number }) {
 
 /** The same list without paging, for the CSV export (capped) */
 export async function exportLeads(f: LeadFilters) {
+  await ensureLeadTables();
   const { sql, args } = leadWhere(f);
   try {
     const [rows] = await getPool().query(`SELECT * FROM (${UNION_SQL}) t ${sql} ORDER BY created_at DESC, id DESC LIMIT 10000`, args);
@@ -226,6 +229,7 @@ export async function exportLeads(f: LeadFilters) {
 
 /** One lead with every field its form collected */
 export async function getLead(source: EnquirySource, id: number): Promise<EnquiryRow | null> {
+  await ensureLeadTables();
   const { table } = SOURCES[source];
   const [rows] =
     source === "manual"

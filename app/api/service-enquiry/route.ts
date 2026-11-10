@@ -4,6 +4,7 @@ import { INDUSTRY_TABLE, SERVICE_FORMS, isIndustry, isServiceFormKey } from "@/l
 import { readJson, validateServiceEnquiry, type ServiceEnquiryInput } from "@/lib/enquiry";
 import { LEADS_NOTIFICATION_EMAIL, escapeHtml, sendMail } from "@/lib/mailer";
 import { logLeadReceived } from "@/lib/crm/leadActivity";
+import { ensureLeadTables } from "@/lib/crm/ensureTables";
 
 /*
  * Service page forms → one table per service:
@@ -154,6 +155,7 @@ async function saveIndustryLead(service: keyof typeof SERVICE_FORMS, d: ServiceE
   const form = SERVICE_FORMS[service];
   const isYoutube = service === "youtube";
   try {
+    await ensureLeadTables();
     const [res] = await getPool().execute(
       `INSERT INTO ${INDUSTRY_TABLE}
         (full_name, email, phone, company_name, company_website, country, industry, other_industry, service, category, budget, timeline, youtube_link, message, source_page)

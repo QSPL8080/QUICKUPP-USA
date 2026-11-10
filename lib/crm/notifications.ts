@@ -1,6 +1,7 @@
 import "server-only";
 import { getPool } from "@/lib/db";
 import { SOURCES } from "@/lib/crm/data";
+import { ensureLeadTables } from "@/lib/crm/ensureTables";
 import { type EnquirySource } from "@/lib/crm/leadOptions";
 
 /*
@@ -67,6 +68,7 @@ const money = (extra: string) => {
 };
 
 export async function getNotifications(userId: number): Promise<Notifications> {
+  await ensureLeadTables();
   const pool = getPool();
   const [[u]] = (await pool.query(
     `SELECT DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') AS now,
