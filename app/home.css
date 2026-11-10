@@ -1337,9 +1337,9 @@
   display: flex;
   flex: none;
   align-items: center;
-  gap: clamp(40px, 4.6vw, 72px);
-  padding-right: clamp(40px, 4.6vw, 72px);
-  animation: hx-marquee 90s linear infinite reverse;
+  gap: clamp(26px, 2.6vw, 44px);
+  padding-right: clamp(26px, 2.6vw, 44px);
+  animation: hx-marquee 75s linear infinite reverse;
   will-change: transform;
   backface-visibility: hidden;
 }
