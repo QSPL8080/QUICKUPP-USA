@@ -70,7 +70,7 @@ const CLIENT_LOGOS = [
   { src: "anna-design", name: "Anna Design", h: 38 },
   { src: "be-electricals", name: "BE Electricals", h: 44 },
   { src: "capstone-industries", name: "Capstone Industries", h: 42 },
-  { src: "closets-by-design", name: "Closets by Design", h: 24 },
+  { src: "closets-by-design", name: "Closets by Design", h: 26 },
   { src: "ipa-commercial-real-estate", name: "IPA Commercial Real Estate", h: 34 },
   { src: "client-y", name: "Client logo", h: 40 },
   { src: "us-control-tech", name: "U.S. Control Tech", h: 28 },

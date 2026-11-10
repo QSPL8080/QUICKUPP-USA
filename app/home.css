@@ -1340,6 +1340,8 @@
   gap: clamp(40px, 4.6vw, 72px);
   padding-right: clamp(40px, 4.6vw, 72px);
   animation: hx-marquee 90s linear infinite reverse;
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .hx-logos-row img {
