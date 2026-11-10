@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requireUser } from "@/lib/crm/auth";
+import { requireArea } from "@/lib/crm/auth";
 import { paymentStats } from "@/lib/crm/stats";
 import { PageHead } from "@/components/crm/ListTools";
 import PaymentsDashboard from "@/components/crm/PaymentsDashboard";
@@ -17,7 +17,7 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const MONTH_RE = /^\d{4}-\d{2}$/;
 
 export default async function PaymentsDashboardPage({ searchParams }: Props) {
-  await requireUser();
+  await requireArea("payments");
   const sp = await searchParams;
 
   const rawMonth = sp.month && MONTH_RE.test(sp.month)

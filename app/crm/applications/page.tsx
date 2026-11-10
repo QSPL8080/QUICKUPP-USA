@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requireUser } from "@/lib/crm/auth";
+import { requireArea } from "@/lib/crm/auth";
 import { applicationJobs, listApplications } from "@/lib/crm/applications";
 import { APPLICATION_STATUSES, APPLICATION_STATUS_LABEL } from "@/lib/applications";
 import ApplicationsView from "@/components/crm/ApplicationsView";
@@ -10,7 +10,7 @@ type Props = { searchParams: Promise<{ q?: string; status?: string; job?: string
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 export default async function ApplicationsPage({ searchParams }: Props) {
-  await requireUser();
+  await requireArea("applications");
   const sp = await searchParams;
   const f = {
     q: sp.q || "",

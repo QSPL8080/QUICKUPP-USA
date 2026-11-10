@@ -1,4 +1,4 @@
-import { requireUser } from "@/lib/crm/auth";
+import { requireArea } from "@/lib/crm/auth";
 import { CURRENCIES, PAYMENT_METHODS, PAYMENT_SERVICES, PAYMENT_STATUSES, listPayments } from "@/lib/crm/data";
 import PaymentsView from "@/components/crm/PaymentsView";
 
@@ -18,7 +18,7 @@ const ymd = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 export default async function PaymentsPage({ searchParams }: Props) {
-  const user = await requireUser();
+  const user = await requireArea("payments");
   const sp = await searchParams;
   const q = sp.q || "";
   const status = sp.status || "";
@@ -51,7 +51,7 @@ export default async function PaymentsPage({ searchParams }: Props) {
     <PaymentsView
       rows={data.items}
       openNew={sp.new === "1"}
-      userRole={user.role}
+      userRole={user.role === "super_admin" ? "super_admin" : "admin"}
       options={{ services: PAYMENT_SERVICES, methods: PAYMENT_METHODS, currencies: CURRENCIES, statuses: PAYMENT_STATUSES }}
       q={q}
       status={status}

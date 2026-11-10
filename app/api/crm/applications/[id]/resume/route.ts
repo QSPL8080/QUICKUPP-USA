@@ -1,9 +1,9 @@
 import { getPool } from "@/lib/db";
-import { getCurrentUser } from "@/lib/crm/auth";
+import { getUserFor } from "@/lib/crm/auth";
 
 /* GET → download a candidate's resume (signed-in CRM users only) */
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const user = await getCurrentUser();
+  const user = await getUserFor("applications");
   if (!user) return new Response("Please sign in again.", { status: 401 });
   const id = Number((await params).id);
   if (!Number.isInteger(id) || id < 1) return new Response("Not found", { status: 404 });

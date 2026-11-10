@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requireUser } from "@/lib/crm/auth";
+import { requireArea } from "@/lib/crm/auth";
 import { listMeetings, meetingCounts, meetingsVersion, MEETING_STATUSES, MEETING_STATUS_LABEL, syncMeetings, type SyncResult } from "@/lib/crm/calendly";
 import MeetingsView from "@/components/crm/MeetingsView";
 import { PageHead, Pager } from "@/components/crm/ListTools";
@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 type Props = { searchParams: Promise<{ q?: string; status?: string; when?: string; page?: string }> };
 
 export default async function MeetingsPage({ searchParams }: Props) {
-  await requireUser();
+  await requireArea("leads");
   const sp = await searchParams;
   const f = {
     q: sp.q || "",

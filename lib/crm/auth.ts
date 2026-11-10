@@ -19,7 +19,7 @@ export const IDLE_MINUTES = 15;
 /** Signed out after this many hours even when active (sign in again) */
 const MAX_SESSION_HOURS = 12;
 
-export type CrmRole = "super_admin" | "admin";
+export type CrmRole = "super_admin" | "admin" | "seo";
 export type CrmUser = { id: number; name: string; username: string; email: string; role: CrmRole };
 
 export async function hashPassword(password: string): Promise<string> {
@@ -115,6 +115,39 @@ export async function requireUser(): Promise<CrmUser> {
 }
 
 export const isSuperAdmin = (u: CrmUser | null) => u?.role === "super_admin";
+
+/*
+ * What each role may open. Super Admin and Admin: everything (Team & Users is
+ * the super admin's alone). SEO: only the website's Blogs and Job Openings,
+ * plus their own profile; never enquiries, payments, meetings or applications.
+ */
+export type CrmArea = "dashboard" | "leads" | "payments" | "applications" | "jobs" | "blogs" | "profile" | "users";
+const SEO_AREAS: readonly CrmArea[] = ["blogs", "jobs", "profile"];
+
+export const canAccess = (u: { role: string } | null, area: CrmArea) => {
+  if (!u) return false;
+  if (area === "users") return u.role === "super_admin";
+  if (u.role === "seo") return SEO_AREAS.includes(area);
+  return true;
+};
+
+/** Where a user lands after signing in (and when they open a page they can't use) */
+export const homeFor = (u: { role: string }) => (u.role === "seo" ? "/crm/blogs" : "/crm");
+
+export const roleName = (role: string | null | undefined) => (role === "super_admin" ? "Super Admin" : role === "seo" ? "SEO" : "Admin");
+
+/** For CRM pages: the signed-in user, sent to their own start page if this area isn't theirs */
+export async function requireArea(area: CrmArea): Promise<CrmUser> {
+  const user = await requireUser();
+  if (!canAccess(user, area)) redirect(homeFor(user));
+  return user;
+}
+
+/** For CRM API routes: the signed-in user when this area is theirs, otherwise null (refused) */
+export async function getUserFor(area: CrmArea): Promise<CrmUser | null> {
+  const user = await getCurrentUser();
+  return user && canAccess(user, area) ? user : null;
+}
 
 /** The super admin's sign-in email, where password requests and sign-in alerts go */
 export const SUPER_ADMIN_EMAIL = "info@quickuppsoftech.us";

@@ -1,4 +1,4 @@
-import { requireUser } from "@/lib/crm/auth";
+import { requireArea } from "@/lib/crm/auth";
 import { getCrmBlogs } from "@/lib/blogs";
 import BlogsView from "@/components/crm/BlogsView";
 
@@ -9,7 +9,7 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function CrmBlogsPage() {
-  await requireUser();
+  await requireArea("blogs");
   const blogs = await getCrmBlogs();
 
   return <BlogsView rows={blogs} />;

@@ -1,5 +1,5 @@
 import { getPool } from "@/lib/db";
-import { getCurrentUser } from "@/lib/crm/auth";
+import { getUserFor } from "@/lib/crm/auth";
 import { validatePayment } from "@/lib/crm/payments";
 import { readJson } from "@/lib/enquiry";
 import { parseIds } from "@/lib/crm/ids";
@@ -8,7 +8,7 @@ import { statusLabel } from "@/lib/crm/paymentActivity";
 
 /* POST → add a payment entered by hand */
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
+  const user = await getUserFor("payments");
   if (!user) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
   const body = await readJson(request);
   if (!body) return Response.json({ ok: false, error: "Invalid request." }, { status: 400 });
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
 
 /* DELETE { ids: [...] } → permanently remove several payments (any CRM user) */
 export async function DELETE(request: Request) {
-  const user = await getCurrentUser();
+  const user = await getUserFor("payments");
   if (!user) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
   const body = await readJson(request);
   const ids = parseIds(body?.ids);

@@ -9,7 +9,7 @@ import type { TeamUser } from "@/lib/crm/users";
 const fmtDate = (iso: string | null) =>
   iso ? new Date(iso).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }) : "Never";
 
-type Form = { name: string; username: string; email: string; password: string; isActive: boolean };
+type Form = { name: string; username: string; email: string; password: string; isActive: boolean; role: "admin" | "seo" };
 
 /* current password, hidden until the eye is pressed (super admin only) */
 function PasswordCell({ value }: { value: string | null | undefined }) {
@@ -60,7 +60,7 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
   const router = useRouter();
   const { confirm, toast } = useFeedback();
   const [editing, setEditing] = useState<TeamUser | "new" | null>(null);
-  const [form, setForm] = useState<Form>({ name: "", username: "", email: "", password: "", isActive: true });
+  const [form, setForm] = useState<Form>({ name: "", username: "", email: "", password: "", isActive: true, role: "admin" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [error, setError] = useState("");
   const [listError, setListError] = useState("");
@@ -69,7 +69,11 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
   const isSA = (u: TeamUser | "new" | null) => u !== "new" && u !== null && u.role === "super_admin";
 
   const openForm = (u: TeamUser | "new") => {
-    setForm(u === "new" ? { name: "", username: "", email: "", password: "", isActive: true } : { name: u.name, username: u.username, email: u.email, password: "", isActive: u.isActive });
+    setForm(
+      u === "new"
+        ? { name: "", username: "", email: "", password: "", isActive: true, role: "admin" }
+        : { name: u.name, username: u.username, email: u.email, password: "", isActive: u.isActive, role: u.role === "seo" ? "seo" : "admin" }
+    );
     setErrors({});
     setError("");
     setEditing(u);
@@ -191,7 +195,7 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
                     {u.email}
                   </td>
                   <td data-label="Role">
-                    <span className={`crm-pill ${locked ? "crm-pill-paid" : "crm-pill-pending"}`}>{locked ? "Super Admin" : "Admin"}</span>
+                    <span className={`crm-pill ${locked ? "crm-pill-paid" : "crm-pill-pending"}`}>{locked ? "Super Admin" : u.role === "seo" ? "SEO" : "Admin"}</span>
                   </td>
                   <td data-label="Password" className="crm-nowrap" onClick={(e) => e.stopPropagation()}>
                     <PasswordCell value={u.password} />
@@ -271,7 +275,7 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
           <form className="crm-modal" onClick={(e) => e.stopPropagation()} onSubmit={save} noValidate role="dialog" aria-label={editing === "new" ? "Add user" : "Edit user"}>
             <div className="crm-drawer-head">
               <div>
-                <p className="crm-drawer-kicker">{editing === "new" ? "Team & Users" : isSA(editing) ? "Super Admin account" : "Admin account"}</p>
+                <p className="crm-drawer-kicker">{editing === "new" ? "Team & Users" : isSA(editing) ? "Super Admin account" : editing.role === "seo" ? "SEO account" : "Admin account"}</p>
                 <h2 className="crm-drawer-title">{editing === "new" ? "Add user" : `Edit ${editing.name}`}</h2>
               </div>
               <button type="button" className="crm-icon-act" onClick={() => setEditing(null)} aria-label="Close">
@@ -308,6 +312,24 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
                 <input className="crm-input" type="text" value={form.password} onChange={set("password")} autoComplete="new-password" placeholder="At least 8 characters" />
                 {err("password")}
               </label>
+              {!isSA(editing) && (
+                <div className="crm-field crm-span-2">
+                  <span className="crm-label">Role *</span>
+                  <select
+                    className="crm-input crm-select"
+                    value={form.role}
+                    onChange={(e) => setForm((f) => ({ ...f, role: e.target.value === "seo" ? "seo" : "admin" }))}
+                  >
+                    <option value="admin">Admin — the whole CRM</option>
+                    <option value="seo">SEO — Blogs and Job Openings only</option>
+                  </select>
+                  <span className="crm-cell-sub">
+                    {form.role === "seo"
+                      ? "Can view and edit the website's blogs and job openings, and their own profile and password. No enquiries, payments, meetings or job applications."
+                      : "Can use every part of the CRM except Team & Users."}
+                  </span>
+                </div>
+              )}
               {!isSA(editing) && (
                 <label className="crm-check crm-check-row crm-span-2">
                   <input type="checkbox" checked={form.isActive} onChange={set("isActive")} />

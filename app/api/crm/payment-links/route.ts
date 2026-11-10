@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { randomBytes } from "node:crypto";
 import { getPool } from "@/lib/db";
-import { getCurrentUser } from "@/lib/crm/auth";
+import { getUserFor } from "@/lib/crm/auth";
 import { readJson } from "@/lib/enquiry";
 import { toDateOnly } from "@/lib/crm/data";
 import { actorOf, logMany, money, type ActivityInput } from "@/lib/crm/activity";
@@ -34,7 +34,7 @@ const clip = (v: string, max = 255) => (v.length > max ? `${v.slice(0, max - 3)}
 
 export async function POST(req: Request) {
   try {
-    const user = await getCurrentUser();
+    const user = await getUserFor("payments");
     if (!user) {
       return NextResponse.json({ ok: false, error: "Please sign in again." }, { status: 401 });
     }
@@ -268,7 +268,7 @@ export async function POST(req: Request) {
 
 export async function PATCH(req: Request) {
   try {
-    const user = await getCurrentUser();
+    const user = await getUserFor("payments");
     if (!user) {
       return NextResponse.json({ ok: false, error: "Please sign in again." }, { status: 401 });
     }
@@ -435,7 +435,7 @@ export async function PATCH(req: Request) {
 
 /* GET → List payment links (can filter by leadSource & leadId, or email, phone) */
 export async function GET(req: Request) {
-  const user = await getCurrentUser();
+  const user = await getUserFor("payments");
   if (!user) {
     return NextResponse.json({ ok: false, error: "Please sign in again." }, { status: 401 });
   }

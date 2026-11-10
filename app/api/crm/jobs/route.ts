@@ -1,12 +1,12 @@
 import { getPool } from "@/lib/db";
-import { getCurrentUser } from "@/lib/crm/auth";
+import { getUserFor } from "@/lib/crm/auth";
 import { parseIds } from "@/lib/crm/ids";
 import { readJson } from "@/lib/enquiry";
 import { validateJob } from "@/lib/jobs";
 
 /* POST → add a job opening */
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
+  const user = await getUserFor("jobs");
   if (!user) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
   const body = await readJson(request);
   if (!body) return Response.json({ ok: false, error: "Invalid request." }, { status: 400 });
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
 
 /* DELETE { ids: [...] } → permanently remove several job openings */
 export async function DELETE(request: Request) {
-  const user = await getCurrentUser();
+  const user = await getUserFor("jobs");
   if (!user) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
   const body = await readJson(request);
   const ids = parseIds(body?.ids);

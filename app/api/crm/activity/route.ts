@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/lib/crm/auth";
+import { getUserFor } from "@/lib/crm/auth";
 import { listActivity } from "@/lib/crm/activity";
 import { isEnquirySource } from "@/lib/crm/leadOptions";
 import { paymentHistory } from "@/lib/crm/paymentActivity";
@@ -8,7 +8,7 @@ import { paymentHistory } from "@/lib/crm/paymentActivity";
  * history, newest first (read only: history is never edited from the CRM).
  */
 export async function GET(request: Request) {
-  if (!(await getCurrentUser())) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
+  if (!(await getUserFor("leads"))) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
   const url = new URL(request.url);
   const entity = url.searchParams.get("entity");
   const id = Number(url.searchParams.get("id"));

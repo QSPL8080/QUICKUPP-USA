@@ -1,5 +1,5 @@
 import { getPool } from "@/lib/db";
-import { getCurrentUser } from "@/lib/crm/auth";
+import { getUserFor } from "@/lib/crm/auth";
 import { ENQUIRY_STATUSES, SOURCES, getLead, isEnquirySource, toDateOnly, type EnquirySource } from "@/lib/crm/data";
 import { validateManualLead } from "@/lib/crm/leadOptions";
 import { readJson } from "@/lib/enquiry";
@@ -13,7 +13,7 @@ const invalid = () => Response.json({ ok: false, error: "Invalid request." }, { 
 
 /* GET ?source=&id= → one lead with all its details, attachments, and payment links */
 export async function GET(request: Request) {
-  if (!(await getCurrentUser())) return unauthorized();
+  if (!(await getUserFor("leads"))) return unauthorized();
   const url = new URL(request.url);
   const source = url.searchParams.get("source");
   const id = Number(url.searchParams.get("id"));
@@ -105,7 +105,7 @@ export async function GET(request: Request) {
 
 /* POST → add a lead by hand */
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
+  const user = await getUserFor("leads");
   if (!user) return unauthorized();
   const body = await readJson(request);
   if (!body) return invalid();
@@ -129,7 +129,7 @@ export async function POST(request: Request) {
 
 /* PUT { id, source, ...fields } → edit a lead */
 export async function PUT(request: Request) {
-  const user = await getCurrentUser();
+  const user = await getUserFor("leads");
   if (!user) return unauthorized();
   const body = await readJson(request);
   const id = Number(body?.id);
@@ -211,7 +211,7 @@ export async function PUT(request: Request) {
 
 /* PATCH { source, id, status, projectStatus, assignedTo } → change a lead's status, projectStatus, or assignedTo (any CRM user) */
 export async function PATCH(request: Request) {
-  const user = await getCurrentUser();
+  const user = await getUserFor("leads");
   if (!user) return unauthorized();
   const body = await readJson(request);
   const id = Number(body?.id);
@@ -264,7 +264,7 @@ export async function PATCH(request: Request) {
  * from any source (super admin and admin)
  */
 export async function DELETE(request: Request) {
-  if (!(await getCurrentUser())) return unauthorized();
+  if (!(await getUserFor("leads"))) return unauthorized();
   const body = await readJson(request);
   const keys = Array.isArray(body?.keys) ? body.keys : body?.source && body?.id ? [`${body.source}:${body.id}`] : null;
   if (!keys || !keys.length || keys.length > 500) return invalid();

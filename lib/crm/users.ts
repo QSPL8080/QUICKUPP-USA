@@ -11,7 +11,7 @@ export type TeamUser = {
   name: string;
   username: string;
   email: string;
-  role: "super_admin" | "admin";
+  role: "super_admin" | "admin" | "seo";
   isActive: boolean;
   lastLoginAt: string | null;
   createdAt: string;
@@ -37,7 +37,7 @@ export async function listUsers(opts: { withPasswords?: boolean } = {}): Promise
     name: String(r.name ?? ""),
     username: String(r.username ?? ""),
     email: String(r.email ?? ""),
-    role: r.role === "super_admin" ? "super_admin" : "admin",
+    role: r.role === "super_admin" ? "super_admin" : r.role === "seo" ? "seo" : "admin",
     isActive: Number(r.is_active) === 1,
     lastLoginAt: r.last_login_at ? new Date(r.last_login_at as string).toISOString() : null,
     createdAt: new Date(r.created_at as string).toISOString(),
@@ -81,9 +81,9 @@ export async function renameAssignee(oldName: string, newName: string) {
   }
 }
 
-/** Names of active team members, for "Assigned to" */
+/** Names of active team members who work on leads, for "Assigned to" (not the SEO role) */
 export async function listTeamNames(): Promise<string[]> {
-  const [rows] = await getPool().query("SELECT name FROM crm_users WHERE is_active = 1 ORDER BY name");
+  const [rows] = await getPool().query("SELECT name FROM crm_users WHERE is_active = 1 AND role <> 'seo' ORDER BY name");
   return (rows as { name: string }[]).map((r) => r.name);
 }
 
@@ -98,6 +98,8 @@ export function readAccountFields(body: Record<string, unknown>) {
     username: text(body.username, 30).toLowerCase(),
     email: text(body.email, 190).toLowerCase(),
     password: typeof body.password === "string" ? body.password.slice(0, 200) : "",
+    // the role a super admin gives a team member (never super admin)
+    role: body.role === "seo" ? ("seo" as const) : ("admin" as const),
   };
 }
 

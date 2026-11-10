@@ -1,5 +1,5 @@
 import { getPool } from "@/lib/db";
-import { getCurrentUser } from "@/lib/crm/auth";
+import { getUserFor } from "@/lib/crm/auth";
 import { readJson } from "@/lib/enquiry";
 import { validateJob } from "@/lib/jobs";
 
@@ -12,7 +12,7 @@ const parseId = async (ctx: Ctx) => {
 
 /* PATCH → edit a job opening, or { isOpen } alone to open / close it */
 export async function PATCH(request: Request, ctx: Ctx) {
-  const user = await getCurrentUser();
+  const user = await getUserFor("jobs");
   if (!user) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
   const id = await parseId(ctx);
   const body = await readJson(request);
@@ -37,7 +37,7 @@ export async function PATCH(request: Request, ctx: Ctx) {
 
 /* DELETE → permanently remove a job opening */
 export async function DELETE(_request: Request, ctx: Ctx) {
-  const user = await getCurrentUser();
+  const user = await getUserFor("jobs");
   if (!user) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
   const id = await parseId(ctx);
   if (!id) return Response.json({ ok: false, error: "Invalid request." }, { status: 400 });

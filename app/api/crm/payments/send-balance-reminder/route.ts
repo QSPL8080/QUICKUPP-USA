@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { randomBytes } from "node:crypto";
 import { getPool } from "@/lib/db";
-import { getCurrentUser } from "@/lib/crm/auth";
+import { getUserFor } from "@/lib/crm/auth";
 import { sendMail, EMAIL_LOGO_SRC } from "@/lib/mailer";
 import { readJson } from "@/lib/enquiry";
 import { toDateOnly } from "@/lib/crm/data";
@@ -12,7 +12,7 @@ import { errMessage } from "@/lib/err";
 
 export async function POST(req: Request) {
   try {
-    const user = await getCurrentUser();
+    const user = await getUserFor("payments");
     if (!user) {
       return NextResponse.json({ ok: false, error: "Please sign in again." }, { status: 401 });
     }

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requireUser } from "@/lib/crm/auth";
+import { requireArea } from "@/lib/crm/auth";
 import { crmOverview, paymentStats } from "@/lib/crm/stats";
 import { ENQUIRY_STATUS_LABEL, type EnquiryStatus } from "@/lib/crm/leadOptions";
 import { APPLICATION_STATUS_LABEL, type ApplicationStatus } from "@/lib/applications";
@@ -48,7 +48,7 @@ function statusLabel(type: "lead" | "application" | "payment", s: string) {
 }
 
 export default async function CrmDashboard() {
-  const user = await requireUser();
+  const user = await requireArea("dashboard");
   const [o, p] = await Promise.all([crmOverview(), paymentStats()]);
   const cur = p.currency;
   const maxSource = Math.max(1, ...o.perSource.map((s) => s.total));

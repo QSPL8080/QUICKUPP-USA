@@ -53,15 +53,17 @@ export async function PATCH(request: Request, ctx: Ctx) {
     await getPool().execute("UPDATE crm_users SET name = ?, username = ?, email = ? WHERE id = ?", [f.name, f.username, f.email, t.id]);
     if (f.password) await savePassword(t.id, f.password);
   } else {
-    await getPool().execute("UPDATE crm_users SET name = ?, username = ?, email = ?, is_active = ? WHERE id = ?", [
+    await getPool().execute("UPDATE crm_users SET name = ?, username = ?, email = ?, role = ?, is_active = ? WHERE id = ?", [
       f.name,
       f.username,
       f.email,
+      f.role,
       body.isActive === false ? 0 : 1,
       t.id,
     ]);
     if (f.password) await savePassword(t.id, f.password);
-    if (f.password || body.isActive === false) await endUserSessions(t.id);
+    // a new password, deactivation or a new role signs them out everywhere
+    if (f.password || body.isActive === false || f.role !== t.role) await endUserSessions(t.id);
   }
   if (before) await renameAssignee(before.name, f.name);
 

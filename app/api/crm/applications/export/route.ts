@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/lib/crm/auth";
+import { getUserFor } from "@/lib/crm/auth";
 import { exportApplications } from "@/lib/crm/applications";
 import { APPLICATION_STATUS_LABEL, fmtBytes } from "@/lib/applications";
 import { parseIds } from "@/lib/crm/ids";
@@ -11,7 +11,7 @@ const cell = (v: string | number | null | undefined) => {
 
 /* GET ?q=&job=&status=&from=&to=&ids= → the filtered job applications as a CSV file */
 export async function GET(request: Request) {
-  if (!(await getCurrentUser())) return new Response("Please sign in again.", { status: 401 });
+  if (!(await getUserFor("applications"))) return new Response("Please sign in again.", { status: 401 });
   const sp = new URL(request.url).searchParams;
   const rawIds = sp.get("ids");
   const parsed = rawIds ? parseIds(rawIds.split(",")) : null;

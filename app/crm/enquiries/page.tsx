@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requireUser } from "@/lib/crm/auth";
+import { requireArea } from "@/lib/crm/auth";
 import { listLeads } from "@/lib/crm/data";
 import { listTeamNames } from "@/lib/crm/users";
 import { ENQUIRY_STATUSES, ENQUIRY_STATUS_LABEL, PROJECT_STATUSES } from "@/lib/crm/leadOptions";
@@ -13,7 +13,7 @@ const ymd = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 export default async function EnquiriesPage({ searchParams }: Props) {
-  const user = await requireUser();
+  const user = await requireArea("leads");
   const sp = await searchParams;
   const f = {
     q: sp.q || "",

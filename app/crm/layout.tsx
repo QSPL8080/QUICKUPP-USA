@@ -18,7 +18,11 @@ export const metadata: Metadata = {
 
 export default async function CrmLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser();
-  const [{ perSource }, applications, notifications] = await Promise.all([dashboardStats(), newApplicationCount(), getNotifications(user.id)]);
+  // the SEO role only works on blogs and job openings: no lead, payment or application counts or alerts
+  const seo = user.role === "seo";
+  const [{ perSource }, applications, notifications] = seo
+    ? [{ perSource: [] as { fresh: number }[] }, 0, { asOf: "", unread: 0, items: [] }]
+    : await Promise.all([dashboardStats(), newApplicationCount(), getNotifications(user.id)]);
   const newCounts = { leads: perSource.reduce((a, s) => a + s.fresh, 0), applications };
   return (
     <div className="crm-root">

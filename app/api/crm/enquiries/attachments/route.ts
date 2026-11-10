@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { actorOf, logMany } from "@/lib/crm/activity";
 import { getPool } from "@/lib/db";
-import { getCurrentUser } from "@/lib/crm/auth";
+import { getUserFor } from "@/lib/crm/auth";
 import { isEnquirySource, SOURCES, type EnquirySource } from "@/lib/crm/data";
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -47,7 +47,7 @@ function parseAttachments(raw: unknown): StoredAttachment[] {
 
 /* GET → Download single file or list files stored directly on the lead */
 export async function GET(request: Request) {
-  const user = await getCurrentUser();
+  const user = await getUserFor("leads");
   if (!user) {
     return new Response("Please sign in again.", { status: 401 });
   }
@@ -118,7 +118,7 @@ export async function GET(request: Request) {
 
 /* POST → Upload files directly to a lead (stored in manual_leads or other lead table) */
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
+  const user = await getUserFor("leads");
   if (!user) {
     return NextResponse.json({ ok: false, error: "Please sign in again." }, { status: 401 });
   }
@@ -229,7 +229,7 @@ export async function POST(request: Request) {
 
 /* DELETE → Delete an attachment from a lead (stored directly in the lead table) */
 export async function DELETE(request: Request) {
-  const user = await getCurrentUser();
+  const user = await getUserFor("leads");
   if (!user) {
     return NextResponse.json({ ok: false, error: "Please sign in again." }, { status: 401 });
   }

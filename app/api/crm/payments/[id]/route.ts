@@ -1,5 +1,5 @@
 import { getPool } from "@/lib/db";
-import { getCurrentUser } from "@/lib/crm/auth";
+import { getUserFor } from "@/lib/crm/auth";
 import { validatePayment } from "@/lib/crm/payments";
 import { readJson } from "@/lib/enquiry";
 import { actorOf } from "@/lib/crm/activity";
@@ -15,7 +15,7 @@ const parseId = async (ctx: Ctx) => {
 
 /* PATCH → edit a payment */
 export async function PATCH(request: Request, ctx: Ctx) {
-  const user = await getCurrentUser();
+  const user = await getUserFor("payments");
   if (!user) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
   const id = await parseId(ctx);
   const body = await readJson(request);
@@ -40,7 +40,7 @@ export async function PATCH(request: Request, ctx: Ctx) {
 
 /* DELETE → permanently remove a payment (any CRM user) */
 export async function DELETE(_request: Request, ctx: Ctx) {
-  const user = await getCurrentUser();
+  const user = await getUserFor("payments");
   if (!user) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
   const id = await parseId(ctx);
   if (!id) return Response.json({ ok: false, error: "Invalid request." }, { status: 400 });

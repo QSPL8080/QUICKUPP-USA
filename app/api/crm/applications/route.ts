@@ -1,12 +1,12 @@
 import { getPool } from "@/lib/db";
-import { getCurrentUser } from "@/lib/crm/auth";
+import { getUserFor } from "@/lib/crm/auth";
 import { parseIds } from "@/lib/crm/ids";
 import { APPLICATION_STATUSES } from "@/lib/applications";
 import { readJson } from "@/lib/enquiry";
 
 /* PATCH { id, status } → change an application's status (any CRM user) */
 export async function PATCH(request: Request) {
-  const user = await getCurrentUser();
+  const user = await getUserFor("applications");
   if (!user) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
   const body = await readJson(request);
   const id = Number(body?.id);
@@ -19,7 +19,7 @@ export async function PATCH(request: Request) {
 
 /* DELETE { ids: [...] } → permanently remove applications, resumes included (any CRM user) */
 export async function DELETE(request: Request) {
-  const user = await getCurrentUser();
+  const user = await getUserFor("applications");
   if (!user) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
   const body = await readJson(request);
   const ids = body?.ids !== undefined ? parseIds(body.ids) : parseIds([body?.id]);

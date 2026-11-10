@@ -3,7 +3,7 @@ import { getCurrentUser, hashPassword, isSuperAdmin } from "@/lib/crm/auth";
 import { EMAIL_RE, USERNAME_RE, readAccountFields, savePassword, uniqueErrors } from "@/lib/crm/users";
 import { readJson } from "@/lib/enquiry";
 
-/* POST { name, username, email, password } → super admin adds an admin account */
+/* POST { name, username, email, password, role } → super admin adds an Admin or SEO account */
 export async function POST(request: Request) {
   const me = await getCurrentUser();
   if (!me) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
@@ -21,8 +21,8 @@ export async function POST(request: Request) {
   if (Object.keys(errors).length) return Response.json({ ok: false, errors }, { status: 400 });
 
   const [res] = await getPool().execute(
-    "INSERT INTO crm_users (name, username, email, password_hash, role, is_active, notified_at) VALUES (?, ?, ?, ?, 'admin', ?, NOW())",
-    [f.name, f.username, f.email, await hashPassword(f.password), body.isActive === false ? 0 : 1]
+    "INSERT INTO crm_users (name, username, email, password_hash, role, is_active, notified_at) VALUES (?, ?, ?, ?, ?, ?, NOW())",
+    [f.name, f.username, f.email, await hashPassword(f.password), f.role, body.isActive === false ? 0 : 1]
   );
   const id = (res as { insertId: number }).insertId;
   // also keeps the copy the super admin can view

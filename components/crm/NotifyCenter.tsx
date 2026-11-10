@@ -471,7 +471,7 @@ export default function NotifyCenter({
                   <span className="crm-profile-dropdown-name">{user?.name || "Administrator"}</span>
                   <span className="crm-profile-dropdown-email">{user?.email || "admin@quickuppsoftech.us"}</span>
                   <span className="crm-profile-dropdown-role">
-                    {user?.role === "super_admin" ? "Super Admin" : user?.role === "admin" ? "Admin" : "Staff"}
+                    {user?.role === "super_admin" ? "Super Admin" : user?.role === "admin" ? "Admin" : user?.role === "seo" ? "SEO" : "Staff"}
                   </span>
                 </div>
               </div>

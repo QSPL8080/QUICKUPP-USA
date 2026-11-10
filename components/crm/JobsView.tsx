@@ -56,7 +56,8 @@ const fromJob = (j: Job): FormState => ({
 const liveState = (j: Job) => (!j.isOpen ? "closed" : j.deadline && j.deadline < todayStr() ? "expired" : "live");
 const STATE_LABEL = { live: "Live", closed: "Closed", expired: "Deadline passed" } as const;
 
-export default function JobsView({ rows, openNew }: { rows: Job[]; openNew: boolean }) {
+/* showApplications: false for the SEO role, who works on openings only and never sees applications */
+export default function JobsView({ rows, openNew, showApplications = true }: { rows: Job[]; openNew: boolean; showApplications?: boolean }) {
   const router = useRouter();
   const { confirm, toast } = useFeedback();
   const [editing, setEditing] = useState<Job | "new" | null>(openNew ? "new" : null);
@@ -169,15 +170,17 @@ export default function JobsView({ rows, openNew }: { rows: Job[]; openNew: bool
         title="Job Openings (Website)"
         sub="Post and manage the vacancies listed under Current Job Openings on the Careers page. Closed openings and ones past their deadline are hidden there."
       >
-        <Link href="/crm/applications" className="crm-act crm-act-ghost">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-            <polyline points="14 2 14 8 20 8" />
-            <line x1="16" y1="13" x2="8" y2="13" />
-            <line x1="16" y1="17" x2="8" y2="17" />
-          </svg>
-          View applications
-        </Link>
+        {showApplications && (
+          <Link href="/crm/applications" className="crm-act crm-act-ghost">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+            </svg>
+            View applications
+          </Link>
+        )}
         {addButton}
       </PageHead>
 
@@ -204,7 +207,7 @@ export default function JobsView({ rows, openNew }: { rows: Job[]; openNew: bool
                 <th>Type</th>
                 <th>Location</th>
                 <th>Deadline</th>
-                <th>Applications</th>
+                {showApplications && <th>Applications</th>}
                 <th>On careers page</th>
                 <th>Actions</th>
               </tr>
@@ -227,15 +230,17 @@ export default function JobsView({ rows, openNew }: { rows: Job[]; openNew: bool
                     <td data-label="Deadline" className="crm-nowrap">
                       {fmtDate(j.deadline)}
                     </td>
-                    <td data-label="Applications" onClick={(e) => e.stopPropagation()}>
-                      {j.applications ? (
-                        <a className="crm-link-btn" href={`/crm/applications?job=${j.id}`}>
-                          {j.applications} {j.applications === 1 ? "application" : "applications"}
-                        </a>
-                      ) : (
-                        <span className="crm-muted">None yet</span>
-                      )}
-                    </td>
+                    {showApplications && (
+                      <td data-label="Applications" onClick={(e) => e.stopPropagation()}>
+                        {j.applications ? (
+                          <a className="crm-link-btn" href={`/crm/applications?job=${j.id}`}>
+                            {j.applications} {j.applications === 1 ? "application" : "applications"}
+                          </a>
+                        ) : (
+                          <span className="crm-muted">None yet</span>
+                        )}
+                      </td>
+                    )}
                     <td data-label="On careers page">
                       <span className={`crm-pill crm-pill-${state === "live" ? "paid" : state === "closed" ? "failed" : "pending"}`}>{STATE_LABEL[state]}</span>
                     </td>

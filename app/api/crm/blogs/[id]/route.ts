@@ -1,6 +1,6 @@
 import { revalidatePath } from "next/cache";
 import { getPool } from "@/lib/db";
-import { getCurrentUser } from "@/lib/crm/auth";
+import { getUserFor } from "@/lib/crm/auth";
 import { type BlogDbRow, rowToCrmBlog, validateBlog } from "@/lib/blogs";
 import { readJson } from "@/lib/enquiry";
 
@@ -13,7 +13,7 @@ async function parseId(ctx: Ctx): Promise<number | null> {
 }
 
 export async function GET(_request: Request, ctx: Ctx) {
-  const me = await getCurrentUser();
+  const me = await getUserFor("blogs");
   if (!me) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
 
   const id = await parseId(ctx);
@@ -27,7 +27,7 @@ export async function GET(_request: Request, ctx: Ctx) {
 }
 
 export async function PATCH(request: Request, ctx: Ctx) {
-  const me = await getCurrentUser();
+  const me = await getUserFor("blogs");
   if (!me) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
 
   const id = await parseId(ctx);
@@ -77,7 +77,7 @@ export async function PATCH(request: Request, ctx: Ctx) {
 }
 
 export async function DELETE(_request: Request, ctx: Ctx) {
-  const me = await getCurrentUser();
+  const me = await getUserFor("blogs");
   if (!me) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
 
   const id = await parseId(ctx);

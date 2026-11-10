@@ -1,11 +1,11 @@
 import { revalidatePath } from "next/cache";
 import { getPool } from "@/lib/db";
-import { getCurrentUser } from "@/lib/crm/auth";
+import { getUserFor } from "@/lib/crm/auth";
 import { getCrmBlogs, validateBlog } from "@/lib/blogs";
 import { readJson } from "@/lib/enquiry";
 
 export async function GET() {
-  const me = await getCurrentUser();
+  const me = await getUserFor("blogs");
   if (!me) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
 
   // Ensure legacy blog_images table is dropped if still present on Hostinger
@@ -16,7 +16,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const me = await getCurrentUser();
+  const me = await getUserFor("blogs");
   if (!me) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
 
   const body = await readJson(request);
