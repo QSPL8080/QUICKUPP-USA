@@ -173,27 +173,38 @@
   padding: clamp(16px, 2vw, 28px) 0 clamp(80px, 8vw, 120px);
 }
 
+/* one line: fits on desktop, slides sideways on smaller screens */
 .cl-chips {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  flex-wrap: nowrap;
+  gap: 6px;
   margin-bottom: clamp(26px, 3vw, 40px);
+  padding: 1px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cl-chips::-webkit-scrollbar {
+  display: none;
 }
 
 .cl-page button.cl-chip:not(#_):not(#__) {
   display: inline-flex !important;
+  flex: none;
   align-items: center;
-  gap: 10px;
+  gap: 7px;
   min-height: 0;
   margin: 0;
-  padding: 9px 16px;
+  padding: 8px 12px;
+  white-space: nowrap;
   border-radius: 999px !important;
   border: 1px solid var(--cl-line) !important;
   background: #ffffff !important;
   box-shadow: none !important;
   color: #334155 !important;
   font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif) !important;
-  font-size: 14px !important;
+  font-size: 13px !important;
   font-weight: 600 !important;
   line-height: 1.2 !important;
   cursor: pointer;
@@ -212,8 +223,8 @@
 }
 
 .cl-chip-n {
-  min-width: 22px;
-  padding: 1px 7px;
+  min-width: 20px;
+  padding: 1px 6px;
   border-radius: 999px;
   background: #f1f5f9;
   color: #475569;
