@@ -30,6 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: doc.intro,
     alternates: {
       canonical: `https://www.quickuppsoftech.us/case-studies/${slug}`,
+      languages: { "en-US": `https://www.quickuppsoftech.us/case-studies/${slug}` },
     },
     openGraph: { title: doc.title, description: doc.intro, type: "article", images: [caseStudyCover(slug, 1200)] },
   };

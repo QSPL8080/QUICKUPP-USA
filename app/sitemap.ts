@@ -30,7 +30,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // 1. Core Homepage & Top-level landing pages
   addUrl("/", 1.0, "daily");
-  addUrl("/about", 0.9, "monthly");
   addUrl("/contact", 0.9, "weekly");
   addUrl("/industries", 0.8, "monthly");
   addUrl("/locations", 0.8, "monthly");
@@ -40,6 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   addUrl("/career", 0.7, "weekly");
   addUrl("/testimonials", 0.7, "monthly");
   addUrl("/faq-page", 0.7, "monthly");
+  addUrl("/resources", 0.8, "weekly");
   addUrl("/services/youtube-video-promotion", 0.8, "weekly");
 
   // 2. About subpages

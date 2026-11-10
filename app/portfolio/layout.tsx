@@ -6,6 +6,7 @@ export const metadata: Metadata = {
     "Explore Quickupp Softech's featured client work, successful digital campaigns, and custom technology solutions across AI, SaaS, web apps, and performance marketing.",
   alternates: {
     canonical: "https://www.quickuppsoftech.us/portfolio",
+    languages: { "en-US": "https://www.quickuppsoftech.us/portfolio" },
   },
 };
 

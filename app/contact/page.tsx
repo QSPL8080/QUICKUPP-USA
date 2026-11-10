@@ -7,6 +7,7 @@ export const metadata: Metadata = {
     "At Quickupp Softech LLC, we help businesses build, market, and scale through strategic digital marketing, AI-powered solutions, IT services, and business process outsourcing.",
   alternates: {
     canonical: "https://www.quickuppsoftech.us/contact",
+    languages: { "en-US": "https://www.quickuppsoftech.us/contact" },
   },
   openGraph: {
     title: "Contact Quickupp Softech – Let's Grow Your Business",

@@ -6,6 +6,7 @@ export const metadata: Metadata = {
     "Read real client reviews and testimonials about Quickupp Softech's digital marketing, AI automation, and custom web development services.",
   alternates: {
     canonical: "https://www.quickuppsoftech.us/testimonials",
+    languages: { "en-US": "https://www.quickuppsoftech.us/testimonials" },
   },
 };
 

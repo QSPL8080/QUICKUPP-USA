@@ -9,10 +9,7 @@ export const metadata: Metadata = {
     "Quickupp Softech is a digital marketing, AI, and IT solutions agency helping brands grow with performance marketing, web & app development, and AI-driven automation.",
   alternates: {
     canonical: "https://www.quickuppsoftech.us",
-    languages: {
-      "en-US": "https://www.quickuppsoftech.us",
-      "x-default": "https://quickuppsoftech.us",
-    },
+    languages: { "en-US": "https://www.quickuppsoftech.us" },
   },
 };
 

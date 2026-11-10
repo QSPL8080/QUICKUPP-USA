@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   description: "Client case studies from Quickupp Softech: Google Ads, Google Business Profiles, SEO and call tracking results.",
   alternates: {
     canonical: "https://www.quickuppsoftech.us/case-studies",
+    languages: { "en-US": "https://www.quickuppsoftech.us/case-studies" },
   },
 };
 

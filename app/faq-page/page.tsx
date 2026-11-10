@@ -10,6 +10,7 @@ export const metadata: Metadata = {
     "Find answers to common questions about Quickupp Softech's Marketing, AI Automation, Web Development, and Staff Augmentation services.",
   alternates: {
     canonical: "https://www.quickuppsoftech.us/faq-page",
+    languages: { "en-US": "https://www.quickuppsoftech.us/faq-page" },
   },
 };
 

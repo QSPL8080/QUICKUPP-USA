@@ -17,13 +17,6 @@ const META_PIXEL_ID = "1916135312886878";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.quickuppsoftech.us"),
-  alternates: {
-    canonical: "https://www.quickuppsoftech.us",
-    languages: {
-      "en-US": "https://www.quickuppsoftech.us",
-      "x-default": "https://quickuppsoftech.us",
-    },
-  },
   generator: "Quickupp Softech",
   applicationName: "Quickupp Softech",
   title: "IT & Digital Marketing Services | Quickupp Softech",

@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   description: data.metaDescription,
   alternates: {
     canonical: "https://www.quickuppsoftech.us/industries/travel-hospitality",
+    languages: { "en-US": "https://www.quickuppsoftech.us/industries/travel-hospitality" },
   },
 };
 

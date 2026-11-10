@@ -22,6 +22,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     description: c.pages.map((p) => p.h1).slice(0, 4).join(" · "),
     alternates: {
       canonical: `https://www.quickuppsoftech.us/locations/${city}`,
+      languages: { "en-US": `https://www.quickuppsoftech.us/locations/${city}` },
     },
   };
 }

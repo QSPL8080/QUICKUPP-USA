@@ -7,6 +7,7 @@ export const metadata: Metadata = {
     "Built Around Your Business. Focused on What Comes Next. Discover why ambitious companies choose Quickupp Softech as their growth partner.",
   alternates: {
     canonical: "https://www.quickuppsoftech.us/about/why-businesses-choose-us",
+    languages: { "en-US": "https://www.quickuppsoftech.us/about/why-businesses-choose-us" },
   },
 };
 

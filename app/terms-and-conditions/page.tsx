@@ -8,6 +8,7 @@ export const metadata: Metadata = {
     "These Terms and Conditions govern your access to and use of the Quickupp Softech LLC website, https://www.quickuppsoftech.us.",
   alternates: {
     canonical: "https://www.quickuppsoftech.us/terms-and-conditions",
+    languages: { "en-US": "https://www.quickuppsoftech.us/terms-and-conditions" },
   },
 };
 

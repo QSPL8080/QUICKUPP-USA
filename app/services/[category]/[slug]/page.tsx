@@ -35,6 +35,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     description: match.service.data.metaDescription,
     alternates: {
       canonical: `https://www.quickuppsoftech.us/services/${category}/${slug}`,
+      languages: { "en-US": `https://www.quickuppsoftech.us/services/${category}/${slug}` },
     },
   };
 }

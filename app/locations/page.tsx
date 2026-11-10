@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   description: "Explore Quickupp Softech's services across top US metropolitan areas and tech hubs.",
   alternates: {
     canonical: "https://www.quickuppsoftech.us/locations",
+    languages: { "en-US": "https://www.quickuppsoftech.us/locations" },
   },
 };
 

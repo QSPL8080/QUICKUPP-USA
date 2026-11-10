@@ -25,6 +25,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     description: pageExcerpt(match.page),
     alternates: {
       canonical: `https://www.quickuppsoftech.us/${locSlug}`,
+      languages: { "en-US": `https://www.quickuppsoftech.us/${locSlug}` },
     },
   };
 }

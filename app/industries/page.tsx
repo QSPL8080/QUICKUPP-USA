@@ -7,6 +7,7 @@ export const metadata: Metadata = {
     "Explore tailored digital marketing, AI automation, and custom technology solutions engineered for Healthcare, Education, Real Estate, Home Services, IT & SaaS, eCommerce, and more.",
   alternates: {
     canonical: "https://www.quickuppsoftech.us/industries",
+    languages: { "en-US": "https://www.quickuppsoftech.us/industries" },
   },
 };
 

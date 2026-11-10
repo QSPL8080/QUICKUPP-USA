@@ -7,6 +7,7 @@ export const metadata: Metadata = {
     "Understand. Strategize. Build. Optimize. Grow. Discover how Quickupp Softech connects Marketing, AI and Technology into one disciplined growth framework.",
   alternates: {
     canonical: "https://www.quickuppsoftech.us/about/our-approach",
+    languages: { "en-US": "https://www.quickuppsoftech.us/about/our-approach" },
   },
 };
 

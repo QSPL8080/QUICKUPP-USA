@@ -6,6 +6,7 @@ export const metadata: Metadata = {
     "Complete your project payment securely with Quickupp Softech LLC via PayPal, Credit or Debit Card.",
   alternates: {
     canonical: "https://www.quickuppsoftech.us/checkout",
+    languages: { "en-US": "https://www.quickuppsoftech.us/checkout" },
   },
 };
 

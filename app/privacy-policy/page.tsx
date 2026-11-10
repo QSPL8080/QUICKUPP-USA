@@ -8,6 +8,7 @@ export const metadata: Metadata = {
     "This Privacy Policy describes how Quickupp Softech LLC collects, uses, discloses, stores, and protects personal information when you visit our website, contact us, request information, or use our services.",
   alternates: {
     canonical: "https://www.quickuppsoftech.us/privacy-policy",
+    languages: { "en-US": "https://www.quickuppsoftech.us/privacy-policy" },
   },
 };
 

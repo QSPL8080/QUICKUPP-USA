@@ -7,6 +7,7 @@ export const metadata: Metadata = {
     "Discover why ambitious businesses choose Quickupp Softech for unified Marketing, AI automation, and high-performance software engineering.",
   alternates: {
     canonical: "https://www.quickuppsoftech.us/about/why-choose-us",
+    languages: { "en-US": "https://www.quickuppsoftech.us/about/why-choose-us" },
   },
 };
 

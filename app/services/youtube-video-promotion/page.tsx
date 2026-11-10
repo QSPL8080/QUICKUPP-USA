@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   description: content.metaDescription,
   alternates: {
     canonical: "https://www.quickuppsoftech.us/services/youtube-video-promotion",
+    languages: { "en-US": "https://www.quickuppsoftech.us/services/youtube-video-promotion" },
   },
 };
 

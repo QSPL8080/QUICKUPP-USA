@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   description: "Explore industry-leading perspectives on AI, digital marketing, search visibility, web engineering, and enterprise growth.",
   alternates: {
     canonical: "https://www.quickuppsoftech.us/blog",
+    languages: { "en-US": "https://www.quickuppsoftech.us/blog" },
   },
 };
 

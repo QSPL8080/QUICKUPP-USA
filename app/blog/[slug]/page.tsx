@@ -28,6 +28,7 @@ export async function generateMetadata({
     description: post.desc,
     alternates: {
       canonical: `https://www.quickuppsoftech.us/blog/${slug}`,
+      languages: { "en-US": `https://www.quickuppsoftech.us/blog/${slug}` },
     },
     openGraph: { title, description: post.desc, type: "article", images: post.img ? [post.img] : undefined },
   };

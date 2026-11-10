@@ -8,6 +8,7 @@ export const metadata: Metadata = {
     "This Cookie Policy explains what cookies are, how Quickupp Softech LLC uses them, what information they collect, and how you can manage your cookie preferences.",
   alternates: {
     canonical: "https://www.quickuppsoftech.us/cookie-policy",
+    languages: { "en-US": "https://www.quickuppsoftech.us/cookie-policy" },
   },
 };
 

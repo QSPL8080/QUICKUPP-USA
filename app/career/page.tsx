@@ -10,6 +10,7 @@ export const metadata: Metadata = {
     "We're always looking for talented individuals who are passionate about their work, eager to learn, and ready to make an impact. Explore career opportunities at Quickupp Softech.",
   alternates: {
     canonical: "https://www.quickuppsoftech.us/career",
+    languages: { "en-US": "https://www.quickuppsoftech.us/career" },
   },
 };
 

@@ -14,6 +14,7 @@ export const metadata: Metadata = {
     "Access industry insights, case studies, client testimonials, and featured portfolios from Quickupp Softech.",
   alternates: {
     canonical: "https://www.quickuppsoftech.us/resources",
+    languages: { "en-US": "https://www.quickuppsoftech.us/resources" },
   },
 };
 

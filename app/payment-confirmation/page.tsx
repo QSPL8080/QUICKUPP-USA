@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   description: "Official payment receipt and order confirmation for Quickupp Softech LLC.",
   alternates: {
     canonical: "https://www.quickuppsoftech.us/payment-confirmation",
+    languages: { "en-US": "https://www.quickuppsoftech.us/payment-confirmation" },
   },
 };
 
