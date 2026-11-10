@@ -255,8 +255,7 @@ pre {
    ========================================================================== */
 .w-container,
 .container,
-.w-layout-blockcontainer,
-.container-large {
+.w-layout-blockcontainer {
   width: 100% !important;
   max-width: 1200px !important;
   margin-left: auto !important;
@@ -269,8 +268,7 @@ pre {
 @media (max-width: 991px) {
   .w-container,
 .container,
-.w-layout-blockcontainer,
-.container-large {
+.w-layout-blockcontainer {
     padding-left: 20px !important;
     padding-right: 20px !important;
   }
@@ -279,8 +277,7 @@ pre {
 @media (max-width: 600px) {
   .w-container,
 .container,
-.w-layout-blockcontainer,
-.container-large {
+.w-layout-blockcontainer {
     padding-left: 16px !important;
     padding-right: 16px !important;
   }
@@ -618,36 +615,10 @@ pre {
 }
 
 /* ===== Breadcrumb / PageHero Global Styles ===== */
-.breadcrumb-section {
-  position: relative;
-  background-color: #090e1a !important;
-  background-image: linear-gradient(180deg, rgba(9, 14, 26, 0.9) 0%, rgba(15, 23, 42, 0.96) 100%) !important;
-  background-position: center;
-  background-size: cover;
-  padding: 140px 0 54px !important;
-  color: #ffffff;
-  overflow: hidden;
-  text-align: left !important;
-}
-@media (max-width: 991px) {
-  .breadcrumb-section {
-    padding: 110px 0 40px !important;
-  }
-}
-@media (max-width: 640px) {
-  .breadcrumb-section {
-    padding: 100px 0 32px !important;
-  }
-}
 
 /* ==========================================================================
    HOME PAGE COLOR PALETTE & BUTTON STYLES
    ========================================================================== */
-.subtitle-left-icon {
-  background: var(--qs-gradient) !important;
-  border-radius: 50% !important;
-  box-shadow: 0 0 10px rgba(124, 58, 237, 0.4) !important;
-}
 
 .subtitle-head {
   color: #7c3aed !important;
@@ -847,13 +818,6 @@ a.button-link[data-wf--button--variant="white-bg"] .button-arrow,
   font-size: 13.5px !important;
 }
 
-.subtitle-left-icon {
-  background: var(--qs-gradient) !important;
-  border-radius: 50% !important;
-  width: 10px !important;
-  height: 10px !important;
-}
-
 .subtitle-head-wrap {
   display: inline-flex !important;
   align-items: center !important;
@@ -1047,13 +1011,6 @@ a.button-link[data-wf--button--variant="white-bg"] .button-arrow,
   margin: 0 !important;
 }
 
-.breadcrumb-wrap {
-  margin-bottom: 24px;
-}
-.breadcrumb-title-animation {
-  opacity: 1 !important;
-  transform: none !important;
-}
 .breadcrumb-heading-title {
   font-family: var(--font-heading) !important;
   font-size: clamp(30px, 4vw, 48px) !important;
@@ -1063,15 +1020,7 @@ a.button-link[data-wf--button--variant="white-bg"] .button-arrow,
   margin: 0 !important;
   letter-spacing: -0.025em !important;
 }
-.breadcrumb-bottom-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
-  padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-}
+
 .breadcrumb-pages-map {
   display: flex;
   align-items: center;
@@ -1082,24 +1031,11 @@ a.button-link[data-wf--button--variant="white-bg"] .button-arrow,
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
-.breadcrumb-pages-text-wrap {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.breadcrumb-pages-text {
-  color: #ffffff;
-  text-decoration: none;
-}
-.breadcrumb-pages-text.underline:hover {
-  color: #00d2ff;
-}
+
 .dashed {
   color: rgba(255, 255, 255, 0.4);
 }
-.breadcrumb-desc-wrap {
-  max-width: 620px;
-}
+
 .breadcrumb-desc {
   font-size: 15px;
   line-height: 1.6;
@@ -1108,28 +1044,6 @@ a.button-link[data-wf--button--variant="white-bg"] .button-arrow,
 }
 
 /* ===== Breadcrumb / PageHero Follower Spacing Guarantee ===== */
-.breadcrumb-section + section,
-.breadcrumb-section + div,
-.breadcrumb-section + main,
-.breadcrumb-section + .section-gap {
-  padding-top: 64px !important;
-}
-@media (max-width: 991px) {
-  .breadcrumb-section + section,
-.breadcrumb-section + div,
-.breadcrumb-section + main,
-.breadcrumb-section + .section-gap {
-    padding-top: 48px !important;
-  }
-}
-@media (max-width: 640px) {
-  .breadcrumb-section + section,
-.breadcrumb-section + div,
-.breadcrumb-section + main,
-.breadcrumb-section + .section-gap {
-    padding-top: 36px !important;
-  }
-}
 
 /* ==========================================================================
    QUICKUPP FLOATING CAPSULE HEADER & NAVBAR (MATCHING REFERENCE UI)
@@ -2176,15 +2090,6 @@ a.button-link[data-wf--button--variant="white-bg"] .button-arrow,
   transition: all 0.3s ease !important;
 }
 
-.subtitle-left-icon {
-  width: 8px !important;
-  height: 8px !important;
-  border-radius: 50% !important;
-  background: var(--qs-gradient) !important;
-  box-shadow: 0 0 8px rgba(124, 58, 237, 0.6) !important;
-  animation: qs-pulse-glow 2.4s infinite ease-in-out !important;
-}
-
 @keyframes qs-pulse-glow {
   0%, 100% {
     transform: scale(1);
@@ -2706,8 +2611,7 @@ a.button-link[data-wf--button--variant="white-bg"] .button-arrow,
 /* 2. Universal Glowing Radiant Dot (Built-in elements) */
 .asx-tag-dot,
 .badge-dot,
-.res-tag-dot,
-.subtitle-left-icon {
+.res-tag-dot {
   display: inline-block !important;
   width: 7px !important;
   height: 7px !important;
@@ -2721,7 +2625,6 @@ a.button-link[data-wf--button--variant="white-bg"] .button-arrow,
 
 /* Hide SVG icon inside subtitle-left-icon or section-subtitle-icon to keep clean glowing dot */
 .section-subtitle-icon,
-.subtitle-left-icon svg,
 .badge-icon {
   display: none !important;
 }

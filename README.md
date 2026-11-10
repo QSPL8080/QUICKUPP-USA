@@ -42,7 +42,6 @@ QUICKUPP-USA/
 │   ├── career/                         # Careers & open engineering/marketing roles
 │   ├── case-studies/                   # Real-world client case studies & metrics
 │   ├── contact/                        # Interactive enquiry & consultation form
-│   ├── faq-page/                       # Comprehensive searchable FAQ
 │   ├── industries/                     # Industry vertical solutions
 │   │   ├── ecommerce/                  # E-Commerce & Retail
 │   │   ├── education/                  # EdTech & Academic institutions
