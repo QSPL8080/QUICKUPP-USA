@@ -333,27 +333,13 @@
     transform: none;
   }
 
-  .qs-new-header .nv-tab-direct-arrow {
-    display: inline-flex;
-    color: var(--nv-muted);
-    transition: transform 0.2s ease, color 0.2s ease;
-  }
+  
 
-  .qs-new-header .nv-panel a.nv-tab-direct:hover {
-    color: var(--nv-ink) !important;
-    background: rgba(255, 255, 255, 0.85) !important;
-    border-color: var(--nv-line) !important;
-  }
+  
 
-  .qs-new-header .nv-panel a.nv-tab-direct:hover .nv-tab-icon {
-    border-color: rgba(99, 102, 241, 0.45);
-    color: var(--nv-indigo);
-  }
+  
 
-  .qs-new-header .nv-panel a.nv-tab-direct:hover .nv-tab-direct-arrow {
-    color: var(--nv-indigo);
-    transform: translateX(3px);
-  }
+  
 
   .qs-new-header .nv-tab-body {
     padding: 8px 4px 4px;

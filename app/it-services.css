@@ -64,11 +64,6 @@
   color: #334155;
 }
 
-.itx-page p.itx-cue:not(#_) {
-  font-weight: 600;
-  color: var(--itx-ink);
-}
-
 .itx-page p.itx-kicker:not(#_):not(#__) {
   font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif) !important;
   font-size: 12px !important;
@@ -114,14 +109,6 @@
   margin-left: auto;
   margin-right: auto;
   text-align: center;
-}
-
-.itx-page p.itx-after:not(#_) {
-  max-width: 820px;
-  margin: 28px auto 0;
-  text-align: center;
-  font-weight: 600;
-  color: var(--itx-ink);
 }
 
 /* ---- Buttons ------------------------------------------------------------------------- */
@@ -445,15 +432,6 @@
 
 .itx-svc-link:hover svg {
   transform: translateX(4px);
-}
-
-.itx-tiles li,
-.itx-why-list li {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  font-weight: 600;
-  color: var(--itx-ink);
 }
 
 /* ---- List block: heading column + dotted list card ------------------------------------------ */
@@ -973,7 +951,6 @@
   .itx-track[style] {
     grid-template-columns: minmax(0, 1fr) !important;
   }
-
 
   .itx-faq-a .itx-text {
     padding-right: 22px;

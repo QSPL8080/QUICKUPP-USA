@@ -1620,17 +1620,6 @@ html:has(.ytv-page) {
 /* ==========================================================================
    10. FAQ
    ========================================================================== */
-.ytv-faq-wrap {
-  display: grid;
-  grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
-  gap: clamp(32px, 5vw, 72px);
-  align-items: start;
-}
-
-.ytv-faq-head {
-  position: sticky;
-  top: 120px;
-}
 
 .ytv-faq {
   display: flex;
@@ -1734,99 +1723,6 @@ html:has(.ytv-page) {
 /* ==========================================================================
    11. FORM
    ========================================================================== */
-.ytv-form-sec {
-  scroll-margin-top: 80px;
-}
-
-.ytv-form-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
-  gap: clamp(32px, 5vw, 72px);
-  align-items: center;
-}
-
-.ytv-form-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.ytv-form {
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-  padding: clamp(24px, 3vw, 36px);
-  border-radius: 28px;
-  border: 1px solid var(--ytv-line);
-  background: #ffffff;
-  box-shadow: 0 40px 80px -50px rgba(15, 23, 42, 0.5);
-}
-
-.ytv-form-top {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding-bottom: 20px;
-  border-bottom: 1px dashed var(--ytv-line);
-}
-
-.ytv-fields {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-}
-
-.ytv-field {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
-
-.ytv-field.is-wide {
-  grid-column: 1 / -1;
-}
-
-.ytv-field > span {
-  font-size: 13.5px;
-  font-weight: 700;
-  color: var(--ytv-ink);
-}
-
-.ytv-field input {
-  width: 100%;
-  min-height: 48px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid var(--ytv-line);
-  background: #f9fafc;
-  font-size: 15px;
-  color: var(--ytv-ink);
-  outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-}
-
-.ytv-field input:focus {
-  border-color: var(--ytv-indigo);
-  background: #ffffff;
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
-}
-
-.ytv-page button.ytv-submit:not(#_) {
-  display: inline-flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  width: 100%;
-  font-size: 15px !important;
-  font-weight: 700 !important;
-  border-radius: 10px !important;
-}
-
-.ytv-page p.ytv-form-note:not(#_) {
-  margin: 0;
-  text-align: center;
-  font-size: 14px !important;
-  color: var(--ytv-muted);
-}
 
 /* ==========================================================================
    SCROLL-IN MOTION (prefix yv — this page only)
@@ -2061,14 +1957,11 @@ html:has(.ytv-page) {
 
 @media (max-width: 991px) {
   .ytv-reach,
-  .ytv-faq-wrap,
-  .ytv-form-grid,
-  .ytv-playlist {
+.ytv-playlist {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .ytv-reach-copy,
-  .ytv-faq-head {
+  .ytv-reach-copy {
     position: static;
   }
 
@@ -2253,9 +2146,7 @@ html:has(.ytv-page) {
     border-radius: 0 0 16px 16px;
   }
 
-  .ytv-fields {
-    grid-template-columns: minmax(0, 1fr);
-  }
+  
 
   .ytv-playlist {
     border-radius: 24px;

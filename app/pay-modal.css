@@ -214,55 +214,7 @@ h3.pm-head-title {
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
 }
 
-.pm-textarea {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  background: #ffffff;
-  font-size: 13px;
-  color: #0f172a;
-  resize: vertical;
-  min-height: 48px;
-  font-family: inherit;
-  box-sizing: border-box;
-}
-
-.pm-textarea:focus {
-  outline: none;
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
-}
-
 /* Amount Selector */
-.pm-amount-pills {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 4px;
-}
-
-.pm-amount-pill {
-  padding: 6px 14px;
-  font-size: 13px;
-  font-weight: 700;
-  border-radius: 999px;
-  background: #f1f5f9;
-  border: 1px solid #cbd5e1;
-  color: #334155;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.pm-amount-pill:hover {
-  background: #e2e8f0;
-}
-
-.pm-amount-pill.is-active {
-  background: #4f46e5;
-  border-color: #4f46e5;
-  color: #ffffff;
-}
 
 .pm-currency-input-wrap {
   position: relative;
@@ -287,24 +239,6 @@ h3.pm-head-title {
 }
 
 /* Date range section */
-.pm-date-box {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  padding: 14px;
-}
-
-.pm-date-title {
-  font-size: 12.5px;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: #4f46e5;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
 
 /* Proceed CTA button */
 .pm-submit-btn {
@@ -607,43 +541,6 @@ h3.pm-success-title {
 }
 
 /* Confirmation message banner */
-.pm-confirm-banner {
-  background: #ecfdf5;
-  border: 1px solid #a7f3d0;
-  border-radius: 12px;
-  padding: 16px 20px;
-  margin-bottom: 20px;
-  text-align: left;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.pm-confirm-banner-icon {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: #10b981;
-  color: #ffffff;
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.pm-confirm-banner-title {
-  font-size: 15px;
-  font-weight: 800;
-  color: #065f46;
-  margin: 0 0 4px 0;
-}
-
-.pm-confirm-banner-text {
-  font-size: 13.5px;
-  color: #047857;
-  line-height: 1.5;
-  margin: 0;
-}
 
 /* Multi-Select Category Styles */
 .pm-multiselect-btn,
@@ -901,15 +798,12 @@ button.pm-multiselect-btn.is-open {
 
   /* 16px text stops iPhones zooming in when a field is tapped */
   .pm-input,
-  .pm-select,
-  .pm-textarea {
+.pm-select {
     height: 44px;
     font-size: 16px;
   }
 
-  .pm-textarea {
-    height: auto;
-  }
+  
 
   /* amount on its own row, billing dates side by side under it */
   .pm-row-3 {
@@ -971,7 +865,6 @@ button.pm-multiselect-btn.is-open {
     text-align: left;
   }
 }
-
 
 /* steady text even with a large phone font setting: plain line heights
    (the site-wide rules use tall ones), no browser font boosting, and a pay

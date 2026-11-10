@@ -53,3 +53,6 @@ next-env.d.ts
 
 # CRM account hashes for the Hostinger import
 /db/hostinger-crm-accounts.sql
+
+# reference documents kept locally, not part of the website
+*.pdf

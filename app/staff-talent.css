@@ -545,10 +545,6 @@
   color: var(--tlx-ink);
 }
 
-.tlx-span-d2 { grid-column: span 2; }
-.tlx-span-d3 { grid-column: span 3; }
-.tlx-span-d4 { grid-column: span 4; }
-
 /* ---- 4. Process: chevron flow ------------------------------------------------------ */
 .tlx-flow {
   --tlx-tip: 22px;
@@ -915,7 +911,6 @@
     clip-path: polygon(0 0, 50% var(--tlx-tip), 100% 0, 100% 100%, 0 100%);
   }
 
-
 }
 
 @media (max-width: 960px) {
@@ -942,15 +937,9 @@
     min-height: 300px;
   }
 
-  .tlx-span-d2,
-  .tlx-span-d3,
-  .tlx-span-d4 {
-    grid-column: auto;
-  }
+  
 
-  .tlx-span-m2 {
-    grid-column: span 2;
-  }
+  
 
   .tlx-panel-grid {
     grid-template-columns: minmax(0, 1fr);
@@ -1016,8 +1005,7 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .tlx-bento-photo,
-  .tlx-span-m2 {
+  .tlx-bento-photo {
     grid-column: auto;
   }
 

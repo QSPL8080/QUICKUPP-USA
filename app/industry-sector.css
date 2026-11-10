@@ -491,22 +491,6 @@
   box-shadow: 0 24px 48px -36px rgba(15, 23, 42, 0.45);
 }
 
-.inx-card-num {
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  font-variant-numeric: tabular-nums;
-  color: var(--inx-muted);
-  margin-bottom: 14px;
-  padding-bottom: 14px;
-  border-bottom: 1px dashed #dfe2ec;
-  transition: color 0.3s ease;
-}
-
-.inx-card:hover .inx-card-num {
-  color: var(--inx-indigo);
-}
-
 /* ---- Text-only split ---------------------------------------------------------------- */
 .inx-split-text {
   display: grid;
@@ -714,13 +698,6 @@
 
 .inx-matrix li:hover::after {
   transform: scaleX(1);
-}
-
-.inx-matrix-num {
-  font-size: 12px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: var(--inx-indigo);
 }
 
 .inx-matrix-text {
@@ -980,11 +957,6 @@
   max-width: 900px;
 }
 
-.inx-faq-side {
-  position: sticky;
-  top: 120px;
-}
-
 .inx-faq {
   border-top: 2px solid var(--inx-ink);
 }
@@ -1010,18 +982,6 @@
   text-align: left;
   cursor: pointer;
   font-family: inherit;
-}
-
-.inx-faq-num {
-  font-size: 12px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: var(--inx-muted);
-  transition: color 0.3s ease;
-}
-
-.inx-faq-item.is-open .inx-faq-num {
-  color: var(--inx-indigo);
 }
 
 .inx-faq-sign {
@@ -1170,8 +1130,7 @@
   }
 
   .inx-ledger-side,
-  .inx-why-side,
-  .inx-faq-side {
+.inx-why-side {
     position: static;
   }
 
