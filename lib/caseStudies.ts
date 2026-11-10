@@ -58,7 +58,15 @@ const COVERS: Record<string, string> = {
   "madtax": "photo-1454165804606-c3d57bc86b40",
   "romero-injury-law": "photo-1556761175-5973dc0f32e7",
 };
-export const caseStudyCover = (slug: string, w = 1600) => (COVERS[slug] ? U(COVERS[slug], w) : "/images/contact-consultancy-meeting.jpg");
+/* covers supplied for these studies (public/images/case-studies/covers); they take the place of the stock photo */
+const OWN_COVERS = new Set(["madtax", "smoke-it-up", "erics-car-care", "kim-bruno-law", "jlg-law", "lakhani-mcgrath"]);
+
+export const caseStudyCover = (slug: string, w = 1600) =>
+  OWN_COVERS.has(slug)
+    ? `/images/case-studies/covers/${slug}.jpg`
+    : COVERS[slug]
+      ? U(COVERS[slug], w)
+      : "/images/contact-consultancy-meeting.jpg";
 
 const titleCase = (s: string) =>
   s
