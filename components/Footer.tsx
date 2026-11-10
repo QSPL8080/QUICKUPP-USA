@@ -89,11 +89,25 @@ export default function Footer() {
                   {
                     label: "Address",
                     value: "167 Princeton Street, Bridgeport, Connecticut - 06605, USA",
-                    href: "https://www.google.com/maps/search/?api=1&query=167+Princeton+Street+Bridgeport+Connecticut+06605+USA",
+                    // shown as text only: no link to Google Maps
+                    href: "",
                     icon: "M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0zM12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z",
                     wrap: true,
                   },
-                ].map((m) => (
+                ].map((m) =>
+                  !m.href ? (
+                    <div key={m.label} className="qs-ft-mail is-static">
+                      <span className="qs-ft-mail-icon" aria-hidden="true">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d={m.icon} />
+                        </svg>
+                      </span>
+                      <span className="qs-ft-mail-text">
+                        <span className="qs-ft-mail-label">{m.label}</span>
+                        <span className={`qs-ft-mail-addr${m.wrap ? " is-wrap" : ""}`}>{m.value}</span>
+                      </span>
+                    </div>
+                  ) : (
                   <a
                     key={m.label}
                     href={m.href}
@@ -124,7 +138,8 @@ export default function Footer() {
                       <path d="M7 17L17 7M8 7h9v9" />
                     </svg>
                   </a>
-                ))}
+                  )
+                )}
               </div>
               <div className="qs-scalient-chip-location">
                 United States • Global Delivery

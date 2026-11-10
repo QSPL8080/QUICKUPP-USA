@@ -3974,6 +3974,15 @@ section.section-gap.padding-top-0 {
   color: #38bdf8;
 }
 
+/* footer address: plain text, not a link */
+.qs-ft-mail.is-static:hover {
+  background: transparent;
+}
+
+.qs-ft-mail.is-static:hover .qs-ft-mail-addr {
+  color: #ffffff;
+}
+
 .qs-ft-mail-go {
   flex-shrink: 0;
   color: #64748b;
