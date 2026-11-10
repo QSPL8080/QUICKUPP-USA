@@ -9,6 +9,9 @@ import ButtonTone from "@/components/ButtonTone";
 import PayNowModal from "@/components/PayNowModal";
 import DynamicEmailModal from "@/components/DynamicEmailModal";
 
+/* Google Tag Manager container for this website */
+const GTM_ID = "GTM-KDJV786R";
+
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.quickuppsoftech.us"),
   alternates: {
@@ -136,6 +139,16 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Google Tag Manager (GTM-KDJV786R): first thing in <head> on every page */}
+        <script async src={`https://www.googletagmanager.com/gtm.js?id=${GTM_ID}`} />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());`,
+          }}
+        />
+
         {/* Schema.org Organization & WebSite JSON-LD */}
         <script
           type="application/ld+json"
@@ -204,6 +217,12 @@ export default function RootLayout({
         <Script src="/js/jquery.js" strategy="beforeInteractive" />
       </head>
       <body>
+        {/* Google Tag Manager (noscript): straight after the opening <body> */}
+        <noscript
+          dangerouslySetInnerHTML={{
+            __html: `<iframe src="https://www.googletagmanager.com/ns.html?id=${GTM_ID}" height="0" width="0" style="display:none;visibility:hidden"></iframe>`,
+          }}
+        />
         {children}
         <ThemeScripts
           srcs={[
