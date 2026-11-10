@@ -267,7 +267,7 @@ export async function runBalanceReminders(): Promise<ReminderRun> {
       <p style="font-size: 14px; color: #1e293b; line-height: 1.5; margin: 0;">
         Best regards,<br />
         <strong>Quickupp Softech LLC</strong><br />
-        <span style="font-size: 12px; color: #64748b;">8 The Green, Suite A, Dover, Delaware - 19901, USA</span>
+        <span style="font-size: 12px; color: #64748b;">167 Princeton Street, Bridgeport, Connecticut - 06605, USA</span>
       </p>
     </div>
 
@@ -297,7 +297,7 @@ If you have any questions, please contact info@quickuppsoftech.us.
 
 Best regards,
 Quickupp Softech LLC
-8 The Green, Suite A, Dover, Delaware - 19901, USA`;
+167 Princeton Street, Bridgeport, Connecticut - 06605, USA`;
 
       try {
         const sent = await sendMail({

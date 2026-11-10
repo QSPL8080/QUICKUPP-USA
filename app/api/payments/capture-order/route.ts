@@ -650,7 +650,7 @@ export async function POST(req: Request) {
                   <p style="font-size: 14.5px; color: #1e293b; line-height: 1.5; margin: 0;">
                     Best regards,<br />
                     <strong>Quickupp Softech LLC</strong><br />
-                    <span style="font-size: 12px; color: #64748b;">8 The Green, Suite A, Dover, Delaware - 19901, USA</span>
+                    <span style="font-size: 12px; color: #64748b;">167 Princeton Street, Bridgeport, Connecticut - 06605, USA</span>
                   </p>
                 </div>
 

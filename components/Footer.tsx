@@ -88,8 +88,8 @@ export default function Footer() {
                   { label: "Phone", value: "+1 (302) 754-5679", href: "tel:+13027545679", icon: "M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z" },
                   {
                     label: "Address",
-                    value: "8 The Green, Suite A, Dover, Delaware - 19901, USA",
-                    href: "https://www.google.com/maps/search/?api=1&query=8+The+Green+Suite+A+Dover+Delaware+19901+USA",
+                    value: "167 Princeton Street, Bridgeport, Connecticut - 06605, USA",
+                    href: "https://www.google.com/maps/search/?api=1&query=167+Princeton+Street+Bridgeport+Connecticut+06605+USA",
                     icon: "M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0zM12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z",
                     wrap: true,
                   },

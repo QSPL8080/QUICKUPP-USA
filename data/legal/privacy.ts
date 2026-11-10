@@ -629,7 +629,7 @@ export const PRIVACY: LegalDoc = {
           p: "Quickupp Softech LLC",
         },
         {
-          lines: ["US Mailing Address:", "8 The Green, Suite A", "Dover, Delaware 19901", "United States of America"],
+          lines: ["US Mailing Address:", "167 Princeton Street", "Bridgeport, Connecticut 06605", "United States of America"],
         },
         {
           p: "Website: https://www.quickuppsoftech.us",

@@ -26,10 +26,10 @@ const contactJsonLd = {
   email: "info@quickuppsoftech.us",
   address: {
     "@type": "PostalAddress",
-    streetAddress: "8 The Green, Suite A",
-    addressLocality: "Dover",
-    addressRegion: "DE",
-    postalCode: "19901",
+    streetAddress: "167 Princeton Street",
+    addressLocality: "Bridgeport",
+    addressRegion: "CT",
+    postalCode: "06605",
     addressCountry: "US",
   },
   contactPoint: [

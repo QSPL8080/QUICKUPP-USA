@@ -367,7 +367,7 @@ export const COOKIES: LegalDoc = {
           p: "Phone: +1 475-346-5572",
         },
         {
-          p: "Registered/Mailing Address: 8 The Green, Suite A, Dover, Delaware 19901, USA.",
+          p: "Registered/Mailing Address: 167 Princeton Street, Bridgeport, Connecticut 06605, USA.",
         },
         {
           p: 'For privacy-related requests, please use the subject line "Privacy Request – Cookie Policy".',

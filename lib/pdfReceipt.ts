@@ -214,7 +214,7 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
   let curY = logoBottomY - LOGO_GAP;
   page.drawText("Quickupp Softech LLC", { x: leftX, y: curY, size: 10, font: fontBold, color: darkNavy });
   curY -= LINE + 1.5;
-  page.drawText("8 The Green, Suite A, Dover, Delaware - 19901, USA", { x: leftX, y: curY, size: 8.5, font, color: slateMid });
+  page.drawText("167 Princeton Street, Bridgeport, Connecticut - 06605, USA", { x: leftX, y: curY, size: 8.5, font, color: slateMid });
   curY -= LINE;
   page.drawText("Phone: +1 (302) 754-5679", { x: leftX, y: curY, size: 8.5, font, color: slateMid });
   curY -= LINE;
