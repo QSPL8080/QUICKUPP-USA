@@ -66,26 +66,26 @@ const titleCase = (s: string) =>
     .replace(/(^|[\s/&-])([a-z])/g, (_, a: string, b: string) => a + b.toUpperCase())
     .replace(/\bSeo\b/g, "SEO");
 
-/** Each case study's category (the filter chip) and its industry tag */
-const CATEGORY: Record<string, { area: (typeof CASE_STUDY_CATEGORIES)[number]; sector: string }> = {
-  "afa-movers": { area: "Other", sector: "" },
-  "ainsley-heights": { area: "Professional Services", sector: "Real Estate" },
-  "altus-emergency-centers": { area: "Healthcare", sector: "" },
-  "eg-elite": { area: "Automotive", sector: "Car Shipping" },
-  "erics-car-care": { area: "Automotive", sector: "Car Care" },
-  "exceptional-emergency-center": { area: "Healthcare", sector: "" },
-  "grandewood-pointe": { area: "Professional Services", sector: "Real Estate" },
-  "jlg-law": { area: "Professional Services", sector: "Law Firms" },
-  "kim-bruno-law": { area: "Professional Services", sector: "Law Firms" },
-  "lakhani-mcgrath": { area: "Professional Services", sector: "Law Firms" },
-  "madtax": { area: "Professional Services", sector: "" },
-  "neighbors-emergency-center": { area: "Healthcare", sector: "" },
-  "romero-injury-law": { area: "Professional Services", sector: "Law Firms" },
-  "smoke-it-up": { area: "E-Commerce", sector: "Smoke Shop" },
-  "stat-specialty-hospital": { area: "Healthcare", sector: "" },
-  "st-michaels-elite-hospital": { area: "Healthcare", sector: "" },
+/** Each case study's category (the filter chip and its tag) */
+const CATEGORY: Record<string, (typeof CASE_STUDY_CATEGORIES)[number]> = {
+  "afa-movers": "Others",
+  "ainsley-heights": "Real Estate",
+  "altus-emergency-centers": "Healthcare",
+  "eg-elite": "Car Shipping",
+  "erics-car-care": "Car Care",
+  "exceptional-emergency-center": "Healthcare",
+  "grandewood-pointe": "Real Estate",
+  "jlg-law": "Law Firms",
+  "kim-bruno-law": "Law Firms",
+  "lakhani-mcgrath": "Law Firms",
+  "madtax": "Professional Services",
+  "neighbors-emergency-center": "Healthcare",
+  "romero-injury-law": "Law Firms",
+  "smoke-it-up": "Smoke Shop",
+  "st-michaels-elite-hospital": "Healthcare",
+  "stat-specialty-hospital": "Healthcare",
 };
-export const caseStudyArea = (slug: string) => CATEGORY[slug] ?? { area: "Other", sector: "" };
+export const caseStudyArea = (slug: string) => ({ area: CATEGORY[slug] ?? "Others", sector: "" });
 
 /** "RESULTS · GOOGLE MAPS" → "Results · Google Maps" for the page navigator */
 export const sectionLabel = (kicker: string) => titleCase(kicker).replace(/’S\b/g, "’s");

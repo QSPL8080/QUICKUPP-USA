@@ -61,7 +61,7 @@ export default function CaseStudiesGrid({ cards }: { cards: CaseCard[] }) {
   const areas = useMemo(() => {
     const seen = new Map<string, number>();
     for (const c of cards) seen.set(c.area, (seen.get(c.area) || 0) + 1);
-    return CASE_STUDY_CATEGORIES.map((a) => [a, seen.get(a) ?? 0] as const);
+    return CASE_STUDY_CATEGORIES.filter((a) => seen.has(a)).map((a) => [a, seen.get(a) as number] as const);
   }, [cards]);
   const [area, setArea] = useState("");
   const shown = area ? cards.filter((c) => c.area === area) : cards;
@@ -75,7 +75,7 @@ export default function CaseStudiesGrid({ cards }: { cards: CaseCard[] }) {
           All <span className="cl-chip-n">{cards.length}</span>
         </button>
         {areas.map(([a, n]) => (
-          <button key={a} type="button" className={`cl-chip${area === a ? " is-on" : ""}`} aria-pressed={area === a} disabled={n === 0} onClick={() => setArea(a)}>
+          <button key={a} type="button" className={`cl-chip${area === a ? " is-on" : ""}`} aria-pressed={area === a} onClick={() => setArea(a)}>
             {a} <span className="cl-chip-n">{n}</span>
           </button>
         ))}
