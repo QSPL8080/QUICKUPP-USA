@@ -72,6 +72,7 @@ const CLIENT_LOGOS = [
   { src: "capstone-industries", name: "Capstone Industries", h: 42 },
   { src: "closets-by-design", name: "Closets by Design", h: 26 },
   { src: "ipa-commercial-real-estate", name: "IPA Commercial Real Estate", h: 34 },
+  { src: "american-custom-lifts", name: "American Custom Lifts", h: 32 },
   { src: "client-y", name: "Client logo", h: 40 },
   { src: "us-control-tech", name: "U.S. Control Tech", h: 28 },
   { src: "nms-consulting", name: "NMS Consulting", h: 38 },
