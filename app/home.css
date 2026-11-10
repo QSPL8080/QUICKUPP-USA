@@ -1337,20 +1337,16 @@
   display: flex;
   flex: none;
   align-items: center;
-  gap: clamp(48px, 6vw, 88px);
-  padding-right: clamp(48px, 6vw, 88px);
-  animation: hx-marquee 36s linear infinite reverse;
+  gap: clamp(40px, 4.6vw, 72px);
+  padding-right: clamp(40px, 4.6vw, 72px);
+  animation: hx-marquee 40s linear infinite reverse;
 }
 
 .hx-logos-row img {
-  height: 28px;
+  flex: none;
+  height: calc(var(--h, 34) * 1px);
   width: auto;
-  opacity: 0.75;
-  transition: opacity 0.3s ease;
-}
-
-.hx-logos-row img:hover {
-  opacity: 1;
+  object-fit: contain;
 }
 
 @keyframes hx-marquee {
@@ -1430,7 +1426,7 @@
   }
 
   .hx-logos-row img {
-    height: 22px;
+    height: calc(var(--h, 34) * 0.78px);
   }
 }
 

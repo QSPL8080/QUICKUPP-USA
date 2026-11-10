@@ -63,12 +63,31 @@ const INSIGHTS_NOTE = INSIGHTS_REST.join(" ");
 const FACES = ["testimonial-img-01", "team-img-01", "testimonial-img-02", "team-img-02", "testimonial-img-03", "team-img-03", "testimonial-img-04", "team-img-04", "testimonial-01", "team-img-05", "testimonial-03", "team-img-06"];
 const CURVE_FACES = [...FACES, ...FACES];
 
+// client logos on the white tape; h = display height in px, set per logo so
+// round badges and long wordmarks read at the same visual size
+const CLIENT_LOGOS = [
+  { src: "american-plc", name: "American PLC", h: 46 },
+  { src: "anna-design", name: "Anna Design", h: 38 },
+  { src: "be-electricals", name: "BE Electricals", h: 44 },
+  { src: "capstone-industries", name: "Capstone Industries", h: 42 },
+  { src: "closets-by-design", name: "Closets by Design", h: 24 },
+  { src: "ipa-commercial-real-estate", name: "IPA Commercial Real Estate", h: 34 },
+  { src: "client-y", name: "Client logo", h: 40 },
+  { src: "us-control-tech", name: "U.S. Control Tech", h: 28 },
+  { src: "nms-consulting", name: "NMS Consulting", h: 38 },
+];
+
 function Logos() {
-  const nums = ["01", "02", "03", "04", "05", "06"];
   const row = (k: string) => (
     <div className="hx-logos-row" aria-hidden={k === "b" ? true : undefined} key={k}>
-      {nums.map((n) => (
-        <img key={`${k}${n}`} src={`/images/client-logo-${n}.svg`} alt={k === "a" ? "Client logo" : ""} loading="lazy" />
+      {CLIENT_LOGOS.map((l) => (
+        <img
+          key={`${k}${l.src}`}
+          src={`/images/clients/${l.src}.png`}
+          alt={k === "a" ? l.name : ""}
+          loading="lazy"
+          style={{ "--h": l.h } as CSSProperties}
+        />
       ))}
     </div>
   );
