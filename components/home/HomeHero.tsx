@@ -8,7 +8,7 @@ import HomeIcon, { type HomeIconName } from "@/components/home/HomeIcon";
  * the left and a photo filling the right side to the stage's edge (the IT
  * service pages' hero layout), and a white pillar dock lying across the
  * stage's lower edge. The photo slowly drifts and zooms; its label shows the
- * eyebrow word whose pillar is open. The four pillars take turns every 5
+ * eyebrow word whose pillar is open. The four pillars take turns every 3
  * seconds; hovering or focusing a pillar opens it and holds it, and hovering
  * the photo holds it too.
  * Every word comes from the home page document.
@@ -28,13 +28,13 @@ const UNSPLASH = (id: string) => `https://images.unsplash.com/${id}?auto=format&
 const HERO_PHOTO = UNSPLASH("photo-1551434678-e076c223a692");
 
 const PILLARS: { photo: string; icon: HomeIconName }[] = [
-  { photo: UNSPLASH("photo-1686061592689-312bbfb5c055"), icon: "megaphone" }, // MARKETING. (analytics dashboard)
-  { photo: UNSPLASH("photo-1680783954745-3249be59e527"), icon: "bot" }, // AI. (robot and human hands)
-  { photo: UNSPLASH("photo-1498050108023-c5249f4df085"), icon: "code-xml" }, // TECHNOLOGY. (code on a laptop)
-  { photo: UNSPLASH("photo-1758691737124-05c5bffe46f0"), icon: "trending-up" }, // BUILT FOR GROWTH. (team around a laptop)
+  { photo: UNSPLASH("photo-1611926653458-09294b3142bf"), icon: "megaphone" }, // MARKETING. (social media apps on a phone)
+  { photo: UNSPLASH("photo-1677442136019-21780ecad995"), icon: "bot" }, // AI. (3D "AI" on a digital grid)
+  { photo: UNSPLASH("photo-1555066931-4365d14bab8c"), icon: "code-xml" }, // TECHNOLOGY. (code on a laptop screen)
+  { photo: UNSPLASH("photo-1551288049-bebda4e38f71"), icon: "trending-up" }, // BUILT FOR GROWTH. (analytics charts)
 ];
 
-const STEP_MS = 5000; // the next pillar every 5 seconds
+const STEP_MS = 3000; // the next pillar every 3 seconds
 
 const d = (s: number) => ({ "--d": `${s}s` }) as CSSProperties;
 
@@ -156,7 +156,7 @@ export default function HomeHero({ hero, actions }: { hero: Hero; actions: React
               onClick={() => go(i)}
             >
               <span className="hxd-pillar-photo" aria-hidden="true">
-                <img src={PILLARS[i].photo} alt="" loading="lazy" />
+                <img src={PILLARS[i].photo} alt="" loading="eager" decoding="async" />
               </span>
               <span className="hxd-pillar-top">
                 <span className="hxd-pillar-icon" aria-hidden="true">
