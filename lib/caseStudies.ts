@@ -1,3 +1,4 @@
+import { CASE_STUDY_CATEGORIES } from "@/lib/caseStudyCategories";
 import { CASE_STUDY_DOCS, type CsBlock, type CsDoc } from "@/data/case-study-docs";
 
 /* Helpers for the case study pages (content comes from data/case-study-docs.ts) */
@@ -23,13 +24,6 @@ export const CASE_STUDY_ORDER = [
 ] as const;
 
 export const getCaseStudyDoc = (slug: string): CsDoc | undefined => CASE_STUDY_DOCS[slug];
-
-/** "CASE STUDY · AUTO REPAIR · MULTI-LOCATION" → "Auto Repair · Multi-location" style label for lists */
-export const caseStudyKickerParts = (kicker: string) =>
-  kicker
-    .split("·")
-    .map((s) => s.trim())
-    .filter((s) => s && s.toUpperCase() !== "CASE STUDY");
 
 /** A document's first results row (the headline numbers) */
 export const headlineStats = (doc: CsDoc) => (doc.blocks.find((b) => b.type === "stats") as Extract<CsBlock, { type: "stats" }> | undefined)?.items ?? [];
@@ -66,16 +60,32 @@ const COVERS: Record<string, string> = {
 };
 export const caseStudyCover = (slug: string, w = 1600) => (COVERS[slug] ? U(COVERS[slug], w) : "/images/contact-consultancy-meeting.jpg");
 
-/** "CASE STUDY · LOCAL SEO · MOVING & PACKING" → { area: "Local SEO", sector: "Moving & Packing" } */
 const titleCase = (s: string) =>
   s
     .toLowerCase()
     .replace(/(^|[\s/&-])([a-z])/g, (_, a: string, b: string) => a + b.toUpperCase())
     .replace(/\bSeo\b/g, "SEO");
-export const caseStudyArea = (doc: CsDoc) => {
-  const [area = "", ...rest] = caseStudyKickerParts(doc.kicker);
-  return { area: titleCase(area), sector: titleCase(rest.join(" · ")) };
+
+/** Each case study's category (the filter chip) and its industry tag */
+const CATEGORY: Record<string, { area: (typeof CASE_STUDY_CATEGORIES)[number]; sector: string }> = {
+  "afa-movers": { area: "Other", sector: "" },
+  "ainsley-heights": { area: "Professional Services", sector: "Real Estate" },
+  "altus-emergency-centers": { area: "Healthcare", sector: "" },
+  "eg-elite": { area: "Automotive", sector: "Car Shipping" },
+  "erics-car-care": { area: "Automotive", sector: "Car Care" },
+  "exceptional-emergency-center": { area: "Healthcare", sector: "" },
+  "grandewood-pointe": { area: "Professional Services", sector: "Real Estate" },
+  "jlg-law": { area: "Professional Services", sector: "Law Firms" },
+  "kim-bruno-law": { area: "Professional Services", sector: "Law Firms" },
+  "lakhani-mcgrath": { area: "Professional Services", sector: "Law Firms" },
+  "madtax": { area: "Professional Services", sector: "" },
+  "neighbors-emergency-center": { area: "Healthcare", sector: "" },
+  "romero-injury-law": { area: "Professional Services", sector: "Law Firms" },
+  "smoke-it-up": { area: "E-Commerce", sector: "Smoke Shop" },
+  "stat-specialty-hospital": { area: "Healthcare", sector: "" },
+  "st-michaels-elite-hospital": { area: "Healthcare", sector: "" },
 };
+export const caseStudyArea = (slug: string) => CATEGORY[slug] ?? { area: "Other", sector: "" };
 
 /** "RESULTS · GOOGLE MAPS" → "Results · Google Maps" for the page navigator */
 export const sectionLabel = (kicker: string) => titleCase(kicker).replace(/’S\b/g, "’s");

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import Link from "next/link";
+import { CASE_STUDY_CATEGORIES } from "@/lib/caseStudyCategories";
 
 /*
  * Case studies list: category chips, one featured study and a magazine grid of
@@ -60,7 +61,7 @@ export default function CaseStudiesGrid({ cards }: { cards: CaseCard[] }) {
   const areas = useMemo(() => {
     const seen = new Map<string, number>();
     for (const c of cards) seen.set(c.area, (seen.get(c.area) || 0) + 1);
-    return Array.from(seen.entries());
+    return CASE_STUDY_CATEGORIES.filter((a) => seen.has(a)).map((a) => [a, seen.get(a) as number] as const);
   }, [cards]);
   const [area, setArea] = useState("");
   const shown = area ? cards.filter((c) => c.area === area) : cards;

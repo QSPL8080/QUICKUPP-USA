@@ -23,7 +23,7 @@ export default function CaseStudiesPage() {
   const cards: CaseCard[] = CASE_STUDY_ORDER.flatMap((slug) => {
     const doc = getCaseStudyDoc(slug);
     if (!doc) return [];
-    const { area, sector } = caseStudyArea(doc);
+    const { area, sector } = caseStudyArea(slug);
     return [
       {
         slug,

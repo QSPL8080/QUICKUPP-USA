@@ -138,7 +138,7 @@ export default async function CaseStudyDetailPage({ params }: Props) {
   const doc = getCaseStudyDoc(slug);
   if (!doc) notFound();
 
-  const { area, sector } = caseStudyArea(doc);
+  const { area, sector } = caseStudyArea(slug);
   const sections = toSections(doc.blocks);
   const headIndex = sections.findIndex((sec) => sec[0].type === "kicker" && /^HEADLINE RESULTS/i.test(sec[0].text));
   const headline = headIndex >= 0 ? sections[headIndex] : null;
