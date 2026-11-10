@@ -10258,6 +10258,12 @@ a.secondary-button,
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12) !important;
 }
 
+/* industry pages: no categories until a service is picked */
+.sef-multi-trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
 .sef-multi-trigger.has-error {
   background: #ffffff !important;
   border-color: #ef4444 !important;

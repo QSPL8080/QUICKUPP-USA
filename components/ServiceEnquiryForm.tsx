@@ -6,9 +6,10 @@ import CountrySelect from "@/components/CountrySelect";
 import { CONTACT_BUDGETS, CONTACT_TIMELINES, INDUSTRIES, SERVICE_FORMS, type ServiceFormKey } from "@/lib/formOptions";
 
 /*
- * Enquiry form shown on every subpage of a service.
- * "Service" is fixed to the service this page belongs to;
- * "Category" supports selecting multiple categories/subpages of that service.
+ * Enquiry form shown on every subpage of a service, and on every industry page.
+ * On a service page "Service" is fixed to that service; on an industry page
+ * "Industry" is fixed instead and the visitor picks the service.
+ * "Category" supports selecting multiple categories/subpages of the service.
  * Submissions go to /api/service-enquiry and are saved in the service's own table.
  */
 
@@ -28,13 +29,24 @@ const EMPTY = {
   agreed: false,
 };
 
-export default function ServiceEnquiryForm({ service, current }: { service: ServiceFormKey; current?: string }) {
-  const form = SERVICE_FORMS[service];
-  const options: readonly string[] = form.options;
-  const hasCategories = service !== "youtube" && options.length > 0;
-  const idp = `sef-${service}`;
+const SERVICE_KEYS = Object.keys(SERVICE_FORMS) as ServiceFormKey[];
 
-  const [formData, setFormData] = useState(EMPTY);
+type Props =
+  | { service: ServiceFormKey; industry?: undefined; current?: string }
+  | { service?: undefined; industry: (typeof INDUSTRIES)[number]; current?: string };
+
+export default function ServiceEnquiryForm({ service: fixedService, industry: fixedIndustry, current }: Props) {
+  const start = { ...EMPTY, industry: fixedIndustry ?? "" };
+  // on an industry page the visitor picks the service
+  const [pickedService, setPickedService] = useState<ServiceFormKey | "">("");
+  const service = fixedService ?? pickedService;
+  const form = service ? SERVICE_FORMS[service] : null;
+  const options: readonly string[] = form?.options ?? [];
+  const hasCategories = service !== "youtube" && (fixedIndustry ? true : options.length > 0);
+  const idp = `sef-${fixedService ?? (fixedIndustry || "").toLowerCase().replace(/[^a-z]+/g, "-")}`;
+  const [serviceError, setServiceError] = useState(false);
+
+  const [formData, setFormData] = useState(start);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [categoryError, setCategoryError] = useState(false);
@@ -57,7 +69,8 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
     }, 1000);
     const timer = setTimeout(() => {
       setSubmitted(false);
-      setFormData(EMPTY);
+      setFormData(start);
+      setPickedService("");
       setSelectedCategories([]);
       setCategoryError(false);
       setAgreedError(false);
@@ -68,6 +81,7 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
       clearInterval(interval);
       clearTimeout(timer);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [submitted]);
 
   // Close category dropdown on outside click
@@ -100,8 +114,21 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
     setSelectedCategories([]);
   };
 
+  const pickService = (key: ServiceFormKey | "") => {
+    setPickedService(key);
+    setSelectedCategories([]);
+    setIsCategoryOpen(false);
+    setCategoryError(false);
+    if (key) setServiceError(false);
+    if (key !== "youtube") set({ youtubeLink: "" });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!service) {
+      setServiceError(true);
+      return;
+    }
     if (hasCategories && selectedCategories.length === 0) {
       setCategoryError(true);
       return;
@@ -162,7 +189,7 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
     <section className="sef-section" id="enquiry">
       <div className="sef-container">
         <h2 className="sef-heading">
-          Talk to Us About <span className="qs-gradient-text">{current || form.label}</span>
+          Talk to Us About <span className="qs-gradient-text">{current || form?.label || fixedIndustry}</span>
         </h2>
         <div className="su-contact-form-container">
           {submitted ? (
@@ -184,7 +211,8 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
                 style={{ marginTop: "16px" }}
                 onClick={() => {
                   setSubmitted(false);
-                  setFormData(EMPTY);
+                  setFormData(start);
+                  setPickedService("");
                   setSelectedCategories([]);
                   setCategoryError(false);
                   setAgreedError(false);
@@ -329,21 +357,42 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
                   <label htmlFor={`${idp}-service`} className="su-field-label">
                     Service Interested In*
                   </label>
-                  <div className="sef-locked-wrap" title="Fixed on this service's pages">
-                    <input
-                      id={`${idp}-service`}
-                      type="text"
-                      readOnly
-                      tabIndex={-1}
-                      aria-readonly="true"
-                      className="su-text-input sef-locked"
-                      value={form.label}
-                    />
-                    <svg className="sef-lock" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <rect x="4.5" y="10.5" width="15" height="10" rx="2.5" stroke="currentColor" strokeWidth="1.8" />
-                      <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                    </svg>
-                  </div>
+                  {fixedService ? (
+                    <div className="sef-locked-wrap" title="Fixed on this service's pages">
+                      <input
+                        id={`${idp}-service`}
+                        type="text"
+                        readOnly
+                        tabIndex={-1}
+                        aria-readonly="true"
+                        className="su-text-input sef-locked"
+                        value={form?.label ?? ""}
+                      />
+                      <LockIcon />
+                    </div>
+                  ) : (
+                    <>
+                      <select
+                        id={`${idp}-service`}
+                        required
+                        className={`su-select-input${serviceError ? " has-error" : ""}`}
+                        value={pickedService}
+                        onChange={(e) => pickService(e.target.value as ServiceFormKey | "")}
+                      >
+                        <option value="">Select Service</option>
+                        {SERVICE_KEYS.map((k) => (
+                          <option key={k} value={k}>
+                            {SERVICE_FORMS[k].label}
+                          </option>
+                        ))}
+                      </select>
+                      {serviceError && (
+                        <span style={{ color: "#dc2626", fontSize: "12px", marginTop: "4px", display: "block" }}>
+                          Please select a service.
+                        </span>
+                      )}
+                    </>
+                  )}
                 </div>
 
                 {hasCategories && (
@@ -362,12 +411,15 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
                         id={`${idp}-category`}
                         type="button"
                         className={`su-select-input sef-multi-trigger ${categoryError ? "has-error" : ""} ${isCategoryOpen ? "is-active" : ""}`}
+                        disabled={!service}
                         onClick={() => setIsCategoryOpen((v) => !v)}
                         aria-expanded={isCategoryOpen}
                         aria-haspopup="listbox"
                       >
                         <div className="sef-trigger-text">
-                          {selectedCategories.length === 0 ? (
+                          {!service ? (
+                            <span className="sef-placeholder">Select a service first...</span>
+                          ) : selectedCategories.length === 0 ? (
                             <span className="sef-placeholder">Select one or more categories...</span>
                           ) : selectedCategories.length === 1 ? (
                             <span className="sef-trigger-names">{selectedCategories[0]}</span>
@@ -480,6 +532,20 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
                   <label htmlFor={`${idp}-industry`} className="su-field-label">
                     Industry*
                   </label>
+                  {fixedIndustry ? (
+                    <div className="sef-locked-wrap" title="Fixed on this industry's page">
+                      <input
+                        id={`${idp}-industry`}
+                        type="text"
+                        readOnly
+                        tabIndex={-1}
+                        aria-readonly="true"
+                        className="su-text-input sef-locked"
+                        value={fixedIndustry}
+                      />
+                      <LockIcon />
+                    </div>
+                  ) : (
                   <select
                     id={`${idp}-industry`}
                     required
@@ -497,6 +563,7 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
                       </option>
                     ))}
                   </select>
+                  )}
                 </div>
               </div>
 
@@ -658,5 +725,14 @@ export default function ServiceEnquiryForm({ service, current }: { service: Serv
         </div>
       </div>
     </section>
+  );
+}
+
+function LockIcon() {
+  return (
+    <svg className="sef-lock" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="4.5" y="10.5" width="15" height="10" rx="2.5" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
   );
 }

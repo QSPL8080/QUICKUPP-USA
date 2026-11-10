@@ -1,5 +1,7 @@
 "use client";
 
+import ServiceEnquiryForm from "@/components/ServiceEnquiryForm";
+import type { INDUSTRIES } from "@/lib/formOptions";
 import React, { useCallback, useState } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
@@ -767,6 +769,9 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
           if (block.type === "faq") return <FaqSection key={i} block={block as FaqBlock} />;
           return null;
         })}
+
+        {/* Lead form: industry fixed to this page, visitor picks the service and categories */}
+        <ServiceEnquiryForm industry={data.crumb as (typeof INDUSTRIES)[number]} current={data.crumb} />
 
         {/* Book a call (live Calendly) */}
         <BookingSection eyebrow="Schedule a Consultation" title={["Let’s Grow Your", `${data.crumb} Business`]} text={["Choose a convenient date and time for a free consultation call. We\u2019ll discuss your goals and the right next steps for your business."]} tone="soft" icon="calendar" />
