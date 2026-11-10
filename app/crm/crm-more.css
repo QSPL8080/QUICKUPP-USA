@@ -1345,3 +1345,223 @@
     max-height: calc(100vh - 300px);
   }
 }
+
+/* ---- Blogs list: fits every screen ------------------------------------------
+   Wide: every column. ≤1440px: read time moves under the title. ≤1280px: the
+   author does too. Phones (≤700px): each blog becomes a card. */
+.crm-table.crm-blogs-table {
+  min-width: 0;
+}
+
+.crm-blogs-table td {
+  vertical-align: middle;
+}
+
+.crm-blogs-table th.crm-col-article {
+  width: 46%;
+}
+
+.crm-blogs-table .crm-pill {
+  white-space: nowrap;
+}
+
+.crm-blog-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.crm-blog-thumb {
+  flex: none;
+  width: 64px;
+  height: 44px;
+  border-radius: 8px;
+  border: 1px solid var(--crm-line);
+  background: #f1f5f9;
+  object-fit: cover;
+}
+
+.crm-blog-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.crm-blog-title {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: var(--crm-ink);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.crm-blog-slug {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow-wrap: anywhere;
+  color: var(--crm-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11.5px;
+}
+
+.crm-blog-author {
+  display: block;
+  color: var(--crm-ink);
+}
+
+.crm-blog-meta {
+  display: none;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  margin-top: 2px;
+  color: var(--crm-muted);
+  font-size: 12px;
+}
+
+.crm-blog-meta > span {
+  display: none;
+}
+
+.crm-blogs-table td.crm-col-acts,
+.crm-blogs-table th.crm-col-acts {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.crm-blog-status-inline {
+  display: none !important;
+}
+
+/* the same specificity as the phone-card rules in crm.css, so hiding a column wins there too */
+@media (max-width: 1440px) {
+  .crm-blogs-table.crm-stack tbody tr .crm-col-read,
+  .crm-blogs-table thead .crm-col-read {
+    display: none;
+  }
+
+  .crm-blog-meta,
+  .crm-blog-meta .crm-blog-meta-read {
+    display: flex;
+  }
+}
+
+@media (max-width: 1280px) {
+  .crm-blogs-table.crm-stack tbody tr .crm-col-author,
+  .crm-blogs-table thead .crm-col-author {
+    display: none;
+  }
+
+  .crm-blog-meta .crm-blog-meta-author {
+    display: inline;
+  }
+}
+
+/* small laptops and tablets: status joins the category */
+@media (max-width: 1100px) and (min-width: 701px) {
+  .crm-blogs-table.crm-stack tbody tr .crm-col-status,
+  .crm-blogs-table thead .crm-col-status {
+    display: none;
+  }
+
+  .crm-blogs-table td.crm-col-cat {
+    white-space: nowrap;
+  }
+
+  .crm-blog-status-inline {
+    display: flex !important;
+    width: fit-content;
+    margin-top: 6px;
+  }
+
+  .crm-blog-title {
+    -webkit-line-clamp: 3;
+  }
+}
+
+@media (max-width: 700px) {
+  .crm-blogs-table td.crm-col-acts {
+    width: auto;
+  }
+
+  .crm-blog-cell {
+    align-items: flex-start;
+  }
+
+  .crm-blog-thumb {
+    width: 76px;
+    height: 54px;
+  }
+
+  .crm-blog-title {
+    -webkit-line-clamp: 3;
+  }
+}
+
+/* ---- Job openings list: department, type and location move under the title when space runs out */
+.crm-table.crm-jobs-table {
+  min-width: 0;
+}
+
+.crm-jobs-table .crm-pill,
+.crm-jobs-table .crm-row-acts {
+  white-space: nowrap;
+}
+.crm-job-meta {
+  display: none !important;
+}
+
+@media (max-width: 1280px) {
+  .crm-jobs-table.crm-stack tbody tr .crm-col-dept,
+  .crm-jobs-table.crm-stack tbody tr .crm-col-type,
+  .crm-jobs-table thead .crm-col-dept,
+  .crm-jobs-table thead .crm-col-type {
+    display: none;
+  }
+
+  .crm-job-meta {
+    display: block !important;
+  }
+}
+
+.crm-job-meta-loc {
+  display: none;
+}
+
+@media (max-width: 1100px) {
+  .crm-jobs-table.crm-stack tbody tr .crm-col-loc,
+  .crm-jobs-table thead .crm-col-loc {
+    display: none;
+  }
+
+  .crm-job-meta-loc {
+    display: inline;
+  }
+}
+
+/* phones: the job opening card already lists every field */
+@media (max-width: 700px) {
+  .crm-job-meta {
+    display: none !important;
+  }
+
+  .crm-jobs-table.crm-stack tbody tr td.crm-col-dept,
+  .crm-jobs-table.crm-stack tbody tr td.crm-col-type,
+  .crm-jobs-table.crm-stack tbody tr td.crm-col-loc {
+    display: block;
+  }
+}
+
+/* phone cards (every CRM list): the main cell stays left-aligned on the last card too */
+@media (max-width: 700px) {
+  .crm-stack tbody tr td.crm-cell-main,
+  .crm-stack tbody tr:last-child td.crm-cell-main {
+    text-align: left !important;
+  }
+}

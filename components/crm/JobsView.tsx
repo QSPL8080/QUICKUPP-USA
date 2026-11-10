@@ -196,16 +196,16 @@ export default function JobsView({ rows, openNew, showApplications = true }: { r
 
       {rows.length ? (
         <div className="crm-table-wrap">
-          <table className="crm-table crm-stack crm-selectable">
+          <table className="crm-table crm-stack crm-selectable crm-jobs-table">
             <thead>
               <tr>
                 <th className="crm-col-check">
                   <SelectBox checked={sel.all} mixed={sel.some} onChange={sel.toggleAll} label="Select all" />
                 </th>
                 <th>Job title</th>
-                <th>Department</th>
-                <th>Type</th>
-                <th>Location</th>
+                <th className="crm-col-dept">Department</th>
+                <th className="crm-col-type">Type</th>
+                <th className="crm-col-loc">Location</th>
                 <th>Deadline</th>
                 {showApplications && <th>Applications</th>}
                 <th>On careers page</th>
@@ -223,10 +223,15 @@ export default function JobsView({ rows, openNew, showApplications = true }: { r
                     <td data-label="Job title" className="crm-cell-main">
                       <span className="crm-strong">{j.title}</span>
                       <span className="crm-cell-sub">{j.experience}</span>
+                      {/* shown under the title when the screen is too narrow for their own columns */}
+                      <span className="crm-cell-sub crm-job-meta">
+                        {[j.department, j.employmentType].filter(Boolean).join(" · ")}
+                        {j.location && <span className="crm-job-meta-loc"> · {j.location}</span>}
+                      </span>
                     </td>
-                    <td data-label="Department">{j.department}</td>
-                    <td data-label="Type">{j.employmentType}</td>
-                    <td data-label="Location">{j.location}</td>
+                    <td data-label="Department" className="crm-col-dept">{j.department}</td>
+                    <td data-label="Type" className="crm-col-type">{j.employmentType}</td>
+                    <td data-label="Location" className="crm-col-loc">{j.location}</td>
                     <td data-label="Deadline" className="crm-nowrap">
                       {fmtDate(j.deadline)}
                     </td>

@@ -421,17 +421,18 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
       </div>
 
       {/* Blogs Table */}
-      <div className="crm-card crm-table-card">
-        <div className="crm-scroll">
-          <table className="crm-table">
+      {/* columns drop out as the screen narrows (their details move under the title); phones get cards */}
+      <div className="crm-card crm-card-flush">
+        <div className="crm-table-wrap">
+          <table className="crm-table crm-stack crm-blogs-table">
             <thead>
               <tr>
-                <th>Article</th>
-                <th>Category</th>
-                <th>Author</th>
-                <th>Read Time</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th className="crm-col-article">Article</th>
+                <th className="crm-col-cat">Category</th>
+                <th className="crm-col-author">Author</th>
+                <th className="crm-col-read">Read time</th>
+                <th className="crm-col-status">Status</th>
+                <th className="crm-col-acts">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -444,46 +445,41 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
               ) : (
                 filtered.map((b) => (
                   <tr key={b.id} className="crm-row" onClick={() => openForm(b)}>
-                    <td data-label="Article" className="crm-cell-main">
-                      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                        <img
-                          src={b.img}
-                          alt=""
-                          style={{
-                            width: "48px",
-                            height: "36px",
-                            objectFit: "cover",
-                            borderRadius: "6px",
-                            flexShrink: 0,
-                            border: "1px solid #e2e8f0",
-                          }}
-                        />
-                        <div>
-                          <span className="crm-strong" style={{ display: "block", fontSize: "14.5px" }}>
+                    <td data-label="Article" className="crm-cell-main crm-col-article">
+                      <div className="crm-blog-cell">
+                        {b.img ? <img src={b.img} alt="" className="crm-blog-thumb" /> : <span className="crm-blog-thumb" aria-hidden="true" />}
+                        <div className="crm-blog-text">
+                          <span className="crm-blog-title" title={b.title}>
                             {b.title}
                           </span>
-                          <span className="crm-cell-sub" style={{ fontFamily: "monospace", fontSize: "12px" }}>
-                            /blog/{b.slug}
+                          <span className="crm-blog-slug">/blog/{b.slug}</span>
+                          <span className="crm-blog-meta">
+                            <span className="crm-blog-meta-author">{b.author}</span>
+                            <span className="crm-blog-meta-read">{b.readTime}</span>
                           </span>
                         </div>
                       </div>
                     </td>
-                    <td data-label="Category">
+                    <td data-label="Category" className="crm-col-cat">
                       <span className="crm-pill crm-pill-pending">{b.category}</span>
+                      {/* the status sits under the category when the screen is too narrow for its own column */}
+                      <span className={`crm-pill crm-blog-status-inline ${b.isPublished ? "crm-pill-paid" : "crm-pill-failed"}`}>
+                        {b.isPublished ? "Published" : "Draft"}
+                      </span>
                     </td>
-                    <td data-label="Author" className="crm-nowrap">
-                      <div>{b.author}</div>
+                    <td data-label="Author" className="crm-col-author">
+                      <span className="crm-blog-author">{b.author}</span>
                       <span className="crm-cell-sub">{b.authorRole}</span>
                     </td>
-                    <td data-label="Read Time" className="crm-nowrap">
+                    <td data-label="Read time" className="crm-col-read crm-nowrap">
                       {b.readTime}
                     </td>
-                    <td data-label="Status">
+                    <td data-label="Status" className="crm-col-status">
                       <span className={`crm-pill ${b.isPublished ? "crm-pill-paid" : "crm-pill-failed"}`}>
                         {b.isPublished ? "Published" : "Draft"}
                       </span>
                     </td>
-                    <td data-label="Actions" onClick={(e) => e.stopPropagation()}>
+                    <td data-label="Actions" className="crm-col-acts" onClick={(e) => e.stopPropagation()}>
                       <span className="crm-row-acts">
                         <Link
                           href={`/blog/${b.slug}`}
