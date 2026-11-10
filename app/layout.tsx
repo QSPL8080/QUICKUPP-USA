@@ -77,12 +77,13 @@ const organizationJsonLd = {
         "postalCode": "06605",
         "addressCountry": "US",
       },
+      // the brand's profiles (from the H1 & Schema Markup document)
       "sameAs": [
-        "https://quickuppsoftech.us",
-        "https://twitter.com/QuickuppL57802",
-        "https://www.linkedin.com/company/quickupp-softech",
-        "https://www.facebook.com/quickuppsoftech",
-        "https://www.instagram.com/quickuppsoftech",
+        "https://www.facebook.com/people/Quickupp-Softech-LLC/61581644461743/",
+        "https://www.instagram.com/quickuppsoftech.usa/",
+        "https://x.com/QuickuppL57802",
+        "https://www.youtube.com/@quickuppsoftechusa",
+        "https://www.linkedin.com/company/108772091/",
       ],
       "contactPoint": [
         {

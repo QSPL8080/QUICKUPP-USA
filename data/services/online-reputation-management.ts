@@ -1,8 +1,8 @@
 import type { ServicePageData } from "@/lib/servicePageTypes";
 
 const data: ServicePageData = {
-  metaTitle: "Online Reputation Management (ORM) | Quickupp Softech",
-  metaDescription: "Build Trust. Protect Your Brand. Strengthen Your Online Reputation.",
+  metaTitle: "Online Reputation Management | Quickupp Softech",
+  metaDescription: "Improve your brand image with Quickupp Softech's online reputation management services. Build trust, manage reviews, and strengthen customer confidence.",
   crumb: "Online Reputation Management",
   heroEyebrow: "Online Reputation Management",
   heroTitle: "Build Trust. Protect Your Brand. Strengthen Your Online Reputation.",

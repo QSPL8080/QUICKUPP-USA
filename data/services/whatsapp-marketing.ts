@@ -2,7 +2,7 @@ import type { ServicePageData } from "@/lib/servicePageTypes";
 
 const data: ServicePageData = {
   metaTitle: "WhatsApp Marketing Services | Quickupp Softech",
-  metaDescription: "Connect. Engage. Convert With WhatsApp Marketing.",
+  metaDescription: "Grow customer engagement and drive conversions with Quickupp Softech's WhatsApp marketing services through targeted campaigns and personalised messaging.",
   crumb: "WhatsApp Marketing",
   heroEyebrow: "WhatsApp Marketing",
   heroTitle: "Connect. Engage. Convert With WhatsApp Marketing",

@@ -8,6 +8,7 @@ import {
   getAllCategorizedServiceParams,
   getServiceByCategoryAndSlug,
 } from "@/lib/servicesData";
+import { SERVICE_FAQ_SCHEMA } from "@/lib/serviceFaqSchema";
 
 interface PageProps {
   params: Promise<{
@@ -38,7 +39,26 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
+/* the page plus its FAQ structured data (schema.org FAQPage), when the page has one */
 export default async function ServicePage({ params }: PageProps) {
+  const { slug } = await params;
+  const faq = SERVICE_FAQ_SCHEMA[slug];
+  const faqLd = faq?.length
+    ? {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+      }
+    : null;
+  return (
+    <>
+      {faqLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd).replace(/</g, "\\u003c") }} />}
+      <ServicePageBody params={params} />
+    </>
+  );
+}
+
+async function ServicePageBody({ params }: PageProps) {
   const { category, slug } = await params;
   const match = getServiceByCategoryAndSlug(category, slug);
 

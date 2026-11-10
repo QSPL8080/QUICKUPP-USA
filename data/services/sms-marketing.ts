@@ -2,7 +2,7 @@ import type { ServicePageData } from "@/lib/servicePageTypes";
 
 const data: ServicePageData = {
   metaTitle: "SMS Marketing Services | Quickupp Softech",
-  metaDescription: "Reach Customers Instantly With Targeted SMS Marketing.",
+  metaDescription: "Reach customers instantly with Quickupp Softech's SMS marketing services. Send targeted messages, promote offers, and boost customer engagement.",
   crumb: "SMS Marketing",
   heroEyebrow: "SMS Marketing",
   heroTitle: "Reach Customers Instantly With Targeted SMS Marketing",

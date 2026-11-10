@@ -1,9 +1,8 @@
 import type { ServicePageData } from "@/lib/servicePageTypes";
 
 const data: ServicePageData = {
-  metaTitle: "Web Design & Development | Quickupp Softech",
-  metaDescription:
-    "Websites designed to look better, perform better and grow your business. Professional Web Design & Development Services by Quickupp Softech.",
+  metaTitle: "Web Design & Development Company | Quickupp Softech",
+  metaDescription: "Build a professional online presence with Quickupp Softech's web design and development services. Create responsive, user-friendly websites that drive growth.",
   crumb: "Web Design & Development",
   heroEyebrow: "Web Design & Development",
   heroTitle: "Websites Designed to Look Better, Perform Better & Grow Your Business",

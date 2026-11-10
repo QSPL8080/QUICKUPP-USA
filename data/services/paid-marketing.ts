@@ -1,8 +1,8 @@
 import type { ServicePageData } from "@/lib/servicePageTypes";
 
 const data: ServicePageData = {
-  metaTitle: "Paid Marketing | Quickupp Softech",
-  metaDescription: "Paid Marketing Services That Turn Ad Spend Into Growth. Reach the right audience, on the right platform, at the right time.",
+  metaTitle: "Paid Media Management Company | Quickupp Softech",
+  metaDescription: "Drive more leads and sales with targeted paid marketing campaigns, PPC advertising, and performance-focused strategies by Quickupp Softech.",
   crumb: "Paid Marketing",
   heroEyebrow: "Paid Marketing",
   heroTitle: "Paid Marketing Services That Turn Ad Spend Into Growth",

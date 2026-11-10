@@ -2,7 +2,7 @@ import type { ServicePageData } from "@/lib/servicePageTypes";
 
 const data: ServicePageData = {
   metaTitle: "Email Marketing Services | Quickupp Softech",
-  metaDescription: "Turn Emails Into Customer Relationships & Business Growth.",
+  metaDescription: "Grow customer relationships and drive conversions with Quickupp Softech's email marketing services through targeted campaigns and personalised communication.",
   crumb: "Email Marketing",
   heroEyebrow: "Email Marketing",
   heroTitle: "Turn Emails Into Customer Relationships & Business Growth",

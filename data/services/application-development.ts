@@ -1,9 +1,8 @@
 import type { ServicePageData } from "@/lib/servicePageTypes";
 
 const data: ServicePageData = {
-  metaTitle: "Application Development | Quickupp Softech",
-  metaDescription:
-    "Build powerful mobile applications that drive business growth. Professional Android, iOS, and Mobile App Development Services by Quickupp Softech.",
+  metaTitle: "App Development Services | Quickupp Softech",
+  metaDescription: "Build powerful mobile and web applications with Quickupp Softech's application development solutions tailored to your business needs and goals.",
   crumb: "Application Development",
   heroEyebrow: "Application Development",
   heroTitle: "Build Powerful Mobile Applications That Drive Business Growth",

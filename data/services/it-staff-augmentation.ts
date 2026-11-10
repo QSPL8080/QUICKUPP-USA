@@ -2,8 +2,7 @@ import type { ServicePageData } from "@/lib/servicePageTypes";
 
 const data: ServicePageData = {
   metaTitle: "IT Staff Augmentation | Quickupp Softech",
-  metaDescription:
-    "Scale your technology team with skilled IT professionals. Flexible IT Staff Augmentation Services by Quickupp Softech.",
+  metaDescription: "Scale your team with skilled IT staff augmentation solutions. Access experienced professionals to fill talent gaps, speed up projects, and support business growth.",
   crumb: "IT Staff Augmentation",
   heroEyebrow: "IT Staff Augmentation",
   heroTitle: "Scale Your Technology Team With Skilled IT Professionals",

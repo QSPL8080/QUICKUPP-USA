@@ -1,8 +1,8 @@
 import type { ServicePageData } from "@/lib/servicePageTypes";
 
 const data: ServicePageData = {
-  metaTitle: "SEO & AI Search Visibility | Quickupp Softech",
-  metaDescription: "Be Found on Google. Be Discovered in AI Search. Grow Your Business.",
+  metaTitle: "SEO, AEO & GEO Services for Better Search Visibility",
+  metaDescription: "Boost your Google rankings and AI search visibility with expert SEO, AEO and GEO strategies from Quickupp Softech to grow your business online.",
   crumb: "SEO & AI Search Visibility",
   heroEyebrow: "SEO & AI Search Visibility",
   heroTitle: "Be Found on Google. Be Discovered in AI Search. Grow Your Business.",

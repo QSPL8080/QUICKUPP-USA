@@ -2,11 +2,10 @@ import type { ServicePageData } from "@/lib/servicePageTypes";
 
 const data: ServicePageData = {
   metaTitle: "UI/UX Design Services | Quickupp Softech",
-  metaDescription:
-    "Create modern, intuitive, responsive, and conversion-focused digital experiences with professional UI/UX Design Services by Quickupp Softech.",
+  metaDescription: "Create modern, intuitive, responsive, and conversion-focused digital experiences with professional UI/UX Design Services by Quickupp Softech.",
   crumb: "UI/UX Design",
   heroEyebrow: "UI/UX Design Services",
-  heroTitle: "Create Intuitive, Modern & Engaging Digital Experiences",
+  heroTitle: "Create modern, responsive, and user-friendly websites with our Website UI/UX Design Services.",
   heroParagraphs: [
     "At Quickupp Softech, we provide end-to-end UI/UX Design Services to help businesses turn ideas, user journeys, and complex requirements into intuitive and high-converting digital products.",
     "From website and mobile app design to SaaS platforms, wireframing, and interactive prototyping, we combine aesthetics, usability, and product strategy to deliver measurable business value.",

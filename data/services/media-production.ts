@@ -1,7 +1,7 @@
 import type { ServicePageData } from "@/lib/servicePageTypes";
 
 const data: ServicePageData = {
-  metaTitle: "Media Production | Quickupp Softech",
+  metaTitle: "Best Media Production Company | Quickupp Softech",
   metaDescription: "Professional Video Production & Reels for Your Brand. Create engaging, professional and platform-ready videos that capture attention.",
   crumb: "Media Production",
   heroEyebrow: "Media Production",

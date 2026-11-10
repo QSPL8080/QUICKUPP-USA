@@ -1,7 +1,7 @@
 import type { ServicePageData } from "@/lib/servicePageTypes";
 
 const data: ServicePageData = {
-  metaTitle: "Social Media Marketing | Quickupp Softech",
+  metaTitle: "Social Media Agency | Quickupp Softech",
   metaDescription: "Quickupp Softech is a Social Media Marketing Agency helping businesses build stronger brands, engage target audiences and generate leads.",
   crumb: "Social Media Marketing",
   heroEyebrow: "Social Media Marketing",

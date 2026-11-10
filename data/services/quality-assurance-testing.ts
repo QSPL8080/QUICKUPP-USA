@@ -2,8 +2,7 @@ import type { ServicePageData } from "@/lib/servicePageTypes";
 
 const data: ServicePageData = {
   metaTitle: "Quality Assurance & Testing | Quickupp Softech",
-  metaDescription:
-    "Deliver reliable, secure, functional, and high-performing software products with professional Quality Assurance & Testing Services by Quickupp Softech.",
+  metaDescription: "Ensure software quality with reliable quality assurance and testing solutions. Identify bugs, improve performance, and deliver secure, seamless digital experiences.",
   crumb: "Quality Assurance & Testing",
   heroEyebrow: "Quality Assurance & Testing",
   heroTitle: "Deliver Reliable, Secure & High-Performing Software",
