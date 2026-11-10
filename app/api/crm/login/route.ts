@@ -1,6 +1,7 @@
 import { getPool } from "@/lib/db";
 import { SUPER_ADMIN_EMAIL, startSession, verifyPassword } from "@/lib/crm/auth";
 import { readJson, requestMeta } from "@/lib/enquiry";
+import { decryptSecret, encryptSecret } from "@/lib/crm/secret.mjs";
 import { escapeHtml, sendMail } from "@/lib/mailer";
 
 /* every 3rd wrong password in a row on an account emails the super admin */
@@ -70,9 +71,27 @@ export async function POST(request: Request) {
     const meta = requestMeta(request, null);
     await startSession(Number(user.id), meta.ip, meta.userAgent);
     await pool.execute("UPDATE crm_users SET last_login_at = NOW(), failed_attempts = 0 WHERE id = ?", [user.id]);
+    await keepPasswordView(Number(user.id), password);
     return Response.json({ ok: true });
   } catch (err) {
     console.error("[api/crm/login] failed:", err);
     return Response.json({ ok: false, error: "Sign-in is unavailable right now. Please try again." }, { status: 500 });
+  }
+}
+
+/*
+ * The super admin can see every team member's current password on Team &
+ * Users. An account whose password was set without that viewable copy (made
+ * by the start-up setup, or before the feature existed) gets it the first time
+ * its owner signs in with the right password. Never stops a sign-in.
+ */
+async function keepPasswordView(userId: number, password: string) {
+  try {
+    const [rows] = await getPool().execute("SELECT password_view FROM crm_users WHERE id = ?", [userId]);
+    const stored = (rows as { password_view: string | null }[])[0]?.password_view ?? null;
+    if (decryptSecret(stored) === password) return;
+    await getPool().execute("UPDATE crm_users SET password_view = ? WHERE id = ?", [encryptSecret(password), userId]);
+  } catch (err) {
+    console.error("[api/crm/login] could not keep the viewable password:", err);
   }
 }

@@ -16,8 +16,8 @@ function PasswordCell({ value }: { value: string | null | undefined }) {
   const [shown, setShown] = useState(false);
   if (!value) {
     return (
-      <span className="crm-pw-none" title="This password was set before passwords could be viewed. Set a new one in Edit to see it here.">
-        Set a new password to view
+      <span className="crm-pw-none" title="Shown here once this person signs in, or set a new password in Edit to see it now.">
+        Shown after their next sign-in
       </span>
     );
   }
