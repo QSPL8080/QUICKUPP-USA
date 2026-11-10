@@ -211,6 +211,12 @@
   color: #ffffff !important;
 }
 
+.cl-page button.cl-chip:disabled:not(#_):not(#__) {
+  opacity: 0.45;
+  cursor: default;
+  pointer-events: none;
+}
+
 .cl-chip-n {
   min-width: 22px;
   padding: 1px 7px;
