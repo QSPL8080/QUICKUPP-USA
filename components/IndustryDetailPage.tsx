@@ -1,6 +1,6 @@
 "use client";
 
-import ServiceEnquiryForm from "@/components/ServiceEnquiryForm";
+import IndustryHeroForm from "@/components/IndustryHeroForm";
 import type { INDUSTRIES } from "@/lib/formOptions";
 import React, { useCallback, useState } from "react";
 import Link from "next/link";
@@ -717,7 +717,11 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
     <div className="inx-page">
       <Header />
       <main>
-        <section className="inx-hero">
+        <section className="inx-hero inx-hero-has-form">
+          {/* the hero photo fills the section behind the copy and the form */}
+          <div className="inx-hero-photo" aria-hidden="true">
+            <img src={images.hero} alt="" loading="eager" fetchPriority="high" style={images.heroPos ? { objectPosition: images.heroPos } : undefined} />
+          </div>
           <div className="inx-hero-bg" aria-hidden="true" />
           <div className="inx-container">
             <nav className="inx-crumbs" aria-label="Breadcrumb">
@@ -739,14 +743,14 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                 ))}
                 <Cta cta={data.heroCta} />
               </div>
-              <figure className="inx-hero-media">
+              <div className="inx-hero-form" id="enquiry">
                 <span className="inx-frame-plate" aria-hidden="true" />
-                <img src={images.hero} alt={data.crumb} loading="eager" style={images.heroPos ? { objectPosition: images.heroPos } : undefined} />
+                <IndustryHeroForm industry={data.crumb as (typeof INDUSTRIES)[number]} />
                 <span className="inx-mark inx-mark-tl" aria-hidden="true" />
                 <span className="inx-mark inx-mark-tr" aria-hidden="true" />
                 <span className="inx-mark inx-mark-bl" aria-hidden="true" />
                 <span className="inx-mark inx-mark-br" aria-hidden="true" />
-              </figure>
+              </div>
             </div>
           </div>
         </section>
@@ -775,9 +779,6 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
           if (block.type === "faq") return <FaqSection key={i} block={block as FaqBlock} />;
           return null;
         })}
-
-        {/* Lead form: industry fixed to this page, visitor picks the service and categories */}
-        <ServiceEnquiryForm industry={data.crumb as (typeof INDUSTRIES)[number]} current={data.crumb} />
 
         {/* Book a call (live Calendly) */}
         <BookingSection eyebrow="Schedule a Consultation" title={["Let’s Grow Your", `${data.crumb} Business`]} text={["Choose a convenient date and time for a free consultation call. We\u2019ll discuss your goals and the right next steps for your business."]} tone="soft" icon="calendar" />
