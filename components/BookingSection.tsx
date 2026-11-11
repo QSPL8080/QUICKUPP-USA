@@ -14,9 +14,37 @@ import "@/app/booking.css";
 const CALENDLY_URL =
   "https://calendly.com/quickuppsoftechmeet/strategy-call?hide_gdpr_banner=1&hide_event_type_details=1&hide_landing_page_details=1&background_color=ffffff&text_color=0b0f17&primary_color=6366f1";
 
+/**
+ * After a visitor books, Calendly shows its confirmation inside the embed.
+ * 3 seconds later the embed starts again at the calendar (like the forms do).
+ * Returns a number to use as the iframe's key: changing it reloads the embed.
+ */
+export function useCalendlyReset(onReset?: () => void) {
+  const [round, setRound] = useState(0);
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const onMessage = (e: MessageEvent) => {
+      if (e.origin !== "https://calendly.com" || !e.data || e.data.event !== "calendly.event_scheduled") return;
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        onReset?.();
+        setRound((r) => r + 1);
+      }, 3000);
+    };
+    window.addEventListener("message", onMessage);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("message", onMessage);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return round;
+}
+
 function CalendlyFrame() {
   const [src, setSrc] = useState("");
   const [height, setHeight] = useState<number | null>(null);
+  const round = useCalendlyReset(() => setHeight(null));
   const boxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -55,7 +83,7 @@ function CalendlyFrame() {
     <div ref={boxRef} className="su-calendly-scroll bk-cal-scroll" style={height ? ({ "--cal-h": `${height}px` } as CSSProperties) : undefined}>
       <div className="su-calendly-frame">
         {src ? (
-          <iframe src={src} title="Book a Free Consultation with Quickupp Softech" />
+          <iframe key={round} src={src} title="Book a Free Consultation with Quickupp Softech" />
         ) : (
           <div className="bk-cal-wait" aria-hidden="true">
             <span />

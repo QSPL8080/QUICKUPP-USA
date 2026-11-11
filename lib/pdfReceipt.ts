@@ -18,6 +18,8 @@ export interface ReceiptData {
   /** "pending" while PayPal is still clearing the payment */
   paymentStatus?: "paid" | "partially_paid" | "pending";
   remainingAmount?: number | null;
+  /** a balance payment: the amount the client paid earlier (the deposit) */
+  earlierPaid?: number | null;
   transactionId: string;
   paymentDate: string;
   paymentTime: string;
@@ -130,6 +132,7 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
     paymentType = "full",
     paymentStatus,
     remainingAmount = 0,
+    earlierPaid = 0,
     transactionId,
     paymentDate,
     paymentTime,
@@ -169,6 +172,7 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
 
   const isPending = paymentStatus === "pending";
   const isPartial = paymentType === "partial" && !isPending;
+  const isBalance = !isPartial && !isPending && Number(earlierPaid) > 0;
   const usd = (n: unknown) => `$${Number(n || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   const finalTotal = totalAmount != null && Number(totalAmount) > 0 ? Number(totalAmount) : Number(amountPaid);
   const formattedDate = formatReceiptDate(paymentDate);
@@ -339,7 +343,7 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
     { label: "Transaction ID", value: transactionId || "N/A" },
     { label: "Payment Date", value: `${formattedDate}${paymentTime ? ` · ${paymentTime}` : ""}` },
     { label: "Payment Status", value: statusStr, color: statusColor },
-    { label: "Payment Type", value: paymentType === "partial" ? "Advance Deposit" : "Full Payment" },
+    { label: "Payment Type", value: paymentType === "partial" ? "Advance Deposit" : isBalance ? "Balance Payment" : "Full Payment" },
   ];
 
   const sectionBottomY = Math.min(infoColumn(leftX, billRows), infoColumn(col2X, payRows));
@@ -366,7 +370,7 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
   const DESC_LINE = 13;
   const itemRowH = Math.max(38, (descLines.length - 1) * DESC_LINE + CAP * TBL_SIZE + 26);
   const summaryRowH = 26;
-  const summaryRowCount = isPartial ? 2 : 1;
+  const summaryRowCount = isPartial ? 2 : isBalance ? 3 : 1;
   const finalRowH = 38;
   const tblH = headerRowH + itemRowH + summaryRowCount * summaryRowH + finalRowH;
   const tableTop = detailsHeadingY - 14;
@@ -408,6 +412,10 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
     const paidPct = finalTotal > 0 ? Math.round((Number(amountPaid) / finalTotal) * 100) : 0;
     summaryRow(`Amount Paid (${paidPct}% Advance)`, usd(amountPaid), greenText);
   }
+  if (isBalance) {
+    summaryRow("Deposit Paid Earlier", usd(earlierPaid));
+    summaryRow("Balance Paid Now", usd(amountPaid), greenText);
+  }
 
   // highlighted last row: green "Total Paid" when fully paid, amber when a balance remains or PayPal is clearing it
   const finalBg = isPending || isPartial ? amberBg : greenBg;
@@ -417,7 +425,9 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
   const FINAL_SIZE = 11;
   const finalY = midBaseline(tblY, finalRowH, FINAL_SIZE);
   const finalLabel = isPending ? "Amount Pending" : isPartial ? "Balance Due" : "Total Paid";
-  const finalValStr = isPartial ? `${usd(remainingAmount)} USD` : `${usd(amountPaid)} USD`;
+  const finalValStr = isPartial
+    ? `${usd(remainingAmount)} USD`
+    : `${usd(isBalance ? Number(earlierPaid) + Number(amountPaid) : amountPaid)} USD`;
   right(finalLabel, labelRight, finalY, FINAL_SIZE, fontBold, finalColor);
   right(finalValStr, amountRight, finalY, FINAL_SIZE, fontBold, finalColor);
 

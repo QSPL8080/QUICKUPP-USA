@@ -11,6 +11,7 @@ import { SERVICES_DATA } from "@/components/PayNowModal";
 import CountrySelect from "@/components/CountrySelect";
 import { openDynamicEmailModal } from "@/components/DynamicEmailModal";
 import "@/app/contact.css";
+import { useCalendlyReset } from "@/components/BookingSection";
 
 const getCategoriesForService = (service: string): readonly string[] => {
   if (service === "AI & Automation Solutions" || service === "AI Solutions & Automation") {
@@ -149,6 +150,7 @@ function InquiryForm() {
       setSubmitError("");
       setTrap("");
       setSubmitted(false);
+      setCountdown(3);
     }, 3000);
     return () => {
       clearInterval(interval);
@@ -371,6 +373,7 @@ function InquiryForm() {
 function CalendlyEmbed() {
   const [src, setSrc] = useState("");
   const [height, setHeight] = useState<number | null>(null);
+  const round = useCalendlyReset(() => setHeight(null));
 
   useEffect(() => {
     // Calendly's inline embed: the iframe reports its content height back to the page
@@ -392,7 +395,7 @@ function CalendlyEmbed() {
   return (
     <div className="su-calendly-scroll ct-cal-scroll" style={height ? ({ "--cal-h": `${height}px` } as React.CSSProperties) : undefined}>
       <div className="su-calendly-frame">
-        {src && <iframe src={src} title="Book a Free Consultation with Quickupp Softech" />}
+        {src && <iframe key={round} src={src} title="Book a Free Consultation with Quickupp Softech" />}
       </div>
     </div>
   );

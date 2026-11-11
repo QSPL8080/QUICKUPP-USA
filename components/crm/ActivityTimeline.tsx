@@ -39,6 +39,8 @@ const TITLES: Record<string, string> = {
   payment_type: "Payment Type Updated",
   link_status: "Link Status Updated",
   reminder: "Balance Reminder",
+  receipt_email: "Receipt Emailed to Client",
+  receipt_email_failed: "Receipt Email Not Sent",
 };
 
 const FIELD_TITLES: Record<string, string> = {
@@ -169,7 +171,7 @@ export default function ActivityTimeline({
         >
           {list.map((a) => {
             const dot = DOTS[a.actorType] || DOTS.user;
-            const showChange = (a.oldValue || a.newValue) && short(a.oldValue) && short(a.newValue) && a.action !== "created" && a.action !== "payment" && a.action !== "payment_failed" && a.action !== "reminder" && a.action !== "payment_link" && a.action !== "attachment";
+            const showChange = (a.oldValue || a.newValue) && short(a.oldValue) && short(a.newValue) && a.action !== "created" && a.action !== "payment" && a.action !== "payment_failed" && a.action !== "reminder" && a.action !== "receipt_email" && a.action !== "receipt_email_failed" && a.action !== "payment_link" && a.action !== "attachment";
             return (
               <div key={a.id} className="crm-timeline-item">
                 <div className="crm-timeline-dot" style={{ background: dot.bg, borderColor: dot.ring }} />

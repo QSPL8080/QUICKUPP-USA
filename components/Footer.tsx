@@ -144,6 +144,11 @@ export default function Footer() {
               <div className="qs-scalient-chip-location">
                 United States • Global Delivery
               </div>
+              <div className="qs-ft-reviews">
+                <img src="/images/reviews/google-reviews.png" alt="Google Reviews: 4.9 stars, 152 reviews" width={300} height={150} className="qs-ft-review is-google" loading="lazy" />
+                <img src="/images/reviews/trustpilot.png" alt="Trustpilot 5-star rating" width={283} height={132} className="qs-ft-review is-trustpilot" loading="lazy" />
+                <img src="/images/reviews/goodfirms.png" alt="GoodFirms 5-star rating" width={598} height={57} className="qs-ft-review is-goodfirms" loading="lazy" />
+              </div>
             </div>
           </div>
 

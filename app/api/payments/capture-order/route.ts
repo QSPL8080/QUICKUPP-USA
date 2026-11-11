@@ -5,7 +5,8 @@ import { getPool } from "@/lib/db";
 import { sendMail, LEADS_NOTIFICATION_EMAIL, EMAIL_LOGO_SRC } from "@/lib/mailer";
 import { generateReceiptPdf } from "@/lib/pdfReceipt";
 import { paymentDateTime } from "@/lib/paymentTime";
-import { logGatewayResult, paymentSnapshot, type PaymentSnapshot, type PaymentTable } from "@/lib/crm/paymentActivity";
+import { entityOf, logGatewayResult, paymentSnapshot, type PaymentSnapshot, type PaymentTable } from "@/lib/crm/paymentActivity";
+import { logActivity } from "@/lib/crm/activity";
 import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { errMessage } from "@/lib/err";
 
@@ -96,6 +97,8 @@ export async function POST(req: Request) {
     let effectiveCompany = companyName || "";
     let effectiveService = service || "Quickupp Softech Service";
     let effectiveCategory = categoryStr || "";
+    let recordTable: PaymentTable = "payments";
+    let earlierPaid = 0; // a balance payment: what the client had already paid (the deposit)
 
     try {
       const pool = getPool();
@@ -156,6 +159,7 @@ export async function POST(req: Request) {
         if (previouslyPaid > 0 && paymentStatus !== "failed") {
           // Paying remaining balance!
           isBalancePayment = true;
+          earlierPaid = previouslyPaid;
           isPartial = false;
           finalRemaining = 0;
           paymentStatus = "paid";
@@ -322,6 +326,7 @@ export async function POST(req: Request) {
 
       }
 
+      recordTable = (existingRecord ? targetTable : "payments") as PaymentTable;
       if (insertedId) {
         await logGatewayResult({
           table: (existingRecord ? targetTable : "payments") as PaymentTable,
@@ -411,9 +416,16 @@ export async function POST(req: Request) {
       if (paymentStatus !== "failed" && effectiveClientEmail && effectiveClientEmail.includes("@")) {
         try {
           const firstName = effectiveClientName.trim().split(" ")[0] || "Valued Client";
-          const clientSubject = paymentStatus === "pending"
-            ? `Payment Processing (Pending Clearing) — Quickupp Softech LLC | Order #${orderNumber}`
-            : `Payment Confirmed — Quickupp Softech LLC | Order #${orderNumber}`;
+          // what this payment was: a deposit (part payment), the balance that completes the order, or the full amount
+          const receiptKind = paymentStatus === "pending" ? "pending" : isPartial ? "deposit" : isBalancePayment ? "balance" : "full";
+          const clientSubject =
+            receiptKind === "pending"
+              ? `Payment Processing (Pending Clearing) — Quickupp Softech LLC | Order #${orderNumber}`
+              : receiptKind === "deposit"
+              ? `Deposit Received — Your Receipt | Quickupp Softech LLC | Order #${orderNumber}`
+              : receiptKind === "balance"
+              ? `Balance Paid — Order Fully Paid | Quickupp Softech LLC | Order #${orderNumber}`
+              : `Payment Confirmed — Your Receipt | Quickupp Softech LLC | Order #${orderNumber}`;
 
           const { date: paymentDateFormatted, time: paymentTimeFormatted } = paymentDateTime(new Date());
 
@@ -435,6 +447,7 @@ export async function POST(req: Request) {
             totalAmount: finalTotal,
             paymentType: isPartial ? "partial" : "full",
             paymentStatus: paymentStatus === "pending" ? "pending" : isPartial ? "partially_paid" : "paid",
+            earlierPaid: isBalancePayment ? earlierPaid : 0,
             remainingAmount: finalRemaining,
             transactionId: captureID,
             paymentDate: paymentDateFormatted,
@@ -445,7 +458,8 @@ export async function POST(req: Request) {
           const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.quickuppsoftech.us";
           const receiptDownloadUrl = `${siteUrl}/api/payments/receipt?order=${encodeURIComponent(orderNumber)}`;
 
-          const statusBannerTitle = paymentStatus === "pending" ? "PAYMENT PROCESSING (PENDING)" : "PAYMENT CONFIRMED";
+          const statusBannerTitle =
+            receiptKind === "pending" ? "PAYMENT PROCESSING (PENDING)" : receiptKind === "deposit" ? "DEPOSIT RECEIVED" : receiptKind === "balance" ? "BALANCE PAID · ORDER COMPLETE" : "PAYMENT CONFIRMED";
           const statusBannerValue = paymentStatus === "pending"
             ? "Status: PENDING CLEARING"
             : isPartial
@@ -595,7 +609,7 @@ export async function POST(req: Request) {
             </html>
           `;
 
-          await sendMail({
+          const receiptSent = await sendMail({
             channel: "info",
             to: effectiveClientEmail,
             fromName: "Quickupp Softech LLC",
@@ -609,6 +623,19 @@ export async function POST(req: Request) {
                 contentType: "application/pdf",
               },
             ],
+          });
+
+          // record it on the payment, so the CRM shows whether the client got this receipt
+          const what = receiptKind === "deposit" ? "Deposit receipt" : receiptKind === "balance" ? "Balance receipt" : receiptKind === "pending" ? "Payment-processing notice" : "Payment receipt";
+          await logActivity({
+            entity: entityOf(recordTable),
+            id: insertedId,
+            action: receiptSent ? "receipt_email" : "receipt_email_failed",
+            text: receiptSent
+              ? `${what} for $${capturedAmount.toFixed(2)} ${currency} emailed to ${effectiveClientEmail} with the PDF receipt`
+              : `${what} for $${capturedAmount.toFixed(2)} ${currency} could not be emailed to ${effectiveClientEmail} (mail server not available)`,
+            actor: { type: "system", label: "Email" },
+            eventKey: `receipt:${captureID}`,
           });
         } catch (clientMailErr) {
           console.error("[Customer Receipt Email Error]", clientMailErr);

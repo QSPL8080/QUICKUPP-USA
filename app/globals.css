@@ -1594,6 +1594,39 @@ a.button-link[data-wf--button--variant="white-bg"] .button-arrow,
   padding-left: 4px;
 }
 
+/* review badges under the location line (light-on-dark versions, transparent) */
+.qs-ft-reviews {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 26px;
+  margin-top: 22px;
+  padding-left: 4px;
+}
+
+.qs-ft-review {
+  display: block;
+  width: auto;
+  max-width: 100%;
+}
+
+.qs-ft-review.is-goodfirms { height: 19px; }
+/* GoodFirms is a long strip: it takes its own line under Google and Trustpilot */
+.qs-ft-review.is-goodfirms {
+  flex-basis: 100%;
+  object-fit: contain;
+  object-position: left center;
+}
+.qs-ft-review.is-google { height: 50px; }
+.qs-ft-review.is-trustpilot { height: 44px; }
+
+@media (max-width: 480px) {
+  .qs-ft-reviews { gap: 12px 20px; }
+  .qs-ft-review.is-goodfirms { height: 17px; }
+  .qs-ft-review.is-google { height: 44px; }
+  .qs-ft-review.is-trustpilot { height: 38px; }
+}
+
 /* Right Navigation Columns */
 .qs-scalient-nav-grid {
   display: grid;

@@ -69,6 +69,7 @@ export default function ServiceEnquiryForm({ service: fixedService, industry: fi
     }, 1000);
     const timer = setTimeout(() => {
       setSubmitted(false);
+      setCountdown(3);
       setFormData(start);
       setPickedService("");
       setSelectedCategories([]);
