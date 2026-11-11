@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { toDateOnly } from "@/lib/crm/data";
 import { getPool } from "@/lib/db";
+import { getCurrentUser } from "@/lib/crm/auth";
 import type { RowDataPacket } from "mysql2/promise";
 import { LINK_MESSAGES, findByToken, linkState, markExpired, type LinkTable } from "@/lib/paymentLink";
 
@@ -25,6 +26,10 @@ export async function GET(req: Request) {
         table = found.table;
       }
     } else if (orderNumber) {
+      // by order number: CRM only (order numbers are sequential, so anyone could guess them)
+      if (!(await getCurrentUser())) {
+        return NextResponse.json({ ok: false, error: "Payment record or link not found." }, { status: 404 });
+      }
       try {
         const [plRes] = await pool.query("SELECT * FROM payment_links WHERE invoice_number = ? OR id = ? LIMIT 1", [
           orderNumber,

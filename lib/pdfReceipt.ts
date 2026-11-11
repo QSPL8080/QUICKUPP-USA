@@ -20,6 +20,8 @@ export interface ReceiptData {
   remainingAmount?: number | null;
   /** a balance payment: the amount the client paid earlier (the deposit) */
   earlierPaid?: number | null;
+  /** a balance payment: the deposit's transaction ID */
+  earlierTransactionId?: string | null;
   transactionId: string;
   paymentDate: string;
   paymentTime: string;
@@ -340,7 +342,12 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
   const statusColor = isPending || isPartial ? amberText : greenText;
   const payRows: InfoRow[] = [
     { label: "Payment Method", value: "PayPal" },
-    { label: "Transaction ID", value: transactionId || "N/A" },
+    ...(isBalance && data.earlierTransactionId
+      ? [
+          { label: "Deposit Transaction ID", value: data.earlierTransactionId },
+          { label: "Balance Transaction ID", value: transactionId || "N/A" },
+        ]
+      : [{ label: "Transaction ID", value: transactionId || "N/A" }]),
     { label: "Payment Date", value: `${formattedDate}${paymentTime ? ` · ${paymentTime}` : ""}` },
     { label: "Payment Status", value: statusStr, color: statusColor },
     { label: "Payment Type", value: paymentType === "partial" ? "Advance Deposit" : isBalance ? "Balance Payment" : "Full Payment" },

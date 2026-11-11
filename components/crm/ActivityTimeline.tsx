@@ -101,6 +101,13 @@ export function fmtWhen(iso: string) {
   return `${date}, ${time}`;
 }
 
+/** "Nov 10, 2026, 8:25 PM": payment history shows the exact moment */
+export function fmtExact(iso: string) {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" });
+}
+
 /** the sentence without its trailing "by Admin (Priya)." — shown separately */
 function sentence(a: ActivityEntry) {
   const tail = ` by ${a.by}.`;
@@ -115,12 +122,15 @@ export default function ActivityTimeline({
   loading = false,
   emptyText = "No activity recorded yet.",
   visibleCount = 2,
+  orderTotal,
 }: {
   entries: ActivityEntry[];
   kind: "lead" | "payment";
   loading?: boolean;
   emptyText?: string;
   visibleCount?: number;
+  /** payment history: the order total, to tell a deposit from a full payment */
+  orderTotal?: number;
 }) {
   // the latest 2 entries are shown; older ones are reached by scrolling the list
   const VISIBLE = visibleCount;
@@ -143,6 +153,23 @@ export default function ActivityTimeline({
     return () => ro.disconnect();
   }, [entries, VISIBLE]);
   const list = entries;
+  // payment history: name each PayPal payment (deposit, balance or full) and show its amount and transaction ID
+  const paymentInfo = new Map<number, { title: string; amount: string | null; txn: string | null }>();
+  if (kind === "payment") {
+    const payments = entries.filter((a) => a.action === "payment" && a.actorType === "gateway").slice().reverse(); // oldest first
+    payments.forEach((a, i) => {
+      const amount = a.newValue;
+      const txn = /\(Ref: ([^)]+)\)/.exec(a.message)?.[1] || null;
+      const value = Number(String(amount || "").replace(/[^0-9.]/g, "")) || 0;
+      const pending = /pending/i.test(a.message);
+      const title = /^Balance payment/i.test(a.message)
+        ? "Balance Paid"
+        : i === 0 && orderTotal && value > 0 && value < orderTotal
+        ? "Deposit Paid (partial payment)"
+        : "Full Payment Received";
+      paymentInfo.set(a.id, { title: pending ? `${title} · pending clearing` : title, amount, txn });
+    });
+  }
 
   return (
     <div className="crm-drawer-card crm-activity-card">
@@ -177,11 +204,23 @@ export default function ActivityTimeline({
                 <div className="crm-timeline-dot" style={{ background: dot.bg, borderColor: dot.ring }} />
                 <div className="crm-timeline-body">
                   <div className="crm-timeline-top">
-                    <span className="crm-timeline-title">{titleOf(a, kind)}</span>
+                    <span className="crm-timeline-title">{paymentInfo.get(a.id)?.title || titleOf(a, kind)}</span>
                     <span className="crm-timeline-time" title={new Date(a.createdAt).toLocaleString()}>
-                      {fmtWhen(a.createdAt)}
+                      {kind === "payment" ? fmtExact(a.createdAt) : fmtWhen(a.createdAt)}
                     </span>
                   </div>
+                  {paymentInfo.has(a.id) && (
+                    <p className="crm-activity-payment">
+                      <span>
+                        Amount <strong>{paymentInfo.get(a.id)!.amount || "—"}</strong>
+                      </span>
+                      {paymentInfo.get(a.id)!.txn && (
+                        <span>
+                          Transaction ID <code>{paymentInfo.get(a.id)!.txn}</code>
+                        </span>
+                      )}
+                    </p>
+                  )}
                   {showChange && (
                     <p className="crm-activity-change">
                       <span className="crm-activity-old">{a.oldValue || "—"}</span>

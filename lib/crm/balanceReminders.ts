@@ -133,13 +133,14 @@ export async function runBalanceReminders(): Promise<ReminderRun> {
 
       const diffDays = Math.round((dueDate.getTime() - todayMidnight.getTime()) / (1000 * 60 * 60 * 24));
 
-      // Milestone check:
-      // Milestone 10d: diffDays === 10 (or 8..9 if created in window and never reminded)
-      // Milestone 2d: diffDays === 2 (or 0..1 if created in window and never reminded)
       let targetMilestone: "10d" | "2d" | null = null;
 
-      if (diffDays === 10 || (diffDays < 10 && diffDays >= 8 && !p.balance_reminder_10d_sent_at && !p.balance_reminder_sent_at)) {
-        if (!p.balance_reminder_10d_sent_at) {
+      // 10 days before (or up to 2 days late if the site was down); 2 days before (or up to the due day)
+      // (a deposit made in the last 2 days already came with the balance link, so it skips the 10-day one)
+      const depositAt = p.paid_at ? new Date(p.paid_at).getTime() : 0;
+      const justPaid = depositAt > 0 && Date.now() - depositAt < 2 * 24 * 3600 * 1000;
+      if (diffDays <= 10 && diffDays >= 8) {
+        if (!p.balance_reminder_10d_sent_at && !justPaid) {
           targetMilestone = "10d";
         }
       } else if (diffDays === 2 || (diffDays < 2 && diffDays >= 0 && !p.balance_reminder_2d_sent_at)) {
@@ -157,8 +158,9 @@ export async function runBalanceReminders(): Promise<ReminderRun> {
       let token = p.token;
       if (!token) {
         token = randomBytes(16).toString("hex");
-        await pool.query(`UPDATE payment_links SET token = ?, link_status = 'active' WHERE id = ?`, [token, p.id]).catch(() => {});
-        await pool.query(`UPDATE payments SET token = ?, link_status = 'active' WHERE id = ?`, [token, p.id]).catch(() => {});
+        // only in the record's own table: a payment and a payment link can share an id
+        const ownTable = p._table === "payment_links" ? "payment_links" : "payments";
+        await pool.query(`UPDATE \`${ownTable}\` SET token = ?, link_status = 'active' WHERE id = ?`, [token, p.id]).catch(() => {});
       }
 
       const balanceUrl = `${siteUrl}/pay/${token}`;

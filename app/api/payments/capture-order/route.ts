@@ -1,48 +1,76 @@
 import { NextResponse, after } from "next/server";
 import { randomBytes } from "node:crypto";
+import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { capturePayPalOrder } from "@/lib/paypal";
 import { getPool } from "@/lib/db";
-import { sendMail, LEADS_NOTIFICATION_EMAIL, EMAIL_LOGO_SRC } from "@/lib/mailer";
-import { generateReceiptPdf } from "@/lib/pdfReceipt";
-import { paymentDateTime } from "@/lib/paymentTime";
-import { entityOf, logGatewayResult, paymentSnapshot, type PaymentSnapshot, type PaymentTable } from "@/lib/crm/paymentActivity";
+import { sendMail, LEADS_NOTIFICATION_EMAIL } from "@/lib/mailer";
+import { entityOf, logGatewayResult, paymentSnapshot, type PaymentSnapshot } from "@/lib/crm/paymentActivity";
 import { logActivity } from "@/lib/crm/activity";
-import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { errMessage } from "@/lib/err";
-import { LINK_MESSAGES, chargeFor, findByToken, linkState, recordTransaction } from "@/lib/paymentLink";
+import { LINK_MESSAGES, chargeFor, findByToken, linkState, recordTransaction, type LinkTable } from "@/lib/paymentLink";
+import { getRecord, listTransactions, orderNumberOf, receiptPdfFor } from "@/lib/paymentTxns";
+import { clientEmail as clientEmailFor, teamEmail, type PaymentCase } from "@/lib/paymentEmails";
+
+/*
+ * PayPal approved a payment: take the money (capture), save it on the
+ * payment record, keep the transaction, and send the emails.
+ *
+ * - Pay link (/pay/<token>, a CRM payment link or a balance link): the
+ *   record already exists. The first payment is the full amount or a 50%
+ *   deposit; after a deposit the next one is the balance.
+ * - Website Pay Now (/checkout): a new payment record.
+ *
+ * The same PayPal order is never saved twice (a double click or a retry gets
+ * the first result back), and a failed attempt never changes a record.
+ */
+
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || "https://www.quickuppsoftech.us";
+const round2 = (v: number) => Math.round(v * 100) / 100;
+const ymd = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+/** A website deposit's balance due date: 10 days before the billing period ends, and at least 3 days away */
+function websiteDueDate(billingEndDate: unknown): string {
+  const soonest = new Date();
+  soonest.setDate(soonest.getDate() + 3);
+  const end = typeof billingEndDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(billingEndDate) ? new Date(`${billingEndDate}T00:00:00`) : null;
+  if (end && !isNaN(end.getTime())) {
+    end.setDate(end.getDate() - 10);
+    if (end >= soonest) return ymd(end);
+  }
+  const twoWeeks = new Date();
+  twoWeeks.setDate(twoWeeks.getDate() + 14);
+  return ymd(twoWeeks);
+}
+
+/** The answer the pay pages get; the confirmation page is opened with the transaction ID */
+async function answer(table: LinkTable, id: number, status: string, txnId: string) {
+  const rec = await getRecord(table, id);
+  return NextResponse.json({
+    success: true,
+    status,
+    orderNumber: rec ? orderNumberOf(rec) : "",
+    txn: txnId,
+    captureID: txnId,
+    remainingAmount: rec && rec.status === "partially_paid" ? Number(rec.remaining_amount || 0) : 0,
+  });
+}
 
 export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => null);
-    if (!body || !body.orderID) {
-      return NextResponse.json({ error: "Missing orderID in request" }, { status: 400 });
-    }
+    const orderID = body?.orderID ? String(body.orderID).slice(0, 64) : "";
+    if (!orderID) return NextResponse.json({ error: "Missing orderID in request" }, { status: 400 });
+    const pool = getPool();
 
-    const currentYear = new Date().getFullYear();
+    // 0. this PayPal order was already saved (double click, retry): give the same result back
+    const [seen] = await pool
+      .query<RowDataPacket[]>("SELECT record_table, record_id, status, transaction_id FROM payment_transactions WHERE paypal_order_id = ? AND status <> 'failed' LIMIT 1", [orderID])
+      .catch(() => [[] as RowDataPacket[]]);
+    if (seen.length) return answer(seen[0].record_table, Number(seen[0].record_id), seen[0].status, seen[0].transaction_id);
 
-    const {
-      orderID,
-      clientName,
-      clientEmail,
-      clientPhone,
-      companyName,
-      category,
-      service,
-      billingStartDate,
-      billingEndDate,
-      amount,
-      totalAmount,
-      paymentType,
-      remainingAmount,
-      notes,
-      token,
-      invoiceNumber,
-      existingPaymentId,
-    } = body;
-
-    // a pay link: stop before taking any money if the link can no longer be paid,
-    // and use the amount worked out from the record (see lib/paymentLink)
-    const linked = token ? await findByToken(String(token)) : null;
+    // 1. a pay link: stop before taking money if it can no longer be paid; the amount comes from the record
+    const token = body.token ? String(body.token) : "";
+    const linked = token ? await findByToken(token) : null;
     if (token && !linked) return NextResponse.json({ error: "This payment link was not found." }, { status: 404 });
     let charge: ReturnType<typeof chargeFor> = null;
     if (linked) {
@@ -50,23 +78,11 @@ export async function POST(req: Request) {
       if (state === "paid" || state === "expired" || state === "cancelled") {
         return NextResponse.json({ error: LINK_MESSAGES[state], state }, { status: 409 });
       }
-      charge = chargeFor(linked.row, paymentType);
+      charge = chargeFor(linked.row, body.paymentType);
       if (!charge) return NextResponse.json({ error: "Nothing is due on this payment link." }, { status: 409 });
     }
 
-    const isPartialParam = charge ? charge.type === "partial" : paymentType === "partial";
-    const parsedAmount = charge ? charge.amount : Number(amount) || 0;
-    let finalTotal = charge ? charge.total : Number(totalAmount) || parsedAmount;
-    let isPartial = isPartialParam;
-    let finalRemaining = isPartial
-      ? Math.max(0, Number(remainingAmount ?? (finalTotal - parsedAmount)))
-      : 0;
-
-    const categoryStr = Array.isArray(category)
-      ? category.filter(Boolean).join(", ")
-      : (typeof category === "string" ? category : "");
-
-    // 1. Attempt to capture with PayPal
+    // 2. capture with PayPal
     let captureData: Awaited<ReturnType<typeof capturePayPalOrder>> | null = null;
     let captureError: unknown = null;
     try {
@@ -74,649 +90,228 @@ export async function POST(req: Request) {
     } catch (err) {
       captureError = err;
     }
-
-    // Determine Payment Status
-    let paymentStatus: "paid" | "partially_paid" | "pending" | "failed" = "failed";
+    const capture = captureData?.purchase_units?.[0]?.payments?.captures?.[0];
+    const txnId = String(capture?.id || orderID);
+    const currency = String(capture?.amount?.currency_code || "USD");
+    let status: "paid" | "pending" | "failed" = "failed";
     let failureReason = "";
     let pendingReason = "";
-
-    const captureDetail = captureData?.purchase_units?.[0]?.payments?.captures?.[0];
-    const captureID = captureDetail?.id || orderID;
-    const capturedAmount = Number(captureDetail?.amount?.value || parsedAmount);
-    const currency = captureDetail?.amount?.currency_code || "USD";
-
     if (captureError) {
-      paymentStatus = "failed";
-      failureReason = errMessage(captureError) || "Payment authorization or capture failed.";
+      failureReason = errMessage(captureError) || "PayPal could not take the payment.";
     } else if (captureData?.status === "COMPLETED") {
-      paymentStatus = isPartial ? "partially_paid" : "paid";
+      status = "paid";
     } else if (captureData?.status === "PENDING") {
-      paymentStatus = "pending";
-      pendingReason = captureDetail?.status_details?.reason || "Funds pending clearing in PayPal";
+      status = "pending";
+      pendingReason = capture?.status_details?.reason || "Funds pending clearing in PayPal";
     } else {
-      paymentStatus = "failed";
-      failureReason =
-        captureData?.status_details?.reason ||
-        captureData?.message ||
-        `PayPal returned status: ${captureData?.status || "DECLINED"}`;
+      failureReason = captureData?.status_details?.reason || captureData?.message || `PayPal returned status: ${captureData?.status || "DECLINED"}`;
     }
 
-    // 2. Database Handling: In-place row update vs new insertion
-    let insertedId = 0;
-    let orderNumber = "";
-    let isPaymentLink = false;
-    let isBalancePayment = false;
-    let effectiveClientName = clientName || "Valued Client";
-    let effectiveClientEmail = clientEmail || "";
-    let effectiveClientPhone = clientPhone || "";
-    let effectiveCompany = companyName || "";
-    let effectiveService = service || "Quickupp Softech Service";
-    let effectiveCategory = categoryStr || "";
-    let recordTable: PaymentTable = "payments";
-    let earlierPaid = 0; // a balance payment: what the client had already paid (the deposit)
-    let balanceToken = ""; // after a deposit: the link the client pays the balance with
+    // what the client paid: PayPal's figure; the planned figure if PayPal sent none
+    const website = !linked;
+    const planned = charge ? charge.amount : Math.max(0, Number(body.amount) || 0);
+    const paid = round2(Number(capture?.amount?.value) || planned);
 
-    try {
-      const pool = getPool();
-      let existingRecord: RowDataPacket | null = null;
-      let targetTable = "payments";
-      let beforeSnap: PaymentSnapshot | null = null;
+    // 3. save it
+    let table: LinkTable = linked ? linked.table : "payments";
+    let id = linked ? Number(linked.row.id) : 0;
+    let kind: "full" | "deposit" | "balance" = charge
+      ? charge.type === "balance"
+        ? "balance"
+        : charge.type === "partial"
+        ? "deposit"
+        : "full"
+      : body.paymentType === "partial"
+      ? "deposit"
+      : "full";
+    let before: PaymentSnapshot | null = null;
+    let balanceToken = linked ? String(linked.row.token || token) : "";
 
-      // Check for existing record by token, invoiceNumber, or ID (checking payment_links first)
-      if (linked) {
-        existingRecord = linked.row;
-        targetTable = linked.table;
-      } else if (token) {
-        let [rows] = await pool.query("SELECT * FROM payment_links WHERE token = ? LIMIT 1", [token]).catch(() => [[]]);
-        if (Array.isArray(rows) && rows.length > 0) {
-          existingRecord = rows[0] as RowDataPacket;
-          targetTable = "payment_links";
-        } else {
-          [rows] = await pool.query("SELECT * FROM payments WHERE token = ? LIMIT 1", [token]).catch(() => [[]]);
-          if (Array.isArray(rows) && rows.length > 0) {
-            existingRecord = rows[0] as RowDataPacket;
-            targetTable = "payments";
-          }
-        }
-      }
-      if (!existingRecord && (invoiceNumber || existingPaymentId)) {
-        let [rows] = await pool.query("SELECT * FROM payment_links WHERE invoice_number = ? OR id = ? LIMIT 1", [
-          invoiceNumber || null,
-          Number(existingPaymentId) || 0,
-        ]).catch(() => [[]]);
-        if (Array.isArray(rows) && rows.length > 0) {
-          existingRecord = rows[0] as RowDataPacket;
-          targetTable = "payment_links";
-        } else {
-          [rows] = await pool.query("SELECT * FROM payments WHERE invoice_number = ? OR id = ? LIMIT 1", [
-            invoiceNumber || null,
-            Number(existingPaymentId) || 0,
-          ]).catch(() => [[]]);
-          if (Array.isArray(rows) && rows.length > 0) {
-            existingRecord = rows[0] as RowDataPacket;
-            targetTable = "payments";
-          }
-        }
-      }
-
-      if (existingRecord) {
-        // MATCH FOUND: UPDATE THE EXACT SAME ROW IN-PLACE!
-        insertedId = Number(existingRecord.id);
-        beforeSnap = await paymentSnapshot(targetTable as PaymentTable, insertedId);
-        orderNumber = existingRecord.invoice_number || `QAS-${new Date().getFullYear()}-${String(insertedId).padStart(6, "0")}`;
-        isPaymentLink = targetTable === "payment_links" || existingRecord.source === "payment_link";
-        effectiveClientName = existingRecord.client_name || clientName || "Valued Client";
-        effectiveClientEmail = existingRecord.client_email || clientEmail || "";
-        effectiveClientPhone = existingRecord.client_phone || clientPhone || "";
-        effectiveCompany = existingRecord.company_name || companyName || "";
-        effectiveService = existingRecord.service || service || "Quickupp Softech Service";
-        effectiveCategory = existingRecord.category || categoryStr || "";
-        finalTotal = Number(existingRecord.total_amount || totalAmount || capturedAmount);
-
-        const previouslyPaid = Number(existingRecord.amount || 0);
-        balanceToken = String(existingRecord.token || token || "");
-
-        if (previouslyPaid > 0 && paymentStatus !== "failed") {
-          // Paying remaining balance!
-          isBalancePayment = true;
-          earlierPaid = previouslyPaid;
-          isPartial = false;
-          finalRemaining = 0;
-          paymentStatus = "paid";
-          const newTotalPaid = finalTotal;
-          const updatedRef = existingRecord.reference
-            ? `${existingRecord.reference} | Balance: ${captureID}`
-            : `Initial: ${previouslyPaid} | Balance: ${captureID}`;
-
-          await pool.query(
-            `UPDATE \`${targetTable}\` SET
-              amount = ?,
-              total_amount = ?,
-              remaining_amount = 0,
-              payment_type = 'full',
-              status = 'paid',
-              link_status = 'used',
-              reference = ?,
-              paypal_order_id = ?,
-              paid_at = NOW()
-            WHERE id = ?`,
-            [newTotalPaid, finalTotal, updatedRef, orderID, insertedId]
-          );
-
-        } else {
-          // First payment on this record (e.g. initial payment via Payment Link)
-          if (paymentStatus === "failed") {
-            const failNote = `[PAYMENT FAILED / DECLINED]: ${failureReason}${notes ? ` | Note: ${notes}` : ""}`;
-            await pool.query(
-              `UPDATE \`${targetTable}\` SET
-                status = 'failed',
-                notes = CONCAT(COALESCE(notes, ''), ' | ', ?)
-              WHERE id = ?`,
-              [failNote, insertedId]
-            );
-          } else {
-            isPartial = isPartialParam;
-            finalRemaining = isPartial ? Math.max(0, finalTotal - capturedAmount) : 0;
-            const linkStatus = isPartial ? "active" : "used";
-            const currentStatus = isPartial ? "partially_paid" : paymentStatus;
-
-            await pool.query(
-              `UPDATE \`${targetTable}\` SET
-                amount = ?,
-                total_amount = ?,
-                remaining_amount = ?,
-                payment_type = ?,
-                status = ?,
-                link_status = ?,
-                reference = ?,
-                paypal_order_id = ?,
-                method = 'PayPal',
-                paid_at = NOW()
-              WHERE id = ?`,
-              [
-                capturedAmount,
-                finalTotal,
-                finalRemaining,
-                isPartial ? "partial" : "full",
-                currentStatus,
-                linkStatus,
-                captureID,
-                orderID,
-                insertedId,
-              ]
-            );
-          }
-        }
-      } else {
-        // NO EXISTING RECORD: Create new website checkout payment record
-        let paymentDesc = "";
-        if (paymentStatus === "failed") {
-          paymentDesc = `Payment Failed (${isPartial ? "Partial Deposit" : "Full Payment"}) - ${service || ""} (${categoryStr || ""})`.trim();
-        } else if (paymentStatus === "pending") {
-          paymentDesc = `Website Payment Pending (${isPartial ? "Partial Deposit" : "Full Payment"}) - ${service || ""} (${categoryStr || ""})`.trim();
-        } else {
-          paymentDesc = `Website PayPal Payment (${isPartial ? "Partial Deposit" : "Full Payment"}) - ${service || ""} (${categoryStr || ""})`.trim();
-        }
-
-        // keep within the column even on a database that hasn't been updated yet
-        if (paymentDesc.length > 255) paymentDesc = `${paymentDesc.slice(0, 252)}...`;
-
-        const paymentNotes =
-          paymentStatus === "failed"
-            ? `[PAYMENT FAILED / DECLINED]: ${failureReason}${notes ? ` | Client Note: ${notes}` : ""}`
-            : paymentStatus === "pending"
-            ? `[PAYMENT PENDING CLEARING]: ${pendingReason}${notes ? ` | Client Note: ${notes}` : ""}`
-            : notes || null;
-
-        let balanceDueDate: string | null = null;
-        if (isPartial) {
-          if (billingEndDate) {
-            const d = new Date(billingEndDate);
-            if (!isNaN(d.getTime())) {
-              d.setDate(d.getDate() - 10);
-              balanceDueDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-            }
-          }
-          if (!balanceDueDate) {
-            const now = new Date();
-            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-            lastDay.setDate(lastDay.getDate() - 10);
-            balanceDueDate = `${lastDay.getFullYear()}-${String(lastDay.getMonth() + 1).padStart(2, "0")}-${String(lastDay.getDate()).padStart(2, "0")}`;
-          }
-        }
-        const persistentToken = isPartial ? randomBytes(16).toString("hex") : null;
-        balanceToken = persistentToken || "";
-        const initialLinkStatus = isPartial ? "active" : "used";
-
-        const [insertRes] = await pool.query(
-          `INSERT INTO payments (
-            client_name,
-            client_email,
-            client_phone,
-            company_name,
-            category,
-            service,
-            description,
-            amount,
-            total_amount,
-            payment_type,
-            remaining_amount,
-            currency,
-            method,
-            status,
-            link_status,
-            source,
-            reference,
-            paypal_order_id,
-            billing_start_date,
-            billing_end_date,
-            balance_due_date,
-            token,
-            paid_at,
-            notes
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PayPal', ?, ?, 'website', ?, ?, ?, ?, ?, ?, NOW(), ?)`,
+    if (linked && status !== "failed") {
+      before = await paymentSnapshot(table, id);
+      const r = linked.row;
+      const total = round2(Number(r.total_amount) || charge!.total);
+      if (kind === "balance") {
+        const newPaid = round2(Number(r.amount || 0) + paid);
+        const remaining = round2(Math.max(0, total - newPaid));
+        await pool.query(
+          `UPDATE \`${table}\` SET amount = ?, total_amount = ?, remaining_amount = ?, payment_type = ?, status = ?, link_status = ?,
+             reference = CONCAT_WS(' | ', NULLIF(reference, ''), ?), paypal_order_id = ?, method = 'PayPal', paid_at = NOW() WHERE id = ?`,
           [
-            effectiveClientName,
-            effectiveClientEmail || null,
-            effectiveClientPhone || null,
-            effectiveCompany || null,
-            effectiveCategory || null,
-            effectiveService,
-            paymentDesc,
-            capturedAmount,
-            finalTotal,
-            isPartial ? "partial" : "full",
-            finalRemaining,
-            currency,
-            paymentStatus,
-            initialLinkStatus,
-            captureID,
+            newPaid,
+            total,
+            remaining,
+            remaining > 0 ? "partial" : "full",
+            status === "pending" ? "pending" : remaining > 0 ? "partially_paid" : "paid",
+            remaining > 0 ? "active" : "used",
+            txnId,
             orderID,
-            billingStartDate || null,
-            billingEndDate || null,
-            balanceDueDate,
-            persistentToken,
-            paymentNotes,
+            id,
           ]
         );
-        insertedId = (insertRes as ResultSetHeader).insertId || 0;
-
-        const currentYear = new Date().getFullYear();
-        orderNumber = `QS-${currentYear}-${String(insertedId).padStart(6, "0")}`;
-        await pool.query(`UPDATE payments SET invoice_number = ? WHERE id = ?`, [orderNumber, insertedId]);
-
+      } else {
+        const remaining = kind === "deposit" ? round2(Math.max(0, total - paid)) : 0;
+        await pool.query(
+          `UPDATE \`${table}\` SET amount = ?, total_amount = ?, remaining_amount = ?, payment_type = ?, status = ?, link_status = ?,
+             reference = ?, paypal_order_id = ?, method = 'PayPal', paid_at = NOW() WHERE id = ?`,
+          [
+            paid,
+            total,
+            remaining,
+            kind === "deposit" ? "partial" : "full",
+            status === "pending" ? "pending" : kind === "deposit" ? "partially_paid" : "paid",
+            kind === "deposit" ? "active" : "used",
+            txnId,
+            orderID,
+            id,
+          ]
+        );
       }
-
-      recordTable = (existingRecord ? targetTable : "payments") as PaymentTable;
-      if (insertedId) {
-        // one row per transaction, so the deposit's and the balance's transaction IDs both stay visible
-        await recordTransaction({
-          table: recordTable,
-          id: insertedId,
-          kind: isBalancePayment ? "balance" : isPartial ? "deposit" : "full",
-          amount: capturedAmount,
+    } else if (website && status !== "failed") {
+      // a new website payment
+      const isPartial = body.paymentType === "partial";
+      const total = round2(Math.max(paid, Number(body.totalAmount) || paid));
+      const remaining = isPartial ? round2(Math.max(0, total - paid)) : 0;
+      kind = isPartial && remaining > 0 ? "deposit" : "full";
+      const category = Array.isArray(body.category) ? body.category.filter(Boolean).join(", ") : String(body.category || "");
+      const service = String(body.service || "Quickupp Softech Service").slice(0, 150);
+      let desc = `Website PayPal Payment (${kind === "deposit" ? "Partial Deposit" : "Full Payment"}) - ${service}${category ? ` (${category})` : ""}`;
+      if (desc.length > 255) desc = `${desc.slice(0, 252)}...`;
+      balanceToken = kind === "deposit" ? randomBytes(16).toString("hex") : "";
+      const [ins] = await pool.query<ResultSetHeader>(
+        `INSERT INTO payments (client_name, client_email, client_phone, company_name, category, service, description, amount, total_amount, payment_type,
+           remaining_amount, currency, method, status, link_status, source, reference, paypal_order_id, billing_start_date, billing_end_date,
+           balance_due_date, token, paid_at, notes)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PayPal', ?, ?, 'website', ?, ?, ?, ?, ?, ?, NOW(), ?)`,
+        [
+          String(body.clientName || "Valued Client").slice(0, 150),
+          String(body.clientEmail || "").slice(0, 190) || null,
+          String(body.clientPhone || "").slice(0, 50) || null,
+          String(body.companyName || "").slice(0, 190) || null,
+          category.slice(0, 1000) || null,
+          service,
+          desc,
+          paid,
+          total,
+          kind === "deposit" ? "partial" : "full",
+          remaining,
           currency,
-          status: paymentStatus === "failed" ? "failed" : paymentStatus === "pending" ? "pending" : "paid",
-          transactionId: String(captureID),
-          orderId: String(orderID),
-          note: failureReason || pendingReason || undefined,
-        });
-        await logGatewayResult({
-          table: (existingRecord ? targetTable : "payments") as PaymentTable,
-          id: insertedId,
-          before: beforeSnap,
-          status: paymentStatus,
-          amount: capturedAmount,
-          captureId: String(captureID),
-          orderId: String(orderID),
-          orderNumber,
-          isNewWebsitePayment: !existingRecord,
-          isBalancePayment,
-          reason: failureReason || pendingReason || undefined,
-        });
-      }
-    } catch (dbErr) {
-      console.error("[Database Save / Update Payment Error]", dbErr);
+          status === "pending" ? "pending" : kind === "deposit" ? "partially_paid" : "paid",
+          kind === "deposit" ? "active" : "used",
+          txnId,
+          orderID,
+          /^\d{4}-\d{2}-\d{2}$/.test(String(body.billingStartDate || "")) ? body.billingStartDate : null,
+          /^\d{4}-\d{2}-\d{2}$/.test(String(body.billingEndDate || "")) ? body.billingEndDate : null,
+          kind === "deposit" ? websiteDueDate(body.billingEndDate) : null,
+          balanceToken || null,
+          String(body.notes || "").slice(0, 2000) || null,
+        ]
+      );
+      id = ins.insertId;
+      table = "payments";
+      await pool.query("UPDATE payments SET invoice_number = ? WHERE id = ?", [`QS-${new Date().getFullYear()}-${String(id).padStart(6, "0")}`, id]);
     }
 
-    // 3. Dispatch emails asynchronously via after()
-    after(async () => {
-      // Admin Notification Email
-      try {
-        let adminSubject = "";
-        let headerColor = "#0f172a";
-        let statusTag = "PAYMENT RECEIVED";
-
-        if (paymentStatus === "failed") {
-          adminSubject = `Failed Payment Attempt: $${capturedAmount.toFixed(2)} USD from ${effectiveClientName} (#${orderNumber})`;
-          headerColor = "#991b1b";
-          statusTag = "PAYMENT FAILED / DECLINED";
-        } else if (paymentStatus === "pending") {
-          adminSubject = `Payment Pending Clearing: $${capturedAmount.toFixed(2)} USD from ${effectiveClientName} (#${orderNumber})`;
-          headerColor = "#d97706";
-          statusTag = "PAYMENT PENDING CLEARING";
-        } else {
-          const typeLabel = isBalancePayment ? "Balance Payment" : isPartial ? "Partial Payment (Deposit)" : "Full Payment";
-          adminSubject = `${typeLabel} Received: $${capturedAmount.toFixed(2)} USD from ${effectiveClientName} (#${orderNumber})`;
-          headerColor = "#065f46";
-          statusTag = "PAYMENT CONFIRMED";
-        }
-
-        const adminHtml = `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px;">
-            <div style="background: ${headerColor}; padding: 18px 24px; border-radius: 8px; margin-bottom: 24px;">
-              <h2 style="color: #ffffff; margin: 0; font-size: 20px;">${statusTag}</h2>
-              <p style="color: #cbd5e1; margin: 4px 0 0; font-size: 13px;">Quickupp Softech LLC ${isPaymentLink ? "Payment Link Checkout" : "Online Checkout"}</p>
-            </div>
-            
-            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-              <tr><td style="padding: 8px 0; color: #64748b; width: 40%;">Order / Invoice No:</td><td style="padding: 8px 0; font-weight: bold; color: #0f172a; font-family: monospace;">${orderNumber}</td></tr>
-              <tr><td style="padding: 8px 0; color: #64748b;">Status:</td><td style="padding: 8px 0; font-weight: bold; color: ${paymentStatus === "failed" ? "#dc2626" : paymentStatus === "pending" ? "#d97706" : "#10b981"};">${paymentStatus.toUpperCase()}</td></tr>
-              <tr><td style="padding: 8px 0; color: #64748b;">Amount:</td><td style="padding: 8px 0; font-weight: bold; color: ${paymentStatus === "failed" ? "#dc2626" : "#10b981"}; font-size: 18px;">$${capturedAmount.toFixed(2)} ${currency}</td></tr>
-              ${isPartial ? `<tr><td style="padding: 8px 0; color: #64748b;">Total Service Amount:</td><td style="padding: 8px 0; font-weight: 600; color: #0f172a;">$${finalTotal.toFixed(2)} ${currency}</td></tr>` : ""}
-              ${isPartial ? `<tr><td style="padding: 8px 0; color: #64748b;">Remaining Balance Due:</td><td style="padding: 8px 0; font-weight: bold; color: #ef4444;">$${finalRemaining.toFixed(2)} ${currency}</td></tr>` : ""}
-              <tr><td style="padding: 8px 0; color: #64748b;">Client Name:</td><td style="padding: 8px 0; font-weight: bold; color: #0f172a;">${effectiveClientName}</td></tr>
-              <tr><td style="padding: 8px 0; color: #64748b;">Client Email:</td><td style="padding: 8px 0; color: #0f172a;"><a href="mailto:${effectiveClientEmail}">${effectiveClientEmail}</a></td></tr>
-              <tr><td style="padding: 8px 0; color: #64748b;">Client Phone:</td><td style="padding: 8px 0; color: #0f172a;"><a href="tel:${effectiveClientPhone}">${effectiveClientPhone}</a></td></tr>
-              ${effectiveCompany ? `<tr><td style="padding: 8px 0; color: #64748b;">Company:</td><td style="padding: 8px 0; color: #0f172a;">${effectiveCompany}</td></tr>` : ""}
-              ${effectiveCategory ? `<tr><td style="padding: 8px 0; color: #64748b;">Category:</td><td style="padding: 8px 0; color: #0f172a;">${effectiveCategory}</td></tr>` : ""}
-              ${effectiveService ? `<tr><td style="padding: 8px 0; color: #64748b;">Service:</td><td style="padding: 8px 0; color: #0f172a;">${effectiveService}</td></tr>` : ""}
-              ${billingStartDate || billingEndDate ? `<tr><td style="padding: 8px 0; color: #64748b;">Billing Period:</td><td style="padding: 8px 0; color: #0f172a;">${billingStartDate || "—"} to ${billingEndDate || "—"}</td></tr>` : ""}
-              <tr><td style="padding: 8px 0; color: #64748b;">Transaction / Order ID:</td><td style="padding: 8px 0; color: #0f172a; font-family: monospace;">${captureID}</td></tr>
-              ${paymentStatus === "failed" ? `<tr><td style="padding: 8px 0; color: #dc2626; font-weight: bold;">Failure Reason:</td><td style="padding: 8px 0; color: #dc2626;">${failureReason}</td></tr>` : ""}
-              ${notes ? `<tr><td style="padding: 8px 0; color: #64748b;">Notes:</td><td style="padding: 8px 0; color: #0f172a;">${notes}</td></tr>` : ""}
-            </table>
-            
-            <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8;">
-              This payment record has been automatically logged into the CRM Payments database.
-            </div>
-          </div>
-        `;
-
-        await sendMail({
-          channel: "info",
-          to: LEADS_NOTIFICATION_EMAIL,
-          subject: adminSubject,
-          html: adminHtml,
-          text: `${adminSubject} - ${effectiveClientName} (${effectiveClientEmail}, ${effectiveClientPhone}) for ${effectiveService || effectiveCategory || "service"}. Order Number: ${orderNumber}. Reference: ${captureID}`,
-          replyTo: effectiveClientEmail || undefined,
-        });
-      } catch (mailErr) {
-        console.error("[Payment Notification Email Error]", mailErr);
-      }
-
-      // Customer Confirmation & Receipt Email (for paid or pending)
-      if (paymentStatus !== "failed" && effectiveClientEmail && effectiveClientEmail.includes("@")) {
-        try {
-          const firstName = effectiveClientName.trim().split(" ")[0] || "Valued Client";
-          // what this payment was: a deposit (part payment), the balance that completes the order, or the full amount
-          const receiptKind = paymentStatus === "pending" ? "pending" : isPartial ? "deposit" : isBalancePayment ? "balance" : "full";
-          const clientSubject =
-            receiptKind === "pending"
-              ? `Payment Processing (Pending Clearing) — Quickupp Softech LLC | Order #${orderNumber}`
-              : receiptKind === "deposit"
-              ? `Deposit Received — Your Receipt | Quickupp Softech LLC | Order #${orderNumber}`
-              : receiptKind === "balance"
-              ? `Balance Paid — Order Fully Paid | Quickupp Softech LLC | Order #${orderNumber}`
-              : `Payment Confirmed — Your Receipt | Quickupp Softech LLC | Order #${orderNumber}`;
-
-          const { date: paymentDateFormatted, time: paymentTimeFormatted } = paymentDateTime(new Date());
-
-          const billingCoverageStr =
-            billingStartDate || billingEndDate
-              ? `${billingStartDate || "—"} to ${billingEndDate || "—"}`
-              : "Active Service Retainer";
-
-          // Generate PDF Receipt buffer
-          const pdfBuffer = await generateReceiptPdf({
-            orderNumber,
-            clientName: effectiveClientName,
-            clientEmail: effectiveClientEmail,
-            clientPhone: effectiveClientPhone,
-            companyName: effectiveCompany,
-            service: effectiveService,
-            category: effectiveCategory,
-            amountPaid: capturedAmount,
-            totalAmount: finalTotal,
-            paymentType: isPartial ? "partial" : "full",
-            paymentStatus: paymentStatus === "pending" ? "pending" : isPartial ? "partially_paid" : "paid",
-            earlierPaid: isBalancePayment ? earlierPaid : 0,
-            remainingAmount: finalRemaining,
-            transactionId: captureID,
-            paymentDate: paymentDateFormatted,
-            paymentTime: paymentTimeFormatted,
-            billingPeriod: billingCoverageStr,
-          });
-
-          const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.quickuppsoftech.us";
-          const receiptDownloadUrl = `${siteUrl}/api/payments/receipt?order=${encodeURIComponent(orderNumber)}`;
-
-          const statusBannerTitle =
-            receiptKind === "pending" ? "PAYMENT PROCESSING (PENDING)" : receiptKind === "deposit" ? "DEPOSIT RECEIVED" : receiptKind === "balance" ? "BALANCE PAID · ORDER COMPLETE" : "PAYMENT CONFIRMED";
-          const statusBannerValue = paymentStatus === "pending"
-            ? "Status: PENDING CLEARING"
-            : isPartial
-            ? "Status: PARTIALLY PAID"
-            : "Status: PAID";
-
-          const clientHtml = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-              <meta charset="utf-8" />
-              <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            </head>
-            <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 24px 12px; background-color: #f1f5f9; color: #1e293b;">
-              <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
-                
-                <!-- Email Header with Quickupp Logo -->
-                <div style="background: #0b0f17; padding: 28px 32px; text-align: center; border-bottom: 2px solid #3b82f6;">
-                  <img src="${EMAIL_LOGO_SRC}" alt="Quickupp Softech LLC" width="170" style="display: block; margin: 0 auto; max-width: 170px; height: auto;" />
-                  <p style="color: #94a3b8; font-size: 12px; margin: 8px 0 0; letter-spacing: 0.05em; text-transform: uppercase;">Enterprise Marketing • AI • Technology</p>
-                </div>
-
-                <!-- Main Content -->
-                <div style="padding: 32px 32px 28px;">
-                  <h1 style="font-size: 22px; font-weight: 800; color: #0f172a; margin: 0 0 12px;">Hi ${firstName},</h1>
-                  <p style="font-size: 15px; line-height: 1.6; color: #334155; margin: 0 0 8px;">
-                    Thank you for choosing <strong>Quickupp Softech LLC</strong>.
-                  </p>
-                  <p style="font-size: 15px; line-height: 1.6; color: #334155; margin: 0 0 24px;">
-                    ${paymentStatus === "pending"
-                      ? "Your payment is currently being cleared by PayPal. Once clearance completes, your confirmation will finalize automatically."
-                      : "We're pleased to confirm that your payment has been successfully received."}
-                  </p>
-
-                  <!-- Payment Status Banner -->
-                  <div style="background: ${paymentStatus === "pending" ? "#fffbeb" : "linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)"}; border: 1px solid ${paymentStatus === "pending" ? "#fde68a" : "#a7f3d0"}; border-radius: 12px; padding: 18px 24px; margin-bottom: 28px; text-align: center;">
-                    <span style="font-size: 12px; font-weight: 800; letter-spacing: 0.1em; color: ${paymentStatus === "pending" ? "#b45309" : "#047857"}; text-transform: uppercase; display: block; margin-bottom: 4px;">${statusBannerTitle}</span>
-                    <span style="font-size: 20px; font-weight: 800; color: ${paymentStatus === "pending" ? "#92400e" : "#065f46"};">${statusBannerValue}</span>
-                  </div>
-
-                  <!-- Order Details Table -->
-                  <h2 style="font-size: 15px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.04em; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid #e2e8f0;">
-                    Order Details
-                  </h2>
-                  <table style="width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 24px;">
-                    <tr>
-                      <td style="padding: 9px 0; color: #64748b; width: 42%;">Order / Invoice No.</td>
-                      <td style="padding: 9px 0; font-weight: 700; color: #0f172a; font-family: monospace; font-size: 14.5px;">${orderNumber}</td>
-                    </tr>
-                    <tr>
-                      <td style="padding: 9px 0; color: #64748b;">Service</td>
-                      <td style="padding: 9px 0; font-weight: 600; color: #0f172a;">${service}</td>
-                    </tr>
-                    ${category ? `
-                    <tr>
-                      <td style="padding: 9px 0; color: #64748b;">Category</td>
-                      <td style="padding: 9px 0; color: #0f172a;">${category}</td>
-                    </tr>` : ""}
-                    ${isPartial ? `
-                    <tr>
-                      <td style="padding: 9px 0; color: #64748b;">Total Invoice Amount</td>
-                      <td style="padding: 9px 0; font-weight: 600; color: #475569;">$${finalTotal.toFixed(2)} ${currency}</td>
-                    </tr>` : ""}
-                    <tr>
-                      <td style="padding: 9px 0; color: #64748b;">${paymentStatus === "pending" ? "Amount (Pending Clearing)" : "Amount Paid"}</td>
-                      <td style="padding: 9px 0; font-weight: 800; color: ${paymentStatus === "pending" ? "#b45309" : "#10b981"}; font-size: 16px;">$${capturedAmount.toFixed(2)} ${currency}</td>
-                    </tr>
-                    ${isPartial ? `
-                    <tr>
-                      <td style="padding: 9px 0; color: #64748b;">Remaining Balance Due</td>
-                      <td style="padding: 9px 0; font-weight: 700; color: #dc2626;">$${finalRemaining.toFixed(2)} ${currency}</td>
-                    </tr>` : ""}
-                    <tr>
-                      <td style="padding: 9px 0; color: #64748b;">Payment Date &amp; Time</td>
-                      <td style="padding: 9px 0; color: #0f172a;">${paymentDateFormatted}, ${paymentTimeFormatted}</td>
-                    </tr>
-                    <tr>
-                      <td style="padding: 9px 0; color: #64748b;">Payment Method</td>
-                      <td style="padding: 9px 0; color: #0f172a;">PayPal</td>
-                    </tr>
-                    <tr>
-                      <td style="padding: 9px 0; color: #64748b;">Transaction ID</td>
-                      <td style="padding: 9px 0; font-family: monospace; color: #0f172a; word-break: break-all;">${captureID}</td>
-                    </tr>
-                  </table>
-
-                  <!-- Billing Information -->
-                  <h2 style="font-size: 15px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.04em; margin: 24px 0 12px; padding-bottom: 8px; border-bottom: 1px solid #e2e8f0;">
-                    Billing Information
-                  </h2>
-                  <table style="width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 24px;">
-                    <tr>
-                      <td style="padding: 7px 0; color: #64748b; width: 42%;">Name:</td>
-                      <td style="padding: 7px 0; font-weight: 600; color: #0f172a;">${clientName}</td>
-                    </tr>
-                    <tr>
-                      <td style="padding: 7px 0; color: #64748b;">Email:</td>
-                      <td style="padding: 7px 0; color: #0f172a;">${clientEmail}</td>
-                    </tr>
-                    ${clientPhone ? `
-                    <tr>
-                      <td style="padding: 7px 0; color: #64748b;">Phone:</td>
-                      <td style="padding: 7px 0; color: #0f172a;">${clientPhone}</td>
-                    </tr>` : ""}
-                    ${companyName ? `
-                    <tr>
-                      <td style="padding: 7px 0; color: #64748b;">Company:</td>
-                      <td style="padding: 7px 0; color: #0f172a;">${companyName}</td>
-                    </tr>` : ""}
-                    <tr>
-                      <td style="padding: 7px 0; color: #64748b;">Billing Coverage:</td>
-                      <td style="padding: 7px 0; color: #0f172a;">${billingCoverageStr}</td>
-                    </tr>
-                  </table>
-
-                  ${receiptKind === "deposit" && balanceToken && finalRemaining > 0 ? `
-                  <!-- Balance link -->
-                  <div style="background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 12px; padding: 18px 20px; text-align: center; margin: 24px 0 0;">
-                    <p style="font-size: 14px; color: #1e1b4b; margin: 0 0 6px; font-weight: 700;">
-                      Remaining balance: $${finalRemaining.toFixed(2)} ${currency}
-                    </p>
-                    <p style="font-size: 13px; color: #475569; margin: 0 0 14px;">
-                      Pay it any time with your personal balance link.
-                    </p>
-                    <a href="${siteUrl}/pay/${balanceToken}" style="display: inline-block; background: #4f46e5; color: #ffffff; text-decoration: none; font-size: 13.5px; font-weight: 700; padding: 12px 28px; border-radius: 8px;">
-                      PAY REMAINING BALANCE
-                    </a>
-                  </div>` : ""}
-
-                  <!-- PDF Receipt Download Section -->
-                  <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; text-align: center; margin: 24px 0 28px;">
-                    <p style="font-size: 14px; color: #334155; margin: 0 0 14px; font-weight: 600;">
-                      Your official payment receipt is attached to this email as a PDF.
-                    </p>
-                    <a href="${receiptDownloadUrl}" style="display: inline-block; background: #0f172a; color: #ffffff; text-decoration: none; font-size: 13.5px; font-weight: 700; padding: 12px 28px; border-radius: 8px; letter-spacing: 0.02em;">
-                      DOWNLOAD PAYMENT RECEIPT
-                    </a>
-                  </div>
-
-                  <!-- Support -->
-                  <p style="font-size: 14px; color: #475569; line-height: 1.6; margin: 0 0 20px;">
-                    If you have any questions or require custom onboarding, simply reply to this email or contact us at:<br />
-                    <strong>Quickupp Softech LLC</strong><br />
-                    Email: <a href="mailto:info@quickuppsoftech.us" style="color: #4f46e5; text-decoration: none;">info@quickuppsoftech.us</a><br />
-                    Website: <a href="https://www.quickuppsoftech.us/" style="color: #4f46e5; text-decoration: none;">www.quickuppsoftech.us</a>
-                  </p>
-
-                  <p style="font-size: 14.5px; color: #1e293b; line-height: 1.5; margin: 0;">
-                    Best regards,<br />
-                    <strong>Quickupp Softech LLC</strong>
-                  </p>
-                </div>
-
-                <!-- Email Footer -->
-                <div style="background: #f8fafc; padding: 18px 32px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 12px; color: #94a3b8;">
-                  © ${currentYear} Quickupp Softech LLC. All rights reserved.<br />
-                  Secure payment processed via PayPal.
-                </div>
-              </div>
-            </body>
-            </html>
-          `;
-
-          const receiptSent = await sendMail({
-            channel: "info",
-            to: effectiveClientEmail,
-            fromName: "Quickupp Softech LLC",
-            subject: clientSubject,
-            html: clientHtml,
-            text: `${clientSubject}\n\nHi ${firstName},\n\nThank you for choosing Quickupp Softech LLC. Order Number: ${orderNumber}. Amount: $${capturedAmount.toFixed(2)} ${currency}. Status: ${statusBannerValue}. Download receipt: ${receiptDownloadUrl}${receiptKind === "deposit" && balanceToken && finalRemaining > 0 ? `\n\nRemaining balance: $${finalRemaining.toFixed(2)} ${currency}. Pay it any time here: ${siteUrl}/pay/${balanceToken}` : ""}\n\nQuickupp Softech LLC`,
-            attachments: [
-              {
-                filename: `Quickupp-Receipt-${orderNumber}.pdf`,
-                content: pdfBuffer,
-                contentType: "application/pdf",
-              },
-            ],
-          });
-
-          // record it on the payment, so the CRM shows whether the client got this receipt
-          const what = receiptKind === "deposit" ? "Deposit receipt" : receiptKind === "balance" ? "Balance receipt" : receiptKind === "pending" ? "Payment-processing notice" : "Payment receipt";
-          await logActivity({
-            entity: entityOf(recordTable),
-            id: insertedId,
-            action: receiptSent ? "receipt_email" : "receipt_email_failed",
-            text: receiptSent
-              ? `${what} for $${capturedAmount.toFixed(2)} ${currency} emailed to ${effectiveClientEmail} with the PDF receipt`
-              : `${what} for $${capturedAmount.toFixed(2)} ${currency} could not be emailed to ${effectiveClientEmail} (mail server not available)`,
-            actor: { type: "system", label: "Email" },
-            eventKey: `receipt:${captureID}`,
-          });
-        } catch (clientMailErr) {
-          console.error("[Customer Receipt Email Error]", clientMailErr);
-        }
-      }
-    });
-
-    // 4. Return API response
-    if (paymentStatus === "failed") {
-      return NextResponse.json({
-        success: false,
-        status: "failed",
-        orderNumber,
-        error: failureReason || "Payment was declined or could not be processed. Please check your card details or try a different payment method.",
+    // the transaction and the history (a failed attempt on a pay link is kept on that link; a failed
+    // website attempt has no record, the team is told by email)
+    if (id) {
+      await recordTransaction({ table, id, kind, amount: paid, currency, status, transactionId: txnId, orderId: orderID, note: failureReason || pendingReason || undefined });
+      await logGatewayResult({
+        table,
+        id,
+        before,
+        status: status === "paid" ? (kind === "deposit" ? "partially_paid" : "paid") : status,
+        amount: paid,
+        captureId: txnId,
+        orderId: orderID,
+        orderNumber: linked ? orderNumberOf(linked.row) : `QS-${new Date().getFullYear()}-${String(id).padStart(6, "0")}`,
+        isNewWebsitePayment: website,
+        isBalancePayment: kind === "balance",
+        reason: failureReason || pendingReason || undefined,
       });
     }
 
-    return NextResponse.json({
-      success: true,
-      status: paymentStatus,
-      orderNumber,
-      captureID,
-      orderID,
-      amount: capturedAmount,
-      totalAmount: finalTotal,
-      paymentType: isPartial ? "partial" : "full",
-      remainingAmount: finalRemaining,
+    // 4. emails (sent after the answer)
+    const rec = id ? await getRecord(table, id) : null;
+    const txns = rec ? await listTransactions(table, id, rec) : [];
+    const mailCase: PaymentCase = status === "failed" ? "failed" : status === "pending" ? "pending" : kind;
+    const source: "website" | "link" | "balance-link" = website ? "website" : kind === "balance" ? "balance-link" : "link";
+    const balanceUrl = balanceToken && rec?.status === "partially_paid" ? `${SITE}/pay/${balanceToken}` : null;
+    const attempted = {
+      id: 0,
+      client_name: body.clientName || "",
+      client_email: body.clientEmail || "",
+      client_phone: body.clientPhone || "",
+      company_name: body.companyName || "",
+      service: body.service || "",
+      category: Array.isArray(body.category) ? body.category.join(", ") : body.category || "",
+      total_amount: Number(body.totalAmount) || paid,
+      amount: 0,
+      status: "failed",
+      invoice_number: "not created (payment failed)",
+      created_at: new Date(),
+    } as unknown as RowDataPacket;
+    const ctx = {
+      kind: mailCase,
+      rec: rec || attempted,
+      txns,
+      amount: paid,
       currency,
+      transactionId: txnId,
+      source,
+      balanceUrl,
+      failureReason: failureReason || undefined,
+      notes: website ? String(body.notes || "") || null : null,
+    };
+
+    after(async () => {
+      try {
+        const t = teamEmail(ctx);
+        await sendMail({ channel: "info", to: LEADS_NOTIFICATION_EMAIL, subject: t.subject, html: t.html, text: t.text, replyTo: ctx.rec.client_email || undefined });
+      } catch (err) {
+        console.error("[payments] team email failed:", err);
+      }
+      const to = String(ctx.rec.client_email || "");
+      if (!rec || status === "failed" || !to.includes("@")) return;
+      try {
+        const c = clientEmailFor(ctx);
+        const pdf = await receiptPdfFor(table, rec, txns);
+        const sent = await sendMail({
+          channel: "info",
+          to,
+          fromName: "Quickupp Softech LLC",
+          subject: c.subject,
+          html: c.html,
+          text: c.text,
+          attachments: [{ filename: `Quickupp-Receipt-${orderNumberOf(rec)}.pdf`, content: pdf, contentType: "application/pdf" }],
+        });
+        const what = mailCase === "deposit" ? "Deposit receipt" : mailCase === "balance" ? "Balance receipt" : mailCase === "pending" ? "Payment-processing notice" : "Payment receipt";
+        await logActivity({
+          entity: entityOf(table),
+          id,
+          action: sent ? "receipt_email" : "receipt_email_failed",
+          text: sent
+            ? `${what} for $${paid.toFixed(2)} ${currency} emailed to ${to} with the PDF receipt`
+            : `${what} for $${paid.toFixed(2)} ${currency} could not be emailed to ${to} (mail server not available)`,
+          actor: { type: "system", label: "Email" },
+          eventKey: `receipt:${txnId}`,
+        });
+      } catch (err) {
+        console.error("[payments] client email failed:", err);
+      }
     });
+
+    // 5. answer the pay page
+    if (status === "failed") {
+      return NextResponse.json({
+        success: false,
+        status: "failed",
+        error: "The payment was declined or could not be completed. No money was taken. Please try again or use a different card or PayPal account.",
+      });
+    }
+    return answer(table, id, status, txnId);
   } catch (err) {
     console.error("[Capture Order API Fatal Error]", err);
-    return NextResponse.json(
-      { error: errMessage(err) || "An unexpected error occurred while capturing payment." },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: errMessage(err) || "An unexpected error occurred while capturing payment." }, { status: 500 });
   }
 }

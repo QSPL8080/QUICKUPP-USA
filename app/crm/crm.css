@@ -4671,3 +4671,104 @@ a.crm-dash-legend-row:hover {
   word-break: break-all;
 }
 .crm-balance-link-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ---- payment details popup: summary, every payment, the link to share, history ---- */
+.crm-view-modal.crm-paydetail { max-width: 860px; }
+.crm-paydetail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 22px;
+  border-bottom: 1px solid #e2e8f0;
+}
+.crm-paydetail-head h3 { margin: 0; font-size: 16.5px; font-weight: 800; color: #0f172a; }
+.crm-paydetail-head p { margin: 3px 0 0; font-size: 12.5px; color: #64748b; }
+.crm-paydetail-head .crm-detail-close {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #475569;
+  cursor: pointer;
+}
+.crm-paydetail-head .crm-detail-close:hover { background: #f1f5f9; color: #0f172a; }
+.crm-paydetail-body { display: grid; gap: 14px; padding: 16px 22px 18px; overflow-y: auto; }
+.crm-paydetail-client {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 12px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
+  font-size: 13px;
+}
+.crm-paydetail-client strong { font-size: 14.5px; color: #0f172a; }
+.crm-paydetail-service { text-align: right; }
+.crm-paydetail-figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+.crm-paydetail-figures > div {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+  padding: 12px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+.crm-paydetail-figures span:first-child { font-size: 11.5px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; }
+.crm-paydetail-figures strong { font-size: 19px; color: #0f172a; }
+.crm-paydetail-figures strong.is-green { color: #047857; }
+.crm-paydetail-figures strong.is-red { color: #dc2626; }
+.crm-paydetail-figures small { font-size: 12px; color: #64748b; }
+.crm-paydetail-figures .crm-pill { justify-self: start; }
+.crm-paydetail-linkline { margin: -4px 0 0; font-size: 13px; color: #475569; }
+.crm-paydetail-section { display: grid; gap: 10px; }
+.crm-paydetail-section-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.crm-paydetail-section-head h4 { margin: 0; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: #0f172a; display: inline-flex; gap: 8px; align-items: center; }
+.crm-paylist { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.crm-payitem {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+  border: 1px solid #d1fae5;
+  border-radius: 12px;
+  background: #f8fffb;
+}
+.crm-payitem-main { display: grid; gap: 3px; min-width: 0; font-size: 13px; }
+.crm-payitem-main strong { font-size: 14px; color: #0f172a; }
+.crm-payitem-when { color: #334155; font-weight: 600; }
+.crm-payitem-id { color: #475569; }
+.crm-payitem-id code { font-size: 12.5px; color: #0f172a; font-weight: 700; word-break: break-all; }
+.crm-payitem-sub { font-size: 11.5px; word-break: break-all; }
+.crm-payitem-side { display: grid; gap: 5px; justify-items: end; align-content: start; text-align: right; }
+.crm-payitem-side strong { font-size: 16px; color: #047857; white-space: nowrap; }
+.crm-paydetail-failed { margin: 0; font-size: 12.5px; color: #b91c1c; }
+.crm-paydetail-reminders { margin: 0; font-size: 12.5px; color: #475569; }
+.crm-paydetail-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 12px 22px;
+  border-top: 1px solid #e2e8f0;
+}
+.crm-paydetail-foot > div { display: flex; gap: 8px; flex-wrap: wrap; }
+.crm-activity-payment { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 3px 0 2px; font-size: 12.5px; color: #475569; }
+.crm-activity-payment strong { color: #047857; }
+.crm-activity-payment code { font-size: 12px; color: #0f172a; font-weight: 700; word-break: break-all; }
+@media (max-width: 600px) {
+  .crm-paydetail-service { text-align: left; }
+  .crm-payitem { flex-direction: column; }
+  .crm-payitem-side { justify-items: start; text-align: left; }
+}

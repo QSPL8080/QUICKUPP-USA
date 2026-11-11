@@ -8,59 +8,28 @@ import "./checkout.css";
 import { errMessage } from "@/lib/err";
 
 // an order already on file, as /api/payments/lookup returns it
-type ExistingOrder = {
-  clientName?: string;
-  clientEmail?: string;
-  clientPhone?: string;
-  companyName?: string;
-  service?: string;
-  category?: string;
-  notes?: string;
-  paymentType?: "full" | "partial";
-  amountPaid?: number | string;
-  remainingAmount?: number | string;
-  totalAmount?: number | string;
-};
 
 function CheckoutContent() {
   const router = useRouter();
   const sp = useSearchParams();
 
-  const [existingOrder, setExistingOrder] = useState<ExistingOrder | null>(null);
-  const orderParam = sp.get("order") || sp.get("invoice") || "";
-
-  useEffect(() => {
-    if (!orderParam) return;
-    fetch(`/api/payments/lookup?order=${encodeURIComponent(orderParam)}`)
-      .then(async (res) => {
-        if (!res.ok) return;
-        const data = await res.json();
-        if (data.ok && data.order) setExistingOrder(data.order);
-      })
-      .catch(() => {});
-  }, [orderParam]);
-
-  const clientName = existingOrder?.clientName || sp.get("name") || "Valued Client";
-  const clientEmail = existingOrder?.clientEmail || sp.get("email") || "";
-  const clientPhone = existingOrder?.clientPhone || sp.get("phone") || "";
-  const companyName = existingOrder?.companyName || sp.get("company") || "";
-  const service = existingOrder?.service || sp.get("service") || "AI-Powered Digital Marketing Services";
-  const category = existingOrder?.category ?? (sp.has("category") ? sp.get("category")! : "Social Media Marketing");
+  // balances are paid with the client's own balance link (/pay/<token>), not here
+  const clientName = sp.get("name") || "Valued Client";
+  const clientEmail = sp.get("email") || "";
+  const clientPhone = sp.get("phone") || "";
+  const companyName = sp.get("company") || "";
+  const service = sp.get("service") || "AI-Powered Digital Marketing Services";
+  const category = sp.has("category") ? sp.get("category")! : "Social Media Marketing";
   const billingStartDate = sp.get("from") || "";
   const billingEndDate = sp.get("to") || "";
-  const notes = existingOrder?.notes || sp.get("notes") || "";
+  const notes = sp.get("notes") || "";
 
-  const isBalancePayment = existingOrder && Number(existingOrder.amountPaid) > 0 && Number(existingOrder.remainingAmount) > 0;
-  const paymentType = isBalancePayment ? "full" : (existingOrder?.paymentType || (sp.get("type") as "full" | "partial") || "full");
+  const paymentType = (sp.get("type") as "full" | "partial") === "partial" ? "partial" : "full";
 
-  const numTotal = existingOrder ? Number(existingOrder.totalAmount) : Math.max(1, Number(sp.get("amount") || 79));
+  const numTotal = Math.max(1, Number(sp.get("amount") || 79));
   const isPartial = paymentType === "partial";
-  const payAmount = isBalancePayment
-    ? Number(existingOrder.remainingAmount)
-    : isPartial
-    ? Math.round(numTotal * 0.5 * 100) / 100
-    : numTotal;
-  const remainingAmount = isBalancePayment ? 0 : isPartial ? Math.max(0, Math.round((numTotal - payAmount) * 100) / 100) : 0;
+  const payAmount = isPartial ? Math.round(numTotal * 0.5 * 100) / 100 : numTotal;
+  const remainingAmount = isPartial ? Math.max(0, Math.round((numTotal - payAmount) * 100) / 100) : 0;
 
   const [error, setError] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
@@ -95,7 +64,6 @@ function CheckoutContent() {
           paymentType,
           remainingAmount,
           notes,
-          invoiceNumber: orderParam || undefined,
         }),
       });
 
@@ -128,8 +96,7 @@ function CheckoutContent() {
             paymentType,
             remainingAmount,
             notes,
-            invoiceNumber: orderParam || undefined,
-          }),
+            }),
         });
 
         const captureData = await res.json();
@@ -143,15 +110,7 @@ function CheckoutContent() {
           return;
         }
 
-        if (captureData.status === "pending") {
-          router.push(
-            "/payment-confirmation?order=" + encodeURIComponent(captureData.orderNumber) + "&status=pending"
-          );
-        } else {
-          router.push(
-            "/payment-confirmation?order=" + encodeURIComponent(captureData.orderNumber)
-          );
-        }
+        router.push("/payment-confirmation?txn=" + encodeURIComponent(captureData.txn || captureData.captureID || ""));
       } catch (err) {
         setError(errMessage(err) || "An error occurred while confirming your payment. Please contact support.");
         setIsProcessing(false);

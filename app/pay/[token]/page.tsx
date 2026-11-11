@@ -176,15 +176,7 @@ export default function PayTokenPage({ params }: { params: Promise<{ token: stri
           return;
         }
 
-        if (captureData.status === "pending") {
-          router.push(
-            `/payment-confirmation?order=${encodeURIComponent(captureData.orderNumber || order.invoiceNumber)}&status=pending`
-          );
-        } else {
-          router.push(
-            `/payment-confirmation?order=${encodeURIComponent(captureData.orderNumber || order.invoiceNumber)}`
-          );
-        }
+        router.push(`/payment-confirmation?txn=${encodeURIComponent(captureData.txn || captureData.captureID || "")}`);
       } catch (err) {
         setError(errMessage(err) || "An error occurred while confirming payment. Please contact support.");
         setIsProcessing(false);

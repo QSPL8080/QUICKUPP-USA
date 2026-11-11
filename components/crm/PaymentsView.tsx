@@ -258,7 +258,7 @@ export default function PaymentsView({
       ? [viewing.status, viewing.amount, viewing.totalAmount, viewing.remainingAmount, viewing.linkStatus, viewing.paymentType, viewing.clientName, viewing.clientEmail, viewing.clientPhone, viewing.notes, viewing.paidAt].join("|")
       : ""
   );
-  const [modalSubtab, setModalSubtab] = useState<"orders" | "payments">("orders");
+  const [, setModalSubtab] = useState<"orders" | "payments">("orders");
   // the PayPal transactions on the record shown in the details (deposit, balance, full)
   const [txns, setTxns] = useState<Txn[]>([]);
   const [txnsLoading, setTxnsLoading] = useState(false);
@@ -1530,533 +1530,219 @@ ${sign}`;
       </div>
       </section>
 
-      {/* ---- DETAILS MODAL (Matching Screenshot 4 & 5) ---- */}
+      {/* ---- PAYMENT DETAILS: who, how much, every payment with its transaction ID, links, history ---- */}
       {viewing && (() => {
         const isViewingExpired = isExpiredLink(viewing);
         const isViewingPaid = viewing.status === "paid" || viewing.linkStatus === "used";
         const canShareViewing = !isViewingExpired && !isViewingPaid && viewing.linkStatus !== "cancelled";
+        const isLink = viewing.table === "payment_links";
+        const cur = viewing.currency || "USD";
+        const total = viewing.totalAmount != null ? viewing.totalAmount : viewing.amount;
+        const paidSoFar = Number(viewing.amount || 0);
+        const balanceDue = viewing.status === "partially_paid" ? Number(viewing.remainingAmount || 0) : 0;
+        const okTx = txns.filter((t) => t.status !== "failed");
+        const failedTx = txns.filter((t) => t.status === "failed");
+        const linkOpenUntil = viewing.expiresAt || (viewing.createdAt ? new Date(new Date(viewing.createdAt).getTime() + 24 * 3600_000).toISOString() : null);
+        const statusPill =
+          viewing.linkStatus === "cancelled" && paidSoFar === 0
+            ? ["Cancelled", "failed"]
+            : paidSoFar === 0
+            ? [isViewingExpired ? "Not paid · link expired" : "Not paid yet", "pending"]
+            : viewing.status === "pending"
+            ? ["Pending clearing", "pending"]
+            : balanceDue > 0
+            ? ["Partially paid", "partially_paid"]
+            : ["Fully paid", "paid"];
+        const linkLine =
+          viewing.linkStatus === "cancelled"
+            ? "This link was cancelled and can't be paid."
+            : balanceDue > 0
+            ? "The balance link stays open until the balance is paid."
+            : paidSoFar > 0
+            ? isLink
+              ? "The link was used. Nothing more is due."
+              : "Paid on the website. Nothing more is due."
+            : isViewingExpired
+            ? "Not paid within 24 hours, so the link expired. Generate a new link for the client."
+            : `The client can pay with this link until ${fmtDate(linkOpenUntil, true)}.`;
+        const dueDay = viewing.balanceDueDate ? new Date(`${viewing.balanceDueDate}T00:00:00`) : null;
+        // when each automatic reminder goes out (or why it won't: the deposit came after that day)
+        const reminderOn = (days: number, sentAt: string | null | undefined) => {
+          if (sentAt) return `sent ${fmtDate(sentAt, true)}`;
+          if (!dueDay) return "";
+          const d = new Date(dueDay);
+          d.setDate(d.getDate() - days);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          if (days === 10 && d < today) return "not needed, the deposit came less than 10 days before the due date";
+          if (d < today) return dueDay >= today ? "goes out within the hour" : "the due date has passed";
+          return `on ${d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`;
+        };
+        const receiptHref = `/api/payments/receipt?table=${viewing.table}&id=${viewing.id}`;
 
         return (
           <div className="crm-modal-wrap" onClick={() => setViewing(null)}>
-            <div className="crm-view-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "880px" }}>
-              {/* Header */}
-              <div className="crm-drawer-head" style={{ padding: "16px 24px", borderBottom: "1px solid #e2e8f0" }}>
+            <div className="crm-view-modal crm-paydetail" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Payment details">
+              <div className="crm-paydetail-head">
                 <div>
-                  <h3 className="crm-modal-title" style={{ fontSize: "16px", fontWeight: 700, margin: 0, color: "#0f172a" }}>
-                    {viewing.table === "payment_links" ? "Payment Link Details" : "Payment Details"}
-                  </h3>
-                  <p className="crm-modal-sub" style={{ fontSize: "12px", margin: "2px 0 0", color: "#64748b" }}>
-                    Order #{viewing.invoiceNumber || `QAS-${viewing.id}`} ·{" "}
-                    {viewing.table === "payment_links"
-                      ? `Generated by ${viewing.createdBy || "Admin"} on ${fmtDate(viewing.createdAt, true)}`
-                      : viewing.source === "website" || viewing.source === "online"
-                      ? `Paid on the website on ${fmtDate(viewing.createdAt, true)}`
-                      : `Recorded on ${fmtDate(viewing.createdAt, true)}`}
+                  <h3>{isLink ? "Payment link" : viewing.source === "website" || viewing.source === "online" ? "Website payment" : "Payment"} · Order {viewing.invoiceNumber || `#${viewing.id}`}</h3>
+                  <p>
+                    {isLink
+                      ? `Link created by ${viewing.createdBy || "Admin"} on ${fmtDate(viewing.createdAt, true)}`
+                      : `Received on ${fmtDate(viewing.createdAt, true)} through the website's Pay Now`}
                   </p>
                 </div>
-
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  {canShareViewing && viewing.token && (
-                    <button
-                      type="button"
-                      className="crm-act crm-act-ghost crm-act-sm"
-                      onClick={() => copyLink(viewing.token!)}
-                      style={{ display: "inline-flex", alignItems: "center", gap: "5px", fontSize: "12px", padding: "5px 11px" }}
-                    >
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                      </svg>
-                      <span>Copy Link</span>
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    className="crm-icon-act"
-                    onClick={() => setViewing(null)}
-                    aria-label="Close"
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                      <path d="M18 6L6 18M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
+                <button type="button" className="crm-detail-close" onClick={() => setViewing(null)} aria-label="Close">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+                    <path d="M18 6 6 18M6 6l12 12" />
+                  </svg>
+                </button>
               </div>
 
-              {/* Info Summary in Details */}
-              <div style={{ padding: "14px 24px 0" }}>
-                <div
-                  style={{
-                    background: "#f8fafc",
-                    border: "1px solid #e2e8f0",
-                    borderRadius: "10px",
-                    padding: "12px 16px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    flexWrap: "wrap",
-                    gap: "12px",
-                  }}
-                >
-                  <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-                      <span style={{ fontSize: "14.5px", fontWeight: 800, color: "#0f172a" }}>{viewing.clientName}</span>
-                      {viewing.companyName && (
-                        <span style={{ fontSize: "12px", color: "#64748b", fontWeight: 500 }}>
-                          ({viewing.companyName})
-                        </span>
-                      )}
-                      <span style={{ color: "#cbd5e1" }}>•</span>
-                      <span style={{ fontSize: "13px", fontWeight: 600, color: "#334155" }}>{viewing.service}</span>
-                      {viewing.quantity && (
-                        <span
-                          style={{
-                            background: "#faf5ff",
-                            color: "#7c3aed",
-                            border: "1px solid #f3e8ff",
-                            padding: "1px 7px",
-                            borderRadius: "4px",
-                            fontSize: "11.5px",
-                            fontWeight: 700,
-                          }}
-                        >
-                          {viewing.quantity}
-                        </span>
-                      )}
-                    </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "11.5px", color: "#64748b", flexWrap: "wrap" }}>
-                      {viewing.clientEmail && <span>{viewing.clientEmail}</span>}
-                      {viewing.clientPhone && <span>• {viewing.clientPhone}</span>}
-                      {viewing.industry && <span>• Industry: {viewing.industry}</span>}
+              <div className="crm-view-modal-body crm-paydetail-body">
+                {/* who and what */}
+                <div className="crm-paydetail-client">
+                  <div>
+                    <strong>{viewing.clientName}</strong>
+                    {viewing.companyName && <span className="crm-muted"> · {viewing.companyName}</span>}
+                    <div className="crm-muted">
+                      {viewing.clientEmail || "—"} · {viewing.clientPhone || "—"}
                     </div>
                   </div>
-
-                  <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: "16px", fontWeight: 800, color: "#0f172a" }}>
-                      ${(viewing.totalAmount != null ? viewing.totalAmount : viewing.amount).toFixed(2)} USD
-                    </div>
-                    <div style={{ fontSize: "11px", fontWeight: 600, marginTop: "2px" }}>
-                      {isViewingPaid ? (
-                        <span style={{ color: "#16a34a" }}>Payment Completed</span>
-                      ) : viewing.linkStatus === "cancelled" ? (
-                        <span style={{ color: "#dc2626" }}>Link cancelled</span>
-                      ) : viewing.status === "partially_paid" && Number(viewing.remainingAmount || 0) > 0 ? (
-                        <span style={{ color: "#2563eb" }}>
-                          {money(viewing.remainingAmount || 0, viewing.currency)} balance due · balance link open until paid
-                        </span>
-                      ) : isViewingExpired ? (
-                        <span style={{ color: "#dc2626" }}>Link Expired (24h exceeded)</span>
-                      ) : viewing.expiresAt ? (
-                        <span style={{ color: "#64748b" }}>Expires {fmtDate(viewing.expiresAt, true)}</span>
-                      ) : (
-                        <span style={{ color: "#64748b" }}>Valid for 24 hours</span>
-                      )}
-                    </div>
+                  <div className="crm-paydetail-service">
+                    <strong>{viewing.service}</strong>
+                    <div className="crm-muted">{viewing.category || viewing.quantity || ""}</div>
                   </div>
                 </div>
-              </div>
 
-              {/* Modal Subtabs (Orders (1) vs Payments) */}
-              <div style={{ padding: "14px 24px 0" }}>
-                <div className="crm-modal-subtabs">
-                  <button
-                    type="button"
-                    className={`crm-modal-subtab ${modalSubtab === "orders" ? "is-active" : ""}`}
-                    onClick={() => setModalSubtab("orders")}
-                  >
-                    Orders (1)
-                  </button>
-                  <button
-                    type="button"
-                    className={`crm-modal-subtab ${modalSubtab === "payments" ? "is-active" : ""}`}
-                    onClick={() => setModalSubtab("payments")}
-                  >
-                    Payments ({txns.filter((t) => t.status !== "failed").length || (viewing.amount > 0 ? 1 : 0)})
-                  </button>
-                </div>
-              </div>
-
-              {/* Modal Body */}
-              <div className="crm-view-modal-body" style={{ paddingTop: "10px" }}>
-                {modalSubtab === "orders" ? (
-                  /* Orders Subtab Table */
-                  <div className="crm-table-wrap" style={{ border: "1px solid #e2e8f0", borderRadius: "10px", flexShrink: 0 }}>
-                    <table className="crm-table" style={{ fontSize: "12.5px" }}>
-                      <thead>
-                        <tr style={{ background: "#f8fafc" }}>
-                          <th>ORDER</th>
-                          <th>CUSTOMER</th>
-                          <th>SERVICE &amp; CATEGORY</th>
-                          <th>AMOUNT</th>
-                          <th>PAYMENT STATUS</th>
-                          <th>LINK</th>
-                          <th style={{ textAlign: "right" }}>ACTIONS</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>
-                            <span style={{ fontWeight: 800, fontFamily: "monospace", color: "#0f172a" }}>
-                              {viewing.invoiceNumber || `QAS-${viewing.id}`}
-                            </span>
-                            <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>
-                              {fmtDate(viewing.createdAt, true)}
-                            </span>
-                            <span style={{ display: "block", fontSize: "10.5px", color: "#7c3aed", fontWeight: 700 }}>
-                              Source: {viewing.leadSource || "Manual"}
-                            </span>
-                          </td>
-                          <td>
-                            <span style={{ fontWeight: 700, color: "#0f172a", display: "block" }}>
-                              {viewing.clientName}
-                            </span>
-                            <span style={{ color: "#64748b", fontSize: "11.5px" }}>
-                              {viewing.clientPhone || "—"}
-                            </span>
-                          </td>
-                          <td>
-                            <span style={{ fontWeight: 600, color: "#0f172a", display: "block" }}>
-                              {viewing.service}
-                            </span>
-                            <span style={{ color: "#64748b", fontSize: "11.5px" }}>
-                              {viewing.quantity || viewing.category || "Standard"}
-                            </span>
-                          </td>
-                          <td>
-                            <span style={{ display: "block", fontWeight: 700, color: "#0f172a" }}>
-                              Total ${(viewing.totalAmount != null ? viewing.totalAmount : viewing.amount).toFixed(2)}
-                            </span>
-                            <span style={{ display: "block", color: "#16a34a", fontSize: "11.5px", fontWeight: 600 }}>
-                              Paid ${viewing.amount.toFixed(2)}
-                            </span>
-                            <span style={{ display: "block", color: "#ef4444", fontSize: "11.5px", fontWeight: 600 }}>
-                              Remaining ${(viewing.remainingAmount != null ? viewing.remainingAmount : 0).toFixed(2)}
-                            </span>
-                          </td>
-                          <td>
-                            {Number(viewing.amount) === 0 ? (
-                              <span style={{ color: "#64748b", fontWeight: 700 }}>Not Paid</span>
-                            ) : viewing.status === "failed" ? (
-                              <span className="crm-pill crm-pill-failed">Payment Failed</span>
-                            ) : viewing.status === "paid" ? (
-                              <span className="crm-pill crm-pill-paid">Fully Paid</span>
-                            ) : viewing.status === "pending" && Number(viewing.amount) > 0 ? (
-                              <span className="crm-pill crm-pill-pending">Pending Clearing</span>
-                            ) : (
-                              <span className="crm-pill crm-pill-partially_paid">Partially Paid</span>
-                            )}
-                          </td>
-                          <td>
-                            <span className={`crm-link-pill crm-link-pill-${isViewingPaid ? "used" : isViewingExpired ? "expired" : viewing.linkStatus || "active"}`}>
-                              {isViewingPaid ? "Used" : isViewingExpired ? "Expired" : viewing.linkStatus || "Active"}
-                            </span>
-                          </td>
-                          <td style={{ textAlign: "right" }}>
-                            <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", justifyContent: "flex-end", flexWrap: "wrap" }}>
-                              {/* Copy Link */}
-                              {canShareViewing && viewing.token && (
-                                <button
-                                  type="button"
-                                  className="crm-att-btn"
-                                  onClick={() => copyLink(viewing.token!)}
-                                  title="Copy Payment Link"
-                                  style={{ fontSize: "11px", padding: "4px 8px" }}
-                                >
-                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                                  </svg>
-                                  Copy Link
-                                </button>
-                              )}
-
-                              {/* WhatsApp (only if not expired and not used/paid) */}
-                              {canShareViewing && (
-                                <button
-                                  type="button"
-                                  className="crm-att-btn"
-                                  onClick={() => openWhatsApp(viewing)}
-                                  title="Share on WhatsApp (valid 24h)"
-                                  style={{ fontSize: "11px", padding: "4px 8px", color: "#15803d", borderColor: "#bbf7d0", background: "#f0fdf4" }}
-                                >
-                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.54 1.777.804 2.791.805h.005c3.18 0 5.767-2.586 5.768-5.766 0-1.541-.6-2.99-1.69-4.08-1.09-1.09-2.54-1.691-4.084-1.691zm0-2c4.29 0 7.768 3.477 7.768 7.766 0 2.072-.807 4.02-2.273 5.485-1.467 1.467-3.414 2.275-5.49 2.275h-.005c-1.332 0-2.639-.356-3.784-1.031l-4.247 1.114 1.134-4.143c-.742-1.2-1.133-2.584-1.133-3.966.002-4.289 3.479-7.766 7.77-7.766zm-3.34 4.542c-.183-.408-.376-.416-.55-.424l-.468-.008c-.161 0-.424.061-.646.303-.222.242-.848.828-.848 2.02 0 1.192.868 2.343.989 2.505.121.162 1.676 2.678 4.12 3.633 1.996.779 2.404.624 2.838.584.434-.04 1.393-.57 1.59-1.121.198-.55.198-1.022.139-1.122-.06-.099-.222-.161-.468-.283-.246-.121-1.455-.718-1.68-.8-.226-.081-.39-.122-.555.122-.164.243-.637.8-.781.962-.144.162-.288.182-.534.061-.246-.122-1.038-.383-1.978-1.221-.731-.652-1.225-1.457-1.369-1.703-.144-.246-.015-.379.108-.501.111-.11.246-.283.37-.424.123-.142.164-.243.246-.405.082-.162.041-.304-.02-.425-.062-.122-.55-1.353-.768-1.854z" />
-                                  </svg>
-                                  WhatsApp
-                                </button>
-                              )}
-
-                              {/* Edit */}
-                              <button
-                                type="button"
-                                className="crm-att-btn"
-                                onClick={() => openEditLink(viewing)}
-                                title="Edit payment lead"
-                                style={{ fontSize: "11px", padding: "4px 8px" }}
-                              >
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                                  <path d="M12 20h9" />
-                                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-                                </svg>
-                                Edit
-                              </button>
-
-                              {/* Delete */}
-                              <button
-                                type="button"
-                                className="crm-att-btn crm-att-btn-del"
-                                onClick={() => deleteSingle(viewing)}
-                                title="Delete payment link"
-                                style={{ fontSize: "11px", padding: "4px 8px" }}
-                              >
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                                  <polyline points="3 6 5 6 21 6" />
-                                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                                </svg>
-                                Delete
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+                {/* the money at a glance */}
+                <div className="crm-paydetail-figures">
+                  <div>
+                    <span>Order total</span>
+                    <strong>{money(total, cur)}</strong>
                   </div>
-                ) : (
-                /* Payments Subtab: every PayPal transaction on this order, each with its transaction ID */
-                viewing.amount > 0 || txns.length ? (
-                  <>
-                  <div className="crm-table-wrap" style={{ border: "1px solid #e2e8f0", borderRadius: "10px", flexShrink: 0 }}>
-                    <table className="crm-table" style={{ fontSize: "12.5px" }}>
-                      <thead>
-                        <tr style={{ background: "#f8fafc" }}>
-                          <th>TRANSACTION ID</th>
-                          <th>TYPE</th>
-                          <th>AMOUNT</th>
-                          <th>PAID SO FAR</th>
-                          <th>STATUS</th>
-                          <th>DATE &amp; TIME</th>
-                          <th>RECEIPT</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {txnsLoading && !txns.length ? (
-                          <tr>
-                            <td colSpan={7} className="crm-muted" style={{ textAlign: "center", padding: "18px" }}>
-                              Loading transactions…
-                            </td>
-                          </tr>
-                        ) : (
-                          (() => {
-                            let soFar = 0;
-                            const total = viewing.totalAmount || viewing.amount;
-                            return txns.map((t, i) => {
-                              if (t.status !== "failed") soFar += t.amount;
-                              const pill = t.status === "paid" ? "paid" : t.status === "pending" ? "pending" : "failed";
-                              return (
-                                <tr key={`${t.transactionId || "tx"}-${i}`}>
-                                  <td>
-                                    <span style={{ fontWeight: 800, fontFamily: "monospace", color: "#0f172a", wordBreak: "break-all" }}>
-                                      {t.transactionId || "—"}
-                                    </span>
-                                    <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>
-                                      Order {viewing.invoiceNumber || `QAS-${viewing.id}`}
-                                    </span>
-                                  </td>
-                                  <td>
-                                    <span style={{ fontWeight: 600, color: "#0f172a", display: "block" }}>{TXN_KIND[t.kind] || "Payment"}</span>
-                                    <span style={{ color: "#64748b", fontSize: "11.5px" }}>
-                                      PayPal · {viewing.table === "payment_links" ? "Payment link" : t.kind === "balance" ? "Balance link" : "Website"}
-                                    </span>
-                                  </td>
-                                  <td>
-                                    <span style={{ fontWeight: 700, color: "#0f172a", display: "block" }}>
-                                      {t.amount > 0 ? money(t.amount, t.currency) : "—"}
-                                    </span>
-                                    <span style={{ color: "#64748b", fontSize: "11.5px" }}>of {money(total, viewing.currency)}</span>
-                                  </td>
-                                  <td>
-                                    {t.status === "failed" ? (
-                                      <span className="crm-muted">—</span>
-                                    ) : (
-                                      <>
-                                        <span style={{ fontWeight: 700, color: "#16a34a", display: "block" }}>
-                                          {t.note ? money(viewing.amount, viewing.currency) : money(soFar, viewing.currency)}
-                                        </span>
-                                        <span style={{ color: "#64748b", fontSize: "11.5px" }}>
-                                          Remaining {money(i === txns.length - 1 || t.note ? viewing.remainingAmount || 0 : Math.max(0, total - soFar), viewing.currency)}
-                                        </span>
-                                      </>
-                                    )}
-                                  </td>
-                                  <td>
-                                    <span className={`crm-pill crm-pill-${pill}`}>{TXN_STATUS[t.status] || t.status}</span>
-                                    {t.status === "failed" && t.note && (
-                                      <span style={{ display: "block", fontSize: "11px", color: "#b91c1c", marginTop: "3px" }}>{t.note}</span>
-                                    )}
-                                  </td>
-                                  <td>
-                                    <span style={{ fontWeight: 600, color: "#0f172a", display: "block" }}>{fmtDate(t.at, true)}</span>
-                                    {t.orderId && t.orderId !== t.transactionId && (
-                                      <span style={{ color: "#64748b", fontSize: "11px", fontFamily: "monospace", wordBreak: "break-all" }}>
-                                        PayPal order {t.orderId}
-                                      </span>
-                                    )}
-                                  </td>
-                                  <td>
-                                    {t.status !== "failed" ? (
-                                      <a
-                                        href={`/api/payments/receipt?order=${encodeURIComponent(viewing.invoiceNumber || String(viewing.id))}`}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        style={{ color: "#7c3aed", fontWeight: 700, textDecoration: "none" }}
-                                      >
-                                        PDF
-                                      </a>
-                                    ) : (
-                                      <span className="crm-muted">—</span>
-                                    )}
-                                  </td>
-                                </tr>
-                              );
-                            });
-                          })()
-                        )}
-                      </tbody>
-                    </table>
+                  <div>
+                    <span>Paid so far</span>
+                    <strong className={paidSoFar > 0 ? "is-green" : undefined}>{money(paidSoFar, cur)}</strong>
                   </div>
-                  {viewing.status === "partially_paid" && viewing.token && Number(viewing.remainingAmount || 0) > 0 && viewing.linkStatus !== "cancelled" && (
-                    <div className="crm-balance-link">
-                      <div className="crm-balance-link-head">
-                        <strong>Balance link</strong>
-                        <span>
-                          {money(viewing.remainingAmount || 0, viewing.currency)} still due. The client pays it with this link; it stays open until the balance is paid.
-                        </span>
-                      </div>
-                      <code className="crm-balance-link-url">{payUrlFor(viewing.token)}</code>
-                      <div className="crm-balance-link-actions">
-                        <button type="button" className="crm-act crm-act-ghost crm-act-sm" onClick={() => copyLink(viewing.token!, "Balance link")}>
-                          Copy balance link
-                        </button>
-                        <button type="button" className="crm-act crm-act-sm crm-act-wa" onClick={() => openWhatsApp(viewing)}>
-                          Share on WhatsApp
-                        </button>
-                      </div>
+                  {balanceDue > 0 && (
+                    <div>
+                      <span>Balance due</span>
+                      <strong className="is-red">{money(balanceDue, cur)}</strong>
+                      {dueDay && <small>by {fmtDate(viewing.balanceDueDate || null)}</small>}
                     </div>
                   )}
-                  </>
-                ) : (
-                  <div style={{ padding: "30px 20px", textAlign: "center", background: "#f8fafc", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
-                    <p style={{ margin: "0 0 10px", color: "#64748b", fontSize: "14px" }}>
-                      {canShareViewing
-                        ? "No payments recorded yet for this order. Share the link with the client:"
-                        : isViewingExpired
-                        ? "No payment was made within 24 hours, so this link has expired. Generate a new link for the client."
-                        : "No payments recorded for this order."}
-                    </p>
-                    {viewing.token && canShareViewing && (
-                      <button
-                        type="button"
-                        className="crm-act crm-act-dark"
-                        onClick={() => copyLink(viewing.token!)}
-                        style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
-                      >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                        </svg>
-                        <span>Copy Payment Link</span>
-                      </button>
+                  <div>
+                    <span>Status</span>
+                    <span className={`crm-pill crm-pill-${statusPill[1]}`}>{statusPill[0]}</span>
+                  </div>
+                </div>
+                <p className="crm-paydetail-linkline">{linkLine}</p>
+
+                {/* every payment, with its transaction ID and exact time */}
+                <section className="crm-paydetail-section">
+                  <div className="crm-paydetail-section-head">
+                    <h4>Payments received {okTx.length > 0 && <span className="crm-tab-badge">{okTx.length}</span>}</h4>
+                    {paidSoFar > 0 && (
+                      <a href={receiptHref} target="_blank" rel="noreferrer" className="crm-link-btn">
+                        Receipt (PDF)
+                      </a>
                     )}
                   </div>
-                )
-              )}
+                  {txnsLoading && !txns.length ? (
+                    <p className="crm-muted">Loading payments…</p>
+                  ) : okTx.length === 0 ? (
+                    <p className="crm-muted">No payment received yet.</p>
+                  ) : (
+                    <ol className="crm-paylist">
+                      {okTx.map((t, i) => {
+                        const soFar = okTx.slice(0, i + 1).reduce((a, x) => a + x.amount, 0);
+                        return (
+                          <li key={`${t.transactionId}-${i}`} className="crm-payitem">
+                            <div className="crm-payitem-main">
+                              <strong>
+                                {i + 1}. {TXN_KIND[t.kind]}
+                              </strong>
+                              <span className="crm-payitem-when">{fmtDate(t.at, true)}</span>
+                              <span className="crm-payitem-id">
+                                Transaction ID <code>{t.transactionId || "—"}</code>
+                              </span>
+                              {t.orderId && t.orderId !== t.transactionId && <span className="crm-muted crm-payitem-sub">PayPal order {t.orderId}</span>}
+                            </div>
+                            <div className="crm-payitem-side">
+                              <strong>{t.amount > 0 ? money(t.amount, t.currency) : "—"}</strong>
+                              <span className={`crm-pill crm-pill-${t.status === "pending" ? "pending" : "paid"}`}>{TXN_STATUS[t.status]}</span>
+                              {!t.note && soFar > 0 && soFar < total && <small className="crm-muted">{money(total - soFar, cur)} left after this</small>}
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ol>
+                  )}
+                  {failedTx.length > 0 && (
+                    <p className="crm-paydetail-failed">
+                      {failedTx.length === 1 ? "1 failed attempt" : `${failedTx.length} failed attempts`} (no money taken):{" "}
+                      {failedTx.map((t) => `${fmtDate(t.at, true)}${t.note ? `, ${t.note}` : ""}`).join("; ")}
+                    </p>
+                  )}
+                </section>
 
-              {/* Activity History & Audit Trail (newest first) */}
-              <div style={{ marginTop: "4px", flexShrink: 0 }}>
-                <ActivityTimeline entries={payActivity} kind="payment" loading={payActivityLoading} emptyText="No activity has been recorded for this payment yet." visibleCount={2} />
+                {/* the link to share: the payment link before anything is paid, the balance link after a deposit */}
+                {viewing.token && viewing.linkStatus !== "cancelled" && (balanceDue > 0 || (paidSoFar === 0 && canShareViewing)) && (
+                  <section className="crm-balance-link">
+                    <div className="crm-balance-link-head">
+                      <strong>{balanceDue > 0 ? "Balance link" : "Payment link"}</strong>
+                      <span>
+                        {balanceDue > 0
+                          ? `${money(balanceDue, cur)} still due. The client pays it with this link.`
+                          : `Send this to the client. It can be paid until ${fmtDate(linkOpenUntil, true)}.`}
+                      </span>
+                    </div>
+                    <code className="crm-balance-link-url">{payUrlFor(viewing.token)}</code>
+                    <div className="crm-balance-link-actions">
+                      <button type="button" className="crm-act crm-act-ghost crm-act-sm" onClick={() => copyLink(viewing.token!, balanceDue > 0 ? "Balance link" : "Payment link")}>
+                        Copy link
+                      </button>
+                      <button type="button" className="crm-act crm-act-sm crm-act-wa" onClick={() => openWhatsApp(viewing)}>
+                        Share on WhatsApp
+                      </button>
+                      {balanceDue > 0 && (
+                        <button type="button" className="crm-act crm-act-ghost crm-act-sm" onClick={() => sendBalanceReminder(viewing)}>
+                          Email the balance reminder now
+                        </button>
+                      )}
+                    </div>
+                    {balanceDue > 0 && dueDay && (
+                      <p className="crm-paydetail-reminders">
+                        Automatic reminder emails to the client: 10 days before the due date ({reminderOn(10, viewing.balanceReminder10dSentAt)}) and 2 days
+                        before ({reminderOn(2, viewing.balanceReminder2dSentAt)}).
+                      </p>
+                    )}
+                  </section>
+                )}
+
+                <ActivityTimeline
+                  entries={payActivity}
+                  kind="payment"
+                  loading={payActivityLoading}
+                  emptyText="No activity has been recorded for this payment yet."
+                  visibleCount={4}
+                  orderTotal={total}
+                />
               </div>
 
-              {/* Actions in Footer */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "8px", paddingTop: "12px", borderTop: "1px solid #e2e8f0", flexWrap: "wrap", gap: "8px", flexShrink: 0 }}>
-                <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                  {viewing.status === "partially_paid" && (
-                    <>
-                      <button
-                        type="button"
-                        className="crm-act crm-act-sm"
-                        style={{ background: "#f8fafc", color: "#0f172a", border: "1px solid #cbd5e1", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: "5px" }}
-                        onClick={() => sendBalanceReminder(viewing)}
-                      >
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                          <polyline points="22,6 12,13 2,6" />
-                        </svg>
-                        <span>Send Balance Reminder Email</span>
-                      </button>
-                      <button
-                        type="button"
-                        className="crm-act crm-act-sm"
-                        style={{ background: "#10b981", color: "#ffffff", border: "none", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: "5px" }}
-                        onClick={() => openWhatsApp(viewing)}
-                      >
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M20.52 3.48A11.93 11.93 0 0 0 12.06 0C5.46 0 .09 5.37.09 11.97c0 2.11.55 4.17 1.6 6L0 24l6.19-1.62a11.93 11.93 0 0 0 5.87 1.51h.01c6.6 0 11.97-5.37 11.97-11.97 0-3.2-1.25-6.21-3.52-8.44zm-8.46 18.36h-.01a9.92 9.92 0 0 1-5.06-1.39l-.36-.22-3.76.99 1-3.66-.24-.38a9.93 9.93 0 0 1-1.52-5.21c0-5.5 4.47-9.97 9.97-9.97 2.66 0 5.16 1.04 7.05 2.92a9.92 9.92 0 0 1 2.92 7.05c0 5.5-4.48 9.97-9.99 9.97zm5.46-7.46c-.3-.15-1.77-.87-2.04-.97-.28-.1-.48-.15-.68.15-.2.3-.77.97-.95 1.17-.17.2-.35.22-.65.07-.3-.15-1.27-.47-2.42-1.49-.9-.8-1.5-1.78-1.68-2.08-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.68-1.64-.93-2.25-.24-.59-.49-.51-.68-.52h-.58c-.2 0-.52.07-.8.37-.27.3-1.05 1.03-1.05 2.51s1.08 2.91 1.23 3.11c.15.2 2.12 3.24 5.14 4.54.72.31 1.28.5 1.72.64.72.23 1.38.2 1.9.12.58-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.18-1.42-.08-.13-.27-.2-.57-.35z" />
-                        </svg>
-                        <span>WhatsApp Balance Notice</span>
-                      </button>
-                    </>
-                  )}
-                  {canShareViewing && viewing.token && (
-                    <button
-                      type="button"
-                      className="crm-act crm-act-ghost crm-act-sm"
-                      onClick={() => copyLink(viewing.token!)}
-                      style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}
-                    >
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                      </svg>
-                      <span>Copy Link</span>
-                    </button>
-                  )}
-                  {canShareViewing && (
-                    <button
-                      type="button"
-                      className="crm-act crm-act-sm"
-                      style={{ background: "#10b981", color: "#ffffff", border: "none", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: "5px" }}
-                      onClick={() => openWhatsApp(viewing)}
-                      title="Share link on WhatsApp (valid 24h)"
-                    >
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M20.52 3.48A11.93 11.93 0 0 0 12.06 0C5.46 0 .09 5.37.09 11.97c0 2.11.55 4.17 1.6 6L0 24l6.19-1.62a11.93 11.93 0 0 0 5.87 1.51h.01c6.6 0 11.97-5.37 11.97-11.97 0-3.2-1.25-6.21-3.52-8.44zm-8.46 18.36h-.01a9.92 9.92 0 0 1-5.06-1.39l-.36-.22-3.76.99 1-3.66-.24-.38a9.93 9.93 0 0 1-1.52-5.21c0-5.5 4.47-9.97 9.97-9.97 2.66 0 5.16 1.04 7.05 2.92a9.92 9.92 0 0 1 2.92 7.05c0 5.5-4.48 9.97-9.99 9.97zm5.46-7.46c-.3-.15-1.77-.87-2.04-.97-.28-.1-.48-.15-.68.15-.2.3-.77.97-.95 1.17-.17.2-.35.22-.65.07-.3-.15-1.27-.47-2.42-1.49-.9-.8-1.5-1.78-1.68-2.08-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.68-1.64-.93-2.25-.24-.59-.49-.51-.68-.52h-.58c-.2 0-.52.07-.8.37-.27.3-1.05 1.03-1.05 2.51s1.08 2.91 1.23 3.11c.15.2 2.12 3.24 5.14 4.54.72.31 1.28.5 1.72.64.72.23 1.38.2 1.9.12.58-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.18-1.42-.08-.13-.27-.2-.57-.35z" />
-                      </svg>
-                      <span>Share on WhatsApp</span>
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    className="crm-act crm-act-ghost crm-act-sm"
-                    onClick={() => openEditLink(viewing)}
-                    style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}
-                  >
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M12 20h9" />
-                      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-                    </svg>
-                    <span>Edit Payment Lead</span>
+              <div className="crm-paydetail-foot">
+                <div>
+                  <button type="button" className="crm-act crm-act-ghost crm-act-sm" onClick={() => openEditLink(viewing)}>
+                    Edit details
                   </button>
-                  <button
-                    type="button"
-                    className="crm-act crm-act-ghost crm-act-sm"
-                    onClick={() => deleteSingle(viewing)}
-                    style={{ display: "inline-flex", alignItems: "center", gap: "5px", color: "#dc2626" }}
-                  >
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="3 6 5 6 21 6" />
-                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                    </svg>
-                    <span>Delete</span>
+                  {isLink && canShareViewing && paidSoFar === 0 && (
+                    <button type="button" className="crm-act crm-act-ghost crm-act-sm" onClick={() => cancelLink(viewing)}>
+                      Cancel link
+                    </button>
+                  )}
+                  <button type="button" className="crm-act crm-act-ghost crm-act-sm crm-act-danger" onClick={() => deleteSingle(viewing)}>
+                    Delete
                   </button>
                 </div>
                 <button type="button" className="crm-act crm-act-dark" onClick={() => setViewing(null)}>
@@ -2065,7 +1751,6 @@ ${sign}`;
               </div>
             </div>
           </div>
-        </div>
         );
       })()}
 
