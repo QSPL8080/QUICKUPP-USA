@@ -1726,7 +1726,6 @@ Quickupp Softech LLC`;
                           <th>STATUS</th>
                           <th>DATE · PAYPAL REF</th>
                           <th>RECEIPT</th>
-                          <th>OUTSTANDING</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1786,11 +1785,6 @@ Quickupp Softech LLC`;
                               📄 PDF
                             </a>
                             <span style={{ display: "block", fontSize: "10.5px", color: "#16a34a" }}>Email: sent</span>
-                          </td>
-                          <td style={{ fontWeight: 700, color: viewing.remainingAmount && viewing.remainingAmount > 0 ? "#dc2626" : "#64748b" }}>
-                            {viewing.remainingAmount && viewing.remainingAmount > 0
-                              ? `$${viewing.remainingAmount.toFixed(2)}`
-                              : "—"}
                           </td>
                         </tr>
                       </tbody>
