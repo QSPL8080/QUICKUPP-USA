@@ -168,6 +168,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
 
   // Reschedule Modal
   const [reschedulingMeeting, setReschedulingMeeting] = useState<MeetingItem | null>(null);
+  const reschedulingMeetingRef = useRef<MeetingItem | null>(null);
   const [rescheduleTab, setRescheduleTab] = useState<"calendly" | "manual">("calendly");
   const [rescheduleTime, setRescheduleTime] = useState("");
   const [rescheduleDuration, setRescheduleDuration] = useState(30);
@@ -195,6 +196,10 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
   useEffect(() => {
     versionRef.current = version;
   }, [version]);
+
+  useEffect(() => {
+    reschedulingMeetingRef.current = reschedulingMeeting;
+  }, [reschedulingMeeting]);
 
   // Open meeting if selected in list
   const open = openId === null ? null : rows.find((r) => r.id === openId) || null;
@@ -233,32 +238,6 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
       .finally(() => setLoadingEventTypes(false));
   }, [showArrange, arrangeForm.eventTypeUri]);
 
-  // Catch postMessage from Calendly iframe inside the modal or drawer
-  useEffect(() => {
-    const onMessage = (e: MessageEvent) => {
-      if (e.origin !== "https://calendly.com" || !e.data) return;
-      if (e.data.event === "calendly.event_scheduled") {
-        if (e.data.payload) {
-          fetch("/api/calendly/client-scheduled", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(e.data.payload),
-          }).catch(() => {});
-        }
-        setLiveSuccess(true);
-        toast("Meeting successfully scheduled & synced with CRM!");
-        setTimeout(() => {
-          setShowArrange(false);
-          setReschedulingMeeting(null);
-          setLiveSuccess(false);
-          void check(true);
-        }, 2200);
-      }
-    };
-    window.addEventListener("message", onMessage);
-    return () => window.removeEventListener("message", onMessage);
-  }, [toast]);
-
   const check = useCallback(
     async (force = false) => {
       if (document.hidden && !force) return;
@@ -275,6 +254,37 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
     },
     [router]
   );
+
+  // Catch postMessage from Calendly iframe inside the modal or drawer
+  useEffect(() => {
+    const onMessage = (e: MessageEvent) => {
+      if (e.origin !== "https://calendly.com" || !e.data) return;
+      if (e.data.event === "calendly.event_scheduled") {
+        const activeReschedule = reschedulingMeetingRef.current;
+        if (e.data.payload) {
+          fetch("/api/calendly/client-scheduled", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              ...e.data.payload,
+              meetingId: activeReschedule ? activeReschedule.id : undefined,
+            }),
+          }).catch(() => {});
+        }
+        setLiveSuccess(true);
+        toast(activeReschedule ? "Meeting successfully rescheduled & updated in CRM!" : "Meeting successfully scheduled & synced with CRM!");
+        setTimeout(() => {
+          setShowArrange(false);
+          setReschedulingMeeting(null);
+          reschedulingMeetingRef.current = null;
+          setLiveSuccess(false);
+          void check(true);
+        }, 2200);
+      }
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, [toast, check]);
 
   // Background check every 10 seconds while open
   useEffect(() => {
@@ -416,6 +426,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
 
   // Open Reschedule Modal
   const openRescheduleModal = (m: MeetingItem) => {
+    reschedulingMeetingRef.current = m;
     setReschedulingMeeting(m);
     setRescheduleTime(toLocalInput(new Date(Date.now() + 24 * 3600 * 1000)));
     setRescheduleDuration(minutes(m.startTime, m.endTime) || 30);
@@ -1331,15 +1342,25 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
       {/* Reschedule Modal */}
       {reschedulingMeeting && (
         <div className="crm-modal-wrap" onClick={() => setReschedulingMeeting(null)}>
-          <div className="crm-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "680px", width: "95vw" }}>
-            <div className="crm-drawer-head" style={{ padding: "16px 20px" }}>
-              <div>
-                <h2 className="crm-drawer-title" style={{ fontSize: "16px" }}>
-                  Reschedule: {reschedulingMeeting.name || reschedulingMeeting.email}
-                </h2>
-                <p style={{ margin: "2px 0 0", fontSize: "12px", color: "#64748b" }}>
-                  Current: {fmtWhen(reschedulingMeeting.startTime)}
-                </p>
+          <div className="crm-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "820px", width: "95vw", maxHeight: "90vh", overflowY: "auto" }}>
+            <div className="crm-drawer-head" style={{ padding: "16px 22px", borderBottom: "1px solid #e2e8f0" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <div style={{ width: "36px", height: "36px", borderRadius: "8px", background: "#eef2ff", display: "flex", alignItems: "center", justifyContent: "center", color: "#4f46e5" }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                    <path d="M3 3v5h5" />
+                    <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+                    <path d="M16 16h5v5" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="crm-drawer-title" style={{ fontSize: "16px", fontWeight: 800 }}>
+                    Reschedule: {reschedulingMeeting.name || reschedulingMeeting.email}
+                  </h2>
+                  <p style={{ margin: "2px 0 0", fontSize: "12px", color: "#64748b" }}>
+                    Current Time: <strong>{fmtWhen(reschedulingMeeting.startTime)}</strong> {reschedulingMeeting.rescheduleCount > 0 ? `(Rescheduled ×${reschedulingMeeting.rescheduleCount})` : ""}
+                  </p>
+                </div>
               </div>
               <button type="button" className="crm-icon-act" onClick={() => setReschedulingMeeting(null)}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -1349,13 +1370,14 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
             </div>
 
             {reschedulingMeeting.rescheduleUrl && (
-              <div style={{ display: "flex", borderBottom: "1px solid #e2e8f0", background: "#f8fafc", padding: "0 20px" }}>
+              <div style={{ display: "flex", borderBottom: "1px solid #e2e8f0", background: "#f8fafc", padding: "0 22px" }}>
                 <button
                   type="button"
+                  className={`crm-tab-btn${rescheduleTab === "calendly" ? " is-active" : ""}`}
                   onClick={() => setRescheduleTab("calendly")}
                   style={{
-                    padding: "10px 14px",
-                    fontSize: "12.5px",
+                    padding: "12px 16px",
+                    fontSize: "13px",
                     fontWeight: 600,
                     border: "none",
                     background: "transparent",
@@ -1364,14 +1386,15 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
                     cursor: "pointer",
                   }}
                 >
-                  Via Calendly Reschedule Link
+                  1. Live Calendly Rescheduler
                 </button>
                 <button
                   type="button"
+                  className={`crm-tab-btn${rescheduleTab === "manual" ? " is-active" : ""}`}
                   onClick={() => setRescheduleTab("manual")}
                   style={{
-                    padding: "10px 14px",
-                    fontSize: "12.5px",
+                    padding: "12px 16px",
+                    fontSize: "13px",
                     fontWeight: 600,
                     border: "none",
                     background: "transparent",
@@ -1380,38 +1403,65 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
                     cursor: "pointer",
                   }}
                 >
-                  Direct Time Change in CRM
+                  2. Direct Time Change in CRM
                 </button>
               </div>
             )}
 
-            <div style={{ padding: "20px" }}>
+            <div style={{ padding: "20px 22px" }}>
               {rescheduleTab === "calendly" && reschedulingMeeting.rescheduleUrl ? (
                 <div>
-                  <p style={{ fontSize: "13px", color: "#475569", marginBottom: "14px" }}>
-                    Open Calendly&apos;s official reschedule session for this invitee to select a new available time slot:
-                  </p>
-                  <div style={{ display: "flex", gap: "10px" }}>
-                    <a
-                      className="crm-act crm-act-dark"
-                      href={reschedulingMeeting.rescheduleUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
-                    >
-                      Open Calendly Rescheduler ↗
-                    </a>
-                    <button
-                      type="button"
-                      className="crm-act crm-act-ghost"
-                      onClick={() => copyLink(reschedulingMeeting.rescheduleUrl || "")}
-                    >
-                      Copy Reschedule Link
-                    </button>
-                  </div>
+                  {liveSuccess ? (
+                    <div style={{ padding: "40px 20px", textAlign: "center", background: "#f0fdf4", borderRadius: "10px", border: "1px solid #bbf7d0" }}>
+                      <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "#22c55e", color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: "24px" }}>
+                        ✓
+                      </div>
+                      <h3 style={{ margin: "12px 0 4px", fontSize: "16px", color: "#166534" }}>Meeting Successfully Rescheduled!</h3>
+                      <p style={{ margin: 0, fontSize: "13px", color: "#15803d" }}>
+                        The meeting record in CRM has been updated with the new date &amp; time. Updated confirmation emails were sent by Calendly.
+                      </p>
+                    </div>
+                  ) : (
+                    <div>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px", flexWrap: "wrap", gap: "10px" }}>
+                        <span style={{ fontSize: "12.5px", color: "#475569" }}>
+                          ⚡ Pick an available time slot below to reschedule dynamically across Calendly and CRM:
+                        </span>
+                        <div style={{ display: "flex", gap: "8px" }}>
+                          <a
+                            className="crm-act crm-act-ghost crm-act-sm"
+                            href={reschedulingMeeting.rescheduleUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ fontSize: "12px", padding: "3px 10px" }}
+                          >
+                            Open in New Tab ↗
+                          </a>
+                          <button
+                            type="button"
+                            className="crm-act crm-act-ghost crm-act-sm"
+                            onClick={() => copyLink(reschedulingMeeting.rescheduleUrl || "")}
+                            style={{ fontSize: "12px", padding: "3px 10px" }}
+                          >
+                            Copy Link
+                          </button>
+                        </div>
+                      </div>
+                      <div style={{ height: "560px", border: "1px solid #e2e8f0", borderRadius: "10px", overflow: "hidden", background: "#ffffff" }}>
+                        <iframe
+                          src={reschedulingMeeting.rescheduleUrl}
+                          style={{ width: "100%", height: "100%", border: "none" }}
+                          title="Calendly Rescheduler"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                  <div style={{ padding: "10px 14px", borderRadius: "8px", background: "#f8fafc", border: "1px solid #e2e8f0", fontSize: "12px", color: "#64748b" }}>
+                    ℹ️ Directly adjusts meeting start and end times in the CRM database and updates internal history audit log.
+                  </div>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
                     <label className="crm-field">
                       <span className="crm-label">New Date &amp; Start Time *</span>
@@ -1434,6 +1484,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
                         <option value={30}>30 minutes</option>
                         <option value={45}>45 minutes</option>
                         <option value={60}>60 minutes</option>
+                        <option value={90}>90 minutes</option>
                       </select>
                     </label>
                   </div>

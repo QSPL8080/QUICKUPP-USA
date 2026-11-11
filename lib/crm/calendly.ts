@@ -148,7 +148,15 @@ function fieldsOf(inv: CalInvitee, ev: CalEvent) {
   };
 }
 
-const isCanceled = (inv: CalInvitee) => inv.status === "canceled" && !inv.rescheduled;
+export const isRescheduledCancellation = (inv: CalInvitee) =>
+  Boolean(inv.rescheduled) ||
+  Boolean(inv.new_invitee) ||
+  /reschedul/i.test(inv.cancellation?.reason || "") ||
+  /reschedul/i.test(inv.cancellation?.canceler_type || "");
+
+export const isCanceled = (inv: CalInvitee) =>
+  inv.status === "canceled" && !isRescheduledCancellation(inv);
+
 const cancelFields = (inv: CalInvitee) => ({
   canceled_by: inv.cancellation?.canceled_by ? String(inv.cancellation.canceled_by).slice(0, 190) : null,
   cancel_reason: inv.cancellation?.reason || null,
@@ -175,11 +183,44 @@ async function mapInvitee(invitee: string | null | undefined, meetingId: number,
   );
 }
 
-async function meetingFor(uri: string | null | undefined): Promise<number | null> {
+export async function meetingFor(uri: string | null | undefined): Promise<number | null> {
   if (!uri) return null;
-  const [rows] = await getPool().query("SELECT meeting_id FROM crm_meeting_invitees WHERE invitee_uri = ?", [uri]);
-  const r = (rows as { meeting_id: number }[])[0];
-  return r ? Number(r.meeting_id) : null;
+  const pool = getPool();
+  try {
+    const [mRows] = await pool.query("SELECT meeting_id FROM crm_meeting_invitees WHERE invitee_uri = ? LIMIT 1", [uri]);
+    const mr = (mRows as { meeting_id: number }[])[0];
+    if (mr?.meeting_id) return Number(mr.meeting_id);
+
+    const [cRows] = await pool.query("SELECT id FROM crm_meetings WHERE invitee_uri = ? AND deleted_at IS NULL LIMIT 1", [uri]);
+    const cr = (cRows as { id: number }[])[0];
+    if (cr?.id) return Number(cr.id);
+
+    const [eRows] = await pool.query("SELECT id FROM crm_meetings WHERE event_uri = ? AND deleted_at IS NULL LIMIT 1", [uri]);
+    const er = (eRows as { id: number }[])[0];
+    if (er?.id) return Number(er.id);
+  } catch (err) {
+    console.warn("[calendly] meetingFor error:", err);
+  }
+  return null;
+}
+
+export async function findMeetingByEmail(email: string | null | undefined): Promise<number | null> {
+  if (!email) return null;
+  const pool = getPool();
+  try {
+    const [rows] = await pool.query(
+      `SELECT id FROM crm_meetings
+        WHERE invitee_email = ?
+          AND deleted_at IS NULL
+          AND (status IN ('scheduled', 'rescheduled') OR (status = 'canceled' AND (synced_at >= DATE_SUB(NOW(), INTERVAL 2 DAY) OR cancel_reason LIKE '%reschedul%')))
+        ORDER BY id DESC LIMIT 1`,
+      [email]
+    );
+    const r = (rows as { id: number }[])[0];
+    return r ? Number(r.id) : null;
+  } catch {
+    return null;
+  }
 }
 
 async function loadRow(id: number): Promise<MeetingRow | null> {
@@ -214,13 +255,18 @@ async function startOfInvitee(uri: string): Promise<string | null> {
  * reschedule moves the existing row to the new time, a cancellation marks the
  * row canceled. Seeing the same thing twice changes nothing.
  */
-export async function applyInvitee(inv: CalInvitee, ev: CalEvent) {
+export async function applyInvitee(inv: CalInvitee, ev: CalEvent, forcedMeetingId?: number) {
   if (!inv?.uri || !ev?.uri || !ev.start_time || !ev.end_time) return;
   const pool = getPool();
   const f = fieldsOf(inv, ev);
 
-  let id = await meetingFor(inv.uri);
+  let id = forcedMeetingId || (await meetingFor(inv.uri));
   if (!id && inv.old_invitee) id = await meetingFor(inv.old_invitee);
+  if (!id && inv.new_invitee) id = await meetingFor(inv.new_invitee);
+  if (!id && ev.uri) id = await meetingFor(ev.uri);
+  if (!id && (inv.old_invitee || isRescheduledCancellation(inv) || inv.email)) {
+    id = await findMeetingByEmail(inv.email);
+  }
 
   if (!id) {
     // a meeting not seen before
@@ -273,51 +319,63 @@ export async function applyInvitee(inv: CalInvitee, ev: CalEvent) {
   if (!row) return;
   const history = parseHistory(row.history);
 
-  if (row.invitee_uri === inv.uri) {
-    // the meeting's current booking: keep its details in step; mark a cancellation
-    const set: Record<string, unknown> = { ...f };
-    if (isCanceled(inv)) {
-      if (row.status !== "canceled") {
-        const c = inv.cancellation || {};
-        history.push({ kind: "canceled", at: c.created_at || inv.updated_at || new Date().toISOString(), by: c.canceled_by || undefined, reason: c.reason || undefined });
-        Object.assign(set, { status: "canceled", ...cancelFields(inv), history: JSON.stringify(history) });
-      }
-    } else if (inv.status !== "canceled") {
-      // (a booking canceled because it was rescheduled waits for its new booking)
-      set.status = row.reschedule_count > 0 ? "rescheduled" : "scheduled";
-    } else {
-      // canceled by a reschedule: the time shown stays until the new booking is read
-      delete set.start_time;
-      delete set.end_time;
-      delete set.event_uri;
-      delete set.join_url;
-      delete set.location_text;
-      delete set.location_type;
+  // Case 1: The invitee is reporting a cancellation due to reschedule
+  if (isRescheduledCancellation(inv)) {
+    if (inv.new_invitee) {
+      await mapInvitee(inv.new_invitee, id);
     }
-    await updateRow(id, set);
-  } else if (inv.old_invitee && row.invitee_uri === inv.old_invitee) {
-    // rescheduled: the same row moves to the new booking
-    history.push({ kind: "rescheduled", at: inv.created_at || new Date().toISOString(), from: row.start_time, to: ev.start_time });
-    const canceled = isCanceled(inv);
-    if (canceled) {
-      const c = inv.cancellation || {};
-      history.push({ kind: "canceled", at: c.created_at || inv.updated_at || new Date().toISOString(), by: c.canceled_by || undefined, reason: c.reason || undefined });
-    }
+    await mapInvitee(inv.uri, id, ev.uri, ev.updated_at);
     await updateRow(id, {
-      ...f,
-      status: canceled ? "canceled" : "rescheduled",
-      reschedule_count: row.reschedule_count + 1,
-      previous_start_time: sqlTime(row.start_time),
-      ...(canceled ? cancelFields(inv) : { canceled_by: null, cancel_reason: null, canceled_at: null }),
-      history: JSON.stringify(history),
+      status: "rescheduled",
+      reschedule_count: Math.max(1, row.reschedule_count || 1),
     });
-  } else if (inv.new_invitee && row.invitee_uri === inv.new_invitee && !row.previous_start_time) {
-    // the original booking, read after its reschedule: fill in the earlier time
-    const fixed = history.map((h) => (h.kind === "rescheduled" && !h.from ? { ...h, from: ev.start_time } : h));
-    if (!fixed.some((h) => h.kind === "booked")) fixed.unshift({ kind: "booked", at: inv.created_at || ev.start_time, start: ev.start_time });
-    await updateRow(id, { previous_start_time: sqlTime(ev.start_time), history: JSON.stringify(fixed), booked_at: sqlTime(inv.created_at) });
+    return;
   }
-  // (anything else is an older booking of a meeting that has since moved on)
+
+  // Case 2: Genuine cancellation
+  if (isCanceled(inv)) {
+    if (row.status !== "canceled") {
+      const c = inv.cancellation || {};
+      history.push({
+        kind: "canceled",
+        at: c.created_at || inv.updated_at || new Date().toISOString(),
+        by: c.canceled_by || undefined,
+        reason: c.reason || undefined,
+      });
+      await updateRow(id, {
+        status: "canceled",
+        ...cancelFields(inv),
+        history: JSON.stringify(history),
+      });
+    }
+    await mapInvitee(inv.uri, id, ev.uri, ev.updated_at);
+    return;
+  }
+
+  // Case 3: Active booking (either newly scheduled, updated, or rescheduled to a new slot)
+  const isTimeChanged = sqlTime(row.start_time) !== sqlTime(ev.start_time);
+  const isDifferentInvitee = row.invitee_uri !== inv.uri;
+  const isReschedule = Boolean(inv.old_invitee) || isTimeChanged || isDifferentInvitee || row.status === "rescheduled" || row.status === "canceled";
+
+  if (isReschedule && isTimeChanged) {
+    history.push({
+      kind: "rescheduled",
+      at: inv.created_at || new Date().toISOString(),
+      from: row.start_time || undefined,
+      to: ev.start_time,
+    });
+  }
+
+  await updateRow(id, {
+    ...f,
+    status: isReschedule ? "rescheduled" : (row.reschedule_count > 0 ? "rescheduled" : "scheduled"),
+    reschedule_count: isReschedule ? Math.max(1, (row.reschedule_count || 0) + (isTimeChanged ? 1 : 0)) : row.reschedule_count,
+    previous_start_time: isTimeChanged ? sqlTime(row.start_time) : (row.previous_start_time ? sqlTime(row.previous_start_time) : null),
+    canceled_by: null,
+    cancel_reason: null,
+    canceled_at: null,
+    history: JSON.stringify(history),
+  });
 
   await mapInvitee(inv.uri, id, ev.uri, ev.updated_at);
   await mapInvitee(inv.old_invitee, id);
@@ -942,8 +1000,13 @@ export async function generateCalendlySchedulingLink(eventTypeUri?: string) {
 /**
  * Synchronizes a single event immediately when booked via website or client embed.
  */
-export async function syncSingleEvent(eventUri: string, inviteeUri: string) {
+export async function syncSingleEvent(eventUri: string, inviteeUri: string, meetingId?: number) {
   if (!eventUri || !inviteeUri) return { ok: false, error: "Missing URIs" };
+
+  if (meetingId && meetingId > 0) {
+    await mapInvitee(inviteeUri, meetingId, eventUri);
+    await mapInvitee(eventUri, meetingId, eventUri);
+  }
 
   if (calendlyConfigured()) {
     try {
@@ -952,7 +1015,7 @@ export async function syncSingleEvent(eventUri: string, inviteeUri: string) {
         cal<{ resource: CalInvitee }>(inviteeUri),
       ]);
       if (invRes.resource && evRes.resource) {
-        await applyInvitee(invRes.resource, evRes.resource);
+        await applyInvitee(invRes.resource, evRes.resource, meetingId);
         return { ok: true, synced: true };
       }
     } catch (err: unknown) {
@@ -962,7 +1025,7 @@ export async function syncSingleEvent(eventUri: string, inviteeUri: string) {
 
   // Fallback: If token is not set yet or API was temporarily unreachable,
   // we ensure the meeting is recorded in the database
-  const id = await meetingFor(inviteeUri);
+  let id = meetingId || (await meetingFor(inviteeUri));
   if (!id) {
     const nowIso = new Date().toISOString();
     const [res] = await getPool().query(
@@ -971,8 +1034,8 @@ export async function syncSingleEvent(eventUri: string, inviteeUri: string) {
        ON DUPLICATE KEY UPDATE synced_at = NOW()`,
       [inviteeUri, eventUri]
     );
-    const meetingId = Number((res as { insertId: number }).insertId);
-    if (meetingId) await mapInvitee(inviteeUri, meetingId, eventUri, nowIso);
+    const newId = Number((res as { insertId: number }).insertId);
+    if (newId) await mapInvitee(inviteeUri, newId, eventUri, nowIso);
   }
   return { ok: true, synced: true };
 }

@@ -14,12 +14,13 @@ export async function POST(request: Request) {
     const body = await request.json().catch(() => null);
     const eventUri = body?.event?.uri || body?.uri || body?.eventUri;
     const inviteeUri = body?.invitee?.uri || body?.inviteeUri;
+    const meetingId = body?.meetingId ? Number(body.meetingId) : undefined;
 
     if (!eventUri || !inviteeUri) {
       return Response.json({ ok: false, error: "Missing event or invitee URI" }, { status: 400 });
     }
 
-    const res = await syncSingleEvent(eventUri, inviteeUri);
+    const res = await syncSingleEvent(eventUri, inviteeUri, meetingId);
     return Response.json({ ok: res.ok });
   } catch (err: unknown) {
     console.error("[calendly] client-scheduled sync error:", err);
