@@ -276,10 +276,19 @@ export async function DELETE(request: Request) {
     bySource.set(src, [...(bySource.get(src) || []), id]);
   }
   let deleted = 0;
+  const pool = getPool();
   for (const [src, ids] of bySource) {
-    // permanently removed (no hidden "deleted" copies are kept)
-    const [res] = await getPool().query(`DELETE FROM \`${SOURCES[src].table}\` WHERE id IN (?)`, [ids]);
+    // permanently removed from the database (no hidden "deleted" copies are kept);
+    // its attachments live in the same row and go with it
+    const [res] = await pool.query(`DELETE FROM \`${SOURCES[src].table}\` WHERE id IN (?)`, [ids]);
     deleted += (res as { affectedRows: number }).affectedRows;
+    // the lead's history and notification marks go too; payment links and payments
+    // made for it are kept (money records) but no longer point at the deleted lead
+    await pool.query("DELETE FROM crm_activity WHERE entity_type = 'lead' AND entity_source = ? AND entity_id IN (?)", [src, ids]).catch(() => {});
+    await pool.query("DELETE FROM crm_notification_reads WHERE item_key IN (?)", [ids.map((id) => `${src}:${id}`)]).catch(() => {});
+    for (const table of ["payment_links", "payments"]) {
+      await pool.query(`UPDATE \`${table}\` SET lead_id = NULL, lead_source = NULL WHERE lead_source = ? AND lead_id IN (?)`, [src, ids]).catch(() => {});
+    }
   }
   if (!deleted) return Response.json({ ok: false, error: "Already deleted." }, { status: 404 });
   return Response.json({ ok: true, deleted });

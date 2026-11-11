@@ -247,6 +247,11 @@ export async function getLead(source: EnquirySource, id: number): Promise<Enquir
       : await getPool().query(`SELECT * FROM \`${table}\` WHERE id = ?`, [id]);
   const r = (rows as Record<string, unknown>[])[0];
   if (!r) return null;
+  return toEnquiry(source, r);
+}
+
+/** One database row of a lead table → every field its form collected */
+function toEnquiry(source: EnquirySource, r: Record<string, unknown>): EnquiryRow {
   const isContact = source === "contact";
   const isManual = source === "manual";
   return {
@@ -287,6 +292,38 @@ export async function getLead(source: EnquirySource, id: number): Promise<Enquir
     })(),
     createdAt: new Date(r.created_at as string).toISOString(),
   };
+}
+
+/**
+ * Leads with every field, for the CSV export: the filtered list (same filters
+ * as All Enquiries) or just the selected ones ("source:id" keys), newest first.
+ */
+export async function exportLeadDetails(f: LeadFilters, keys?: string[]): Promise<EnquiryRow[]> {
+  await ensureLeadTables();
+  const order: { source: EnquirySource; id: number }[] = keys?.length
+    ? keys
+        .map((k) => {
+          const [s, raw] = String(k).split(":");
+          return { source: s as EnquirySource, id: Number(raw) };
+        })
+        .filter((k) => isEnquirySource(k.source) && Number.isInteger(k.id) && k.id > 0)
+    : (await exportLeads(f)).map((l) => ({ source: l.source, id: l.id }));
+  const bySource = new Map<EnquirySource, number[]>();
+  for (const k of order) bySource.set(k.source, [...(bySource.get(k.source) || []), k.id]);
+  const found = new Map<string, EnquiryRow>();
+  for (const [source, ids] of bySource) {
+    for (let i = 0; i < ids.length; i += 500) {
+      const chunk = ids.slice(i, i + 500);
+      const [rows] =
+        source === "manual"
+          ? await getPool().query(`SELECT m.*, u.name AS created_by_name FROM manual_leads m LEFT JOIN crm_users u ON u.id = m.created_by WHERE m.id IN (?)`, [chunk])
+          : await getPool().query(`SELECT * FROM \`${SOURCES[source].table}\` WHERE id IN (?)`, [chunk]);
+      for (const r of rows as Record<string, unknown>[]) found.set(`${source}:${Number(r.id)}`, toEnquiry(source, r));
+    }
+  }
+  const list = order.map((k) => found.get(`${k.source}:${k.id}`)).filter((x): x is EnquiryRow => Boolean(x));
+  if (keys?.length) list.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  return list;
 }
 
 /* ---- Payments --------------------------------------------------------------------------- */
@@ -349,9 +386,12 @@ export async function listPayments(opts: {
   page?: number;
   from?: string;
   to?: string;
+  /** every matching payment on one page (the CSV export) */
+  all?: boolean;
 }) {
   const pool = getPool();
   const currentTab = opts.tab || "all";
+  const pageSize = opts.all ? 10000 : PAGE_SIZE;
 
   // Tab counts
   let websiteCount = 0;
@@ -426,7 +466,7 @@ export async function listPayments(opts: {
     [countRows] = await pool.query<RowDataPacket[]>(`SELECT COUNT(*) AS n FROM (${baseQuery}) p ${whereSql}`, args);
     [rows] = await pool.query<RowDataPacket[]>(
       `SELECT p.*, u.name AS created_by_name FROM (${baseQuery}) p LEFT JOIN crm_users u ON u.id = p.created_by
-       ${whereSql} ORDER BY COALESCE(p.paid_at, p.created_at) DESC, p.id DESC LIMIT ${PAGE_SIZE} OFFSET ${(page - 1) * PAGE_SIZE}`,
+       ${whereSql} ORDER BY COALESCE(p.paid_at, p.created_at) DESC, p.id DESC LIMIT ${pageSize} OFFSET ${opts.all ? 0 : (page - 1) * PAGE_SIZE}`,
       args
     );
   } catch {
@@ -435,7 +475,7 @@ export async function listPayments(opts: {
     [countRows] = await pool.query<RowDataPacket[]>(`SELECT COUNT(*) AS n FROM (${fallbackBase}) p ${whereSql}`, args);
     [rows] = await pool.query<RowDataPacket[]>(
       `SELECT p.*, u.name AS created_by_name FROM (${fallbackBase}) p LEFT JOIN crm_users u ON u.id = p.created_by
-       ${whereSql} ORDER BY COALESCE(p.paid_at, p.created_at) DESC, p.id DESC LIMIT ${PAGE_SIZE} OFFSET ${(page - 1) * PAGE_SIZE}`,
+       ${whereSql} ORDER BY COALESCE(p.paid_at, p.created_at) DESC, p.id DESC LIMIT ${pageSize} OFFSET ${opts.all ? 0 : (page - 1) * PAGE_SIZE}`,
       args
     );
   }

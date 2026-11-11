@@ -655,8 +655,19 @@ Quickupp Softech LLC`;
     router.refresh();
   };
 
+  // export: the payments this view shows (same tab, status, search and month)
+  const exportHref = `/api/crm/payments/export?${new URLSearchParams(
+    Object.entries({ q, status, tab: currentTab === "all" ? "" : currentTab, from, to }).filter(([, v]) => v) as [string, string][]
+  ).toString()}`;
+
   const headerActions = (
     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+      <a href={exportHref} className="crm-act crm-act-ghost" title="Download these payments as a spreadsheet (CSV)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+            </svg>
+        Export CSV
+      </a>
       {currentTab !== "website" && (
         <button
           type="button"
@@ -789,7 +800,22 @@ Quickupp Softech LLC`;
 
       <div className="crm-pay-table">
         {rows.length > 0 && (
-          <BulkBar sel={sel} noun={["payment", "payments"]} busy={busy} onDelete={removeSelected} />
+          <BulkBar sel={sel} noun={["payment", "payments"]} busy={busy} onDelete={removeSelected}>
+            {sel.selected.length > 0 && (
+              <a
+                href={`/api/crm/payments/export?${new URLSearchParams({
+                  ...(currentTab !== "all" ? { tab: currentTab } : {}),
+                  keys: rows.filter((p) => sel.has(p.id)).map((p) => `${p.source}:${p.id}`).join(","),
+                }).toString()}`}
+                className="crm-act crm-act-ghost crm-act-sm"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+            </svg>
+                Export selected ({sel.selected.length})
+              </a>
+            )}
+          </BulkBar>
         )}
         {listError && (
           <p className="crm-alert crm-alert-inset" role="alert">
