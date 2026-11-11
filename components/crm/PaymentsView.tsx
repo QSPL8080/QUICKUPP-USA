@@ -1811,19 +1811,8 @@ Quickupp Softech LLC`;
                               rel="noreferrer"
                               style={{ color: "#7c3aed", fontWeight: 700, textDecoration: "none" }}
                             >
-                              📄 PDF
+                              PDF
                             </a>
-                            {(() => {
-                              // from the payment's own history: was a receipt actually emailed to the client?
-                              const sent = payActivity.filter((a) => a.action === "receipt_email").length;
-                              const failed = payActivity.some((a) => a.action === "receipt_email_failed");
-                              const [text, color] = sent
-                                ? [sent > 1 ? `Emailed ×${sent}` : "Email: sent", "#16a34a"]
-                                : failed
-                                ? ["Email: not sent", "#dc2626"]
-                                : [payActivityLoading ? "Email: …" : "Email: not recorded", "#94a3b8"];
-                              return <span style={{ display: "block", fontSize: "10.5px", color }}>{text}</span>;
-                            })()}
                           </td>
                         </tr>
                       </tbody>
