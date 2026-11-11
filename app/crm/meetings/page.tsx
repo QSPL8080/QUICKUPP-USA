@@ -37,7 +37,14 @@ export default async function MeetingsPage({ searchParams }: Props) {
       <PageHead
         title="Calendly Meetings"
         sub="Meetings booked through the website's Calendly. Reschedules and cancellations made in Calendly show up here by themselves. View only: meetings are changed in Calendly."
-      />
+      >
+        <a href={`/api/crm/meetings/export${filtered ? `?${new URLSearchParams(Object.entries(f).filter(([, v]) => v) as [string, string][]).toString()}` : ""}`} className="crm-act crm-act-ghost">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+          </svg>
+          Export CSV
+        </a>
+      </PageHead>
 
       {!sync.configured && (
         <p className="crm-alert crm-meet-note" role="status">

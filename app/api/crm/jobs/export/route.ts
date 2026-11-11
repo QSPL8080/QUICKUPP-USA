@@ -2,6 +2,11 @@ import { getUserFor } from "@/lib/crm/auth";
 import { listAllJobs } from "@/lib/jobsData";
 import { parseIds } from "@/lib/crm/ids";
 import { csvFile } from "@/lib/crm/csv";
+import { exportStamp, exportZone, viewerTimeZone } from "@/lib/crm/crmTime";
+import { getPool } from "@/lib/db";
+import type { RowDataPacket } from "mysql2/promise";
+import { APPLICATION_STATUS_LABEL } from "@/lib/applications";
+import { SITE_URL } from "@/lib/siteUrl";
 
 const todayStr = () => {
   const n = new Date();
@@ -13,7 +18,7 @@ export async function GET(request: Request) {
   if (!(await getUserFor("jobs"))) return new Response("Please sign in again.", { status: 401 });
   const sp = new URL(request.url).searchParams;
   const rawIds = sp.get("ids");
-  const parsed = rawIds ? parseIds(rawIds.split(",")) : null;
+  const parsed = rawIds ? parseIds(rawIds.split(","), 5000) : null;
   const ids = parsed && parsed.length ? new Set(parsed) : null;
   const status = sp.get("status") || "";
   const today = todayStr();
@@ -29,20 +34,35 @@ export async function GET(request: Request) {
     return true;
   });
 
+  const tz = await viewerTimeZone();
+  const zone = exportZone(tz);
+  const pool = getPool();
+  const ids2 = jobs.map((j) => j.id);
+  // who posted each opening, when it last changed, and its applications by status
+  const extra = new Map<number, { by: string; updated: Date | null }>();
+  const apps = new Map<number, Record<string, number>>();
+  if (ids2.length) {
+    const [jr] = await pool
+      .query<RowDataPacket[]>("SELECT j.id, j.updated_at, u.name AS by_name FROM job_openings j LEFT JOIN crm_users u ON u.id = j.created_by WHERE j.id IN (?)", [ids2])
+      .catch(() => [[] as RowDataPacket[]]);
+    for (const r of jr) extra.set(Number(r.id), { by: r.by_name || "", updated: r.updated_at ? new Date(r.updated_at) : null });
+    if (withApps) {
+      const [ar] = await pool
+        .query<RowDataPacket[]>("SELECT job_id, status, COUNT(*) AS n FROM job_applications WHERE job_id IN (?) GROUP BY job_id, status", [ids2])
+        .catch(() => [[] as RowDataPacket[]]);
+      for (const r of ar) apps.set(Number(r.job_id), { ...(apps.get(Number(r.job_id)) || {}), [r.status]: Number(r.n) });
+    }
+  }
+  const byStatus = (id: number) =>
+    Object.entries(apps.get(id) || {})
+      .map(([k, n]) => `${APPLICATION_STATUS_LABEL[k as keyof typeof APPLICATION_STATUS_LABEL] || k}: ${n}`)
+      .join(", ");
+
   const head = [
-    "Sr. No",
-    "Job ID",
-    "Job Title",
-    "Department",
-    "Employment Type",
-    "Location",
-    "Experience",
-    "Responsibilities",
-    "Skills",
-    "Deadline",
-    "On Careers Page",
-    ...(withApps ? ["Applications"] : []),
-    "Posted Date & Time",
+    "Sr. No", "Job ID", "Job Title", "Department", "Employment Type", "Location", "Experience", "Responsibilities", "Skills",
+    "Application Deadline", "On Careers Page", "Careers Page Link",
+    ...(withApps ? ["Applications", "Applications by Status"] : []),
+    "Posted By", `Posted (${zone})`, `Last Changed (${zone})`,
   ];
   const rows = jobs.map((j, i) => [
     i + 1,
@@ -54,10 +74,13 @@ export async function GET(request: Request) {
     j.experience,
     j.responsibilities.join("; "),
     j.skills.join("; "),
-    j.deadline || "",
+    j.deadline || "No deadline",
     state(j.isOpen, j.deadline),
-    ...(withApps ? [j.applications ?? 0] : []),
-    new Date(j.createdAt).toISOString().replace("T", " ").slice(0, 16),
+    `${SITE_URL}/career`,
+    ...(withApps ? [j.applications ?? 0, byStatus(j.id)] : []),
+    extra.get(j.id)?.by || "",
+    exportStamp(j.createdAt, tz),
+    exportStamp(extra.get(j.id)?.updated || null, tz),
   ]);
-  return csvFile(`job-openings-${today}.csv`, head, rows);
+  return csvFile(`quickupp-job-openings-${today}.csv`, head, rows);
 }

@@ -207,7 +207,13 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
           <span>{syncing ? "Syncing..." : "Sync Calendly"}</span>
         </button>
       </div>
-      <BulkBar sel={sel} noun={["meeting", "meetings"]} busy={busy} onDelete={removeSelected} />
+      <BulkBar sel={sel} noun={["meeting", "meetings"]} busy={busy} onDelete={removeSelected}>
+        {sel.selected.length > 0 && (
+          <a href={`/api/crm/meetings/export?ids=${sel.selected.join(",")}`} className="crm-act crm-act-ghost crm-act-sm">
+            Export selected ({sel.selected.length})
+          </a>
+        )}
+      </BulkBar>
       <div className="crm-table-wrap">
         <table className="crm-table crm-stack crm-selectable">
           <thead>

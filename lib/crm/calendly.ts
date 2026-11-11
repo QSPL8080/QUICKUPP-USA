@@ -463,7 +463,8 @@ const json = <T,>(v: unknown, fallback: T): T => {
   }
 };
 
-export async function listMeetings(opts: { q?: string; status?: string; when?: string; page?: number }) {
+/* all: every matching meeting on one page (the CSV export); ids: only these */
+export async function listMeetings(opts: { q?: string; status?: string; when?: string; page?: number; all?: boolean; ids?: number[] }) {
   const where = ["deleted_at IS NULL"];
   const args: (string | number)[] = [];
   const q = (opts.q || "").trim().slice(0, 100);
@@ -476,6 +477,10 @@ export async function listMeetings(opts: { q?: string; status?: string; when?: s
   else if (opts.status === "completed") where.push("status <> 'canceled' AND end_time < UTC_TIMESTAMP()");
   else if (opts.status === "rescheduled") where.push("status <> 'canceled' AND reschedule_count > 0 AND end_time >= UTC_TIMESTAMP()");
   else if (opts.status === "upcoming") where.push("status = 'scheduled' AND (reschedule_count IS NULL OR reschedule_count = 0) AND end_time >= UTC_TIMESTAMP()");
+  if (opts.ids?.length) {
+    where.push(`id IN (${opts.ids.map(() => "?").join(", ")})`);
+    args.push(...opts.ids);
+  }
   if (opts.when === "upcoming") where.push("end_time >= UTC_TIMESTAMP()");
   else if (opts.when === "past") where.push("end_time < UTC_TIMESTAMP()");
   const whereSql = `WHERE ${where.join(" AND ")}`;
@@ -492,7 +497,7 @@ export async function listMeetings(opts: { q?: string; status?: string; when?: s
             (status <> 'canceled' AND end_time >= UTC_TIMESTAMP()) AS ahead
        FROM crm_meetings ${whereSql}
       ORDER BY ahead DESC, IF(ahead = 1, start_time, NULL) ASC, start_time DESC, id DESC
-      LIMIT ${PAGE_SIZE} OFFSET ${(page - 1) * PAGE_SIZE}`,
+      LIMIT ${opts.all ? 10000 : PAGE_SIZE} OFFSET ${opts.all ? 0 : (page - 1) * PAGE_SIZE}`,
     args
   );
   const now = Date.now();

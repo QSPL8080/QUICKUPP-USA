@@ -387,6 +387,15 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
         title="Website Blogs"
         sub={`${rows.length} total articles (${publishedCount} published, ${draftCount} drafts) — synced live with MySQL database and website.`}
       >
+        <a
+          href={`/api/crm/blogs/export?${new URLSearchParams({ ...(search ? { q: search } : {}), ...(categoryFilter !== "All" ? { category: categoryFilter } : {}) }).toString()}`}
+          className="crm-act crm-act-ghost"
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+          </svg>
+          Export CSV
+        </a>
         <button type="button" className="crm-act crm-act-dark" onClick={() => openForm("new")}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <line x1="12" y1="5" x2="12" y2="19" />

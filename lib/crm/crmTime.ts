@@ -89,3 +89,21 @@ export function monthPeriod(from: string, to: string, tz: string) {
   const label = new Date(Date.UTC(y, m - 1, 1)).toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
   return { label, isWholeMonth: from === cur.from && to === cur.to, range };
 }
+
+/** "2026-11-11 16:22" in the zone, for CSV exports (empty for no date) */
+export function exportStamp(v: string | Date | null | undefined, tz: string): string {
+  if (!v) return "";
+  const d = v instanceof Date ? v : new Date(v);
+  if (isNaN(d.getTime())) return "";
+  const p = Object.fromEntries(
+    new Intl.DateTimeFormat("en-CA", { timeZone: tz, hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })
+      .formatToParts(d)
+      .map((x) => [x.type, x.value])
+  );
+  return `${p.year}-${p.month}-${p.day} ${p.hour}:${p.minute}`;
+}
+
+/** The zone named in export column headings, e.g. "India time (Asia/Kolkata)" */
+export function exportZone(tz: string): string {
+  return tz === "Asia/Kolkata" || tz === "Asia/Calcutta" ? "India time" : tz === "America/New_York" ? "US Eastern time" : tz;
+}
