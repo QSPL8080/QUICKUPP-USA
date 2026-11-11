@@ -2,6 +2,7 @@ import Link from "next/link";
 import { PAYMENT_STATUS_LABEL, money } from "@/lib/crm/format";
 import type { PaymentStats } from "@/lib/crm/stats";
 import { ColumnChart, StackBar, shortMoney } from "@/components/crm/DashCharts";
+import LocalDateTime from "@/components/crm/LocalDateTime";
 
 /*
  * Payments dashboard (its own page under Payments in the sidebar). Covers
@@ -17,6 +18,13 @@ const STATUS_PARTS: Record<string, { label: string; color: string }> = {
 };
 
 const day = (iso: string) => new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
+
+/** "2026-11" -> the whole month as a Payments-tab date filter */
+function monthRange(key: string) {
+  const [y, m] = key.split("-").map(Number);
+  const last = new Date(y, m, 0).getDate();
+  return `from=${key}-01&to=${key}-${String(last).padStart(2, "0")}`;
+}
 
 function dueLabel(iso: string | null) {
   if (!iso) return { text: "No due date", late: false };
@@ -132,7 +140,7 @@ export default function PaymentsDashboard({
               label: STATUS_PARTS[b.status].label,
               color: STATUS_PARTS[b.status].color,
               count: b.count,
-              href: `/crm/payments?status=${b.status}&from=${s.selectedMonthKey}-01`,
+              href: `/crm/payments?status=${b.status}&${monthRange(s.selectedMonthKey)}`,
             }))}
           />
         </div>
@@ -150,11 +158,13 @@ export default function PaymentsDashboard({
                 const due = dueLabel(d.dueDate);
                 return (
                   <li key={d.key}>
-                    <span className="crm-pdash-list-text">
-                      <span className="crm-strong">{d.client}</span>
-                      <span className={`crm-cell-sub${due.late ? " crm-pdash-overdue" : ""}`}>{[d.invoice, due.text].filter(Boolean).join(" · ")}</span>
-                    </span>
-                    <span className="crm-pdash-list-amt">{m(d.due)}</span>
+                    <Link href={d.href} className="crm-pdash-list-link">
+                      <span className="crm-pdash-list-text">
+                        <span className="crm-strong">{d.client}</span>
+                        <span className={`crm-cell-sub${due.late ? " crm-pdash-overdue" : ""}`}>{[d.invoice, due.text].filter(Boolean).join(" · ")}</span>
+                      </span>
+                      <span className="crm-pdash-list-amt">{m(d.due)}</span>
+                    </Link>
                   </li>
                 );
               })}
@@ -167,7 +177,7 @@ export default function PaymentsDashboard({
         <div className="crm-card">
           <div className="crm-card-head">
             <h2 className="crm-card-title">Payments in {activeMonthName}</h2>
-            <Link href={`/crm/payments?from=${s.selectedMonthKey}-01`} className="crm-dash-more">
+            <Link href={`/crm/payments?${monthRange(s.selectedMonthKey)}`} className="crm-dash-more">
               View all
             </Link>
           </div>
@@ -175,17 +185,19 @@ export default function PaymentsDashboard({
             <ul className="crm-pdash-list">
               {s.recent.map((r) => (
                 <li key={r.key}>
-                  <span className="crm-pdash-list-text">
-                    <span className="crm-strong">{r.client}</span>
-                    <span className="crm-cell-sub">
-                      {r.kind === "link" ? "Payment link" : "Website"}
-                      {r.service ? ` · ${r.service}` : ""} · {day(r.at)}
+                  <Link href={r.href} className="crm-pdash-list-link">
+                    <span className="crm-pdash-list-text">
+                      <span className="crm-strong">{r.client}</span>
+                      <span className="crm-cell-sub">
+                        {r.kind === "link" ? "Payment link" : "Website"}
+                        {r.service ? ` · ${r.service}` : ""} · <LocalDateTime iso={r.at} />
+                      </span>
                     </span>
-                  </span>
-                  <span className="crm-pdash-list-side">
-                    <span className="crm-pdash-list-amt">{m(r.amount)}</span>
-                    <span className={`crm-pill crm-pill-${r.status}`}>{PAYMENT_STATUS_LABEL[r.status] || r.status}</span>
-                  </span>
+                    <span className="crm-pdash-list-side">
+                      <span className="crm-pdash-list-amt">{m(r.amount)}</span>
+                      <span className={`crm-pill crm-pill-${r.status}`}>{PAYMENT_STATUS_LABEL[r.status] || r.status}</span>
+                    </span>
+                  </Link>
                 </li>
               ))}
             </ul>

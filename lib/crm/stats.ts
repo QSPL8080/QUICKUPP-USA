@@ -24,6 +24,16 @@ async function q(sql: string, args: unknown[] = []): Promise<Row[]> {
 
 const n = (v: unknown) => Number(v || 0);
 
+/** Opens one payment in the Payments tab: its own tab (website / payment links), searched by order number, with its details open. */
+function paymentHref(r: Row) {
+  const p = new URLSearchParams();
+  p.set("tab", r.kind === "link" ? "payment_link" : "website");
+  const find = String(r.invoice_number || r.client_email || r.client_name || "").trim();
+  if (find) p.set("q", find);
+  p.set("open", String(r.id));
+  return `/crm/payments?${p.toString()}`;
+}
+
 /** The last `count` months up to `baseDate`, oldest first: { key: "2026-06", label: "Jun" } */
 export function lastMonths(count = 6, baseDate: Date = new Date()) {
   const out: { key: string; label: string }[] = [];
@@ -46,16 +56,16 @@ export function lastMonths(count = 6, baseDate: Date = new Date()) {
    --------------------------------------------------------------------------- */
 const PAY_SET = `
   SELECT 'website' AS kind, amount, total_amount, remaining_amount, currency, method, status, service,
-         link_status, expires_at, paid_at, created_at, balance_due_date, client_name, invoice_number, id
+         link_status, expires_at, paid_at, created_at, balance_due_date, client_name, client_email, invoice_number, id
     FROM payments WHERE source IN ('website', 'online')
   UNION ALL
   SELECT 'link' AS kind, amount, total_amount, remaining_amount, currency, method, status, service,
-         link_status, expires_at, paid_at, created_at, balance_due_date, client_name, invoice_number, id
+         link_status, expires_at, paid_at, created_at, balance_due_date, client_name, client_email, invoice_number, id
     FROM payment_links`;
 
 const PAY_WEBSITE_ONLY = `
   SELECT 'website' AS kind, amount, total_amount, remaining_amount, currency, method, status, service,
-         link_status, expires_at, paid_at, created_at, balance_due_date, client_name, invoice_number, id
+         link_status, expires_at, paid_at, created_at, balance_due_date, client_name, client_email, invoice_number, id
     FROM payments WHERE source IN ('website', 'online')`;
 
 const RECEIVED = `CASE WHEN p.status IN ('paid','partially_paid') THEN p.amount ELSE 0 END`;
@@ -121,13 +131,14 @@ export async function paymentStats(opts?: { targetMonth?: string | Date }) {
             SUM(CASE WHEN p.status = 'refunded' THEN p.amount ELSE 0 END) AS refunded,
             SUM(CASE WHEN p.status IN ('paid','partially_paid') THEN 1 ELSE 0 END) AS paid_count
        ${inCur}`,
+    // same order as the placeholders: the five date ranges, then the currency (in WHERE)
     [
-      currency,
       curMonthStartStr, curMonthEndStr,
       prevMonthStartStr, prevMonthEndStr,
       curMonthStartStr, curMonthEndStr,
       curMonthStartStr, curMonthEndStr,
       curMonthStartStr, curMonthEndStr,
+      currency,
     ]
   );
 
@@ -183,7 +194,7 @@ export async function paymentStats(opts?: { targetMonth?: string | Date }) {
 
   const dueSoon = (
     await q(
-      `SELECT p.kind, p.id, p.client_name, p.invoice_number, p.service, p.balance_due_date, ${DUE} AS due
+      `SELECT p.kind, p.id, p.client_name, p.client_email, p.invoice_number, p.service, p.balance_due_date, ${DUE} AS due
          ${inCur} AND p.status IN ('pending','partially_paid')
          ORDER BY p.balance_due_date IS NULL, p.balance_due_date ASC, p.created_at DESC LIMIT 5`,
       [currency]
@@ -195,11 +206,12 @@ export async function paymentStats(opts?: { targetMonth?: string | Date }) {
     service: r.service ? String(r.service) : null,
     dueDate: r.balance_due_date ? new Date(r.balance_due_date as string).toISOString() : null,
     due: n(r.due),
+    href: paymentHref(r),
   }));
 
   const recent = (
     await q(
-      `SELECT p.kind, p.id, p.client_name, p.service, p.status, p.amount, p.total_amount, p.remaining_amount, p.paid_at, p.created_at
+      `SELECT p.kind, p.id, p.client_name, p.client_email, p.invoice_number, p.service, p.status, p.amount, p.total_amount, p.remaining_amount, p.paid_at, p.created_at
          ${inCur} AND COALESCE(p.paid_at, p.created_at) >= ? AND COALESCE(p.paid_at, p.created_at) < ?
          ORDER BY COALESCE(p.paid_at, p.created_at) DESC, p.created_at DESC LIMIT 10`,
       [currency, curMonthStartStr, curMonthEndStr]
@@ -212,6 +224,7 @@ export async function paymentStats(opts?: { targetMonth?: string | Date }) {
     status: String(r.status || "pending"),
     amount: n(r.status === "pending" ? r.total_amount || r.amount : r.amount),
     at: new Date((r.paid_at || r.created_at) as string).toISOString(),
+    href: paymentHref(r),
   }));
 
   const received = n(totals?.received);

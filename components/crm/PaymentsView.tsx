@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useFeedback } from "@/components/crm/Feedback";
@@ -40,10 +40,17 @@ const fmtDate = (d: string | null, withTime = false) => {
   }
 };
 
-const today = () => {
-  const n = new Date();
-  return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`;
+const pad2 = (v: number) => String(v).padStart(2, "0");
+
+/** A time as the date-and-time box shows it, on this computer's clock: "2026-11-10T20:13" */
+const toLocalInput = (iso: string | null | undefined) => {
+  if (!iso) return "";
+  const n = new Date(iso.includes("T") ? iso : `${iso}T00:00:00`);
+  if (Number.isNaN(n.getTime())) return "";
+  return `${n.getFullYear()}-${pad2(n.getMonth() + 1)}-${pad2(n.getDate())}T${pad2(n.getHours())}:${pad2(n.getMinutes())}`;
 };
+
+const nowLocalInput = () => toLocalInput(new Date().toISOString());
 
 type Options = {
   services: readonly string[];
@@ -88,7 +95,7 @@ const blank = (): FormState => ({
   currency: "USD",
   method: "PayPal",
   status: "paid",
-  paidAt: today(),
+  paidAt: nowLocalInput(),
   invoiceNumber: "",
   reference: "",
   notes: "",
@@ -109,7 +116,7 @@ const fromRow = (p: PaymentRow): FormState => ({
   currency: p.currency,
   method: p.method,
   status: p.status,
-  paidAt: p.paidAt || "",
+  paidAt: toLocalInput(p.paidAt),
   invoiceNumber: p.invoiceNumber || "",
   reference: p.reference || "",
   notes: p.notes || "",
@@ -153,6 +160,7 @@ export default function PaymentsView({
   rows,
   options,
   openNew,
+  openId,
   userRole = "admin",
   q = "",
   status = "",
@@ -174,6 +182,8 @@ export default function PaymentsView({
   rows: PaymentRow[];
   options: Options;
   openNew: boolean;
+  /** a payment to show straight away (from a Payments Dashboard link) */
+  openId?: number;
   userRole?: "super_admin" | "admin";
   q?: string;
   status?: string;
@@ -195,7 +205,14 @@ export default function PaymentsView({
   const router = useRouter();
   const { confirm, toast } = useFeedback();
   const [editing, setEditing] = useState<PaymentRow | "new" | null>(openNew ? "new" : null);
-  const [viewing, setViewing] = useState<PaymentRow | null>(null);
+  const [viewing, setViewing] = useState<PaymentRow | null>(() => (openId ? rows.find((r) => r.id === openId) ?? null : null));
+  // drop ?open= once used, so closing the details and refreshing doesn't reopen them
+  useEffect(() => {
+    if (!openId) return;
+    const url = new URL(window.location.href);
+    url.searchParams.delete("open");
+    window.history.replaceState(window.history.state, "", url.toString());
+  }, [openId]);
   const viewEntity = viewing ? (viewing.source === "payment_link" ? "payment_link" : "payment") : null;
   const { entries: payActivity, loading: payActivityLoading } = usePaymentActivity(
     viewEntity,
@@ -528,7 +545,8 @@ Quickupp Softech LLC`;
     const res = await fetch(isNew ? "/api/crm/payments" : `/api/crm/payments/${(editing as PaymentRow).id}`, {
       method: isNew ? "POST" : "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      // the date-and-time box is on this computer's clock; send it as an exact time
+      body: JSON.stringify({ ...form, paidAt: form.paidAt ? new Date(form.paidAt).toISOString() : "" }),
     }).catch(() => null);
     setBusy(false);
     const json = res ? await res.json().catch(() => ({})) : {};
@@ -956,7 +974,7 @@ Quickupp Softech LLC`;
                           </span>
                           {p.paidAt && p.status === "paid" && (
                             <span style={{ display: "block", fontSize: "11px", color: "#64748b", marginTop: "3px" }}>
-                              Paid {fmtDate(p.paidAt)}
+                              Paid {fmtDate(p.paidAt, true)}
                             </span>
                           )}
                         </td>
@@ -1165,7 +1183,7 @@ Quickupp Softech LLC`;
 
                       {/* Timestamp */}
                       <td data-label="Timestamp" className="crm-nowrap" style={{ fontSize: "13px" }}>
-                        {p.paidAt ? fmtDate(p.paidAt) : fmtDate(p.createdAt, true)}
+                        {fmtDate(p.paidAt || p.createdAt, true)}
                       </td>
 
                       {/* Client, Phone, Email */}
@@ -1751,7 +1769,7 @@ Quickupp Softech LLC`;
                           </td>
                           <td>
                             <span style={{ fontWeight: 600, color: "#0f172a", display: "block" }}>
-                              {fmtDate(viewing.paidAt)}
+                              {fmtDate(viewing.paidAt, true)}
                             </span>
                             <span style={{ color: "#64748b", fontSize: "11px", fontFamily: "monospace", wordBreak: "break-all" }}>
                               {viewing.reference || viewing.paypalOrderId || "PayPal"}
@@ -2758,8 +2776,8 @@ Quickupp Softech LLC`;
               </label>
 
               <label className="crm-field">
-                <span className="crm-label">Date paid</span>
-                <input className="crm-input" type="date" value={form.paidAt} onChange={set("paidAt")} />
+                <span className="crm-label">Date &amp; time paid</span>
+                <input className="crm-input" type="datetime-local" value={form.paidAt} onChange={set("paidAt")} />
               </label>
 
               <label className="crm-field">

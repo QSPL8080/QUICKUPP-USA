@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getPool } from "@/lib/db";
 import { generateReceiptPdf } from "@/lib/pdfReceipt";
 import type { RowDataPacket } from "mysql2/promise";
+import { paymentDateTime } from "@/lib/paymentTime";
 
 export async function GET(req: Request) {
   try {
@@ -31,23 +32,8 @@ export async function GET(req: Request) {
       payment.invoice_number ||
       `QS-${new Date(payment.created_at || Date.now()).getFullYear()}-${String(payment.id).padStart(6, "0")}`;
 
-    const paidDate = payment.paid_at
-      ? new Date(payment.paid_at).toLocaleDateString("en-US", {
-          month: "long",
-          day: "numeric",
-          year: "numeric",
-        })
-      : new Date(payment.created_at || Date.now()).toLocaleDateString("en-US", {
-          month: "long",
-          day: "numeric",
-          year: "numeric",
-        });
-
-    const paidTime = new Date(payment.created_at || Date.now()).toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      timeZoneName: "short",
-    });
+    // when the payment was received (paid_at keeps the date and time)
+    const { date: paidDate, time: paidTime } = paymentDateTime(payment.paid_at || payment.created_at);
 
     const billingPeriod =
       payment.billing_start_date || payment.billing_end_date

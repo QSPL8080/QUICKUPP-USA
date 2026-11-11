@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { getPool } from "@/lib/db";
-import PrintReceiptButton from "@/components/PrintReceiptButton";
 import "./confirmation.css";
 import type { RowDataPacket } from "mysql2/promise";
 
@@ -227,7 +226,6 @@ export default async function PaymentConfirmationPage({ searchParams }: Props) {
 
           {/* Section 4: Action Buttons */}
           <div className="pc-actions">
-            <PrintReceiptButton label="Print Order Confirmation" />
             <Link href="/" className="pc-btn-primary">
               <span>Back to Quickupp Softech LLC</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">

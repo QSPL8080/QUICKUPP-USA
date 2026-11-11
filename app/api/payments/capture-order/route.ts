@@ -4,7 +4,7 @@ import { capturePayPalOrder } from "@/lib/paypal";
 import { getPool } from "@/lib/db";
 import { sendMail, LEADS_NOTIFICATION_EMAIL, EMAIL_LOGO_SRC } from "@/lib/mailer";
 import { generateReceiptPdf } from "@/lib/pdfReceipt";
-import { logActivity } from "@/lib/crm/activity";
+import { paymentDateTime } from "@/lib/paymentTime";
 import { logGatewayResult, paymentSnapshot, type PaymentSnapshot, type PaymentTable } from "@/lib/crm/paymentActivity";
 import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { errMessage } from "@/lib/err";
@@ -174,21 +174,11 @@ export async function POST(req: Request) {
               link_status = 'used',
               reference = ?,
               paypal_order_id = ?,
-              paid_at = CURDATE()
+              paid_at = NOW()
             WHERE id = ?`,
             [newTotalPaid, finalTotal, updatedRef, orderID, insertedId]
           );
 
-          // If from website, update existing lead without creating duplicate row
-          if (!isPaymentLink && effectiveClientEmail) {
-            await pool.query(
-              `UPDATE contact_enquiries 
-               SET status = 'closed',
-                   message = CONCAT(COALESCE(message, ''), ' | Balance of $', ?, ' USD fully paid via PayPal (Ref: ', ?, ')')
-               WHERE email = ? ORDER BY id DESC LIMIT 1`,
-              [capturedAmount.toFixed(2), captureID, effectiveClientEmail]
-            ).catch(() => {});
-          }
         } else {
           // First payment on this record (e.g. initial payment via Payment Link)
           if (paymentStatus === "failed") {
@@ -217,7 +207,7 @@ export async function POST(req: Request) {
                 reference = ?,
                 paypal_order_id = ?,
                 method = 'PayPal',
-                paid_at = CURDATE()
+                paid_at = NOW()
               WHERE id = ?`,
               [
                 capturedAmount,
@@ -299,7 +289,7 @@ export async function POST(req: Request) {
             token,
             paid_at,
             notes
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PayPal', ?, ?, 'website', ?, ?, ?, ?, ?, ?, CURDATE(), ?)`,
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PayPal', ?, ?, 'website', ?, ?, ?, ?, ?, ?, NOW(), ?)`,
           [
             effectiveClientName,
             effectiveClientEmail || null,
@@ -330,54 +320,6 @@ export async function POST(req: Request) {
         orderNumber = `QS-${currentYear}-${String(insertedId).padStart(6, "0")}`;
         await pool.query(`UPDATE payments SET invoice_number = ? WHERE id = ?`, [orderNumber, insertedId]);
 
-        // Save customer into CRM enquiries so they appear in Leads — only for the
-        // website's own Pay Now checkout. A payment link (token / invoice given)
-        // never creates an enquiry, even if its record could not be found.
-        const fromPaymentLink = Boolean(token || invoiceNumber || existingPaymentId);
-        const leadStatus = paymentStatus === "failed" ? "contacted" : paymentStatus === "pending" ? "new" : "closed";
-        const leadMsg =
-          paymentStatus === "failed"
-            ? `[PAYMENT FAILED]: Order #${orderNumber}. Attempted: $${capturedAmount.toFixed(2)} USD. Failure reason: ${failureReason}. Client phone: ${effectiveClientPhone || "None"}.`
-            : paymentStatus === "pending"
-            ? `[PAYMENT PENDING]: Order #${orderNumber}. Amount: $${capturedAmount.toFixed(2)} USD (Pending clearing in PayPal). Reason: ${pendingReason}.`
-            : `Website Pay Now Payment. Order #${orderNumber}. PayPal Capture ID: ${captureID}. Total Amount: $${finalTotal.toFixed(2)}, Paid: $${capturedAmount.toFixed(2)}${isPartial ? `, Due: $${finalRemaining.toFixed(2)}` : ""}. Notes: ${notes || "None"}`;
-
-        const leadInsert = fromPaymentLink ? null : await pool.query(
-          `INSERT INTO contact_enquiries (
-            full_name,
-            email,
-            phone,
-            company_name,
-            industry,
-            project_type,
-            budget,
-            message,
-            status
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          [
-            effectiveClientName,
-            effectiveClientEmail || "customer@payment.quickupp.com",
-            effectiveClientPhone || null,
-            effectiveCompany || null,
-            "Other",
-            `${effectiveService}${effectiveCategory ? ` – ${effectiveCategory}` : ""}`,
-            `$${capturedAmount.toFixed(2)} USD (${isPartial ? "Partial Deposit" : "Full Payment"})`,
-            leadMsg,
-            leadStatus,
-          ]
-        );
-        const leadId = leadInsert ? Number((leadInsert[0] as { insertId?: number }).insertId || 0) : 0;
-        if (leadId) {
-          await logActivity({
-            entity: "lead",
-            source: "contact",
-            id: leadId,
-            action: "created",
-            text: `New enquiry received from Website Pay Now checkout (order ${orderNumber})`,
-            actor: { type: "website", label: "Website Pay Now" },
-            eventKey: `paypal:${captureID}:newlead`,
-          });
-        }
       }
 
       if (insertedId) {
@@ -473,17 +415,7 @@ export async function POST(req: Request) {
             ? `Payment Processing (Pending Clearing) — Quickupp Softech LLC | Order #${orderNumber}`
             : `Payment Confirmed — Quickupp Softech LLC | Order #${orderNumber}`;
 
-          const now = new Date();
-          const paymentDateFormatted = now.toLocaleDateString("en-US", {
-            month: "long",
-            day: "numeric",
-            year: "numeric",
-          });
-          const paymentTimeFormatted = now.toLocaleTimeString("en-US", {
-            hour: "numeric",
-            minute: "2-digit",
-            timeZoneName: "short",
-          });
+          const { date: paymentDateFormatted, time: paymentTimeFormatted } = paymentDateTime(new Date());
 
           const billingCoverageStr =
             billingStartDate || billingEndDate
@@ -587,8 +519,8 @@ export async function POST(req: Request) {
                       <td style="padding: 9px 0; font-weight: 700; color: #dc2626;">$${finalRemaining.toFixed(2)} ${currency}</td>
                     </tr>` : ""}
                     <tr>
-                      <td style="padding: 9px 0; color: #64748b;">Payment Date</td>
-                      <td style="padding: 9px 0; color: #0f172a;">${paymentDateFormatted}</td>
+                      <td style="padding: 9px 0; color: #64748b;">Payment Date &amp; Time</td>
+                      <td style="padding: 9px 0; color: #0f172a;">${paymentDateFormatted}, ${paymentTimeFormatted}</td>
                     </tr>
                     <tr>
                       <td style="padding: 9px 0; color: #64748b;">Payment Method</td>
@@ -649,8 +581,7 @@ export async function POST(req: Request) {
 
                   <p style="font-size: 14.5px; color: #1e293b; line-height: 1.5; margin: 0;">
                     Best regards,<br />
-                    <strong>Quickupp Softech LLC</strong><br />
-                    <span style="font-size: 12px; color: #64748b;">167 Princeton Street, Bridgeport, Connecticut - 06605, USA</span>
+                    <strong>Quickupp Softech LLC</strong>
                   </p>
                 </div>
 

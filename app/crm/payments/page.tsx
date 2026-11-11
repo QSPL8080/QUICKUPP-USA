@@ -11,6 +11,7 @@ type Props = {
     new?: string;
     from?: string;
     to?: string;
+    open?: string;
   }>;
 };
 
@@ -51,6 +52,7 @@ export default async function PaymentsPage({ searchParams }: Props) {
     <PaymentsView
       rows={data.items}
       openNew={sp.new === "1"}
+      openId={Number(sp.open) || undefined}
       userRole={user.role === "super_admin" ? "super_admin" : "admin"}
       options={{ services: PAYMENT_SERVICES, methods: PAYMENT_METHODS, currencies: CURRENCIES, statuses: PAYMENT_STATUSES }}
       q={q}

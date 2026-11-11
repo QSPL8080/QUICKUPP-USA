@@ -20,12 +20,29 @@ export type PaymentInput = {
   status: string;
   reference: string | null;
   invoiceNumber: string | null;
-  paidAt: string | null;
+  /** when the payment was received (date and time) */
+  paidAt: Date | null;
   notes: string | null;
 };
 
 const text = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+/**
+ * The payment's date and time. The CRM form sends a full time (ISO, from the
+ * admin's own clock); a bare "YYYY-MM-DD" from older screens means that day.
+ */
+function parsePaidAt(raw: string): Date | null {
+  if (!raw) return null;
+  const day = /^(\d{4})-(\d{2})-(\d{2})$/.exec(raw);
+  if (day) {
+    const d = new Date(Number(day[1]), Number(day[2]) - 1, Number(day[3]));
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(raw)) return null;
+  const d = new Date(raw);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
 
 export function validatePayment(body: Record<string, unknown>):
   | { ok: true; data: PaymentInput }
@@ -53,7 +70,8 @@ export function validatePayment(body: Record<string, unknown>):
   const status = text(body.status, 20);
   const reference = text(body.reference, 120);
   const invoiceNumber = text(body.invoiceNumber, 60);
-  const paidAt = text(body.paidAt, 10);
+  const paidAtRaw = text(body.paidAt, 40);
+  const paidAt = parsePaidAt(paidAtRaw);
   const notes = text(body.notes, 2000);
 
   if (!clientName) errors.clientName = "Enter the client's name.";
@@ -63,8 +81,8 @@ export function validatePayment(body: Record<string, unknown>):
   if (!(CURRENCIES as readonly string[]).includes(currency)) errors.currency = "Choose a currency.";
   if (!method) errors.method = "Choose a payment method.";
   if (!(PAYMENT_STATUSES as readonly string[]).includes(status)) errors.status = "Choose a status.";
-  if (paidAt && (!/^\d{4}-\d{2}-\d{2}$/.test(paidAt) || Number.isNaN(Date.parse(paidAt)))) errors.paidAt = "Enter a valid date.";
-  if ((status === "paid" || status === "partially_paid") && !paidAt) errors.paidAt = "Enter the date the payment was received.";
+  if (paidAtRaw && !paidAt) errors.paidAt = "Enter a valid date and time.";
+  if ((status === "paid" || status === "partially_paid") && !paidAt) errors.paidAt = "Enter the date and time the payment was received.";
 
   if (Object.keys(errors).length) return { ok: false, errors };
   return {

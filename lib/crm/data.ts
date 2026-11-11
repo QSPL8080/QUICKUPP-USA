@@ -416,7 +416,7 @@ export async function listPayments(opts: {
     [countRows] = await pool.query<RowDataPacket[]>(`SELECT COUNT(*) AS n FROM (${baseQuery}) p ${whereSql}`, args);
     [rows] = await pool.query<RowDataPacket[]>(
       `SELECT p.*, u.name AS created_by_name FROM (${baseQuery}) p LEFT JOIN crm_users u ON u.id = p.created_by
-       ${whereSql} ORDER BY COALESCE(p.paid_at, DATE(p.created_at)) DESC, p.id DESC LIMIT ${PAGE_SIZE} OFFSET ${(page - 1) * PAGE_SIZE}`,
+       ${whereSql} ORDER BY COALESCE(p.paid_at, p.created_at) DESC, p.id DESC LIMIT ${PAGE_SIZE} OFFSET ${(page - 1) * PAGE_SIZE}`,
       args
     );
   } catch {
@@ -425,7 +425,7 @@ export async function listPayments(opts: {
     [countRows] = await pool.query<RowDataPacket[]>(`SELECT COUNT(*) AS n FROM (${fallbackBase}) p ${whereSql}`, args);
     [rows] = await pool.query<RowDataPacket[]>(
       `SELECT p.*, u.name AS created_by_name FROM (${fallbackBase}) p LEFT JOIN crm_users u ON u.id = p.created_by
-       ${whereSql} ORDER BY COALESCE(p.paid_at, DATE(p.created_at)) DESC, p.id DESC LIMIT ${PAGE_SIZE} OFFSET ${(page - 1) * PAGE_SIZE}`,
+       ${whereSql} ORDER BY COALESCE(p.paid_at, p.created_at) DESC, p.id DESC LIMIT ${PAGE_SIZE} OFFSET ${(page - 1) * PAGE_SIZE}`,
       args
     );
   }
@@ -454,7 +454,7 @@ export async function listPayments(opts: {
     billingStartDate: r.billing_start_date ? toDateOnly(r.billing_start_date) : null,
     billingEndDate: r.billing_end_date ? toDateOnly(r.billing_end_date) : null,
     invoiceNumber: (r.invoice_number as string) || null,
-    paidAt: r.paid_at ? toDateOnly(r.paid_at) : null,
+    paidAt: r.paid_at ? new Date(r.paid_at as string).toISOString() : null,
     notes: (r.notes as string) || null,
     createdBy: (r.created_by_name as string) || null,
     createdAt: new Date(r.created_at as string).toISOString(),
