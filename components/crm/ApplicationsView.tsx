@@ -156,7 +156,7 @@ export default function ApplicationsView({ rows }: { rows: ApplicationRow[] }) {
                   </a>
                 </td>
                 <td data-label="Received" className="crm-nowrap">
-                  {fmtDate(r.createdAt)}
+                  {fmtDate(r.createdAt, true)}
                 </td>
                 <td data-label="Status" onClick={(e) => e.stopPropagation()}>
                   <StatusSelect row={r} busy={busy} onChange={(s) => setStatus(r, s)} />

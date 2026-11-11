@@ -183,6 +183,12 @@ export default function JobsView({
         title="Job Openings (Website)"
         sub="Post and manage the vacancies listed under Current Job Openings on the Careers page. Closed openings and ones past their deadline are hidden there."
       >
+        <a href={`/api/crm/jobs/export${filterStatus ? `?status=${filterStatus}` : ""}`} className="crm-act crm-act-ghost">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+          </svg>
+          Export CSV
+        </a>
         {showApplications && (
           <Link href="/crm/applications" className="crm-act crm-act-ghost">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -234,7 +240,16 @@ export default function JobsView({
 
       <div className="crm-card crm-card-flush">
         {visibleRows.length > 0 && (
-          <BulkBar sel={sel} noun={["job opening", "job openings"]} busy={busy} onDelete={removeSelected} />
+          <BulkBar sel={sel} noun={["job opening", "job openings"]} busy={busy} onDelete={removeSelected}>
+            {sel.selected.length > 0 && (
+              <a href={`/api/crm/jobs/export?ids=${sel.selected.join(",")}`} className="crm-act crm-act-ghost crm-act-sm">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                </svg>
+                Export selected ({sel.selected.length})
+              </a>
+            )}
+          </BulkBar>
         )}
       {listError && (
         <p className="crm-alert crm-alert-inset" role="alert">

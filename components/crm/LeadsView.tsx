@@ -856,7 +856,7 @@ export default function LeadsView({
                     </select>
                   </td>
                   <td data-label="Received" className="crm-nowrap">
-                    {fmtDate(r.createdAt)}
+                    {fmtDate(r.createdAt, true)}
                   </td>
                   <td data-label="Lead Status" onClick={(e) => e.stopPropagation()}>
                     <StatusSelect value={r.status} busy={busy} label={`Lead status for ${r.name}`} onChange={(s) => setStatus(r.source, r.id, s)} />
