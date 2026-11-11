@@ -818,7 +818,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
                 <div>
                   <h2 className="crm-drawer-title" style={{ fontSize: "17px", fontWeight: 800 }}>Arrange Calendly Meeting</h2>
                   <p style={{ margin: "2px 0 0", fontSize: "12px", color: "#64748b" }}>
-                    Select a date and time slot below to schedule directly via Calendly.
+                    Select a date and time slot below to schedule via Calendly.
                   </p>
                 </div>
               </div>
@@ -842,7 +842,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
                 <div>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
                     <span style={{ fontSize: "12.5px", color: "#64748b" }}>
-                      Select a date and time slot below to schedule:
+                      Select an available date and time slot below:
                     </span>
                     <button
                       type="button"
@@ -913,7 +913,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
                 <div>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px", flexWrap: "wrap", gap: "10px" }}>
                     <span style={{ fontSize: "12.5px", color: "#475569" }}>
-                      ⚡ Pick an available time slot below to reschedule dynamically across Calendly and CRM:
+                      Pick an available time slot below to reschedule:
                     </span>
                     <div style={{ display: "flex", gap: "8px" }}>
                       {reschedulingMeeting.rescheduleUrl && (
