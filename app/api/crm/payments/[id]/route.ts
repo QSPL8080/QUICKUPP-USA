@@ -5,6 +5,7 @@ import { readJson } from "@/lib/enquiry";
 import { actorOf } from "@/lib/crm/activity";
 import { logPaymentChanges, paymentSnapshot } from "@/lib/crm/paymentActivity";
 import type { ResultSetHeader } from "mysql2/promise";
+import { resolvePayTable } from "@/lib/crm/paymentTable";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -39,17 +40,17 @@ export async function PATCH(request: Request, ctx: Ctx) {
 }
 
 /* DELETE → permanently remove a payment (any CRM user) */
-export async function DELETE(_request: Request, ctx: Ctx) {
+export async function DELETE(request: Request, ctx: Ctx) {
   const user = await getUserFor("payments");
   if (!user) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
   const id = await parseId(ctx);
   if (!id) return Response.json({ ok: false, error: "Invalid request." }, { status: 400 });
+  // ?table= says which record: a payment and a payment link can share an id
+  const picked = await resolvePayTable(id, new URL(request.url).searchParams.get("table"));
+  if ("error" in picked) return Response.json({ ok: false, error: picked.error }, { status: picked.status });
   // permanently removed from the database (no hidden "deleted" copies are kept)
-  const pool = getPool();
-  const [res1] = await pool.execute("DELETE FROM payment_links WHERE id = ?", [id]).catch(() => [{ affectedRows: 0 }]);
-  const [res2] = await pool.execute("DELETE FROM payments WHERE id = ?", [id]).catch(() => [{ affectedRows: 0 }]);
-  const totalDeleted = Number((res1 as ResultSetHeader)?.affectedRows || 0) + Number((res2 as ResultSetHeader)?.affectedRows || 0);
-  if (!totalDeleted) {
+  const [res] = await getPool().execute(`DELETE FROM \`${picked.table}\` WHERE id = ?`, [id]).catch(() => [{ affectedRows: 0 }]);
+  if (!Number((res as ResultSetHeader)?.affectedRows || 0)) {
     return Response.json({ ok: false, error: "This payment was already deleted." }, { status: 404 });
   }
   return Response.json({ ok: true });

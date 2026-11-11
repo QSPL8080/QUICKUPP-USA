@@ -2,6 +2,7 @@ import { getUserFor } from "@/lib/crm/auth";
 import { exportLeadDetails } from "@/lib/crm/data";
 import { ENQUIRY_STATUS_LABEL, SOURCE_LABEL } from "@/lib/crm/leadOptions";
 import { csvFile } from "@/lib/crm/csv";
+import { viewerTimeZone } from "@/lib/crm/crmTime";
 
 /*
  * GET ?q=&source=&status=&projectStatus=&channel=&from=&to= → the leads the
@@ -22,6 +23,7 @@ export async function GET(request: Request) {
       channel: sp.get("channel") || "",
       from: sp.get("from") || "",
       to: sp.get("to") || "",
+      tz: await viewerTimeZone(),
     },
     keys.length ? keys : undefined
   );

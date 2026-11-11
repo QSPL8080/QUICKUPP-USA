@@ -4,6 +4,7 @@ import { applicationJobs, listApplications } from "@/lib/crm/applications";
 import { APPLICATION_STATUSES, APPLICATION_STATUS_LABEL } from "@/lib/applications";
 import ApplicationsView from "@/components/crm/ApplicationsView";
 import { PageHead, Pager } from "@/components/crm/ListTools";
+import { viewerTimeZone } from "@/lib/crm/crmTime";
 
 type Props = { searchParams: Promise<{ q?: string; status?: string; job?: string; from?: string; to?: string; page?: string }> };
 
@@ -19,7 +20,8 @@ export default async function ApplicationsPage({ searchParams }: Props) {
     from: DATE_RE.test(sp.from || "") ? (sp.from as string) : "",
     to: DATE_RE.test(sp.to || "") ? (sp.to as string) : "",
   };
-  const [data, jobs] = await Promise.all([listApplications({ ...f, page: Number(sp.page) || 1 }), applicationJobs()]);
+  const tz = await viewerTimeZone();
+  const [data, jobs] = await Promise.all([listApplications({ ...f, tz, page: Number(sp.page) || 1 }), applicationJobs()]);
   const exportHref = `/api/crm/applications/export?${new URLSearchParams(Object.entries(f).filter(([, v]) => v) as [string, string][]).toString()}`;
   const filtered = Boolean(f.q || f.status || f.job || f.from || f.to);
 
@@ -55,8 +57,9 @@ export default async function ApplicationsPage({ searchParams }: Props) {
         <select className="crm-input crm-select" name="job" defaultValue={f.job} aria-label="Applied for">
           <option value="">All positions</option>
           {jobs.map((j) => (
-            <option key={j.id} value={j.id}>
-              {j.title} ({j.n})
+            <option key={j.value} value={j.value}>
+              {j.title}
+              {j.removed ? " (opening deleted)" : ""} ({j.n})
             </option>
           ))}
         </select>

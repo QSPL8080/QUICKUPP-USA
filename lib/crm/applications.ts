@@ -1,6 +1,7 @@
 import "server-only";
 import { getPool } from "@/lib/db";
 import { APPLICATION_STATUSES, type ApplicationRow, type ApplicationStatus } from "@/lib/applications";
+import { DEFAULT_TZ, dayEnd, dayStart } from "@/lib/crm/crmTime";
 
 /* Reading job applications for the CRM (the resume itself is fetched separately) */
 
@@ -12,12 +13,15 @@ export type ApplicationFilters = {
   job?: string;
   from?: string;
   to?: string;
+  /** the viewer's time zone, which the from/to days are in */
+  tz?: string;
   ids?: number[] | null;
 };
 
 function buildApplicationsWhere(opts: ApplicationFilters) {
   const where: string[] = [];
-  const args: (string | number)[] = [];
+  const args: (string | number | Date)[] = [];
+  const tz = opts.tz || DEFAULT_TZ;
   if (opts.ids && opts.ids.length > 0) {
     where.push(`id IN (${opts.ids.map(() => "?").join(", ")})`);
     args.push(...opts.ids);
@@ -26,10 +30,15 @@ function buildApplicationsWhere(opts: ApplicationFilters) {
     where.push("status = ?");
     args.push(opts.status);
   }
-  const jobId = Number(opts.job);
+  // job: an opening's id, or "title:<job title>" for applications whose opening has since been deleted
+  const job = String(opts.job || "");
+  const jobId = Number(job);
   if (Number.isInteger(jobId) && jobId > 0) {
     where.push("job_id = ?");
     args.push(jobId);
+  } else if (job.startsWith("title:") && job.length > 6) {
+    where.push("job_id IS NULL AND job_title = ?");
+    args.push(job.slice(6, 200));
   }
   const q = (opts.q || "").trim().slice(0, 100);
   if (q) {
@@ -39,11 +48,11 @@ function buildApplicationsWhere(opts: ApplicationFilters) {
   }
   if (opts.from && /^\d{4}-\d{2}-\d{2}$/.test(opts.from)) {
     where.push("created_at >= ?");
-    args.push(`${opts.from} 00:00:00`);
+    args.push(dayStart(opts.from, tz));
   }
   if (opts.to && /^\d{4}-\d{2}-\d{2}$/.test(opts.to)) {
-    where.push("created_at <= ?");
-    args.push(`${opts.to} 23:59:59`);
+    where.push("created_at < ?");
+    args.push(dayEnd(opts.to, tz));
   }
   const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : "";
   return { whereSql, args };
@@ -134,11 +143,19 @@ export async function exportApplications(opts: ApplicationFilters): Promise<Expo
 }
 
 /** Openings that have applications, for the "applied for" filter */
-export async function applicationJobs(): Promise<{ id: number; title: string; n: number }[]> {
+/** The positions in the "Applied for" filter: current openings, then deleted ones (by title) */
+export async function applicationJobs(): Promise<{ value: string; title: string; n: number; removed: boolean }[]> {
   const [rows] = await getPool().query(
-    "SELECT job_id, MAX(job_title) AS title, COUNT(*) AS n FROM job_applications WHERE job_id IS NOT NULL GROUP BY job_id ORDER BY title"
+    `SELECT job_id, MAX(job_title) AS title, COUNT(*) AS n FROM job_applications WHERE job_id IS NOT NULL GROUP BY job_id
+     UNION ALL
+     SELECT NULL AS job_id, job_title AS title, COUNT(*) AS n FROM job_applications WHERE job_id IS NULL GROUP BY job_title
+     ORDER BY job_id IS NULL, title`
   );
-  return (rows as Record<string, unknown>[]).map((r) => ({ id: Number(r.job_id), title: String(r.title), n: Number(r.n) }));
+  return (rows as Record<string, unknown>[]).map((r) =>
+    r.job_id == null
+      ? { value: `title:${String(r.title)}`, title: String(r.title), n: Number(r.n), removed: true }
+      : { value: String(r.job_id), title: String(r.title), n: Number(r.n), removed: false }
+  );
 }
 
 /** Number of applications nobody has looked at yet (sidebar badge) */

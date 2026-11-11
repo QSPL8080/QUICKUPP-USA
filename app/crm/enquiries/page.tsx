@@ -6,10 +6,10 @@ import { ENQUIRY_STATUSES, ENQUIRY_STATUS_LABEL, PROJECT_STATUSES } from "@/lib/
 import LeadsView from "@/components/crm/LeadsView";
 import AddLeadButton from "@/components/crm/AddLeadButton";
 import { PageHead, Pager } from "@/components/crm/ListTools";
+import { monthPeriod, viewerTimeZone } from "@/lib/crm/crmTime";
 
 type Props = { searchParams: Promise<{ q?: string; source?: string; status?: string; projectStatus?: string; channel?: string; from?: string; to?: string; page?: string; new?: string }> };
 
-const ymd = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 export default async function EnquiriesPage({ searchParams }: Props) {
@@ -24,26 +24,25 @@ export default async function EnquiriesPage({ searchParams }: Props) {
     from: DATE_RE.test(sp.from || "") ? (sp.from as string) : "",
     to: DATE_RE.test(sp.to || "") ? (sp.to as string) : "",
   };
-  const [data, team] = await Promise.all([listLeads({ ...f, page: Number(sp.page) || 1 }), listTeamNames()]);
+  const tz = await viewerTimeZone();
+  const [data, team] = await Promise.all([listLeads({ ...f, tz, page: Number(sp.page) || 1 }), listTeamNames()]);
 
   // month links: the month shown in the date filter (or this month), and the ones either side
-  const base = f.from ? new Date(`${f.from}T00:00:00`) : new Date();
-  const monthStart = new Date(base.getFullYear(), base.getMonth(), 1);
-  const isWholeMonth = f.from === ymd(monthStart) && f.to === ymd(new Date(base.getFullYear(), base.getMonth() + 1, 0));
+  const period = monthPeriod(f.from, f.to, tz);
+  const isWholeMonth = period.isWholeMonth;
   const monthHref = (offset: number) => {
-    const s = new Date(monthStart.getFullYear(), monthStart.getMonth() + offset, 1);
-    const e = new Date(s.getFullYear(), s.getMonth() + 1, 0);
+    const r = period.range(offset);
     const p = new URLSearchParams();
     if (f.q) p.set("q", f.q);
     if (f.source) p.set("source", f.source);
     if (f.status) p.set("status", f.status);
     if (f.projectStatus) p.set("projectStatus", f.projectStatus);
     if (f.channel) p.set("channel", f.channel);
-    p.set("from", ymd(s));
-    p.set("to", ymd(e));
+    p.set("from", r.from);
+    p.set("to", r.to);
     return `?${p.toString()}`;
   };
-  const monthLabel = monthStart.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  const monthLabel = period.label;
 
   const exportHref = `/api/crm/enquiries/export?${new URLSearchParams(Object.entries(f).filter(([, v]) => v) as [string, string][]).toString()}`;
   const filtered = Boolean(f.q || f.source || f.status || f.projectStatus || f.channel || f.from || f.to);

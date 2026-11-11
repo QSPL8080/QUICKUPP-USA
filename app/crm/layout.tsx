@@ -8,6 +8,8 @@ import TableFit from "@/components/crm/TableFit";
 import { FeedbackProvider } from "@/components/crm/Feedback";
 import CrmSidebar from "@/components/crm/Sidebar";
 import IdleLogout from "@/components/crm/IdleLogout";
+import TimeZoneCookie from "@/components/crm/TimeZoneCookie";
+import { viewerTimeZone } from "@/lib/crm/crmTime";
 import { IDLE_MINUTES } from "@/lib/crm/auth";
 import "./crm.css";
 
@@ -23,6 +25,7 @@ export default async function CrmLayout({ children }: { children: React.ReactNod
   const [{ perSource }, applications, notifications] = seo
     ? [{ perSource: [] as { fresh: number }[] }, 0, { asOf: "", unread: 0, items: [] }]
     : await Promise.all([dashboardStats(), newApplicationCount(), getNotifications(user.id)]);
+  const zone = await viewerTimeZone();
   const newCounts = { leads: perSource.reduce((a, s) => a + s.fresh, 0), applications };
   return (
     <div className="crm-root">
@@ -39,6 +42,7 @@ export default async function CrmLayout({ children }: { children: React.ReactNod
         </div>
         <TableFit />
         <IdleLogout idleMinutes={IDLE_MINUTES} />
+        <TimeZoneCookie serverZone={zone} />
       </FeedbackProvider>
     </div>
   );

@@ -196,9 +196,8 @@ export async function logGatewayResult(opts: {
 }
 
 export async function paymentHistory(source: string, id: number) {
+  // source: the record's table (payment_link = payment_links). A link and a payment can share an id,
+  // so one record's history never falls back to the other table's.
   const table: PaymentTable = source === "payment_link" ? "payment_links" : "payments";
-  // a link can live in either table (older links were kept in payments)
-  const primary = await listActivity(entityOf(table), id);
-  if (primary.length || table === "payments") return primary;
-  return listActivity("payment", id);
+  return listActivity(entityOf(table), id);
 }

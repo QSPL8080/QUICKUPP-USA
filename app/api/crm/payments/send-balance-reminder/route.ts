@@ -9,6 +9,7 @@ import { actorOf, logActivity, money } from "@/lib/crm/activity";
 import { entityOf } from "@/lib/crm/paymentActivity";
 import type { RowDataPacket } from "mysql2/promise";
 import { errMessage } from "@/lib/err";
+import { resolvePayTable } from "@/lib/crm/paymentTable";
 
 export async function POST(req: Request) {
   try {
@@ -24,12 +25,10 @@ export async function POST(req: Request) {
 
     const id = Number(body.id);
     const pool = getPool();
-    let [rows] = await pool.query("SELECT * FROM payment_links WHERE id = ? LIMIT 1", [id]).catch(() => [[]]);
-    let targetTable = "payment_links";
-    if (!Array.isArray(rows) || !rows.length) {
-      [rows] = await pool.query("SELECT * FROM payments WHERE id = ? LIMIT 1", [id]).catch(() => [[]]);
-      targetTable = "payments";
-    }
+    const picked = await resolvePayTable(id, body.table);
+    if ("error" in picked) return NextResponse.json({ ok: false, error: picked.error }, { status: picked.status });
+    const targetTable = picked.table;
+    const [rows] = await pool.query(`SELECT * FROM \`${targetTable}\` WHERE id = ? LIMIT 1`, [id]).catch(() => [[]]);
     const p = (rows as RowDataPacket[])?.[0];
 
     if (!p) {
@@ -46,8 +45,7 @@ export async function POST(req: Request) {
     let token = p.token;
     if (!token) {
       token = randomBytes(16).toString("hex");
-      await pool.query(`UPDATE payment_links SET token = ?, link_status = 'active' WHERE id = ?`, [token, id]).catch(() => {});
-      await pool.query(`UPDATE payments SET token = ?, link_status = 'active' WHERE id = ?`, [token, id]).catch(() => {});
+      await pool.query(`UPDATE \`${targetTable}\` SET token = ?, link_status = 'active' WHERE id = ?`, [token, id]).catch(() => {});
     }
 
     const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.quickuppsoftech.us").replace(/\/+$/, "");
@@ -211,8 +209,9 @@ Quickupp Softech LLC`;
       text: `Hi ${firstName}, this is a reminder regarding your remaining balance of $${remainingAmount.toFixed(2)} USD for order #${orderNumber}. Due: ${dueDate}. Direct payment link: ${balanceUrl}`,
     });
 
-    await pool.query(`UPDATE payment_links SET balance_reminder_sent_at = NOW() WHERE token = ? OR id = ?`, [token, id]).catch(() => {});
-    await pool.query(`UPDATE payments SET balance_reminder_sent_at = NOW() WHERE token = ? OR id = ?`, [token, id]).catch(() => {});
+    await pool.query(`UPDATE \`${targetTable}\` SET balance_reminder_sent_at = NOW() WHERE id = ?`, [id]).catch(() => {});
+    await pool.query(`UPDATE payment_links SET balance_reminder_sent_at = NOW() WHERE token = ?`, [token]).catch(() => {});
+    await pool.query(`UPDATE payments SET balance_reminder_sent_at = NOW() WHERE token = ?`, [token]).catch(() => {});
 
     await logActivity({
       entity: entityOf(targetTable),

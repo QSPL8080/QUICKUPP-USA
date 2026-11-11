@@ -2,6 +2,7 @@ import { getUserFor } from "@/lib/crm/auth";
 import { exportApplications } from "@/lib/crm/applications";
 import { APPLICATION_STATUS_LABEL, fmtBytes } from "@/lib/applications";
 import { parseIds } from "@/lib/crm/ids";
+import { viewerTimeZone } from "@/lib/crm/crmTime";
 
 const cell = (v: string | number | null | undefined) => {
   const s = v == null ? "" : String(v);
@@ -23,6 +24,7 @@ export async function GET(request: Request) {
     status: sp.get("status") || "",
     from: sp.get("from") || "",
     to: sp.get("to") || "",
+    tz: await viewerTimeZone(),
     ids,
   });
 

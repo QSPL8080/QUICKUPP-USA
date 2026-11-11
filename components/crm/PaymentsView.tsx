@@ -42,6 +42,9 @@ const fmtDate = (d: string | null, withTime = false) => {
 
 const pad2 = (v: number) => String(v).padStart(2, "0");
 
+/* a payment record and a payment link can share an id, so rows are told apart by table too */
+const rowKey = (p: PaymentRow) => `${p.table === "payment_links" ? "link" : "pay"}:${p.id}`;
+
 /** A time as the date-and-time box shows it, on this computer's clock: "2026-11-10T20:13" */
 const toLocalInput = (iso: string | null | undefined) => {
   if (!iso) return "";
@@ -207,7 +210,7 @@ export default function PaymentsView({
   const [editing, setEditing] = useState<PaymentRow | "new" | null>(openNew ? "new" : null);
   const [viewing, setViewing] = useState<PaymentRow | null>(() => {
     if (!openId) return null;
-    return rows.find((r) => r.id === openId) || (rows.length === 1 ? rows[0] : null);
+    return rows.find((r) => r.id === openId && r.table === "payments") || rows.find((r) => r.id === openId) || (rows.length === 1 ? rows[0] : null);
   });
   // drop ?open= once used, so closing the details and refreshing doesn't reopen them
   useEffect(() => {
@@ -216,7 +219,7 @@ export default function PaymentsView({
     url.searchParams.delete("open");
     window.history.replaceState(window.history.state, "", url.toString());
   }, [openId]);
-  const viewEntity = viewing ? (viewing.source === "payment_link" ? "payment_link" : "payment") : null;
+  const viewEntity = viewing ? (viewing.table === "payment_links" ? "payment_link" : "payment") : null;
   const { entries: payActivity, loading: payActivityLoading } = usePaymentActivity(
     viewEntity,
     viewing?.id ?? null,
@@ -286,7 +289,7 @@ export default function PaymentsView({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [listError, setListError] = useState("");
-  const sel = useSelection(rows.map((p) => p.id));
+  const sel = useSelection<string>(rows.map(rowKey));
 
   const handleTabChange = (t: "all" | "website" | "payment_link") => {
     const params = new URLSearchParams(window.location.search);
@@ -420,7 +423,7 @@ Quickupp Softech LLC`;
     const res = await fetch("/api/crm/payment-links", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "cancel", id: p.id }),
+      body: JSON.stringify({ action: "cancel", id: p.id, table: p.table }),
     }).catch(() => null);
     setBusy(false);
     if (!res?.ok) {
@@ -469,6 +472,7 @@ Quickupp Softech LLC`;
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ...editLinkForm,
+        table: editingLink?.table,
         category: finalCategory,
         quantity: finalCategory,
       }),
@@ -479,7 +483,7 @@ Quickupp Softech LLC`;
       setError(json.error || "Failed to update payment link.");
       return;
     }
-    if (viewing && viewing.id === editLinkForm.id) {
+    if (viewing && editingLink && rowKey(viewing) === rowKey(editingLink)) {
       setViewing((prev) =>
         prev
           ? {
@@ -520,7 +524,7 @@ Quickupp Softech LLC`;
     const res = await fetch("/api/crm/payments/send-balance-reminder", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: p.id }),
+      body: JSON.stringify({ id: p.id, table: p.table }),
     }).catch(() => null);
     setBusy(false);
     const json = res ? await res.json().catch(() => ({})) : {};
@@ -613,13 +617,13 @@ Quickupp Softech LLC`;
     )
       return;
     setBusy(true);
-    const res = await fetch(`/api/crm/payments/${p.id}`, { method: "DELETE" }).catch(() => null);
+    const res = await fetch(`/api/crm/payments/${p.id}?table=${p.table}`, { method: "DELETE" }).catch(() => null);
     setBusy(false);
     if (!res?.ok && res?.status !== 404) {
       toast("Couldn't delete payment. Please try again.");
       return;
     }
-    if (viewing?.id === p.id) setViewing(null);
+    if (viewing && rowKey(viewing) === rowKey(p)) setViewing(null);
     toast("Payment deleted");
     router.refresh();
   };
@@ -646,7 +650,7 @@ Quickupp Softech LLC`;
     const res = await fetch("/api/crm/payments", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ids }),
+      body: JSON.stringify({ keys: ids }),
     }).catch(() => null);
     setBusy(false);
     if (!res?.ok) return setListError("Couldn't delete the selected payments. Please try again.");
@@ -805,7 +809,7 @@ Quickupp Softech LLC`;
               <a
                 href={`/api/crm/payments/export?${new URLSearchParams({
                   ...(currentTab !== "all" ? { tab: currentTab } : {}),
-                  keys: rows.filter((p) => sel.has(p.id)).map((p) => `${p.source}:${p.id}`).join(","),
+                  keys: sel.selected.join(","),
                 }).toString()}`}
                 className="crm-act crm-act-ghost crm-act-sm"
               >
@@ -890,8 +894,8 @@ Quickupp Softech LLC`;
                     /* Row Format for Payment Link Tab (Screenshot 2) */
                     return (
                       <tr
-                        key={p.id}
-                        className={`crm-row${sel.has(p.id) ? " is-picked" : ""}`}
+                        key={rowKey(p)}
+                        className={`crm-row${sel.has(rowKey(p)) ? " is-picked" : ""}`}
                         onClick={() => {
                           setViewing(p);
                           setModalSubtab("orders");
@@ -900,8 +904,8 @@ Quickupp Softech LLC`;
                       >
                         <td className="crm-col-check" onClick={(e) => e.stopPropagation()}>
                           <SelectBox
-                            checked={sel.has(p.id)}
-                            onChange={(on) => sel.toggle(p.id, on)}
+                            checked={sel.has(rowKey(p))}
+                            onChange={(on) => sel.toggle(rowKey(p), on)}
                             label={`Select payment link for ${p.clientName}`}
                           />
                         </td>
@@ -1172,8 +1176,8 @@ Quickupp Softech LLC`;
                   /* Unified Table Row Format (Website & All Payments) */
                   return (
                     <tr
-                      key={p.id}
-                      className={`crm-row${sel.has(p.id) ? " is-picked" : ""}`}
+                      key={rowKey(p)}
+                      className={`crm-row${sel.has(rowKey(p)) ? " is-picked" : ""}`}
                       onClick={() => {
                         setViewing(p);
                         setModalSubtab("orders");
@@ -1182,8 +1186,8 @@ Quickupp Softech LLC`;
                     >
                       <td className="crm-col-check" onClick={(e) => e.stopPropagation()}>
                         <SelectBox
-                          checked={sel.has(p.id)}
-                          onChange={(on) => sel.toggle(p.id, on)}
+                          checked={sel.has(rowKey(p))}
+                          onChange={(on) => sel.toggle(rowKey(p), on)}
                           label={`Select payment from ${p.clientName}`}
                         />
                       </td>

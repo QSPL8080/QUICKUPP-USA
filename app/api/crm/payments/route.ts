@@ -34,15 +34,39 @@ export async function POST(request: Request) {
   return Response.json({ ok: true, id: newId });
 }
 
-/* DELETE { ids: [...] } → permanently remove several payments (any CRM user) */
+/*
+ * DELETE { keys: ["pay:5", "link:3"] } → permanently remove several payment
+ * records (pay) and payment links (link). A payment and a link can share an
+ * id, so each key names its table. { ids: [...] } still removes payment records.
+ */
 export async function DELETE(request: Request) {
   const user = await getUserFor("payments");
   if (!user) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
   const body = await readJson(request);
-  const ids = parseIds(body?.ids);
-  if (!ids) return Response.json({ ok: false, error: "Invalid request." }, { status: 400 });
-  const [res] = await getPool().query("DELETE FROM payments WHERE id IN (?)", [ids]);
-  const deleted = (res as { affectedRows: number }).affectedRows;
+  const pay: number[] = [];
+  const link: number[] = [];
+  if (Array.isArray(body?.keys)) {
+    if (!body.keys.length || body.keys.length > 400) return Response.json({ ok: false, error: "Invalid request." }, { status: 400 });
+    for (const k of body.keys) {
+      const m = /^(pay|link):(\d{1,10})$/.exec(String(k));
+      if (!m) return Response.json({ ok: false, error: "Invalid request." }, { status: 400 });
+      (m[1] === "link" ? link : pay).push(Number(m[2]));
+    }
+  } else {
+    const ids = parseIds(body?.ids);
+    if (!ids) return Response.json({ ok: false, error: "Invalid request." }, { status: 400 });
+    pay.push(...ids);
+  }
+  const pool = getPool();
+  let deleted = 0;
+  if (pay.length) {
+    const [res] = await pool.query("DELETE FROM payments WHERE id IN (?)", [pay]);
+    deleted += (res as { affectedRows: number }).affectedRows;
+  }
+  if (link.length) {
+    const [res] = await pool.query("DELETE FROM payment_links WHERE id IN (?)", [link]).catch(() => [{ affectedRows: 0 }]);
+    deleted += (res as { affectedRows: number }).affectedRows;
+  }
   if (!deleted) return Response.json({ ok: false, error: "These payments were already deleted." }, { status: 404 });
   return Response.json({ ok: true, deleted });
 }

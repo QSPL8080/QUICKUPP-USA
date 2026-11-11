@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { resolvePayTable } from "@/lib/crm/paymentTable";
 import { randomBytes } from "node:crypto";
 import { getPool } from "@/lib/db";
 import { getUserFor } from "@/lib/crm/auth";
@@ -48,11 +49,11 @@ export async function POST(req: Request) {
     if (body.action === "cancel" && body.id) {
       const pool = getPool();
       const cid = Number(body.id);
-      const beforeLink = await paymentSnapshot("payment_links", cid);
-      const table: PaymentTable = beforeLink ? "payment_links" : "payments";
-      const before = beforeLink || (await paymentSnapshot("payments", cid));
-      await pool.query("UPDATE payment_links SET link_status = 'cancelled' WHERE id = ?", [cid]).catch(() => {});
-      await pool.query("UPDATE payments SET link_status = 'cancelled' WHERE id = ?", [cid]).catch(() => {});
+      const picked = await resolvePayTable(cid, body.table);
+      if ("error" in picked) return NextResponse.json({ ok: false, error: picked.error }, { status: picked.status });
+      const table: PaymentTable = picked.table;
+      const before = await paymentSnapshot(table, cid);
+      await pool.query(`UPDATE \`${table}\` SET link_status = 'cancelled' WHERE id = ?`, [cid]).catch(() => {});
       const after = await paymentSnapshot(table, cid);
       if (before && after) await logPaymentChanges(table, cid, before, after, actorOf(user));
       return NextResponse.json({ ok: true, message: "Payment link cancelled." });
@@ -280,12 +281,10 @@ export async function PATCH(req: Request) {
 
     const id = Number(body.id);
     const pool = getPool();
-    let [existingRows] = await pool.query("SELECT * FROM payment_links WHERE id = ? LIMIT 1", [id]).catch(() => [[]]);
-    let targetTable = "payment_links";
-    if (!Array.isArray(existingRows) || !existingRows.length) {
-      [existingRows] = await pool.query("SELECT * FROM payments WHERE id = ? LIMIT 1", [id]).catch(() => [[]]);
-      targetTable = "payments";
-    }
+    const picked = await resolvePayTable(id, body.table);
+    if ("error" in picked) return NextResponse.json({ ok: false, error: picked.error }, { status: picked.status });
+    const targetTable = picked.table;
+    const [existingRows] = await pool.query(`SELECT * FROM \`${targetTable}\` WHERE id = ? LIMIT 1`, [id]).catch(() => [[]]);
     const existing = (existingRows as RowDataPacket[])?.[0];
     if (!existing) {
       return NextResponse.json({ ok: false, error: "Payment link record not found." }, { status: 404 });

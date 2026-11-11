@@ -316,14 +316,13 @@ Quickupp Softech LLC
         // Dedicated milestone update: mark milestone sent in both tables to guarantee no duplicate sends
         const milestoneCol = targetMilestone === "10d" ? "balance_reminder_10d_sent_at" : "balance_reminder_2d_sent_at";
 
-        await pool.query(
-          `UPDATE payment_links SET ${milestoneCol} = NOW(), balance_reminder_sent_at = NOW() WHERE token = ? OR id = ?`,
-          [token, p.id]
-        ).catch(() => {});
-        await pool.query(
-          `UPDATE payments SET ${milestoneCol} = NOW(), balance_reminder_sent_at = NOW() WHERE token = ? OR id = ?`,
-          [token, p.id]
-        ).catch(() => {});
+        // this record (ids repeat across the two tables, so only in its own table), and any copy sharing its token
+        const ownTable = p._table === "payment_links" ? "payment_links" : "payments";
+        await pool.query(`UPDATE \`${ownTable}\` SET ${milestoneCol} = NOW(), balance_reminder_sent_at = NOW() WHERE id = ?`, [p.id]).catch(() => {});
+        if (token) {
+          await pool.query(`UPDATE payment_links SET ${milestoneCol} = NOW(), balance_reminder_sent_at = NOW() WHERE token = ?`, [token]).catch(() => {});
+          await pool.query(`UPDATE payments SET ${milestoneCol} = NOW(), balance_reminder_sent_at = NOW() WHERE token = ?`, [token]).catch(() => {});
+        }
 
         await logActivity({
           entity: entityOf(p._table || "payments"),

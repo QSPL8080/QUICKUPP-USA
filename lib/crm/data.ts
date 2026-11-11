@@ -5,6 +5,7 @@ import { ENQUIRY_STATUSES, PROJECT_STATUSES, isEnquirySource, type EnquirySource
 import type { RowDataPacket } from "mysql2/promise";
 import { errCode, errMessage } from "@/lib/err";
 import { ensureLeadTables } from "@/lib/crm/ensureTables";
+import { DEFAULT_TZ, dayEnd, dayStart } from "@/lib/crm/crmTime";
 
 /*
  * Reading enquiries and payments for the CRM. Table names only ever come
@@ -94,11 +95,13 @@ const UNION_SQL_SAFE = (Object.keys(SOURCES) as EnquirySource[])
   })
   .join(" UNION ALL ");
 
-export type LeadFilters = { q?: string; source?: string; status?: string; projectStatus?: string; channel?: string; from?: string; to?: string };
+/* tz: the viewer's time zone, which the from/to days are in (see lib/crm/crmTime) */
+export type LeadFilters = { q?: string; source?: string; status?: string; projectStatus?: string; channel?: string; from?: string; to?: string; tz?: string };
 
 function leadWhere(f: LeadFilters) {
   const where: string[] = [];
-  const args: (string | number)[] = [];
+  const args: (string | number | Date)[] = [];
+  const tz = f.tz || DEFAULT_TZ;
   if (f.source === "services") {
     where.push("src IN ('digital-marketing', 'ai-automation', 'it-services', 'staff-augmentation')");
   } else if (f.source && isEnquirySource(f.source)) {
@@ -123,17 +126,17 @@ function leadWhere(f: LeadFilters) {
   }
   if (f.from && /^\d{4}-\d{2}-\d{2}$/.test(f.from)) {
     where.push("created_at >= ?");
-    args.push(`${f.from} 00:00:00`);
+    args.push(dayStart(f.from, tz));
   }
   if (f.to && /^\d{4}-\d{2}-\d{2}$/.test(f.to)) {
-    where.push("created_at < ? + INTERVAL 1 DAY");
-    args.push(`${f.to} 00:00:00`);
+    where.push("created_at < ?");
+    args.push(dayEnd(f.to, tz));
   }
   const q = (f.q || "").trim().slice(0, 100);
   if (q) {
     const like = `%${q}%`;
-    where.push("(full_name LIKE ? OR email LIKE ? OR phone LIKE ? OR company_name LIKE ? OR detail LIKE ?)");
-    args.push(like, like, like, like, like);
+    where.push("(full_name LIKE ? OR email LIKE ? OR phone LIKE ? OR company_name LIKE ? OR detail LIKE ? OR service LIKE ?)");
+    args.push(like, like, like, like, like, like);
   }
   return { sql: where.length ? `WHERE ${where.join(" AND ")}` : "", args };
 }
@@ -175,29 +178,22 @@ export async function listLeads(f: LeadFilters & { page?: number }) {
   }
   const total = Number((countRows as { n: number }[])[0]?.n || 0);
 
+  // the tab badges count what each tab would show with the other filters (search, status, dates…)
+  const others = leadWhere({ ...f, source: "" });
+  const countSql = (union: string) => `
+      SELECT
+        COUNT(*) AS all_count,
+        SUM(CASE WHEN src = 'contact' THEN 1 ELSE 0 END) AS contact_count,
+        SUM(CASE WHEN src IN ('digital-marketing', 'ai-automation', 'it-services', 'staff-augmentation') THEN 1 ELSE 0 END) AS services_count,
+        SUM(CASE WHEN src = 'youtube' THEN 1 ELSE 0 END) AS youtube_count,
+        SUM(CASE WHEN src = 'industries' THEN 1 ELSE 0 END) AS industries_count,
+        SUM(CASE WHEN src = 'manual' THEN 1 ELSE 0 END) AS manual_count
+      FROM (${union}) t ${others.sql}`;
   let tabCounts: RowDataPacket[];
   try {
-    [tabCounts] = await pool.query<RowDataPacket[]>(`
-      SELECT
-        COUNT(*) AS all_count,
-        SUM(CASE WHEN src = 'contact' THEN 1 ELSE 0 END) AS contact_count,
-        SUM(CASE WHEN src IN ('digital-marketing', 'ai-automation', 'it-services', 'staff-augmentation') THEN 1 ELSE 0 END) AS services_count,
-        SUM(CASE WHEN src = 'youtube' THEN 1 ELSE 0 END) AS youtube_count,
-        SUM(CASE WHEN src = 'industries' THEN 1 ELSE 0 END) AS industries_count,
-        SUM(CASE WHEN src = 'manual' THEN 1 ELSE 0 END) AS manual_count
-      FROM (${currentUnion}) t
-    `);
+    [tabCounts] = await pool.query<RowDataPacket[]>(countSql(currentUnion), others.args);
   } catch {
-    [tabCounts] = await pool.query<RowDataPacket[]>(`
-      SELECT
-        COUNT(*) AS all_count,
-        SUM(CASE WHEN src = 'contact' THEN 1 ELSE 0 END) AS contact_count,
-        SUM(CASE WHEN src IN ('digital-marketing', 'ai-automation', 'it-services', 'staff-augmentation') THEN 1 ELSE 0 END) AS services_count,
-        SUM(CASE WHEN src = 'youtube' THEN 1 ELSE 0 END) AS youtube_count,
-        SUM(CASE WHEN src = 'industries' THEN 1 ELSE 0 END) AS industries_count,
-        SUM(CASE WHEN src = 'manual' THEN 1 ELSE 0 END) AS manual_count
-      FROM (${UNION_SQL_SAFE}) t
-    `);
+    [tabCounts] = await pool.query<RowDataPacket[]>(countSql(UNION_SQL_SAFE), others.args);
   }
   const tc = (tabCounts as Record<string, unknown>[])?.[0] || {};
   const counts = {
@@ -358,6 +354,8 @@ export type PaymentRow = {
   method: string;
   status: string;
   source: "website" | "payment_link" | "manual" | "online";
+  /** which table the row lives in: ids are only unique within one table */
+  table: "payments" | "payment_links";
   reference: string | null;
   paypalOrderId?: string | null;
   billingStartDate?: string | null;
@@ -386,32 +384,15 @@ export async function listPayments(opts: {
   page?: number;
   from?: string;
   to?: string;
+  /** the viewer's time zone, which the from/to days are in */
+  tz?: string;
   /** every matching payment on one page (the CSV export) */
   all?: boolean;
 }) {
   const pool = getPool();
   const currentTab = opts.tab || "all";
   const pageSize = opts.all ? 10000 : PAGE_SIZE;
-
-  // Tab counts
-  let websiteCount = 0;
-  let paymentLinkCount = 0;
-
-  try {
-    const [wRows] = await pool.query("SELECT COUNT(*) AS c FROM payments WHERE source IN ('website', 'online')");
-    websiteCount = Number((wRows as RowDataPacket[])?.[0]?.c || 0);
-  } catch {}
-
-  try {
-    const [pRows] = await pool.query("SELECT COUNT(*) AS c FROM payment_links");
-    paymentLinkCount = Number((pRows as RowDataPacket[])?.[0]?.c || 0);
-  } catch {
-    try {
-      const [fallbackRows] = await pool.query("SELECT COUNT(*) AS c FROM payments WHERE source IN ('payment_link', 'manual')");
-      paymentLinkCount = Number((fallbackRows as RowDataPacket[])?.[0]?.c || 0);
-    } catch {}
-  }
-
+  const tz = opts.tz || DEFAULT_TZ;
 
   const PAY_COLS = `id, client_name, client_email, client_phone, company_name, category, service, industry,
     description, amount, total_amount, payment_type, remaining_amount, currency, method, status,
@@ -420,21 +401,24 @@ export async function listPayments(opts: {
     link_status, lead_source, lead_id, quantity, balance_reminder_sent_at,
     balance_reminder_10d_sent_at, balance_reminder_2d_sent_at`;
 
-  let baseQuery = "";
-  if (currentTab === "website") {
-    baseQuery = `SELECT ${PAY_COLS} FROM payments WHERE source IN ('website', 'online')`;
-  } else if (currentTab === "payment_link") {
-    baseQuery = `SELECT ${PAY_COLS} FROM payment_links`;
-  } else {
-    baseQuery = `
-      SELECT ${PAY_COLS} FROM payments WHERE source IN ('website', 'online')
-      UNION ALL
-      SELECT ${PAY_COLS} FROM payment_links
-    `;
-  }
+  /*
+   * Website Payments: checkouts on the website. Payment Links: the links made in
+   * the CRM, plus any other payment record (older manual entries). All
+   * Payments: both, so every record shows up somewhere.
+   */
+  const WEBSITE = `SELECT 'payments' AS tbl, ${PAY_COLS} FROM payments WHERE source IN ('website', 'online')`;
+  const OTHER = `SELECT 'payments' AS tbl, ${PAY_COLS} FROM payments WHERE source IS NULL OR source NOT IN ('website', 'online')`;
+  const LINKS = `SELECT 'payment_links' AS tbl, ${PAY_COLS} FROM payment_links`;
+  const sets = (withLinks: boolean) => {
+    const links = withLinks ? `${LINKS} UNION ALL ${OTHER}` : OTHER;
+    return {
+      all: `${WEBSITE} UNION ALL ${links}`,
+      tab: currentTab === "website" ? WEBSITE : currentTab === "payment_link" ? links : `${WEBSITE} UNION ALL ${links}`,
+    };
+  };
 
   const where: string[] = [];
-  const args: (string | number)[] = [];
+  const args: (string | number | Date)[] = [];
 
   if (opts.status && (PAYMENT_STATUSES as readonly string[]).includes(opts.status)) {
     where.push("p.status = ?");
@@ -442,11 +426,11 @@ export async function listPayments(opts: {
   }
   if (opts.from && /^\d{4}-\d{2}-\d{2}$/.test(opts.from)) {
     where.push("COALESCE(p.paid_at, p.created_at) >= ?");
-    args.push(`${opts.from} 00:00:00`);
+    args.push(dayStart(opts.from, tz));
   }
   if (opts.to && /^\d{4}-\d{2}-\d{2}$/.test(opts.to)) {
-    where.push("COALESCE(p.paid_at, p.created_at) < ? + INTERVAL 1 DAY");
-    args.push(`${opts.to} 00:00:00`);
+    where.push("COALESCE(p.paid_at, p.created_at) < ?");
+    args.push(dayEnd(opts.to, tz));
   }
   const q = (opts.q || "").trim().slice(0, 100);
   if (q) {
@@ -459,30 +443,39 @@ export async function listPayments(opts: {
   const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : "";
   const page = Math.max(1, Math.floor(opts.page || 1));
 
-  let countRows: RowDataPacket[];
-  let rows: RowDataPacket[];
+  const run = async (withLinks: boolean) => {
+    const set = sets(withLinks);
+    // the tab badges count what each tab would show with the same search, status and dates
+    const [c] = await pool.query<RowDataPacket[]>(
+      `SELECT COUNT(*) AS a, SUM(p.tbl = 'payments' AND p.source IN ('website', 'online')) AS w FROM (${set.all}) p ${whereSql}`,
+      args
+    );
+    const [n] = await pool.query<RowDataPacket[]>(`SELECT COUNT(*) AS n FROM (${set.tab}) p ${whereSql}`, args);
+    const [r] = await pool.query<RowDataPacket[]>(
+      `SELECT p.*, u.name AS created_by_name FROM (${set.tab}) p LEFT JOIN crm_users u ON u.id = p.created_by
+       ${whereSql} ORDER BY COALESCE(p.paid_at, p.created_at) DESC, p.tbl ASC, p.id DESC LIMIT ${pageSize} OFFSET ${opts.all ? 0 : (page - 1) * PAGE_SIZE}`,
+      args
+    );
+    return { c, n, r };
+  };
 
+  let result: Awaited<ReturnType<typeof run>>;
   try {
-    [countRows] = await pool.query<RowDataPacket[]>(`SELECT COUNT(*) AS n FROM (${baseQuery}) p ${whereSql}`, args);
-    [rows] = await pool.query<RowDataPacket[]>(
-      `SELECT p.*, u.name AS created_by_name FROM (${baseQuery}) p LEFT JOIN crm_users u ON u.id = p.created_by
-       ${whereSql} ORDER BY COALESCE(p.paid_at, p.created_at) DESC, p.id DESC LIMIT ${pageSize} OFFSET ${opts.all ? 0 : (page - 1) * PAGE_SIZE}`,
-      args
-    );
+    result = await run(true);
   } catch {
-    // Graceful fallback if payment_links table has not been created yet in the DB
-    const fallbackBase = `SELECT * FROM payments WHERE ${currentTab === "payment_link" ? "source IN ('payment_link', 'manual')" : currentTab === "website" ? "source IN ('website', 'online')" : "1=1"}`;
-    [countRows] = await pool.query<RowDataPacket[]>(`SELECT COUNT(*) AS n FROM (${fallbackBase}) p ${whereSql}`, args);
-    [rows] = await pool.query<RowDataPacket[]>(
-      `SELECT p.*, u.name AS created_by_name FROM (${fallbackBase}) p LEFT JOIN crm_users u ON u.id = p.created_by
-       ${whereSql} ORDER BY COALESCE(p.paid_at, p.created_at) DESC, p.id DESC LIMIT ${pageSize} OFFSET ${opts.all ? 0 : (page - 1) * PAGE_SIZE}`,
-      args
-    );
+    // payment_links not created yet
+    result = await run(false);
   }
+  const allCount = Number(result.c[0]?.a || 0);
+  const websiteCount = Number(result.c[0]?.w || 0);
+  const paymentLinkCount = allCount - websiteCount;
+  const countRows = result.n;
+  const rows = result.r;
 
   const total = Number((countRows as { n: number }[])[0]?.n || 0);
   const items: PaymentRow[] = (rows as Record<string, unknown>[]).map((r) => ({
     id: Number(r.id),
+    table: r.tbl === "payment_links" ? "payment_links" : "payments",
     clientName: String(r.client_name ?? ""),
     clientEmail: (r.client_email as string) || null,
     clientPhone: (r.client_phone as string) || null,
@@ -529,7 +522,7 @@ export async function listPayments(opts: {
     counts: {
       website: websiteCount,
       paymentLink: paymentLinkCount,
-      all: websiteCount + paymentLinkCount,
+      all: allCount,
     },
   };
 }
