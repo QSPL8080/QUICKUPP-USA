@@ -199,7 +199,7 @@ export default function BlogTextField({
           </svg>
           <span>{preview ? "Hide preview" : "Preview"}</span>
         </button>
-        <span className="crm-btf-hint">Images are saved directly on this specific blog. Leave an empty line before and after.</span>
+        <span className="crm-btf-hint">Added images are saved with this blog when you save. Keep each image on its own line.</span>
         <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" multiple hidden onChange={(e) => onFiles(e.target.files)} />
         <input ref={replaceInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" hidden onChange={(e) => onReplaceFile(e.target.files)} />
       </div>
@@ -263,18 +263,20 @@ export function BlogImageLibrary({
   onRemove?: (url: string) => void;
   onError?: (msg: string) => void;
 }) {
-  const [uploaded, setUploaded] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
+  // where a new upload goes: the cover, or the end of a part of the article
+  const [addTo, setAddTo] = useState(targets[0]?.key || "intro");
   const fileRef = useRef<HTMLInputElement>(null);
   const replaceRef = useRef<HTMLInputElement>(null);
   const [targetReplaceUrl, setTargetReplaceUrl] = useState<string | null>(null);
 
-  // All images belonging to this specific blog
+  // every image in this blog: the cover and the images placed in the article
   const inText = targets.flatMap((t) => Array.from(t.text.matchAll(/!\[[^\]]*\]\(([^)\s]+)\)/g)).map((m) => m[1]));
-  const all = Array.from(new Set([...inText, ...uploaded, ...(cover ? [cover] : [])]));
+  const all = Array.from(new Set([...(cover ? [cover] : []), ...inText]));
 
   const usedIn = (url: string) => targets.filter((t) => t.text.includes(`](${url})`)).map((t) => t.label.split(":")[0]);
 
+  /* an upload is placed straight away, so it is saved with the blog */
   const onFiles = async (files: FileList | null) => {
     if (!files || !files.length) return;
     setBusy(true);
@@ -285,7 +287,12 @@ export function BlogImageLibrary({
       onError?.(r.error);
       return;
     }
-    setUploaded((u) => [...u, ...r.urls]);
+    if (addTo === "cover") {
+      onCover(r.urls[0]);
+      r.urls.slice(1).forEach((u) => onPlace(targets[0]?.key || "intro", u));
+    } else {
+      r.urls.forEach((u) => onPlace(addTo, u));
+    }
   };
 
   const handleStartReplace = (url: string) => {
@@ -293,6 +300,7 @@ export function BlogImageLibrary({
     replaceRef.current?.click();
   };
 
+  /* replace = the new picture takes the old one's place (cover and/or article) */
   const handleDoReplace = async (files: FileList | null) => {
     if (!files || !files.length || !targetReplaceUrl) return;
     setBusy(true);
@@ -304,33 +312,36 @@ export function BlogImageLibrary({
       setTargetReplaceUrl(null);
       return;
     }
-    const newUrl = r.urls[0];
-    onReplace?.(targetReplaceUrl, newUrl);
-    setUploaded((u) => u.map((x) => (x === targetReplaceUrl ? newUrl : x)));
+    onReplace?.(targetReplaceUrl, r.urls[0]);
     setTargetReplaceUrl(null);
-  };
-
-  const handleRemove = (url: string) => {
-    onRemove?.(url);
-    setUploaded((u) => u.filter((x) => x !== url));
   };
 
   return (
     <div className="crm-bil">
       <div className="crm-bil-head">
         <div>
-          <span className="crm-label">Blog Images (Saved in this Blog)</span>
+          <span className="crm-label">Blog Images</span>
           <span className="crm-btf-hint">
-            Images belong specifically to this blog. No separate table is used. Deleting or replacing images updates this blog and database dynamically.
+            Choose where a new image goes, then upload it. Every image here is saved with this blog when you save; Replace swaps it in the same place.
           </span>
         </div>
-        <button type="button" className="crm-btf-add" onClick={() => fileRef.current?.click()} disabled={busy}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />
-          </svg>
-          <span>{busy ? "Processing…" : "Add Blog Image"}</span>
-        </button>
-        <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" multiple hidden onChange={(e) => onFiles(e.target.files)} />
+        <div className="crm-bil-add">
+          <select className="crm-input crm-select" value={addTo} onChange={(e) => setAddTo(e.target.value)} aria-label="Add the new image to">
+            <option value="cover">Cover image</option>
+            {targets.map((t) => (
+              <option key={t.key} value={t.key}>
+                {t.label}
+              </option>
+            ))}
+          </select>
+          <button type="button" className="crm-btf-add" onClick={() => fileRef.current?.click()} disabled={busy}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />
+            </svg>
+            <span>{busy ? "Processing…" : "Upload image"}</span>
+          </button>
+        </div>
+        <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" multiple={addTo !== "cover"} hidden onChange={(e) => onFiles(e.target.files)} />
         <input ref={replaceRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" hidden onChange={(e) => handleDoReplace(e.target.files)} />
       </div>
 
@@ -345,16 +356,18 @@ export function BlogImageLibrary({
                   <img src={url} alt="" />
                   {isCover && <span className="crm-bil-badge">Cover</span>}
                 </span>
-                <span className="crm-bil-where">{where.length ? `In: ${Array.from(new Set(where)).join(", ")}` : isCover ? "Used as cover" : "In library (not placed)"}</span>
+                <span className="crm-bil-where">
+                  {[isCover ? "Cover" : "", where.length ? `In: ${Array.from(new Set(where)).join(", ")}` : ""].filter(Boolean).join(" · ")}
+                </span>
                 <select
                   className="crm-input crm-select"
                   value=""
-                  aria-label="Place this image in"
+                  aria-label="Also place this image in"
                   onChange={(e) => {
                     if (e.target.value) onPlace(e.target.value, url);
                   }}
                 >
-                  <option value="">Place in…</option>
+                  <option value="">Also place in…</option>
                   {targets.map((t) => (
                     <option key={t.key} value={t.key}>
                       {t.label}
@@ -375,7 +388,7 @@ export function BlogImageLibrary({
                     className="crm-act crm-act-ghost crm-act-sm"
                     style={{ fontSize: "11px", padding: "4px 8px" }}
                     onClick={() => handleStartReplace(url)}
-                    title="Replace this image with a new file"
+                    title="Replace this image with a new file, in the same place"
                   >
                     Replace
                   </button>
@@ -383,8 +396,8 @@ export function BlogImageLibrary({
                     type="button"
                     className="crm-act crm-act-ghost crm-act-sm"
                     style={{ fontSize: "11px", padding: "4px 8px", color: "#ef4444" }}
-                    onClick={() => handleRemove(url)}
-                    title="Remove this image from blog"
+                    onClick={() => onRemove?.(url)}
+                    title="Remove this image from the blog"
                   >
                     Delete
                   </button>
@@ -394,7 +407,7 @@ export function BlogImageLibrary({
           })}
         </ul>
       ) : (
-        <p className="crm-bil-empty">No images uploaded for this blog yet. Add images above or place them in article paragraphs.</p>
+        <p className="crm-bil-empty">No images in this blog yet. Choose where it goes and upload it above.</p>
       )}
     </div>
   );

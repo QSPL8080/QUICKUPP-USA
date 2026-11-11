@@ -751,6 +751,20 @@
   gap: 3px;
 }
 
+/* "add to: [where] [Upload image]" */
+.crm-root .crm-bil-head > .crm-bil-add {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+}
+
+.crm-bil-add .crm-select {
+  width: auto;
+  max-width: 240px;
+  min-width: 170px;
+}
+
 .crm-bil-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
@@ -832,6 +846,16 @@
 @media (max-width: 560px) {
   .crm-bil-head {
     flex-direction: column;
+  }
+
+  .crm-root .crm-bil-head > .crm-bil-add {
+    width: 100%;
+  }
+
+  .crm-bil-add .crm-select {
+    flex: 1;
+    max-width: none;
+    min-width: 0;
   }
 
   .crm-bil-grid {

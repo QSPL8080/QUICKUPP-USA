@@ -141,10 +141,16 @@ export async function getPublishedBlogBySlug(slug: string): Promise<BlogPost | n
   }
 }
 
-/** Fetches all blogs for CRM management (including unpublished / drafts). */
+/**
+ * All blogs for the CRM list (drafts included), without the article content:
+ * articles can hold many images, and the list only needs titles, covers and
+ * status. The editor loads one whole blog when it is opened.
+ */
 export async function getCrmBlogs(): Promise<CrmBlog[]> {
   try {
-    const [rows] = await getPool().query("SELECT * FROM blogs ORDER BY id DESC");
+    const [rows] = await getPool().query(
+      "SELECT id, slug, category, title, `desc`, author, author_role, read_time, img, '' AS content, is_published, created_at, updated_at FROM blogs ORDER BY id DESC"
+    );
     return (rows as BlogDbRow[]).map(rowToCrmBlog);
   } catch (err) {
     console.error("[blogs] getCrmBlogs query failed:", err);

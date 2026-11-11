@@ -132,7 +132,21 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
   const [step, setStep] = useState(0);
   const [reached, setReached] = useState(0); // furthest step opened so far
 
-  const openForm = (b: CrmBlog | "new") => {
+  const [opening, setOpening] = useState<number | null>(null);
+
+  /* an existing blog: load the whole blog (article and images) before editing */
+  const openForm = async (b: CrmBlog | "new") => {
+    if (b !== "new") {
+      setOpening(b.id);
+      const res = await fetch(`/api/crm/blogs/${b.id}`).catch(() => null);
+      const json = res ? await res.json().catch(() => ({})) : {};
+      setOpening(null);
+      if (!res?.ok || !json.ok || !json.blog) {
+        toast(json.error || "Couldn't open this blog. Please try again.", "error");
+        return;
+      }
+      b = json.blog as CrmBlog;
+    }
     setForm(b === "new" ? blankForm() : fromBlog(b));
     setSlugLocked(b !== "new");
     setErrors({});
@@ -448,7 +462,7 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
                 </tr>
               ) : (
                 filtered.map((b) => (
-                  <tr key={b.id} className="crm-row" onClick={() => openForm(b)}>
+                  <tr key={b.id} className="crm-row" onClick={() => openForm(b)} aria-busy={opening === b.id || undefined} style={opening === b.id ? { opacity: 0.55, cursor: "progress" } : undefined}>
                     <td data-label="Article" className="crm-cell-main crm-col-article">
                       <div className="crm-blog-cell">
                         {b.img ? <img src={b.img} alt="" className="crm-blog-thumb" /> : <span className="crm-blog-thumb" aria-hidden="true" />}
