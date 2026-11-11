@@ -1001,30 +1001,55 @@ Quickupp Softech LLC`;
                         {/* Actions matching screenshot media_1793689282840.png */}
                         <td data-label="Actions" onClick={(e) => e.stopPropagation()} style={{ textAlign: "right" }}>
                           <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", flexWrap: "nowrap" }}>
-                            {/* Copy Link */}
-                            <button
-                              type="button"
-                              className="crm-act crm-act-ghost crm-act-sm"
-                              style={{
-                                fontSize: "12px",
-                                padding: "4px 10px",
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: "5px",
-                                background: "#f8fafc",
-                                border: "1px solid #cbd5e1",
-                                color: "#0f172a",
-                                fontWeight: 600,
-                              }}
-                              onClick={() => copyLink(p.token || String(p.id))}
-                              title="Copy Payment Link"
-                            >
-                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                              </svg>
-                              Copy Link
-                            </button>
+                            {/* Copy Link (only when link is active and not paid) */}
+                            {!isLinkExpired && p.status !== "paid" && p.linkStatus !== "used" && p.linkStatus !== "cancelled" && (
+                              <button
+                                type="button"
+                                className="crm-act crm-act-ghost crm-act-sm"
+                                style={{
+                                  fontSize: "12px",
+                                  padding: "4px 10px",
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: "5px",
+                                  background: "#f8fafc",
+                                  border: "1px solid #cbd5e1",
+                                  color: "#0f172a",
+                                  fontWeight: 600,
+                                }}
+                                onClick={() => copyLink(p.token || String(p.id))}
+                                title="Copy Payment Link"
+                              >
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                </svg>
+                                Copy Link
+                              </button>
+                            )}
+                            {(p.status === "paid" || p.linkStatus === "used") && (
+                              <a
+                                href={`/api/payments/receipt?order=${encodeURIComponent(p.invoiceNumber || String(p.id))}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="crm-act crm-act-ghost crm-act-sm"
+                                style={{
+                                  fontSize: "12px",
+                                  padding: "4px 10px",
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: "5px",
+                                  color: "#7c3aed",
+                                  borderColor: "#ddd6fe",
+                                  background: "#fbfaff",
+                                  textDecoration: "none",
+                                  fontWeight: 600,
+                                }}
+                                title="View Receipt PDF"
+                              >
+                                📄 Receipt
+                              </a>
+                            )}
 
                             {/* WhatsApp (Green Button) */}
                             {!isLinkExpired && p.status !== "paid" && p.linkStatus !== "used" && p.linkStatus !== "cancelled" ? (
@@ -1355,7 +1380,7 @@ Quickupp Softech LLC`;
                               <circle cx="12" cy="12" r="3" />
                             </svg>
                           </button>
-                          {p.token && (
+                          {p.token && p.status !== "paid" && p.linkStatus !== "used" && !isExpiredLink(p) && (
                             <button
                               type="button"
                               className="crm-action-btn"
@@ -1452,7 +1477,7 @@ Quickupp Softech LLC`;
                 </div>
 
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  {viewing.token && (
+                  {canShareViewing && viewing.token && (
                     <button
                       type="button"
                       className="crm-act crm-act-ghost crm-act-sm"
@@ -1465,6 +1490,18 @@ Quickupp Softech LLC`;
                       </svg>
                       <span>Copy Link</span>
                     </button>
+                  )}
+                  {isViewingPaid && (
+                    <a
+                      href={`/api/payments/receipt?order=${encodeURIComponent(viewing.invoiceNumber || String(viewing.id))}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="crm-act crm-act-ghost crm-act-sm"
+                      style={{ display: "inline-flex", alignItems: "center", gap: "5px", fontSize: "12px", padding: "5px 11px", color: "#7c3aed", borderColor: "#ddd6fe", textDecoration: "none", fontWeight: 700 }}
+                      title="View Official Receipt"
+                    >
+                      📄 <span>Receipt</span>
+                    </a>
                   )}
                   <button
                     type="button"
@@ -1570,7 +1607,7 @@ Quickupp Softech LLC`;
               <div className="crm-view-modal-body" style={{ paddingTop: "10px" }}>
                 {modalSubtab === "orders" ? (
                   /* Orders Subtab Table */
-                  <div className="crm-table-wrap" style={{ border: "1px solid #e2e8f0", borderRadius: "10px" }}>
+                  <div className="crm-table-wrap" style={{ border: "1px solid #e2e8f0", borderRadius: "10px", flexShrink: 0 }}>
                     <table className="crm-table" style={{ fontSize: "12.5px" }}>
                       <thead>
                         <tr style={{ background: "#f8fafc" }}>
@@ -1644,7 +1681,7 @@ Quickupp Softech LLC`;
                           <td style={{ textAlign: "right" }}>
                             <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", justifyContent: "flex-end", flexWrap: "wrap" }}>
                               {/* Copy Link */}
-                              {viewing.token && (
+                              {canShareViewing && viewing.token && (
                                 <button
                                   type="button"
                                   className="crm-att-btn"
@@ -1658,6 +1695,18 @@ Quickupp Softech LLC`;
                                   </svg>
                                   Copy Link
                                 </button>
+                              )}
+                              {isViewingPaid && (
+                                <a
+                                  href={`/api/payments/receipt?order=${encodeURIComponent(viewing.invoiceNumber || String(viewing.id))}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="crm-att-btn"
+                                  title="View Receipt PDF"
+                                  style={{ fontSize: "11px", padding: "4px 8px", color: "#7c3aed", textDecoration: "none" }}
+                                >
+                                  📄 Receipt
+                                </a>
                               )}
 
                               {/* WhatsApp (only if not expired and not used/paid) */}
@@ -1714,7 +1763,7 @@ Quickupp Softech LLC`;
                 ) : (
                 /* Payments Subtab Table (Screenshot 5) */
                 viewing.amount > 0 ? (
-                  <div className="crm-table-wrap" style={{ border: "1px solid #e2e8f0", borderRadius: "10px" }}>
+                  <div className="crm-table-wrap" style={{ border: "1px solid #e2e8f0", borderRadius: "10px", flexShrink: 0 }}>
                     <table className="crm-table" style={{ fontSize: "12.5px" }}>
                       <thead>
                         <tr style={{ background: "#f8fafc" }}>
@@ -1819,12 +1868,12 @@ Quickupp Softech LLC`;
               )}
 
               {/* Activity History & Audit Trail (newest first) */}
-              <div style={{ marginTop: "16px" }}>
-                <ActivityTimeline entries={payActivity} kind="payment" loading={payActivityLoading} emptyText="No activity has been recorded for this payment yet." />
+              <div style={{ marginTop: "4px", flexShrink: 0 }}>
+                <ActivityTimeline entries={payActivity} kind="payment" loading={payActivityLoading} emptyText="No activity has been recorded for this payment yet." visibleCount={2} />
               </div>
 
               {/* Actions in Footer */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "16px", paddingTop: "12px", borderTop: "1px solid #e2e8f0", flexWrap: "wrap", gap: "8px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "8px", paddingTop: "12px", borderTop: "1px solid #e2e8f0", flexWrap: "wrap", gap: "8px", flexShrink: 0 }}>
                 <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
                   {viewing.status === "partially_paid" && (
                     <>
@@ -1853,7 +1902,7 @@ Quickupp Softech LLC`;
                       </button>
                     </>
                   )}
-                  {viewing.token && (
+                  {canShareViewing && viewing.token && (
                     <button
                       type="button"
                       className="crm-act crm-act-ghost crm-act-sm"
@@ -1866,6 +1915,17 @@ Quickupp Softech LLC`;
                       </svg>
                       <span>Copy Link</span>
                     </button>
+                  )}
+                  {isViewingPaid && (
+                    <a
+                      href={`/api/payments/receipt?order=${encodeURIComponent(viewing.invoiceNumber || String(viewing.id))}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="crm-act crm-act-ghost crm-act-sm"
+                      style={{ display: "inline-flex", alignItems: "center", gap: "5px", color: "#7c3aed", borderColor: "#ddd6fe", textDecoration: "none", fontWeight: 700 }}
+                    >
+                      📄 <span>Download Receipt</span>
+                    </a>
                   )}
                   {canShareViewing && (
                     <button

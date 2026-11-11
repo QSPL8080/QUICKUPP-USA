@@ -15,6 +15,7 @@ export default function TableFit() {
     const fit = () => {
       frame = 0;
       document.querySelectorAll<HTMLElement>(".crm-root .crm-table-wrap").forEach((wrap) => {
+        if (wrap.closest(".crm-modal-wrap, .crm-modal, .crm-drawer")) return;
         const rows = wrap.querySelectorAll<HTMLElement>(":scope > table > tbody > tr");
         if (rows.length <= VISIBLE_ROWS) {
           wrap.style.maxHeight = "";

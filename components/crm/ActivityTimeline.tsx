@@ -112,14 +112,16 @@ export default function ActivityTimeline({
   kind,
   loading = false,
   emptyText = "No activity recorded yet.",
+  visibleCount = 2,
 }: {
   entries: ActivityEntry[];
   kind: "lead" | "payment";
   loading?: boolean;
   emptyText?: string;
+  visibleCount?: number;
 }) {
-  // the latest 3 entries are shown; older ones are reached by scrolling the list
-  const VISIBLE = 3;
+  // the latest 2 entries are shown; older ones are reached by scrolling the list
+  const VISIBLE = visibleCount;
   const listRef = useRef<HTMLDivElement>(null);
   const [maxH, setMaxH] = useState<number | null>(null);
   useLayoutEffect(() => {
@@ -129,14 +131,15 @@ export default function ActivityTimeline({
       const items = el.querySelectorAll<HTMLElement>(":scope > .crm-timeline-item");
       if (items.length <= VISIBLE) return setMaxH(null);
       const cut = items[VISIBLE];
-      setMaxH(cut.offsetTop - el.offsetTop - 2);
+      const offset = cut.offsetParent === el ? cut.offsetTop : cut.offsetTop - el.offsetTop;
+      setMaxH(Math.max(0, offset - 2));
     };
     measure();
     if (typeof ResizeObserver === "undefined") return;
     const ro = new ResizeObserver(measure);
     ro.observe(el);
     return () => ro.disconnect();
-  }, [entries]);
+  }, [entries, VISIBLE]);
   const list = entries;
 
   return (

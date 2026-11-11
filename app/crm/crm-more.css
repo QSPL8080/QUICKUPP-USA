@@ -969,7 +969,11 @@
   color: #94a3b8;
 }
 
-/* the latest 3 activities show; older ones scroll inside the card */
+/* the latest 2 activities show; older ones scroll inside the card */
+.crm-view-modal .crm-table-wrap {
+  flex-shrink: 0;
+}
+
 .crm-activity-list.is-scroll {
   overflow-y: auto;
   overscroll-behavior: contain;
