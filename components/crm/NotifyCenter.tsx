@@ -155,7 +155,7 @@ export default function NotifyCenter({
   }, []);
 
   // Sync / refresh logic
-  const syncNow = useCallback(async () => {
+  const syncNow = useCallback(async (manual = false) => {
     setSyncing(true);
     setCountdown(5);
 
@@ -199,11 +199,16 @@ export default function NotifyCenter({
           freshItems.forEach((it) => knownKeysRef.current.add(it.key));
         }
       }
+
+      // If manual refresh and user is on the meetings page, force Calendly to sync immediately
+      if (manual && typeof window !== "undefined" && window.location.pathname.startsWith("/crm/meetings")) {
+        await fetch("/api/crm/meetings?force=1", { cache: "no-store" }).catch(() => null);
+      }
     } catch {
       // Ignore network hiccup
     } finally {
       // Auto refresh the page router so enquiries list / payments / tables stay updated
-      // Only refresh if user is not actively typing in an input/textarea or has an edit modal open
+      // Only suppress background refresh if user is actively typing; on manual click ALWAYS refresh
       const isTyping =
         typeof document !== "undefined" &&
         document.activeElement &&
@@ -212,7 +217,7 @@ export default function NotifyCenter({
         typeof document !== "undefined" &&
         Boolean(document.querySelector(".crm-modal-wrap, .crm-form-modal"));
 
-      if (!isTyping && !isModalOpen) {
+      if (manual || (!isTyping && !isModalOpen)) {
         router.refresh();
       }
 
@@ -299,7 +304,7 @@ export default function NotifyCenter({
         <button
           type="button"
           className="crm-live-pill"
-          onClick={syncNow}
+          onClick={() => syncNow(true)}
           title="Click to sync immediately with server"
           aria-label="Live sync indicator"
         >
@@ -311,7 +316,7 @@ export default function NotifyCenter({
         <button
           type="button"
           className={`crm-circle-btn${syncing ? " is-spinning" : ""}`}
-          onClick={syncNow}
+          onClick={() => syncNow(true)}
           title="Refresh CRM now"
           aria-label="Refresh CRM now"
         >

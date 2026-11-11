@@ -302,7 +302,7 @@ let running: Promise<SyncResult> | null = null;
 let meUri: string | null = null;
 export type SyncResult = { ok: boolean; configured: boolean; changed?: number; error?: string; at?: string };
 
-async function runSync(): Promise<SyncResult> {
+async function runSync(force = false): Promise<SyncResult> {
   const signal = AbortSignal.timeout(25_000);
   if (!meUri) {
     const me = await cal<{ resource: { uri: string } }>("/users/me", signal);
@@ -323,9 +323,28 @@ async function runSync(): Promise<SyncResult> {
     ? await getPool().query("SELECT event_uri, event_updated_at FROM crm_meeting_invitees WHERE event_uri IN (?)", [events.map((e) => e.uri)])
     : [[]];
   const seen = new Map<string, string | null>();
-  for (const r of seenRows as { event_uri: string; event_updated_at: string | null }[]) seen.set(r.event_uri, r.event_updated_at);
+  for (const r of seenRows as { event_uri: string; event_updated_at: string | null }[]) {
+    if (r.event_uri && r.event_updated_at) seen.set(r.event_uri, r.event_updated_at);
+  }
+
+  // Also query existing meeting statuses from crm_meetings so status mismatches are never missed
+  const [meetingRows] = events.length
+    ? await getPool().query("SELECT event_uri, status FROM crm_meetings WHERE event_uri IN (?)", [events.map((e) => e.uri)])
+    : [[]];
+  const meetingStatusMap = new Map<string, string>();
+  for (const m of meetingRows as { event_uri: string; status: string }[]) {
+    if (m.event_uri) meetingStatusMap.set(m.event_uri, m.status);
+  }
+
   const changed = events
-    .filter((e) => !seen.has(e.uri) || seen.get(e.uri) !== (e.updated_at || null))
+    .filter((e) => {
+      if (force) return true;
+      if (!seen.has(e.uri)) return true;
+      if (seen.get(e.uri) !== (e.updated_at || null)) return true;
+      const localStatus = meetingStatusMap.get(e.uri);
+      if (e.status === "canceled" && localStatus && localStatus !== "canceled") return true;
+      return false;
+    })
     .sort((a, b) => String(a.created_at || "").localeCompare(String(b.created_at || "")));
 
   for (const ev of changed) {
@@ -345,13 +364,13 @@ async function runSync(): Promise<SyncResult> {
 
 /**
  * Reads new and changed meetings from Calendly. At most once every
- * `maxAgeMs`; calls made while one is running share it.
+ * `maxAgeMs` (or immediately if force: true); calls made while one is running share it.
  */
-export async function syncMeetings({ maxAgeMs = 30_000 }: { maxAgeMs?: number } = {}): Promise<SyncResult> {
+export async function syncMeetings({ maxAgeMs = 5_000, force = false }: { maxAgeMs?: number; force?: boolean } = {}): Promise<SyncResult> {
   if (!calendlyConfigured()) return { ok: false, configured: false };
   if (running) return running;
-  if (Date.now() - lastSync < maxAgeMs) return { ok: true, configured: true, changed: 0 };
-  running = runSync()
+  if (!force && Date.now() - lastSync < maxAgeMs) return { ok: true, configured: true, changed: 0 };
+  running = runSync(force)
     .catch((err: unknown) => {
       console.error("[calendly] sync failed:", err);
       meUri = null;

@@ -7,10 +7,12 @@ export const dynamic = "force-dynamic";
 
 /* GET → read new and changed meetings from Calendly, then report the list's
    version so an open Meetings page knows when to refresh (any CRM user) */
-export async function GET() {
+export async function GET(request: Request) {
   const user = await getUserFor("leads");
   if (!user) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
-  const sync = await syncMeetings();
+  const url = new URL(request.url);
+  const force = url.searchParams.get("force") === "1" || url.searchParams.get("sync") === "1";
+  const sync = await syncMeetings({ maxAgeMs: force ? 0 : 5_000, force });
   const version = await meetingsVersion().catch(() => "");
   return Response.json({ ok: sync.ok, configured: sync.configured, error: sync.error ? "Couldn't reach Calendly right now." : undefined, version });
 }

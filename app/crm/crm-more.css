@@ -1593,3 +1593,8 @@
     text-align: left !important;
   }
 }
+
+.is-spinning {
+  animation: crm-spin 0.75s linear infinite;
+  display: inline-block;
+}

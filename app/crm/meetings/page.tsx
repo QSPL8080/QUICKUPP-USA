@@ -18,7 +18,7 @@ export default async function MeetingsPage({ searchParams }: Props) {
   };
   // bring in what changed in Calendly first (never wait on Calendly for long)
   const sync: SyncResult = await Promise.race([
-    syncMeetings(),
+    syncMeetings({ maxAgeMs: 5_000 }),
     new Promise<SyncResult>((r) => setTimeout(() => r({ ok: true, configured: true }), 7000)),
   ]);
   const [data, version, counts] = await Promise.all([listMeetings({ ...f, page: Number(sp.page) || 1 }), meetingsVersion().catch(() => ""), meetingCounts()]);

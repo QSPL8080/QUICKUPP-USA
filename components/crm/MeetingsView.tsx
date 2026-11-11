@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useFeedback } from "@/components/crm/Feedback";
 import { BulkBar, SelectBox, useSelection } from "@/components/crm/Selection";
@@ -9,7 +9,7 @@ import type { MeetingItem } from "@/lib/crm/calendly";
 /*
  * Calendly meetings in the CRM: view only. A meeting can be joined and removed
  * from the CRM list, never changed (that happens in Calendly). The list checks
- * Calendly every minute while it is open and refreshes when anything changed.
+ * Calendly every 10 seconds while it is open and refreshes when anything changed.
  */
 
 const LABEL: Record<MeetingItem["view"], string> = {
@@ -19,7 +19,7 @@ const LABEL: Record<MeetingItem["view"], string> = {
   canceled: "Canceled",
 };
 
-const POLL_MS = 60_000;
+const POLL_MS = 10_000;
 
 const fmtDay = (iso: string) => new Date(iso).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
 const fmtTime = (iso: string) => new Date(iso).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
@@ -94,6 +94,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
   const { confirm, toast } = useFeedback();
   const [openId, setOpenId] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const sel = useSelection(rows.map((r) => r.id));
   const versionRef = useRef(version);
   useEffect(() => {
@@ -101,25 +102,34 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
   }, [version]);
   const open = openId === null ? null : rows.find((r) => r.id === openId) || null;
 
-  // check Calendly every minute while the page is open; refresh when something changed
+  const check = useCallback(
+    async (force = false) => {
+      if (document.hidden && !force) return;
+      if (force) setSyncing(true);
+      try {
+        const res = await fetch(`/api/crm/meetings${force ? "?force=1" : ""}`, { cache: "no-store" }).catch(() => null);
+        const j = res?.ok ? await res.json().catch(() => null) : null;
+        if (force || (j?.version && j.version !== versionRef.current)) {
+          router.refresh();
+        }
+      } finally {
+        if (force) setSyncing(false);
+      }
+    },
+    [router]
+  );
+
+  // check Calendly every 10 seconds while the page is open; force refresh immediately when tab is refocused
   useEffect(() => {
     if (!live) return;
-    let stop = false;
-    const check = async () => {
-      if (document.hidden) return;
-      const res = await fetch("/api/crm/meetings", { cache: "no-store" }).catch(() => null);
-      const j = res?.ok ? await res.json().catch(() => null) : null;
-      if (!stop && j?.version && j.version !== versionRef.current) router.refresh();
-    };
-    const t = window.setInterval(check, POLL_MS);
-    const onShow = () => !document.hidden && check();
+    const t = window.setInterval(() => void check(false), POLL_MS);
+    const onShow = () => !document.hidden && void check(true);
     document.addEventListener("visibilitychange", onShow);
     return () => {
-      stop = true;
       window.clearInterval(t);
       document.removeEventListener("visibilitychange", onShow);
     };
-  }, [live, router]);
+  }, [live, check]);
 
   const removeIds = async (ids: number[], what: string) => {
     if (
@@ -153,15 +163,50 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
 
   if (!rows.length) {
     return (
-      <div className="crm-empty">
+      <div className="crm-empty" style={{ padding: "40px 20px", textAlign: "center" }}>
         <p className="crm-empty-title">No meetings found</p>
         <p className="crm-muted">When someone books a call through Calendly on the website, it will appear here.</p>
+        {live && (
+          <div style={{ marginTop: "16px" }}>
+            <button
+              type="button"
+              className="crm-act crm-act-dark crm-act-sm"
+              disabled={syncing}
+              onClick={() => void check(true)}
+              style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={syncing ? "is-spinning" : ""}>
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.19" />
+              </svg>
+              <span>{syncing ? "Syncing from Calendly..." : "Sync Calendly Now"}</span>
+            </button>
+          </div>
+        )}
       </div>
     );
   }
 
   return (
     <>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 16px", borderBottom: "1px solid #e2e8f0", background: "#f8fafc", flexWrap: "wrap", gap: "8px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "12px", color: "#64748b" }}>
+          <span className="crm-live-dot" style={{ width: "7px", height: "7px", borderRadius: "50%", background: syncing ? "#f59e0b" : "#10b981", display: "inline-block" }} />
+          <span>{syncing ? "Syncing with Calendly..." : "Live Calendly Sync • Auto-checking every 10s"}</span>
+        </div>
+        <button
+          type="button"
+          className="crm-act crm-act-ghost crm-act-sm"
+          disabled={syncing}
+          onClick={() => void check(true)}
+          style={{ display: "inline-flex", alignItems: "center", gap: "5px", fontSize: "12px", padding: "4px 10px", borderRadius: "6px", fontWeight: 600, background: "#ffffff", borderColor: "#cbd5e1", color: "#0f172a" }}
+          title="Fetch latest updates from Calendly immediately"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={syncing ? "is-spinning" : ""}>
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.19" />
+          </svg>
+          <span>{syncing ? "Syncing..." : "Sync Calendly"}</span>
+        </button>
+      </div>
       <BulkBar sel={sel} noun={["meeting", "meetings"]} busy={busy} onDelete={removeSelected} />
       <div className="crm-table-wrap">
         <table className="crm-table crm-stack crm-selectable">
