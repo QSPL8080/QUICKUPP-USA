@@ -3,15 +3,12 @@ import { notFound } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BlogDetailView from "@/components/BlogDetailView";
-import { getAllBlogSlugs, getPublishedBlogBySlug, getPublishedBlogs } from "@/lib/blogs";
+import { getPublishedBlogBySlug, getPublishedBlogs } from "@/lib/blogs";
 
-export const dynamicParams = true;
-export const revalidate = 60;
-
-export async function generateStaticParams() {
-  const slugs = await getAllBlogSlugs();
-  return slugs.map((slug) => ({ slug }));
-}
+// Built from the database on every visit, so whatever the CRM saves (new
+// blogs, edits, unpublishing, deleting) shows on the website straight away.
+// A saved copy (ISR) kept serving old versions on the live server.
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,

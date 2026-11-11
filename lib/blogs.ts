@@ -112,46 +112,34 @@ export function rowToCrmBlog(r: BlogDbRow): CrmBlog {
   };
 }
 
-/** Fetches all published blogs for the public website. Falls back to static blogs on DB failure. */
+/*
+ * The website reads blogs from the database only. The built-in copies in
+ * data/blogs are used only when the database can't be reached; an empty
+ * result is real (everything deleted or unpublished), so a blog removed in
+ * the CRM never comes back from those copies.
+ */
+
+/** All published blogs for the website. */
 export async function getPublishedBlogs(): Promise<BlogPost[]> {
   try {
     const [rows] = await getPool().query("SELECT * FROM blogs WHERE is_published = 1 ORDER BY id ASC");
-    const list = rows as BlogDbRow[];
-    if (list && list.length > 0) {
-      return list.map(rowToBlog);
-    }
+    return (rows as BlogDbRow[]).map(rowToBlog);
   } catch (err) {
-    console.warn("[blogs] DB query failed, falling back to static posts:", err);
+    console.warn("[blogs] DB query failed, showing the built-in blogs:", err);
+    return fallbackPosts;
   }
-  return fallbackPosts;
 }
 
-/** Fetches a single published blog by slug for the website. Falls back to static. */
+/** One published blog by its slug, or null when there is none. */
 export async function getPublishedBlogBySlug(slug: string): Promise<BlogPost | null> {
   try {
     const [rows] = await getPool().query("SELECT * FROM blogs WHERE slug = ? AND is_published = 1 LIMIT 1", [slug]);
     const list = rows as BlogDbRow[];
-    if (list && list.length > 0) {
-      return rowToBlog(list[0]);
-    }
+    return list.length ? rowToBlog(list[0]) : null;
   } catch (err) {
-    console.warn(`[blogs] DB query for ${slug} failed, falling back to static:`, err);
+    console.warn(`[blogs] DB query for ${slug} failed, showing the built-in blog:`, err);
+    return fallbackPosts.find((p) => p.slug === slug) || null;
   }
-  return fallbackPosts.find((p) => p.slug === slug) || null;
-}
-
-/** Returns all published slugs for static paths and sitemaps. */
-export async function getAllBlogSlugs(): Promise<string[]> {
-  try {
-    const [rows] = await getPool().query("SELECT slug FROM blogs WHERE is_published = 1");
-    const list = rows as { slug: string }[];
-    if (list && list.length > 0) {
-      return list.map((r) => r.slug);
-    }
-  } catch (err) {
-    console.warn("[blogs] Failed to fetch slugs from DB, falling back:", err);
-  }
-  return fallbackPosts.map((p) => p.slug);
 }
 
 /** Fetches all blogs for CRM management (including unpublished / drafts). */

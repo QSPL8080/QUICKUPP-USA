@@ -46,6 +46,7 @@ export async function POST(request: Request) {
     );
 
     revalidatePath("/blog", "layout");
+    revalidatePath("/resources");
     return Response.json({ ok: true, id: (res as { insertId: number }).insertId });
   } catch (err) {
     console.error("[api/crm/blogs] insert failed:", err);

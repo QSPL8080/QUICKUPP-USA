@@ -36,6 +36,7 @@ type SectionForm = {
 
 type FormState = {
   title: string;
+  metaTitle: string;
   slug: string;
   category: string;
   desc: string;
@@ -52,6 +53,7 @@ type FormState = {
 
 const blankForm = (): FormState => ({
   title: "",
+  metaTitle: "",
   slug: "",
   category: "Healthcare",
   desc: "",
@@ -71,6 +73,7 @@ const blankForm = (): FormState => ({
 
 const fromBlog = (b: CrmBlog): FormState => ({
   title: b.title,
+  metaTitle: b.content.metaTitle || "",
   slug: b.slug,
   category: b.category,
   desc: b.desc,
@@ -100,7 +103,7 @@ const STEPS = [
 const LAST = STEPS.length - 1;
 
 /* which step a field (or server error) belongs to */
-const STEP_OF: Record<string, number> = { title: 0, slug: 0, category: 0, desc: 0, author: 1, authorRole: 1, readTime: 1, img: 1, content: 2 };
+const STEP_OF: Record<string, number> = { title: 0, metaTitle: 0, slug: 0, category: 0, desc: 0, author: 1, authorRole: 1, readTime: 1, img: 1, content: 2 };
 
 const words = (s: string) => s.replace(/!\[[^\]]*\]\([^)]*\)/g, " ").split(/\s+/).filter(Boolean).length;
 
@@ -273,6 +276,7 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
       img: form.img,
       isPublished: form.isPublished,
       content: {
+        metaTitle: form.metaTitle.trim(),
         intro: form.intro,
         keyTakeaways: form.keyTakeaways
           .split("\n")
@@ -605,6 +609,17 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
                     {errors.title && <span className="crm-field-error">{errors.title}</span>}
                   </label>
 
+                  <label className="crm-field crm-span-2">
+                    <span className="crm-label">Meta Title (browser tab &amp; Google)</span>
+                    <input
+                      className="crm-input"
+                      value={form.metaTitle}
+                      onChange={set("metaTitle")}
+                      placeholder={`Leave empty to use: ${form.title || "Blog Title"} | Quickupp Softech`}
+                      maxLength={255}
+                    />
+                  </label>
+
                   <label className="crm-field">
                     <span className="crm-label">URL Slug *</span>
                     <input
@@ -865,6 +880,7 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
                     </div>
                     <p className="crm-wiz-title">{form.title || "—"}</p>
                     <p className="crm-cell-sub">/blog/{form.slug || "…"} · {form.category || "No category"}</p>
+                    <p className="crm-cell-sub">Meta title: {form.metaTitle.trim() || `${form.title || "Blog Title"} | Quickupp Softech`}</p>
                     <p className="crm-wiz-text">{form.desc || "—"}</p>
                   </div>
 

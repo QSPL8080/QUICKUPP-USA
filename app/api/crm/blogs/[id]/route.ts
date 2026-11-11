@@ -40,6 +40,7 @@ export async function PATCH(request: Request, ctx: Ctx) {
   if (Object.keys(body).length === 1 && typeof body.isPublished === "boolean") {
     await getPool().execute("UPDATE blogs SET is_published = ? WHERE id = ?", [body.isPublished ? 1 : 0, id]);
     revalidatePath("/blog", "layout");
+    revalidatePath("/resources");
     return Response.json({ ok: true });
   }
 
@@ -69,6 +70,7 @@ export async function PATCH(request: Request, ctx: Ctx) {
     );
 
     revalidatePath("/blog", "layout");
+    revalidatePath("/resources");
     return Response.json({ ok: true });
   } catch (err) {
     console.error("[api/crm/blogs/[id]] update failed:", err);
@@ -87,5 +89,6 @@ export async function DELETE(_request: Request, ctx: Ctx) {
   await pool.execute("DELETE FROM blogs WHERE id = ?", [id]);
 
   revalidatePath("/blog", "layout");
+  revalidatePath("/resources");
   return Response.json({ ok: true });
 }

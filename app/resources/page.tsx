@@ -6,7 +6,8 @@ import ResourceCtaBanner from "@/components/ResourceCtaBanner";
 import ResourceMotion from "@/components/ResourceMotion";
 import { getPublishedBlogs } from "@/lib/blogs";
 
-export const revalidate = 60;
+// the latest blogs come from the database on every visit (see app/blog/[slug])
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Resources & Insights | Quickupp Softech",
