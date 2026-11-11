@@ -9,6 +9,7 @@ import { entityOf, logGatewayResult, paymentSnapshot, type PaymentSnapshot, type
 import { logActivity } from "@/lib/crm/activity";
 import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { errMessage } from "@/lib/err";
+import { LINK_MESSAGES, chargeFor, findByToken, linkState, recordTransaction } from "@/lib/paymentLink";
 
 export async function POST(req: Request) {
   try {
@@ -39,9 +40,23 @@ export async function POST(req: Request) {
       existingPaymentId,
     } = body;
 
-    const isPartialParam = paymentType === "partial";
-    const parsedAmount = Number(amount) || 0;
-    let finalTotal = Number(totalAmount) || parsedAmount;
+    // a pay link: stop before taking any money if the link can no longer be paid,
+    // and use the amount worked out from the record (see lib/paymentLink)
+    const linked = token ? await findByToken(String(token)) : null;
+    if (token && !linked) return NextResponse.json({ error: "This payment link was not found." }, { status: 404 });
+    let charge: ReturnType<typeof chargeFor> = null;
+    if (linked) {
+      const state = linkState(linked.row);
+      if (state === "paid" || state === "expired" || state === "cancelled") {
+        return NextResponse.json({ error: LINK_MESSAGES[state], state }, { status: 409 });
+      }
+      charge = chargeFor(linked.row, paymentType);
+      if (!charge) return NextResponse.json({ error: "Nothing is due on this payment link." }, { status: 409 });
+    }
+
+    const isPartialParam = charge ? charge.type === "partial" : paymentType === "partial";
+    const parsedAmount = charge ? charge.amount : Number(amount) || 0;
+    let finalTotal = charge ? charge.total : Number(totalAmount) || parsedAmount;
     let isPartial = isPartialParam;
     let finalRemaining = isPartial
       ? Math.max(0, Number(remainingAmount ?? (finalTotal - parsedAmount)))
@@ -99,6 +114,7 @@ export async function POST(req: Request) {
     let effectiveCategory = categoryStr || "";
     let recordTable: PaymentTable = "payments";
     let earlierPaid = 0; // a balance payment: what the client had already paid (the deposit)
+    let balanceToken = ""; // after a deposit: the link the client pays the balance with
 
     try {
       const pool = getPool();
@@ -107,7 +123,10 @@ export async function POST(req: Request) {
       let beforeSnap: PaymentSnapshot | null = null;
 
       // Check for existing record by token, invoiceNumber, or ID (checking payment_links first)
-      if (token) {
+      if (linked) {
+        existingRecord = linked.row;
+        targetTable = linked.table;
+      } else if (token) {
         let [rows] = await pool.query("SELECT * FROM payment_links WHERE token = ? LIMIT 1", [token]).catch(() => [[]]);
         if (Array.isArray(rows) && rows.length > 0) {
           existingRecord = rows[0] as RowDataPacket;
@@ -155,6 +174,7 @@ export async function POST(req: Request) {
         finalTotal = Number(existingRecord.total_amount || totalAmount || capturedAmount);
 
         const previouslyPaid = Number(existingRecord.amount || 0);
+        balanceToken = String(existingRecord.token || token || "");
 
         if (previouslyPaid > 0 && paymentStatus !== "failed") {
           // Paying remaining balance!
@@ -265,6 +285,7 @@ export async function POST(req: Request) {
           }
         }
         const persistentToken = isPartial ? randomBytes(16).toString("hex") : null;
+        balanceToken = persistentToken || "";
         const initialLinkStatus = isPartial ? "active" : "used";
 
         const [insertRes] = await pool.query(
@@ -328,6 +349,18 @@ export async function POST(req: Request) {
 
       recordTable = (existingRecord ? targetTable : "payments") as PaymentTable;
       if (insertedId) {
+        // one row per transaction, so the deposit's and the balance's transaction IDs both stay visible
+        await recordTransaction({
+          table: recordTable,
+          id: insertedId,
+          kind: isBalancePayment ? "balance" : isPartial ? "deposit" : "full",
+          amount: capturedAmount,
+          currency,
+          status: paymentStatus === "failed" ? "failed" : paymentStatus === "pending" ? "pending" : "paid",
+          transactionId: String(captureID),
+          orderId: String(orderID),
+          note: failureReason || pendingReason || undefined,
+        });
         await logGatewayResult({
           table: (existingRecord ? targetTable : "payments") as PaymentTable,
           id: insertedId,
@@ -575,6 +608,20 @@ export async function POST(req: Request) {
                     </tr>
                   </table>
 
+                  ${receiptKind === "deposit" && balanceToken && finalRemaining > 0 ? `
+                  <!-- Balance link -->
+                  <div style="background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 12px; padding: 18px 20px; text-align: center; margin: 24px 0 0;">
+                    <p style="font-size: 14px; color: #1e1b4b; margin: 0 0 6px; font-weight: 700;">
+                      Remaining balance: $${finalRemaining.toFixed(2)} ${currency}
+                    </p>
+                    <p style="font-size: 13px; color: #475569; margin: 0 0 14px;">
+                      Pay it any time with your personal balance link.
+                    </p>
+                    <a href="${siteUrl}/pay/${balanceToken}" style="display: inline-block; background: #4f46e5; color: #ffffff; text-decoration: none; font-size: 13.5px; font-weight: 700; padding: 12px 28px; border-radius: 8px;">
+                      PAY REMAINING BALANCE
+                    </a>
+                  </div>` : ""}
+
                   <!-- PDF Receipt Download Section -->
                   <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; text-align: center; margin: 24px 0 28px;">
                     <p style="font-size: 14px; color: #334155; margin: 0 0 14px; font-weight: 600;">
@@ -615,7 +662,7 @@ export async function POST(req: Request) {
             fromName: "Quickupp Softech LLC",
             subject: clientSubject,
             html: clientHtml,
-            text: `${clientSubject}\n\nHi ${firstName},\n\nThank you for choosing Quickupp Softech LLC. Order Number: ${orderNumber}. Amount: $${capturedAmount.toFixed(2)} ${currency}. Status: ${statusBannerValue}. Download receipt: ${receiptDownloadUrl}\n\nQuickupp Softech LLC`,
+            text: `${clientSubject}\n\nHi ${firstName},\n\nThank you for choosing Quickupp Softech LLC. Order Number: ${orderNumber}. Amount: $${capturedAmount.toFixed(2)} ${currency}. Status: ${statusBannerValue}. Download receipt: ${receiptDownloadUrl}${receiptKind === "deposit" && balanceToken && finalRemaining > 0 ? `\n\nRemaining balance: $${finalRemaining.toFixed(2)} ${currency}. Pay it any time here: ${siteUrl}/pay/${balanceToken}` : ""}\n\nQuickupp Softech LLC`,
             attachments: [
               {
                 filename: `Quickupp-Receipt-${orderNumber}.pdf`,

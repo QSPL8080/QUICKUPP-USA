@@ -4643,3 +4643,31 @@ a.crm-dash-legend-row:hover {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+/* Payments: WhatsApp share buttons and the balance link under a part-paid order's transactions */
+.crm-action-btn.is-wa { color: #059669; }
+.crm-action-btn.is-wa:hover { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+.crm-act.crm-act-wa { background: #10b981; color: #ffffff; border: none; font-weight: 700; }
+.crm-act.crm-act-wa:hover { background: #059669; color: #ffffff; }
+.crm-balance-link {
+  margin-top: 12px;
+  padding: 14px 16px;
+  border: 1px solid #c7d2fe;
+  background: #eef2ff;
+  border-radius: 10px;
+  display: grid;
+  gap: 10px;
+}
+.crm-balance-link-head { display: grid; gap: 2px; font-size: 13px; color: #312e81; }
+.crm-balance-link-head span { color: #475569; font-size: 12.5px; }
+.crm-balance-link-url {
+  display: block;
+  padding: 8px 10px;
+  background: #ffffff;
+  border: 1px solid #e0e7ff;
+  border-radius: 8px;
+  font-size: 12.5px;
+  color: #0f172a;
+  word-break: break-all;
+}
+.crm-balance-link-actions { display: flex; gap: 8px; flex-wrap: wrap; }

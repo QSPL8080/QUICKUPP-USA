@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createPayPalOrder } from "@/lib/paypal";
 import { errMessage } from "@/lib/err";
+import { LINK_MESSAGES, chargeFor, findByToken, linkState, markExpired } from "@/lib/paymentLink";
 
 export async function POST(req: Request) {
   try {
@@ -26,6 +27,35 @@ export async function POST(req: Request) {
       token,
       invoiceNumber,
     } = body;
+
+    // a pay link: the link must still be payable, and the amount comes from the record, not the browser
+    if (token) {
+      const found = await findByToken(String(token));
+      if (!found) return NextResponse.json({ error: "This payment link was not found." }, { status: 404 });
+      const state = linkState(found.row);
+      if (state === "paid" || state === "expired" || state === "cancelled") {
+        if (state === "expired") await markExpired(found.table, Number(found.row.id));
+        return NextResponse.json({ error: LINK_MESSAGES[state], state }, { status: 409 });
+      }
+      const charge = chargeFor(found.row, paymentType);
+      if (!charge) return NextResponse.json({ error: "Nothing is due on this payment link." }, { status: 409 });
+      const r = found.row;
+      const inv = r.invoice_number || invoiceNumber || "";
+      const label = charge.type === "balance" ? "Balance" : charge.type === "partial" ? "Deposit" : "Payment";
+      const order = await createPayPalOrder({
+        amount: charge.amount,
+        currency: "USD",
+        description: `Order #${inv} ${label} - ${r.service || "Quickupp Softech"}`.slice(0, 127),
+        customId: JSON.stringify({
+          n: String(r.client_name || "").slice(0, 25),
+          e: String(r.client_email || "").slice(0, 35),
+          t: charge.type,
+          inv: inv || undefined,
+          tok: String(token).slice(0, 40),
+        }).slice(0, 127),
+      });
+      return NextResponse.json({ orderID: order.id, status: order.status, amount: charge.amount });
+    }
 
     if (!clientName || !clientEmail || !clientPhone) {
       return NextResponse.json(

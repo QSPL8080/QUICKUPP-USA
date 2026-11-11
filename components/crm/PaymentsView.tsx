@@ -42,6 +42,37 @@ const fmtDate = (d: string | null, withTime = false) => {
 
 const pad2 = (v: number) => String(v).padStart(2, "0");
 
+/* the client's pay link (/pay/<token>) on this site */
+const payUrlFor = (token: string) =>
+  `${typeof window !== "undefined" ? window.location.origin : "https://www.quickuppsoftech.us"}/pay/${token}`;
+
+/*
+ * A phone number as WhatsApp wants it: digits with the country code. A
+ * 10-digit number without one is taken as a US number (+1).
+ */
+const whatsAppNumber = (raw?: string | null) => {
+  const s = String(raw || "").trim();
+  const digits = s.replace(/\D/g, "");
+  if (!digits) return "";
+  if (s.startsWith("+") || s.startsWith("00")) return digits.replace(/^00/, "");
+  if (digits.length === 10) return `1${digits}`;
+  return digits;
+};
+
+/* one PayPal transaction on a payment record (from /api/crm/payments/transactions) */
+type Txn = {
+  kind: "full" | "deposit" | "balance";
+  amount: number;
+  currency: string;
+  status: "paid" | "pending" | "failed";
+  transactionId: string | null;
+  orderId: string | null;
+  at: string;
+  note: string | null;
+};
+const TXN_KIND = { full: "Full payment", deposit: "Deposit (partial payment)", balance: "Balance payment" } as const;
+const TXN_STATUS = { paid: "Paid", pending: "Pending clearing", failed: "Failed" } as const;
+
 /* a payment record and a payment link can share an id, so rows are told apart by table too */
 const rowKey = (p: PaymentRow) => `${p.table === "payment_links" ? "link" : "pay"}:${p.id}`;
 
@@ -228,6 +259,27 @@ export default function PaymentsView({
       : ""
   );
   const [modalSubtab, setModalSubtab] = useState<"orders" | "payments">("orders");
+  // the PayPal transactions on the record shown in the details (deposit, balance, full)
+  const [txns, setTxns] = useState<Txn[]>([]);
+  const [txnsLoading, setTxnsLoading] = useState(false);
+  const txnKey = viewing ? `${rowKey(viewing)}:${viewing.amount}:${viewing.status}` : "";
+  useEffect(() => {
+    if (!viewing) return;
+    let live = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- shows the loader while the transactions load
+    setTxnsLoading(true);
+    fetch(`/api/crm/payments/transactions?table=${viewing.table}&id=${viewing.id}`, { cache: "no-store" })
+      .then((r) => r.json())
+      .then((d) => {
+        if (live) setTxns(d?.ok ? d.items : []);
+      })
+      .catch(() => live && setTxns([]))
+      .finally(() => live && setTxnsLoading(false));
+    return () => {
+      live = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- txnKey covers the record and its payments
+  }, [txnKey]);
 
   // Generate Payment Link State
   const initialDates = getInitialBillingDates();
@@ -298,20 +350,29 @@ export default function PaymentsView({
     router.push(`/crm/payments?${params.toString()}`);
   };
 
-  const copyLink = (tokenOrUrl: string) => {
-    const fullUrl = tokenOrUrl.startsWith("http") ? tokenOrUrl : `${window.location.origin}/pay/${tokenOrUrl}`;
-    navigator.clipboard.writeText(fullUrl);
-    toast("Payment link copied to clipboard!");
+  const copyLink = (tokenOrUrl: string, what = "Payment link") => {
+    const fullUrl = tokenOrUrl.startsWith("http") ? tokenOrUrl : payUrlFor(tokenOrUrl);
+    navigator.clipboard.writeText(fullUrl).then(
+      () => toast(`${what} copied`),
+      () => toast("Couldn't copy. Select the link and copy it instead.")
+    );
   };
 
   const isExpiredLink = (p: { expiresAt?: string | null; createdAt?: string | null; status?: string | null; amount?: number | null; linkStatus?: string | null }) => {
-    if (p.linkStatus === "expired") return true;
     if (p.status === "paid" || p.linkStatus === "used") return false;
+    // after a deposit the link is the balance link: it stays open until the balance is paid
+    if (Number(p.amount || 0) > 0) return false;
+    if (p.linkStatus === "expired") return true;
     if (p.expiresAt && !isNaN(new Date(p.expiresAt).getTime()) && new Date(p.expiresAt) < new Date()) return true;
     if (p.createdAt && !isNaN(new Date(p.createdAt).getTime()) && p.status !== "paid" && (new Date().getTime() - new Date(p.createdAt).getTime() > 24 * 60 * 60 * 1000)) return true;
     return false;
   };
 
+  /*
+   * WhatsApp text. A new link: the order and the amount (with the 50% deposit
+   * option on a part-payment link). After a deposit: what was paid, what is
+   * left, the due date and the balance link.
+   */
   const getWhatsAppMessage = (p: {
     clientName: string;
     clientPhone?: string | null;
@@ -329,61 +390,52 @@ export default function PaymentsView({
     balanceDueDate?: string | null;
     billingEndDate?: string | null;
   }) => {
-    const origin = typeof window !== "undefined" ? window.location.origin : "https://www.quickuppsoftech.us";
-    const payUrl = p.token ? `${origin}/pay/${p.token}` : `${origin}/pay`;
+    const payUrl = p.token ? payUrlFor(p.token) : payUrlFor("");
+    const first = (p.clientName || "").trim().split(/\s+/)[0] || "there";
+    const usd = (v: number) => `$${v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD`;
     const tot = Number(p.totalAmount || p.amount || 0);
-    const isPartial = p.paymentType === "partial" || (p.remainingAmount != null && p.remainingAmount > 0);
-    const deposit = Number(p.amount || 0);
-    const remaining = Number(p.remainingAmount != null ? p.remainingAmount : (tot - deposit));
+    const paid = Number(p.amount || 0);
+    const remaining = Number(p.remainingAmount != null ? p.remainingAmount : tot - paid);
+    const order = p.invoiceNumber ? `#${p.invoiceNumber}` : p.id ? `#QS-${p.id}` : "";
+    const scope = p.quantity || p.category || "";
+    const sign = `If you have any questions, just reply here or email info@quickuppsoftech.us.
+
+Thank you,
+Quickupp Softech LLC
+www.quickuppsoftech.us`;
 
     if (p.status === "partially_paid" && remaining > 0) {
-      // Balance notice message
-      return `Hello ${p.clientName},
+      const dueRaw = p.balanceDueDate || (p.billingEndDate ? p.billingEndDate.slice(0, 10) : "");
+      const due = /^\d{4}-\d{2}-\d{2}$/.test(dueRaw)
+        ? new Date(`${dueRaw}T00:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+        : "";
+      return `Hi ${first},
 
-This is a courtesy reminder regarding your outstanding balance for ${p.service} (${p.quantity || p.category || "Deliverables"}) with Quickupp Softech LLC.
+Thank you for your deposit for ${p.service}${order ? ` (order ${order})` : ""}.
 
-• Order / Invoice: ${p.invoiceNumber || (p.id ? `QS-${p.id}` : "")}
-• Total Engagement: $${tot.toFixed(2)} USD
-• Amount Paid: $${deposit.toFixed(2)} USD
-• Remaining Balance Due: $${remaining.toFixed(2)} USD
-• Balance Due Date: ${p.balanceDueDate || (p.billingEndDate ? p.billingEndDate.slice(0, 10) : "Due Shortly")}
+Total: ${usd(tot)}
+Paid so far: ${usd(paid)}
+Balance due: ${usd(remaining)}${due ? `\nDue by: ${due}` : ""}
 
-Please complete your balance payment securely via PayPal or Debit/Credit Card using the link below:
-👉 ${payUrl}
+You can pay the balance securely by PayPal or debit/credit card with your balance link:
+${payUrl}
 
-If you have any questions, feel free to reply directly or contact us at info@quickuppsoftech.us.
-
-Website: https://www.quickuppsoftech.us/
-Email: info@quickuppsoftech.us
-
-Best regards,
-Quickupp Softech LLC`;
+${sign}`;
     }
 
-    // Initial Payment link message (CRITICAL: 24h expiration is NOT conveyed to client)
-    const partialLines = isPartial
-      ? `• Initial Deposit Due: $${(tot * 0.5).toFixed(2)} USD (50% Deposit)\n• Remaining Balance: $${(tot * 0.5).toFixed(2)} USD`
-      : "";
+    const partial = p.paymentType === "partial";
+    const half = Math.round(tot * 50) / 100;
+    return `Hi ${first},
 
-    return `Hello ${p.clientName},
+Thank you for choosing Quickupp Softech LLC! Here is your secure payment link.
 
-Thank you for choosing Quickupp Softech LLC!
+${order ? `Order: ${order}\n` : ""}Service: ${p.service}${scope && scope !== "Not Applicable" ? `\nPackage: ${scope}` : ""}
+Total: ${usd(tot)}${partial ? `\n\nYou can pay the full amount, or a 50% deposit of ${usd(half)} now and the remaining ${usd(Math.round((tot - half) * 100) / 100)} later.` : ""}
 
-Here are your custom engagement details:
-• Service: ${p.service}
-• Scope / Package: ${p.quantity || p.category || "Deliverables"}
-• Total Amount: $${tot.toFixed(2)} USD
-${partialLines ? `${partialLines}\n` : ""}
-Please complete your secure payment via PayPal or Debit/Credit Card using the link below:
-👉 ${payUrl}
+Pay securely by PayPal or debit/credit card:
+${payUrl}
 
-If you have any questions or need custom assistance, feel free to reply directly or contact us at info@quickuppsoftech.us.
-
-Website: https://www.quickuppsoftech.us/
-Email: info@quickuppsoftech.us
-
-Best regards,
-Quickupp Softech LLC`;
+${sign}`;
   };
 
   const openWhatsApp = (p: {
@@ -404,11 +456,11 @@ Quickupp Softech LLC`;
     billingEndDate?: string | null;
   }) => {
     const msg = getWhatsAppMessage(p);
-    const cleanPhone = (p.clientPhone || "").replace(/[^0-9+]/g, "");
-    const url = cleanPhone
-      ? `https://api.whatsapp.com/send?phone=${encodeURIComponent(cleanPhone)}&text=${encodeURIComponent(msg)}`
+    const phone = whatsAppNumber(p.clientPhone);
+    const url = phone
+      ? `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(msg)}`
       : `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
-    window.open(url, "_blank");
+    window.open(url, "_blank", "noopener");
   };
 
   const cancelLink = async (p: PaymentRow) => {
@@ -1389,12 +1441,25 @@ Quickupp Softech LLC`;
                               <circle cx="12" cy="12" r="3" />
                             </svg>
                           </button>
+                          {p.token && p.status === "partially_paid" && Number(p.remainingAmount || 0) > 0 && p.linkStatus !== "cancelled" && (
+                            <button
+                              type="button"
+                              className="crm-action-btn is-wa"
+                              title="Share the balance link on WhatsApp"
+                              aria-label="Share the balance link on WhatsApp"
+                              onClick={() => openWhatsApp(p)}
+                            >
+                              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <path d="M20.52 3.48A11.93 11.93 0 0 0 12.06 0C5.46 0 .09 5.37.09 11.97c0 2.11.55 4.17 1.6 6L0 24l6.19-1.62a11.93 11.93 0 0 0 5.87 1.51h.01c6.6 0 11.97-5.37 11.97-11.97 0-3.2-1.25-6.21-3.52-8.44zm-8.46 18.36h-.01a9.92 9.92 0 0 1-5.06-1.39l-.36-.22-3.76.99 1-3.66-.24-.38a9.93 9.93 0 0 1-1.52-5.21c0-5.5 4.47-9.97 9.97-9.97 2.66 0 5.16 1.04 7.05 2.92a9.92 9.92 0 0 1 2.92 7.05c0 5.5-4.48 9.97-9.99 9.97zm5.46-7.46c-.3-.15-1.77-.87-2.04-.97-.28-.1-.48-.15-.68.15-.2.3-.77.97-.95 1.17-.17.2-.35.22-.65.07-.3-.15-1.27-.47-2.42-1.49-.9-.8-1.5-1.78-1.68-2.08-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.68-1.64-.93-2.25-.24-.59-.49-.51-.68-.52h-.58c-.2 0-.52.07-.8.37-.27.3-1.05 1.03-1.05 2.51s1.08 2.91 1.23 3.11c.15.2 2.12 3.24 5.14 4.54.72.31 1.28.5 1.72.64.72.23 1.38.2 1.9.12.58-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.18-1.42-.08-.13-.27-.2-.57-.35z" />
+                              </svg>
+                            </button>
+                          )}
                           {p.token && p.status !== "paid" && p.linkStatus !== "used" && !isExpiredLink(p) && (
                             <button
                               type="button"
                               className="crm-action-btn"
-                              title="Copy Payment Link"
-                              onClick={() => copyLink(p.token!)}
+                              title={p.status === "partially_paid" ? "Copy the balance link" : "Copy Payment Link"}
+                              onClick={() => copyLink(p.token!, p.status === "partially_paid" ? "Balance link" : "Payment link")}
                             >
                               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
@@ -1478,10 +1543,15 @@ Quickupp Softech LLC`;
               <div className="crm-drawer-head" style={{ padding: "16px 24px", borderBottom: "1px solid #e2e8f0" }}>
                 <div>
                   <h3 className="crm-modal-title" style={{ fontSize: "16px", fontWeight: 700, margin: 0, color: "#0f172a" }}>
-                    Payment Link Details
+                    {viewing.table === "payment_links" ? "Payment Link Details" : "Payment Details"}
                   </h3>
                   <p className="crm-modal-sub" style={{ fontSize: "12px", margin: "2px 0 0", color: "#64748b" }}>
-                    Order #{viewing.invoiceNumber || `QAS-${viewing.id}`} · Generated by {viewing.createdBy || "Admin"} on {fmtDate(viewing.createdAt, true)}
+                    Order #{viewing.invoiceNumber || `QAS-${viewing.id}`} ·{" "}
+                    {viewing.table === "payment_links"
+                      ? `Generated by ${viewing.createdBy || "Admin"} on ${fmtDate(viewing.createdAt, true)}`
+                      : viewing.source === "website" || viewing.source === "online"
+                      ? `Paid on the website on ${fmtDate(viewing.createdAt, true)}`
+                      : `Recorded on ${fmtDate(viewing.createdAt, true)}`}
                   </p>
                 </div>
 
@@ -1568,6 +1638,12 @@ Quickupp Softech LLC`;
                     <div style={{ fontSize: "11px", fontWeight: 600, marginTop: "2px" }}>
                       {isViewingPaid ? (
                         <span style={{ color: "#16a34a" }}>Payment Completed</span>
+                      ) : viewing.linkStatus === "cancelled" ? (
+                        <span style={{ color: "#dc2626" }}>Link cancelled</span>
+                      ) : viewing.status === "partially_paid" && Number(viewing.remainingAmount || 0) > 0 ? (
+                        <span style={{ color: "#2563eb" }}>
+                          {money(viewing.remainingAmount || 0, viewing.currency)} balance due · balance link open until paid
+                        </span>
                       ) : isViewingExpired ? (
                         <span style={{ color: "#dc2626" }}>Link Expired (24h exceeded)</span>
                       ) : viewing.expiresAt ? (
@@ -1595,7 +1671,7 @@ Quickupp Softech LLC`;
                     className={`crm-modal-subtab ${modalSubtab === "payments" ? "is-active" : ""}`}
                     onClick={() => setModalSubtab("payments")}
                   >
-                    Payments ({viewing.amount > 0 ? 1 : 0})
+                    Payments ({txns.filter((t) => t.status !== "failed").length || (viewing.amount > 0 ? 1 : 0)})
                   </button>
                 </div>
               </div>
@@ -1746,88 +1822,138 @@ Quickupp Softech LLC`;
                     </table>
                   </div>
                 ) : (
-                /* Payments Subtab Table (Screenshot 5) */
-                viewing.amount > 0 ? (
+                /* Payments Subtab: every PayPal transaction on this order, each with its transaction ID */
+                viewing.amount > 0 || txns.length ? (
+                  <>
                   <div className="crm-table-wrap" style={{ border: "1px solid #e2e8f0", borderRadius: "10px", flexShrink: 0 }}>
                     <table className="crm-table" style={{ fontSize: "12.5px" }}>
                       <thead>
                         <tr style={{ background: "#f8fafc" }}>
-                          <th>TRANSACTION</th>
+                          <th>TRANSACTION ID</th>
                           <th>TYPE</th>
                           <th>AMOUNT</th>
                           <th>PAID SO FAR</th>
                           <th>STATUS</th>
-                          <th>DATE · PAYPAL REF</th>
+                          <th>DATE &amp; TIME</th>
                           <th>RECEIPT</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr>
-                          <td>
-                            <span style={{ fontWeight: 800, fontFamily: "monospace", color: "#0f172a" }}>
-                              {viewing.reference ? viewing.reference.split("|")[0].replace("Initial:", "").trim() : `TX-${viewing.id}`}
-                            </span>
-                            <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>
-                              Order {viewing.invoiceNumber || `QAS-${viewing.id}`}
-                            </span>
-                          </td>
-                          <td>
-                            <span style={{ fontWeight: 600, color: "#0f172a", display: "block" }}>
-                              {viewing.paymentType === "partial" ? "Deposit payment" : "Full payment"}
-                            </span>
-                            <span style={{ color: "#64748b", fontSize: "11.5px" }}>
-                              PayPal / Payment link
-                            </span>
-                          </td>
-                          <td>
-                            <span style={{ fontWeight: 700, color: "#0f172a", display: "block" }}>
-                              ${viewing.amount.toFixed(2)}
-                            </span>
-                            <span style={{ color: "#64748b", fontSize: "11.5px" }}>
-                              of ${(viewing.totalAmount || viewing.amount).toFixed(2)}
-                            </span>
-                          </td>
-                          <td>
-                            <span style={{ fontWeight: 700, color: "#16a34a", display: "block" }}>
-                              ${viewing.amount.toFixed(2)}
-                            </span>
-                            <span style={{ color: "#64748b", fontSize: "11.5px" }}>
-                              Remaining ${(viewing.remainingAmount || 0).toFixed(2)}
-                            </span>
-                          </td>
-                          <td>
-                            <span className={`crm-pill crm-pill-${viewing.status === "paid" ? "paid" : "partially_paid"}`}>
-                              {viewing.status === "paid" ? "Fully Paid" : "Partially Paid"}
-                            </span>
-                          </td>
-                          <td>
-                            <span style={{ fontWeight: 600, color: "#0f172a", display: "block" }}>
-                              {fmtDate(viewing.paidAt, true)}
-                            </span>
-                            <span style={{ color: "#64748b", fontSize: "11px", fontFamily: "monospace", wordBreak: "break-all" }}>
-                              {viewing.reference || viewing.paypalOrderId || "PayPal"}
-                            </span>
-                          </td>
-                          <td>
-                            <a
-                              href={`/api/payments/receipt?order=${encodeURIComponent(viewing.invoiceNumber || String(viewing.id))}`}
-                              target="_blank"
-                              rel="noreferrer"
-                              style={{ color: "#7c3aed", fontWeight: 700, textDecoration: "none" }}
-                            >
-                              PDF
-                            </a>
-                          </td>
-                        </tr>
+                        {txnsLoading && !txns.length ? (
+                          <tr>
+                            <td colSpan={7} className="crm-muted" style={{ textAlign: "center", padding: "18px" }}>
+                              Loading transactions…
+                            </td>
+                          </tr>
+                        ) : (
+                          (() => {
+                            let soFar = 0;
+                            const total = viewing.totalAmount || viewing.amount;
+                            return txns.map((t, i) => {
+                              if (t.status !== "failed") soFar += t.amount;
+                              const pill = t.status === "paid" ? "paid" : t.status === "pending" ? "pending" : "failed";
+                              return (
+                                <tr key={`${t.transactionId || "tx"}-${i}`}>
+                                  <td>
+                                    <span style={{ fontWeight: 800, fontFamily: "monospace", color: "#0f172a", wordBreak: "break-all" }}>
+                                      {t.transactionId || "—"}
+                                    </span>
+                                    <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>
+                                      Order {viewing.invoiceNumber || `QAS-${viewing.id}`}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    <span style={{ fontWeight: 600, color: "#0f172a", display: "block" }}>{TXN_KIND[t.kind] || "Payment"}</span>
+                                    <span style={{ color: "#64748b", fontSize: "11.5px" }}>
+                                      PayPal · {viewing.table === "payment_links" ? "Payment link" : t.kind === "balance" ? "Balance link" : "Website"}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    <span style={{ fontWeight: 700, color: "#0f172a", display: "block" }}>
+                                      {t.amount > 0 ? money(t.amount, t.currency) : "—"}
+                                    </span>
+                                    <span style={{ color: "#64748b", fontSize: "11.5px" }}>of {money(total, viewing.currency)}</span>
+                                  </td>
+                                  <td>
+                                    {t.status === "failed" ? (
+                                      <span className="crm-muted">—</span>
+                                    ) : (
+                                      <>
+                                        <span style={{ fontWeight: 700, color: "#16a34a", display: "block" }}>
+                                          {t.note ? money(viewing.amount, viewing.currency) : money(soFar, viewing.currency)}
+                                        </span>
+                                        <span style={{ color: "#64748b", fontSize: "11.5px" }}>
+                                          Remaining {money(i === txns.length - 1 || t.note ? viewing.remainingAmount || 0 : Math.max(0, total - soFar), viewing.currency)}
+                                        </span>
+                                      </>
+                                    )}
+                                  </td>
+                                  <td>
+                                    <span className={`crm-pill crm-pill-${pill}`}>{TXN_STATUS[t.status] || t.status}</span>
+                                    {t.status === "failed" && t.note && (
+                                      <span style={{ display: "block", fontSize: "11px", color: "#b91c1c", marginTop: "3px" }}>{t.note}</span>
+                                    )}
+                                  </td>
+                                  <td>
+                                    <span style={{ fontWeight: 600, color: "#0f172a", display: "block" }}>{fmtDate(t.at, true)}</span>
+                                    {t.orderId && t.orderId !== t.transactionId && (
+                                      <span style={{ color: "#64748b", fontSize: "11px", fontFamily: "monospace", wordBreak: "break-all" }}>
+                                        PayPal order {t.orderId}
+                                      </span>
+                                    )}
+                                  </td>
+                                  <td>
+                                    {t.status !== "failed" ? (
+                                      <a
+                                        href={`/api/payments/receipt?order=${encodeURIComponent(viewing.invoiceNumber || String(viewing.id))}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        style={{ color: "#7c3aed", fontWeight: 700, textDecoration: "none" }}
+                                      >
+                                        PDF
+                                      </a>
+                                    ) : (
+                                      <span className="crm-muted">—</span>
+                                    )}
+                                  </td>
+                                </tr>
+                              );
+                            });
+                          })()
+                        )}
                       </tbody>
                     </table>
                   </div>
+                  {viewing.status === "partially_paid" && viewing.token && Number(viewing.remainingAmount || 0) > 0 && viewing.linkStatus !== "cancelled" && (
+                    <div className="crm-balance-link">
+                      <div className="crm-balance-link-head">
+                        <strong>Balance link</strong>
+                        <span>
+                          {money(viewing.remainingAmount || 0, viewing.currency)} still due. The client pays it with this link; it stays open until the balance is paid.
+                        </span>
+                      </div>
+                      <code className="crm-balance-link-url">{payUrlFor(viewing.token)}</code>
+                      <div className="crm-balance-link-actions">
+                        <button type="button" className="crm-act crm-act-ghost crm-act-sm" onClick={() => copyLink(viewing.token!, "Balance link")}>
+                          Copy balance link
+                        </button>
+                        <button type="button" className="crm-act crm-act-sm crm-act-wa" onClick={() => openWhatsApp(viewing)}>
+                          Share on WhatsApp
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  </>
                 ) : (
                   <div style={{ padding: "30px 20px", textAlign: "center", background: "#f8fafc", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
                     <p style={{ margin: "0 0 10px", color: "#64748b", fontSize: "14px" }}>
-                      No payments recorded yet for this order. Share the link with the client:
+                      {canShareViewing
+                        ? "No payments recorded yet for this order. Share the link with the client:"
+                        : isViewingExpired
+                        ? "No payment was made within 24 hours, so this link has expired. Generate a new link for the client."
+                        : "No payments recorded for this order."}
                     </p>
-                    {viewing.token && (
+                    {viewing.token && canShareViewing && (
                       <button
                         type="button"
                         className="crm-act crm-act-dark"

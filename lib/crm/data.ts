@@ -6,6 +6,7 @@ import type { RowDataPacket } from "mysql2/promise";
 import { errCode, errMessage } from "@/lib/err";
 import { ensureLeadTables } from "@/lib/crm/ensureTables";
 import { DEFAULT_TZ, dayEnd, dayStart } from "@/lib/crm/crmTime";
+import { expireStaleLinks } from "@/lib/paymentLink";
 
 /*
  * Reading enquiries and payments for the CRM. Table names only ever come
@@ -390,6 +391,8 @@ export async function listPayments(opts: {
   all?: boolean;
 }) {
   const pool = getPool();
+  // CRM links unpaid after 24 hours show as expired
+  await expireStaleLinks();
   const currentTab = opts.tab || "all";
   const pageSize = opts.all ? 10000 : PAGE_SIZE;
   const tz = opts.tz || DEFAULT_TZ;

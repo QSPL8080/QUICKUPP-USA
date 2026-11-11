@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { toDateOnly } from "@/lib/crm/data";
 import { getPool } from "@/lib/db";
 import type { RowDataPacket } from "mysql2/promise";
+import { LINK_MESSAGES, findByToken, linkState, markExpired, type LinkTable } from "@/lib/paymentLink";
 
 export async function GET(req: Request) {
   try {
@@ -15,15 +16,13 @@ export async function GET(req: Request) {
 
     const pool = getPool();
     let rows: RowDataPacket[] = [];
+    let table: LinkTable = "payment_links";
 
     if (token) {
-      try {
-        const [plRes] = await pool.query("SELECT * FROM payment_links WHERE token = ? LIMIT 1", [token]);
-        rows = plRes as RowDataPacket[];
-      } catch {}
-      if (!rows.length) {
-        const [res] = await pool.query("SELECT * FROM payments WHERE token = ? LIMIT 1", [token]).catch(() => [[]]);
-        rows = res as RowDataPacket[];
+      const found = await findByToken(token);
+      if (found) {
+        rows = [found.row];
+        table = found.table;
       }
     } else if (orderNumber) {
       try {
@@ -34,6 +33,7 @@ export async function GET(req: Request) {
         rows = plRes as RowDataPacket[];
       } catch {}
       if (!rows.length) {
+        table = "payments";
         const [res] = await pool.query("SELECT * FROM payments WHERE invoice_number = ? OR id = ? LIMIT 1", [
           orderNumber,
           Number(orderNumber) || 0,
@@ -48,33 +48,14 @@ export async function GET(req: Request) {
 
     const p = rows[0];
 
-    // Check if link was cancelled
-    if (p.link_status === "cancelled") {
-      return NextResponse.json({
-        ok: false,
-        error: "This payment link has been cancelled. Please contact Quickupp support.",
-        cancelled: true,
-        orderNumber: p.invoice_number,
-      }, { status: 410 });
-    }
-
-    // Check 24-hour expiration for unpaid payment links (amount = 0 and pending).
-    const isPast24h =
-      p.link_status === "expired" ||
-      (p.expires_at && !isNaN(new Date(p.expires_at).getTime()) && new Date() > new Date(p.expires_at)) ||
-      (p.created_at && !isNaN(new Date(p.created_at).getTime()) && new Date().getTime() - new Date(p.created_at).getTime() > 24 * 60 * 60 * 1000);
-
-    if (isPast24h && p.status === "pending" && Number(p.amount || 0) === 0) {
-      // Mark as expired in DB
-      await pool.query("UPDATE payment_links SET link_status = 'expired' WHERE id = ?", [p.id]).catch(() => {});
-      await pool.query("UPDATE payments SET link_status = 'expired' WHERE id = ?", [p.id]).catch(() => {});
-
-      return NextResponse.json({
-        ok: false,
-        error: "This payment link has expired (valid for 24 hours). Please contact Quickupp support to generate a fresh link.",
-        expired: true,
-        orderNumber: p.invoice_number,
-      }, { status: 410 });
+    // what the link is now: open, balance due, paid, expired (24 hours unpaid) or cancelled
+    const state = token ? linkState(p) : "open";
+    if (state === "cancelled" || state === "expired") {
+      if (state === "expired" && p.link_status !== "expired") await markExpired(table, Number(p.id));
+      return NextResponse.json(
+        { ok: false, error: LINK_MESSAGES[state], expired: state === "expired", cancelled: state === "cancelled", orderNumber: p.invoice_number },
+        { status: 410 }
+      );
     }
 
     const totalAmount = Number(p.total_amount != null ? p.total_amount : p.amount);
@@ -100,6 +81,7 @@ export async function GET(req: Request) {
         paymentType: p.payment_type || "full",
         status: p.status,
         linkStatus: p.link_status,
+        linkState: state,
         currency: p.currency || "USD",
         notes: p.notes,
         source: p.source,

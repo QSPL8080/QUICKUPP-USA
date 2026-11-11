@@ -24,6 +24,7 @@ type OrderData = {
   paymentType: "full" | "partial";
   status: string;
   linkStatus: string;
+  linkState?: "open" | "balance" | "paid";
   currency: string;
   notes: string | null;
   source: string;
@@ -64,7 +65,7 @@ export default function PayTokenPage({ params }: { params: Promise<{ token: stri
           return;
         }
         setOrder(data.order);
-        if (data.order.status === "paid" || data.order.linkStatus === "used") {
+        if (data.order.status === "paid" || data.order.linkStatus === "used" || data.order.linkState === "paid") {
           setIsPaid(true);
         } else if (data.order.amountPaid > 0) {
           // Already partially paid, next payment is remaining balance!
@@ -129,7 +130,17 @@ export default function PayTokenPage({ params }: { params: Promise<{ token: stri
 
       const data = await res.json();
       if (!res.ok || !data.orderID) {
-        throw new Error(data.error || "Unable to initiate payment with PayPal. Please try again.");
+        const msg = data.error || "Unable to initiate payment with PayPal. Please try again.";
+        // the link may have just expired or been paid: say so instead of a general PayPal error
+        setError(msg);
+        if (res.status === 409 && (data.state === "paid" || data.state === "expired" || data.state === "cancelled")) {
+          if (data.state === "paid") setIsPaid(true);
+          else {
+            setIsExpired(data.state === "expired");
+            setLoadError(msg);
+          }
+        }
+        throw new Error(msg);
       }
       return data.orderID;
     };
@@ -201,7 +212,7 @@ export default function PayTokenPage({ params }: { params: Promise<{ token: stri
             onApprove,
             onError: (err: unknown) => {
               console.error("[PayPal Pay Error]", err);
-              setError("PayPal encountered an issue. Please try again or use another payment method.");
+              setError((prev) => prev || "PayPal encountered an issue. Please try again or use another payment method.");
               setIsProcessing(false);
             },
             onCancel: () => setIsProcessing(false),
@@ -231,7 +242,7 @@ export default function PayTokenPage({ params }: { params: Promise<{ token: stri
             onApprove,
             onError: (err: unknown) => {
               console.error("[Card Pay Error]", err);
-              setError("Card payment encountered an issue. Please check your card details or try again.");
+              setError((prev) => prev || "Card payment encountered an issue. Please check your card details or try again.");
               setIsProcessing(false);
             },
             onCancel: () => setIsProcessing(false),
