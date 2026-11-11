@@ -1,6 +1,5 @@
 import { PDFDocument, rgb, StandardFonts, PDFPage } from "pdf-lib";
-import fs from "node:fs";
-import path from "node:path";
+import { PDF_LOGO_PNG } from "@/lib/brandAssets";
 
 export interface ReceiptData {
   orderNumber: string;
@@ -228,26 +227,12 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
   // HEADER: logo and company details (left) | title, receipt no, date, badge (right)
   // ===========================================================================
   const logoTopY = 780;
-  let logoBottomY = logoTopY - 40; // fallback if the logo can't be embedded
-  const logoPath = path.join(process.cwd(), "public", "images", "quickupp-logo-black.png");
-  let logoDrawn = false;
-  if (fs.existsSync(logoPath)) {
-    try {
-      const logo = await doc.embedPng(fs.readFileSync(logoPath));
-      // drawn 130 pt wide, whatever the image's pixel size
-      const logoW = 130;
-      const logoH = logo.height * (logoW / logo.width);
-      page.drawImage(logo, { x: leftX, y: logoTopY - logoH, width: logoW, height: logoH });
-      logoBottomY = logoTopY - logoH;
-      logoDrawn = true;
-    } catch {
-      /* fall through to the text logo */
-    }
-  }
-  if (!logoDrawn) {
-    page.drawText("QUICKUPP", { x: leftX, y: logoTopY - 18, size: 18, font: fontBold, color: deepPurple });
-    logoBottomY = logoTopY - 24;
-  }
+  // the logo is built into the code (lib/brandAssets), so every receipt has it
+  const logo = await doc.embedPng(PDF_LOGO_PNG);
+  const logoW = 130; // points, whatever the image's pixel size
+  const logoH = logo.height * (logoW / logo.width);
+  page.drawImage(logo, { x: leftX, y: logoTopY - logoH, width: logoW, height: logoH });
+  const logoBottomY = logoTopY - logoH;
 
   // company details under the logo; "Email:" / "Website:" values follow their label
   const INFO_SIZE = 8.5;

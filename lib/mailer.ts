@@ -1,8 +1,6 @@
 import "server-only";
-import fs from "node:fs";
-import path from "node:path";
+import { EMAIL_LOGO_PNG } from "@/lib/brandAssets";
 import nodemailer, { type Transporter } from "nodemailer";
-import { SITE_URL } from "@/lib/siteUrl";
 
 /*
  * Outgoing email (server side only). Uses the SMTP mailbox set in the
@@ -26,22 +24,14 @@ export type MailChannel = "info" | "hr" | "default";
  * The logo in email headers is sent inside the email itself (an inline
  * attachment), so it shows in every inbox without loading anything from the
  * website. Templates use EMAIL_LOGO_SRC as the <img> src.
- * quickupp-email-logo.png has the dark header colour built into the image: the site's
+ * The email logo (lib/brandAssets) has the dark header colour built into the image: the site's
  * logo is white lettering on a transparent background, which disappears in
  * mail apps that drop the header's background colour (Outlook, dark mode).
  */
 const LOGO_CID = "qs-logo";
 export const EMAIL_LOGO_SRC = `cid:${LOGO_CID}`;
-let logoBytes: Buffer | null | undefined;
-function emailLogo(): Buffer | null {
-  if (logoBytes !== undefined) return logoBytes;
-  try {
-    logoBytes = fs.readFileSync(path.join(process.cwd(), "public", "images", "quickupp-email-logo.png"));
-  } catch {
-    logoBytes = null;
-  }
-  return logoBytes;
-}
+// built into the code (lib/brandAssets), so every email shows the same logo
+const emailLogo = (): Buffer => EMAIL_LOGO_PNG;
 
 export type Mail = {
   to: string;
@@ -119,14 +109,7 @@ export async function sendMail(mail: Mail): Promise<boolean> {
     const { fromName, fromAddress, channel: _ch, ...rest } = mail;
     const attachments: Record<string, unknown>[] = [...(rest.attachments || [])];
     if (rest.html.includes(EMAIL_LOGO_SRC)) {
-      const logo = emailLogo();
-      if (logo) {
-        attachments.push({ filename: "quickupp-logo.png", content: logo, contentType: "image/png", cid: LOGO_CID, contentDisposition: "inline" });
-      } else {
-        // no logo file on this server: fall back to the website copy
-        const site = SITE_URL;
-        rest.html = rest.html.split(EMAIL_LOGO_SRC).join(`${site}/images/quickupp-email-logo.png`);
-      }
+      attachments.push({ filename: "quickupp-logo.png", content: emailLogo(), contentType: "image/png", cid: LOGO_CID, contentDisposition: "inline" });
     }
     await mailer.transporter.sendMail({
       from: {

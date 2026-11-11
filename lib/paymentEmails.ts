@@ -71,7 +71,7 @@ function shell(title: string, body: string) {
 <body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;margin:0;padding:24px 12px;background:#f1f5f9;color:#1e293b;">
   <div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e2e8f0;">
     <div style="background:#0b0f17;padding:26px 32px;text-align:center;border-bottom:2px solid #3b82f6;">
-      <img src="${EMAIL_LOGO_SRC}" alt="Quickupp Softech LLC" width="170" style="display:block;margin:0 auto;max-width:170px;height:auto;"/>
+      <img src="${EMAIL_LOGO_SRC}" alt="Quickupp Softech" width="170" style="display:block;margin:0 auto;max-width:170px;height:auto;"/>
     </div>
     <div style="padding:30px 32px 26px;">${body}</div>
     <div style="background:#f8fafc;padding:16px 32px;border-top:1px solid #e2e8f0;text-align:center;font-size:12px;color:#94a3b8;">

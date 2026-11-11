@@ -107,7 +107,7 @@ Quickupp Softech LLC`;
   <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
     <!-- Header -->
     <div style="background: #0b0f17; padding: 28px 32px; text-align: center; border-bottom: 2px solid #3b82f6;">
-      <img src="${EMAIL_LOGO_SRC}" alt="Quickupp Softech LLC" width="170" style="display: block; margin: 0 auto; max-width: 170px; height: auto;" />
+      <img src="${EMAIL_LOGO_SRC}" alt="Quickupp Softech" width="170" style="display: block; margin: 0 auto; max-width: 170px; height: auto;" />
       <p style="color: #94a3b8; font-size: 12px; margin: 8px 0 0; letter-spacing: 0.05em; text-transform: uppercase;">Enterprise Marketing • AI • Technology</p>
     </div>
 
