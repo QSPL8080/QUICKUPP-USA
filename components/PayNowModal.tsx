@@ -959,7 +959,7 @@ export default function PayNowModal() {
               {/* Logo */}
               <div style={{ textAlign: "center", marginBottom: "16px" }}>
                 <img
-                  src="/images/logo-black.png"
+                  src="/images/quickupp-logo-black.png"
                   alt="Quickupp Softech LLC"
                   width="155"
                   style={{ display: "inline-block", maxWidth: "155px", height: "auto" }}

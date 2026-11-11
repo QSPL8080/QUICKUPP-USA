@@ -4,6 +4,7 @@ import { EMAIL_LOGO_SRC, escapeHtml } from "@/lib/mailer";
 import { paymentDateTime } from "@/lib/paymentTime";
 import type { Txn } from "@/lib/paymentTxns";
 import { orderNumberOf } from "@/lib/paymentTxns";
+import { SITE_URL } from "@/lib/siteUrl";
 
 /*
  * The emails sent when PayPal reports a payment:
@@ -29,6 +30,8 @@ export type PaymentMailContext = {
 };
 
 const e = (v: unknown) => escapeHtml(String(v ?? ""));
+/* the client's own receipt download (opened with the transaction ID, which only they have) */
+const receiptUrl = (txn: string) => `${SITE_URL}/api/payments/receipt?txn=${encodeURIComponent(txn)}&download=1`;
 const usd = (v: number, c = "USD") => `$${Number(v || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${c}`;
 const when = (iso: string) => {
   const { date, time } = paymentDateTime(iso);
@@ -226,7 +229,10 @@ export function clientEmail(ctx: PaymentMailContext) {
     ${details}
     ${ctx.kind === "balance" ? `<div style="font-size:13px;font-weight:800;color:#0f172a;text-transform:uppercase;letter-spacing:.04em;margin:0 0 8px;">Your payments</div>${paymentsTable(ctx.txns, cur)}` : ""}
     ${balanceBox}
-    <p style="font-size:14px;color:#334155;margin:0 0 18px;">Your PDF receipt is attached to this email.</p>
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px 20px;text-align:center;margin:0 0 20px;">
+      <div style="font-size:14px;color:#334155;margin-bottom:12px;">Your PDF receipt is attached to this email. You can also download it here:</div>
+      <a href="${e(receiptUrl(ctx.transactionId))}" style="display:inline-block;background:#0f172a;color:#ffffff;text-decoration:none;font-size:13.5px;font-weight:700;padding:11px 24px;border-radius:8px;">Download PDF receipt</a>
+    </div>
     <p style="font-size:14px;color:#475569;line-height:1.6;margin:0 0 18px;">If you have any questions, just reply to this email or write to <a href="mailto:info@quickuppsoftech.us" style="color:#4f46e5;">info@quickuppsoftech.us</a>.</p>
     <p style="font-size:14.5px;color:#1e293b;margin:0;">Thank you,<br/><strong>Quickupp Softech LLC</strong></p>`;
 
@@ -244,7 +250,7 @@ export function clientEmail(ctx: PaymentMailContext) {
     remaining > 0 ? `Balance remaining: ${usd(remaining, cur)}${r.balance_due_date ? `, due by ${dueDate(r.balance_due_date)}` : ""}` : "Status: paid in full",
     ctx.kind === "deposit" && remaining > 0 && ctx.balanceUrl ? `Pay the balance any time: ${ctx.balanceUrl}` : "",
     "",
-    "Your PDF receipt is attached.",
+    `Your PDF receipt is attached. Download it any time: ${receiptUrl(ctx.transactionId)}`,
     "",
     "Thank you,",
     "Quickupp Softech LLC",

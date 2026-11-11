@@ -24,7 +24,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       </div>
       <div className="crm-login-body">
         <div className="crm-login-inner">
-          <img src="/images/logo-black.png" alt="Quickupp Softech" className="crm-login-logo" />
+          <img src="/images/quickupp-logo-black.png" alt="Quickupp Softech" className="crm-login-logo" />
           <h1 className="crm-title">Sign in</h1>
           <p className="crm-sub">Use your Quickupp Softech team account.</p>
           {notice && (

@@ -1105,7 +1105,7 @@ a.button-link[data-wf--button--variant="white-bg"] .button-arrow,
 }
 
 .qs-header-logo-img {
-  /* tall enough for the "Quickupp Softech LLC" wordmark to read clearly */
+  /* tall enough for the two-line "Quickupp Softech" wordmark to read clearly */
   height: 48px !important;
   width: auto !important;
   max-width: none !important;

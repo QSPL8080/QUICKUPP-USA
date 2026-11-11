@@ -243,7 +243,7 @@ function CheckoutContent() {
       <header className="ck-topbar">
         <Link href="/" className="ck-logo-link" aria-label="Quickupp Softech LLC">
           <Image
-            src="/images/logo-black.png"
+            src="/images/quickupp-logo-black.png"
             alt="Quickupp Softech LLC"
             width={135}
             height={32}

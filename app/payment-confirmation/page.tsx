@@ -20,8 +20,8 @@ export const metadata: Metadata = {
  * Shown after paying on the website (Pay Now) or with a pay link. It is
  * opened with the PayPal transaction ID (?txn=), which only the payer has, so
  * nobody can look up someone else's order by guessing an order number.
- * Three cases: paid in full, deposit (balance still due, with the balance
- * link), and balance paid (deposit + balance, order complete).
+ * Three cases: paid in full, deposit (balance still due; the balance link is
+ * only sent by email, never shown here), and balance paid (deposit + balance).
  */
 
 type Props = { searchParams: Promise<{ txn?: string; status?: string }> };
@@ -53,7 +53,7 @@ export default async function PaymentConfirmationPage({ searchParams }: Props) {
   const header = (
     <header className="pc-topbar">
       <Link href="/" className="pc-logo-link" aria-label="Quickupp Softech LLC Home">
-        <Image src="/images/logo-black.png" alt="Quickupp Softech LLC" width={160} height={36} className="pc-logo-img" priority />
+        <Image src="/images/quickupp-logo-black.png" alt="Quickupp Softech LLC" width={160} height={36} className="pc-logo-img" priority />
       </Link>
       <Link href="/" className="pc-back-home">
         <span>← Back to Website</span>
@@ -94,8 +94,6 @@ export default async function PaymentConfirmationPage({ searchParams }: Props) {
   const kind: "full" | "deposit" | "balance" = thisTxn?.kind || (remaining > 0 ? "deposit" : "full");
   const thisAmount = thisTxn?.amount || paidTotal;
   const order = orderNumberOf(rec);
-  const site = process.env.NEXT_PUBLIC_SITE_URL || "";
-  const balanceHref = remaining > 0 && rec.token ? `${site}/pay/${rec.token}` : null;
   const due = rec.balance_due_date
     ? new Date(`${String(rec.balance_due_date instanceof Date ? rec.balance_due_date.toISOString() : rec.balance_due_date).slice(0, 10)}T00:00:00`).toLocaleDateString("en-US", {
         month: "long",
@@ -114,7 +112,7 @@ export default async function PaymentConfirmationPage({ searchParams }: Props) {
   const subtitle = isPending
     ? `We have received your payment of ${usd(thisAmount, cur)}. PayPal is clearing it; we will email you as soon as it clears.`
     : kind === "deposit"
-    ? `Thank you! Your deposit of ${usd(thisAmount, cur)} has been received. The remaining balance of ${usd(remaining, cur)} can be paid any time with your balance link.`
+    ? `Thank you! Your deposit of ${usd(thisAmount, cur)} has been received. The remaining balance is ${usd(remaining, cur)}; we have emailed you the details to pay it.`
     : kind === "balance"
     ? `Thank you! Your balance payment of ${usd(thisAmount, cur)} has been received. Your order is now fully paid.`
     : `Thank you! Your payment of ${usd(thisAmount, cur)} has been received. Your order is fully paid.`;
@@ -212,17 +210,14 @@ export default async function PaymentConfirmationPage({ searchParams }: Props) {
             </div>
           </div>
 
-          {balanceHref && !isPending && (
+          {remaining > 0 && !isPending && (
             <div className="pc-balance">
               <div>
                 <strong>Balance remaining: {usd(remaining, cur)}</strong>
                 <p>
-                  {due ? `Please pay by ${due}. ` : ""}Your balance link is also in your email, and we&apos;ll send a reminder before it&apos;s due.
+                  {due ? `Due by ${due}. ` : ""}We have emailed you how to pay the balance, and we&apos;ll send a reminder before it&apos;s due.
                 </p>
               </div>
-              <a href={balanceHref} className="pc-btn-primary">
-                Pay remaining balance
-              </a>
             </div>
           )}
 

@@ -4,6 +4,7 @@ import { getPool } from "@/lib/db";
 import { sendMail, EMAIL_LOGO_SRC } from "@/lib/mailer";
 import { logActivity, money } from "@/lib/crm/activity";
 import { entityOf } from "@/lib/crm/paymentActivity";
+import { SITE_URL } from "@/lib/siteUrl";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -72,7 +73,7 @@ export async function runBalanceReminders(): Promise<ReminderRun> {
     const pool = getPool();
     await ensureReminderColumns();
 
-    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.quickuppsoftech.us").replace(/\/+$/, "");
+    const siteUrl = SITE_URL;
 
     // Query partially paid orders from both payment_links and payments tables
     const [plRows] = await pool.query(`
@@ -300,6 +301,12 @@ If you have any questions, please contact info@quickuppsoftech.us.
 Best regards,
 Quickupp Softech LLC
 167 Princeton Street, Bridgeport, Connecticut - 06605, USA`;
+
+      // check again just before sending: if the balance was paid meanwhile, no reminder goes out
+      const ownTbl = p._table === "payment_links" ? "payment_links" : "payments";
+      const [fresh] = await pool.query(`SELECT status, remaining_amount FROM \`${ownTbl}\` WHERE id = ?`, [p.id]).catch(() => [[]]);
+      const now0 = (fresh as any[])[0];
+      if (!now0 || now0.status !== "partially_paid" || Number(now0.remaining_amount || 0) <= 0) continue;
 
       try {
         const sent = await sendMail({

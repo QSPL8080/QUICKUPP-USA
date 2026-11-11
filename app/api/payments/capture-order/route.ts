@@ -10,6 +10,7 @@ import { errMessage } from "@/lib/err";
 import { LINK_MESSAGES, chargeFor, findByToken, linkState, recordTransaction, type LinkTable } from "@/lib/paymentLink";
 import { getRecord, listTransactions, orderNumberOf, receiptPdfFor } from "@/lib/paymentTxns";
 import { clientEmail as clientEmailFor, teamEmail, type PaymentCase } from "@/lib/paymentEmails";
+import { SITE_URL } from "@/lib/siteUrl";
 
 /*
  * PayPal approved a payment: take the money (capture), save it on the
@@ -24,7 +25,7 @@ import { clientEmail as clientEmailFor, teamEmail, type PaymentCase } from "@/li
  * the first result back), and a failed attempt never changes a record.
  */
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL || "https://www.quickuppsoftech.us";
+const SITE = SITE_URL;
 const round2 = (v: number) => Math.round(v * 100) / 100;
 const ymd = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 

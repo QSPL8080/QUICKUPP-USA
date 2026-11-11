@@ -70,7 +70,7 @@ export default function Footer() {
           <div className="qs-scalient-left-col">
             <Link href="/" className="qs-scalient-logo-link" aria-label="Quickupp Softech Home">
               <img
-                src="/images/logo-white.png"
+                src="/images/quickupp-logo-white.png"
                 alt="Quickupp Softech"
                 className="qs-scalient-logo-img"
               />

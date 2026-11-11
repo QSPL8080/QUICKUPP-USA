@@ -50,7 +50,8 @@ export async function GET(req: Request) {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `inline; filename="Quickupp-Receipt-${orderNumberOf(rec)}.pdf"`,
+        // ?download=1 (the client's email button) saves the file; the CRM opens it in the browser
+        "Content-Disposition": `${sp.get("download") ? "attachment" : "inline"}; filename="Quickupp-Receipt-${orderNumberOf(rec)}.pdf"`,
         "Cache-Control": "private, no-store",
       },
     });

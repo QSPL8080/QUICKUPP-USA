@@ -178,7 +178,7 @@ export default function Header() {
             aria-label="Quickupp Softech Home"
           >
             <img
-              src="/images/logo-white.png"
+              src="/images/quickupp-logo-white.png"
               alt="Quickupp Softech"
               className="qs-header-logo-img"
             />

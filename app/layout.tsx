@@ -54,7 +54,7 @@ const organizationJsonLd = {
       "logo": {
         "@type": "ImageObject",
         "@id": "https://www.quickuppsoftech.us/#logo",
-        "url": "https://www.quickuppsoftech.us/images/logo-white.png",
+        "url": "https://www.quickuppsoftech.us/images/quickupp-logo-white.png",
         "caption": "Quickupp Softech LLC",
       },
       "image": "https://www.quickuppsoftech.us/images/graph.webp",

@@ -11,6 +11,8 @@ import { PageHead, Pager } from "@/components/crm/ListTools";
 import { SERVICES_DATA } from "@/components/PayNowModal";
 import { SOURCE_LABEL, isEnquirySource } from "@/lib/crm/leadOptions";
 import ActivityTimeline, { usePaymentActivity } from "@/components/crm/ActivityTimeline";
+import { SITE_URL, payLinkUrl } from "@/lib/siteUrl";
+import { payMessage, whatsAppUrl, type PayMessageInput } from "@/lib/payMessages";
 
 /* a payment link made from an enquiry shows which form that enquiry came from */
 function EnquiryOrigin({ p }: { p: PaymentRow }) {
@@ -43,21 +45,7 @@ const fmtDate = (d: string | null, withTime = false) => {
 const pad2 = (v: number) => String(v).padStart(2, "0");
 
 /* the client's pay link (/pay/<token>) on this site */
-const payUrlFor = (token: string) =>
-  `${typeof window !== "undefined" ? window.location.origin : "https://www.quickuppsoftech.us"}/pay/${token}`;
-
-/*
- * A phone number as WhatsApp wants it: digits with the country code. A
- * 10-digit number without one is taken as a US number (+1).
- */
-const whatsAppNumber = (raw?: string | null) => {
-  const s = String(raw || "").trim();
-  const digits = s.replace(/\D/g, "");
-  if (!digits) return "";
-  if (s.startsWith("+") || s.startsWith("00")) return digits.replace(/^00/, "");
-  if (digits.length === 10) return `1${digits}`;
-  return digits;
-};
+const payUrlFor = (token: string) => payLinkUrl(token);
 
 /* one PayPal transaction on a payment record (from /api/crm/payments/transactions) */
 type Txn = {
@@ -368,75 +356,7 @@ export default function PaymentsView({
     return false;
   };
 
-  /*
-   * WhatsApp text. A new link: the order and the amount (with the 50% deposit
-   * option on a part-payment link). After a deposit: what was paid, what is
-   * left, the due date and the balance link.
-   */
-  const getWhatsAppMessage = (p: {
-    clientName: string;
-    clientPhone?: string | null;
-    service: string;
-    quantity?: string | null;
-    category?: string | null;
-    amount?: number | null;
-    totalAmount?: number | null;
-    remainingAmount?: number | null;
-    paymentType?: string | null;
-    status?: string | null;
-    token?: string | null;
-    invoiceNumber?: string | null;
-    id?: number | null;
-    balanceDueDate?: string | null;
-    billingEndDate?: string | null;
-  }) => {
-    const payUrl = p.token ? payUrlFor(p.token) : payUrlFor("");
-    const first = (p.clientName || "").trim().split(/\s+/)[0] || "there";
-    const usd = (v: number) => `$${v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD`;
-    const tot = Number(p.totalAmount || p.amount || 0);
-    const paid = Number(p.amount || 0);
-    const remaining = Number(p.remainingAmount != null ? p.remainingAmount : tot - paid);
-    const order = p.invoiceNumber ? `#${p.invoiceNumber}` : p.id ? `#QS-${p.id}` : "";
-    const scope = p.quantity || p.category || "";
-    const sign = `If you have any questions, just reply here or email info@quickuppsoftech.us.
-
-Thank you,
-Quickupp Softech LLC
-www.quickuppsoftech.us`;
-
-    if (p.status === "partially_paid" && remaining > 0) {
-      const dueRaw = p.balanceDueDate || (p.billingEndDate ? p.billingEndDate.slice(0, 10) : "");
-      const due = /^\d{4}-\d{2}-\d{2}$/.test(dueRaw)
-        ? new Date(`${dueRaw}T00:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
-        : "";
-      return `Hi ${first},
-
-Thank you for your deposit for ${p.service}${order ? ` (order ${order})` : ""}.
-
-Total: ${usd(tot)}
-Paid so far: ${usd(paid)}
-Balance due: ${usd(remaining)}${due ? `\nDue by: ${due}` : ""}
-
-You can pay the balance securely by PayPal or debit/credit card with your balance link:
-${payUrl}
-
-${sign}`;
-    }
-
-    const partial = p.paymentType === "partial";
-    const half = Math.round(tot * 50) / 100;
-    return `Hi ${first},
-
-Thank you for choosing Quickupp Softech LLC! Here is your secure payment link.
-
-${order ? `Order: ${order}\n` : ""}Service: ${p.service}${scope && scope !== "Not Applicable" ? `\nPackage: ${scope}` : ""}
-Total: ${usd(tot)}${partial ? `\n\nYou can pay the full amount, or a 50% deposit of ${usd(half)} now and the remaining ${usd(Math.round((tot - half) * 100) / 100)} later.` : ""}
-
-Pay securely by PayPal or debit/credit card:
-${payUrl}
-
-${sign}`;
-  };
+  const getWhatsAppMessage = (p: PayMessageInput) => payMessage(p);
 
   const openWhatsApp = (p: {
     clientName: string;
@@ -455,12 +375,7 @@ ${sign}`;
     balanceDueDate?: string | null;
     billingEndDate?: string | null;
   }) => {
-    const msg = getWhatsAppMessage(p);
-    const phone = whatsAppNumber(p.clientPhone);
-    const url = phone
-      ? `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(msg)}`
-      : `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
-    window.open(url, "_blank", "noopener");
+    window.open(whatsAppUrl(p.clientPhone, getWhatsAppMessage(p)), "_blank", "noopener");
   };
 
   const cancelLink = async (p: PaymentRow) => {
@@ -644,7 +559,7 @@ ${sign}`;
     }
     setGeneratingLink(false);
     setCreatedLink({
-      url: `${window.location.origin}${json.url}`,
+      url: `${SITE_URL}${json.url}`,
       token: json.token,
       orderNumber: json.orderNumber,
       clientName: linkForm.clientName,
@@ -1558,6 +1473,8 @@ ${sign}`;
             ? "This link was cancelled and can't be paid."
             : balanceDue > 0
             ? "The balance link stays open until the balance is paid."
+            : paidSoFar > 0 && okTx.some((t) => t.kind === "balance")
+            ? `Balance paid on ${fmtDate(okTx.filter((t) => t.kind === "balance").slice(-1)[0].at, true)}. Order fully paid; no reminder emails will be sent.`
             : paidSoFar > 0
             ? isLink
               ? "The link was used. Nothing more is due."
@@ -1715,7 +1632,7 @@ ${sign}`;
                     {balanceDue > 0 && dueDay && (
                       <p className="crm-paydetail-reminders">
                         Automatic reminder emails to the client: 10 days before the due date ({reminderOn(10, viewing.balanceReminder10dSentAt)}) and 2 days
-                        before ({reminderOn(2, viewing.balanceReminder2dSentAt)}).
+                        before ({reminderOn(2, viewing.balanceReminder2dSentAt)}). They stop as soon as the balance is paid.
                       </p>
                     )}
                   </section>

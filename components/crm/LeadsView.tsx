@@ -22,6 +22,8 @@ import { CRM_INDUSTRIES } from "@/components/crm/PaymentsView";
 import { formatFileSize } from "@/lib/crm/format";
 import CountrySelect from "@/components/CountrySelect";
 import ActivityTimeline, { fmtWhen, sameEntries, type ActivityEntry } from "@/components/crm/ActivityTimeline";
+import { payLinkUrl } from "@/lib/siteUrl";
+import { payMessage, whatsAppNumber, whatsAppUrl } from "@/lib/payMessages";
 
 type LeadAudit = {
   createdBy: string;
@@ -211,6 +213,9 @@ export default function LeadsView({
     clientName?: string;
     clientPhone?: string;
     totalAmount?: number;
+    service?: string;
+    category?: string;
+    paymentType?: string;
   } | null>(null);
   const [linkForm, setLinkForm] = useState({
     clientName: "",
@@ -640,6 +645,9 @@ export default function LeadsView({
           clientName: linkForm.clientName,
           clientPhone: linkForm.clientPhone,
           totalAmount: amt,
+          service: linkForm.service,
+          category: linkForm.category,
+          paymentType: linkForm.paymentOption,
         });
 
         // Refresh payment links for this lead
@@ -692,20 +700,31 @@ export default function LeadsView({
   const copyPaymentLink = (tokenOrUrl: string) => {
     const fullUrl = tokenOrUrl.startsWith("http")
       ? tokenOrUrl
-      : `${typeof window !== "undefined" ? window.location.origin : ""}/pay/${tokenOrUrl}`;
+      : payLinkUrl(tokenOrUrl);
     if (typeof navigator !== "undefined" && navigator.clipboard) {
       navigator.clipboard.writeText(fullUrl);
       toast("Payment link copied to clipboard!");
     }
   };
 
-  const getLeadWhatsAppMessage = (link: LeadPaymentLinkItem | { orderNumber: string; token: string; totalAmount?: number }) => {
-    const fullUrl = `${typeof window !== "undefined" ? window.location.origin : "https://www.quickuppsoftech.us"}/pay/${link.token}`;
-    const orderNo = ("orderNumber" in link && link.orderNumber) || ("invoiceNumber" in link && link.invoiceNumber) || "N/A";
-    return encodeURIComponent(
-      `Hello ${open?.name || "Client"},\n\nHere is your secure QuickUpp payment link for Order #${orderNo}:\n${fullUrl}\n\nAmount: $${Number(link.totalAmount || 0).toLocaleString()}\n\nThank you for choosing QuickUpp!`
+  // the same WhatsApp text the Payments tab sends (lib/payMessages)
+  const leadWhatsAppUrl = (link: LeadPaymentLinkItem | { orderNumber: string; token: string; totalAmount?: number; paymentType?: string }, phone: string) =>
+    whatsAppUrl(
+      phone,
+      payMessage({
+        clientName: ("clientName" in link && link.clientName) || open?.name || "",
+        service: "service" in link ? link.service : null,
+        category: "category" in link ? link.category : null,
+        amount: "amount" in link ? link.amount : 0,
+        totalAmount: link.totalAmount ?? 0,
+        remainingAmount: "remainingAmount" in link ? link.remainingAmount : null,
+        paymentType: ("paymentType" in link && link.paymentType) || null,
+        status: "status" in link ? link.status : null,
+        token: link.token,
+        invoiceNumber: ("orderNumber" in link && link.orderNumber) || ("invoiceNumber" in link && link.invoiceNumber) || null,
+        balanceDueDate: "balanceDueDate" in link ? link.balanceDueDate : null,
+      })
     );
-  };
 
   const getFileIconClass = (fileName: string) => {
     const ext = fileName.split(".").pop()?.toLowerCase() || "";
@@ -973,7 +992,7 @@ export default function LeadsView({
                 {open.phone && (
                   <a
                     className="crm-head-btn crm-head-btn-wa"
-                    href={`https://wa.me/${open.phone.replace(/[^\d]/g, "")}`}
+                    href={`https://wa.me/${whatsAppNumber(open.phone)}`}
                     target="_blank"
                     rel="noreferrer"
                   >
@@ -1157,7 +1176,7 @@ export default function LeadsView({
                         </a>
                         {open.phone && (
                           <a
-                            href={`https://wa.me/${open.phone.replace(/[^\d]/g, "")}?text=${getLeadWhatsAppMessage(pl)}`}
+                            href={leadWhatsAppUrl(pl, open.phone)}
                             target="_blank"
                             rel="noreferrer"
                             className="crm-att-btn"
@@ -1808,7 +1827,7 @@ export default function LeadsView({
                   </a>
                   {createdLink.clientPhone && (
                     <a
-                      href={`https://wa.me/${createdLink.clientPhone.replace(/[^\d]/g, "")}?text=${getLeadWhatsAppMessage(createdLink)}`}
+                      href={leadWhatsAppUrl(createdLink, createdLink.clientPhone)}
                       target="_blank"
                       rel="noreferrer"
                       className="crm-act"

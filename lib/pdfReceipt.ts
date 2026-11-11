@@ -229,14 +229,14 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
   // ===========================================================================
   const logoTopY = 780;
   let logoBottomY = logoTopY - 40; // fallback if the logo can't be embedded
-  const logoPath = path.join(process.cwd(), "public", "images", "logo-black.png");
+  const logoPath = path.join(process.cwd(), "public", "images", "quickupp-logo-black.png");
   let logoDrawn = false;
   if (fs.existsSync(logoPath)) {
     try {
       const logo = await doc.embedPng(fs.readFileSync(logoPath));
-      const logoScale = 0.095;
-      const logoW = logo.width * logoScale;
-      const logoH = logo.height * logoScale;
+      // drawn 130 pt wide, whatever the image's pixel size
+      const logoW = 130;
+      const logoH = logo.height * (logoW / logo.width);
       page.drawImage(logo, { x: leftX, y: logoTopY - logoH, width: logoW, height: logoH });
       logoBottomY = logoTopY - logoH;
       logoDrawn = true;
@@ -454,7 +454,7 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
   page.drawText(thankOrderText, { x: leftX, y: tyY, size: 9.5, font: fontBold, color: isPending ? amberText : greenText });
   if (isPartial) {
     tyY -= 16;
-    page.drawText(`Balance due: ${usd(remainingAmount)} USD. Pay anytime via the link in your email.`, { x: leftX, y: tyY, size: 9, font: fontBold, color: amberText });
+    page.drawText(`Balance due: ${usd(remainingAmount)} USD.`, { x: leftX, y: tyY, size: 9, font: fontBold, color: amberText });
   }
 
   const divY = tyY - 22;

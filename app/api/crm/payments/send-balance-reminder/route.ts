@@ -10,6 +10,7 @@ import { entityOf } from "@/lib/crm/paymentActivity";
 import type { RowDataPacket } from "mysql2/promise";
 import { errMessage } from "@/lib/err";
 import { resolvePayTable } from "@/lib/crm/paymentTable";
+import { SITE_URL } from "@/lib/siteUrl";
 
 export async function POST(req: Request) {
   try {
@@ -48,7 +49,7 @@ export async function POST(req: Request) {
       await pool.query(`UPDATE \`${targetTable}\` SET token = ?, link_status = 'active' WHERE id = ?`, [token, id]).catch(() => {});
     }
 
-    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.quickuppsoftech.us").replace(/\/+$/, "");
+    const siteUrl = SITE_URL;
     const balanceUrl = `${siteUrl}/pay/${token}`;
 
     const clientName = p.client_name || "Valued Client";

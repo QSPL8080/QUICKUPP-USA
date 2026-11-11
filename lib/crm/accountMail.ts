@@ -2,6 +2,7 @@ import "server-only";
 import { SUPER_ADMIN_EMAIL, type CrmUser } from "@/lib/crm/auth";
 import { escapeHtml, sendMail } from "@/lib/mailer";
 import { roleLabel } from "@/lib/crm/activity";
+import { SITE_URL } from "@/lib/siteUrl";
 
 /*
  * Emails the super admin (info@quickuppsoftech.us) whenever a team account's
@@ -28,7 +29,7 @@ export async function notifyAccountChange(opts: { before: Account; after: Accoun
     ? `CRM password changed: ${after.name} (${roleLabel(after.role)})`
     : `CRM account details changed: ${after.name} (${roleLabel(after.role)})`;
   const when = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata", dateStyle: "medium", timeStyle: "short" }) + " IST";
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.quickuppsoftech.us";
+  const siteUrl = SITE_URL;
 
   const html = `<!DOCTYPE html><html><body style="margin:0;padding:24px 12px;background:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#0f172a">
   <div style="max-width:560px;margin:0 auto;background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden">

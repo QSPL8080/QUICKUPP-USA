@@ -2,6 +2,7 @@ import "server-only";
 import fs from "node:fs";
 import path from "node:path";
 import nodemailer, { type Transporter } from "nodemailer";
+import { SITE_URL } from "@/lib/siteUrl";
 
 /*
  * Outgoing email (server side only). Uses the SMTP mailbox set in the
@@ -25,7 +26,7 @@ export type MailChannel = "info" | "hr" | "default";
  * The logo in email headers is sent inside the email itself (an inline
  * attachment), so it shows in every inbox without loading anything from the
  * website. Templates use EMAIL_LOGO_SRC as the <img> src.
- * email-logo.png has the dark header colour built into the image: the site's
+ * quickupp-email-logo.png has the dark header colour built into the image: the site's
  * logo is white lettering on a transparent background, which disappears in
  * mail apps that drop the header's background colour (Outlook, dark mode).
  */
@@ -35,7 +36,7 @@ let logoBytes: Buffer | null | undefined;
 function emailLogo(): Buffer | null {
   if (logoBytes !== undefined) return logoBytes;
   try {
-    logoBytes = fs.readFileSync(path.join(process.cwd(), "public", "images", "email-logo.png"));
+    logoBytes = fs.readFileSync(path.join(process.cwd(), "public", "images", "quickupp-email-logo.png"));
   } catch {
     logoBytes = null;
   }
@@ -123,8 +124,8 @@ export async function sendMail(mail: Mail): Promise<boolean> {
         attachments.push({ filename: "quickupp-logo.png", content: logo, contentType: "image/png", cid: LOGO_CID, contentDisposition: "inline" });
       } else {
         // no logo file on this server: fall back to the website copy
-        const site = process.env.NEXT_PUBLIC_SITE_URL || "https://www.quickuppsoftech.us";
-        rest.html = rest.html.split(EMAIL_LOGO_SRC).join(`${site}/images/email-logo.png`);
+        const site = SITE_URL;
+        rest.html = rest.html.split(EMAIL_LOGO_SRC).join(`${site}/images/quickupp-email-logo.png`);
       }
     }
     await mailer.transporter.sendMail({
