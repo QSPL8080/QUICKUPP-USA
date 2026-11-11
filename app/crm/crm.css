@@ -3478,6 +3478,19 @@ h2.crm-view-modal-title {
   color: #0f172a;
 }
 
+/* the lead panel's close button sits in its top-right corner; the header keeps
+   clear of it */
+.crm-detail-head {
+  position: relative;
+  padding-right: 44px;
+}
+
+.crm-detail-head > .crm-detail-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
 /* 4-card management bar */
 .crm-mgmt-bar {
   display: grid;
