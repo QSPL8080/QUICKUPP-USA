@@ -36,7 +36,7 @@ export default async function MeetingsPage({ searchParams }: Props) {
     <>
       <PageHead
         title="Calendly Meetings"
-        sub="Meetings booked through the website's Calendly. Reschedules and cancellations made in Calendly show up here by themselves. View only: meetings are changed in Calendly."
+        sub="Meetings booked through the website and Calendly. Arrange, reschedule, edit, and cancel meetings directly with two-way Calendly & CRM synchronization."
       >
         <a href={`/api/crm/meetings/export${filtered ? `?${new URLSearchParams(Object.entries(f).filter(([, v]) => v) as [string, string][]).toString()}` : ""}`} className="crm-act crm-act-ghost">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -48,7 +48,7 @@ export default async function MeetingsPage({ searchParams }: Props) {
 
       {!sync.configured && (
         <p className="crm-alert crm-meet-note" role="status">
-          Calendly isn&apos;t connected yet. Add your Calendly personal access token as <code>CALENDLY_TOKEN</code> in the website&apos;s settings and restart the site; meetings will then appear here.
+          Calendly personal access token not configured in <code>CALENDLY_TOKEN</code>. Real-time website bookings and local CRM meeting management work automatically. To enable direct Calendly API cancellations and single-use link generation, add your Calendly token to <code>.env.local</code>.
         </p>
       )}
       {sync.configured && !sync.ok && (

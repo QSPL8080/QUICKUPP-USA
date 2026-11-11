@@ -227,3 +227,56 @@ CREATE TABLE IF NOT EXISTS job_applications (
   CONSTRAINT fk_applications_job FOREIGN KEY (job_id) REFERENCES job_openings (id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Calendly & CRM Meetings ----------------------------------------------------
+CREATE TABLE IF NOT EXISTS crm_meetings (
+  id                  INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  invitee_uri         VARCHAR(255) NOT NULL,
+  event_uri           VARCHAR(255) NOT NULL,
+  event_name          VARCHAR(255) NOT NULL DEFAULT '',
+  status              VARCHAR(20)  NOT NULL DEFAULT 'scheduled',
+  start_time          DATETIME     NOT NULL,
+  end_time            DATETIME     NOT NULL,
+  invitee_timezone    VARCHAR(80)  NULL,
+  invitee_name        VARCHAR(190) NOT NULL DEFAULT '',
+  invitee_email       VARCHAR(190) NOT NULL DEFAULT '',
+  invitee_phone       VARCHAR(60)  NULL,
+  location_type       VARCHAR(60)  NULL,
+  location_text       VARCHAR(500) NULL,
+  join_url            VARCHAR(700) NULL,
+  reschedule_url      VARCHAR(700) NULL,
+  cancel_url          VARCHAR(700) NULL,
+  answers             TEXT         NULL,
+  notes               TEXT         NULL,
+  lead_id             INT UNSIGNED NULL,
+  source              VARCHAR(60)  NOT NULL DEFAULT 'website',
+  guests              TEXT         NULL,
+  host_name           VARCHAR(190) NULL,
+  host_email          VARCHAR(190) NULL,
+  reschedule_count    INT UNSIGNED NOT NULL DEFAULT 0,
+  previous_start_time DATETIME     NULL,
+  canceled_by         VARCHAR(190) NULL,
+  cancel_reason       TEXT         NULL,
+  canceled_at         DATETIME     NULL,
+  history             TEXT         NULL,
+  booked_at           DATETIME     NULL,
+  deleted_at          DATETIME     NULL,
+  synced_at           TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  created_at          TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at          TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_invitee (invitee_uri),
+  KEY idx_start (start_time),
+  KEY idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS crm_meeting_invitees (
+  invitee_uri      VARCHAR(255) NOT NULL,
+  meeting_id       INT UNSIGNED NOT NULL,
+  event_uri        VARCHAR(255) NULL,
+  event_updated_at VARCHAR(40)  NULL,
+  PRIMARY KEY (invitee_uri),
+  KEY idx_meeting (meeting_id),
+  KEY idx_event (event_uri)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+

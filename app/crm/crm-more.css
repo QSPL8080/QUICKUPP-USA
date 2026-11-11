@@ -1146,6 +1146,17 @@
   border-color: #fca5a5;
 }
 
+.crm-tab-btn {
+  transition: all 0.15s ease;
+}
+.crm-tab-btn:hover {
+  color: #1e293b !important;
+  background: rgba(0, 0, 0, 0.02) !important;
+}
+.crm-tab-btn.is-active {
+  color: #4f46e5 !important;
+}
+
 .crm-meet-chips {
   display: flex;
   flex-wrap: wrap;

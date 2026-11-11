@@ -25,6 +25,16 @@ export function useCalendlyReset(onReset?: () => void) {
     let timer: ReturnType<typeof setTimeout> | undefined;
     const onMessage = (e: MessageEvent) => {
       if (e.origin !== "https://calendly.com" || !e.data || e.data.event !== "calendly.event_scheduled") return;
+
+      // Immediately notify CRM backend of scheduled meeting
+      if (e.data.payload) {
+        fetch("/api/calendly/client-scheduled", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(e.data.payload),
+        }).catch(() => {});
+      }
+
       clearTimeout(timer);
       timer = setTimeout(() => {
         onReset?.();

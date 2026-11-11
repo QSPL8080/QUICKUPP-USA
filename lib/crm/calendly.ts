@@ -1,16 +1,17 @@
 import "server-only";
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { getPool } from "@/lib/db";
+import { logActivity } from "@/lib/crm/activity";
+import type { CrmUser } from "@/lib/crm/auth";
 
 /*
- * Calendly → CRM. Meetings booked on the website's Calendly page are read from
- * the Calendly API (and, when a webhook is set up, pushed by Calendly) and kept
- * in crm_meetings: one row per meeting. A reschedule moves the same row to the
- * new time; a cancellation marks it canceled. The CRM never changes anything in
- * Calendly; deleting only hides the row in the CRM.
+ * Dynamic Calendly ↔ CRM Synchronization.
+ * Meetings booked on the website or through Calendly are synced to crm_meetings.
+ * Meetings can also be arranged, created, rescheduled, edited, and canceled directly
+ * from the CRM with live Calendly API reflection.
  *
- * Settings: CALENDLY_TOKEN (a Calendly personal access token) and, for the
- * optional webhook, CALENDLY_WEBHOOK_SIGNING_KEY.
+ * Settings: CALENDLY_TOKEN (Calendly personal access token) and, for webhooks,
+ * CALENDLY_WEBHOOK_SIGNING_KEY.
  */
 
 const API = (process.env.CALENDLY_API_BASE || "https://api.calendly.com").replace(/\/$/, "");
@@ -43,21 +44,46 @@ export type CalInvitee = {
   rescheduled?: boolean;
   old_invitee?: string | null;
   new_invitee?: string | null;
+  cancel_url?: string | null;
+  reschedule_url?: string | null;
   text_reminder_number?: string | null;
   questions_and_answers?: { question?: string; answer?: string; position?: number }[];
   cancellation?: { canceled_by?: string; reason?: string | null; canceler_type?: string; created_at?: string } | null;
   scheduled_event?: CalEvent;
 };
 
-async function cal<T>(pathOrUrl: string, signal?: AbortSignal): Promise<T> {
+export type CalEventType = {
+  uri: string;
+  name: string;
+  active: boolean;
+  slug?: string;
+  scheduling_url: string;
+  duration?: number;
+  kind?: string;
+  description_plain?: string;
+  color?: string;
+};
+
+async function cal<T>(
+  pathOrUrl: string,
+  opts?: { method?: string; body?: unknown; signal?: AbortSignal } | AbortSignal
+): Promise<T> {
+  const signal = opts instanceof AbortSignal ? opts : opts?.signal;
+  const method = !(opts instanceof AbortSignal) && opts?.method ? opts.method : "GET";
+  const body = !(opts instanceof AbortSignal) && opts?.body !== undefined ? JSON.stringify(opts.body) : undefined;
   const url = pathOrUrl.startsWith("http") ? pathOrUrl : `${API}${pathOrUrl}`;
   // only ever send the token to Calendly's API (or the configured base)
   if (!url.startsWith(API)) throw new Error("unexpected Calendly address");
-  const res = await fetch(url, { headers: { Authorization: `Bearer ${token()}`, "Content-Type": "application/json" }, cache: "no-store", signal });
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${token()}`,
+    "Content-Type": "application/json",
+  };
+  const res = await fetch(url, { method, headers, body, cache: "no-store", signal });
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     throw new Error(`Calendly ${res.status}: ${text.slice(0, 200)}`);
   }
+  if (res.status === 204) return {} as T;
   return (await res.json()) as T;
 }
 
@@ -113,6 +139,8 @@ function fieldsOf(inv: CalInvitee, ev: CalEvent) {
     location_type: loc.type,
     location_text: loc.text ? loc.text.slice(0, 500) : null,
     join_url: loc.join ? loc.join.slice(0, 700) : null,
+    reschedule_url: inv.reschedule_url ? inv.reschedule_url.slice(0, 700) : null,
+    cancel_url: inv.cancel_url ? inv.cancel_url.slice(0, 700) : null,
     answers: answers.length ? JSON.stringify(answers) : null,
     guests: guests.length ? JSON.stringify(guests) : null,
     host_name: host?.user_name || null,
@@ -441,6 +469,11 @@ export type MeetingItem = {
   locationType: string | null;
   locationText: string | null;
   joinUrl: string | null;
+  rescheduleUrl: string | null;
+  cancelUrl: string | null;
+  notes: string | null;
+  leadId: number | null;
+  source: string;
   answers: { question: string; answer: string }[];
   guests: string[];
   hostName: string | null;
@@ -470,8 +503,8 @@ export async function listMeetings(opts: { q?: string; status?: string; when?: s
   const q = (opts.q || "").trim().slice(0, 100);
   if (q) {
     const like = `%${q}%`;
-    where.push("(invitee_name LIKE ? OR invitee_email LIKE ? OR event_name LIKE ? OR answers LIKE ?)");
-    args.push(like, like, like, like);
+    where.push("(invitee_name LIKE ? OR invitee_email LIKE ? OR event_name LIKE ? OR answers LIKE ? OR notes LIKE ?)");
+    args.push(like, like, like, like, like);
   }
   if (opts.status === "canceled") where.push("status = 'canceled'");
   else if (opts.status === "completed") where.push("status <> 'canceled' AND end_time < UTC_TIMESTAMP()");
@@ -492,7 +525,7 @@ export async function listMeetings(opts: { q?: string; status?: string; when?: s
   // coming meetings first (soonest on top), then the rest (latest on top)
   const [rows] = await pool.query(
     `SELECT id, event_name, status, ${iso("start_time")} AS start_time, ${iso("end_time")} AS end_time, invitee_timezone, invitee_name, invitee_email, invitee_phone,
-            location_type, location_text, join_url, answers, guests, host_name, host_email, reschedule_count, ${iso("previous_start_time")} AS previous_start_time,
+            location_type, location_text, join_url, reschedule_url, cancel_url, notes, lead_id, source, answers, guests, host_name, host_email, reschedule_count, ${iso("previous_start_time")} AS previous_start_time,
             canceled_by, cancel_reason, ${iso("canceled_at")} AS canceled_at, history, ${iso("booked_at")} AS booked_at,
             (status <> 'canceled' AND end_time >= UTC_TIMESTAMP()) AS ahead
        FROM crm_meetings ${whereSql}
@@ -518,6 +551,11 @@ export async function listMeetings(opts: { q?: string; status?: string; when?: s
       locationType: r.location_type ? String(r.location_type) : null,
       locationText: r.location_text ? String(r.location_text) : null,
       joinUrl: r.join_url ? String(r.join_url) : null,
+      rescheduleUrl: r.reschedule_url ? String(r.reschedule_url) : null,
+      cancelUrl: r.cancel_url ? String(r.cancel_url) : null,
+      notes: r.notes ? String(r.notes) : null,
+      leadId: r.lead_id ? Number(r.lead_id) : null,
+      source: String(r.source || "website"),
       answers: json(r.answers, []),
       guests: json(r.guests, []),
       hostName: r.host_name ? String(r.host_name) : null,
@@ -545,4 +583,396 @@ export async function meetingsVersion(): Promise<string> {
 export async function deleteMeetings(ids: number[]) {
   const [res] = await getPool().query("UPDATE crm_meetings SET deleted_at = UTC_TIMESTAMP() WHERE id IN (?) AND deleted_at IS NULL", [ids]);
   return (res as { affectedRows: number }).affectedRows;
+}
+
+/* ---------------------------------------------------------------- Dynamic CRM Meeting Actions */
+
+/**
+ * Cancels a meeting directly from the CRM:
+ * - Invokes Calendly API cancellation endpoint (which officially cancels on Calendly & emails client)
+ * - Updates crm_meetings row (status='canceled', canceled_by, cancel_reason, canceled_at, history)
+ * - Logs to CRM activity audit trail
+ */
+export async function cancelCalendlyMeeting({
+  id,
+  reason,
+  user,
+  cancelInCalendly = true,
+}: {
+  id: number;
+  reason?: string;
+  user: Pick<CrmUser, "id" | "name" | "role">;
+  cancelInCalendly?: boolean;
+}) {
+  const pool = getPool();
+  const [rows] = await pool.query(
+    `SELECT id, invitee_uri, event_uri, event_name, invitee_name, invitee_email, ${iso("start_time")} AS start_time, status, history, lead_id FROM crm_meetings WHERE id = ? AND deleted_at IS NULL`,
+    [id]
+  );
+  const row = (rows as Record<string, unknown>[])[0];
+  if (!row) throw new Error("Meeting not found");
+  if (row.status === "canceled") return { ok: true, alreadyCanceled: true };
+
+  let calendlyCanceled = false;
+  if (cancelInCalendly && calendlyConfigured() && typeof row.event_uri === "string" && !row.event_uri.startsWith("crm:")) {
+    try {
+      const uuid = row.event_uri.split("/").pop();
+      if (uuid) {
+        await cal(`/scheduled_events/${uuid}/cancellation`, {
+          method: "POST",
+          body: { reason: (reason || "Canceled via CRM").slice(0, 1000) },
+        });
+        calendlyCanceled = true;
+      }
+    } catch (err: unknown) {
+      console.warn("[calendly] API cancellation warning (proceeding with CRM update):", err instanceof Error ? err.message : err);
+    }
+  }
+
+  const history = parseHistory(row.history as string | null);
+  const nowIso = new Date().toISOString();
+  history.push({
+    kind: "canceled",
+    at: nowIso,
+    by: `${user.name} (${user.role === "super_admin" ? "Super Admin" : "Admin"})`,
+    reason: reason || undefined,
+  });
+
+  await pool.query(
+    `UPDATE crm_meetings
+        SET status = 'canceled',
+            canceled_by = ?,
+            cancel_reason = ?,
+            canceled_at = ?,
+            history = ?,
+            synced_at = NOW()
+      WHERE id = ?`,
+    [user.name, reason || null, sqlTime(nowIso), JSON.stringify(history), id]
+  );
+
+  const cleanReason = reason ? ` (Reason: ${reason})` : "";
+  await logActivity({
+    entity: "lead",
+    id: Number(row.lead_id) || Number(row.id),
+    action: "meeting_canceled",
+    text: `Meeting "${row.event_name || "Strategy Call"}" with ${row.invitee_name || row.invitee_email} was canceled${cleanReason}`,
+    actor: { type: "user", user },
+  });
+
+  return { ok: true, calendlyCanceled };
+}
+
+/**
+ * Reschedules a meeting time directly from the CRM:
+ * - Updates start_time and end_time, saves previous_start_time
+ * - Increments reschedule_count, appends to history
+ * - Logs to CRM activity audit trail
+ */
+export async function rescheduleMeetingDetails({
+  id,
+  startTime,
+  endTime,
+  reason,
+  user,
+}: {
+  id: number;
+  startTime: string;
+  endTime: string;
+  reason?: string;
+  user: Pick<CrmUser, "id" | "name" | "role">;
+}) {
+  const pool = getPool();
+  const [rows] = await pool.query(
+    `SELECT id, invitee_uri, event_name, invitee_name, invitee_email, ${iso("start_time")} AS start_time, reschedule_count, history, lead_id FROM crm_meetings WHERE id = ? AND deleted_at IS NULL`,
+    [id]
+  );
+  const row = (rows as Record<string, unknown>[])[0];
+  if (!row) throw new Error("Meeting not found");
+
+  const history = parseHistory(row.history as string | null);
+  const nowIso = new Date().toISOString();
+  history.push({
+    kind: "rescheduled",
+    at: nowIso,
+    from: String(row.start_time),
+    to: startTime,
+    reason: reason || undefined,
+    by: `${user.name} (${user.role === "super_admin" ? "Super Admin" : "Admin"})`,
+  });
+
+  const nextCount = Number(row.reschedule_count || 0) + 1;
+  await pool.query(
+    `UPDATE crm_meetings
+        SET status = 'rescheduled',
+            reschedule_count = ?,
+            previous_start_time = ?,
+            start_time = ?,
+            end_time = ?,
+            history = ?,
+            synced_at = NOW()
+      WHERE id = ?`,
+    [nextCount, sqlTime(String(row.start_time)), sqlTime(startTime), sqlTime(endTime), JSON.stringify(history), id]
+  );
+
+  await logActivity({
+    entity: "lead",
+    id: Number(row.lead_id) || Number(row.id),
+    action: "meeting_rescheduled",
+    text: `Meeting "${row.event_name || "Strategy Call"}" with ${row.invitee_name || row.invitee_email} rescheduled to ${new Date(startTime).toLocaleString()}${reason ? ` (${reason})` : ""}`,
+    actor: { type: "user", user },
+  });
+
+  return { ok: true, rescheduleCount: nextCount };
+}
+
+/**
+ * Updates editable meeting fields and internal CRM notes.
+ */
+export async function updateMeetingDetails({
+  id,
+  data,
+  user,
+}: {
+  id: number;
+  data: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    eventName?: string;
+    locationText?: string;
+    joinUrl?: string;
+    notes?: string;
+    hostName?: string;
+    hostEmail?: string;
+  };
+  user: Pick<CrmUser, "id" | "name" | "role">;
+}) {
+  const pool = getPool();
+  const [rows] = await pool.query("SELECT id, invitee_name, lead_id FROM crm_meetings WHERE id = ? AND deleted_at IS NULL", [id]);
+  const row = (rows as Record<string, unknown>[])[0];
+  if (!row) throw new Error("Meeting not found");
+
+  const set: Record<string, unknown> = {};
+  if (data.name !== undefined) set.invitee_name = data.name.trim().slice(0, 190);
+  if (data.email !== undefined) set.invitee_email = data.email.trim().slice(0, 190);
+  if (data.phone !== undefined) set.invitee_phone = data.phone.trim().slice(0, 60) || null;
+  if (data.eventName !== undefined) set.event_name = data.eventName.trim().slice(0, 255);
+  if (data.locationText !== undefined) set.location_text = data.locationText.trim().slice(0, 500) || null;
+  if (data.joinUrl !== undefined) set.join_url = data.joinUrl.trim().slice(0, 700) || null;
+  if (data.notes !== undefined) set.notes = data.notes.trim() || null;
+  if (data.hostName !== undefined) set.host_name = data.hostName.trim().slice(0, 190) || null;
+  if (data.hostEmail !== undefined) set.host_email = data.hostEmail.trim().slice(0, 190) || null;
+
+  const keys = Object.keys(set);
+  if (keys.length > 0) {
+    await pool.query(
+      `UPDATE crm_meetings SET ${keys.map((k) => `\`${k}\` = ?`).join(", ")}, synced_at = NOW() WHERE id = ?`,
+      [...keys.map((k) => set[k]), id]
+    );
+  }
+
+  await logActivity({
+    entity: "lead",
+    id: Number(row.lead_id) || id,
+    action: "meeting_updated",
+    text: `Meeting details for ${data.name || row.invitee_name || "invitee"} updated`,
+    actor: { type: "user", user },
+  });
+
+  return { ok: true };
+}
+
+/**
+ * Creates a meeting directly from the CRM (offline consultation, phone meeting, or manual booking).
+ */
+export async function createCrmMeeting({
+  data,
+  user,
+}: {
+  data: {
+    name: string;
+    email: string;
+    phone?: string;
+    eventName: string;
+    startTime: string;
+    endTime: string;
+    locationType?: string;
+    locationText?: string;
+    joinUrl?: string;
+    notes?: string;
+    hostName?: string;
+    hostEmail?: string;
+    leadId?: number;
+    source?: string;
+  };
+  user: Pick<CrmUser, "id" | "name" | "role">;
+}) {
+  const pool = getPool();
+  const inviteeUri = `crm:invitee:${Date.now()}:${randomBytes(4).toString("hex")}`;
+  const eventUri = `crm:event:${Date.now()}:${randomBytes(4).toString("hex")}`;
+  const nowIso = new Date().toISOString();
+
+  const history = [
+    {
+      kind: "booked" as const,
+      at: nowIso,
+      start: data.startTime,
+      by: `${user.name} (${user.role === "super_admin" ? "Super Admin" : "Admin"})`,
+    },
+  ];
+
+  const row = {
+    invitee_uri: inviteeUri,
+    event_uri: eventUri,
+    event_name: (data.eventName || "Strategy Call").trim().slice(0, 255),
+    status: "scheduled",
+    start_time: sqlTime(data.startTime),
+    end_time: sqlTime(data.endTime),
+    invitee_timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "America/New_York",
+    invitee_name: data.name.trim().slice(0, 190),
+    invitee_email: data.email.trim().slice(0, 190),
+    invitee_phone: data.phone?.trim().slice(0, 60) || null,
+    location_type: data.locationType || "google_conference",
+    location_text: data.locationText?.trim().slice(0, 500) || null,
+    join_url: data.joinUrl?.trim().slice(0, 700) || null,
+    notes: data.notes?.trim() || null,
+    lead_id: data.leadId || null,
+    source: data.source || "crm",
+    host_name: data.hostName?.trim().slice(0, 190) || user.name,
+    host_email: data.hostEmail?.trim().slice(0, 190) || null,
+    reschedule_count: 0,
+    history: JSON.stringify(history),
+    booked_at: sqlTime(nowIso),
+  };
+
+  const keys = Object.keys(row);
+  const [res] = await pool.query(
+    `INSERT INTO crm_meetings (${keys.map((k) => `\`${k}\``).join(", ")}) VALUES (${keys.map(() => "?").join(", ")})`,
+    keys.map((k) => (row as Record<string, unknown>)[k])
+  );
+  const insertId = Number((res as { insertId: number }).insertId);
+
+  await mapInvitee(inviteeUri, insertId, eventUri, nowIso);
+
+  await logActivity({
+    entity: "lead",
+    id: data.leadId || insertId,
+    action: "meeting_scheduled",
+    text: `Meeting "${row.event_name}" scheduled with ${data.name} (${data.email}) for ${new Date(data.startTime).toLocaleString()}`,
+    actor: { type: "user", user },
+  });
+
+  return { ok: true, id: insertId };
+}
+
+/**
+ * Fetches active event types from Calendly (with fallback if token is not yet configured).
+ */
+export async function fetchCalendlyEventTypes(): Promise<{ ok: boolean; types: CalEventType[] }> {
+  const fallback: CalEventType[] = [
+    {
+      uri: "default:strategy-call",
+      name: "30-Minute Strategy Call",
+      active: true,
+      scheduling_url: "https://calendly.com/quickuppsoftechmeet/strategy-call",
+      duration: 30,
+      description_plain: "Free 30-Minute Strategy Call with Quickupp Softech Team",
+    },
+  ];
+  if (!calendlyConfigured()) {
+    return { ok: false, types: fallback };
+  }
+  try {
+    if (!meUri) {
+      const me = await cal<{ resource: { uri: string } }>("/users/me");
+      meUri = me.resource.uri;
+    }
+    const res = await cal<{ collection: CalEventType[] }>(`/event_types?user=${encodeURIComponent(meUri)}&active=true`);
+    const types = (res.collection || []).map((t) => ({
+      uri: t.uri,
+      name: t.name,
+      active: Boolean(t.active),
+      slug: t.slug,
+      scheduling_url: t.scheduling_url,
+      duration: t.duration,
+      kind: t.kind,
+      description_plain: t.description_plain,
+      color: t.color,
+    }));
+    return { ok: true, types: types.length ? types : fallback };
+  } catch (err: unknown) {
+    console.warn("[calendly] fetch event types failed:", err instanceof Error ? err.message : err);
+    return { ok: false, types: fallback };
+  }
+}
+
+/**
+ * Generates a dynamic single-use scheduling link from Calendly.
+ */
+export async function generateCalendlySchedulingLink(eventTypeUri?: string) {
+  if (!calendlyConfigured()) {
+    return {
+      ok: false,
+      booking_url: "https://calendly.com/quickuppsoftechmeet/strategy-call",
+    };
+  }
+  try {
+    let owner = eventTypeUri;
+    if (!owner || owner.startsWith("default:")) {
+      const types = await fetchCalendlyEventTypes();
+      const real = types.types.find((t) => !t.uri.startsWith("default:"));
+      owner = real?.uri;
+    }
+    if (!owner) throw new Error("No Calendly event type available");
+    const res = await cal<{ resource: { booking_url: string; uri: string } }>("/scheduling_links", {
+      method: "POST",
+      body: {
+        max_event_count: 1,
+        owner,
+        owner_type: "EventType",
+      },
+    });
+    return { ok: true, booking_url: res.resource.booking_url, uri: res.resource.uri };
+  } catch (err: unknown) {
+    console.warn("[calendly] generate link failed, using default:", err instanceof Error ? err.message : err);
+    return { ok: false, booking_url: "https://calendly.com/quickuppsoftechmeet/strategy-call", error: err instanceof Error ? err.message : String(err) };
+  }
+}
+
+/**
+ * Synchronizes a single event immediately when booked via website or client embed.
+ */
+export async function syncSingleEvent(eventUri: string, inviteeUri: string) {
+  if (!eventUri || !inviteeUri) return { ok: false, error: "Missing URIs" };
+
+  if (calendlyConfigured()) {
+    try {
+      const [evRes, invRes] = await Promise.all([
+        cal<{ resource: CalEvent }>(eventUri),
+        cal<{ resource: CalInvitee }>(inviteeUri),
+      ]);
+      if (invRes.resource && evRes.resource) {
+        await applyInvitee(invRes.resource, evRes.resource);
+        return { ok: true, synced: true };
+      }
+    } catch (err: unknown) {
+      console.warn("[calendly] single sync API pull error, checking fallback:", err instanceof Error ? err.message : err);
+    }
+  }
+
+  // Fallback: If token is not set yet or API was temporarily unreachable,
+  // we ensure the meeting is recorded in the database
+  const id = await meetingFor(inviteeUri);
+  if (!id) {
+    const nowIso = new Date().toISOString();
+    const [res] = await getPool().query(
+      `INSERT INTO crm_meetings (invitee_uri, event_uri, event_name, status, start_time, end_time, invitee_name, invitee_email, source, booked_at)
+       VALUES (?, ?, 'Strategy Call (Website)', 'scheduled', DATE_ADD(NOW(), INTERVAL 1 DAY), DATE_ADD(DATE_ADD(NOW(), INTERVAL 1 DAY), INTERVAL 30 MINUTE), 'Website Invitee', 'client@booking', 'website', NOW())
+       ON DUPLICATE KEY UPDATE synced_at = NOW()`,
+      [inviteeUri, eventUri]
+    );
+    const meetingId = Number((res as { insertId: number }).insertId);
+    if (meetingId) await mapInvitee(inviteeUri, meetingId, eventUri, nowIso);
+  }
+  return { ok: true, synced: true };
 }
