@@ -177,228 +177,256 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
   // Top accent bar
   drawGradientBar(page, 0, 841.89 - 7, PAGE_W, 7, GRADIENT);
 
-  // 1. Logo — the logo PNG already contains the "Quickupp Softech" wordmark,
-  // so the text block below it must start clear of the logo's actual bottom
-  // edge (computed from its real aspect ratio), not a hardcoded guess, or
-  // the two overlap/collide for any logo whose proportions change.
-  const logoTopY = 775;
-  let logoBottomY = logoTopY - 40; // sane fallback if the logo can't be embedded
+  /* ---- layout helpers ---------------------------------------------------
+     Helvetica's capital letters are 0.718 of the font size tall. Text is
+     placed by its baseline, so "vertically centred" means the capitals sit
+     in the middle of the row. */
+  const CAP = 0.718;
+  type Font = typeof font;
+  const w = (text: string, f: Font, size: number) => f.widthOfTextAtSize(text, size);
+  const midBaseline = (rowBottom: number, rowH: number, size: number) => rowBottom + (rowH - CAP * size) / 2;
+  const right = (text: string, xRight: number, y: number, size: number, f: Font, color: ReturnType<typeof rgb>) =>
+    page.drawText(text, { x: xRight - w(text, f, size), y, size, font: f, color });
+
+  /** Breaks text into lines no wider than maxW (at spaces and " | ", and inside very long words). */
+  const wrap = (text: string, f: Font, size: number, maxW: number): string[] => {
+    const lines: string[] = [];
+    for (const part of String(text).split(/\s*\|\s*/)) {
+      let line = "";
+      for (const word of part.split(/\s+/).filter(Boolean)) {
+        const next = line ? `${line} ${word}` : word;
+        if (w(next, f, size) <= maxW) {
+          line = next;
+          continue;
+        }
+        if (line) lines.push(line);
+        // a single word wider than the column: break it across lines
+        let rest = word;
+        while (w(rest, f, size) > maxW) {
+          let cut = rest.length - 1;
+          while (cut > 1 && w(rest.slice(0, cut), f, size) > maxW) cut--;
+          // prefer to break just after "@", "-", "." or "_" (emails, web addresses)
+          const soft = Math.max(...["@", "-", ".", "_"].map((c) => rest.lastIndexOf(c, cut - 1)));
+          if (soft > 0) cut = soft + 1;
+          lines.push(rest.slice(0, cut));
+          rest = rest.slice(cut);
+        }
+        line = rest;
+      }
+      if (line) lines.push(line);
+    }
+    return lines.length ? lines : [""];
+  };
+
+  // ===========================================================================
+  // HEADER: logo and company details (left) | title, receipt no, date, badge (right)
+  // ===========================================================================
+  const logoTopY = 780;
+  let logoBottomY = logoTopY - 40; // fallback if the logo can't be embedded
   const logoPath = path.join(process.cwd(), "public", "images", "logo-black.png");
+  let logoDrawn = false;
   if (fs.existsSync(logoPath)) {
     try {
-      const pngBytes = fs.readFileSync(logoPath);
-      const logo = await doc.embedPng(pngBytes);
+      const logo = await doc.embedPng(fs.readFileSync(logoPath));
       const logoScale = 0.095;
       const logoW = logo.width * logoScale;
       const logoH = logo.height * logoScale;
-      page.drawImage(logo, {
-        x: leftX,
-        y: logoTopY - logoH,
-        width: logoW,
-        height: logoH,
-      });
+      page.drawImage(logo, { x: leftX, y: logoTopY - logoH, width: logoW, height: logoH });
       logoBottomY = logoTopY - logoH;
+      logoDrawn = true;
     } catch {
-      page.drawText("QUICKUPP", { x: leftX, y: 755, size: 18, font: fontBold, color: deepPurple });
-      logoBottomY = 752;
+      /* fall through to the text logo */
     }
-  } else {
-    page.drawText("QUICKUPP", { x: leftX, y: 755, size: 18, font: fontBold, color: deepPurple });
-    logoBottomY = 752;
+  }
+  if (!logoDrawn) {
+    page.drawText("QUICKUPP", { x: leftX, y: logoTopY - 18, size: 18, font: fontBold, color: deepPurple });
+    logoBottomY = logoTopY - 24;
   }
 
-  // Under Logo text - Official Company Details: a clear gap below the logo's
-  // real bottom edge and comfortable line spacing, so the header breathes.
-  const LOGO_GAP = 24;
-  const LINE = 13.5;
-  let curY = logoBottomY - LOGO_GAP;
+  // company details under the logo; "Email:" / "Website:" values follow their label
+  const INFO_SIZE = 8.5;
+  const INFO_LINE = 13.5;
+  let curY = logoBottomY - 22;
   page.drawText("Quickupp Softech LLC", { x: leftX, y: curY, size: 10, font: fontBold, color: darkNavy });
-  curY -= LINE + 1.5;
-  page.drawText("167 Princeton Street, Bridgeport, Connecticut - 06605, USA", { x: leftX, y: curY, size: 8.5, font, color: slateMid });
-  curY -= LINE;
-  page.drawText("Phone: +1 (302) 754-5679", { x: leftX, y: curY, size: 8.5, font, color: slateMid });
-  curY -= LINE;
-  page.drawText("Email: ", { x: leftX, y: curY, size: 8.5, font, color: slateMid });
-  page.drawText("info@quickuppsoftech.us", { x: leftX + 28, y: curY, size: 8.5, font, color: linkBlue });
-  curY -= LINE;
-  page.drawText("Website: ", { x: leftX, y: curY, size: 8.5, font, color: slateMid });
-  page.drawText("https://www.quickuppsoftech.us/", { x: leftX + 38, y: curY, size: 8.5, font, color: linkBlue });
+  curY -= INFO_LINE + 1.5;
+  page.drawText("167 Princeton Street, Bridgeport, Connecticut - 06605, USA", { x: leftX, y: curY, size: INFO_SIZE, font, color: slateMid });
+  const contactLine = (label: string, value: string, color: ReturnType<typeof rgb>) => {
+    curY -= INFO_LINE;
+    page.drawText(label, { x: leftX, y: curY, size: INFO_SIZE, font, color: slateMid });
+    page.drawText(value, { x: leftX + w(`${label} `, font, INFO_SIZE), y: curY, size: INFO_SIZE, font, color });
+  };
+  contactLine("Phone:", "+1 (302) 754-5679", slateMid);
+  contactLine("Email:", "info@quickuppsoftech.us", linkBlue);
+  contactLine("Website:", "https://www.quickuppsoftech.us/", linkBlue);
   const companyBottomY = curY;
 
-  // Top Right Header
-  const titleText = "PAYMENT RECEIPT";
-  const titleW = fontBold.widthOfTextAtSize(titleText, 21);
-  page.drawText(titleText, { x: rightX - titleW, y: 755, size: 21, font: fontBold, color: darkNavy });
+  // right column: every line right-aligned to the page margin, title level with the logo's top
+  const TITLE_SIZE = 21;
+  const titleY = logoTopY - CAP * TITLE_SIZE;
+  right("PAYMENT RECEIPT", rightX, titleY, TITLE_SIZE, fontBold, darkNavy);
+  const rcptY = titleY - 26;
+  right(`Receipt No: ${orderNumber}`, rightX, rcptY, 10, fontBold, slateDark);
+  const dateY = rcptY - 16;
+  right(`Date: ${formattedDate}`, rightX, dateY, 9.5, font, slateMid);
 
-  const rcptText = `Receipt No: ${orderNumber}`;
-  const rcptW = fontBold.widthOfTextAtSize(rcptText, 10);
-  page.drawText(rcptText, { x: rightX - rcptW, y: 731, size: 10, font: fontBold, color: slateDark });
-
-  const dateText = `Date: ${formattedDate}`;
-  const dateW = font.widthOfTextAtSize(dateText, 9.5);
-  page.drawText(dateText, { x: rightX - dateW, y: 714, size: 9.5, font, color: slateMid });
-
-  // Pill Badge (PAID / PARTIALLY PAID)
+  // status badge
   const badgeLabel = isPending ? "PENDING" : isPartial ? "PARTIALLY PAID" : "PAID";
   const badgeFontColor = isPending || isPartial ? amberText : greenText;
   const badgeBgColor = isPending || isPartial ? amberBg : greenBg;
-  const badgeTextW = fontBold.widthOfTextAtSize(badgeLabel, 8.5);
-  const pillW = badgeTextW + 24;
+  const BADGE_SIZE = 8.5;
   const pillH = 20;
+  const pillW = w(badgeLabel, fontBold, BADGE_SIZE) + 26;
   const pillX = rightX - pillW;
-  const pillY = 682;
+  const pillY = dateY - 14 - pillH;
+  drawRoundedRect(page, pillX, pillY, pillW, pillH, pillH / 2, badgeBgColor, undefined);
+  page.drawText(badgeLabel, { x: pillX + 13, y: midBaseline(pillY, pillH, BADGE_SIZE), size: BADGE_SIZE, font: fontBold, color: badgeFontColor });
 
-  drawRoundedRect(page, pillX, pillY, pillW, pillH, 10, badgeBgColor, undefined);
-  page.drawText(badgeLabel, { x: pillX + 12, y: pillY + 6, size: 8.5, font: fontBold, color: badgeFontColor });
-
-  // Top Divider Line: below whichever header column ends lower, with room to breathe
+  // divider below whichever header column ends lower
   const dividerY = Math.min(companyBottomY, pillY) - 22;
-  // everything below was laid out for a divider at 668; move it with the divider
-  const headerShift = dividerY - 668;
   page.drawLine({ start: { x: leftX, y: dividerY }, end: { x: rightX, y: dividerY }, thickness: 1, color: borderLight });
 
   // ===========================================================================
-  // BILL TO  |  PAYMENT INFORMATION — side-by-side, directly under the divider
+  // BILL TO  |  PAYMENT INFORMATION — two columns; in each, the labels form one
+  // column and every value starts at the same x
   // ===========================================================================
-  const colStartY = 648 + headerShift;
-  const col2X = leftX + 270;
-  const rowGap = 15.5;
+  const SECTION_SIZE = 11;
+  const ROW_SIZE = 9;
+  const ROW_GAP = 17; // baseline to baseline between rows
+  const WRAP_LINE = 12; // between wrapped lines of one value
+  const GUTTER = 14; // label column to value column
+  const colGap = 30;
+  const colW = (contentWidth - colGap) / 2;
+  const col2X = leftX + colW + colGap;
+  const headingY = dividerY - 26;
 
-  page.drawText("BILL TO", { x: leftX, y: colStartY, size: 11, font: fontBold, color: primaryPurple });
-  page.drawText("PAYMENT INFORMATION", { x: col2X, y: colStartY, size: 11, font: fontBold, color: primaryPurple });
+  page.drawText("BILL TO", { x: leftX, y: headingY, size: SECTION_SIZE, font: fontBold, color: primaryPurple });
+  page.drawText("PAYMENT INFORMATION", { x: col2X, y: headingY, size: SECTION_SIZE, font: fontBold, color: primaryPurple });
 
-  // Left column rows (variable count: Name, Email, Company?, Address/Phone)
-  let lY = colStartY - 18;
-  page.drawText("Customer Name: ", { x: leftX, y: lY, size: 9, font, color: slateMid });
-  page.drawText(clientName || "Valued Client", { x: leftX + 80, y: lY, size: 9, font: fontBold, color: darkNavy });
-  lY -= rowGap;
-  page.drawText("Email: ", { x: leftX, y: lY, size: 9, font, color: slateMid });
-  page.drawText(clientEmail || "info@quickuppsoftech.us", { x: leftX + 32, y: lY, size: 9, font, color: linkBlue });
-  if (companyName) {
-    lY -= rowGap;
-    page.drawText("Company: ", { x: leftX, y: lY, size: 9, font, color: slateMid });
-    page.drawText(companyName, { x: leftX + 48, y: lY, size: 9, font: fontBold, color: darkNavy });
-  }
-  if (clientPhone) {
-    lY -= rowGap;
-    page.drawText("Phone: ", { x: leftX, y: lY, size: 9, font, color: slateMid });
-    page.drawText(clientPhone, { x: leftX + 34, y: lY, size: 9, font: fontBold, color: darkNavy });
-  }
-  if (billingAddress) {
-    lY -= rowGap;
-    page.drawText("Billing Address: ", { x: leftX, y: lY, size: 9, font, color: slateMid });
-    page.drawText(billingAddress, { x: leftX + 74, y: lY, size: 9, font: fontBold, color: darkNavy });
-  }
+  type InfoRow = { label: string; value: string; bold?: boolean; color?: ReturnType<typeof rgb> };
+  /** draws one label/value column and returns the baseline of its last line */
+  const infoColumn = (x: number, rows: InfoRow[]) => {
+    const labelW = Math.max(...rows.map((r) => w(r.label, font, ROW_SIZE)));
+    const valueX = x + labelW + GUTTER;
+    const valueMaxW = x + colW - valueX;
+    let y = headingY - 22;
+    let last = y;
+    rows.forEach((r, i) => {
+      if (i > 0) y -= ROW_GAP;
+      const f = r.bold === false ? font : fontBold;
+      page.drawText(r.label, { x, y, size: ROW_SIZE, font, color: slateMid });
+      const lines = wrap(r.value, f, ROW_SIZE, valueMaxW);
+      lines.forEach((line, li) => {
+        page.drawText(line, { x: valueX, y: y - li * WRAP_LINE, size: ROW_SIZE, font: f, color: r.color || darkNavy });
+      });
+      y -= (lines.length - 1) * WRAP_LINE;
+      last = y;
+    });
+    return last;
+  };
 
-  // Right column rows (fixed 5: Method, Transaction ID, Date, Status, Type)
-  let rY = colStartY - 18;
-  page.drawText("Payment Method: ", { x: col2X, y: rY, size: 9, font, color: slateMid });
-  page.drawText("PayPal", { x: col2X + 92, y: rY, size: 9, font: fontBold, color: darkNavy });
-  rY -= rowGap;
-  page.drawText("Transaction ID: ", { x: col2X, y: rY, size: 9, font, color: slateMid });
-  const txShort = transactionId && transactionId.length > 22 ? `${transactionId.substring(0, 20)}...` : transactionId || "N/A";
-  page.drawText(txShort, { x: col2X + 86, y: rY, size: 9, font: fontBold, color: darkNavy });
-  rY -= rowGap;
-  page.drawText("Payment Date: ", { x: col2X, y: rY, size: 9, font, color: slateMid });
-  page.drawText(`${formattedDate}${paymentTime ? ` · ${paymentTime}` : ""}`, { x: col2X + 80, y: rY, size: 9, font: fontBold, color: darkNavy });
-  rY -= rowGap;
+  const billRows: InfoRow[] = [
+    { label: "Customer Name", value: clientName || "Valued Client" },
+    { label: "Email", value: clientEmail || "info@quickuppsoftech.us", bold: false, color: linkBlue },
+  ];
+  if (companyName) billRows.push({ label: "Company", value: companyName });
+  if (clientPhone) billRows.push({ label: "Phone", value: clientPhone });
+  if (billingAddress) billRows.push({ label: "Billing Address", value: billingAddress });
+
   const statusStr = isPending ? "PENDING CLEARING" : isPartial ? "PARTIALLY PAID" : "PAID";
   const statusColor = isPending || isPartial ? amberText : greenText;
-  page.drawText("Payment Status: ", { x: col2X, y: rY, size: 9, font, color: slateMid });
-  page.drawText(statusStr, { x: col2X + 86, y: rY, size: 9, font: fontBold, color: statusColor });
-  rY -= rowGap;
-  const typeDisplay = paymentType === "partial" ? "Advance Deposit" : "Full Payment";
-  page.drawText("Payment Type: ", { x: col2X, y: rY, size: 9, font, color: slateMid });
-  page.drawText(typeDisplay, { x: col2X + 80, y: rY, size: 9, font: fontBold, color: darkNavy });
+  const payRows: InfoRow[] = [
+    { label: "Payment Method", value: "PayPal" },
+    { label: "Transaction ID", value: transactionId || "N/A" },
+    { label: "Payment Date", value: `${formattedDate}${paymentTime ? ` · ${paymentTime}` : ""}` },
+    { label: "Payment Status", value: statusStr, color: statusColor },
+    { label: "Payment Type", value: paymentType === "partial" ? "Advance Deposit" : "Full Payment" },
+  ];
 
-  // The right column always has 5 rows, so it reliably determines the
-  // bottom of this whole section regardless of how many optional left rows
-  // were drawn.
-  const sectionBottomY = colStartY - 18 - 4 * rowGap;
+  const sectionBottomY = Math.min(infoColumn(leftX, billRows), infoColumn(col2X, payRows));
 
   // ===========================================================================
   // PAYMENT DETAILS table
   // ===========================================================================
-  const detailsHeadingY = sectionBottomY - 25;
-  page.drawText("PAYMENT DETAILS", { x: leftX, y: detailsHeadingY, size: 11, font: fontBold, color: primaryPurple });
+  const detailsHeadingY = sectionBottomY - 34;
+  page.drawText("PAYMENT DETAILS", { x: leftX, y: detailsHeadingY, size: SECTION_SIZE, font: fontBold, color: primaryPurple });
 
   const tblX = leftX;
   const tblW = contentWidth;
-  const headerRowH = 25.5;
-  const itemRowH = 30;
-  const summaryRowH = 16;
+  const PAD = 16;
+  const TBL_SIZE = 9.5;
+  const amountRight = tblX + tblW - PAD; // right edge of the Amount column (and of every total)
+  const amountColW = 96;
+  const qtyCenter = amountRight - amountColW - 30;
+  const descMaxW = qtyCenter - 28 - (tblX + PAD);
+  const labelRight = amountRight - amountColW; // right edge of the total labels
+
+  const headerRowH = 28;
+  const itemDesc = `${service}${category ? ` – ${category}` : ""}`;
+  const descLines = wrap(itemDesc, fontBold, TBL_SIZE, descMaxW);
+  const DESC_LINE = 13;
+  const itemRowH = Math.max(38, (descLines.length - 1) * DESC_LINE + CAP * TBL_SIZE + 26);
+  const summaryRowH = 26;
   const summaryRowCount = isPartial ? 2 : 1;
-  const finalRowH = 32;
-  const tblH = headerRowH + itemRowH + summaryRowCount * summaryRowH + finalRowH + 10;
+  const finalRowH = 38;
+  const tblH = headerRowH + itemRowH + summaryRowCount * summaryRowH + finalRowH;
   const tableTop = detailsHeadingY - 14;
   const tblY = tableTop - tblH;
 
-  drawRoundedRect(page, tblX, tblY, tblW, tblH, 2, rgb(1, 1, 1), borderLight);
+  drawRoundedRect(page, tblX, tblY, tblW, tblH, 3, rgb(1, 1, 1), borderLight);
 
-  // Table Header Row
-  page.drawRectangle({ x: tblX + 0.5, y: tblY + tblH - headerRowH, width: tblW - 1, height: headerRowH - 0.5, color: rgb(0.95, 0.96, 0.98) });
-  page.drawLine({ start: { x: tblX, y: tblY + tblH - headerRowH }, end: { x: tblX + tblW, y: tblY + tblH - headerRowH }, thickness: 1, color: borderLight });
+  // header row
+  const headerBottom = tableTop - headerRowH;
+  page.drawRectangle({ x: tblX + 0.5, y: headerBottom, width: tblW - 1, height: headerRowH - 0.5, color: rgb(0.95, 0.96, 0.98) });
+  page.drawLine({ start: { x: tblX, y: headerBottom }, end: { x: tblX + tblW, y: headerBottom }, thickness: 1, color: borderLight });
+  const headY = midBaseline(headerBottom, headerRowH, TBL_SIZE);
+  page.drawText("Description", { x: tblX + PAD, y: headY, size: TBL_SIZE, font: fontBold, color: slateDark });
+  page.drawText("Qty", { x: qtyCenter - w("Qty", fontBold, TBL_SIZE) / 2, y: headY, size: TBL_SIZE, font: fontBold, color: slateDark });
+  right("Amount (USD)", amountRight, headY, TBL_SIZE, fontBold, slateDark);
 
-  const qtyColX = tblX + tblW - 160;
-  page.drawText("Description", { x: tblX + 16, y: tblY + tblH - 17, size: 9.5, font: fontBold, color: slateDark });
-  const qtyHeaderW = fontBold.widthOfTextAtSize("Qty", 9.5);
-  page.drawText("Qty", { x: qtyColX - qtyHeaderW / 2, y: tblY + tblH - 17, size: 9.5, font: fontBold, color: slateDark });
-  const amtHeader = "Amount (USD)";
-  const amtHW = fontBold.widthOfTextAtSize(amtHeader, 9.5);
-  page.drawText(amtHeader, { x: tblX + tblW - 20 - amtHW, y: tblY + tblH - 17, size: 9.5, font: fontBold, color: slateDark });
-
-  // Line item row
-  const itemDesc = `${service}${category ? ` – ${category}` : ""}`;
-  const truncatedDesc = itemDesc.length > 62 ? `${itemDesc.substring(0, 59)}...` : itemDesc;
-  const itemY = tblY + tblH - headerRowH - itemRowH / 2 - 3;
-
-  page.drawText(truncatedDesc, { x: tblX + 16, y: itemY, size: 9.5, font: fontBold, color: darkNavy });
+  // line item: the description block is centred in the row; Qty and Amount sit on its first line
+  const itemBottom = headerBottom - itemRowH;
+  const blockH = CAP * TBL_SIZE + (descLines.length - 1) * DESC_LINE;
+  const firstY = itemBottom + (itemRowH + blockH) / 2 - CAP * TBL_SIZE;
+  descLines.forEach((line, i) => page.drawText(line, { x: tblX + PAD, y: firstY - i * DESC_LINE, size: TBL_SIZE, font: fontBold, color: darkNavy }));
   const qtyStr = String(qty);
-  const qtyW = fontBold.widthOfTextAtSize(qtyStr, 9.5);
-  page.drawText(qtyStr, { x: qtyColX - qtyW / 2, y: itemY, size: 9.5, font, color: slateMid });
+  page.drawText(qtyStr, { x: qtyCenter - w(qtyStr, font, TBL_SIZE) / 2, y: firstY, size: TBL_SIZE, font, color: slateMid });
   const totalStr = usd(finalTotal);
-  const totalStrW = fontBold.widthOfTextAtSize(totalStr, 9.5);
-  page.drawText(totalStr, { x: tblX + tblW - 20 - totalStrW, y: itemY, size: 9.5, font: fontBold, color: darkNavy });
+  right(totalStr, amountRight, firstY, TBL_SIZE, fontBold, darkNavy);
+  page.drawLine({ start: { x: tblX, y: itemBottom }, end: { x: tblX + tblW, y: itemBottom }, thickness: 1, color: borderLight });
 
-  // Summary separator (above the non-highlighted summary rows)
-  const summaryTop = tblY + finalRowH + summaryRowCount * summaryRowH;
-  page.drawLine({ start: { x: tblX, y: summaryTop }, end: { x: tblX + tblW, y: summaryTop }, thickness: 1, color: borderLight });
-
-  let sumY = summaryTop - summaryRowH + 4;
+  // totals: labels right-aligned in one column, values right-aligned under Amount
+  const SUM_SIZE = 9.5;
+  let rowBottom = itemBottom;
   const summaryRow = (label: string, value: string, color = darkNavy) => {
-    const vW = fontBold.widthOfTextAtSize(value, 9);
-    const lW = font.widthOfTextAtSize(label, 9);
-    page.drawText(label, { x: tblX + tblW - 20 - vW - 10 - lW, y: sumY, size: 9, font, color: slateMid });
-    page.drawText(value, { x: tblX + tblW - 20 - vW, y: sumY, size: 9, font: fontBold, color });
-    sumY -= summaryRowH;
+    rowBottom -= summaryRowH;
+    const y = midBaseline(rowBottom, summaryRowH, SUM_SIZE);
+    right(label, labelRight, y, SUM_SIZE, font, slateMid);
+    right(value, amountRight, y, SUM_SIZE, fontBold, color);
   };
-
-  summaryRow("Order Total:", totalStr);
+  summaryRow("Order Total", totalStr);
   if (isPartial) {
     const paidPct = finalTotal > 0 ? Math.round((Number(amountPaid) / finalTotal) * 100) : 0;
-    summaryRow(`Amount Paid (${paidPct}% Advance):`, usd(amountPaid), greenText);
+    summaryRow(`Amount Paid (${paidPct}% Advance)`, usd(amountPaid), greenText);
   }
 
-  // Highlighted final row: green "Total Paid" when fully paid, amber
-  // "Balance Due" when a balance remains — mirroring the reference receipt.
+  // highlighted last row: green "Total Paid" when fully paid, amber when a balance remains or PayPal is clearing it
   const finalBg = isPending || isPartial ? amberBg : greenBg;
   const finalColor = isPending || isPartial ? amberText : greenText;
   page.drawRectangle({ x: tblX + 0.5, y: tblY + 0.5, width: tblW - 1, height: finalRowH - 0.5, color: finalBg });
   page.drawLine({ start: { x: tblX, y: tblY + finalRowH }, end: { x: tblX + tblW, y: tblY + finalRowH }, thickness: 1, color: borderLight });
-
-  const finalLabel = isPending ? "Amount Pending:" : isPartial ? "Balance Due:" : "Total Paid:";
+  const FINAL_SIZE = 11;
+  const finalY = midBaseline(tblY, finalRowH, FINAL_SIZE);
+  const finalLabel = isPending ? "Amount Pending" : isPartial ? "Balance Due" : "Total Paid";
   const finalValStr = isPartial ? `${usd(remainingAmount)} USD` : `${usd(amountPaid)} USD`;
-  const finalValW = fontBold.widthOfTextAtSize(finalValStr, 11);
-  const finalLabelW = fontBold.widthOfTextAtSize(finalLabel, 11);
-  page.drawText(finalLabel, { x: tblX + tblW - 20 - finalValW - 14 - finalLabelW, y: tblY + finalRowH / 2 - 4, size: 11, font: fontBold, color: finalColor });
-  page.drawText(finalValStr, { x: tblX + tblW - 20 - finalValW, y: tblY + finalRowH / 2 - 4, size: 11, font: fontBold, color: finalColor });
+  right(finalLabel, labelRight, finalY, FINAL_SIZE, fontBold, finalColor);
+  right(finalValStr, amountRight, finalY, FINAL_SIZE, fontBold, finalColor);
 
   // ===========================================================================
   // THANK YOU
   // ===========================================================================
-  let tyY = tblY - 38;
+  let tyY = tblY - 40;
   page.drawText("THANK YOU FOR YOUR PURCHASE", { x: leftX, y: tyY, size: 13, font: fontBold, color: darkNavy });
-  tyY -= 18;
+  tyY -= 20;
   page.drawText(isPending ? "Your payment has been submitted and PayPal is clearing it." : "Your payment has been successfully received.", { x: leftX, y: tyY, size: 9, font, color: slateMid });
   tyY -= 16;
   const thankOrderText = isPending
@@ -409,29 +437,21 @@ export async function generateReceiptPdf(data: ReceiptData): Promise<Buffer> {
   page.drawText(thankOrderText, { x: leftX, y: tyY, size: 9.5, font: fontBold, color: isPending ? amberText : greenText });
   if (isPartial) {
     tyY -= 16;
-    page.drawText(
-      `Balance due: ${usd(remainingAmount)} USD. Pay anytime via the link in your email.`,
-      { x: leftX, y: tyY, size: 9, font: fontBold, color: amberText }
-    );
+    page.drawText(`Balance due: ${usd(remainingAmount)} USD. Pay anytime via the link in your email.`, { x: leftX, y: tyY, size: 9, font: fontBold, color: amberText });
   }
 
-  // Divider Line
-  const divY = tyY - 20;
+  const divY = tyY - 22;
   page.drawLine({ start: { x: leftX, y: divY }, end: { x: rightX, y: divY }, thickness: 1, color: borderLight });
 
   // ===========================================================================
   // NEED ASSISTANCE?
   // ===========================================================================
-  let supY = divY - 22;
-  page.drawText("NEED ASSISTANCE?", { x: leftX, y: supY, size: 10.5, font: fontBold, color: primaryPurple });
-  supY -= 16;
-  page.drawText("Quickupp Softech LLC", { x: leftX, y: supY, size: 10, font: fontBold, color: darkNavy });
-  supY -= 14;
-  page.drawText("Email: ", { x: leftX, y: supY, size: 8.5, font, color: slateMid });
-  page.drawText("info@quickuppsoftech.us", { x: leftX + 28, y: supY, size: 8.5, font, color: linkBlue });
-  supY -= 13;
-  page.drawText("Website: ", { x: leftX, y: supY, size: 8.5, font, color: slateMid });
-  page.drawText("https://www.quickuppsoftech.us/", { x: leftX + 38, y: supY, size: 8.5, font, color: linkBlue });
+  curY = divY - 24;
+  page.drawText("NEED ASSISTANCE?", { x: leftX, y: curY, size: SECTION_SIZE, font: fontBold, color: primaryPurple });
+  curY -= 18;
+  page.drawText("Quickupp Softech LLC", { x: leftX, y: curY, size: 10, font: fontBold, color: darkNavy });
+  contactLine("Email:", "info@quickuppsoftech.us", linkBlue);
+  contactLine("Website:", "https://www.quickuppsoftech.us/", linkBlue);
 
   // Fine print
   const finePrint =
