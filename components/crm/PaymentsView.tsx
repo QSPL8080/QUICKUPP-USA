@@ -205,7 +205,10 @@ export default function PaymentsView({
   const router = useRouter();
   const { confirm, toast } = useFeedback();
   const [editing, setEditing] = useState<PaymentRow | "new" | null>(openNew ? "new" : null);
-  const [viewing, setViewing] = useState<PaymentRow | null>(() => (openId ? rows.find((r) => r.id === openId) ?? null : null));
+  const [viewing, setViewing] = useState<PaymentRow | null>(() => {
+    if (!openId) return null;
+    return rows.find((r) => r.id === openId) || (rows.length === 1 ? rows[0] : null);
+  });
   // drop ?open= once used, so closing the details and refreshing doesn't reopen them
   useEffect(() => {
     if (!openId) return;

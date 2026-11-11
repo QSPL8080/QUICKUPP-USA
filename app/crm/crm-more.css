@@ -1598,3 +1598,44 @@
   animation: crm-spin 0.75s linear infinite;
   display: inline-block;
 }
+
+/* Payments Dashboard interactive clickable cards */
+.crm-pdash-cell-link {
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.15s ease, transform 0.15s ease;
+  cursor: pointer;
+}
+.crm-pdash-cell-link:hover {
+  background: #f8fafc;
+}
+.crm-pdash-cell-link:hover .crm-pdash-value {
+  color: #4f46e5;
+}
+.crm-pdash-cell-link:hover .crm-pdash-note {
+  color: #0f172a;
+}
+
+a.crm-pdash-chip {
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.12s ease, filter 0.12s ease;
+  display: inline-flex;
+  align-items: center;
+}
+a.crm-pdash-chip:hover {
+  transform: translateY(-1px);
+  filter: brightness(0.92);
+}
+
+.crm-dash-col.is-clickable {
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.crm-dash-col.is-clickable:hover {
+  opacity: 0.85;
+  transform: translateY(-2px);
+}
+.crm-dash-col.is-clickable:hover .crm-dash-col-bar {
+  filter: brightness(1.12);
+}

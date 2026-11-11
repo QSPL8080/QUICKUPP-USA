@@ -83,40 +83,65 @@ export default function PaymentsDashboard({
 
       {/* four plain numbers */}
       <section className="crm-pdash-strip">
-        <div className="crm-pdash-cell">
+        <Link
+          href="/crm/payments?status=paid"
+          className="crm-pdash-cell crm-pdash-cell-link"
+          title={`Click to view all paid payments (${m(s.received)} collected)`}
+        >
           <p className="crm-pdash-label">Total collected</p>
           <p className="crm-pdash-value">{m(s.received)}</p>
           <p className="crm-pdash-note">
-            {s.paidCount} {s.paidCount === 1 ? "payment" : "payments"} received overall
+            {s.paidCount} {s.paidCount === 1 ? "payment" : "payments"} received overall &rarr;
           </p>
-        </div>
-        <div className="crm-pdash-cell">
+        </Link>
+        <Link
+          href={`/crm/payments?status=paid&${monthRange(s.selectedMonthKey)}`}
+          className="crm-pdash-cell crm-pdash-cell-link"
+          title={`Click to view payments collected in ${activeMonthName}`}
+        >
           <p className="crm-pdash-label">{isCurrentMonth ? "This month" : activeMonthName}</p>
           <p className="crm-pdash-value">{m(s.month)}</p>
           <p className="crm-pdash-note">
             {delta === null ? (
-              <>Previous month {m(s.lastMonth)}</>
+              <>Previous month {m(s.lastMonth)} &rarr;</>
             ) : (
               <span className={`crm-pdash-delta ${delta >= 0 ? "is-up" : "is-down"}`}>
-                {delta >= 0 ? "▲" : "▼"} {Math.abs(delta)}% vs previous month
+                {delta >= 0 ? "▲" : "▼"} {Math.abs(delta)}% vs previous month &rarr;
               </span>
             )}
           </p>
-        </div>
-        <div className="crm-pdash-cell">
+        </Link>
+        <Link
+          href="/crm/payments?status=partially_paid"
+          className="crm-pdash-cell crm-pdash-cell-link"
+          title={`Click to view all unpaid or partially paid orders (${m(s.due)} due)`}
+        >
           <p className="crm-pdash-label">Still to collect</p>
           <p className="crm-pdash-value">{m(s.due)}</p>
           <p className="crm-pdash-note">
-            {s.openCount} unpaid or part-paid
+            {s.openCount} unpaid or part-paid &rarr;
           </p>
-        </div>
+        </Link>
         <div className="crm-pdash-cell">
-          <p className="crm-pdash-label">Payment links</p>
-          <p className="crm-pdash-value">{s.links.total}</p>
+          <Link
+            href="/crm/payments?tab=payment_link"
+            className="crm-pdash-cell-link"
+            style={{ display: "flex", flexDirection: "column", gap: "6px", textDecoration: "none", color: "inherit" }}
+            title="Click to view all payment links"
+          >
+            <p className="crm-pdash-label">Payment links</p>
+            <p className="crm-pdash-value">{s.links.total}</p>
+          </Link>
           <p className="crm-pdash-note crm-pdash-chips">
-            <span className="crm-pdash-chip is-active">{s.links.active} active</span>
-            <span className="crm-pdash-chip is-paid">{s.links.paid} paid</span>
-            <span className="crm-pdash-chip is-expired">{s.links.expired} expired</span>
+            <Link href="/crm/payments?tab=payment_link&status=pending" className="crm-pdash-chip is-active" title="View active payment links">
+              {s.links.active} active
+            </Link>
+            <Link href="/crm/payments?tab=payment_link&status=paid" className="crm-pdash-chip is-paid" title="View paid payment links">
+              {s.links.paid} paid
+            </Link>
+            <Link href="/crm/payments?tab=payment_link&status=failed" className="crm-pdash-chip is-expired" title="View expired payment links">
+              {s.links.expired} expired
+            </Link>
           </p>
         </div>
       </section>
@@ -125,9 +150,18 @@ export default function PaymentsDashboard({
         <div className="crm-card">
           <div className="crm-card-head">
             <h2 className="crm-card-title">Money collected · 6-month trend</h2>
-            <span className="crm-muted">{m(s.trend.reduce((a, t) => a + t.value, 0))}</span>
+            <Link href={`/crm/payments?status=paid&${monthRange(s.selectedMonthKey)}`} className="crm-dash-more" title="View this month's payments">
+              {m(s.trend.reduce((a, t) => a + t.value, 0))} total
+            </Link>
           </div>
-          <ColumnChart data={s.trend} format={(v) => shortMoney(v, cur)} empty="No payments collected in this period." />
+          <ColumnChart
+            data={s.trend.map((t) => ({
+              ...t,
+              href: `?month=${t.key}&${monthRange(t.key)}`,
+            }))}
+            format={(v) => shortMoney(v, cur)}
+            empty="No payments collected in this period."
+          />
         </div>
         <div className="crm-card">
           <div className="crm-card-head">
@@ -150,7 +184,9 @@ export default function PaymentsDashboard({
         <div className="crm-card">
           <div className="crm-card-head">
             <h2 className="crm-card-title">Waiting for payment</h2>
-            <span className="crm-muted">{m(s.due)}</span>
+            <Link href="/crm/payments?status=partially_paid" className="crm-dash-more" title="View all waiting payments">
+              View all ({m(s.due)})
+            </Link>
           </div>
           {s.dueSoon.length ? (
             <ul className="crm-pdash-list">

@@ -11,7 +11,7 @@ export function ColumnChart({
   format = (v) => String(v),
   empty = "Nothing recorded yet.",
 }: {
-  data: { key: string; label: string; value: number }[];
+  data: { key: string; label: string; value: number; href?: string }[];
   format?: (v: number) => string;
   empty?: string;
 }) {
@@ -32,13 +32,31 @@ export function ColumnChart({
   const last = data.length - 1;
   return (
     <div className="crm-dash-cols" role="img" aria-label={data.map((d) => `${d.label}: ${format(d.value)}`).join(", ")}>
-      {data.map((d, i) => (
-        <div key={d.key} className={`crm-dash-col${i === last ? " is-current" : ""}`}>
-          <span className="crm-dash-col-value">{d.value > 0 ? format(d.value) : ""}</span>
-          <span className="crm-dash-col-bar" style={{ height: `${Math.max(2, (d.value / max) * 100)}%` }} />
-          <span className="crm-dash-col-label">{d.label}</span>
-        </div>
-      ))}
+      {data.map((d, i) => {
+        const colClass = `crm-dash-col${i === last ? " is-current" : ""}${d.href ? " is-clickable" : ""}`;
+        const content = (
+          <>
+            <span className="crm-dash-col-value">{d.value > 0 ? format(d.value) : ""}</span>
+            <span className="crm-dash-col-bar" style={{ height: `${Math.max(2, (d.value / max) * 100)}%` }} />
+            <span className="crm-dash-col-label">{d.label}</span>
+          </>
+        );
+        return d.href ? (
+          <Link
+            key={d.key}
+            href={d.href}
+            className={colClass}
+            style={{ textDecoration: "none", color: "inherit", cursor: "pointer" }}
+            title={`View ${d.label} (${format(d.value)})`}
+          >
+            {content}
+          </Link>
+        ) : (
+          <div key={d.key} className={colClass}>
+            {content}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -80,7 +98,24 @@ export function StackBar({ parts, unit = "" }: { parts: StackPart[]; unit?: stri
         ) : (
           parts
             .filter((p) => p.count > 0)
-            .map((p) => <span key={p.key} className="crm-dash-stack-seg" style={{ flexGrow: p.count, background: p.color }} title={`${p.label}: ${p.count}`} />)
+            .map((p) =>
+              p.href ? (
+                <Link
+                  key={p.key}
+                  href={p.href}
+                  className="crm-dash-stack-seg"
+                  style={{ flexGrow: p.count, background: p.color, display: "block", cursor: "pointer" }}
+                  title={`${p.label}: ${p.count} (Click to view)`}
+                />
+              ) : (
+                <span
+                  key={p.key}
+                  className="crm-dash-stack-seg"
+                  style={{ flexGrow: p.count, background: p.color }}
+                  title={`${p.label}: ${p.count}`}
+                />
+              )
+            )
         )}
       </div>
       <ul className="crm-dash-legend">
