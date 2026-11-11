@@ -1,5 +1,5 @@
 import { getPool } from "@/lib/db";
-import { blogPosts as fallbackPosts, type BlogPost } from "@/data/blogs";
+import type { BlogPost } from "@/data/blogs";
 
 export type { BlogPost };
 
@@ -113,20 +113,19 @@ export function rowToCrmBlog(r: BlogDbRow): CrmBlog {
 }
 
 /*
- * The website reads blogs from the database only. The built-in copies in
- * data/blogs are used only when the database can't be reached; an empty
- * result is real (everything deleted or unpublished), so a blog removed in
- * the CRM never comes back from those copies.
+ * The website reads blogs from the database only: every blog the CRM marks
+ * "Published / show on website" appears, newest first, however many there
+ * are. Unpublished (draft) and deleted blogs never appear.
  */
 
-/** All published blogs for the website. */
+/** All published blogs for the website, newest first. */
 export async function getPublishedBlogs(): Promise<BlogPost[]> {
   try {
-    const [rows] = await getPool().query("SELECT * FROM blogs WHERE is_published = 1 ORDER BY id ASC");
+    const [rows] = await getPool().query("SELECT * FROM blogs WHERE is_published = 1 ORDER BY id DESC");
     return (rows as BlogDbRow[]).map(rowToBlog);
   } catch (err) {
-    console.warn("[blogs] DB query failed, showing the built-in blogs:", err);
-    return fallbackPosts;
+    console.error("[blogs] couldn't read the blogs from the database:", err);
+    return [];
   }
 }
 
@@ -137,8 +136,8 @@ export async function getPublishedBlogBySlug(slug: string): Promise<BlogPost | n
     const list = rows as BlogDbRow[];
     return list.length ? rowToBlog(list[0]) : null;
   } catch (err) {
-    console.warn(`[blogs] DB query for ${slug} failed, showing the built-in blog:`, err);
-    return fallbackPosts.find((p) => p.slug === slug) || null;
+    console.error(`[blogs] couldn't read blog ${slug} from the database:`, err);
+    return null;
   }
 }
 

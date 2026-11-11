@@ -1594,37 +1594,32 @@ a.button-link[data-wf--button--variant="white-bg"] .button-arrow,
   padding-left: 4px;
 }
 
-/* review badges under the location line (light-on-dark versions, transparent) */
+/* client ratings: one row, centred, above the legal-links line. Each badge
+   has its full size on wide screens; on narrower ones all four shrink
+   together (same proportions), so they always stay in one row */
 .qs-ft-reviews {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: 14px 26px;
-  margin-top: 22px;
-  padding-left: 4px;
+  justify-content: center;
+  gap: clamp(12px, 4vw, 60px);
+  padding: 4px 0 32px;
 }
 
 .qs-ft-review {
   display: block;
-  width: auto;
-  max-width: 100%;
+  flex: 0 1 auto;
+  min-width: 0;
+  height: auto;
 }
 
-.qs-ft-review.is-goodfirms { height: 19px; }
-/* GoodFirms is a long strip: it takes its own line under Google and Trustpilot */
-.qs-ft-review.is-goodfirms {
-  flex-basis: 100%;
-  object-fit: contain;
-  object-position: left center;
-}
-.qs-ft-review.is-google { height: 50px; }
-.qs-ft-review.is-trustpilot { height: 44px; }
+.qs-ft-review.is-goodfirms { width: 220px; }
+.qs-ft-review.is-google { width: 108px; }
+.qs-ft-review.is-trustpilot { width: 103px; }
+.qs-ft-review.is-clutch { width: 157px; }
 
-@media (max-width: 480px) {
-  .qs-ft-reviews { gap: 12px 20px; }
-  .qs-ft-review.is-goodfirms { height: 17px; }
-  .qs-ft-review.is-google { height: 44px; }
-  .qs-ft-review.is-trustpilot { height: 38px; }
+@media (max-width: 600px) {
+  .qs-ft-reviews { padding: 4px 0 26px; }
 }
 
 /* Right Navigation Columns */
