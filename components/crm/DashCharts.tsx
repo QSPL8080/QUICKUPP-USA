@@ -19,12 +19,29 @@ export function ColumnChart({
   if (max === 0) {
     return (
       <div className="crm-dash-cols is-empty">
-        {data.map((d) => (
-          <div key={d.key} className="crm-dash-col">
-            <span className="crm-dash-col-bar" style={{ height: "2px" }} />
-            <span className="crm-dash-col-label">{d.label}</span>
-          </div>
-        ))}
+        {data.map((d) => {
+          const col = (
+            <>
+              <span className="crm-dash-col-bar" style={{ height: "2px" }} />
+              <span className="crm-dash-col-label">{d.label}</span>
+            </>
+          );
+          return d.href ? (
+            <Link
+              key={d.key}
+              href={d.href}
+              className="crm-dash-col is-clickable"
+              style={{ textDecoration: "none", color: "inherit", cursor: "pointer" }}
+              title={`View ${d.label} (0)`}
+            >
+              {col}
+            </Link>
+          ) : (
+            <div key={d.key} className="crm-dash-col">
+              {col}
+            </div>
+          );
+        })}
         <p className="crm-dash-empty">{empty}</p>
       </div>
     );
@@ -145,7 +162,7 @@ export function RankList({
   format = (v) => String(v),
   empty = "Nothing recorded yet.",
 }: {
-  items: { label: string; value: number; note?: string }[];
+  items: { label: string; value: number; note?: string; href?: string }[];
   format?: (v: number) => string;
   empty?: string;
 }) {
@@ -153,20 +170,33 @@ export function RankList({
   const max = Math.max(1, ...items.map((i) => i.value));
   return (
     <ul className="crm-dash-rank">
-      {items.map((it) => (
-        <li key={it.label}>
-          <div className="crm-dash-rank-top">
-            <span className="crm-dash-rank-label">{it.label}</span>
-            <span className="crm-dash-rank-num">
-              {format(it.value)}
-              {it.note && <span className="crm-dash-rank-note"> · {it.note}</span>}
+      {items.map((it) => {
+        const content = (
+          <>
+            <div className="crm-dash-rank-top">
+              <span className="crm-dash-rank-label">{it.label}</span>
+              <span className="crm-dash-rank-num">
+                {format(it.value)}
+                {it.note && <span className="crm-dash-rank-note"> · {it.note}</span>}
+              </span>
+            </div>
+            <span className="crm-dash-rank-track">
+              <span className="crm-dash-rank-fill" style={{ width: `${it.value > 0 ? Math.max(3, (it.value / max) * 100) : 0}%` }} />
             </span>
-          </div>
-          <span className="crm-dash-rank-track">
-            <span className="crm-dash-rank-fill" style={{ width: `${it.value > 0 ? Math.max(3, (it.value / max) * 100) : 0}%` }} />
-          </span>
-        </li>
-      ))}
+          </>
+        );
+        return (
+          <li key={it.label}>
+            {it.href ? (
+              <Link href={it.href} className="crm-dash-rank-link" title={`View ${it.label} (${format(it.value)})`}>
+                {content}
+              </Link>
+            ) : (
+              content
+            )}
+          </li>
+        );
+      })}
     </ul>
   );
 }

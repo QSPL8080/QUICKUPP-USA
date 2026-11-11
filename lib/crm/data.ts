@@ -79,7 +79,8 @@ const UNION_SQL = (Object.keys(SOURCES) as EnquirySource[])
   .map((k) => {
     const detail = k === "contact" ? "COALESCE(category, project_type)" : k === "youtube" ? "''" : k === "industries" ? "COALESCE(NULLIF(category, ''), service)" : "category";
     const service = k === "contact" ? "project_type" : "service";
-    return `SELECT '${k}' AS src, id, full_name, email, phone, company_name, ${detail} AS detail, ${service} AS service, assigned_to, status, COALESCE(NULLIF(TRIM(project_status), ''), 'Not Started') AS project_status, created_at FROM \`${SOURCES[k].table}\``;
+    const channel = k === "manual" ? "COALESCE(NULLIF(lead_channel, ''), 'Manual')" : "'Website'";
+    return `SELECT '${k}' AS src, id, full_name, email, phone, company_name, ${detail} AS detail, ${service} AS service, assigned_to, status, COALESCE(NULLIF(TRIM(project_status), ''), 'Not Started') AS project_status, ${channel} AS channel, created_at FROM \`${SOURCES[k].table}\``;
   })
   .join(" UNION ALL ");
 
@@ -88,11 +89,12 @@ const UNION_SQL_SAFE = (Object.keys(SOURCES) as EnquirySource[])
     const detail = k === "contact" ? "COALESCE(category, project_type)" : k === "youtube" ? "''" : k === "industries" ? "COALESCE(NULLIF(category, ''), service)" : "category";
     const service = k === "contact" ? "project_type" : "service";
     const assigned = k === "manual" ? "assigned_to" : "NULL AS assigned_to";
-    return `SELECT '${k}' AS src, id, full_name, email, phone, company_name, ${detail} AS detail, ${service} AS service, ${assigned}, status, 'Not Started' AS project_status, created_at FROM \`${SOURCES[k].table}\``;
+    const channel = k === "manual" ? "COALESCE(NULLIF(lead_channel, ''), 'Manual')" : "'Website'";
+    return `SELECT '${k}' AS src, id, full_name, email, phone, company_name, ${detail} AS detail, ${service} AS service, ${assigned}, status, 'Not Started' AS project_status, ${channel} AS channel, created_at FROM \`${SOURCES[k].table}\``;
   })
   .join(" UNION ALL ");
 
-export type LeadFilters = { q?: string; source?: string; status?: string; projectStatus?: string; from?: string; to?: string };
+export type LeadFilters = { q?: string; source?: string; status?: string; projectStatus?: string; channel?: string; from?: string; to?: string };
 
 function leadWhere(f: LeadFilters) {
   const where: string[] = [];
@@ -110,6 +112,14 @@ function leadWhere(f: LeadFilters) {
   if (f.projectStatus && (PROJECT_STATUSES as readonly string[]).includes(f.projectStatus)) {
     where.push("project_status = ?");
     args.push(f.projectStatus);
+  }
+  if (f.channel) {
+    if (f.channel.toLowerCase() === "website") {
+      where.push("(channel = 'Website' OR channel IS NULL)");
+    } else {
+      where.push("LOWER(channel) = ?");
+      args.push(f.channel.toLowerCase());
+    }
   }
   if (f.from && /^\d{4}-\d{2}-\d{2}$/.test(f.from)) {
     where.push("created_at >= ?");

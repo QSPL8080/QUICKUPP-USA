@@ -351,7 +351,7 @@ export async function crmOverview() {
     title: String(r.full_name || "—"),
     sub: SOURCES[r.src as EnquirySource]?.short || "Lead",
     status: String(r.status || "new"),
-    href: SOURCES[r.src as EnquirySource]?.href || "/crm/enquiries",
+    href: `/crm/enquiries?source=${r.src}&q=${encodeURIComponent(String(r.full_name || ""))}`,
     at: new Date(r.created_at as string).toISOString(),
   }));
   const recentApps = (await q(`SELECT id, full_name, job_title, status, created_at FROM job_applications ORDER BY created_at DESC LIMIT 4`)).map((r) => ({
@@ -360,19 +360,19 @@ export async function crmOverview() {
     title: String(r.full_name || "—"),
     sub: String(r.job_title || "Application"),
     status: String(r.status || "new"),
-    href: "/crm/applications",
+    href: `/crm/applications?q=${encodeURIComponent(String(r.full_name || ""))}`,
     at: new Date(r.created_at as string).toISOString(),
   }));
   let payRecentRows = await q(
     `SELECT * FROM (
-       (SELECT id, client_name, service, status, amount, total_amount, currency, created_at, 'website' AS kind FROM payments WHERE source IN ('website','online') ORDER BY created_at DESC LIMIT 4)
+       (SELECT id, client_name, client_email, invoice_number, service, status, amount, total_amount, currency, created_at, 'website' AS kind FROM payments WHERE source IN ('website','online') ORDER BY created_at DESC LIMIT 4)
        UNION ALL
-       (SELECT id, client_name, service, status, amount, total_amount, currency, created_at, 'link' AS kind FROM payment_links ORDER BY created_at DESC LIMIT 4)
+       (SELECT id, client_name, client_email, invoice_number, service, status, amount, total_amount, currency, created_at, 'link' AS kind FROM payment_links ORDER BY created_at DESC LIMIT 4)
      ) t ORDER BY created_at DESC LIMIT 4`
   );
   if (!payRecentRows.length) {
     payRecentRows = await q(
-      `SELECT id, client_name, service, status, amount, total_amount, currency, created_at, 'website' AS kind FROM payments WHERE source IN ('website','online') ORDER BY created_at DESC LIMIT 4`
+      `SELECT id, client_name, client_email, invoice_number, service, status, amount, total_amount, currency, created_at, 'website' AS kind FROM payments WHERE source IN ('website','online') ORDER BY created_at DESC LIMIT 4`
     );
   }
   const recentPays = payRecentRows.map((r) => ({
@@ -383,7 +383,7 @@ export async function crmOverview() {
     status: String(r.status || "pending"),
     amount: n(r.status === "pending" ? r.total_amount || r.amount : r.amount),
     currency: String(r.currency || "USD"),
-    href: r.kind === "link" ? "/crm/payments?tab=payment_link" : "/crm/payments?tab=website",
+    href: paymentHref(r),
     at: new Date(r.created_at as string).toISOString(),
   }));
   const activity = [...recentLeads, ...recentApps, ...recentPays].sort((a, b) => (a.at < b.at ? 1 : -1)).slice(0, 8);

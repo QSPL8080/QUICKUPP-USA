@@ -7,7 +7,7 @@ import LeadsView from "@/components/crm/LeadsView";
 import AddLeadButton from "@/components/crm/AddLeadButton";
 import { PageHead, Pager } from "@/components/crm/ListTools";
 
-type Props = { searchParams: Promise<{ q?: string; source?: string; status?: string; projectStatus?: string; from?: string; to?: string; page?: string; new?: string }> };
+type Props = { searchParams: Promise<{ q?: string; source?: string; status?: string; projectStatus?: string; channel?: string; from?: string; to?: string; page?: string; new?: string }> };
 
 const ymd = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -20,6 +20,7 @@ export default async function EnquiriesPage({ searchParams }: Props) {
     source: sp.source || "",
     status: sp.status || "",
     projectStatus: sp.projectStatus || "",
+    channel: sp.channel || "",
     from: DATE_RE.test(sp.from || "") ? (sp.from as string) : "",
     to: DATE_RE.test(sp.to || "") ? (sp.to as string) : "",
   };
@@ -37,6 +38,7 @@ export default async function EnquiriesPage({ searchParams }: Props) {
     if (f.source) p.set("source", f.source);
     if (f.status) p.set("status", f.status);
     if (f.projectStatus) p.set("projectStatus", f.projectStatus);
+    if (f.channel) p.set("channel", f.channel);
     p.set("from", ymd(s));
     p.set("to", ymd(e));
     return `?${p.toString()}`;
@@ -44,7 +46,7 @@ export default async function EnquiriesPage({ searchParams }: Props) {
   const monthLabel = monthStart.toLocaleDateString("en-US", { month: "long", year: "numeric" });
 
   const exportHref = `/api/crm/enquiries/export?${new URLSearchParams(Object.entries(f).filter(([, v]) => v) as [string, string][]).toString()}`;
-  const filtered = Boolean(f.q || f.source || f.status || f.projectStatus || f.from || f.to);
+  const filtered = Boolean(f.q || f.source || f.status || f.projectStatus || f.channel || f.from || f.to);
 
   const sourceHref = (s: string) => {
     const p = new URLSearchParams();
@@ -52,6 +54,7 @@ export default async function EnquiriesPage({ searchParams }: Props) {
     if (s) p.set("source", s);
     if (f.status) p.set("status", f.status);
     if (f.projectStatus) p.set("projectStatus", f.projectStatus);
+    if (f.channel) p.set("channel", f.channel);
     if (f.from) p.set("from", f.from);
     if (f.to) p.set("to", f.to);
     const qs = p.toString();
@@ -157,6 +160,12 @@ export default async function EnquiriesPage({ searchParams }: Props) {
             </option>
           ))}
         </select>
+        <select className="crm-input crm-select" name="channel" defaultValue={f.channel} aria-label="Lead channel">
+          <option value="">All channels</option>
+          <option value="Website">Website</option>
+          <option value="Manual">Manual</option>
+          <option value="Meta">Meta</option>
+        </select>
         <span className="crm-date-range">
           <input className="crm-input" type="date" name="from" defaultValue={f.from} aria-label="Received from" />
           <span className="crm-muted">to</span>
@@ -195,7 +204,7 @@ export default async function EnquiriesPage({ searchParams }: Props) {
 
       <div className="crm-card crm-card-flush">
         <LeadsView rows={data.items} offset={(data.page - 1) * data.pageSize} team={team} currentUser={user} openNew={sp.new === "1"} />
-        <Pager {...data} q={f.q} status={f.status} extra={{ source: f.source, projectStatus: f.projectStatus, from: f.from, to: f.to }} />
+        <Pager {...data} q={f.q} status={f.status} extra={{ source: f.source, projectStatus: f.projectStatus, channel: f.channel, from: f.from, to: f.to }} />
       </div>
     </>
   );

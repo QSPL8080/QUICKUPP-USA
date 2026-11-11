@@ -57,16 +57,29 @@ const liveState = (j: Job) => (!j.isOpen ? "closed" : j.deadline && j.deadline <
 const STATE_LABEL = { live: "Live", closed: "Closed", expired: "Deadline passed" } as const;
 
 /* showApplications: false for the SEO role, who works on openings only and never sees applications */
-export default function JobsView({ rows, openNew, showApplications = true }: { rows: Job[]; openNew: boolean; showApplications?: boolean }) {
+export default function JobsView({
+  rows,
+  openNew,
+  initialStatus = "",
+  showApplications = true,
+}: {
+  rows: Job[];
+  openNew: boolean;
+  initialStatus?: string;
+  showApplications?: boolean;
+}) {
   const router = useRouter();
   const { confirm, toast } = useFeedback();
+  const [filterStatus, setFilterStatus] = useState<string>(initialStatus);
   const [editing, setEditing] = useState<Job | "new" | null>(openNew ? "new" : null);
   const [form, setForm] = useState<FormState>(blank());
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [listError, setListError] = useState("");
-  const sel = useSelection(rows.map((j) => j.id));
+
+  const visibleRows = filterStatus ? rows.filter((j) => liveState(j) === filterStatus) : rows;
+  const sel = useSelection(visibleRows.map((j) => j.id));
 
   const openForm = (j: Job | "new") => {
     setForm(j === "new" ? blank() : fromJob(j));
@@ -184,8 +197,43 @@ export default function JobsView({ rows, openNew, showApplications = true }: { r
         {addButton}
       </PageHead>
 
+      <div className="crm-payments-tabs" style={{ marginBottom: "1rem" }}>
+        <button
+          type="button"
+          onClick={() => setFilterStatus("")}
+          className={`crm-payments-tab ${!filterStatus ? "is-active" : ""}`}
+        >
+          <span>All Openings</span>
+          <span className="crm-tab-badge">{rows.length}</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setFilterStatus("live")}
+          className={`crm-payments-tab ${filterStatus === "live" ? "is-active" : ""}`}
+        >
+          <span>Live</span>
+          <span className="crm-tab-badge">{rows.filter((j) => liveState(j) === "live").length}</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setFilterStatus("closed")}
+          className={`crm-payments-tab ${filterStatus === "closed" ? "is-active" : ""}`}
+        >
+          <span>Closed</span>
+          <span className="crm-tab-badge">{rows.filter((j) => liveState(j) === "closed").length}</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setFilterStatus("expired")}
+          className={`crm-payments-tab ${filterStatus === "expired" ? "is-active" : ""}`}
+        >
+          <span>Expired</span>
+          <span className="crm-tab-badge">{rows.filter((j) => liveState(j) === "expired").length}</span>
+        </button>
+      </div>
+
       <div className="crm-card crm-card-flush">
-        {rows.length > 0 && (
+        {visibleRows.length > 0 && (
           <BulkBar sel={sel} noun={["job opening", "job openings"]} busy={busy} onDelete={removeSelected} />
         )}
       {listError && (
@@ -194,7 +242,7 @@ export default function JobsView({ rows, openNew, showApplications = true }: { r
         </p>
       )}
 
-      {rows.length ? (
+      {visibleRows.length ? (
         <div className="crm-table-wrap">
           <table className="crm-table crm-stack crm-selectable crm-jobs-table">
             <thead>
@@ -213,7 +261,7 @@ export default function JobsView({ rows, openNew, showApplications = true }: { r
               </tr>
             </thead>
             <tbody>
-              {rows.map((j) => {
+              {visibleRows.map((j) => {
                 const state = liveState(j);
                 return (
                   <tr key={j.id} className={`crm-row${sel.has(j.id) ? " is-picked" : ""}`} onClick={() => openForm(j)}>
@@ -311,14 +359,20 @@ export default function JobsView({ rows, openNew, showApplications = true }: { r
               <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
             </svg>
           </div>
-          <p className="crm-empty-title">No job openings yet</p>
-          <p className="crm-empty-sub">Publish vacancies here to display them under Current Job Openings on the Careers page.</p>
-          <button type="button" className="crm-act crm-act-dark" onClick={() => openForm("new")}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            Add job opening
-          </button>
+          <p className="crm-empty-title">{filterStatus ? `No ${filterStatus} job openings` : "No job openings yet"}</p>
+          <p className="crm-empty-sub">
+            {filterStatus
+              ? `There are currently no job openings with "${filterStatus}" status.`
+              : "Publish vacancies here to display them under Current Job Openings on the Careers page."}
+          </p>
+          {!filterStatus && (
+            <button type="button" className="crm-act crm-act-dark" onClick={() => openForm("new")}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              Add job opening
+            </button>
+          )}
         </div>
       )}
       </div>

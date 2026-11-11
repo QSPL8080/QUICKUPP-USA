@@ -17,6 +17,7 @@ export async function GET(request: Request) {
     source: sp.get("source") || "",
     status: sp.get("status") || "",
     projectStatus: sp.get("projectStatus") || "",
+    channel: sp.get("channel") || "",
     from: sp.get("from") || "",
     to: sp.get("to") || "",
   });

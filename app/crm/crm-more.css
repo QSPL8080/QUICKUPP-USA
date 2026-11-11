@@ -1639,3 +1639,81 @@ a.crm-pdash-chip:hover {
 .crm-dash-col.is-clickable:hover .crm-dash-col-bar {
   filter: brightness(1.12);
 }
+
+/* Main CRM Dashboard interactive cards, facts, rankings, and links */
+.crm-dash-kpi {
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  cursor: pointer;
+}
+.crm-dash-kpi:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+  border-color: #cbd5e1;
+}
+
+.crm-dash-pay-link {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 12px;
+  margin: -6px -8px 8px -8px;
+  border-radius: 12px;
+  transition: background 0.15s ease, transform 0.15s ease;
+  cursor: pointer;
+}
+.crm-dash-pay-link:hover {
+  background: #f8fafc;
+  transform: translateY(-1px);
+}
+.crm-dash-pay-link:hover .crm-dash-big {
+  color: #4f46e5;
+}
+
+.crm-dash-facts > a,
+.crm-dash-facts > .crm-dash-fact-link {
+  padding: 12px 14px;
+  background: #fafbfd;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: background-color 0.15s ease;
+  cursor: pointer;
+}
+.crm-dash-facts > a:hover,
+.crm-dash-facts > .crm-dash-fact-link:hover {
+  background: #eff6ff;
+}
+.crm-dash-facts > a:hover dt,
+.crm-dash-facts > .crm-dash-fact-link:hover dt {
+  color: #3b82f6;
+}
+.crm-dash-facts > a:hover dd,
+.crm-dash-facts > .crm-dash-fact-link:hover dd {
+  color: #1d4ed8;
+}
+
+.crm-dash-rank-link {
+  display: block;
+  padding: 6px 8px;
+  margin: -6px -8px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.15s ease;
+  cursor: pointer;
+}
+.crm-dash-rank-link:hover {
+  background: #f1f5f9;
+}
+.crm-dash-rank-link:hover .crm-dash-rank-label {
+  color: #4f46e5;
+  font-weight: 600;
+}
+.crm-dash-rank-link:hover .crm-dash-rank-fill {
+  filter: brightness(1.1);
+}
+
