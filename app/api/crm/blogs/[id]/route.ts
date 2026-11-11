@@ -1,7 +1,7 @@
 import { revalidatePath } from "next/cache";
 import { getPool } from "@/lib/db";
 import { getUserFor } from "@/lib/crm/auth";
-import { type BlogDbRow, rowToCrmBlog, validateBlog } from "@/lib/blogs";
+import { type BlogDbRow, blogStoredInFull, ensureBlogColumns, rowToCrmBlog, validateBlog } from "@/lib/blogs";
 import { readJson } from "@/lib/enquiry";
 
 type Ctx = { params: Promise<{ id: string }> };
@@ -48,8 +48,10 @@ export async function PATCH(request: Request, ctx: Ctx) {
   if (!result.ok) return Response.json({ ok: false, errors: result.errors }, { status: 400 });
 
   const d = result.data;
+  const contentJson = JSON.stringify(d.content);
 
   try {
+    await ensureBlogColumns();
     await getPool().execute(
       `UPDATE blogs
        SET slug = ?, category = ?, title = ?, \`desc\` = ?, author = ?, author_role = ?, read_time = ?, img = ?, content = ?, is_published = ?
@@ -63,11 +65,17 @@ export async function PATCH(request: Request, ctx: Ctx) {
         d.authorRole,
         d.readTime,
         d.img,
-        JSON.stringify(d.content),
+        contentJson,
         d.isPublished ? 1 : 0,
         id,
       ]
     );
+    if (!(await blogStoredInFull(id, d.img, contentJson))) {
+      return Response.json(
+        { ok: false, error: "The database couldn't store the whole blog with its images. Please try again with fewer or smaller images." },
+        { status: 500 }
+      );
+    }
 
     revalidatePath("/blog", "layout");
     revalidatePath("/resources");

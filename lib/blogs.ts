@@ -74,6 +74,53 @@ function parseContent(raw: unknown): BlogPost["content"] {
   return { intro: "", keyTakeaways: [], sections: [], conclusion: "" };
 }
 
+const DEFAULT_COVER = "/images/blog-img-01.jpg";
+
+/*
+ * An uploaded picture cut off by a too-small database column (exactly 255,
+ * 65,535 or 16,777,215 characters long) can't be shown; use the default cover
+ * until someone uploads it again.
+ */
+const CUT_LENGTHS = new Set([255, 65535, 16777215]);
+function coverOf(img: string | null | undefined): string {
+  if (!img) return DEFAULT_COVER;
+  if (img.startsWith("data:") && CUT_LENGTHS.has(img.length)) return DEFAULT_COVER;
+  return img;
+}
+
+/*
+ * Pictures uploaded in the CRM are stored inside the blog itself (cover in
+ * `img`, article pictures inside `content`), so both columns must be able to
+ * hold several megabytes. A database whose blogs table was made before this
+ * (img VARCHAR(255) and/or a TEXT content) cuts uploads off without an error;
+ * widen the columns before the first save. Runs once per server start.
+ */
+let columnsReady: Promise<void> | null = null;
+export function ensureBlogColumns(): Promise<void> {
+  if (!columnsReady) {
+    columnsReady = (async () => {
+      const [rows] = await getPool().query(
+        "SELECT COLUMN_NAME AS name, LOWER(DATA_TYPE) AS type FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'blogs' AND COLUMN_NAME IN ('img', 'content')"
+      );
+      for (const r of rows as { name: string; type: string }[]) {
+        if (r.type !== "longtext") await getPool().query(`ALTER TABLE blogs MODIFY COLUMN \`${r.name}\` LONGTEXT NOT NULL`);
+      }
+    })().catch((err) => {
+      columnsReady = null; // try again on the next save
+      throw err;
+    });
+  }
+  return columnsReady;
+}
+
+/** After a save: true when the database kept the whole cover and article (nothing cut off). */
+export async function blogStoredInFull(id: number, img: string, content: string): Promise<boolean> {
+  const [rows] = await getPool().query("SELECT CHAR_LENGTH(img) AS i, CHAR_LENGTH(content) AS c FROM blogs WHERE id = ?", [id]);
+  const r = (rows as { i: number; c: number }[])[0];
+  if (!r) return false;
+  return Number(r.i) >= Array.from(img).length && Number(r.c) >= Array.from(content).length;
+}
+
 export function rowToBlog(r: BlogDbRow): BlogPost {
   const d = new Date(r.created_at);
   const dateFormatted = isNaN(d.getTime())
@@ -89,7 +136,7 @@ export function rowToBlog(r: BlogDbRow): BlogPost {
     author: r.author,
     authorRole: r.author_role,
     readTime: r.read_time,
-    img: r.img || "/images/blog-img-01.jpg",
+    img: coverOf(r.img),
     content: parseContent(r.content),
   };
 }
@@ -104,7 +151,7 @@ export function rowToCrmBlog(r: BlogDbRow): CrmBlog {
     author: r.author,
     authorRole: r.author_role,
     readTime: r.read_time,
-    img: r.img || "/images/blog-img-01.jpg",
+    img: coverOf(r.img),
     content: parseContent(r.content),
     isPublished: Boolean(r.is_published),
     createdAt: new Date(r.created_at).toISOString(),

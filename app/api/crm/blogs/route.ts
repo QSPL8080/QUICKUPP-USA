@@ -1,7 +1,7 @@
 import { revalidatePath } from "next/cache";
 import { getPool } from "@/lib/db";
 import { getUserFor } from "@/lib/crm/auth";
-import { getCrmBlogs, validateBlog } from "@/lib/blogs";
+import { blogStoredInFull, ensureBlogColumns, getCrmBlogs, validateBlog } from "@/lib/blogs";
 import { readJson } from "@/lib/enquiry";
 
 export async function GET() {
@@ -26,8 +26,10 @@ export async function POST(request: Request) {
   if (!result.ok) return Response.json({ ok: false, errors: result.errors }, { status: 400 });
 
   const d = result.data;
+  const contentJson = JSON.stringify(d.content);
 
   try {
+    await ensureBlogColumns();
     const [res] = await getPool().execute(
       `INSERT INTO blogs (slug, category, title, \`desc\`, author, author_role, read_time, img, content, is_published)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -40,14 +42,22 @@ export async function POST(request: Request) {
         d.authorRole,
         d.readTime,
         d.img,
-        JSON.stringify(d.content),
+        contentJson,
         d.isPublished ? 1 : 0,
       ]
     );
+    const id = (res as { insertId: number }).insertId;
+    if (!(await blogStoredInFull(id, d.img, contentJson))) {
+      await getPool().execute("DELETE FROM blogs WHERE id = ?", [id]);
+      return Response.json(
+        { ok: false, error: "The database couldn't store the whole blog with its images. Please try again with fewer or smaller images." },
+        { status: 500 }
+      );
+    }
 
     revalidatePath("/blog", "layout");
     revalidatePath("/resources");
-    return Response.json({ ok: true, id: (res as { insertId: number }).insertId });
+    return Response.json({ ok: true, id });
   } catch (err) {
     console.error("[api/crm/blogs] insert failed:", err);
     return Response.json({ ok: false, error: "Couldn't save the blog. Please try again." }, { status: 500 });
