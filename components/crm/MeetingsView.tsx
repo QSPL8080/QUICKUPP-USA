@@ -67,8 +67,8 @@ function StatusPill({ m }: { m: MeetingItem }) {
   return (
     <span className="crm-meet-status">
       <span className={`crm-pill crm-meet-pill crm-meet-pill-${m.view}`}>{LABEL[m.view]}</span>
-      {/* a meeting that was moved keeps showing it, even once canceled or completed */}
-      {m.rescheduleCount > 0 && m.view !== "rescheduled" && (
+      {/* only show rescheduled sub-pill when not canceled */}
+      {m.rescheduleCount > 0 && m.view !== "rescheduled" && m.view !== "canceled" && (
         <span className="crm-pill crm-meet-pill crm-meet-pill-rescheduled crm-meet-pill-sub">Rescheduled{m.rescheduleCount > 1 ? ` ×${m.rescheduleCount}` : ""}</span>
       )}
       {m.rescheduleCount > 1 && m.view === "rescheduled" && <span className="crm-meet-times">×{m.rescheduleCount}</span>}
@@ -197,7 +197,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
                   <span className="crm-cell-sub">
                     {fmtTime(m.startTime)} – {fmtTime(m.endTime)} ({minutes(m.startTime, m.endTime)} min)
                   </span>
-                  {m.previousStartTime && m.rescheduleCount > 0 && (
+                  {m.view !== "canceled" && m.previousStartTime && m.rescheduleCount > 0 && (
                     <span className="crm-cell-sub crm-meet-was">{sameTime(m.previousStartTime, m.startTime) ? "Rebooked for the same time" : `Was ${fmtWhen(m.previousStartTime)}`}</span>
                   )}
                 </td>

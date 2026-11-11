@@ -388,8 +388,8 @@ export async function meetingCounts(): Promise<Record<string, number>> {
   try {
     const [rows] = await getPool().query(
       `SELECT COUNT(*) AS total,
-              SUM(status = 'scheduled' AND end_time >= UTC_TIMESTAMP()) AS upcoming,
-              SUM(reschedule_count > 0) AS rescheduled,
+              SUM(status = 'scheduled' AND (reschedule_count IS NULL OR reschedule_count = 0) AND end_time >= UTC_TIMESTAMP()) AS upcoming,
+              SUM(status <> 'canceled' AND reschedule_count > 0 AND end_time >= UTC_TIMESTAMP()) AS rescheduled,
               SUM(status <> 'canceled' AND end_time < UTC_TIMESTAMP()) AS completed,
               SUM(status = 'canceled') AS canceled
          FROM crm_meetings WHERE deleted_at IS NULL`
@@ -455,8 +455,8 @@ export async function listMeetings(opts: { q?: string; status?: string; when?: s
   }
   if (opts.status === "canceled") where.push("status = 'canceled'");
   else if (opts.status === "completed") where.push("status <> 'canceled' AND end_time < UTC_TIMESTAMP()");
-  else if (opts.status === "rescheduled") where.push("reschedule_count > 0"); // every meeting that was moved, whatever happened after
-  else if (opts.status === "upcoming") where.push("status = 'scheduled' AND end_time >= UTC_TIMESTAMP()");
+  else if (opts.status === "rescheduled") where.push("status <> 'canceled' AND reschedule_count > 0 AND end_time >= UTC_TIMESTAMP()");
+  else if (opts.status === "upcoming") where.push("status = 'scheduled' AND (reschedule_count IS NULL OR reschedule_count = 0) AND end_time >= UTC_TIMESTAMP()");
   if (opts.when === "upcoming") where.push("end_time >= UTC_TIMESTAMP()");
   else if (opts.when === "past") where.push("end_time < UTC_TIMESTAMP()");
   const whereSql = `WHERE ${where.join(" AND ")}`;
@@ -484,7 +484,7 @@ export async function listMeetings(opts: { q?: string; status?: string; when?: s
       id: Number(r.id),
       eventName: String(r.event_name || ""),
       status,
-      view: status === "canceled" ? "canceled" : ended ? "completed" : status === "rescheduled" ? "rescheduled" : "upcoming",
+      view: status === "canceled" ? "canceled" : ended ? "completed" : status === "rescheduled" || Number(r.reschedule_count || 0) > 0 ? "rescheduled" : "upcoming",
       startTime: String(r.start_time),
       endTime: String(r.end_time),
       inviteeTimezone: r.invitee_timezone ? String(r.invitee_timezone) : null,

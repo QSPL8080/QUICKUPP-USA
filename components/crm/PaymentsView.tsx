@@ -1027,30 +1027,6 @@ Quickupp Softech LLC`;
                                 Copy Link
                               </button>
                             )}
-                            {(p.status === "paid" || p.linkStatus === "used") && (
-                              <a
-                                href={`/api/payments/receipt?order=${encodeURIComponent(p.invoiceNumber || String(p.id))}`}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="crm-act crm-act-ghost crm-act-sm"
-                                style={{
-                                  fontSize: "12px",
-                                  padding: "4px 10px",
-                                  display: "inline-flex",
-                                  alignItems: "center",
-                                  gap: "5px",
-                                  color: "#7c3aed",
-                                  borderColor: "#ddd6fe",
-                                  background: "#fbfaff",
-                                  textDecoration: "none",
-                                  fontWeight: 600,
-                                }}
-                                title="View Receipt PDF"
-                              >
-                                📄 Receipt
-                              </a>
-                            )}
-
                             {/* WhatsApp (Green Button) */}
                             {!isLinkExpired && p.status !== "paid" && p.linkStatus !== "used" && p.linkStatus !== "cancelled" ? (
                               <button
@@ -1491,18 +1467,6 @@ Quickupp Softech LLC`;
                       <span>Copy Link</span>
                     </button>
                   )}
-                  {isViewingPaid && (
-                    <a
-                      href={`/api/payments/receipt?order=${encodeURIComponent(viewing.invoiceNumber || String(viewing.id))}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="crm-act crm-act-ghost crm-act-sm"
-                      style={{ display: "inline-flex", alignItems: "center", gap: "5px", fontSize: "12px", padding: "5px 11px", color: "#7c3aed", borderColor: "#ddd6fe", textDecoration: "none", fontWeight: 700 }}
-                      title="View Official Receipt"
-                    >
-                      📄 <span>Receipt</span>
-                    </a>
-                  )}
                   <button
                     type="button"
                     className="crm-icon-act"
@@ -1695,18 +1659,6 @@ Quickupp Softech LLC`;
                                   </svg>
                                   Copy Link
                                 </button>
-                              )}
-                              {isViewingPaid && (
-                                <a
-                                  href={`/api/payments/receipt?order=${encodeURIComponent(viewing.invoiceNumber || String(viewing.id))}`}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="crm-att-btn"
-                                  title="View Receipt PDF"
-                                  style={{ fontSize: "11px", padding: "4px 8px", color: "#7c3aed", textDecoration: "none" }}
-                                >
-                                  📄 Receipt
-                                </a>
                               )}
 
                               {/* WhatsApp (only if not expired and not used/paid) */}
@@ -1915,17 +1867,6 @@ Quickupp Softech LLC`;
                       </svg>
                       <span>Copy Link</span>
                     </button>
-                  )}
-                  {isViewingPaid && (
-                    <a
-                      href={`/api/payments/receipt?order=${encodeURIComponent(viewing.invoiceNumber || String(viewing.id))}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="crm-act crm-act-ghost crm-act-sm"
-                      style={{ display: "inline-flex", alignItems: "center", gap: "5px", color: "#7c3aed", borderColor: "#ddd6fe", textDecoration: "none", fontWeight: 700 }}
-                    >
-                      📄 <span>Download Receipt</span>
-                    </a>
                   )}
                   {canShareViewing && (
                     <button
