@@ -331,10 +331,8 @@ export async function applyInvitee(inv: CalInvitee, ev: CalEvent, forcedMeetingI
       await mapInvitee(inv.new_invitee, id);
     }
     await mapInvitee(inv.uri, id, ev.uri, ev.updated_at);
-    await updateRow(id, {
-      status: "rescheduled",
-      reschedule_count: Math.max(1, row.reschedule_count || 1),
-    });
+    // the count goes up once, when the new time is read (Case 3), not again here
+    await updateRow(id, { status: "rescheduled" });
     return;
   }
 
@@ -524,7 +522,7 @@ export async function meetingCounts(): Promise<Record<string, number>> {
 export const MEETING_STATUS_LABEL: Record<string, string> = {
   upcoming: "Scheduled",
   rescheduled: "Rescheduled",
-  completed: "Completed",
+  completed: "Past", // the time has passed; whether it was held isn't known
   canceled: "Canceled",
 };
 

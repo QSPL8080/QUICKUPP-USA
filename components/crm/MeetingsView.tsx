@@ -15,7 +15,8 @@ import type { MeetingItem } from "@/lib/crm/calendly";
 const LABEL: Record<MeetingItem["view"], string> = {
   upcoming: "Scheduled",
   rescheduled: "Rescheduled",
-  completed: "Completed",
+  // the meeting time has passed; the CRM doesn't know whether it was held
+  completed: "Past",
   canceled: "Canceled",
 };
 

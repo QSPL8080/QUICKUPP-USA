@@ -1031,7 +1031,7 @@
 /* ---- Calendly meetings (view only) ---------------------------------------------- */
 .crm-meet-pill-upcoming { background: #eef2ff; color: #4f46e5; }
 .crm-meet-pill-rescheduled { background: #fffbeb; color: #b45309; }
-.crm-meet-pill-completed { background: #ecfdf5; color: #047857; }
+.crm-meet-pill-completed { background: #f1f5f9; color: #64748b; }
 .crm-meet-pill-canceled { background: #fef2f2; color: #b91c1c; }
 
 .crm-meet-row-off td:not(.crm-col-check) {
