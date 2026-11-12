@@ -10,6 +10,7 @@ import LucideIcon, { type LucideIconName } from "@/components/LucideIcon";
 import type { Job } from "@/lib/jobs";
 import { RESUME_ACCEPT, checkResume, fmtBytes } from "@/lib/applications";
 import "@/app/career.css";
+import Lines from "@/components/HeadingLines";
 
 /*
  * Careers page ("cv-" design, used on no other page): three rows of team
@@ -155,7 +156,7 @@ function Benefits() {
           <span className="cv-benefit-icon" aria-hidden="true">
             <LucideIcon name={b.icon} size={22} />
           </span>
-          <h3 className="cv-benefit-title">{b.title}</h3>
+          <h3 className="cv-benefit-title"><Lines>{b.title}</Lines></h3>
           <p className="cv-benefit-text">{b.text}</p>
         </li>
       ))}
@@ -186,9 +187,9 @@ function Departments() {
               <span className="cv-dept-icon" aria-hidden="true">
                 <LucideIcon name={d.icon} size={26} />
               </span>
-              <h3 className="cv-dept-title">
+              <h3 className="cv-dept-title"><Lines>
                 {i + 1}. {d.title}
-              </h3>
+              </Lines></h3>
               <p className="cv-dept-text">{d.text}</p>
               <p className="cv-dept-label">{d.label}</p>
               <ul className="cv-roles">
@@ -243,7 +244,7 @@ function HiringTrack() {
             <b>{i + 1}</b>
           </span>
           <span className="cv-step-label">Step {i + 1}</span>
-          <h3 className="cv-step-title">{s.title}</h3>
+          <h3 className="cv-step-title"><Lines>{s.title}</Lines></h3>
           <p className="cv-step-text">{s.text}</p>
         </li>
       ))}
@@ -263,7 +264,7 @@ function JobCard({ job, onApply }: { job: Job; onApply: (job: Job) => void }) {
     <article className={`cv-job${open ? " is-open" : ""}`}>
       <div className="cv-job-head">
         <div className="cv-job-main">
-          <h3 className="cv-job-title">{job.title}</h3>
+          <h3 className="cv-job-title"><Lines>{job.title}</Lines></h3>
           <dl className="cv-job-meta">
             {meta.map((m) => (
               <div key={m.label} className="cv-job-fact">
@@ -289,7 +290,7 @@ function JobCard({ job, onApply }: { job: Job; onApply: (job: Job) => void }) {
       <div className="cv-job-body" hidden={!open}>
         <div className="cv-job-cols">
           <div>
-            <h4 className="cv-job-h4">Key Responsibilities</h4>
+            <h4 className="cv-job-h4"><Lines>Key Responsibilities</Lines></h4>
             <ul className="cv-job-list">
               {job.responsibilities.map((r, i) => (
                 <li key={i}>{r}</li>
@@ -297,7 +298,7 @@ function JobCard({ job, onApply }: { job: Job; onApply: (job: Job) => void }) {
             </ul>
           </div>
           <div>
-            <h4 className="cv-job-h4">Required Skills</h4>
+            <h4 className="cv-job-h4"><Lines>Required Skills</Lines></h4>
             <ul className="cv-job-skills">
               {job.skills.map((s, i) => (
                 <li key={i}>{s}</li>
@@ -454,7 +455,7 @@ function ApplyForm({ job, onClose }: { job: Job; onClose: () => void }) {
           <div className="cv-apply-head">
             <div>
               <span className="cv-apply-kicker">Apply Now</span>
-              <h3 className="cv-apply-title">{job.title}</h3>
+              <h3 className="cv-apply-title"><Lines>{job.title}</Lines></h3>
               <ul className="cv-apply-tags">
                 <li>{job.department}</li>
                 <li>{job.employmentType}</li>
@@ -477,7 +478,7 @@ function ApplyForm({ job, onClose }: { job: Job; onClose: () => void }) {
               <span className="cv-apply-done-icon" aria-hidden="true">
                 <LucideIcon name="check" size={30} strokeWidth={2.6} />
               </span>
-              <h3 className="cv-apply-title">Application sent</h3>
+              <h3 className="cv-apply-title"><Lines>Application sent</Lines></h3>
               <p className="cv-apply-note">
                 Thank you, {f.fullName.split(" ")[0]}. Your application for{" "}
                 {job.title} has reached our recruitment team. If your profile
@@ -661,9 +662,9 @@ export default function CareerView({ jobs }: { jobs: Job[] }) {
                 <i aria-hidden="true" />
                 <span>Defined by Impact.</span>
               </p>
-              <h1 className="cv-h1">
+              <h1 className="cv-h1"><Lines>
                 Careers at Quickupp Softech – <span className="qs-gradient-text">Build Your Future With Us</span>
-              </h1>
+              </Lines></h1>
               <p className="cv-lead">
                 At Quickupp Softech, we believe great companies are built by ambitious people who challenge possibilities, embrace innovation, and turn
                 ideas into meaningful outcomes.
@@ -707,9 +708,9 @@ export default function CareerView({ jobs }: { jobs: Job[] }) {
         <section className="cv-section">
           <div className="cv-container cv-forward">
             <div className="cv-forward-head">
-              <h2 className="cv-h2">
+              <h2 className="cv-h2"><Lines>
                 Build a Career That <span className="qs-gradient-text">Moves You Forward</span>
-              </h2>
+              </Lines></h2>
             </div>
             <div className="cv-forward-copy">
               <p className="cv-text">
@@ -730,9 +731,9 @@ export default function CareerView({ jobs }: { jobs: Job[] }) {
           <div className="cv-container">
             <div className="cv-head">
               <span className="cv-kicker">A Workplace Built for Growth</span>
-              <h2 className="cv-h2">
+              <h2 className="cv-h2"><Lines>
                 Why Work With <span className="qs-gradient-text">Quickupp Softech?</span>
-              </h2>
+              </Lines></h2>
             </div>
             <Benefits />
           </div>
@@ -742,9 +743,9 @@ export default function CareerView({ jobs }: { jobs: Job[] }) {
         <section className="cv-section">
           <div className="cv-container">
             <div className="cv-head cv-head-left">
-              <h2 className="cv-h2">
+              <h2 className="cv-h2"><Lines>
                 Explore Career <span className="qs-gradient-text">Opportunities</span>
-              </h2>
+              </Lines></h2>
               <p className="cv-text">We offer opportunities across multiple departments and professional domains.</p>
             </div>
             <Departments />
@@ -756,9 +757,9 @@ export default function CareerView({ jobs }: { jobs: Job[] }) {
           <div className="cv-container">
             <div className="cv-head">
               <span className="cv-kicker">Think Big. Take Ownership. Grow Together.</span>
-              <h2 className="cv-h2">
+              <h2 className="cv-h2"><Lines>
                 Our Work <span className="qs-gradient-text">Culture</span>
-              </h2>
+              </Lines></h2>
               <p className="cv-text">
                 We believe in creating an environment where people are encouraged to think independently, share ideas, take responsibility, and
                 continuously improve.
@@ -771,7 +772,7 @@ export default function CareerView({ jobs }: { jobs: Job[] }) {
                   <span className="cv-value-mono" aria-hidden="true">
                     {v.title.charAt(0)}
                   </span>
-                  <h3 className="cv-value-title">{v.title}</h3>
+                  <h3 className="cv-value-title"><Lines>{v.title}</Lines></h3>
                   <p className="cv-value-text">{v.text}</p>
                 </li>
               ))}
@@ -783,9 +784,9 @@ export default function CareerView({ jobs }: { jobs: Job[] }) {
         <section className="cv-section cv-mist">
           <div className="cv-container">
             <div className="cv-head">
-              <h2 className="cv-h2">
+              <h2 className="cv-h2"><Lines>
                 Our Hiring <span className="qs-gradient-text">Process</span>
-              </h2>
+              </Lines></h2>
               <p className="cv-text">We aim to keep our recruitment process structured, transparent, and focused on identifying the right talent.</p>
             </div>
             <HiringTrack />
@@ -797,9 +798,9 @@ export default function CareerView({ jobs }: { jobs: Job[] }) {
           <div className="cv-container">
             <div className="cv-head cv-head-left cv-open-head">
               <span className="cv-kicker">Find Your Next Opportunity</span>
-              <h2 className="cv-h2">
+              <h2 className="cv-h2"><Lines>
                 Current Job <span className="qs-gradient-text">Openings</span>
-              </h2>
+              </Lines></h2>
               <p className="cv-text">Explore our latest full-time, part-time, and internship opportunities across different departments.</p>
               <p className="cv-text">
                 Each opening includes the job description, required skills, experience level, work location, employment type, and application
@@ -821,9 +822,9 @@ export default function CareerView({ jobs }: { jobs: Job[] }) {
           <div className="cv-container">
             <div className="cv-connect">
               <div className="cv-connect-copy">
-                <h2 className="cv-connect-title">
+                <h2 className="cv-connect-title"><Lines>
                   Don&apos;t See the Right Role? <span className="qs-gradient-text">Connect With Us.</span>
-                </h2>
+                </Lines></h2>
                 <p className="cv-connect-text">
                   We are always interested in connecting with talented professionals who share our passion for technology, innovation, and business
                   growth.
@@ -857,9 +858,9 @@ export default function CareerView({ jobs }: { jobs: Job[] }) {
         <section className="cv-section cv-journey">
           <div className="cv-container cv-journey-grid">
             <div className="cv-journey-copy">
-              <h2 className="cv-h2">
+              <h2 className="cv-h2"><Lines>
                 Start Your Journey With <span className="qs-gradient-text">Quickupp Softech</span>
-              </h2>
+              </Lines></h2>
               <p className="cv-text">Your next career opportunity could be the beginning of something extraordinary.</p>
               <p className="cv-text">
                 If you&apos;re ambitious, motivated, and ready to contribute to a growing global organization, we&apos;d love to hear from you.

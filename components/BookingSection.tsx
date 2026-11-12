@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import LucideIcon, { type LucideIconName } from "@/components/LucideIcon";
 import "@/app/booking.css";
+import Lines from "@/components/HeadingLines";
 
 /*
  * "Book a call" section with the live Calendly calendar, in the same
@@ -150,9 +151,9 @@ export default function BookingSection({ eyebrow, title, text, icon = "calendar"
             <LucideIcon name={icon} size={14} />
             {eyebrow}
           </span>
-          <h2 className="bk-h2">
+          <h2 className="bk-h2"><Lines>
             {title[0]} <span className="qs-gradient-text">{title[1]}</span>
-          </h2>
+          </Lines></h2>
           {text.map((t) => (
             <p key={t} className="bk-text">
               {t}

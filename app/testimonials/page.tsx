@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ResourceCtaBanner from "@/components/ResourceCtaBanner";
 import ResourceMotion from "@/components/ResourceMotion";
+import Lines from "@/components/HeadingLines";
 
 const filterTabs = ["All Reviews", "Healthcare", "SaaS & Tech", "eCommerce & D2C", "Real Estate", "Enterprise"];
 
@@ -98,9 +99,9 @@ export default function TestimonialsPage() {
                 style={{
                   margin: "0 0 18px 0",
                 }}
-              >
+              ><Lines>
                 Real Partnerships. <span className="qs-gradient-text">Measurable Growth Outcomes.</span>
-              </h1>
+              </Lines></h1>
               <p
                 style={{
                   fontSize: "clamp(16px, 1.3vw, 19px)",

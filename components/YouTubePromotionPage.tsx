@@ -10,6 +10,7 @@ import LucideIcon, { type LucideIconName } from "@/components/LucideIcon";
 import ServiceEnquiryForm from "@/components/ServiceEnquiryForm";
 import { setupScrollMotion, type MotionPreset } from "@/lib/scrollMotion";
 import BookingSection from "@/components/BookingSection";
+import Lines, { sentenceLines } from "@/components/HeadingLines";
 
 /*
  * YouTube Video Promotion page — "video studio" design, used only here:
@@ -39,7 +40,7 @@ const YT_PRESET: MotionPreset = {
 };
 
 /** Puts the last ~45% of a heading in the brand gradient (site-wide style). */
-function GradientHeading({ text }: { text: string }) {
+function GradientHeadingParts({ text }: { text: string }) {
   const words = text.trim().split(/\s+/);
   if (words.length < 3) return <span className="qs-gradient-text">{text}</span>;
   const split = Math.max(1, Math.floor(words.length * 0.55));
@@ -50,6 +51,8 @@ function GradientHeading({ text }: { text: string }) {
     </>
   );
 }
+/* the same title with each sentence on its own line (see HeadingLines) */
+const GradientHeading = (props: Parameters<typeof GradientHeadingParts>[0]) => sentenceLines(GradientHeadingParts(props));
 
 /** YouTube icon — same mark the site footer uses, in its brand red */
 function YouTubeIcon({ size = 24 }: { size?: number }) {
@@ -252,9 +255,9 @@ export default function YouTubePromotionPage({ content }: { content: YouTubeProm
                 <YouTubeIcon size={20} />
                 <span>{c.hero.eyebrow}</span>
               </p>
-              <h1 className="ytv-h1">
+              <h1 className="ytv-h1"><Lines>
                 <GradientHeading text={c.hero.title} />
-              </h1>
+              </Lines></h1>
               <p className="ytv-lead">{c.hero.lead}</p>
               <p className="ytv-text ytv-hero-text">{c.hero.text}</p>
               <div className="ytv-actions">
@@ -315,9 +318,9 @@ export default function YouTubePromotionPage({ content }: { content: YouTubeProm
         <section className="ytv-section">
           <div className="ytv-container ytv-reach">
             <div className="ytv-reach-copy">
-              <h2 className="ytv-h2">
+              <h2 className="ytv-h2"><Lines>
                 <GradientHeading text={c.reach.title} />
-              </h2>
+              </Lines></h2>
               {c.reach.paragraphs.map((p, i) => (
                 <p key={i} className={i === 0 ? "ytv-lead" : "ytv-text"}>
                   {p}
@@ -367,9 +370,9 @@ export default function YouTubePromotionPage({ content }: { content: YouTubeProm
         <section className="ytv-section ytv-soft">
           <div className="ytv-container">
             <div className="ytv-head">
-              <h2 className="ytv-h2">
+              <h2 className="ytv-h2"><Lines>
                 <GradientHeading text={c.process.title} />
-              </h2>
+              </Lines></h2>
               <p className="ytv-tagline">{c.process.subtitle}</p>
             </div>
 
@@ -396,7 +399,7 @@ export default function YouTubePromotionPage({ content }: { content: YouTubeProm
                 {c.process.steps.map((s, i) => (
                   <li key={s.num} data-state={i === activeStep ? "active" : i < activeStep ? "done" : "next"}>
                     <span className="ytv-step-num">{s.num}.</span>
-                    <h3 className="ytv-h3">{s.title}</h3>
+                    <h3 className="ytv-h3"><Lines>{s.title}</Lines></h3>
                     <p className="ytv-text">{s.desc}</p>
                   </li>
                 ))}
@@ -413,9 +416,9 @@ export default function YouTubePromotionPage({ content }: { content: YouTubeProm
         <section className="ytv-section">
           <div className="ytv-container">
             <div className="ytv-head">
-              <h2 className="ytv-h2">
+              <h2 className="ytv-h2"><Lines>
                 <GradientHeading text={c.placements.title} />
-              </h2>
+              </Lines></h2>
               <p className="ytv-tagline">{c.placements.subtitle}</p>
             </div>
             <ul className="ytv-bento">
@@ -423,7 +426,7 @@ export default function YouTubePromotionPage({ content }: { content: YouTubeProm
                 <li key={it.title} className={`ytv-tile ytv-tile-${i}`}>
                   <PlacementPreview index={i} />
                   <div className="ytv-tile-body">
-                    <h3 className="ytv-h3">{it.title}</h3>
+                    <h3 className="ytv-h3"><Lines>{it.title}</Lines></h3>
                     <p className="ytv-text">{it.desc}</p>
                   </div>
                 </li>
@@ -437,9 +440,9 @@ export default function YouTubePromotionPage({ content }: { content: YouTubeProm
         <section className="ytv-section ytv-soft">
           <div className="ytv-container">
             <div className="ytv-head">
-              <h2 className="ytv-h2">
+              <h2 className="ytv-h2"><Lines>
                 <GradientHeading text={c.why.title} />
-              </h2>
+              </Lines></h2>
               <p className="ytv-tagline">{c.why.subtitle}</p>
             </div>
             <ul className="ytv-why" data-yv-on="">
@@ -451,7 +454,7 @@ export default function YouTubePromotionPage({ content }: { content: YouTubeProm
                   <span className="ytv-why-icon">
                     <LucideIcon name={whyIcons[i % whyIcons.length]} size={22} />
                   </span>
-                  <h3 className="ytv-h3">{it.title}</h3>
+                  <h3 className="ytv-h3"><Lines>{it.title}</Lines></h3>
                   <p className="ytv-text">{it.desc}</p>
                 </li>
               ))}
@@ -463,9 +466,9 @@ export default function YouTubePromotionPage({ content }: { content: YouTubeProm
         <section className="ytv-section">
           <div className="ytv-container">
             <div className="ytv-head">
-              <h2 className="ytv-h2">
+              <h2 className="ytv-h2"><Lines>
                 <GradientHeading text={c.audience.title} />
-              </h2>
+              </Lines></h2>
             </div>
             <ul className="ytv-channels">
               {c.audience.items.map((it, i) => (
@@ -476,7 +479,7 @@ export default function YouTubePromotionPage({ content }: { content: YouTubeProm
                       <LucideIcon name={audienceIcons[i % audienceIcons.length]} size={26} />
                     </span>
                   </span>
-                  <h3 className="ytv-h3">{it.title}</h3>
+                  <h3 className="ytv-h3"><Lines>{it.title}</Lines></h3>
                   <p className="ytv-text">{it.desc}</p>
                 </li>
               ))}
@@ -492,9 +495,9 @@ export default function YouTubePromotionPage({ content }: { content: YouTubeProm
                 <span className="ytv-playlist-mark" aria-hidden="true">
                   <YouTubeIcon size={34} />
                 </span>
-                <h2 className="ytv-h2">
+                <h2 className="ytv-h2"><Lines>
                   <GradientHeading text={c.deliverables.title} />
-                </h2>
+                </Lines></h2>
                 <p className="ytv-playlist-note">{c.deliverables.note}</p>
               </div>
               <ol className="ytv-playlist-list">
@@ -520,9 +523,9 @@ export default function YouTubePromotionPage({ content }: { content: YouTubeProm
         <section className="ytv-section ytv-soft">
           <div className="ytv-container">
             <div className="ytv-head">
-              <h2 className="ytv-h2">
+              <h2 className="ytv-h2"><Lines>
                 <GradientHeading text={c.comparison.title} />
-              </h2>
+              </Lines></h2>
               <p className="ytv-text ytv-head-text">{c.comparison.intro}</p>
             </div>
             <div className="ytv-versus" role="table">
@@ -563,9 +566,9 @@ export default function YouTubePromotionPage({ content }: { content: YouTubeProm
                 <span className="ytv-ripple" />
                 <YouTubeIcon size={64} />
               </span>
-              <h2 className="ytv-h2">
+              <h2 className="ytv-h2"><Lines>
                 <GradientHeading text={c.ready.title} />
-              </h2>
+              </Lines></h2>
               {c.ready.lines.map((l, i) => (
                 <p key={i} className={i === 0 ? "ytv-lead" : "ytv-text"}>
                   {l}

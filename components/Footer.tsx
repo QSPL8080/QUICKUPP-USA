@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { openDynamicEmailModal } from "@/components/DynamicEmailModal";
 import "@/app/footer-rays.css";
+import Lines from "@/components/HeadingLines";
 
 export default function Footer() {
   const year = new Date().getFullYear();
@@ -151,7 +152,7 @@ export default function Footer() {
           <div className="qs-scalient-nav-grid">
             {/* 1. Navigation & Company */}
             <div className="qs-scalient-col">
-              <h3 className="qs-scalient-col-title">Navigation</h3>
+              <h3 className="qs-scalient-col-title"><Lines>Navigation</Lines></h3>
               <ul className="qs-scalient-links">
                 <li><Link href="/">Home</Link></li>
                 <li><Link href="/about">About Us</Link></li>
@@ -170,7 +171,7 @@ export default function Footer() {
 
             {/* 2. Core Services */}
             <div className="qs-scalient-col">
-              <h3 className="qs-scalient-col-title">Services</h3>
+              <h3 className="qs-scalient-col-title"><Lines>Services</Lines></h3>
               <ul className="qs-scalient-links">
                 <li><Link href="/services/ai-powered-digital-marketing-services/social-media-marketing">AI-Powered Digital Marketing</Link></li>
                 <li><Link href="/services/ai-automation-solutions/ai-chatbot-development">AI &amp; Automation Solutions</Link></li>
@@ -183,7 +184,7 @@ export default function Footer() {
 
             {/* 3. Industries & Resources */}
             <div className="qs-scalient-col">
-              <h3 className="qs-scalient-col-title">Industries &amp; Work</h3>
+              <h3 className="qs-scalient-col-title"><Lines>Industries &amp; Work</Lines></h3>
               <ul className="qs-scalient-links">
                 <li><Link href="/industries/healthcare">Healthcare &amp; Medical</Link></li>
                 <li><Link href="/industries/it-saas">IT &amp; SaaS Scale</Link></li>
@@ -198,7 +199,7 @@ export default function Footer() {
 
             {/* 4. Social Media */}
             <div className="qs-scalient-col">
-              <h3 className="qs-scalient-col-title">Social Media</h3>
+              <h3 className="qs-scalient-col-title"><Lines>Social Media</Lines></h3>
               <ul className="qs-scalient-links">
                 {socialLinks.map((soc, idx) => (
                   <li key={idx}>

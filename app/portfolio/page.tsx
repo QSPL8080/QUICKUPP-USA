@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ResourceCtaBanner from "@/components/ResourceCtaBanner";
 import ResourceMotion from "@/components/ResourceMotion";
+import Lines from "@/components/HeadingLines";
 
 const categories = ["All Projects", "AI & Automation", "SaaS & Web Apps", "Performance Marketing", "eCommerce & D2C", "Real Estate"];
 
@@ -98,9 +99,9 @@ export default function PortfolioPage() {
                 style={{
                   margin: "0 0 18px 0",
                 }}
-              >
+              ><Lines>
                 Engineered for Performance. <span className="qs-gradient-text">Built for Growth.</span>
-              </h1>
+              </Lines></h1>
               <p
                 style={{
                   fontSize: "clamp(16px, 1.3vw, 19px)",
@@ -160,7 +161,7 @@ export default function PortfolioPage() {
                   </div>
 
                   <div className="res-card-body">
-                    <h3 className="res-card-title">{proj.title}</h3>
+                    <h3 className="res-card-title"><Lines>{proj.title}</Lines></h3>
                     <p className="res-card-desc">{proj.desc}</p>
 
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", margin: "16px 0 20px 0" }}>

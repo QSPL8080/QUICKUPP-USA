@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import "./checkout.css";
 import { errMessage } from "@/lib/err";
+import Lines from "@/components/HeadingLines";
 
 // an order already on file, as /api/payments/lookup returns it
 
@@ -270,13 +271,13 @@ function CheckoutContent() {
         <div className="ck-grid" style={{ display: isProcessing ? "none" : "grid" }}>
           {/* LEFT PANEL: Order Summary & Fast PayPal Checkout */}
           <div className="ck-summary-card">
-            <h3 className="ck-card-title">
+            <h3 className="ck-card-title"><Lines>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
                 <path d="M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1Z" />
               </svg>
               <span>Order Summary</span>
-            </h3>
+            </Lines></h3>
             <p className="ck-card-subtitle">
               Quickupp Softech Engagement Details
             </p>
@@ -371,7 +372,7 @@ function CheckoutContent() {
 
           {/* RIGHT PANEL: Debit or Credit Card Panel (BESIDE!) */}
           <div className="ck-pay-card">
-            <h3 className="ck-pay-title">Debit or Credit Card</h3>
+            <h3 className="ck-pay-title"><Lines>Debit or Credit Card</Lines></h3>
             <p className="ck-pay-subtitle">
               Pay securely with any major card. No PayPal login required.
             </p>

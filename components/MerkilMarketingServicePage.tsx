@@ -21,6 +21,7 @@ import type {
   StepsBlock,
 } from "@/lib/servicePageTypes";
 import BookingSection from "@/components/BookingSection";
+import Lines, { sentenceLines } from "@/components/HeadingLines";
 
 /*
  * AI-Powered Digital Marketing service pages (all 9 subpages).
@@ -154,7 +155,7 @@ function CheckIcon() {
   );
 }
 
-function Grad({ text }: { text: string }) {
+function GradParts({ text }: { text: string }) {
   const words = text.trim().split(/\s+/);
   if (words.length < 3) return <span className="qs-gradient-text">{text}</span>;
   const split = Math.max(1, Math.floor(words.length * 0.55));
@@ -164,6 +165,8 @@ function Grad({ text }: { text: string }) {
     </>
   );
 }
+/* the same title with each sentence on its own line (see HeadingLines) */
+const Grad = (props: Parameters<typeof GradParts>[0]) => sentenceLines(GradParts(props));
 
 function Arrow() {
   return (
@@ -199,9 +202,9 @@ function Head({
     <div className={`mkx-head${center ? " mkx-head-center" : ""}`}>
       {tagline && !sameText(tagline, title) && <p className="mkx-kicker">{tagline}</p>}
       {title && (
-        <h2>
+        <h2><Lines>
           <Grad text={title} />
-        </h2>
+        </Lines></h2>
       )}
       {lines.map((l, i) => (
         <p key={i} className="mkx-text">
@@ -239,7 +242,7 @@ function ProcessFlow({ steps }: { steps: { num: string; title: string; text?: st
               {s.num && <span className="mkx-flow-num">{s.num}</span>}
               <span className="mkx-flow-line" aria-hidden="true" />
             </div>
-            <h3>{s.title}</h3>
+            <h3><Lines>{s.title}</Lines></h3>
             {s.text && <p className="mkx-text">{s.text}</p>}
             {!rowEnd && (
               <span className="mkx-flow-next" aria-hidden="true">
@@ -358,9 +361,9 @@ export default function MerkilMarketingServicePage({
                 {(b.tagline || b.subtitle) && !sameText(b.tagline || b.subtitle, b.title) && (
                   <p className="mkx-kicker">{b.tagline || b.subtitle}</p>
                 )}
-                <h2>
+                <h2><Lines>
                   <Grad text={b.title} />
-                </h2>
+                </Lines></h2>
                 {lines.map((l, i) => (
                   <p key={i} className="mkx-text">
                     {l}
@@ -402,7 +405,7 @@ export default function MerkilMarketingServicePage({
             <div className={`mkx-posters mkx-posters-${cols}`}>
               {rows.map((r, i) => (
                 <article key={`${r.title}-${i}`} className="mkx-poster">
-                  <h3>{r.title}</h3>
+                  <h3><Lines>{r.title}</Lines></h3>
                   {r.text && <p className="mkx-text">{r.text}</p>}
                 </article>
               ))}
@@ -556,9 +559,9 @@ export default function MerkilMarketingServicePage({
                 <img src={photos.hero} alt="" />
               </div>
               <div className="mkx-cover-card">
-                <h1>
+                <h1><Lines>
                   <Grad text={data.heroTitle} />
-                </h1>
+                </Lines></h1>
                 {heroLead && <p className="mkx-lead">{heroLead}</p>}
               </div>
             </div>
@@ -600,9 +603,9 @@ export default function MerkilMarketingServicePage({
                 </div>
 
                 {data.closingTitle && (
-                  <h2>
+                  <h2><Lines>
                     <Grad text={data.closingTitle} />
-                  </h2>
+                  </Lines></h2>
                 )}
 
                 {(data.closingDesc || "")

@@ -8,6 +8,7 @@ import TechStack from "@/components/home/TechStack";
 import BookingSection from "@/components/BookingSection";
 import { ABOUT, FINAL, HERO, INDUSTRIES, INSIGHTS, PROCESS, SERVICES, TECH, TRUST, VOICES, WHY, WORK } from "@/data/home-content";
 import "@/app/home.css";
+import Lines from "@/components/HeadingLines";
 
 /*
  * Home page ("hx-" design, used on no other page). Every word comes from the
@@ -44,11 +45,13 @@ function Button({ cta, tone = "dark", className = "" }: { cta: Cta; tone?: "dark
 function Title({ lines, as: Tag = "h2", className = "" }: { lines: string[]; as?: "h1" | "h2"; className?: string }) {
   return (
     <Tag className={`hx-title ${className}`}>
+      <Lines>
       {lines.map((l, i) => (
         <span key={l} className="hx-line" data-hx="line" style={{ "--d": `${i * 0.12}s` } as CSSProperties}>
           <span className={i === lines.length - 1 ? "hx-line-in qs-gradient-text" : "hx-line-in"}>{l}</span>
         </span>
       ))}
+      </Lines>
     </Tag>
   );
 }
@@ -133,19 +136,19 @@ export default function HomeView() {
           <span className="hx-trust-lines" aria-hidden="true" />
           <span className="hx-trust-glow" aria-hidden="true" />
           <div className="hx-wrap hx-trust-row">
-            <h2 className="hx-trust-title" data-hx="rise">
+            <h2 className="hx-trust-title" data-hx="rise"><Lines>
               <span className="hx-trust-num">
                 <span data-hx-count={TRUST.count}>{TRUST.count.toLocaleString("en-US")}</span>
                 {TRUST.countSuffix}
               </span>
               <span className="hx-trust-rest">{TRUST.titleRest}</span>
-            </h2>
+            </Lines></h2>
             <span className="hx-trust-bar" aria-hidden="true">
               <span />
             </span>
-            <h3 className="hx-trust-sub" data-hx="rise" style={d(0.15)}>
+            <h3 className="hx-trust-sub" data-hx="rise" style={d(0.15)}><Lines>
               {TRUST.subtitle}
-            </h3>
+            </Lines></h3>
           </div>
         </div>
 
@@ -268,7 +271,7 @@ export default function HomeView() {
                     <span className="hx-wb-icon hx-wb-icon-lg" aria-hidden="true">
                       <HomeIcon name={lead.icon as HomeIconName} size={26} />
                     </span>
-                    <h3 className="hx-wb-title">{lead.title}</h3>
+                    <h3 className="hx-wb-title"><Lines>{lead.title}</Lines></h3>
                     <p className="hx-wb-text">{lead.text}</p>
                   </article>
 
@@ -284,7 +287,7 @@ export default function HomeView() {
                         <span className="hx-wb-icon" aria-hidden="true">
                           <HomeIcon name={pt.icon as HomeIconName} size={20} />
                         </span>
-                        <h3 className="hx-wb-title">{pt.title}</h3>
+                        <h3 className="hx-wb-title"><Lines>{pt.title}</Lines></h3>
                         <p className="hx-wb-text">{pt.text}</p>
                       </li>
                     ))}
@@ -377,7 +380,7 @@ export default function HomeView() {
                       </span>
                       <span className="hx-stair-num">{s.num}.</span>
                     </div>
-                    <h3 className="hx-stair-title">{s.title}</h3>
+                    <h3 className="hx-stair-title"><Lines>{s.title}</Lines></h3>
                     <p className="hx-stair-text">{s.text}</p>
                   </div>
                 </div>
@@ -405,7 +408,7 @@ export default function HomeView() {
                 <span className="hx-ind-icon" aria-hidden="true">
                   <HomeIcon name={it.icon as HomeIconName} size={20} />
                 </span>
-                <h3 className="hx-ind-name">{it.name}</h3>
+                <h3 className="hx-ind-name"><Lines>{it.name}</Lines></h3>
                 <p className="hx-ind-text">{it.text}</p>
               </li>
             ))}

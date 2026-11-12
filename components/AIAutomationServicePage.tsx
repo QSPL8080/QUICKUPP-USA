@@ -18,6 +18,7 @@ import type {
 } from "@/lib/servicePageTypes";
 import LucideIcon, { type LucideIconName } from "@/components/LucideIcon";
 import BookingSection from "@/components/BookingSection";
+import Lines, { sentenceLines } from "@/components/HeadingLines";
 
 /*
  * AI & Automation Solutions service page — "acx-" design, used only here:
@@ -27,7 +28,7 @@ import BookingSection from "@/components/BookingSection";
  * Every word comes from data/services/ai-automation-solutions.ts.
  */
 
-function Grad({ text }: { text: string }) {
+function GradParts({ text }: { text: string }) {
   const words = text.trim().split(/\s+/);
   if (words.length < 3) return <span className="qs-gradient-text">{text}</span>;
   const split = Math.max(1, Math.floor(words.length * 0.55));
@@ -37,6 +38,8 @@ function Grad({ text }: { text: string }) {
     </>
   );
 }
+/* the same title with each sentence on its own line (see HeadingLines) */
+const Grad = (props: Parameters<typeof GradParts>[0]) => sentenceLines(GradParts(props));
 
 const Arrow = () => <LucideIcon name="arrow-right" size={16} strokeWidth={2.2} />;
 const Check = ({ size = 13 }: { size?: number }) => <LucideIcon name="check" size={size} strokeWidth={2.8} />;
@@ -202,9 +205,9 @@ export default function AIAutomationServicePage({
                 <div className="acx-stage-inner">
                   <div className="acx-stage-grid">
                     <div className="acx-stage-copy">
-                      <h1>
+                      <h1><Lines>
                         <Grad text={data.heroTitle} />
-                      </h1>
+                      </Lines></h1>
                       {heroLead && <p className="acx-lead">{heroLead}</p>}
                     </div>
                     {heroRest.length > 0 && (
@@ -248,9 +251,9 @@ export default function AIAutomationServicePage({
             <div className="acx-container">
               <div className="acx-head">
                 {services.title && (
-                  <h2>
+                  <h2><Lines>
                     <Grad text={services.title} />
-                  </h2>
+                  </Lines></h2>
                 )}
                 {services.desc && <p className="acx-text">{services.desc}</p>}
               </div>
@@ -260,7 +263,7 @@ export default function AIAutomationServicePage({
                     <span className="acx-module-icon" aria-hidden="true">
                       <LucideIcon name={serviceIcons[i % serviceIcons.length]} size={22} strokeWidth={1.9} />
                     </span>
-                    <h3>{item.title}</h3>
+                    <h3><Lines>{item.title}</Lines></h3>
                     <p className="acx-text">{item.desc}</p>
                   </li>
                 ))}
@@ -281,9 +284,9 @@ export default function AIAutomationServicePage({
               <div className="acx-matrix-panel">
                 <span className="acx-matrix-grid" aria-hidden="true" />
                 <div className="acx-matrix-head">
-                  <h2>
+                  <h2><Lines>
                     <Grad text={growth.title} />
-                  </h2>
+                  </Lines></h2>
                   {growth.intro && <p className="acx-matrix-intro">{growth.intro}</p>}
                 </div>
                 <ul className="acx-matrix">
@@ -315,9 +318,9 @@ export default function AIAutomationServicePage({
           <section className="acx-sec acx-soft">
             <div className="acx-container acx-proc">
               <div className="acx-proc-side">
-                <h2>
+                <h2><Lines>
                   <Grad text={processBlock.title} />
-                </h2>
+                </Lines></h2>
                 {processBlock.intro && <p className="acx-text">{processBlock.intro}</p>}
                 {processBlock.desc && <p className="acx-text">{processBlock.desc}</p>}
                 {processBlock.cta && (
@@ -331,7 +334,7 @@ export default function AIAutomationServicePage({
                   <li key={st.num + st.title} className="acx-stepper-row">
                     <span className="acx-stepper-node">{st.num}</span>
                     <div className="acx-stepper-body">
-                      <h3>{st.title}</h3>
+                      <h3><Lines>{st.title}</Lines></h3>
                       <p className="acx-text">{st.desc || st.text}</p>
                     </div>
                   </li>
@@ -352,9 +355,9 @@ export default function AIAutomationServicePage({
                 </div>
                 {why.tagline && <p className="acx-kicker">{why.tagline}</p>}
                 {why.title && (
-                  <h2>
+                  <h2><Lines>
                     <Grad text={why.title} />
-                  </h2>
+                  </Lines></h2>
                 )}
                 {why.intro && <p className="acx-text">{why.intro}</p>}
                 {why.desc && <p className="acx-statement">{why.desc}</p>}
@@ -384,9 +387,9 @@ export default function AIAutomationServicePage({
             <div className="acx-container">
               <div className="acx-head acx-head-center">
                 {industries.title && (
-                  <h2>
+                  <h2><Lines>
                     <Grad text={industries.title} />
-                  </h2>
+                  </Lines></h2>
                 )}
                 {industries.intro && <p className="acx-text">{industries.intro}</p>}
               </div>
@@ -440,9 +443,9 @@ export default function AIAutomationServicePage({
               <div className="acx-close-copy">
                 {data.closingTagline && <p className="acx-kicker">{data.closingTagline}</p>}
                 {data.closingTitle && (
-                  <h2>
+                  <h2><Lines>
                     <Grad text={data.closingTitle} />
-                  </h2>
+                  </Lines></h2>
                 )}
                 {(data.closingDesc || "")
                   .split("\n")

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/crm/auth";
 import LoginForm from "@/components/crm/LoginForm";
 import "@/app/crm/crm.css";
+import Lines from "@/components/HeadingLines";
 
 export const metadata: Metadata = {
   title: "Sign in | Quickupp Softech CRM",
@@ -25,7 +26,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       <div className="crm-login-body">
         <div className="crm-login-inner">
           <img src="/images/quickupp-logo-black.png" alt="Quickupp Softech" className="crm-login-logo" />
-          <h1 className="crm-title">Sign in</h1>
+          <h1 className="crm-title"><Lines>Sign in</Lines></h1>
           <p className="crm-sub">Use your Quickupp Softech team account.</p>
           {notice && (
             <p className="crm-notice" role="status">

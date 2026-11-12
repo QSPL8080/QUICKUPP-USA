@@ -5,6 +5,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BookingSection from "@/components/BookingSection";
+import Lines from "@/components/HeadingLines";
 
 function ArrowDownRightSvg({ size = 14 }: { size?: number }) {
   return (
@@ -149,9 +150,9 @@ export default function IndustriesOverviewHub() {
                 <span>Full-Stack Industry Solutions</span>
               </div>
 
-              <h1 className="asx-hero-title" style={{ margin: "0 0 16px" }}>
+              <h1 className="asx-hero-title" style={{ margin: "0 0 16px" }}><Lines>
                 Industries We Scale with <span className="asx-gradient-text">Marketing &amp; AI</span>
-              </h1>
+              </Lines></h1>
               <p style={{ fontSize: "16px", color: "#2c436b", maxWidth: "600px", margin: "0 auto" }}>
                 Select your industry below to explore tailored growth strategies, proven conversion funnels, and automated AI systems.
               </p>
@@ -168,7 +169,7 @@ export default function IndustriesOverviewHub() {
                     <div className="asx-hub-icon">
                       {item.icon}
                     </div>
-                    <h2 className="asx-hub-title">{item.title}</h2>
+                    <h2 className="asx-hub-title"><Lines>{item.title}</Lines></h2>
                     <p className="asx-hub-tagline">{item.tagline}</p>
                   </div>
                   <div className="asx-hub-footer">

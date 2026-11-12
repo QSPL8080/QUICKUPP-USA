@@ -4,6 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import Link from "next/link";
 import type { HomeService } from "@/data/home-content";
 import HomeIcon from "@/components/home/HomeIcon";
+import Lines from "@/components/HeadingLines";
 
 /*
  * Our Services: the six services as a list on the left and one open service
@@ -189,9 +190,9 @@ export default function ServiceExplorer({ items }: { items: HomeService[] }) {
                 </span>
               </figure>
               <div className="hx-svc-copy">
-                <h3 className="hx-svc-title">
+                <h3 className="hx-svc-title"><Lines>
                   <span className="hx-svc-title-num">{s.num}.</span> {s.title}
-                </h3>
+                </Lines></h3>
                 <p className="hx-svc-text">{s.text}</p>
                 <ul className="hx-svc-points">
                   {s.points.map((pt, j) => (

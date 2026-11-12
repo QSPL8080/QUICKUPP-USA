@@ -7,6 +7,7 @@ import { getRecord, listTransactions, orderNumberOf, type Txn } from "@/lib/paym
 import type { LinkTable } from "@/lib/paymentLink";
 import { paymentDateTime } from "@/lib/paymentTime";
 import "./confirmation.css";
+import Lines from "@/components/HeadingLines";
 
 export const dynamic = "force-dynamic";
 
@@ -67,7 +68,7 @@ export default async function PaymentConfirmationPage({ searchParams }: Props) {
         {header}
         <main className="pc-card">
           <div className="pc-hero">
-            <h1 className="pc-title">Thank you</h1>
+            <h1 className="pc-title"><Lines>Thank you</Lines></h1>
             <p className="pc-subtitle">
               If you have just made a payment, your confirmation and PDF receipt are on their way to your email. Questions? Write to{" "}
               <a href="mailto:info@quickuppsoftech.us">info@quickuppsoftech.us</a>.
@@ -135,15 +136,15 @@ export default async function PaymentConfirmationPage({ searchParams }: Props) {
               </svg>
             )}
           </div>
-          <h1 className="pc-title">{title}</h1>
+          <h1 className="pc-title"><Lines>{title}</Lines></h1>
           <p className="pc-subtitle">{subtitle}</p>
         </div>
 
         <div className="pc-body">
           <div className="pc-section">
-            <h2 className="pc-section-title">
+            <h2 className="pc-section-title"><Lines>
               <span>Order summary</span>
-            </h2>
+            </Lines></h2>
             <table className="pc-table">
               <tbody>
                 <tr>
@@ -190,9 +191,9 @@ export default async function PaymentConfirmationPage({ searchParams }: Props) {
           </div>
 
           <div className="pc-section">
-            <h2 className="pc-section-title">
+            <h2 className="pc-section-title"><Lines>
               <span>{txns.length > 1 ? "Your payments" : "Your payment"}</span>
-            </h2>
+            </Lines></h2>
             <div className="pc-txns">
               {txns.map((t, i) => (
                 <div className={`pc-txn${t.transactionId === thisTxn?.transactionId ? " is-now" : ""}`} key={`${t.transactionId}-${i}`}>
@@ -229,7 +230,7 @@ export default async function PaymentConfirmationPage({ searchParams }: Props) {
               </svg>
             </div>
             <div>
-              <h3 className="pc-info-heading">Confirmation sent to your email</h3>
+              <h3 className="pc-info-heading"><Lines>Confirmation sent to your email</Lines></h3>
               <p className="pc-info-sub">
                 We have emailed this confirmation, with your PDF receipt attached, to <span className="pc-info-email">{rec.client_email}</span>. Please check your
                 inbox (and spam folder).
@@ -238,9 +239,9 @@ export default async function PaymentConfirmationPage({ searchParams }: Props) {
           </div>
 
           <div className="pc-next-card">
-            <h3 className="pc-next-title">
+            <h3 className="pc-next-title"><Lines>
               <span>What&apos;s next?</span>
-            </h3>
+            </Lines></h3>
             <p className="pc-next-desc">
               Our team will contact you with the next steps. Please keep your order number (<strong>{order}</strong>) handy when you write to us.
             </p>

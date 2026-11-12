@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import LegalMotion from "@/components/LegalMotion";
 import "@/app/legal.css";
+import Lines from "@/components/HeadingLines";
 
 /*
  * Simple legal pages ("lgl-"): Terms and Conditions and Privacy Policy.
@@ -136,9 +137,9 @@ function Blocks({ blocks }: { blocks: LegalBlock[] }) {
       );
     } else if ("h3" in b) {
       out.push(
-        <h3 key={i} className="lgl-h3">
+        <h3 key={i} className="lgl-h3"><Lines>
           {b.h3}
-        </h3>
+        </Lines></h3>
       );
     } else if ("lines" in b) {
       const r = asRow(b);
@@ -176,7 +177,7 @@ export default function LegalPage({ doc }: { doc: LegalDoc }) {
               <span className="lgl-crumb-sep">/</span>
               <span className="lgl-crumb-current">{doc.crumb}</span>
             </nav>
-            <h1 className="lgl-h1">
+            <h1 className="lgl-h1"><Lines>
               {doc.title.split(" ").length > 1 ? (
                 <>
                   {doc.title.split(" ")[0]} <span className="qs-gradient-text">{doc.title.split(" ").slice(1).join(" ")}</span>
@@ -184,7 +185,7 @@ export default function LegalPage({ doc }: { doc: LegalDoc }) {
               ) : (
                 <span className="qs-gradient-text">{doc.title}</span>
               )}
-            </h1>
+            </Lines></h1>
             <div className="lgl-dates">
               <span className="lgl-date">
                 <span className="lgl-date-dot" aria-hidden="true" />
@@ -205,10 +206,10 @@ export default function LegalPage({ doc }: { doc: LegalDoc }) {
                 <span className="lgl-num" aria-hidden="true">
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <h2 className="lgl-h2">
+                <h2 className="lgl-h2"><Lines>
                   <span className="lgl-sr">{i + 1}. </span>
                   {s.title}
-                </h2>
+                </Lines></h2>
               </div>
               <div className="lgl-sec-body">
                 <Blocks blocks={s.blocks} />

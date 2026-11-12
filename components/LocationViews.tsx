@@ -17,6 +17,7 @@ import {
   type LocPage,
   type LocSection,
 } from "@/lib/locations";
+import Lines, { sentenceLines } from "@/components/HeadingLines";
 
 /*
  * Location pages ("geo-" design, used only here):
@@ -27,7 +28,7 @@ import {
  * service pages comes from the location documents (data/locations/*.json).
  */
 
-function GradientHeading({ text }: { text: string }) {
+function GradientHeadingParts({ text }: { text: string }) {
   const words = text.trim().split(/\s+/);
   if (words.length < 2) return <span className="qs-gradient-text">{text}</span>;
   const split = Math.max(1, Math.floor(words.length * 0.55));
@@ -37,6 +38,8 @@ function GradientHeading({ text }: { text: string }) {
     </>
   );
 }
+/* the same title with each sentence on its own line (see HeadingLines) */
+const GradientHeading = (props: Parameters<typeof GradientHeadingParts>[0]) => sentenceLines(GradientHeadingParts(props));
 
 const Html = ({ html, className = "geo-text", as = "p" }: { html: string; className?: string; as?: "p" | "span" }) =>
   as === "p" ? (
@@ -138,14 +141,14 @@ function Blocks({
     else if (b.type === "qa")
       out.push(
         <div key={i} className="geo-qa">
-          <h3 className="geo-h3">{b.q}</h3>
+          <h3 className="geo-h3"><Lines>{b.q}</Lines></h3>
           <Html html={b.a} />
         </div>
       );
     else if (b.type === "sub")
       out.push(
         <div key={i} className="geo-sub">
-          <h3 className="geo-h3">{b.title}</h3>
+          <h3 className="geo-h3"><Lines>{b.title}</Lines></h3>
           <Blocks blocks={b.blocks} tone={tone} compact={compact} panelLists={panelLists} />
         </div>
       );
@@ -161,7 +164,7 @@ function Steps({ steps }: { steps: { num: string; title: string; desc: string }[
         <li key={s.num + s.title}>
           <span className="geo-tl-num">{s.num}</span>
           <div className="geo-tl-body">
-            <h3 className="geo-h3">{s.title}</h3>
+            <h3 className="geo-h3"><Lines>{s.title}</Lines></h3>
             {s.desc && <Html html={s.desc} />}
           </div>
         </li>
@@ -208,9 +211,9 @@ function DocSection({ section, index }: { section: LocSection; index: number }) 
         {num}
       </span>
       <div className="geo-doc-titles">
-        <h2 className="geo-h2">
+        <h2 className="geo-h2"><Lines>
           <GradientHeading text={section.heading} />
-        </h2>
+        </Lines></h2>
         {tagline && <p className="geo-tagline">{tagline}</p>}
       </div>
     </header>
@@ -281,7 +284,7 @@ function DocSection({ section, index }: { section: LocSection; index: number }) 
         <div className="geo-tiles">
           {subs.map((s) => (
             <article key={s.title} className="geo-tile">
-              <h3 className="geo-h3">{s.title}</h3>
+              <h3 className="geo-h3"><Lines>{s.title}</Lines></h3>
               <Blocks blocks={s.blocks} compact />
             </article>
           ))}
@@ -307,9 +310,9 @@ function ClosingBand({ section }: { section: LocSection }) {
     <section className="geo-section geo-closing-sec">
       <div className="geo-container">
         <div className="geo-closing">
-          <h2 className="geo-h2">
+          <h2 className="geo-h2"><Lines>
             <GradientHeading text={section.heading} />
-          </h2>
+          </Lines></h2>
           {tagline && <p className="geo-tagline geo-tagline-light">{tagline}</p>}
           <Blocks blocks={blocks} tone="dark" />
         </div>
@@ -374,9 +377,9 @@ export function LocationsHub() {
           <div className="geo-container">
             <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Our Locations" }]} />
             <div className="geo-dir-head">
-              <h1 className="geo-h1">
+              <h1 className="geo-h1"><Lines>
                 <GradientHeading text="Our Locations" />
-              </h1>
+              </Lines></h1>
               <span className="geo-dir-count" aria-hidden="true">
                 <span className="geo-dir-count-num">{String(LOCATIONS.length).padStart(2, "0")}</span>
                 <LucideIcon name="map-pin" size={18} />
@@ -429,9 +432,9 @@ export function CityView({ city }: { city: LocCity }) {
                   <span className="geo-bt-pin-ring" />
                   <LucideIcon name="map-pin" size={22} />
                 </span>
-                <h1 className="geo-h1">
+                <h1 className="geo-h1"><Lines>
                   <span className="qs-gradient-text">{city.city}</span>
-                </h1>
+                </Lines></h1>
               </div>
             </div>
             <ul className="geo-city-cards">
@@ -471,9 +474,9 @@ export function CityView({ city }: { city: LocCity }) {
                     {String(gi + 1).padStart(2, "0")}
                   </span>
                   <div className="geo-doc-titles">
-                    <h2 className="geo-h2">
+                    <h2 className="geo-h2"><Lines>
                       <GradientHeading text={CATEGORY_LABELS[g.cat]} />
-                    </h2>
+                    </Lines></h2>
                   </div>
                 </header>
                 <ul className="geo-svc-list">
@@ -534,9 +537,9 @@ export function LocationServiceView({ city, page }: { city: LocCity; page: LocPa
                     { label: page.h1 },
                   ]}
                 />
-                <h1 className="geo-h1">
+                <h1 className="geo-h1"><Lines>
                   <GradientHeading text={page.h1} />
-                </h1>
+                </Lines></h1>
                 {introText.map((b, i) =>
                   b.type === "p" ? (
                     <Html key={i} html={b.html} className={i === firstP ? "geo-lead" : "geo-text"} />

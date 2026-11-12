@@ -13,6 +13,7 @@ import { isWebLink, LINK_ERROR, normalizeLink } from "@/lib/webLink";
 import { openDynamicEmailModal } from "@/components/DynamicEmailModal";
 import "@/app/contact.css";
 import { useCalendlyReset } from "@/components/BookingSection";
+import Lines from "@/components/HeadingLines";
 
 const getCategoriesForService = (service: string): readonly string[] => {
   if (service === "AI & Automation Solutions" || service === "AI Solutions & Automation") {
@@ -207,7 +208,7 @@ function InquiryForm() {
         <span className="ct-success-icon" aria-hidden="true">
           <LucideIcon name="check" size={26} strokeWidth={2.6} />
         </span>
-        <h3 className="ct-success-title">Thank You! Your Inquiry Has Been Received.</h3>
+        <h3 className="ct-success-title"><Lines>Thank You! Your Inquiry Has Been Received.</Lines></h3>
         <p className="ct-note">Our team will review your details and contact you to discuss your requirements.</p>
         <p style={{ fontSize: "13px", color: "#64748b", marginTop: "12px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ animation: "spin 1s linear infinite" }}>
@@ -469,9 +470,9 @@ export default function ContactView() {
                 <span className="ct-live-dot" aria-hidden="true" />
                 Your Trusted Digital Growth &amp; Technology Partner
               </span>
-              <h1 className="ct-h1">
+              <h1 className="ct-h1"><Lines>
                 Contact Quickupp Softech – <span className="qs-gradient-text">Let&apos;s Grow Your Business</span>
-              </h1>
+              </Lines></h1>
               <div className="ct-stage-cols">
                 <p className="ct-lead">
                   Looking to grow your business, generate quality leads, strengthen your online presence, or streamline operations with technology?
@@ -503,9 +504,9 @@ export default function ContactView() {
           <div className="ct-container">
             <aside className="ct-dock" aria-labelledby="ct-touch-title">
               <div className="ct-dock-intro">
-                <h2 id="ct-touch-title" className="ct-dock-title">
+                <h2 id="ct-touch-title" className="ct-dock-title"><Lines>
                   Get in Touch
-                </h2>
+                </Lines></h2>
                 <p className="ct-dock-text">
                   Have a project in mind or need a reliable growth partner? Connect with our team to discuss your requirements, explore our services, and find
                   the right approach for your business.
@@ -626,9 +627,9 @@ export default function ContactView() {
                   <LucideIcon name="sparkle" size={14} />
                   Book a Free Consultation
                 </span>
-                <h2 className="ct-h2">
+                <h2 className="ct-h2"><Lines>
                   Let&apos;s Discuss Your <span className="qs-gradient-text">Business Growth Opportunities</span>
-                </h2>
+                </Lines></h2>
                 <p className="ct-text">
                   Have a project in mind or looking for expert guidance? Schedule a one-on-one consultation with our team to discuss your business goals,
                   challenges, and potential solutions.
@@ -661,9 +662,9 @@ export default function ContactView() {
                   <LucideIcon name="pen-line" size={14} />
                   Tell Us About Your Project
                 </span>
-                <h2 className="ct-h2">
+                <h2 className="ct-h2"><Lines>
                   Let&apos;s Understand <span className="qs-gradient-text">Your Requirements</span>
-                </h2>
+                </Lines></h2>
                 <p className="ct-text">
                   Looking for digital marketing, AI solutions, IT development, or business support services? Share your requirements through the form
                   below.
@@ -680,9 +681,9 @@ export default function ContactView() {
           <section className="ct-section">
             <div className="ct-container">
               <div className="ct-head">
-                <h2 className="ct-h2">
+                <h2 className="ct-h2"><Lines>
                   Our <span className="qs-gradient-text">Services</span>
-                </h2>
+                </Lines></h2>
                 <p className="ct-text">We provide integrated business growth and technology solutions, including:</p>
               </div>
               <ol className="ct-index">
@@ -694,7 +695,7 @@ export default function ContactView() {
                     <span className="ct-index-icon" aria-hidden="true">
                       <LucideIcon name={sv.icon} size={22} />
                     </span>
-                    <h3 className="ct-index-title">{sv.title}</h3>
+                    <h3 className="ct-index-title"><Lines>{sv.title}</Lines></h3>
                     <p className="ct-index-text">{sv.text}</p>
                   </li>
                 ))}
@@ -706,9 +707,9 @@ export default function ContactView() {
           <section className="ct-section ct-tint">
             <div className="ct-container">
               <div className="ct-head">
-                <h2 className="ct-h2">
+                <h2 className="ct-h2"><Lines>
                   Industries <span className="qs-gradient-text">We Serve</span>
-                </h2>
+                </Lines></h2>
                 <p className="ct-text">
                   We work with businesses across multiple industries, helping them improve visibility, acquire customers, and scale operations.
                 </p>
@@ -731,9 +732,9 @@ export default function ContactView() {
             <div className="ct-container">
               <div className="ct-orbit">
                 <div className="ct-orbit-inner">
-                  <h2 className="ct-orbit-title">
+                  <h2 className="ct-orbit-title"><Lines>
                     Let&apos;s Discuss <span className="qs-gradient-text">Your Project</span>
-                  </h2>
+                  </Lines></h2>
                   <p className="ct-orbit-text">
                     Every business has different goals and challenges. Tell us a little about your requirements, and our team will get in touch to
                     understand your needs and discuss possible solutions.

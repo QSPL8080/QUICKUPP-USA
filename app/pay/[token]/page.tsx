@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import "../../checkout/checkout.css";
 import { errMessage } from "@/lib/err";
+import Lines from "@/components/HeadingLines";
 
 type OrderData = {
   id: number;
@@ -319,9 +320,9 @@ export default function PayTokenPage({ params }: { params: Promise<{ token: stri
                 </svg>
               </div>
             )}
-            <h3 className="ck-card-title" style={{ justifyContent: "center", fontSize: "16px", marginBottom: "8px" }}>
+            <h3 className="ck-card-title" style={{ justifyContent: "center", fontSize: "16px", marginBottom: "8px" }}><Lines>
               {isExpired ? "Payment Link Expired" : "Invalid Payment Link"}
-            </h3>
+            </Lines></h3>
             <p style={{ color: "#64748b", fontSize: "13.5px", lineHeight: "1.6", margin: "0 0 20px" }}>
               {loadError || "This payment link does not exist or has expired. Please contact Quickupp Softech support to generate a fresh link."}
             </p>
@@ -361,9 +362,9 @@ export default function PayTokenPage({ params }: { params: Promise<{ token: stri
                 <path d="M20 6 9 17l-5-5" />
               </svg>
             </div>
-            <h3 className="ck-card-title" style={{ justifyContent: "center", fontSize: "16px", marginBottom: "8px" }}>
+            <h3 className="ck-card-title" style={{ justifyContent: "center", fontSize: "16px", marginBottom: "8px" }}><Lines>
               Payment Already Completed
-            </h3>
+            </Lines></h3>
             <p style={{ color: "#64748b", fontSize: "13.5px", lineHeight: "1.6", margin: "0 0 16px" }}>
               Order <strong style={{ color: "#7c3aed" }}>#{order.invoiceNumber}</strong> has already been fully paid ($
               {order.totalAmount.toFixed(2)} USD). Your confirmation and official receipt were sent to {order.clientEmail}.
@@ -410,13 +411,13 @@ export default function PayTokenPage({ params }: { params: Promise<{ token: stri
         <div className="ck-grid" style={{ display: isProcessing ? "none" : "grid" }}>
           {/* LEFT PANEL: Order Summary & Fast PayPal Checkout */}
           <div className="ck-summary-card">
-            <h3 className="ck-card-title">
+            <h3 className="ck-card-title"><Lines>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
                 <path d="M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1Z" />
               </svg>
               <span>Order Summary</span>
-            </h3>
+            </Lines></h3>
             <p className="ck-card-subtitle">
               Quickupp Softech Invoice #{order.invoiceNumber}
             </p>
@@ -557,7 +558,7 @@ export default function PayTokenPage({ params }: { params: Promise<{ token: stri
 
           {/* RIGHT PANEL: Debit or Credit Card Panel (BESIDE!) */}
           <div className="ck-pay-card">
-            <h3 className="ck-pay-title">Debit or Credit Card</h3>
+            <h3 className="ck-pay-title"><Lines>Debit or Credit Card</Lines></h3>
             <p className="ck-pay-subtitle">
               Pay securely with any major card. No PayPal login required.
             </p>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import Lines from "@/components/HeadingLines";
 
 /*
  * Renders blog paragraph strings (from the blog document or the CRM editor):
@@ -115,9 +116,9 @@ export default function BlogRichText({ lines, firstClass }: { lines: string[]; f
           );
         if (b.kind === "lead" && !/[:：]$/.test(b.text.trim()))
           return (
-            <h3 key={i} className="bld-h3">
+            <h3 key={i} className="bld-h3"><Lines>
               {inline(b.text, `${i}`)}
-            </h3>
+            </Lines></h3>
           );
         if (b.kind === "lead")
           return (

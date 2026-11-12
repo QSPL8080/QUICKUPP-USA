@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Lines from "@/components/HeadingLines";
 
 interface ResourceCtaBannerProps {
   tag?: string;
@@ -58,9 +59,9 @@ export default function ResourceCtaBanner({
               {tag}
             </div>
 
-            <h2 className="res-cta-heading">
+            <h2 className="res-cta-heading"><Lines>
               {title} <span className="qs-gradient-text">{titleAccent}</span>
-            </h2>
+            </Lines></h2>
 
             <div className="res-cta-btn-group">
               <Link href={primaryHref} className="res-btn-dark">

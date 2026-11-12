@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import ResourceMotion from "@/components/ResourceMotion";
 import type { BlogPost } from "@/data/blogs";
 import "@/app/blogs-list.css";
+import Lines from "@/components/HeadingLines";
 
 /*
  * Blogs list: every published blog, each with its image, title and the
@@ -23,9 +24,9 @@ export default function BlogListView({ initialPosts }: { initialPosts: BlogPost[
               <span>/</span>
               <span className="asx-breadcrumb-current">Blogs</span>
             </div>
-            <h1 className="bls-h1">
+            <h1 className="bls-h1"><Lines>
               <span className="qs-gradient-text">Blogs</span>
-            </h1>
+            </Lines></h1>
           </div>
         </section>
 
@@ -46,9 +47,9 @@ export default function BlogListView({ initialPosts }: { initialPosts: BlogPost[
                           {post.readTime ? <span> · {post.readTime}</span> : null}
                         </p>
                       )}
-                      <h2 className="bls-title">
+                      <h2 className="bls-title"><Lines>
                         <Link href={`/blog/${post.slug}`}>{post.title}</Link>
-                      </h2>
+                      </Lines></h2>
                       <p className="bls-desc">{post.desc}</p>
                       <Link href={`/blog/${post.slug}`} className="bls-more">
                         <span>Read Article</span>

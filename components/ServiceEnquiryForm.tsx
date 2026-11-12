@@ -5,6 +5,7 @@ import Link from "next/link";
 import CountrySelect from "@/components/CountrySelect";
 import { CONTACT_BUDGETS, CONTACT_TIMELINES, INDUSTRIES, SERVICE_FORMS, type ServiceFormKey } from "@/lib/formOptions";
 import { isWebLink, LINK_ERROR, normalizeLink } from "@/lib/webLink";
+import Lines from "@/components/HeadingLines";
 
 /*
  * Enquiry form shown on every subpage of a service, and on every industry page.
@@ -201,14 +202,14 @@ export default function ServiceEnquiryForm({ service: fixedService, industry: fi
   return (
     <section className="sef-section" id="enquiry">
       <div className="sef-container">
-        <h2 className="sef-heading">
+        <h2 className="sef-heading"><Lines>
           Talk to Us About <span className="qs-gradient-text">{current || form?.label || fixedIndustry}</span>
-        </h2>
+        </Lines></h2>
         <div className="su-contact-form-container">
           {submitted ? (
             <div className="su-success-box">
               <div className="su-success-icon">✓</div>
-              <h3 className="sef-success-title">Thank You! Your Inquiry Has Been Received.</h3>
+              <h3 className="sef-success-title"><Lines>Thank You! Your Inquiry Has Been Received.</Lines></h3>
               <p className="sef-success-text">
                 Our team will review your details and contact you to discuss your requirements.
               </p>
@@ -250,7 +251,7 @@ export default function ServiceEnquiryForm({ service: fixedService, industry: fi
               />
 
               <div className="su-form-top">
-                <h2 className="su-inquiry-title">Send Your Inquiry!</h2>
+                <h2 className="su-inquiry-title"><Lines>Send Your Inquiry!</Lines></h2>
                 <p className="su-inquiry-para">Our team will review your details and contact you to discuss your requirements.</p>
               </div>
 

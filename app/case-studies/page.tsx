@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import CaseStudiesGrid, { type CaseCard } from "@/components/CaseStudiesGrid";
 import { CASE_STUDY_ORDER, caseStudyArea, caseStudyCover, getCaseStudyDoc, headlineStats, infoValue } from "@/lib/caseStudies";
 import "@/app/case-studies-list.css";
+import Lines from "@/components/HeadingLines";
 
 export const metadata: Metadata = {
   title: "Case Studies | Quickupp Softech",
@@ -60,12 +61,12 @@ export default function CaseStudiesPage() {
                 <span>/</span>
                 <span className="asx-breadcrumb-current">Case Studies</span>
               </div>
-              <h1 className="cl-h1">
+              <h1 className="cl-h1"><Lines>
                 <span className="cl-h1-line">Case</span>{" "}
                 <span className="cl-h1-line">
                   <span className="qs-gradient-text">Studies</span>
                 </span>
-              </h1>
+              </Lines></h1>
             </div>
 
             <div className="cl-reel" aria-hidden="true">

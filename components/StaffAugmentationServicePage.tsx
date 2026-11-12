@@ -16,6 +16,7 @@ import type {
   WhyChooseBlock,
 } from "@/lib/servicePageTypes";
 import BookingSection from "@/components/BookingSection";
+import Lines, { sentenceLines } from "@/components/HeadingLines";
 
 /*
  * Staff Augmentation subpages (Marketing & Design / IT) — "tlx-" design, used
@@ -54,7 +55,7 @@ const photoSets: Record<string, Photos> = {
 };
 
 /** Puts the last ~45% of a heading in the site's heading gradient. */
-function GradientHeading({ text }: { text: string }) {
+function GradientHeadingParts({ text }: { text: string }) {
   const words = text.split(" ");
   if (words.length < 3) return <span className="qs-gradient-text">{text}</span>;
   const split = Math.max(1, Math.floor(words.length * 0.55));
@@ -64,6 +65,8 @@ function GradientHeading({ text }: { text: string }) {
     </>
   );
 }
+/* the same title with each sentence on its own line (see HeadingLines) */
+const GradientHeading = (props: Parameters<typeof GradientHeadingParts>[0]) => sentenceLines(GradientHeadingParts(props));
 
 const ROLE_ICONS: [RegExp, LucideIconName][] = [
   [/seo/i, "search"],
@@ -201,9 +204,9 @@ export default function StaffAugmentationServicePage({
               {data.heroEyebrow && data.heroEyebrow !== data.crumb && (
                 <p className="tlx-eyebrow">{data.heroEyebrow}</p>
               )}
-              <h1>
+              <h1><Lines>
                 <GradientHeading text={data.heroTitle} />
-              </h1>
+              </Lines></h1>
               {heroParas.map((p, i) => (
                 <p key={i} className={i === 0 ? "tlx-lead" : "tlx-text"}>
                   {p}
@@ -244,9 +247,9 @@ export default function StaffAugmentationServicePage({
             <div className="tlx-container">
               {data.resourcesTitle && (
                 <div className="tlx-head tlx-head-center">
-                  <h2>
+                  <h2><Lines>
                     <GradientHeading text={data.resourcesTitle} />
-                  </h2>
+                  </Lines></h2>
                   {data.resourcesIntro && <p className="tlx-lead">{data.resourcesIntro}</p>}
                 </div>
               )}
@@ -258,7 +261,7 @@ export default function StaffAugmentationServicePage({
                         <LucideIcon name={trackIcon(t.title)} size={22} strokeWidth={1.9} />
                       </span>
                       <div className="tlx-bench-copy">
-                        {data.resourcesTitle ? <h3>{t.title}</h3> : <h2>{t.title}</h2>}
+                        {data.resourcesTitle ? <h3><Lines>{t.title}</Lines></h3> : <h2><Lines>{t.title}</Lines></h2>}
                         {t.intro && <p className="tlx-text">{t.intro}</p>}
                       </div>
                       {t.cta && (
@@ -294,9 +297,9 @@ export default function StaffAugmentationServicePage({
           <section className="tlx-sec tlx-soft">
             <div className="tlx-container">
               <div className="tlx-head">
-                <h2>
+                <h2><Lines>
                   <GradientHeading text={why.title || ""} />
-                </h2>
+                </Lines></h2>
                 {why.tagline && !whyBullets.includes(why.tagline) && <p className="tlx-lead">{why.tagline}</p>}
               </div>
               <ul className="tlx-bento">
@@ -327,9 +330,9 @@ export default function StaffAugmentationServicePage({
           <section className="tlx-sec qs-backdrop" style={{ "--qs-backdrop": "url('/images/contact-team-conference.jpg')" } as React.CSSProperties}>
             <div className="tlx-container">
               <div className="tlx-head">
-                <h2>
+                <h2><Lines>
                   <GradientHeading text={processBlock.title} />
-                </h2>
+                </Lines></h2>
               </div>
               <ol className="tlx-flow" style={{ "--tlx-steps": steps.length } as React.CSSProperties}>
                 {steps.map((st, i) => (
@@ -339,7 +342,7 @@ export default function StaffAugmentationServicePage({
                     style={{ "--tlx-i": i } as React.CSSProperties}
                   >
                     <span className="tlx-flow-num">{st.num}</span>
-                    <h3>{st.title}</h3>
+                    <h3><Lines>{st.title}</Lines></h3>
                     <p className="tlx-text">{st.desc || st.text}</p>
                   </li>
                 ))}
@@ -361,9 +364,9 @@ export default function StaffAugmentationServicePage({
                 <div className="tlx-panel-glow" aria-hidden="true" />
                 <div className="tlx-panel-grid">
                   <div className="tlx-panel-head">
-                    <h2>
+                    <h2><Lines>
                       <GradientHeading text={audience.title} />
-                    </h2>
+                    </Lines></h2>
                     {audience.intro && <p className="tlx-lead">{audience.intro}</p>}
                     {audience.cta && (
                       <div className="tlx-actions">
@@ -427,9 +430,9 @@ export default function StaffAugmentationServicePage({
         <section className="tlx-sec tlx-closing-sec">
           <div className="tlx-container">
             <div className="tlx-closing">
-              <h2>
+              <h2><Lines>
                 <GradientHeading text={data.closingTitle} />
-              </h2>
+              </Lines></h2>
               {closingQuestions.length > 0 && (
                 <ul className="tlx-asks">
                   {closingQuestions.map((q) => (

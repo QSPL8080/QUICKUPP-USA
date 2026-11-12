@@ -7,6 +7,7 @@ import CaseStudyNav from "@/components/CaseStudyNav";
 import type { CsBlock } from "@/data/case-study-docs";
 import { CASE_STUDY_ORDER, caseStudyArea, caseStudyCover, getCaseStudyDoc, headlineStats, sectionLabel } from "@/lib/caseStudies";
 import "@/app/case-study-detail.css";
+import Lines from "@/components/HeadingLines";
 
 /*
  * One case study ("cd-"), exactly as its document is written — the same
@@ -57,7 +58,7 @@ function Block({ b }: { b: CsBlock }) {
     case "kicker":
       return null; // shown as the section's label
     case "h2":
-      return <h2 className="cd-h2">{b.text}</h2>;
+      return <h2 className="cd-h2"><Lines>{b.text}</Lines></h2>;
     case "p":
       return <p className="cd-text">{b.text}</p>;
     case "caption":
@@ -123,7 +124,7 @@ function Block({ b }: { b: CsBlock }) {
         <div className="cd-cta" data-cs-reveal="">
           <span className="cd-cta-glow" aria-hidden="true" />
           <p className="cd-cta-kicker">{b.kicker}</p>
-          {b.title && <h2 className="cd-cta-title">{b.title}</h2>}
+          {b.title && <h2 className="cd-cta-title"><Lines>{b.title}</Lines></h2>}
           {b.text && <p className="cd-cta-text">{b.text}</p>}
           <Link href="/contact" className="cd-btn">
             <span>Contact Us</span>
@@ -177,7 +178,7 @@ export default async function CaseStudyDetailPage({ params }: Props) {
                 <span className="cd-tag">{area}</span>
                 {sector && <span className="cd-tag cd-tag-ghost">{sector}</span>}
               </p>
-              <h1 className="cd-h1">{doc.title}</h1>
+              <h1 className="cd-h1"><Lines>{doc.title}</Lines></h1>
               <p className="cd-intro">{doc.intro}</p>
               <dl className="cd-facts">
                 {doc.info.labels.map((l, i) => (

@@ -19,6 +19,7 @@ import type {
 } from "@/lib/servicePageTypes";
 import "@/app/it-services.css";
 import BookingSection from "@/components/BookingSection";
+import Lines, { sentenceLines } from "@/components/HeadingLines";
 
 /*
  * Information Technology Services subpages — "itx-" design, used only here:
@@ -33,7 +34,7 @@ interface Props {
   categorySlug?: string;
 }
 
-function Grad({ text }: { text?: string }) {
+function GradParts({ text }: { text?: string }) {
   if (!text) return null;
   const words = text.trim().split(/\s+/);
   if (words.length < 3) return <span className="qs-gradient-text">{text}</span>;
@@ -44,6 +45,8 @@ function Grad({ text }: { text?: string }) {
     </>
   );
 }
+/* the same title with each sentence on its own line (see HeadingLines) */
+const Grad = (props: Parameters<typeof GradParts>[0]) => sentenceLines(GradParts(props));
 
 const Arrow = ({ size = 16 }: { size?: number }) => <LucideIcon name="arrow-right" size={size} strokeWidth={2.2} />;
 const Check = () => <LucideIcon name="check" size={12} strokeWidth={3} />;
@@ -109,7 +112,7 @@ function Capabilities({ blocks }: { blocks: AiBlock[] }) {
                 <span className="itx-svc-rule" aria-hidden="true" />
               </div>
               {b.subtitle && <p className="itx-kicker">{b.subtitle}</p>}
-              <h3>{b.title}</h3>
+              <h3><Lines>{b.title}</Lines></h3>
               {lines(b.desc).map((l, k) => (
                 <p key={`d${k}`} className="itx-text">
                   {l}
@@ -151,9 +154,9 @@ function TilePanel({ b, soft }: { b: AiBlock; soft: boolean }) {
       <div className="itx-container itx-pair">
         <div className="itx-pair-head">
           {b.subtitle && <p className="itx-kicker">{b.subtitle}</p>}
-          <h2>
+          <h2><Lines>
             <Grad text={b.title} />
-          </h2>
+          </Lines></h2>
           {lines(b.intro).map((l, k) => (
             <p key={k} className="itx-text">
               {l}
@@ -192,9 +195,9 @@ function SpecCards({ b }: { b: DescPairsBlock }) {
       <div className="itx-container">
         <div className="itx-head">
           {b.title && (
-            <h2>
+            <h2><Lines>
               <Grad text={b.title} />
-            </h2>
+            </Lines></h2>
           )}
           {lines(b.desc).map((l, k) => (
             <p key={k} className="itx-text">
@@ -211,7 +214,7 @@ function SpecCards({ b }: { b: DescPairsBlock }) {
                 </span>
                 <span className="itx-svc-rule" aria-hidden="true" />
               </div>
-              <h3>{it.title}</h3>
+              <h3><Lines>{it.title}</Lines></h3>
               <p className="itx-text">{it.desc}</p>
             </article>
           ))}
@@ -239,9 +242,9 @@ function ProcessBoard({ b }: { b: ProcessBlock }) {
     >
       <div className="itx-container">
         <div className="itx-head itx-head-center">
-          <h2>
+          <h2><Lines>
             <Grad text={b.title} />
-          </h2>
+          </Lines></h2>
           {lines(b.intro).map((l, k) => (
             <p key={`i${k}`} className="itx-text">
               {l}
@@ -259,7 +262,7 @@ function ProcessBoard({ b }: { b: ProcessBlock }) {
               {row.map((st, i) => (
                 <li key={`${st.title}-${i}`} className="itx-track-step">
                   <span className="itx-track-node">{st.num || pad(r * perRow + i + 1)}</span>
-                  <h3>{st.title}</h3>
+                  <h3><Lines>{st.title}</Lines></h3>
                   {(st.desc || st.text) && <p className="itx-text">{st.desc || st.text}</p>}
                 </li>
               ))}
@@ -286,9 +289,9 @@ function WhySplit({ b }: { b: WhyChooseBlock }) {
             <div className="itx-why-titles">
               {b.tagline && <p className="itx-kicker">{b.tagline}</p>}
               {b.title && (
-                <h2>
+                <h2><Lines>
                   <Grad text={b.title} />
-                </h2>
+                </Lines></h2>
               )}
               {lines(b.intro).map((l, k) => (
                 <p key={`i${k}`} className="itx-text">
@@ -330,9 +333,9 @@ function IndustryPills({ b }: { b: IndustriesBlock }) {
       <div className="itx-container">
         <div className="itx-head itx-head-center">
           {b.title && (
-            <h2>
+            <h2><Lines>
               <Grad text={b.title} />
-            </h2>
+            </Lines></h2>
           )}
           {lines(b.intro).map((l, k) => (
             <p key={k} className="itx-text">
@@ -451,9 +454,9 @@ export default function CoporaServicePage({ data, categoryLabel, categorySlug }:
             <div className="itx-hero-grid">
               <div className="itx-hero-copy">
                 {showEyebrow && <p className="itx-kicker">{data.heroEyebrow}</p>}
-                <h1>
+                <h1><Lines>
                   <Grad text={data.heroTitle} />
-                </h1>
+                </Lines></h1>
                 {heroLead && <p className="itx-lead">{heroLead}</p>}
                 {heroRest.length > 0 && <div className="itx-hero-more">{more}</div>}
                 {actions}
@@ -487,9 +490,9 @@ export default function CoporaServicePage({ data, categoryLabel, categorySlug }:
             <div className="itx-close">
               <span className="itx-close-glow" aria-hidden="true" />
               {data.closingTitle && (
-                <h2>
+                <h2><Lines>
                   <Grad text={data.closingTitle} />
-                </h2>
+                </Lines></h2>
               )}
               {lines(data.closingDesc).map((l, k) => (
                 <p key={k} className="itx-text">

@@ -3,6 +3,7 @@ import type { BlogPost } from "@/data/blogs";
 import BlogRichText from "@/components/BlogRichText";
 import BlogReadingAids from "@/components/BlogReadingAids";
 import "@/app/blog-detail.css";
+import Lines from "@/components/HeadingLines";
 
 /*
  * One blog, exactly as its document is written: the H1, the introduction,
@@ -46,7 +47,7 @@ export default function BlogDetailView({ post, relatedPosts }: { post: BlogPost;
             <span>/</span>
             <Link href="/blog">Blogs</Link>
           </div>
-          <h1 className="bld-h1">{post.title}</h1>
+          <h1 className="bld-h1"><Lines>{post.title}</Lines></h1>
           {post.desc && <p className="bld-standfirst">{post.desc}</p>}
           {post.date && (
             <p className="bld-meta">
@@ -103,10 +104,10 @@ export default function BlogDetailView({ post, relatedPosts }: { post: BlogPost;
             return (
               <section key={toc[i].id} id={toc[i].id} className={`bld-section${isConclusion ? " is-conclusion" : ""}`}>
                 {s.heading && (
-                  <h2 className="bld-h2">
+                  <h2 className="bld-h2"><Lines>
                     {h.num && <span className="bld-h2-num">{h.num.padStart(2, "0")}</span>}
                     <span>{h.text}</span>
-                  </h2>
+                  </Lines></h2>
                 )}
                 <BlogRichText lines={s.paragraphs} />
               </section>
@@ -133,7 +134,7 @@ export default function BlogDetailView({ post, relatedPosts }: { post: BlogPost;
       {relatedPosts.length > 0 && (
         <section className="bld-more">
           <div className="bld-more-wrap">
-            <h2 className="bld-more-title">More Blogs</h2>
+            <h2 className="bld-more-title"><Lines>More Blogs</Lines></h2>
             <div className="bld-more-grid">
               {relatedPosts.map((p) => (
                 <Link key={p.slug} href={`/blog/${p.slug}`} className="bld-more-card">

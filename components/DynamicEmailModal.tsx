@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import "@/app/email-modal.css";
+import Lines from "@/components/HeadingLines";
 
 export interface EmailModalPayload {
   email: string;
@@ -202,9 +203,9 @@ export default function DynamicEmailModal() {
               </svg>
             </div>
             <div className="em-title-wrap">
-              <h2 id="em-modal-title" className="em-title">
+              <h2 id="em-modal-title" className="em-title"><Lines>
                 Send an Email
-              </h2>
+              </Lines></h2>
               <p className="em-subtitle">Quickupp Softech Client Support &amp; Inquiries</p>
             </div>
           </div>

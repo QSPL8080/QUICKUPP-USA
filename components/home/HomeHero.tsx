@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import HomeIcon, { type HomeIconName } from "@/components/home/HomeIcon";
+import Lines from "@/components/HeadingLines";
 
 /*
  * Home hero ("hxd-", used on no other page): a dark stage with the copy on
@@ -86,13 +87,13 @@ export default function HomeHero({ hero, actions }: { hero: Hero; actions: React
 
         <div className="hxd-wrap hxd-grid">
           <div className="hxd-copy">
-            <h1 className="hxd-title">
+            <h1 className="hxd-title"><Lines>
               {hero.title.map((l, i) => (
                 <span key={l} className="hxd-line" style={d(0.2 + i * 0.13)}>
                   <span className={i === hero.title.length - 1 ? "hxd-line-in qs-gradient-text" : "hxd-line-in"}>{l}</span>
                 </span>
               ))}
-            </h1>
+            </Lines></h1>
 
             <p className="hxd-text" style={d(0.62)}>
               {hero.text}

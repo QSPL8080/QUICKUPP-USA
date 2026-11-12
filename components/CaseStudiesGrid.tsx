@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import { CASE_STUDY_CATEGORIES } from "@/lib/caseStudyCategories";
+import Lines from "@/components/HeadingLines";
 
 /*
  * Case studies list: category chips, one featured study and a magazine grid of
@@ -95,9 +96,9 @@ export default function CaseStudiesGrid({ cards }: { cards: CaseCard[] }) {
               {lead.client}
               {lead.location && <span> · {lead.location}</span>}
             </p>
-            <h2 className="cl-lead-title">
+            <h2 className="cl-lead-title"><Lines>
               <Link href={`/case-studies/${lead.slug}`}>{lead.title}</Link>
-            </h2>
+            </Lines></h2>
             <p className="cl-lead-intro">{lead.intro}</p>
             {lead.stats.length > 0 && (
               <dl className="cl-lead-stats">
@@ -139,7 +140,7 @@ export default function CaseStudiesGrid({ cards }: { cards: CaseCard[] }) {
                       {c.client}
                       {c.location && <span> · {c.location}</span>}
                     </span>
-                    <h2 className="cl-card-title">{c.title}</h2>
+                    <h2 className="cl-card-title"><Lines>{c.title}</Lines></h2>
                     {c.sector && <span className="cl-card-sector">{c.sector}</span>}
                     <span className="cl-card-more">
                       Read Full Case Study <Arrow />

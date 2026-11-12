@@ -18,6 +18,7 @@ import type {
   FaqBlock,
 } from "@/lib/servicePageTypes";
 import BookingSection from "@/components/BookingSection";
+import Lines, { sentenceLines } from "@/components/HeadingLines";
 
 /*
  * Industries subpages — "inx-" sector design, used only here.
@@ -380,7 +381,7 @@ function cleanDash(text: string): string {
 const pad = (n: number) => String(n).padStart(2, "0");
 
 /** Second half of a heading in the site gradient */
-function GradientTitle({ text }: { text: string }) {
+function GradientTitleParts({ text }: { text: string }) {
   const title = cleanDash(text || "");
   const dot = title.split(". ").filter(Boolean);
   if (dot.length >= 2) {
@@ -400,6 +401,8 @@ function GradientTitle({ text }: { text: string }) {
     </>
   );
 }
+/* the same title with each sentence on its own line (see HeadingLines) */
+const GradientTitle = (props: Parameters<typeof GradientTitleParts>[0]) => sentenceLines(GradientTitleParts(props));
 
 /** A route written as "A → B → C" */
 function Route({ text }: { text: string }) {
@@ -487,9 +490,9 @@ function ServicesBlock({ block, id }: { block: DescPairsBlock; id?: string }) {
           <div className="inx-head-main">
             {block.subtitle && <p className="inx-eyebrow">{cleanDash(block.subtitle)}</p>}
             {block.title && (
-              <h2>
+              <h2><Lines>
                 <GradientTitle text={block.title} />
-              </h2>
+              </Lines></h2>
             )}
           </div>
           {block.desc && (
@@ -501,7 +504,7 @@ function ServicesBlock({ block, id }: { block: DescPairsBlock; id?: string }) {
         <div className={`inx-cards inx-cards-${cols}`} onPointerMove={onMove}>
           {block.items.map((it, i) => (
             <article key={i} className="inx-card">
-              <h3>{cleanDash(it.title)}</h3>
+              <h3><Lines>{cleanDash(it.title)}</Lines></h3>
               <p className="inx-text">{cleanDash(it.desc)}</p>
             </article>
           ))}
@@ -541,9 +544,9 @@ function AiSection({ block, soft, backdrop }: { block: AiBlock; soft: boolean; b
     return (
       <section className={`inx-sec${soft ? " inx-soft" : ""}${backdrop ? " qs-backdrop" : ""}`} {...bdProps}>
         <div className="inx-container inx-split-text">
-          <h2>
+          <h2><Lines>
             <GradientTitle text={block.title} />
-          </h2>
+          </Lines></h2>
           <div className="inx-split-body">
             <TextFlow text={block.intro} first="inx-lead" />
             <TextFlow text={block.desc} />
@@ -557,9 +560,9 @@ function AiSection({ block, soft, backdrop }: { block: AiBlock; soft: boolean; b
     <section className={`inx-sec${soft ? " inx-soft" : ""}${backdrop ? " qs-backdrop" : ""}`} {...bdProps}>
       <div className="inx-container">
         <div className="inx-head-center">
-          <h2>
+          <h2><Lines>
             <GradientTitle text={block.title} />
-          </h2>
+          </Lines></h2>
           <TextFlow text={block.intro} />
         </div>
         {chain ? (
@@ -591,9 +594,9 @@ function ListSection({ block, image, alt }: { block: ListBlock; image?: string; 
       <div className="inx-container inx-ledger-grid">
         <div className="inx-ledger-side">
           {block.tagline && <p className="inx-eyebrow">{cleanDash(block.tagline)}</p>}
-          <h2>
+          <h2><Lines>
             <GradientTitle text={block.title} />
-          </h2>
+          </Lines></h2>
           {block.subtitle && <p className="inx-eyebrow inx-eyebrow-after">{cleanDash(block.subtitle)}</p>}
           <TextFlow text={block.desc} />
           <Cta cta={block.cta} />
@@ -622,9 +625,9 @@ function ProcessSection({ block }: { block: ProcessBlock }) {
       <div className="inx-container">
         <div className="inx-head-center">
           {block.tagline && <p className="inx-eyebrow">{cleanDash(block.tagline)}</p>}
-          <h2>
+          <h2><Lines>
             <GradientTitle text={block.title} />
-          </h2>
+          </Lines></h2>
         </div>
         {steps.length > 0 ? (
           <ol className="inx-stack">
@@ -632,7 +635,7 @@ function ProcessSection({ block }: { block: ProcessBlock }) {
               <li key={i} className="inx-stack-card" style={{ top: `calc(118px + ${i * 16}px)` }}>
                 <span className="inx-stack-num">{s.num || pad(i + 1)}</span>
                 <div className="inx-stack-body">
-                  <h3>{cleanDash(s.title)}</h3>
+                  <h3><Lines>{cleanDash(s.title)}</Lines></h3>
                   <p className="inx-text">{cleanDash(s.desc || s.text || "")}</p>
                 </div>
               </li>
@@ -659,9 +662,9 @@ function WhySection({ block, image, alt }: { block: WhyChooseBlock; image: strin
         <div className="inx-why-side">
           {showTagline && <p className="inx-eyebrow">{cleanDash(block.tagline!)}</p>}
           {block.title && (
-            <h2>
+            <h2><Lines>
               <GradientTitle text={block.title} />
-            </h2>
+            </Lines></h2>
           )}
           <TextFlow text={block.desc} />
           <Cta cta={block.cta} />
@@ -761,9 +764,9 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
             </nav>
             <div className="inx-hero-grid">
               <div className="inx-hero-copy">
-                <h1>
+                <h1><Lines>
                   <GradientTitle text={data.heroTitle} />
-                </h1>
+                </Lines></h1>
                 {paras.map((p, i) => (
                   <p key={i} className={i === 0 ? "inx-lead" : "inx-text"}>
                     {cleanDash(p)}
@@ -816,9 +819,9 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
             <div className="inx-close">
               <div className="inx-close-copy">
                 {data.closingTitle && (
-                  <h2>
+                  <h2><Lines>
                     <GradientTitle text={data.closingTitle} />
-                  </h2>
+                  </Lines></h2>
                 )}
                 <TextFlow text={data.closingDesc} />
                 {data.closingCtas?.length > 0 && (

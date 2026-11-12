@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import LucideIcon from "@/components/LucideIcon";
 import "@/app/pay-modal.css";
 import { errMessage } from "@/lib/err";
+import Lines from "@/components/HeadingLines";
 
 // the PayPal JS SDK, loaded at runtime from paypal.com
 type PayPalButtons = { render: (el: HTMLElement) => Promise<void>; isEligible: () => boolean };
@@ -461,9 +462,9 @@ export default function PayNowModal() {
               </svg>
             </div>
             <div>
-              <h3 className="pm-head-title">
+              <h3 className="pm-head-title"><Lines>
                 {step === "success" ? "Payment Confirmation" : "Quickupp Softech Payment Portal"}
-              </h3>
+              </Lines></h3>
               <div className="pm-head-sub">
                 {step === "success"
                   ? "Transaction confirmed successfully"
@@ -969,7 +970,7 @@ export default function PayNowModal() {
               <div className="pm-success-icon">
                 <LucideIcon name="check" size={32} />
               </div>
-              <h3 className="pm-success-title">Payment Successful</h3>
+              <h3 className="pm-success-title"><Lines>Payment Successful</Lines></h3>
               <p style={{ fontSize: "15px", fontWeight: 700, color: "#0f172a", margin: "0 0 4px" }}>
                 Thank you for your order.
               </p>

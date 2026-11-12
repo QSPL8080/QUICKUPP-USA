@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import ResourceCtaBanner from "@/components/ResourceCtaBanner";
 import ResourceMotion from "@/components/ResourceMotion";
 import { getPublishedBlogs } from "@/lib/blogs";
+import Lines from "@/components/HeadingLines";
 
 // the latest blogs come from the database on every visit (see app/blog/[slug])
 export const dynamic = "force-dynamic";
@@ -72,10 +73,10 @@ export default async function ResourcesPage() {
               <span className="res-tag-dot"></span>
               RESOURCE HUB
             </div>
-            <h1 className="res-section-title">
+            <h1 className="res-section-title"><Lines>
               A quiet place to learn and{" "}
               <span className="qs-gradient-text">scale</span>
-            </h1>
+            </Lines></h1>
             <p
               style={{
                 fontSize: "17px",
@@ -96,7 +97,7 @@ export default async function ResourcesPage() {
                   <span className="res-tag-dot"></span>
                   {cat.tag}
                 </div>
-                <h2 className="res-hub-card-title">{cat.title}</h2>
+                <h2 className="res-hub-card-title"><Lines>{cat.title}</Lines></h2>
                 <p className="res-hub-card-desc">{cat.desc}</p>
                 <div className="res-hub-card-link">
                   {cat.cta}
@@ -128,9 +129,9 @@ export default async function ResourcesPage() {
               <span className="res-tag-dot"></span>
               LATEST ARTICLES
             </div>
-            <h2 className="res-section-title">
+            <h2 className="res-section-title"><Lines>
               Featured Insights &amp; <span className="qs-gradient-text">Playbooks</span>
-            </h2>
+            </Lines></h2>
           </div>
 
           <div className="res-grid-3">
@@ -146,7 +147,7 @@ export default async function ResourcesPage() {
                 <div className="res-card-meta">
                   {post.date} • {post.readTime}
                 </div>
-                <h3 className="res-card-title">{post.title}</h3>
+                <h3 className="res-card-title"><Lines>{post.title}</Lines></h3>
                 <p className="res-card-desc">{post.desc}</p>
               </Link>
             ))}

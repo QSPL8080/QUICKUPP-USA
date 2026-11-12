@@ -9,6 +9,7 @@ import AboutMotion from "@/components/AboutMotion";
 import "@/app/about-folio.css";
 import { ABOUT_NAV, type AboutCta, type AboutPageData, type AboutSection, type AboutTitle } from "@/data/about/pages";
 import BookingSection from "@/components/BookingSection";
+import Lines, { sentenceLines } from "@/components/HeadingLines";
 
 /*
  * About subpages — "abx-" folio design, used only here.
@@ -32,7 +33,7 @@ function Check({ size = 13 }: { size?: number }) {
   );
 }
 
-function Title({ t }: { t: AboutTitle }) {
+function TitleParts({ t }: { t: AboutTitle }) {
   return t.accent ? (
     <>
       {t.text} <span className="qs-gradient-text">{t.accent}</span>
@@ -41,6 +42,8 @@ function Title({ t }: { t: AboutTitle }) {
     <>{t.text}</>
   );
 }
+/* the same title with each sentence on its own line (see HeadingLines) */
+const Title = (props: Parameters<typeof TitleParts>[0]) => sentenceLines(TitleParts(props));
 
 function Eyebrow({ text, light }: { text?: string; light?: boolean }) {
   if (!text) return null;
@@ -116,9 +119,9 @@ function Statement({ s, backdrop }: { s: Extract<AboutSection, { kind: "statemen
   const body = (
     <div className="abx-statement-body">
       <Eyebrow text={s.eyebrow} />
-      <h2>
+      <h2><Lines>
         <Title t={s.title} />
-      </h2>
+      </Lines></h2>
       {s.paras.map((p, i) => (
         <p key={i} className={i === 0 && !side ? "abx-lead" : "abx-text"}>
           {p}
@@ -170,9 +173,9 @@ function Panels({ s, backdrop }: { s: Extract<AboutSection, { kind: "panels" }>;
         <div className={`abx-head${hasHeadText ? " abx-head-split" : ""}`}>
           <div className="abx-head-main">
             <Eyebrow text={s.eyebrow} />
-            <h2>
+            <h2><Lines>
               <Title t={s.title} />
-            </h2>
+            </Lines></h2>
           </div>
           {hasHeadText && (
             <div className="abx-head-side">
@@ -198,7 +201,7 @@ function Panels({ s, backdrop }: { s: Extract<AboutSection, { kind: "panels" }>;
               <span className="abx-panel-glow" aria-hidden="true" />
               <p className="abx-panel-label">{p.label}</p>
               <div className="abx-panel-body">
-                {p.title && <h3>{p.title}</h3>}
+                {p.title && <h3><Lines>{p.title}</Lines></h3>}
                 <p className="abx-panel-text">{p.text}</p>
               </div>
             </article>
@@ -252,9 +255,9 @@ function Goals({ s, backdrop }: { s: Extract<AboutSection, { kind: "goals" }>; b
         <div className="abx-head abx-head-split">
           <div className="abx-head-main">
             <Eyebrow text={s.eyebrow} />
-            <h2>
+            <h2><Lines>
               <Title t={s.title} />
-            </h2>
+            </Lines></h2>
           </div>
           <div className="abx-head-side">
             {s.paras.map((p, i) => (
@@ -292,9 +295,9 @@ function Route({ s, soft, backdrop }: { s: Extract<AboutSection, { kind: "route"
       <div className="abx-container">
         <div className="abx-head abx-head-center">
           <Eyebrow text={s.eyebrow} />
-          <h2>
+          <h2><Lines>
             <Title t={s.title} />
-          </h2>
+          </Lines></h2>
           {s.intro && <p className="abx-text">{s.intro}</p>}
         </div>
         <ol className={`abx-steps${plain ? " abx-steps-plain" : ""}${hasQuote ? " has-quote" : ""}`}>
@@ -302,7 +305,7 @@ function Route({ s, soft, backdrop }: { s: Extract<AboutSection, { kind: "route"
             <li key={i} className="abx-step">
               <div className="abx-step-head">
                 {st.label && <p className="abx-step-label">{st.label}</p>}
-                <h3>{st.title}</h3>
+                <h3><Lines>{st.title}</Lines></h3>
               </div>
               {st.text && <p className="abx-text abx-step-text">{st.text}</p>}
               {st.quote && <p className="abx-step-quote">{st.quote}</p>}
@@ -386,9 +389,9 @@ function IndexViewer({ s, backdrop }: { s: Extract<AboutSection, { kind: "index"
           <div className="abx-container">
             <div className="abx-head">
               <Eyebrow text={s.eyebrow} />
-              <h2>
+              <h2><Lines>
                 <Title t={s.title} />
-              </h2>
+              </Lines></h2>
             </div>
             <div className="abx-index">
               <div className="abx-index-nav" role="tablist" aria-orientation="vertical">
@@ -416,7 +419,7 @@ function IndexViewer({ s, backdrop }: { s: Extract<AboutSection, { kind: "index"
               <div className="abx-index-stage">
                 {s.items.map((it, i) => (
                   <article key={i} className={`abx-index-panel${active === i ? " is-active" : ""}`} role="tabpanel">
-                    <h3 className="abx-index-title qs-t-lg">{it.title}</h3>
+                    <h3 className="abx-index-title qs-t-lg"><Lines>{it.title}</Lines></h3>
                     <p className="abx-text">{it.desc}</p>
                     <Checks items={it.list} cols={2} />
                     {it.sub && <p className="abx-index-sub">{it.sub}</p>}
@@ -445,9 +448,9 @@ function Proof({ s, backdrop }: { s: Extract<AboutSection, { kind: "proof" }>; b
         <div className="abx-split">
           <div className="abx-statement-body">
             <Eyebrow text={s.eyebrow} />
-            <h2>
+            <h2><Lines>
               <Title t={s.title} />
-            </h2>
+            </Lines></h2>
             {s.paras.map((p, i) => (
               <p key={i} className="abx-text">
                 {p}
@@ -525,9 +528,9 @@ export default function AboutPage({ data }: { data: AboutPageData }) {
             </div>
 
             <Eyebrow text={hero.eyebrow} />
-            <h1 className="abx-hero-title">
+            <h1 className="abx-hero-title"><Lines>
               <Title t={hero.title} />
-            </h1>
+            </Lines></h1>
 
             <div className="abx-hero-cols">
               <div className="abx-hero-left">
@@ -577,9 +580,9 @@ export default function AboutPage({ data }: { data: AboutPageData }) {
               <span className="abx-close-grid" aria-hidden="true" />
               <div className="abx-close-main">
                 <Eyebrow text={closing.eyebrow} light />
-                <h2>
+                <h2><Lines>
                   <Title t={closing.title} />
-                </h2>
+                </Lines></h2>
                 {closing.paras.map((p, i) => (
                   <p key={i} className="abx-close-text">
                     {p}
