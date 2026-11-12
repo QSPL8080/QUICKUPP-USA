@@ -24,6 +24,7 @@ import CountrySelect from "@/components/CountrySelect";
 import ActivityTimeline, { fmtWhen, sameEntries, type ActivityEntry } from "@/components/crm/ActivityTimeline";
 import { payLinkUrl } from "@/lib/siteUrl";
 import { payMessage, whatsAppNumber, whatsAppUrl } from "@/lib/payMessages";
+import ShareLinkButtons from "@/components/crm/ShareLinkButtons";
 
 type LeadAudit = {
   createdBy: string;
@@ -212,6 +213,7 @@ export default function LeadsView({
     orderNumber: string;
     clientName?: string;
     clientPhone?: string;
+    clientEmail?: string;
     totalAmount?: number;
     service?: string;
     category?: string;
@@ -644,6 +646,7 @@ export default function LeadsView({
           orderNumber: data.orderNumber,
           clientName: linkForm.clientName,
           clientPhone: linkForm.clientPhone,
+          clientEmail: linkForm.clientEmail,
           totalAmount: amt,
           service: linkForm.service,
           category: linkForm.category,
@@ -1828,6 +1831,23 @@ export default function LeadsView({
                   </div>
                 </div>
 
+                <div className="crm-field">
+                  <span className="crm-label">Send to the client</span>
+                  <ShareLinkButtons
+                    link={{
+                      clientName: createdLink.clientName || open?.name || "",
+                      clientPhone: createdLink.clientPhone,
+                      clientEmail: createdLink.clientEmail,
+                      service: createdLink.service,
+                      category: createdLink.category,
+                      totalAmount: createdLink.totalAmount,
+                      paymentType: createdLink.paymentType,
+                      token: createdLink.token,
+                      invoiceNumber: createdLink.orderNumber,
+                    }}
+                  />
+                </div>
+
                 <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "4px" }}>
                   <a
                     href={createdLink.url}
@@ -1838,17 +1858,6 @@ export default function LeadsView({
                   >
                     View Checkout Page
                   </a>
-                  {createdLink.clientPhone && (
-                    <a
-                      href={leadWhatsAppUrl(createdLink, createdLink.clientPhone)}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="crm-act"
-                      style={{ flex: 1, justifyContent: "center", background: "#25D366", color: "#fff", textDecoration: "none" }}
-                    >
-                      Share via WhatsApp
-                    </a>
-                  )}
                 </div>
 
                 <div className="crm-modal-foot" style={{ marginTop: "8px" }}>
