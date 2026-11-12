@@ -1116,27 +1116,6 @@ export default function PaymentsView({
                                 <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
                               </svg>
                             </button>
-
-                            {/* If partially paid: Send Balance Reminder Email */}
-                            {p.status === "partially_paid" && (
-                              <button
-                                type="button"
-                                className="crm-act crm-act-sm"
-                                style={{
-                                  fontSize: "11px",
-                                  padding: "4px 8px",
-                                  background: "#faf5ff",
-                                  color: "#7c3aed",
-                                  border: "1px solid #d8b4fe",
-                                  fontWeight: 700,
-                                  borderRadius: "6px",
-                                }}
-                                onClick={() => sendBalanceReminder(p)}
-                                title="Send Balance Reminder Email"
-                              >
-                                📧 Balance
-                              </button>
-                            )}
                           </div>
                         </td>
                       </tr>
