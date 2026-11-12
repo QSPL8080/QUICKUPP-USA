@@ -201,6 +201,8 @@ interface IndustryMedia {
   hero: string;
   story: string;
   arch: string;
+  /** alt text for the Why Choose photo (default: the industry name) */
+  archAlt?: string;
   circle: string;
   video: string;
   ecosystemBg: string;
@@ -217,7 +219,8 @@ const industryImages: Record<string, IndustryMedia> = {
   Healthcare: {
     hero: "/images/industries/healthcare-hero.jpg",
     story: "/images/industries/healthcare-2.jpg",
-    arch: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=800&q=80",
+    arch: "/images/industries/why-choose-quickupp-softech-healthcare-industry.jpg",
+    archAlt: "Why Choose Quickupp Softech? - Healthcare Industry",
     circle: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=600&q=80",
     video: "/video/Portfolio 1.mp4",
     ecosystemBg: "https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1600&q=80",
@@ -775,7 +778,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
             return <ListSection key={i} block={block as ListBlock} image={img} alt={data.crumb} />;
           }
           if (block.type === "process") return <ProcessSection key={i} block={block as ProcessBlock} />;
-          if (block.type === "whyChoose") return <WhySection key={i} block={block as WhyChooseBlock} image={images.arch} alt={data.crumb} />;
+          if (block.type === "whyChoose") return <WhySection key={i} block={block as WhyChooseBlock} image={images.arch} alt={images.archAlt || data.crumb} />;
           if (block.type === "faq") return <FaqSection key={i} block={block as FaqBlock} />;
           return null;
         })}
