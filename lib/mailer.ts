@@ -99,11 +99,16 @@ function getTransporter(channel: MailChannel = "default"): { transporter: Transp
 
 /** Sends an email; resolves true when the mail server accepted it */
 export async function sendMail(mail: Mail): Promise<boolean> {
+  return (await sendMailDetailed(mail)).ok;
+}
+
+/** Sends an email and says why it was not sent, so the CRM can show the reason */
+export async function sendMailDetailed(mail: Mail): Promise<{ ok: boolean; error?: string }> {
   const channel = mail.channel || "default";
   const mailer = getTransporter(channel);
   if (!mailer) {
     console.warn(`[mail] not sent: no SMTP credentials configured for channel "${channel}"`);
-    return false;
+    return { ok: false, error: "the mail server is not set up on the website (SMTP settings missing)" };
   }
   try {
     const { fromName, fromAddress, channel: _ch, ...rest } = mail;
@@ -119,10 +124,11 @@ export async function sendMail(mail: Mail): Promise<boolean> {
       ...rest,
       attachments,
     });
-    return true;
+    return { ok: true };
   } catch (err) {
     console.error(`[mail:${channel}] sending failed:`, err);
-    return false;
+    const reason = err instanceof Error ? err.message : String(err);
+    return { ok: false, error: `the mail server refused it: ${reason.slice(0, 300)}` };
   }
 }
 

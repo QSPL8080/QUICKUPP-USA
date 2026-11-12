@@ -4,12 +4,12 @@ import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { capturePayPalOrder } from "@/lib/paypal";
 import { getPool } from "@/lib/db";
 import { sendMail, LEADS_NOTIFICATION_EMAIL } from "@/lib/mailer";
-import { entityOf, logGatewayResult, paymentSnapshot, type PaymentSnapshot } from "@/lib/crm/paymentActivity";
-import { logActivity } from "@/lib/crm/activity";
+import { logGatewayResult, paymentSnapshot, type PaymentSnapshot } from "@/lib/crm/paymentActivity";
 import { errMessage } from "@/lib/err";
 import { LINK_MESSAGES, chargeFor, findByToken, linkState, recordTransaction, type LinkTable } from "@/lib/paymentLink";
-import { getRecord, listTransactions, orderNumberOf, receiptPdfFor } from "@/lib/paymentTxns";
-import { clientEmail as clientEmailFor, teamEmail, type PaymentCase } from "@/lib/paymentEmails";
+import { getRecord, listTransactions, orderNumberOf } from "@/lib/paymentTxns";
+import { teamEmail, type PaymentCase } from "@/lib/paymentEmails";
+import { sendClientReceipt } from "@/lib/clientReceipt";
 import { SITE_URL } from "@/lib/siteUrl";
 
 /*
@@ -266,39 +266,17 @@ export async function POST(req: Request) {
     };
 
     after(async () => {
+      // the client's receipt first (website, payment link and balance link alike), then the team's copy
+      if (rec && status !== "failed") {
+        await sendClientReceipt({ table, ctx, actor: { type: "system", label: "Email" }, eventKey: `receipt:${txnId}` }).catch((err) =>
+          console.error("[payments] client email failed:", err),
+        );
+      }
       try {
         const t = teamEmail(ctx);
         await sendMail({ channel: "info", to: LEADS_NOTIFICATION_EMAIL, subject: t.subject, html: t.html, text: t.text, replyTo: ctx.rec.client_email || undefined });
       } catch (err) {
         console.error("[payments] team email failed:", err);
-      }
-      const to = String(ctx.rec.client_email || "");
-      if (!rec || status === "failed" || !to.includes("@")) return;
-      try {
-        const c = clientEmailFor(ctx);
-        const pdf = await receiptPdfFor(table, rec, txns);
-        const sent = await sendMail({
-          channel: "info",
-          to,
-          fromName: "Quickupp Softech LLC",
-          subject: c.subject,
-          html: c.html,
-          text: c.text,
-          attachments: [{ filename: `Quickupp-Receipt-${orderNumberOf(rec)}.pdf`, content: pdf, contentType: "application/pdf" }],
-        });
-        const what = mailCase === "deposit" ? "Deposit receipt" : mailCase === "balance" ? "Balance receipt" : mailCase === "pending" ? "Payment-processing notice" : "Payment receipt";
-        await logActivity({
-          entity: entityOf(table),
-          id,
-          action: sent ? "receipt_email" : "receipt_email_failed",
-          text: sent
-            ? `${what} for $${paid.toFixed(2)} ${currency} emailed to ${to} with the PDF receipt`
-            : `${what} for $${paid.toFixed(2)} ${currency} could not be emailed to ${to} (mail server not available)`,
-          actor: { type: "system", label: "Email" },
-          eventKey: `receipt:${txnId}`,
-        });
-      } catch (err) {
-        console.error("[payments] client email failed:", err);
       }
     });
 

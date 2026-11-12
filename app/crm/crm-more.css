@@ -1871,3 +1871,11 @@ a.crm-pdash-chip:hover {
 .crm-multi-chip button:hover {
   background: rgba(55, 48, 163, 0.12);
 }
+
+/* payment details: the receipt link and "Email receipt to client" side by side */
+.crm-paydetail-receipt {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}

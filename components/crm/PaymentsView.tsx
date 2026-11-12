@@ -244,12 +244,14 @@ export default function PaymentsView({
     url.searchParams.delete("open");
     window.history.replaceState(window.history.state, "", url.toString());
   }, [openId]);
+  // bumped after "Email receipt to client", so the history shows the result straight away
+  const [receiptTick, setReceiptTick] = useState(0);
   const viewEntity = viewing ? (viewing.table === "payment_links" ? "payment_link" : "payment") : null;
   const { entries: payActivity, loading: payActivityLoading } = usePaymentActivity(
     viewEntity,
     viewing?.id ?? null,
     viewing
-      ? [viewing.status, viewing.amount, viewing.totalAmount, viewing.remainingAmount, viewing.linkStatus, viewing.paymentType, viewing.clientName, viewing.clientEmail, viewing.clientPhone, viewing.notes, viewing.paidAt].join("|")
+      ? [viewing.status, viewing.amount, viewing.totalAmount, viewing.remainingAmount, viewing.linkStatus, viewing.paymentType, viewing.clientName, viewing.clientEmail, viewing.clientPhone, viewing.notes, viewing.paidAt, receiptTick].join("|")
       : ""
   );
   const [, setModalSubtab] = useState<"orders" | "payments">("orders");
@@ -527,6 +529,34 @@ export default function PaymentsView({
       return;
     }
     toast("Balance reminder email sent!");
+    router.refresh();
+  };
+
+  const emailReceipt = async (p: PaymentRow) => {
+    if (
+      !(await confirm({
+        title: "Email the receipt to the client?",
+        message: `The payment confirmation with the PDF receipt for the latest payment will be emailed to ${p.clientEmail || "the client"}.`,
+        confirmLabel: "Yes, send email",
+        tone: "default",
+      }))
+    )
+      return;
+    setBusy(true);
+    const res = await fetch("/api/crm/payments/send-receipt", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: p.id, table: p.table }),
+    }).catch(() => null);
+    setBusy(false);
+    setReceiptTick((t) => t + 1);
+    const json = res ? await res.json().catch(() => ({})) : {};
+    if (!res?.ok || !json.ok) {
+      toast(json.error || "Couldn't email the receipt. Please try again.", "error");
+      router.refresh();
+      return;
+    }
+    toast(`Receipt emailed to ${json.to}`);
     router.refresh();
   };
 
@@ -1599,9 +1629,16 @@ export default function PaymentsView({
                   <div className="crm-paydetail-section-head">
                     <h4>Payments received {okTx.length > 0 && <span className="crm-tab-badge">{okTx.length}</span>}</h4>
                     {paidSoFar > 0 && (
-                      <a href={receiptHref} target="_blank" rel="noreferrer" className="crm-link-btn">
-                        Receipt (PDF)
-                      </a>
+                      <span className="crm-paydetail-receipt">
+                        <a href={receiptHref} target="_blank" rel="noreferrer" className="crm-link-btn">
+                          Receipt (PDF)
+                        </a>
+                        {!viewOnly && (
+                          <button type="button" className="crm-act crm-act-ghost crm-act-sm" onClick={() => emailReceipt(viewing)}>
+                            Email receipt to client
+                          </button>
+                        )}
+                      </span>
                     )}
                   </div>
                   {txnsLoading && !txns.length ? (
