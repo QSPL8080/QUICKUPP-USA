@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { requireUser } from "@/lib/crm/auth";
+import { isViewOnly, requireUser } from "@/lib/crm/auth";
+import { ViewOnlyProvider } from "@/components/crm/ViewOnly";
 import { dashboardStats } from "@/lib/crm/data";
 import { newApplicationCount } from "@/lib/crm/applications";
 import { getNotifications } from "@/lib/crm/notifications";
@@ -26,15 +27,22 @@ export default async function CrmLayout({ children }: { children: React.ReactNod
     ? [{ perSource: [] as { fresh: number }[] }, 0, { asOf: "", unread: 0, items: [] }]
     : await Promise.all([dashboardStats(), newApplicationCount(), getNotifications(user.id)]);
   const zone = await viewerTimeZone();
+  const viewOnly = isViewOnly(user);
   const newCounts = { leads: perSource.reduce((a, s) => a + s.fresh, 0), applications };
   return (
-    <div className="crm-root">
+    <div className={`crm-root${viewOnly ? " crm-viewonly" : ""}`}>
+      <ViewOnlyProvider viewOnly={viewOnly}>
       <FeedbackProvider>
         <CrmSidebar user={user} newCounts={newCounts} />
         <div className="crm-body">
           <header className="crm-header-bar">
             <div className="crm-header-bar-start">
               <span className="crm-header-portal">Quickupp Softech &middot; CRM</span>
+              {viewOnly && (
+                <span className="crm-viewonly-tag" title="You can look at everything in the CRM but can't make changes. You can still change your own profile and password.">
+                  View only
+                </span>
+              )}
             </div>
             <NotifyCenter data={notifications} user={{ name: user.name, email: user.email, role: user.role }} />
           </header>
@@ -44,6 +52,7 @@ export default async function CrmLayout({ children }: { children: React.ReactNod
         <IdleLogout idleMinutes={IDLE_MINUTES} />
         <TimeZoneCookie serverZone={zone} />
       </FeedbackProvider>
+      </ViewOnlyProvider>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useFeedback } from "@/components/crm/Feedback";
 import { BulkBar, SelectBox, useSelection } from "@/components/crm/Selection";
 import type { MeetingItem } from "@/lib/crm/calendly";
+import { useViewOnly } from "@/components/crm/ViewOnly";
 
 /*
  * Dynamic Calendly ↔ CRM Meetings.
@@ -119,6 +120,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
   const router = useRouter();
   const searchParams = useSearchParams();
   const { confirm, toast } = useFeedback();
+  const viewOnly = useViewOnly();
 
   const [openId, setOpenId] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
@@ -172,10 +174,10 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
 
   // Auto-open Arrange modal if arrived with ?arrange=1 or action=arrange
   useEffect(() => {
-    if (searchParams.get("arrange") === "1" || searchParams.get("action") === "arrange") {
+    if (!viewOnly && (searchParams.get("arrange") === "1" || searchParams.get("action") === "arrange")) {
       setShowArrange(true);
     }
-  }, [searchParams]);
+  }, [searchParams, viewOnly]);
 
   const check = useCallback(
     async (force = false) => {
@@ -401,6 +403,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          {!viewOnly && (
           <button
             type="button"
             className="crm-act crm-act-dark"
@@ -413,6 +416,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
             </svg>
             <span>Arrange Meeting</span>
           </button>
+          )}
           <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#64748b", marginLeft: "6px" }}>
             <span
               className="crm-live-dot"
@@ -481,9 +485,11 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
             Bookings from the website, Calendly, or arranged in the CRM will appear here automatically.
           </p>
           <div style={{ marginTop: "18px" }}>
+            {!viewOnly && (
             <button type="button" className="crm-act crm-act-dark" onClick={() => setShowArrange(true)}>
               + Arrange a Meeting Now
             </button>
+            )}
           </div>
         </div>
       ) : (
@@ -538,6 +544,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
                   <td data-label="" onClick={(e) => e.stopPropagation()}>
                     <span className="crm-meet-actions">
                       <JoinButton m={m} />
+                      {!viewOnly && (
                       <button
                         type="button"
                         className="crm-act-btn crm-act-delete"
@@ -551,6 +558,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
                           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                         </svg>
                       </button>
+                      )}
                     </span>
                   </td>
                 </tr>
@@ -596,7 +604,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
                   Call
                 </a>
               )}
-              {open.view !== "canceled" && open.view !== "completed" && (
+              {!viewOnly && open.view !== "canceled" && open.view !== "completed" && (
                 <button
                   type="button"
                   className="crm-act crm-act-ghost crm-act-sm"
@@ -612,6 +620,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
                   Reschedule
                 </button>
               )}
+              {!viewOnly && (
               <button
                 type="button"
                 className="crm-act crm-act-ghost crm-act-sm"
@@ -623,7 +632,8 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
                 </svg>
                 Edit
               </button>
-              {open.view !== "canceled" && (
+              )}
+              {!viewOnly && open.view !== "canceled" && (
                 <button
                   type="button"
                   className="crm-act crm-act-ghost crm-act-sm"
@@ -652,6 +662,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
                 <span style={{ fontSize: "12.5px", fontWeight: 700, color: "#1e293b", textTransform: "uppercase", letterSpacing: "0.5px" }}>
                   Internal CRM Meeting Notes
                 </span>
+                {!viewOnly && (
                 <button
                   type="button"
                   className="crm-act crm-act-dark crm-act-sm"
@@ -661,12 +672,14 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
                 >
                   {savingNotes ? "Saving..." : "Save Notes"}
                 </button>
+                )}
               </div>
               <textarea
                 className="crm-input"
                 rows={3}
                 value={inlineNotes[open.id] !== undefined ? inlineNotes[open.id] : open.notes || ""}
                 onChange={(e) => setInlineNotes((prev) => ({ ...prev, [open.id]: e.target.value }))}
+                readOnly={viewOnly}
                 placeholder="Add internal discussion points, customer requirements, action items, or followup notes..."
                 style={{ width: "100%", fontSize: "13px", resize: "vertical" }}
               />
@@ -784,6 +797,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
               </div>
             )}
 
+            {!viewOnly && (
             <button
               type="button"
               className="crm-act crm-act-danger crm-meet-delete"
@@ -798,6 +812,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
               </svg>
               Delete from CRM List
             </button>
+            )}
           </aside>
         </div>
       )}

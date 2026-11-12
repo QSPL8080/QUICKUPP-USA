@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import "@/app/crm/crm-more.css";
 
-type NavUser = { name: string; email: string; role: "super_admin" | "admin" | "seo" };
+type NavUser = { name: string; email: string; role: "super_admin" | "admin" | "seo" | "viewer" };
 
 const I = {
   dashboard: "M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z",
@@ -161,7 +161,7 @@ export default function CrmSidebar({ user, newCounts }: { user: NavUser; newCoun
               <span className="crm-avatar" aria-hidden="true">{user.name.slice(0, 1).toUpperCase()}</span>
               <span className="crm-user-text">
                 <span className="crm-user-name">{user.name}</span>
-                <span className="crm-user-role">{user.role === "super_admin" ? "Super Admin" : seo ? "SEO" : "Admin"}</span>
+                <span className="crm-user-role">{user.role === "super_admin" ? "Super Admin" : seo ? "SEO" : user.role === "viewer" ? "Viewer" : "Admin"}</span>
               </span>
             </Link>
             <button type="button" className="crm-icon-act crm-logout" onClick={logout} disabled={leaving} aria-label="Sign out" title="Sign out">

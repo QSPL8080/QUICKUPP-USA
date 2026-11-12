@@ -10,11 +10,12 @@ import { exportStamp, exportZone, viewerTimeZone } from "@/lib/crm/crmTime";
  * GET → the CRM team (super admin only) as a CSV file. Passwords are never
  * exported; the file only says when each one was last changed.
  */
-const ROLE = { super_admin: "Super Admin", admin: "Admin", seo: "SEO" } as const;
+const ROLE = { super_admin: "Super Admin", admin: "Admin", seo: "SEO", viewer: "Viewer" } as const;
 const ACCESS = {
   super_admin: "Everything, including Team & Users",
   admin: "Dashboard, enquiries, meetings, payments, blogs, job openings and applications",
   seo: "Blogs and job openings only",
+  viewer: "Views everything except Team & Users; can't change anything",
 } as const;
 
 export async function GET() {

@@ -1,6 +1,9 @@
 "use client";
 
+import { useViewOnly } from "@/components/crm/ViewOnly";
+
 export default function AddLeadButton() {
+  if (useViewOnly()) return null;
   return (
     <button
       type="button"

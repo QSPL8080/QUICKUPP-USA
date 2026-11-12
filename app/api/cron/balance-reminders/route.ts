@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/crm/auth";
+import { getCurrentUser, isViewOnly } from "@/lib/crm/auth";
 import { runBalanceReminders } from "@/lib/crm/balanceReminders";
 
 /*
@@ -11,7 +11,9 @@ async function allowed(req: Request) {
   const secret = (process.env.CRON_SECRET || "").trim();
   const key = new URL(req.url).searchParams.get("key") || req.headers.get("x-cron-key") || "";
   if (secret && key === secret) return true;
-  return Boolean(await getCurrentUser());
+  const user = await getCurrentUser();
+  // sending reminder emails is a change: not for view-only accounts
+  return Boolean(user) && !isViewOnly(user);
 }
 
 async function handle(req: Request) {

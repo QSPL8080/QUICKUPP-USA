@@ -25,6 +25,7 @@ import ActivityTimeline, { fmtWhen, sameEntries, type ActivityEntry } from "@/co
 import { payLinkUrl } from "@/lib/siteUrl";
 import { payMessage, whatsAppNumber, whatsAppUrl } from "@/lib/payMessages";
 import ShareLinkButtons from "@/components/crm/ShareLinkButtons";
+import { useViewOnly } from "@/components/crm/ViewOnly";
 
 type LeadAudit = {
   createdBy: string;
@@ -145,8 +146,9 @@ const formFrom = (l: EnquiryRow): LeadForm => ({
 });
 
 function StatusSelect({ value, busy, label, onChange }: { value: EnquiryStatus; busy: boolean; label: string; onChange: (s: string) => void }) {
+  const viewOnly = useViewOnly();
   return (
-    <select className={`crm-status crm-lead-status crm-lead-status-${value}`} value={value} disabled={busy} onChange={(e) => onChange(e.target.value)} aria-label={label}>
+    <select className={`crm-status crm-lead-status crm-lead-status-${value}`} value={value} disabled={busy || viewOnly} onChange={(e) => onChange(e.target.value)} aria-label={label}>
       {ENQUIRY_STATUSES.map((s) => (
         <option key={s} value={s}>
           {ENQUIRY_STATUS_LABEL[s]}
@@ -158,8 +160,9 @@ function StatusSelect({ value, busy, label, onChange }: { value: EnquiryStatus; 
 
 function ProjectStatusSelect({ value, busy, label, onChange }: { value: string; busy: boolean; label: string; onChange: (s: string) => void }) {
   const slug = (value || "Not Started").toLowerCase().replace(/\s+/g, "-");
+  const viewOnly = useViewOnly();
   return (
-    <select className={`crm-status crm-project-status crm-project-status-${slug}`} value={value || "Not Started"} disabled={busy} onChange={(e) => onChange(e.target.value)} aria-label={label}>
+    <select className={`crm-status crm-project-status crm-project-status-${slug}`} value={value || "Not Started"} disabled={busy || viewOnly} onChange={(e) => onChange(e.target.value)} aria-label={label}>
       {PROJECT_STATUSES.map((s) => (
         <option key={s} value={s}>
           {s}
@@ -184,6 +187,7 @@ export default function LeadsView({
 }) {
   const router = useRouter();
   const { confirm, toast } = useFeedback();
+  const viewOnly = useViewOnly();
   const [open, setOpen] = useState<EnquiryRow | null>(null);
   const [loading, setLoading] = useState<string>("");
   const [busy, setBusy] = useState(false);
@@ -867,7 +871,7 @@ export default function LeadsView({
                       className="crm-mgmt-select"
                       style={{ height: "30px", fontSize: "12px", minWidth: "125px" }}
                       value={r.assignedTo || ""}
-                      disabled={busy}
+                      disabled={busy || viewOnly}
                       onChange={(e) => setAssignedTo(r.source, r.id, e.target.value)}
                       aria-label={`Assigned team member for ${r.name}`}
                     >
@@ -905,6 +909,7 @@ export default function LeadsView({
                           <circle cx="12" cy="12" r="3" />
                         </svg>
                       </button>
+                      {!viewOnly && (<>
                       <button
                         type="button"
                         className="crm-tbl-btn crm-tbl-btn-edit"
@@ -928,6 +933,7 @@ export default function LeadsView({
                           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                         </svg>
                       </button>
+                      </>)}
                     </div>
                   </td>
                 </tr>
@@ -947,12 +953,12 @@ export default function LeadsView({
           </div>
           <p className="crm-empty-title">No enquiries found</p>
           <p className="crm-empty-sub">Contact form submissions, service requests, and manual leads will appear here.</p>
-          <button type="button" className="crm-act crm-act-dark" onClick={() => openForm("new")}>
+          {!viewOnly && <button type="button" className="crm-act crm-act-dark" onClick={() => openForm("new")}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
               <path d="M12 5v14M5 12h14" />
             </svg>
             Add lead
-          </button>
+          </button>}
         </div>
       )}
 
@@ -1032,6 +1038,7 @@ export default function LeadsView({
                   </svg>
                   Schedule Call
                 </a>
+                {!viewOnly && (<>
                 <button type="button" className="crm-head-btn" onClick={() => editLead(open)}>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
@@ -1052,6 +1059,7 @@ export default function LeadsView({
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                   </svg>
                 </button>
+                </>)}
               </div>
             </div>
 
@@ -1062,7 +1070,7 @@ export default function LeadsView({
                 <select
                   className="crm-mgmt-select crm-mgmt-status-select"
                   value={open.status}
-                  disabled={busy}
+                  disabled={busy || viewOnly}
                   onChange={(e) => setStatus(open.source, open.id, e.target.value)}
                   aria-label="Lead status"
                 >
@@ -1079,7 +1087,7 @@ export default function LeadsView({
                 <select
                   className="crm-mgmt-select crm-mgmt-project-select"
                   value={open.projectStatus || "Not Started"}
-                  disabled={busy}
+                  disabled={busy || viewOnly}
                   onChange={(e) => setProjectStatus(open.source, open.id, e.target.value)}
                   aria-label="Project status"
                 >
@@ -1096,7 +1104,7 @@ export default function LeadsView({
                 <select
                   className="crm-mgmt-select"
                   value={open.assignedTo || ""}
-                  disabled={busy}
+                  disabled={busy || viewOnly}
                   onChange={(e) => setAssignedTo(open.source, open.id, e.target.value)}
                   aria-label="Assigned team member"
                 >
@@ -1145,6 +1153,7 @@ export default function LeadsView({
                   Payment Links · Orders &amp; Payments
                   {paymentLinks.length > 0 && <span className="crm-count-badge">{paymentLinks.length}</span>}
                 </span>
+                {!viewOnly && (
                 <button
                   type="button"
                   className="crm-act crm-act-sm"
@@ -1153,6 +1162,7 @@ export default function LeadsView({
                 >
                   + Generate Payment Link
                 </button>
+                )}
               </div>
 
               {paymentLinks.length === 0 ? (
@@ -1177,7 +1187,7 @@ export default function LeadsView({
                         <span>• Created {fmtDate(pl.createdAt, false)}</span>
                       </div>
                       <div className="crm-lead-link-actions">
-                        {pl.linkStatus !== "cancelled" && (
+                        {!viewOnly && pl.linkStatus !== "cancelled" && (
                         <button
                           type="button"
                           className="crm-att-btn"
@@ -1197,7 +1207,7 @@ export default function LeadsView({
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                           Open Checkout
                         </a>
-                        {open.phone && pl.linkStatus !== "cancelled" && (
+                        {!viewOnly && open.phone && pl.linkStatus !== "cancelled" && (
                           <a
                             href={leadWhatsAppUrl(pl, open.phone)}
                             target="_blank"
@@ -1209,7 +1219,7 @@ export default function LeadsView({
                             WhatsApp
                           </a>
                         )}
-                        {pl.status !== "paid" && pl.linkStatus !== "used" && (
+                        {!viewOnly && pl.status !== "paid" && pl.linkStatus !== "used" && (
                           pl.linkStatus === "cancelled" ? (
                             <button type="button" className="crm-att-btn" onClick={() => setPaymentLinkActive(pl.id, true)}>
                               Activate Link
@@ -1245,6 +1255,7 @@ export default function LeadsView({
                   Attachments
                   {attachments.length > 0 && <span className="crm-count-badge">{attachments.length}</span>}
                 </span>
+                {!viewOnly && (
                 <button
                   type="button"
                   className="crm-act crm-act-ghost crm-act-sm"
@@ -1259,6 +1270,7 @@ export default function LeadsView({
                   </svg>
                   {uploadingFiles ? "Uploading…" : "Add files"}
                 </button>
+                )}
               </div>
 
               {uploadingFiles && (
@@ -1300,6 +1312,7 @@ export default function LeadsView({
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                           Download
                         </a>
+                        {!viewOnly && (
                         <button
                           type="button"
                           className="crm-att-btn crm-att-btn-del"
@@ -1308,6 +1321,7 @@ export default function LeadsView({
                         >
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                         </button>
+                        )}
                       </div>
                     </div>
                   ))}

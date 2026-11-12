@@ -7,6 +7,7 @@ import { PageHead } from "@/components/crm/ListTools";
 import { useFeedback } from "@/components/crm/Feedback";
 import { EMPLOYMENT_TYPES, JOB_DEPARTMENTS, type Job } from "@/lib/jobs";
 import { BulkBar, SelectBox, useSelection } from "@/components/crm/Selection";
+import { useViewOnly } from "@/components/crm/ViewOnly";
 
 const fmtDate = (d: string | null) =>
   d ? new Date(`${d}T00:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—";
@@ -70,6 +71,7 @@ export default function JobsView({
 }) {
   const router = useRouter();
   const { confirm, toast } = useFeedback();
+  const viewOnly = useViewOnly();
   const [filterStatus, setFilterStatus] = useState<string>(initialStatus);
   const [editing, setEditing] = useState<Job | "new" | null>(openNew ? "new" : null);
   const [form, setForm] = useState<FormState>(blank());
@@ -200,7 +202,7 @@ export default function JobsView({
             View applications
           </Link>
         )}
-        {addButton}
+        {!viewOnly && addButton}
       </PageHead>
 
       <div className="crm-payments-tabs" style={{ marginBottom: "1rem" }}>
@@ -314,6 +316,7 @@ export default function JobsView({
                     </td>
                     <td data-label="Actions" onClick={(e) => e.stopPropagation()}>
                       <span className="crm-row-acts">
+                        {!viewOnly && (
                         <button
                           type="button"
                           className="crm-act-btn crm-act-edit"
@@ -325,6 +328,8 @@ export default function JobsView({
                             <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
                           </svg>
                         </button>
+                        )}
+                        {!viewOnly && (
                         <button
                           type="button"
                           className={`crm-act-btn ${j.isOpen ? "crm-act-deactivate" : "crm-act-activate"}`}
@@ -344,6 +349,8 @@ export default function JobsView({
                             </svg>
                           )}
                         </button>
+                        )}
+                        {!viewOnly && (
                         <button
                           type="button"
                           className="crm-act-btn crm-act-delete"
@@ -358,6 +365,7 @@ export default function JobsView({
                             <line x1="14" y1="11" x2="14" y2="17" />
                           </svg>
                         </button>
+                        )}
                       </span>
                     </td>
                   </tr>
@@ -380,7 +388,7 @@ export default function JobsView({
               ? `There are currently no job openings with "${filterStatus}" status.`
               : "Publish vacancies here to display them under Current Job Openings on the Careers page."}
           </p>
-          {!filterStatus && (
+          {!filterStatus && !viewOnly && (
             <button type="button" className="crm-act crm-act-dark" onClick={() => openForm("new")}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
                 <path d="M12 5v14M5 12h14" />
@@ -398,7 +406,7 @@ export default function JobsView({
             <div className="crm-drawer-head">
               <div>
                 <p className="crm-drawer-kicker">{editing === "new" ? "Careers page" : `Job #${editing.id}`}</p>
-                <h2 className="crm-drawer-title">{editing === "new" ? "Add job opening" : "Edit job opening"}</h2>
+                <h2 className="crm-drawer-title">{editing === "new" ? "Add job opening" : viewOnly ? "Job opening" : "Edit job opening"}</h2>
               </div>
               <button type="button" className="crm-icon-act" onClick={close} aria-label="Close">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
@@ -407,6 +415,7 @@ export default function JobsView({
               </button>
             </div>
 
+            <fieldset className="crm-viewonly-fieldset" disabled={viewOnly}>
             <div className="crm-form-grid">
               <label className="crm-field crm-span-2">
                 <span className="crm-label">Job title *</span>
@@ -476,6 +485,8 @@ export default function JobsView({
               </label>
             </div>
 
+            </fieldset>
+
             {error && (
               <p className="crm-alert" role="alert">
                 {error}
@@ -483,7 +494,7 @@ export default function JobsView({
             )}
 
             <div className="crm-modal-foot">
-              {editing !== "new" ? (
+              {editing !== "new" && !viewOnly ? (
                 <button type="button" className="crm-act crm-act-danger" onClick={remove} disabled={busy}>
                   Delete
                 </button>
@@ -492,11 +503,13 @@ export default function JobsView({
               )}
               <span className="crm-modal-foot-end">
                 <button type="button" className="crm-act crm-act-ghost" onClick={close}>
-                  Cancel
+                  {viewOnly ? "Close" : "Cancel"}
                 </button>
+                {!viewOnly && (
                 <button type="submit" className="crm-act crm-act-dark" disabled={busy}>
                   {busy ? "Saving…" : editing === "new" ? "Publish opening" : "Save changes"}
                 </button>
+                )}
               </span>
             </div>
           </form>

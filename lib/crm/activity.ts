@@ -35,7 +35,7 @@ export type ActivityItem = {
 };
 
 export const roleLabel = (role: string | null | undefined) =>
-  role === "super_admin" ? "Super Admin" : role === "admin" ? "Admin" : role === "seo" ? "SEO" : role ? role.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "";
+  role === "super_admin" ? "Super Admin" : role === "admin" ? "Admin" : role === "seo" ? "SEO" : role === "viewer" ? "Viewer" : role ? role.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "";
 
 /** "Admin (Priya)", "Website — Contact Form", "PayPal", "System" */
 export function actorText(a: { actorType: string; actorName: string | null; actorRole: string | null }) {

@@ -8,6 +8,7 @@ import { useFeedback } from "@/components/crm/Feedback";
 import type { CrmBlog } from "@/lib/blogs";
 import LocalDateTime from "@/components/crm/LocalDateTime";
 import BlogTextField, { BlogImageLibrary, uploadBlogImages } from "@/components/crm/BlogTextField";
+import { useViewOnly } from "@/components/crm/ViewOnly";
 
 const INDUSTRIES = [
   "Healthcare",
@@ -133,6 +134,7 @@ const slugify = (s: string) =>
 export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
   const router = useRouter();
   const { confirm, toast } = useFeedback();
+  const viewOnly = useViewOnly();
 
   const [editing, setEditing] = useState<CrmBlog | "new" | null>(null);
   const [form, setForm] = useState<FormState>(blankForm());
@@ -285,7 +287,7 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (step < LAST) goTo(step + 1);
-    else save();
+    else if (!viewOnly) save();
   };
 
   const save = async () => {
@@ -419,6 +421,7 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
           </svg>
           Export CSV
         </a>
+        {!viewOnly && (
         <button type="button" className="crm-act crm-act-dark" onClick={() => openForm("new")}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <line x1="12" y1="5" x2="12" y2="19" />
@@ -426,6 +429,7 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
           </svg>
           New Blog Article
         </button>
+        )}
       </PageHead>
 
       {/* Filter / Search Bar */}
@@ -548,6 +552,7 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
                             <line x1="10" y1="14" x2="21" y2="3" />
                           </svg>
                         </Link>
+                        {!viewOnly && (
                         <button
                           type="button"
                           className="crm-act-btn crm-act-edit"
@@ -559,6 +564,8 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
                             <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
                           </svg>
                         </button>
+                        )}
+                        {!viewOnly && (
                         <button
                           type="button"
                           className={`crm-act-btn ${b.isPublished ? "crm-act-deactivate" : "crm-act-activate"}`}
@@ -578,6 +585,8 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
                             </svg>
                           )}
                         </button>
+                        )}
+                        {!viewOnly && (
                         <button
                           type="button"
                           className="crm-act-btn crm-act-delete"
@@ -590,6 +599,7 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                           </svg>
                         </button>
+                        )}
                       </span>
                     </td>
                   </tr>
@@ -614,7 +624,7 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
             <div className="crm-drawer-head">
               <div>
                 <p className="crm-drawer-kicker">
-                  {editing === "new" ? "Create New Blog Article" : `Edit: ${form.title || "Blog"}`} · Step {step + 1} of {STEPS.length}
+                  {editing === "new" ? "Create New Blog Article" : `${viewOnly ? "View" : "Edit"}: ${form.title || "Blog"}`} · Step {step + 1} of {STEPS.length}
                 </p>
                 <h2 className="crm-drawer-title">{STEPS[step].title}</h2>
                 <p className="crm-wiz-sub">{STEPS[step].sub}</p>
@@ -643,7 +653,7 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
               ))}
             </ol>
 
-            <div className="crm-wiz-body" key={step}>
+            <fieldset className="crm-wiz-body crm-viewonly-fieldset" key={step} disabled={viewOnly}>
               {step === 0 && (
                 <div className="crm-form-grid">
                   <label className="crm-field crm-span-2">
@@ -1021,7 +1031,7 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
                 </label>
                 </div>
               )}
-            </div>
+            </fieldset>
 
             {error && (
               <p className="crm-alert" role="alert">
@@ -1030,7 +1040,7 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
             )}
 
             <div className="crm-modal-foot">
-              {editing !== "new" ? (
+              {editing !== "new" && !viewOnly ? (
                 <button type="button" className="crm-act crm-act-danger" onClick={() => removeBlog(editing as CrmBlog)} disabled={busy}>
                   Delete article
                 </button>
@@ -1047,14 +1057,16 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
                     Cancel
                   </button>
                 )}
-                {editing !== "new" && step < LAST && (
+                {!viewOnly && editing !== "new" && step < LAST && (
                   <button type="button" className="crm-act crm-act-ghost" onClick={() => save()} disabled={busy}>
                     {busy ? "Saving…" : "Save Changes"}
                   </button>
                 )}
+                {!(viewOnly && step === LAST) && (
                 <button type="submit" className="crm-act crm-act-dark" disabled={busy}>
                   {step < LAST ? "Next →" : busy ? "Saving…" : editing !== "new" ? "Save Changes" : form.isPublished ? "Publish Blog" : "Save as Draft"}
                 </button>
+                )}
               </span>
             </div>
           </form>

@@ -9,7 +9,7 @@ import type { TeamUser } from "@/lib/crm/users";
 const fmtDate = (iso: string | null) =>
   iso ? new Date(iso).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }) : "Never";
 
-type Form = { name: string; username: string; email: string; password: string; isActive: boolean; role: "admin" | "seo" };
+type Form = { name: string; username: string; email: string; password: string; isActive: boolean; role: "admin" | "seo" | "viewer" };
 
 /* current password, hidden until the eye is pressed (super admin only) */
 function PasswordCell({ value }: { value: string | null | undefined }) {
@@ -72,7 +72,7 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
     setForm(
       u === "new"
         ? { name: "", username: "", email: "", password: "", isActive: true, role: "admin" }
-        : { name: u.name, username: u.username, email: u.email, password: "", isActive: u.isActive, role: u.role === "seo" ? "seo" : "admin" }
+        : { name: u.name, username: u.username, email: u.email, password: "", isActive: u.isActive, role: u.role === "seo" ? "seo" : u.role === "viewer" ? "viewer" : "admin" }
     );
     setErrors({});
     setError("");
@@ -201,7 +201,7 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
                     {u.email}
                   </td>
                   <td data-label="Role">
-                    <span className={`crm-pill ${locked ? "crm-pill-paid" : "crm-pill-pending"}`}>{locked ? "Super Admin" : u.role === "seo" ? "SEO" : "Admin"}</span>
+                    <span className={`crm-pill ${locked ? "crm-pill-paid" : "crm-pill-pending"}`}>{locked ? "Super Admin" : u.role === "seo" ? "SEO" : u.role === "viewer" ? "Viewer" : "Admin"}</span>
                   </td>
                   <td data-label="Password" className="crm-nowrap" onClick={(e) => e.stopPropagation()}>
                     <PasswordCell value={u.password} />
@@ -281,7 +281,7 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
           <form className="crm-modal" onClick={(e) => e.stopPropagation()} onSubmit={save} noValidate role="dialog" aria-label={editing === "new" ? "Add user" : "Edit user"}>
             <div className="crm-drawer-head">
               <div>
-                <p className="crm-drawer-kicker">{editing === "new" ? "Team & Users" : isSA(editing) ? "Super Admin account" : editing.role === "seo" ? "SEO account" : "Admin account"}</p>
+                <p className="crm-drawer-kicker">{editing === "new" ? "Team & Users" : isSA(editing) ? "Super Admin account" : editing.role === "seo" ? "SEO account" : editing.role === "viewer" ? "Viewer account" : "Admin account"}</p>
                 <h2 className="crm-drawer-title">{editing === "new" ? "Add user" : `Edit ${editing.name}`}</h2>
               </div>
               <button type="button" className="crm-icon-act" onClick={() => setEditing(null)} aria-label="Close">
@@ -324,13 +324,16 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
                   <select
                     className="crm-input crm-select"
                     value={form.role}
-                    onChange={(e) => setForm((f) => ({ ...f, role: e.target.value === "seo" ? "seo" : "admin" }))}
+                    onChange={(e) => setForm((f) => ({ ...f, role: e.target.value === "seo" ? "seo" : e.target.value === "viewer" ? "viewer" : "admin" }))}
                   >
                     <option value="admin">Admin — the whole CRM</option>
                     <option value="seo">SEO — Blogs and Job Openings only</option>
+                    <option value="viewer">Viewer — can view everything, can't change anything</option>
                   </select>
                   <span className="crm-cell-sub">
-                    {form.role === "seo"
+                    {form.role === "viewer"
+                      ? "Can open every part of the CRM except Team & Users, but only to look: can't add, edit, delete, send or export anything. Can change their own profile and password."
+                      : form.role === "seo"
                       ? "Can view and edit the website's blogs and job openings, and their own profile and password. No enquiries, payments, meetings or job applications."
                       : "Can use every part of the CRM except Team & Users."}
                   </span>

@@ -1,13 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useViewOnly } from "@/components/crm/ViewOnly";
 
 /* Checkbox in the CRM style; `mixed` shows a dash (some rows selected) */
 export function SelectBox({ checked, mixed = false, onChange, label }: { checked: boolean; mixed?: boolean; onChange: (checked: boolean) => void; label: string }) {
   const ref = useRef<HTMLInputElement>(null);
+  const viewOnly = useViewOnly();
   useEffect(() => {
     if (ref.current) ref.current.indeterminate = mixed;
   }, [mixed]);
+  // selecting is only for bulk changes and exports, which a view-only account can't make
+  if (viewOnly) return null;
   return (
     <label className="crm-check crm-pick" onClick={(e) => e.stopPropagation()}>
       <input ref={ref} type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} aria-label={label} />
@@ -53,6 +57,8 @@ export function BulkBar({
   onDelete: () => void;
   children?: React.ReactNode;
 }) {
+  const viewOnly = useViewOnly();
+  if (viewOnly) return null;
   const n = sel.selected.length;
   return (
     <div className={`crm-bulk${n ? " is-active" : ""}`}>

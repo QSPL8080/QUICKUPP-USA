@@ -14,6 +14,7 @@ import ActivityTimeline, { usePaymentActivity } from "@/components/crm/ActivityT
 import { SITE_URL, payLinkUrl } from "@/lib/siteUrl";
 import { payMessage, whatsAppUrl, type PayMessageInput } from "@/lib/payMessages";
 import ShareLinkButtons from "@/components/crm/ShareLinkButtons";
+import { useViewOnly } from "@/components/crm/ViewOnly";
 
 /* a payment link made from an enquiry shows which form that enquiry came from */
 function EnquiryOrigin({ p }: { p: PaymentRow }) {
@@ -227,6 +228,7 @@ export default function PaymentsView({
 }) {
   const router = useRouter();
   const { confirm, toast } = useFeedback();
+  const viewOnly = useViewOnly();
   const [editing, setEditing] = useState<PaymentRow | "new" | null>(openNew ? "new" : null);
   const [viewing, setViewing] = useState<PaymentRow | null>(() => {
     if (!openId) return null;
@@ -657,7 +659,7 @@ export default function PaymentsView({
             </svg>
         Export CSV
       </a>
-      {currentTab !== "website" && (
+      {!viewOnly && currentTab !== "website" && (
         <button
           type="button"
           className="crm-act crm-act-dark"
@@ -1022,7 +1024,7 @@ export default function PaymentsView({
                         <td data-label="Actions" onClick={(e) => e.stopPropagation()} style={{ textAlign: "right" }}>
                           <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", flexWrap: "nowrap" }}>
                             {/* Copy Link (only when link is active and not paid) */}
-                            {!isLinkExpired && p.status !== "paid" && p.linkStatus !== "used" && p.linkStatus !== "cancelled" && (
+                            {!viewOnly && !isLinkExpired && p.status !== "paid" && p.linkStatus !== "used" && p.linkStatus !== "cancelled" && (
                               <button
                                 type="button"
                                 className="crm-act crm-act-ghost crm-act-sm"
@@ -1048,7 +1050,7 @@ export default function PaymentsView({
                               </button>
                             )}
                             {/* WhatsApp (Green Button) */}
-                            {!isLinkExpired && p.status !== "paid" && p.linkStatus !== "used" && p.linkStatus !== "cancelled" ? (
+                            {!viewOnly && !isLinkExpired && p.status !== "paid" && p.linkStatus !== "used" && p.linkStatus !== "cancelled" ? (
                               <button
                                 type="button"
                                 className="crm-act crm-act-sm"
@@ -1088,6 +1090,7 @@ export default function PaymentsView({
                             </button>
 
                             {/* Edit */}
+                            {!viewOnly && (
                             <button
                               type="button"
                               className="crm-act crm-act-ghost crm-act-sm"
@@ -1101,9 +1104,10 @@ export default function PaymentsView({
                               </svg>
                               Edit
                             </button>
+                            )}
 
                             {/* Deactivate / Activate */}
-                            {p.status !== "paid" && p.linkStatus !== "used" && (
+                            {!viewOnly && p.status !== "paid" && p.linkStatus !== "used" && (
                               p.linkStatus === "cancelled" ? (
                                 <button
                                   type="button"
@@ -1136,6 +1140,7 @@ export default function PaymentsView({
                             )}
 
                             {/* Delete */}
+                            {!viewOnly && (
                             <button
                               type="button"
                               className="crm-act crm-act-ghost crm-act-sm"
@@ -1149,6 +1154,7 @@ export default function PaymentsView({
                                 <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
                               </svg>
                             </button>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -1371,7 +1377,7 @@ export default function PaymentsView({
                               <circle cx="12" cy="12" r="3" />
                             </svg>
                           </button>
-                          {p.token && p.status === "partially_paid" && Number(p.remainingAmount || 0) > 0 && p.linkStatus !== "cancelled" && (
+                          {!viewOnly && p.token && p.status === "partially_paid" && Number(p.remainingAmount || 0) > 0 && p.linkStatus !== "cancelled" && (
                             <button
                               type="button"
                               className="crm-action-btn is-wa"
@@ -1384,7 +1390,7 @@ export default function PaymentsView({
                               </svg>
                             </button>
                           )}
-                          {p.token && p.status !== "paid" && p.linkStatus !== "used" && !isExpiredLink(p) && (
+                          {!viewOnly && p.token && p.status !== "paid" && p.linkStatus !== "used" && !isExpiredLink(p) && (
                             <button
                               type="button"
                               className="crm-action-btn"
@@ -1397,6 +1403,7 @@ export default function PaymentsView({
                               </svg>
                             </button>
                           )}
+                          {!viewOnly && (
                           <button
                             type="button"
                             className="crm-action-btn is-delete"
@@ -1409,6 +1416,7 @@ export default function PaymentsView({
                               <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
                             </svg>
                           </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -1435,7 +1443,7 @@ export default function PaymentsView({
                 ? "Generate your first customer payment link using the button below."
                 : "All payments and links will appear here."}
             </p>
-            {currentTab === "website" ? null : (
+            {currentTab === "website" || viewOnly ? null : (
               <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
                 <button
                   type="button"
@@ -1633,9 +1641,9 @@ export default function PaymentsView({
                       </span>
                     </div>
                     <code className="crm-balance-link-url">{payUrlFor(viewing.token)}</code>
-                    <ShareLinkButtons link={viewing} what={balanceDue > 0 ? "Balance link" : "Payment link"} />
+                    {!viewOnly && <ShareLinkButtons link={viewing} what={balanceDue > 0 ? "Balance link" : "Payment link"} />}
                     <div className="crm-balance-link-actions">
-                      {balanceDue > 0 && (
+                      {!viewOnly && balanceDue > 0 && (
                         <button type="button" className="crm-act crm-act-ghost crm-act-sm" onClick={() => sendBalanceReminder(viewing)}>
                           Email the balance reminder now
                         </button>
@@ -1662,6 +1670,7 @@ export default function PaymentsView({
 
               <div className="crm-paydetail-foot">
                 <div>
+                  {!viewOnly && (<>
                   <button type="button" className="crm-act crm-act-ghost crm-act-sm" onClick={() => openEditLink(viewing)}>
                     Edit details
                   </button>
@@ -1679,6 +1688,7 @@ export default function PaymentsView({
                   <button type="button" className="crm-act crm-act-ghost crm-act-sm crm-act-danger" onClick={() => deleteSingle(viewing)}>
                     Delete
                   </button>
+                  </>)}
                 </div>
                 <button type="button" className="crm-act crm-act-dark" onClick={() => setViewing(null)}>
                   Close

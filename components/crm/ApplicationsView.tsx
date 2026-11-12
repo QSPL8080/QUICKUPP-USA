@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useFeedback } from "@/components/crm/Feedback";
 import { APPLICATION_STATUSES, APPLICATION_STATUS_LABEL, fmtBytes, type ApplicationRow } from "@/lib/applications";
 import { BulkBar, SelectBox, useSelection } from "@/components/crm/Selection";
+import { useViewOnly } from "@/components/crm/ViewOnly";
 
 const fmtDate = (iso: string, withTime = false) =>
   new Date(iso).toLocaleString("en-US", {
@@ -17,11 +18,12 @@ const fmtDate = (iso: string, withTime = false) =>
 const resumeHref = (id: number) => `/api/crm/applications/${id}/resume`;
 
 function StatusSelect({ row, busy, onChange }: { row: ApplicationRow; busy: boolean; onChange: (s: string) => void }) {
+  const viewOnly = useViewOnly();
   return (
     <select
       className={`crm-status crm-app-status crm-app-status-${row.status}`}
       value={row.status}
-      disabled={busy}
+      disabled={busy || viewOnly}
       onChange={(e) => onChange(e.target.value)}
       aria-label={`Status for ${row.name}`}
     >
@@ -37,6 +39,7 @@ function StatusSelect({ row, busy, onChange }: { row: ApplicationRow; busy: bool
 export default function ApplicationsView({ rows }: { rows: ApplicationRow[] }) {
   const router = useRouter();
   const { confirm, toast } = useFeedback();
+  const viewOnly = useViewOnly();
   const [open, setOpen] = useState<ApplicationRow | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -237,6 +240,7 @@ export default function ApplicationsView({ rows }: { rows: ApplicationRow[] }) {
               <p className="crm-message-text">{open.coverNote || "—"}</p>
             </div>
 
+            {!viewOnly && (
             <button
               type="button"
               className="crm-act crm-act-danger crm-act-sm"
@@ -247,6 +251,7 @@ export default function ApplicationsView({ rows }: { rows: ApplicationRow[] }) {
             >
               Delete application
             </button>
+            )}
           </aside>
         </div>
       )}
