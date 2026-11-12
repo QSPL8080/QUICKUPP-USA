@@ -207,6 +207,8 @@ interface IndustryMedia {
   storyAlt?: string;
   /** alt text for the closing section's photo (ecosystemBg); without it the photo is decorative */
   closeAlt?: string;
+  /** which part of the closing photo stays in view when it is cropped (CSS object-position) */
+  closePos?: string;
   circle: string;
   video: string;
   ecosystemBg: string;
@@ -306,11 +308,14 @@ const industryImages: Record<string, IndustryMedia> = {
   },
   "Professional Services": {
     hero: "/images/industries/professional-services-hero.jpg",
-    story: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1000&q=80",
-    arch: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80",
+    story: "/images/industries/stop-relying-only-on-referrals-professional-services.jpg",
+    storyAlt: "Stop Relying Only on Referrals - Professional Services",
+    arch: "/images/industries/why-choose-quickupp-softech-professional-services-industry.jpg",
+    archAlt: "Why Choose Quickupp Softech? - Professional Services Industry",
     circle: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=600&q=80",
     video: "/video/Portfolio 1.mp4",
-    ecosystemBg: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1600&q=80",
+    ecosystemBg: "/images/industries/ready-to-turn-your-expertise-into-growth-professional-services.jpg",
+    closeAlt: "Ready to Turn Your Expertise Into Growth? - Professional Services",
     channelsBg: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=1600&q=80",
     pipelineBg: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=1600&q=80",
     processBg: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1600&q=80",
@@ -319,10 +324,12 @@ const industryImages: Record<string, IndustryMedia> = {
   eCommerce: {
     hero: "/images/industries/ecommerce-hero.jpg",
     story: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=1000&q=80",
-    arch: "https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?auto=format&fit=crop&w=800&q=80",
+    arch: "/images/industries/why-choose-quickupp-softech-ecommerce-industry.jpg",
+    archAlt: "Why Choose Quickupp Softech? - eCommerce Industry",
     circle: "https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&w=600&q=80",
     video: "/video/Portfolio 1.mp4",
-    ecosystemBg: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1600&q=80",
+    ecosystemBg: "/images/industries/ready-to-grow-your-ecommerce-revenue.jpg",
+    closeAlt: "Ready to Grow Your eCommerce Revenue? - eCommerce",
     channelsBg: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=1600&q=80",
     pipelineBg: "https://images.unsplash.com/photo-1556740758-90de374c12ad?auto=format&fit=crop&w=1600&q=80",
     processBg: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&w=1600&q=80",
@@ -331,11 +338,15 @@ const industryImages: Record<string, IndustryMedia> = {
   "Travel & Hospitality": {
     hero: "/images/industries/travel-hospitality-hero.jpg",
     heroPos: "65% 50%",
-    story: "https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=1000&q=80",
-    arch: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?auto=format&fit=crop&w=800&q=80",
+    story: "/images/industries/who-we-help-travel-hospitality.jpg",
+    storyAlt: "Who We Help - Travel & Hospitality",
+    arch: "/images/industries/why-choose-quickupp-softech-travel-hospitality-industry.jpg",
+    archAlt: "Why Choose Quickupp Softech? - Travel & Hospitality Industry",
     circle: "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=600&q=80",
     video: "/video/Portfolio 2.mp4",
-    ecosystemBg: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+    ecosystemBg: "/images/industries/ready-to-grow-your-travel-hospitality-business.jpg",
+    closeAlt: "Ready to Grow Your Travel & Hospitality Business? - Travel & Hospitality",
+    closePos: "50% 22%",
     channelsBg: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1600&q=80",
     pipelineBg: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1600&q=80",
     processBg: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1600&q=80",
@@ -822,7 +833,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                 )}
               </div>
               <div className="inx-close-media" aria-hidden={images.closeAlt ? undefined : true}>
-                <img src={images.ecosystemBg} alt={images.closeAlt || ""} loading="lazy" />
+                <img src={images.ecosystemBg} alt={images.closeAlt || ""} loading="lazy" style={images.closePos ? { objectPosition: images.closePos } : undefined} />
               </div>
             </div>
           </div>
