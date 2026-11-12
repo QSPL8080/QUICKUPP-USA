@@ -601,23 +601,14 @@ export default function ContactView() {
                   </a>
                 </li>
                 <li>
-                  <a
-                    href="https://www.google.com/maps/search/?api=1&query=167+Princeton+Street%2C+Bridgeport%2C+Connecticut+06605%2C+USA"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="ct-dock-item"
-                    title="Open 167 Princeton Street, Bridgeport, Connecticut 06605, USA in Google Maps"
-                    aria-label="View office location on Google Maps (opens in a new tab or map app)"
-                  >
+                  {/* plain text, not a link (same as the footer) */}
+                  <div className="ct-dock-item">
                     <span className="ct-dock-icon" aria-hidden="true">
                       <LucideIcon name="map-pin" size={19} />
                     </span>
                     <span className="ct-dock-label">Office Address</span>
                     <span className="ct-dock-value">167 Princeton Street, Bridgeport, Connecticut 06605, USA</span>
-                    <span className="ct-dock-go" aria-hidden="true">
-                      <LucideIcon name="arrow-up-right" size={15} strokeWidth={2.2} />
-                    </span>
-                  </a>
+                  </div>
                 </li>
               </ul>
             </aside>
