@@ -1725,3 +1725,38 @@
     animation: none !important;
   }
 }
+
+/* after the inquiry is sent: book a call on the page's Calendly section */
+.ihf .ihf-book {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 6px;
+  padding: 14px 24px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: #0b0f17;
+  box-shadow: 0 0 0 1px #0b0f17, 0 14px 30px -14px rgba(15, 23, 42, 0.6);
+  color: #ffffff !important;
+  font-size: 15.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-decoration: none !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+.ihf .ihf-book svg {
+  transition: transform 0.2s ease;
+}
+.ihf .ihf-book:hover {
+  background: #111827;
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 1px #6366f1, 0 18px 34px -14px rgba(99, 102, 241, 0.55);
+}
+.ihf .ihf-book:hover svg {
+  transform: translate(2px, -2px);
+}
+.ihf .ihf-book:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 3px;
+}

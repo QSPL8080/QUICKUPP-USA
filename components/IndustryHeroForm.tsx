@@ -6,6 +6,9 @@ import CountrySelect from "@/components/CountrySelect";
 import { isWebLink, LINK_ERROR, normalizeLink } from "@/lib/webLink";
 import { CONTACT_BUDGETS, CONTACT_TIMELINES, INDUSTRIES, SERVICE_FORMS, type ServiceFormKey } from "@/lib/formOptions";
 
+/** seconds the thank-you (and the Book a Discovery Call button) stays before the form comes back */
+const RESET_SECONDS = 12;
+
 /*
  * The lead form in the hero of every industry page, in three steps
  * (project → details → send). The industry is fixed to the
@@ -55,7 +58,7 @@ export default function IndustryHeroForm({ industry }: { industry: Industry }) {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const [countdown, setCountdown] = useState(3);
+  const [countdown, setCountdown] = useState(RESET_SECONDS);
 
   const options: readonly string[] = form.service ? SERVICE_FORMS[form.service].options : [];
   const isYoutube = form.service === "youtube";
@@ -70,7 +73,7 @@ export default function IndustryHeroForm({ industry }: { industry: Industry }) {
     });
   };
 
-  // after a successful send: back to step 1 in 3 seconds
+  // after a successful send: back to step 1 in 12 seconds (time to book a call first)
   useEffect(() => {
     if (!submitted) return;
     const tick = setInterval(() => setCountdown((c) => (c > 1 ? c - 1 : 1)), 1000);
@@ -80,9 +83,9 @@ export default function IndustryHeroForm({ industry }: { industry: Industry }) {
       setTrap("");
       setSubmitError("");
       setStep(0);
-      setCountdown(3);
+      setCountdown(RESET_SECONDS);
       setSubmitted(false);
-    }, 3000);
+    }, RESET_SECONDS * 1000);
     return () => {
       clearInterval(tick);
       clearTimeout(reset);
@@ -190,7 +193,7 @@ export default function IndustryHeroForm({ industry }: { industry: Industry }) {
         setSubmitError(String(first || "We couldn't send your inquiry right now. Please try again."));
         return;
       }
-      setCountdown(3);
+      setCountdown(RESET_SECONDS);
       setSubmitted(true);
     } catch {
       setSubmitError("We couldn't send your inquiry right now. Please check your connection and try again.");
@@ -213,6 +216,13 @@ export default function IndustryHeroForm({ industry }: { industry: Industry }) {
         <span className="ihf-done-icon" aria-hidden="true">✓</span>
         <div className="ihf-title" role="heading" aria-level={2}>Thank You! Your Inquiry Has Been Received.</div>
         <div className="ihf-sub">Our team will review your details and contact you to discuss your requirements.</div>
+        {/* the page's own Calendly booking section (BookingSection, id "book-a-call") */}
+        <a href="#book-a-call" className="ihf-book">
+          <span>Book a Discovery Call</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M7 17L17 7M8 7h9v9" />
+          </svg>
+        </a>
         <div className="ihf-countdown">Returning to the form in {countdown}s…</div>
       </div>
     );
