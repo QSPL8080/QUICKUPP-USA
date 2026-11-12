@@ -385,6 +385,7 @@ export default function PaymentsView({
       !(await confirm({
         title: "Cancel this payment link?",
         message: "The link will immediately be deactivated and cannot be paid by the customer.",
+        confirmLabel: "Yes, cancel link",
       }))
     )
       return;
@@ -485,7 +486,9 @@ export default function PaymentsView({
     if (
       !(await confirm({
         title: "Send balance reminder email?",
-        message: `An official balance reminder email with direct payment link will be sent to ${p.clientEmail}.`,
+        message: `A balance reminder email with the balance payment link will be sent to ${p.clientEmail}.`,
+        confirmLabel: "Yes, send email",
+        tone: "default",
       }))
     )
       return;

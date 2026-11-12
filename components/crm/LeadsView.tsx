@@ -675,6 +675,7 @@ export default function LeadsView({
       !(await confirm({
         title: "Cancel payment link?",
         message: "This will invalidate the payment link. The client will no longer be able to complete payment using it.",
+        confirmLabel: "Yes, cancel link",
       }))
     )
       return;

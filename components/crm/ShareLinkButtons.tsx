@@ -1,15 +1,17 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
 import { useFeedback } from "@/components/crm/Feedback";
 import { payLinkUrl } from "@/lib/siteUrl";
-import { mailtoUrl, payEmail, payMessage, smsUrl, whatsAppUrl, type PayMessageInput } from "@/lib/payMessages";
+import { mailtoUrl, payEmail, payMessage, smsUrl, whatsAppNumber, whatsAppUrl, type PayMessageInput } from "@/lib/payMessages";
 
 /*
- * Every way to send a client their payment link (or balance link): copy the
- * link, copy the message, WhatsApp, text message (SMS), email, and the device's
- * own Share menu. WhatsApp and text use the same message; email has its own
- * subject and wording (lib/payMessages).
+ * The ways to send a client their payment link (or balance link): copy the
+ * link, WhatsApp, text message (SMS) and email. WhatsApp and text use the same
+ * message; email has its own subject and wording (lib/payMessages).
+ *
+ * A text message can only be sent from a phone or a texting app, so the Text
+ * message button also copies the message: if no texting app opens on this
+ * computer, it can be pasted wherever the team sends texts from.
  */
 
 type Props = {
@@ -19,39 +21,9 @@ type Props = {
   centered?: boolean;
 };
 
-const I = {
-  copy: (
-    <>
-      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-    </>
-  ),
-  msg: <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />,
-  sms: (
-    <>
-      <rect x="5" y="2" width="14" height="20" rx="2" />
-      <path d="M12 18h.01" />
-    </>
-  ),
-  mail: (
-    <>
-      <rect x="2" y="4" width="20" height="16" rx="2" />
-      <path d="m22 7-10 6L2 7" />
-    </>
-  ),
-  share: (
-    <>
-      <circle cx="18" cy="5" r="3" />
-      <circle cx="6" cy="12" r="3" />
-      <circle cx="18" cy="19" r="3" />
-      <path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4" />
-    </>
-  ),
-};
-
-const Icon = ({ d }: { d: React.ReactNode }) => (
+const Icon = ({ children }: { children: React.ReactNode }) => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    {d}
+    {children}
   </svg>
 );
 
@@ -63,60 +35,62 @@ const WaIcon = () => (
 
 export default function ShareLinkButtons({ link, what = "Payment link", centered }: Props) {
   const { toast } = useFeedback();
-  // the device's own Share menu, where the browser has one (not on the server)
-  const canShare = useSyncExternalStore(
-    () => () => {},
-    () => typeof navigator.share === "function",
-    () => false
-  );
   if (!link.token) return null;
 
   const url = payLinkUrl(link.token);
   const message = payMessage(link);
   const email = payEmail(link);
+  const number = whatsAppNumber(link.clientPhone);
 
-  const copy = (text: string, done: string) =>
-    navigator.clipboard.writeText(text).then(
-      () => toast(done),
-      () => toast("Couldn't copy. Select the text and copy it instead.")
+  const copyLink = () =>
+    navigator.clipboard.writeText(url).then(
+      () => toast(`${what} copied`),
+      () => toast("Couldn't copy. Select the link and copy it instead.", "error")
     );
 
-  const share = async () => {
+  const textMessage = async () => {
+    let copied = false;
     try {
-      await navigator.share({ title: email.subject, text: message });
-    } catch {
-      /* closed without sharing */
-    }
+      await navigator.clipboard.writeText(message);
+      copied = true;
+    } catch {}
+    // opens the phone's / computer's texting app with the message filled in, where there is one
+    window.location.href = smsUrl(link.clientPhone, message);
+    toast(
+      copied
+        ? `Text message copied${number ? ` for +${number}` : ""}. If no texting app opened, paste it into a text to the client.`
+        : "Couldn't copy the message. Use WhatsApp or Email instead.",
+      copied ? "ok" : "error"
+    );
   };
 
   return (
     <div className="crm-share-links" style={centered ? { justifyContent: "center" } : undefined}>
-      <button type="button" className="crm-act crm-act-dark crm-act-sm" onClick={() => copy(url, `${what} copied`)} title="Copy only the link">
-        <Icon d={I.copy} />
+      <button type="button" className="crm-act crm-act-dark crm-act-sm" onClick={copyLink} title="Copy the link">
+        <Icon>
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+        </Icon>
         <span>Copy link</span>
-      </button>
-      <button type="button" className="crm-act crm-act-ghost crm-act-sm" onClick={() => copy(message, "Message with the link copied")} title="Copy the full message to paste anywhere">
-        <Icon d={I.msg} />
-        <span>Copy message</span>
       </button>
       <a className="crm-act crm-act-sm crm-act-wa" href={whatsAppUrl(link.clientPhone, message)} target="_blank" rel="noopener noreferrer" title="Send on WhatsApp">
         <WaIcon />
         <span>WhatsApp</span>
       </a>
-      <a className="crm-act crm-act-ghost crm-act-sm" href={smsUrl(link.clientPhone, message)} title={link.clientPhone ? `Text message to ${link.clientPhone}` : "Text message"}>
-        <Icon d={I.sms} />
+      <button type="button" className="crm-act crm-act-ghost crm-act-sm" onClick={textMessage} title={number ? `Text message to +${number}` : "Text message"}>
+        <Icon>
+          <rect x="5" y="2" width="14" height="20" rx="2" />
+          <path d="M12 18h.01" />
+        </Icon>
         <span>Text message</span>
-      </a>
+      </button>
       <a className="crm-act crm-act-ghost crm-act-sm" href={mailtoUrl(link.clientEmail, email.subject, email.body)} title={link.clientEmail ? `Email to ${link.clientEmail}` : "Email"}>
-        <Icon d={I.mail} />
+        <Icon>
+          <rect x="2" y="4" width="20" height="16" rx="2" />
+          <path d="m22 7-10 6L2 7" />
+        </Icon>
         <span>Email</span>
       </a>
-      {canShare && (
-        <button type="button" className="crm-act crm-act-ghost crm-act-sm" onClick={share} title="Share with another app">
-          <Icon d={I.share} />
-          <span>Share…</span>
-        </button>
-      )}
     </div>
   );
 }
