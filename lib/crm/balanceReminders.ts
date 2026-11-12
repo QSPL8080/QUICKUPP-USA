@@ -80,6 +80,7 @@ export async function runBalanceReminders(): Promise<ReminderRun> {
       SELECT *, 'payment_links' AS _table FROM payment_links 
       WHERE status = 'partially_paid' 
         AND remaining_amount > 0 
+        AND COALESCE(link_status, 'active') <> 'cancelled'
         AND client_email IS NOT NULL 
         AND client_email != ''
     `).catch(() => [[]]);
@@ -88,6 +89,7 @@ export async function runBalanceReminders(): Promise<ReminderRun> {
       SELECT *, 'payments' AS _table FROM payments 
       WHERE status = 'partially_paid' 
         AND remaining_amount > 0 
+        AND COALESCE(link_status, 'active') <> 'cancelled'
         AND client_email IS NOT NULL 
         AND client_email != ''
     `).catch(() => [[]]);

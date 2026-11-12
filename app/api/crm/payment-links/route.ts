@@ -45,18 +45,54 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "Invalid request payload." }, { status: 400 });
     }
 
-    // Cancellation action via POST
-    if (body.action === "cancel" && body.id) {
+    /*
+     * Deactivate / activate a link. Deactivated (stored as link_status
+     * 'cancelled'): the client can't pay with it and no balance reminders are
+     * sent. Activated again: it works as before; a link with nothing paid yet
+     * gets a fresh 24 hours.
+     */
+    if ((body.action === "deactivate" || body.action === "cancel" || body.action === "activate") && body.id) {
       const pool = getPool();
       const cid = Number(body.id);
       const picked = await resolvePayTable(cid, body.table);
       if ("error" in picked) return NextResponse.json({ ok: false, error: picked.error }, { status: picked.status });
       const table: PaymentTable = picked.table;
+      const [recRows] = await pool.query(`SELECT status, link_status, amount, total_amount, remaining_amount FROM \`${table}\` WHERE id = ? LIMIT 1`, [cid]);
+      const rec = (recRows as { status: string; link_status: string | null; amount: number | null; total_amount: number | null; remaining_amount: number | null }[])[0];
+      if (!rec) return NextResponse.json({ ok: false, error: "Payment link not found." }, { status: 404 });
+      const paid = Number(rec.amount || 0);
+      const fullyPaid = rec.status === "paid" || rec.link_status === "used" || (paid > 0 && Number(rec.remaining_amount ?? Number(rec.total_amount || 0) - paid) <= 0);
+      if (fullyPaid) return NextResponse.json({ ok: false, error: "This order is already fully paid, so its link is already closed." }, { status: 400 });
+
+      const activate = body.action === "activate";
+      if (activate && rec.link_status !== "cancelled") return NextResponse.json({ ok: true, message: "The link is already active." });
+      if (!activate && rec.link_status === "cancelled") return NextResponse.json({ ok: true, message: "The link is already deactivated." });
+
       const before = await paymentSnapshot(table, cid);
-      await pool.query(`UPDATE \`${table}\` SET link_status = 'cancelled' WHERE id = ?`, [cid]).catch(() => {});
+      if (activate) {
+        // nothing paid yet: the client gets 24 hours from now; a balance link stays open until paid
+        await pool.query(
+          paid > 0
+            ? `UPDATE \`${table}\` SET link_status = 'active' WHERE id = ?`
+            : `UPDATE \`${table}\` SET link_status = 'active', expires_at = DATE_ADD(NOW(), INTERVAL 24 HOUR) WHERE id = ?`,
+          [cid]
+        );
+      } else {
+        await pool.query(`UPDATE \`${table}\` SET link_status = 'cancelled' WHERE id = ?`, [cid]);
+      }
       const after = await paymentSnapshot(table, cid);
       if (before && after) await logPaymentChanges(table, cid, before, after, actorOf(user));
-      return NextResponse.json({ ok: true, message: "Payment link cancelled." });
+      return NextResponse.json({
+        ok: true,
+        linkStatus: activate ? "active" : "cancelled",
+        message: activate
+          ? paid > 0
+            ? "Balance link activated. The client can pay the balance again."
+            : "Payment link activated. The client can pay for the next 24 hours."
+          : paid > 0
+          ? "Balance link deactivated. The client can't pay with it and no balance reminders will be sent."
+          : "Payment link deactivated. The client can't pay with it.",
+      });
     }
 
     const clientName = String(body.clientName || "").trim().slice(0, 150);

@@ -43,6 +43,10 @@ export async function POST(req: Request) {
       }, { status: 400 });
     }
 
+    if (p.link_status === "cancelled") {
+      return NextResponse.json({ ok: false, error: "The balance link is deactivated. Activate it first, then send the reminder." }, { status: 400 });
+    }
+
     let token = p.token;
     if (!token) {
       token = randomBytes(16).toString("hex");

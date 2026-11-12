@@ -56,7 +56,7 @@ export default function PayTokenPage({ params }: { params: Promise<{ token: stri
     if (!token) return;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- shows the loader while the link is looked up
     setLoading(true);
-    fetch(`/api/payments/lookup?token=${encodeURIComponent(token)}`)
+    fetch(`/api/payments/lookup?token=${encodeURIComponent(token)}`, { cache: "no-store" })
       .then(async (res) => {
         const data = await res.json();
         if (!res.ok) {

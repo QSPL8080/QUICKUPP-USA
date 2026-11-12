@@ -3285,6 +3285,12 @@ h2.crm-view-modal-title {
   border: 1px solid #e2e8f0;
 }
 
+.crm-link-pill-deactivated {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
 .crm-modal-subtabs {
   display: flex;
   gap: 8px;
@@ -3840,7 +3846,8 @@ h2.crm-view-modal-title {
 .crm-link-status-active { background: #ede9fe; color: #6d28d9; }
 .crm-link-status-pending { background: #fef3c7; color: #b45309; }
 .crm-link-status-paid { background: #dcfce7; color: #15803d; }
-.crm-link-status-cancelled { background: #f1f5f9; color: #64748b; }
+.crm-link-status-cancelled,
+.crm-link-status-deactivated { background: #fef2f2; color: #b91c1c; }
 
 .crm-lead-link-row2 {
   display: flex;

@@ -670,12 +670,16 @@ export default function LeadsView({
     }
   };
 
-  const cancelPaymentLink = async (id: number) => {
+  /* deactivate: the client can't pay with the link (no balance reminders either); activate: it works again */
+  const setPaymentLinkActive = async (id: number, activate: boolean) => {
     if (
       !(await confirm({
-        title: "Cancel payment link?",
-        message: "This will invalidate the payment link. The client will no longer be able to complete payment using it.",
-        confirmLabel: "Yes, cancel link",
+        title: activate ? "Activate this payment link?" : "Deactivate this payment link?",
+        message: activate
+          ? "The client will be able to pay with this link again (a link with nothing paid yet gets a fresh 24 hours)."
+          : "The client won't be able to pay with this link, and no balance reminder emails will be sent. You can activate it again at any time.",
+        confirmLabel: activate ? "Yes, activate" : "Yes, deactivate",
+        tone: activate ? "default" : "danger",
       }))
     )
       return;
@@ -684,20 +688,20 @@ export default function LeadsView({
       const res = await fetch("/api/crm/payment-links", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "cancel", id }),
+        body: JSON.stringify({ action: activate ? "activate" : "deactivate", id }),
       });
       const data = await res.json().catch(() => null);
       if (!res.ok || !data?.ok) {
-        toast(data?.error || "Failed to cancel payment link", "error");
+        toast(data?.error || `Couldn't ${activate ? "activate" : "deactivate"} the payment link`, "error");
       } else {
-        toast("Payment link cancelled");
+        toast(data.message || (activate ? "Payment link activated" : "Payment link deactivated"));
         setPaymentLinks((prev) =>
-          prev.map((pl) => (pl.id === id ? { ...pl, status: "cancelled" } : pl))
+          prev.map((pl) => (pl.id === id ? { ...pl, linkStatus: activate ? "active" : "cancelled" } : pl))
         );
         void refreshOpen();
       }
     } catch {
-      toast("Error cancelling payment link", "error");
+      toast(`Couldn't ${activate ? "activate" : "deactivate"} the payment link`, "error");
     }
   };
 
@@ -1162,8 +1166,8 @@ export default function LeadsView({
                           ${Number(pl.totalAmount || 0).toLocaleString()}
                           {(pl.paymentOption === "partial" || pl.paymentType === "partial") && <span className="crm-partial-tag">50% Advance</span>}
                         </div>
-                        <span className={`crm-lead-link-status crm-link-status-${pl.status || "active"}`}>
-                          {pl.status || "active"}
+                        <span className={`crm-lead-link-status crm-link-status-${pl.linkStatus === "cancelled" && pl.status !== "paid" ? "deactivated" : pl.status || "active"}`}>
+                          {pl.linkStatus === "cancelled" && pl.status !== "paid" ? "deactivated" : (pl.status || "active").replace("_", " ")}
                         </span>
                       </div>
                       <div className="crm-lead-link-row2">
@@ -1173,6 +1177,7 @@ export default function LeadsView({
                         <span>• Created {fmtDate(pl.createdAt, false)}</span>
                       </div>
                       <div className="crm-lead-link-actions">
+                        {pl.linkStatus !== "cancelled" && (
                         <button
                           type="button"
                           className="crm-att-btn"
@@ -1182,6 +1187,7 @@ export default function LeadsView({
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                           Copy Link
                         </button>
+                        )}
                         <a
                           href={`/pay/${pl.token}`}
                           target="_blank"
@@ -1191,7 +1197,7 @@ export default function LeadsView({
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                           Open Checkout
                         </a>
-                        {open.phone && (
+                        {open.phone && pl.linkStatus !== "cancelled" && (
                           <a
                             href={leadWhatsAppUrl(pl, open.phone)}
                             target="_blank"
@@ -1203,14 +1209,16 @@ export default function LeadsView({
                             WhatsApp
                           </a>
                         )}
-                        {pl.status !== "paid" && pl.status !== "cancelled" && (
-                          <button
-                            type="button"
-                            className="crm-att-btn crm-att-btn-del"
-                            onClick={() => cancelPaymentLink(pl.id)}
-                          >
-                            Cancel Link
-                          </button>
+                        {pl.status !== "paid" && pl.linkStatus !== "used" && (
+                          pl.linkStatus === "cancelled" ? (
+                            <button type="button" className="crm-att-btn" onClick={() => setPaymentLinkActive(pl.id, true)}>
+                              Activate Link
+                            </button>
+                          ) : (
+                            <button type="button" className="crm-att-btn crm-att-btn-del" onClick={() => setPaymentLinkActive(pl.id, false)}>
+                              Deactivate Link
+                            </button>
+                          )
                         )}
                       </div>
                     </div>

@@ -85,7 +85,7 @@ const STATUS: Record<string, string> = {
 };
 export const statusLabel = (v: string) => STATUS[v] || (v ? v.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "—");
 const typeLabel = (v: string) => (v === "partial" ? "Partial" : "Full");
-const linkLabel = (v: string) => (v ? v.charAt(0).toUpperCase() + v.slice(1) : "—");
+const linkLabel = (v: string) => (v === "cancelled" ? "Deactivated" : v ? v.charAt(0).toUpperCase() + v.slice(1) : "—");
 
 const FIELDS: FieldDef<PaymentSnapshot>[] = [
   { key: "clientName", label: "Customer name" },

@@ -67,7 +67,7 @@ export async function GET(request: Request) {
   const KIND = { full: "Full payment", deposit: "Deposit", balance: "Balance" } as const;
   const linkState = (p: (typeof rows)[number]) => {
     if (p.table !== "payment_links") return p.status === "partially_paid" ? "Balance link open until paid" : "";
-    if (p.linkStatus === "cancelled") return "Cancelled";
+    if (p.linkStatus === "cancelled") return "Deactivated";
     if (p.status === "paid" || p.linkStatus === "used") return p.table === "payment_links" ? "Used (paid)" : "Paid";
     if (p.amount > 0 && p.status === "partially_paid") return "Balance link open until paid";
     const ends = p.expiresAt ? new Date(p.expiresAt) : new Date(new Date(p.createdAt).getTime() + 24 * 3600_000);

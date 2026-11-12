@@ -10,7 +10,7 @@ import { getPool } from "@/lib/db";
  *   nothing is paid within 24 hours it expires.
  * - After a deposit (partial payment) the same link becomes the balance link.
  *   It stays open until the balance is paid, then it is used up.
- * - A cancelled link can't be paid.
+ * - A deactivated link (link_status 'cancelled') can't be paid until it is activated again.
  *
  * The amount is always worked out here from the record, never taken from the
  * browser: the full total, a 50% deposit, or the remaining balance.
@@ -72,7 +72,7 @@ export async function expireStaleLinks() {
 export const LINK_MESSAGES: Record<Exclude<LinkState, "open" | "balance">, string> = {
   paid: "This payment link has already been used and the order is fully paid. Thank you!",
   expired: "This payment link has expired (links are valid for 24 hours). Please contact Quickupp Softech for a new link.",
-  cancelled: "This payment link has been cancelled. Please contact Quickupp Softech for help.",
+  cancelled: "This payment link has been deactivated. Please contact Quickupp Softech for help.",
 };
 
 /**

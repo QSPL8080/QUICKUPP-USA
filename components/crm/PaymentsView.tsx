@@ -380,12 +380,22 @@ export default function PaymentsView({
     window.open(whatsAppUrl(p.clientPhone, getWhatsAppMessage(p)), "_blank", "noopener");
   };
 
-  const cancelLink = async (p: PaymentRow) => {
+  /* deactivate: the client can't pay with the link (and no balance reminders go out); activate: it works again */
+  const setLinkActive = async (p: PaymentRow, activate: boolean) => {
+    const isBalance = Number(p.amount || 0) > 0;
+    const what = isBalance ? "balance link" : "payment link";
     if (
       !(await confirm({
-        title: "Cancel this payment link?",
-        message: "The link will immediately be deactivated and cannot be paid by the customer.",
-        confirmLabel: "Yes, cancel link",
+        title: activate ? `Activate this ${what}?` : `Deactivate this ${what}?`,
+        message: activate
+          ? isBalance
+            ? `${p.clientName} will be able to pay the remaining balance with this link again, and the balance reminder emails resume.`
+            : `${p.clientName} will be able to pay with this link again for the next 24 hours.`
+          : isBalance
+          ? `${p.clientName} won't be able to pay the balance with this link, and no balance reminder emails will be sent. You can activate it again at any time.`
+          : `${p.clientName} won't be able to pay with this link. You can activate it again at any time.`,
+        confirmLabel: activate ? "Yes, activate" : "Yes, deactivate",
+        tone: activate ? "default" : "danger",
       }))
     )
       return;
@@ -393,14 +403,16 @@ export default function PaymentsView({
     const res = await fetch("/api/crm/payment-links", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "cancel", id: p.id, table: p.table }),
+      body: JSON.stringify({ action: activate ? "activate" : "deactivate", id: p.id, table: p.table }),
     }).catch(() => null);
     setBusy(false);
-    if (!res?.ok) {
-      toast("Couldn't cancel payment link. Please try again.");
+    const json = res ? await res.json().catch(() => ({})) : {};
+    if (!res?.ok || !json.ok) {
+      toast(json.error || `Couldn't ${activate ? "activate" : "deactivate"} the link. Please try again.`, "error");
       return;
     }
-    toast("Payment link cancelled");
+    toast(json.message || (activate ? "Link activated" : "Link deactivated"));
+    if (viewing && viewing.id === p.id && viewing.table === p.table) setViewing({ ...viewing, linkStatus: json.linkStatus || (activate ? "active" : "cancelled") });
     router.refresh();
   };
 
@@ -859,6 +871,8 @@ export default function PaymentsView({
                   const linkStatusBadge =
                     p.status === "paid" || p.linkStatus === "used"
                       ? "used"
+                      : p.linkStatus === "cancelled"
+                      ? "deactivated"
                       : isLinkExpired
                       ? "expired"
                       : p.linkStatus || "active";
@@ -1088,21 +1102,37 @@ export default function PaymentsView({
                               Edit
                             </button>
 
-                            {/* Cancel */}
-                            {p.linkStatus !== "cancelled" && p.status !== "paid" && (
-                              <button
-                                type="button"
-                                className="crm-act crm-act-ghost crm-act-sm"
-                                style={{ fontSize: "12px", padding: "4px 9px", display: "inline-flex", alignItems: "center", gap: "4px", color: "#64748b" }}
-                                onClick={() => cancelLink(p)}
-                                title="Cancel Link"
-                              >
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                                  <circle cx="12" cy="12" r="10" />
-                                  <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
-                                </svg>
-                                Cancel
-                              </button>
+                            {/* Deactivate / Activate */}
+                            {p.status !== "paid" && p.linkStatus !== "used" && (
+                              p.linkStatus === "cancelled" ? (
+                                <button
+                                  type="button"
+                                  className="crm-act crm-act-ghost crm-act-sm"
+                                  style={{ fontSize: "12px", padding: "4px 9px", display: "inline-flex", alignItems: "center", gap: "4px", color: "#15803d" }}
+                                  onClick={() => setLinkActive(p, true)}
+                                  title={Number(p.amount || 0) > 0 ? "Activate the balance link again" : "Activate the payment link again (24 hours)"}
+                                >
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M12 2v10" />
+                                    <path d="M18.4 6.6a9 9 0 1 1-12.77.04" />
+                                  </svg>
+                                  Activate
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  className="crm-act crm-act-ghost crm-act-sm"
+                                  style={{ fontSize: "12px", padding: "4px 9px", display: "inline-flex", alignItems: "center", gap: "4px", color: "#64748b" }}
+                                  onClick={() => setLinkActive(p, false)}
+                                  title={Number(p.amount || 0) > 0 ? "Deactivate the balance link" : "Deactivate the payment link"}
+                                >
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+                                  </svg>
+                                  Deactivate
+                                </button>
+                              )
                             )}
 
                             {/* Delete */}
@@ -1445,7 +1475,7 @@ export default function PaymentsView({
         const linkOpenUntil = viewing.expiresAt || (viewing.createdAt ? new Date(new Date(viewing.createdAt).getTime() + 24 * 3600_000).toISOString() : null);
         const statusPill =
           viewing.linkStatus === "cancelled" && paidSoFar === 0
-            ? ["Cancelled", "failed"]
+            ? ["Link deactivated", "failed"]
             : paidSoFar === 0
             ? [isViewingExpired ? "Not paid · link expired" : "Not paid yet", "pending"]
             : viewing.status === "pending"
@@ -1455,7 +1485,9 @@ export default function PaymentsView({
             : ["Fully paid", "paid"];
         const linkLine =
           viewing.linkStatus === "cancelled"
-            ? "This link was cancelled and can't be paid."
+            ? paidSoFar > 0
+              ? "The balance link is deactivated: the client can't pay the balance with it and no reminder emails are sent. Activate it to send it again."
+              : "This link is deactivated: the client can't pay with it. Activate it to send it again."
             : balanceDue > 0
             ? "The balance link stays open until the balance is paid."
             : paidSoFar > 0 && okTx.some((t) => t.kind === "balance")
@@ -1633,10 +1665,16 @@ export default function PaymentsView({
                   <button type="button" className="crm-act crm-act-ghost crm-act-sm" onClick={() => openEditLink(viewing)}>
                     Edit details
                   </button>
-                  {isLink && canShareViewing && paidSoFar === 0 && (
-                    <button type="button" className="crm-act crm-act-ghost crm-act-sm" onClick={() => cancelLink(viewing)}>
-                      Cancel link
-                    </button>
+                  {!isViewingPaid && viewing.token && (
+                    viewing.linkStatus === "cancelled" ? (
+                      <button type="button" className="crm-act crm-act-ghost crm-act-sm" onClick={() => setLinkActive(viewing, true)}>
+                        Activate link
+                      </button>
+                    ) : (canShareViewing || balanceDue > 0) && (
+                      <button type="button" className="crm-act crm-act-ghost crm-act-sm" onClick={() => setLinkActive(viewing, false)}>
+                        Deactivate link
+                      </button>
+                    )
                   )}
                   <button type="button" className="crm-act crm-act-ghost crm-act-sm crm-act-danger" onClick={() => deleteSingle(viewing)}>
                     Delete
@@ -2302,7 +2340,7 @@ export default function PaymentsView({
                   onChange={(e) => setEditLinkForm((f) => ({ ...f, linkStatus: e.target.value }))}
                 >
                   <option value="active">Active</option>
-                  <option value="cancelled">Cancelled</option>
+                  <option value="cancelled">Deactivated</option>
                   <option value="used">Used</option>
                   <option value="expired">Expired</option>
                 </select>
