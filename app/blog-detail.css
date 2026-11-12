@@ -558,3 +558,12 @@
     grid-column: 1 / -1;
   }
 }
+
+/* published date and time under the title */
+.bld-page p.bld-meta:not(#_):not(#__):not(#___) {
+  margin: 14px auto 0;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  font-weight: 600;
+  color: var(--bld-muted);
+}

@@ -48,6 +48,13 @@ export default function BlogDetailView({ post, relatedPosts }: { post: BlogPost;
           </div>
           <h1 className="bld-h1">{post.title}</h1>
           {post.desc && <p className="bld-standfirst">{post.desc}</p>}
+          {post.date && (
+            <p className="bld-meta">
+              <span>Published </span>
+              <time dateTime={post.publishedAt}>{post.date}</time>
+              {post.readTime ? <span> · {post.readTime}</span> : null}
+            </p>
+          )}
         </div>
         <div className="bld-cover-wrap">
           <figure className="bld-cover">

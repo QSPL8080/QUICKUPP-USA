@@ -15,6 +15,7 @@ export type BlogDbRow = {
   img: string;
   content: string;
   is_published: number;
+  published_at?: Date | string | null;
   created_at: Date | string;
   updated_at: Date | string;
 };
@@ -31,6 +32,7 @@ export type CrmBlog = {
   img: string;
   content: BlogPost["content"];
   isPublished: boolean;
+  publishedAt: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -46,6 +48,8 @@ export type BlogInput = {
   img: string;
   content: BlogPost["content"];
   isPublished: boolean;
+  /** when the blog was (or is shown as) published */
+  publishedAt: Date;
 };
 
 function parseContent(raw: unknown): BlogPost["content"] {
@@ -121,16 +125,27 @@ export async function blogStoredInFull(id: number, img: string, content: string)
   return Number(r.i) >= Array.from(img).length && Number(r.c) >= Array.from(content).length;
 }
 
+/** When a blog was published (blogs saved before there was a published date: when it was created) */
+const publishedOf = (r: BlogDbRow) => {
+  const d = new Date((r.published_at || r.created_at) as string);
+  return isNaN(d.getTime()) ? null : d;
+};
+
+/** The website's audience is in the US, so blogs show US Eastern time: "November 12, 2026 · 9:30 AM EST" */
+export function blogDateTime(d: Date): string {
+  const day = d.toLocaleDateString("en-US", { timeZone: "America/New_York", day: "numeric", month: "long", year: "numeric" });
+  const time = d.toLocaleTimeString("en-US", { timeZone: "America/New_York", hour: "numeric", minute: "2-digit", timeZoneName: "short" });
+  return `${day} · ${time}`;
+}
+
 export function rowToBlog(r: BlogDbRow): BlogPost {
-  const d = new Date(r.created_at);
-  const dateFormatted = isNaN(d.getTime())
-    ? "October 2026"
-    : d.toLocaleDateString("en-US", { day: "numeric", month: "long", year: "numeric" });
+  const d = publishedOf(r);
 
   return {
     slug: r.slug,
     category: r.category,
-    date: dateFormatted,
+    date: d ? blogDateTime(d) : "",
+    publishedAt: d ? d.toISOString() : undefined,
     title: r.title,
     desc: r.desc,
     author: r.author,
@@ -154,6 +169,7 @@ export function rowToCrmBlog(r: BlogDbRow): CrmBlog {
     img: coverOf(r.img),
     content: parseContent(r.content),
     isPublished: Boolean(r.is_published),
+    publishedAt: (publishedOf(r) || new Date(r.created_at)).toISOString(),
     createdAt: new Date(r.created_at).toISOString(),
     updatedAt: new Date(r.updated_at).toISOString(),
   };
@@ -168,7 +184,7 @@ export function rowToCrmBlog(r: BlogDbRow): CrmBlog {
 /** All published blogs for the website, newest first. */
 export async function getPublishedBlogs(): Promise<BlogPost[]> {
   try {
-    const [rows] = await getPool().query("SELECT * FROM blogs WHERE is_published = 1 ORDER BY id DESC");
+    const [rows] = await getPool().query("SELECT * FROM blogs WHERE is_published = 1 ORDER BY COALESCE(published_at, created_at) DESC, id DESC");
     return (rows as BlogDbRow[]).map(rowToBlog);
   } catch (err) {
     console.error("[blogs] couldn't read the blogs from the database:", err);
@@ -196,7 +212,7 @@ export async function getPublishedBlogBySlug(slug: string): Promise<BlogPost | n
 export async function getCrmBlogs(): Promise<CrmBlog[]> {
   try {
     const [rows] = await getPool().query(
-      "SELECT id, slug, category, title, `desc`, author, author_role, read_time, img, '' AS content, is_published, created_at, updated_at FROM blogs ORDER BY id DESC"
+      "SELECT id, slug, category, title, `desc`, author, author_role, read_time, img, '' AS content, is_published, published_at, created_at, updated_at FROM blogs ORDER BY id DESC"
     );
     return (rows as BlogDbRow[]).map(rowToCrmBlog);
   } catch (err) {
@@ -222,8 +238,13 @@ export async function validateBlog(
   const readTime = text(body.readTime, 50) || "5 min read";
   const img = typeof body.img === "string" && body.img.trim() ? body.img.trim() : "/images/blog-img-01.jpg";
   const isPublished = body.isPublished !== false;
+  const publishedRaw = typeof body.publishedAt === "string" ? body.publishedAt.trim() : "";
+  const publishedAt = new Date(publishedRaw);
 
   if (!title) errors.title = "Please enter a blog title.";
+  if (!publishedRaw || isNaN(publishedAt.getTime()) || publishedAt.getFullYear() < 2000 || publishedAt.getFullYear() > 2100) {
+    errors.publishedAt = "Please choose the published date and time.";
+  }
 
   if (!slug && title) {
     slug = title
@@ -271,6 +292,7 @@ export async function validateBlog(
       img,
       content,
       isPublished,
+      publishedAt,
     },
   };
 }

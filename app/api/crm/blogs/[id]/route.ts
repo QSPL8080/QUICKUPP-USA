@@ -54,7 +54,7 @@ export async function PATCH(request: Request, ctx: Ctx) {
     await ensureBlogColumns();
     await getPool().execute(
       `UPDATE blogs
-       SET slug = ?, category = ?, title = ?, \`desc\` = ?, author = ?, author_role = ?, read_time = ?, img = ?, content = ?, is_published = ?
+       SET slug = ?, category = ?, title = ?, \`desc\` = ?, author = ?, author_role = ?, read_time = ?, img = ?, content = ?, is_published = ?, published_at = ?
        WHERE id = ?`,
       [
         d.slug,
@@ -67,6 +67,7 @@ export async function PATCH(request: Request, ctx: Ctx) {
         d.img,
         contentJson,
         d.isPublished ? 1 : 0,
+        d.publishedAt,
         id,
       ]
     );

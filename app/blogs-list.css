@@ -187,3 +187,13 @@
     gap: 32px;
   }
 }
+
+/* published date and time on each card */
+.bls-page p.bls-date:not(#_):not(#__):not(#___) {
+  margin: 0;
+  font-size: 13px !important;
+  line-height: 1.4 !important;
+  font-weight: 600;
+  color: var(--bls-body);
+  opacity: 0.85;
+}

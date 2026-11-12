@@ -5,7 +5,10 @@
 export interface BlogPost {
   slug: string;
   category: string;
+  /** published date and time as the website shows it, e.g. "November 12, 2026 · 9:30 AM EST" */
   date: string;
+  /** published date and time (ISO), for <time> and search engines */
+  publishedAt?: string;
   title: string;
   desc: string;
   author: string;

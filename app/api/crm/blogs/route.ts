@@ -31,8 +31,8 @@ export async function POST(request: Request) {
   try {
     await ensureBlogColumns();
     const [res] = await getPool().execute(
-      `INSERT INTO blogs (slug, category, title, \`desc\`, author, author_role, read_time, img, content, is_published)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO blogs (slug, category, title, \`desc\`, author, author_role, read_time, img, content, is_published, published_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         d.slug,
         d.category,
@@ -44,6 +44,7 @@ export async function POST(request: Request) {
         d.img,
         contentJson,
         d.isPublished ? 1 : 0,
+        d.publishedAt,
       ]
     );
     const id = (res as { insertId: number }).insertId;

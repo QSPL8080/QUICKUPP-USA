@@ -29,7 +29,7 @@ export async function GET(request: Request) {
   const head = [
     "Sr. No", "Blog ID", "Title", "Status", "Website Link", "Slug", "Category", "Meta Title", "Summary (meta description)",
     "Author", "Author Role", "Read Time", "Words", "Sections", "Section Headings", "Key Takeaways", "Pictures in Article",
-    "Cover Image", "Article Text", `Created (${zone})`, `Last Updated (${zone})`,
+    "Cover Image", "Article Text", `Published (${zone})`, `Created (${zone})`, `Last Updated (${zone})`,
   ];
   const lines = blogs.map((b, i) => {
     const c = b.content;
@@ -57,6 +57,7 @@ export async function GET(request: Request) {
       (all.match(IMG) || []).length,
       b.img.startsWith("data:") ? "Uploaded picture" : b.img.startsWith("/") ? `${SITE_URL}${b.img}` : b.img,
       textOnly.length > 30000 ? `${textOnly.slice(0, 30000)}…` : textOnly,
+      exportStamp(b.publishedAt, tz),
       exportStamp(b.createdAt, tz),
       exportStamp(b.updatedAt, tz),
     ];

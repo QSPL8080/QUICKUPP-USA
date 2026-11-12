@@ -6,6 +6,7 @@ import Link from "next/link";
 import { PageHead } from "@/components/crm/ListTools";
 import { useFeedback } from "@/components/crm/Feedback";
 import type { CrmBlog } from "@/lib/blogs";
+import LocalDateTime from "@/components/crm/LocalDateTime";
 import BlogTextField, { BlogImageLibrary, uploadBlogImages } from "@/components/crm/BlogTextField";
 
 const INDUSTRIES = [
@@ -43,12 +44,25 @@ type FormState = {
   author: string;
   authorRole: string;
   readTime: string;
+  /** "YYYY-MM-DDTHH:MM" in the editor's own time zone (a datetime-local field) */
+  publishedAt: string;
   img: string;
   intro: string;
   keyTakeaways: string;
   sections: SectionForm[];
   conclusion: string;
   isPublished: boolean;
+};
+
+/** a moment as a datetime-local value, in this browser's time zone */
+const localInput = (d: Date) => {
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+};
+
+const showDateTime = (v: string) => {
+  const d = new Date(v);
+  return isNaN(d.getTime()) ? "—" : d.toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" });
 };
 
 const blankForm = (): FormState => ({
@@ -60,6 +74,7 @@ const blankForm = (): FormState => ({
   author: "Quickupp Team",
   authorRole: "Industry Research Lead",
   readTime: "6 min read",
+  publishedAt: localInput(new Date()),
   img: "/images/blog-img-01.jpg",
   intro: "",
   keyTakeaways: "",
@@ -80,6 +95,7 @@ const fromBlog = (b: CrmBlog): FormState => ({
   author: b.author,
   authorRole: b.authorRole,
   readTime: b.readTime,
+  publishedAt: localInput(new Date(b.publishedAt || b.createdAt)),
   img: b.img || "/images/blog-img-01.jpg",
   intro: b.content.intro || "",
   keyTakeaways: (b.content.keyTakeaways || []).join("\n"),
@@ -103,7 +119,7 @@ const STEPS = [
 const LAST = STEPS.length - 1;
 
 /* which step a field (or server error) belongs to */
-const STEP_OF: Record<string, number> = { title: 0, metaTitle: 0, slug: 0, category: 0, desc: 0, author: 1, authorRole: 1, readTime: 1, img: 1, content: 2 };
+const STEP_OF: Record<string, number> = { title: 0, metaTitle: 0, slug: 0, category: 0, desc: 0, author: 1, authorRole: 1, readTime: 1, publishedAt: 1, img: 1, content: 2 };
 
 const words = (s: string) => s.replace(/!\[[^\]]*\]\([^)]*\)/g, " ").split(/\s+/).filter(Boolean).length;
 
@@ -238,6 +254,9 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
       if (!form.category.trim()) errs.category = "Please select or enter a category.";
       if (!form.desc.trim()) errs.desc = "Please enter a short description/summary.";
     }
+    if (i === 1) {
+      if (!form.publishedAt || isNaN(new Date(form.publishedAt).getTime())) errs.publishedAt = "Please choose the published date and time.";
+    }
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -270,9 +289,11 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
   };
 
   const save = async () => {
-    if (!checkStep(0)) {
-      setStep(0);
-      return;
+    for (const s of [0, 1]) {
+      if (!checkStep(s)) {
+        setStep(s);
+        return;
+      }
     }
     setBusy(true);
     setErrors({});
@@ -287,6 +308,8 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
       author: form.author,
       authorRole: form.authorRole,
       readTime: form.readTime,
+      // the field is in this browser's time zone; the server gets the exact moment
+      publishedAt: new Date(form.publishedAt).toISOString(),
       img: form.img,
       isPublished: form.isPublished,
       content: {
@@ -457,7 +480,7 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
                 <th className="crm-col-article">Article</th>
                 <th className="crm-col-cat">Category</th>
                 <th className="crm-col-author">Author</th>
-                <th className="crm-col-read">Read time</th>
+                <th className="crm-col-read">Published on</th>
                 <th className="crm-col-status">Status</th>
                 <th className="crm-col-acts">Actions</th>
               </tr>
@@ -482,7 +505,9 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
                           <span className="crm-blog-slug">/blog/{b.slug}</span>
                           <span className="crm-blog-meta">
                             <span className="crm-blog-meta-author">{b.author}</span>
-                            <span className="crm-blog-meta-read">{b.readTime}</span>
+                            <span className="crm-blog-meta-read">
+                              <LocalDateTime iso={b.publishedAt} /> · {b.readTime}
+                            </span>
                           </span>
                         </div>
                       </div>
@@ -498,8 +523,9 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
                       <span className="crm-blog-author">{b.author}</span>
                       <span className="crm-cell-sub">{b.authorRole}</span>
                     </td>
-                    <td data-label="Read time" className="crm-col-read crm-nowrap">
-                      {b.readTime}
+                    <td data-label="Published on" className="crm-col-read crm-nowrap">
+                      <LocalDateTime iso={b.publishedAt} />
+                      <span className="crm-cell-sub">{b.readTime}</span>
                     </td>
                     <td data-label="Status" className="crm-col-status">
                       <span className={`crm-pill ${b.isPublished ? "crm-pill-paid" : "crm-pill-failed"}`}>
@@ -705,6 +731,19 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
                   <label className="crm-field">
                     <span className="crm-label">Estimated Read Time</span>
                     <input className="crm-input" value={form.readTime} onChange={set("readTime")} placeholder="e.g. 6 min read" />
+                  </label>
+
+                  <label className="crm-field">
+                    <span className="crm-label">Published Date &amp; Time *</span>
+                    <input
+                      type="datetime-local"
+                      className="crm-input"
+                      value={form.publishedAt}
+                      onChange={set("publishedAt")}
+                      required
+                    />
+                    <span className="crm-cell-sub">Your time. The website shows it in US Eastern time.</span>
+                    {errors.publishedAt && <span className="crm-field-error">{errors.publishedAt}</span>}
                   </label>
 
                   <div className="crm-field crm-span-2">
@@ -919,6 +958,7 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
                         {form.authorRole ? ` · ${form.authorRole}` : ""}
                         {form.readTime ? ` · ${form.readTime}` : ""}
                       </p>
+                      <p className="crm-cell-sub">Published {showDateTime(form.publishedAt)}</p>
                     </div>
                   </div>
 

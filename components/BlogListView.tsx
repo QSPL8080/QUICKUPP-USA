@@ -40,6 +40,12 @@ export default function BlogListView({ initialPosts }: { initialPosts: BlogPost[
                       <span className="bls-num">{String(i + 1).padStart(2, "0")}</span>
                     </Link>
                     <div className="bls-body">
+                      {post.date && (
+                        <p className="bls-date">
+                          <time dateTime={post.publishedAt}>{post.date}</time>
+                          {post.readTime ? <span> · {post.readTime}</span> : null}
+                        </p>
+                      )}
                       <h2 className="bls-title">
                         <Link href={`/blog/${post.slug}`}>{post.title}</Link>
                       </h2>
