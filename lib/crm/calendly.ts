@@ -3,6 +3,7 @@ import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { getPool } from "@/lib/db";
 import { logActivity } from "@/lib/crm/activity";
 import type { CrmUser } from "@/lib/crm/auth";
+import { notifyMeeting } from "@/lib/crm/meetingNotify";
 
 /*
  * Dynamic Calendly ↔ CRM Synchronization.
@@ -103,6 +104,7 @@ type HistoryItem = { kind: "booked" | "rescheduled" | "canceled"; at: string; st
 type MeetingRow = {
   id: number;
   invitee_uri: string;
+  invitee_email: string | null;
   status: string;
   start_time: string;
   reschedule_count: number;
@@ -225,7 +227,7 @@ export async function findMeetingByEmail(email: string | null | undefined): Prom
 
 async function loadRow(id: number): Promise<MeetingRow | null> {
   const [rows] = await getPool().query(
-    `SELECT id, invitee_uri, status, ${iso("start_time")} AS start_time, reschedule_count, ${iso("previous_start_time")} AS previous_start_time, history FROM crm_meetings WHERE id = ?`,
+    `SELECT id, invitee_uri, invitee_email, status, ${iso("start_time")} AS start_time, reschedule_count, ${iso("previous_start_time")} AS previous_start_time, history FROM crm_meetings WHERE id = ?`,
     [id]
   );
   const r = (rows as MeetingRow[])[0];
@@ -302,6 +304,10 @@ export async function applyInvitee(inv: CalInvitee, ev: CalEvent, forcedMeetingI
         keys.map((k) => (row as Record<string, unknown>)[k])
       );
       id = Number((res as { insertId: number }).insertId);
+      // team email for a meeting seen for the first time
+      if (canceled) notifyMeeting(id, "canceled", { key: `canceled:${inv.uri}`, at: inv.cancellation?.created_at || inv.updated_at });
+      else if (rescheduleCount) notifyMeeting(id, "rescheduled", { key: `rescheduled:${sqlTime(ev.start_time)}`, at: inv.created_at });
+      else notifyMeeting(id, "booked", { key: `booked:${inv.uri}`, at: inv.created_at });
     } catch (err) {
       // two syncs at once: the other one added it first
       if ((err as { code?: string }).code !== "ER_DUP_ENTRY") throw err;
@@ -347,6 +353,7 @@ export async function applyInvitee(inv: CalInvitee, ev: CalEvent, forcedMeetingI
         ...cancelFields(inv),
         history: JSON.stringify(history),
       });
+      notifyMeeting(id, "canceled", { key: `canceled:${inv.uri}`, at: c.created_at || inv.updated_at });
     }
     await mapInvitee(inv.uri, id, ev.uri, ev.updated_at);
     return;
@@ -380,6 +387,14 @@ export async function applyInvitee(inv: CalInvitee, ev: CalEvent, forcedMeetingI
   await mapInvitee(inv.uri, id, ev.uri, ev.updated_at);
   await mapInvitee(inv.old_invitee, id);
   await mapInvitee(inv.new_invitee, id);
+
+  // team email: a new time is a reschedule; a different booking by the same client (no old invitee) is a new booking
+  const placeholder = row.invitee_email === "client@booking";
+  if (placeholder || (isDifferentInvitee && !inv.old_invitee)) {
+    notifyMeeting(id, "booked", { key: `booked:${inv.uri}`, at: inv.created_at });
+  } else if (isTimeChanged) {
+    notifyMeeting(id, "rescheduled", { key: `rescheduled:${sqlTime(ev.start_time)}`, at: inv.created_at || inv.updated_at });
+  }
 }
 
 /* ---------------------------------------------------------------- sync from the API */
@@ -708,6 +723,8 @@ export async function cancelCalendlyMeeting({
     [user.name, reason || null, sqlTime(nowIso), JSON.stringify(history), id]
   );
 
+  notifyMeeting(id, "canceled", { key: `canceled:${row.invitee_uri}`, by: `${user.name} (CRM)`, reason: reason || null });
+
   const cleanReason = reason ? ` (Reason: ${reason})` : "";
   await logActivity({
     entity: "lead",
@@ -771,6 +788,7 @@ export async function rescheduleMeetingDetails({
       WHERE id = ?`,
     [nextCount, sqlTime(String(row.start_time)), sqlTime(startTime), sqlTime(endTime), JSON.stringify(history), id]
   );
+  notifyMeeting(id, "rescheduled", { key: `rescheduled:${sqlTime(startTime)}`, by: `${user.name} (CRM)`, reason: reason || null });
 
   await logActivity({
     entity: "lead",
@@ -911,6 +929,7 @@ export async function createCrmMeeting({
   const insertId = Number((res as { insertId: number }).insertId);
 
   await mapInvitee(inviteeUri, insertId, eventUri, nowIso);
+  notifyMeeting(insertId, "booked", { key: `booked:${inviteeUri}`, by: `${user.name} (CRM)` });
 
   await logActivity({
     entity: "lead",
