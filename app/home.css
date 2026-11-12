@@ -4242,3 +4242,54 @@
 .hxd-shot.is-solo img {
   object-position: 72% 50%;
 }
+
+/* ==========================================================================
+   Trust tapes: both strips on the same diagonal, one above the other with a
+   gap, so neither covers the other — client logos on top (over the dark
+   band's edge), the four services just below. Overrides the crossing
+   layout above.
+   ========================================================================== */
+.hx-tapes {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(16px, 1.6vw, 24px);
+  height: auto;
+  padding-block: clamp(30px, 3vw, 48px);
+  margin-top: clamp(-86px, -6.6vw, -64px);
+  margin-inline: -4%;
+  transform: rotate(-2deg);
+}
+
+.hx-tapes > .hx-tape {
+  position: relative;
+  left: auto;
+  right: auto;
+  top: auto;
+  flex: none;
+  width: 100%;
+  transform: none;
+}
+
+.hx-tapes > .hx-tape-logos {
+  order: -1;
+  /* a short, soft shadow so the gap between the strips stays clear */
+  box-shadow: 0 10px 22px -14px rgba(15, 23, 42, 0.3);
+}
+
+@media (max-width: 900px) {
+  .hx-tapes {
+    gap: 10px;
+    padding-block: 26px;
+    margin-top: -48px;
+    transform: rotate(-3deg);
+  }
+
+  .hx-tapes > .hx-tape-logos {
+    height: 54px;
+  }
+
+  .hx-tapes > .hx-tape-svc {
+    height: 50px;
+  }
+}
