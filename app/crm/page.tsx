@@ -335,40 +335,61 @@ export default async function CrmDashboard() {
           <span className="crm-muted">Leads, applications and payments</span>
         </div>
         {o.activity.length ? (
-          <ul className="crm-dash-feed">
-            {o.activity.map((a) => (
-              <li key={a.key}>
-                <Link href={a.href} className="crm-dash-feed-row">
-                  <span className={`crm-dash-feed-icon is-${a.type}`} aria-hidden="true">
-                    {a.type === "lead" ? (
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M4 4h16v12H5.2L4 17.2V4z" />
-                      </svg>
-                    ) : a.type === "application" ? (
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="3" y="7" width="18" height="13" rx="2" />
-                        <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                      </svg>
-                    ) : (
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="2" y="5" width="20" height="14" rx="2" />
-                        <path d="M2 10h20" />
-                      </svg>
-                    )}
-                  </span>
-                  <span className="crm-recent-text">
-                    <span className="crm-strong">{a.title}</span>
-                    <span className="crm-cell-sub">
-                      {TYPE_LABEL[a.type]} · {a.sub}
-                      {"amount" in a && a.amount ? ` · ${money(a.amount, a.currency)}` : ""}
-                    </span>
-                  </span>
-                  <span className={`crm-pill crm-pill-${a.status}`}>{statusLabel(a.type, a.status)}</span>
-                  <span className="crm-dash-feed-time">{ago(a.at)}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <div className="crm-table-wrap crm-dash-activity-wrap" data-all-rows>
+            <table className="crm-table crm-stack crm-dash-activity">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Details</th>
+                  <th className="crm-dash-act-amount">Amount</th>
+                  <th>Status</th>
+                  <th className="crm-dash-act-when">When</th>
+                </tr>
+              </thead>
+              <tbody>
+                {o.activity.map((a) => (
+                  <tr key={a.key} className="crm-row crm-dash-act-row">
+                    <td data-label="Name" className="crm-cell-main">
+                      <Link href={a.href} className="crm-dash-act-link">
+                        <span className={`crm-dash-feed-icon is-${a.type}`} aria-hidden="true">
+                          {a.type === "lead" ? (
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M4 4h16v12H5.2L4 17.2V4z" />
+                            </svg>
+                          ) : a.type === "application" ? (
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <rect x="3" y="7" width="18" height="13" rx="2" />
+                              <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                            </svg>
+                          ) : (
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <rect x="2" y="5" width="20" height="14" rx="2" />
+                              <path d="M2 10h20" />
+                            </svg>
+                          )}
+                        </span>
+                        <span className="crm-strong">{a.title}</span>
+                      </Link>
+                    </td>
+                    <td data-label="Type">
+                      <span className={`crm-dash-act-type is-${a.type}`}>{TYPE_LABEL[a.type]}</span>
+                    </td>
+                    <td data-label="Details" className="crm-dash-act-detail">{a.sub || "—"}</td>
+                    <td data-label="Amount" className="crm-dash-act-amount">
+                      {"amount" in a && a.amount ? <span className="crm-strong">{money(a.amount, a.currency)}</span> : <span className="crm-muted">—</span>}
+                    </td>
+                    <td data-label="Status">
+                      <span className={`crm-pill crm-pill-${a.status}`}>{statusLabel(a.type, a.status)}</span>
+                    </td>
+                    <td data-label="When" className="crm-dash-act-when">
+                      {ago(a.at)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
           <p className="crm-muted">No activity yet.</p>
         )}

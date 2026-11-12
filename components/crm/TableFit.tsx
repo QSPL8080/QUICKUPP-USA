@@ -5,14 +5,24 @@ import { useEffect } from "react";
 const VISIBLE_ROWS = 4;
 
 /**
- * Every CRM table fits its width: when its columns don't fit the space (a
- * tablet, or a laptop with the menu open) it is shown as cards, like on a
- * phone, instead of scrolling sideways (is-cards, styled in crm-cards.css).
+ * A table wider than its space (a tablet, or a laptop with the menu open)
+ * scrolls sideways by swipe, trackpad or Shift + mouse wheel, with no visible
+ * scrollbar; the edge that has more columns behind it fades out (can-left /
+ * can-right). Big screens show the whole table.
  *
  * Every CRM table shows its first 4 rows; the rest scroll inside the table
  * (header stays on top). Heights are measured, so it fits desktop rows and
  * the stacked cards on phones (kept within the screen) alike.
  */
+/** which sides of a sideways-scrolling table have more columns to show */
+function edges(wrap: HTMLElement) {
+  // a few pixels over (the up-down scrollbar's gutter) isn't more columns
+  const max = wrap.scrollWidth - wrap.clientWidth;
+  const more = max > 12;
+  wrap.classList.toggle("can-left", more && wrap.scrollLeft > 1);
+  wrap.classList.toggle("can-right", more && wrap.scrollLeft < max - 1);
+}
+
 export default function TableFit() {
   useEffect(() => {
     let frame = 0;
@@ -20,12 +30,13 @@ export default function TableFit() {
       frame = 0;
       document.querySelectorAll<HTMLElement>(".crm-root .crm-table-wrap").forEach((wrap) => {
         if (wrap.closest(".crm-modal-wrap, .crm-modal, .crm-drawer")) return;
-        const table = wrap.querySelector<HTMLElement>(":scope > table");
-        if (table && window.innerWidth > 700) {
-          // measure as a table; switch to cards only if it doesn't fit
-          wrap.classList.remove("is-cards");
-          if (table.scrollWidth > wrap.clientWidth + 1) wrap.classList.add("is-cards");
+        edges(wrap);
+        if (!wrap.dataset.edges) {
+          wrap.dataset.edges = "1";
+          wrap.addEventListener("scroll", () => edges(wrap), { passive: true });
         }
+        // a short list shown whole (the dashboard's recent activity)
+        if (wrap.hasAttribute("data-all-rows")) return;
         const rows = wrap.querySelectorAll<HTMLElement>(":scope > table > tbody > tr");
         if (rows.length <= VISIBLE_ROWS) {
           wrap.style.maxHeight = "";

@@ -28,6 +28,15 @@ export type NotifyItem = {
 };
 export type Notifications = { asOf: string; unread: number; items: NotifyItem[] };
 
+/** The alerts a role gets: none for SEO, only job applications for HR, everything for the rest */
+export async function notificationsForRole(userId: number, role: string): Promise<Notifications> {
+  if (role === "seo") return { asOf: "", unread: 0, items: [] };
+  const all = await getNotifications(userId);
+  if (role !== "hr") return all;
+  const items = all.items.filter((i) => i.kind === "application");
+  return { asOf: all.asOf, unread: items.filter((i) => i.unread).length, items };
+}
+
 const LIST = 40;
 
 function unionSql() {

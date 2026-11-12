@@ -37,7 +37,7 @@ export async function POST(request: Request) {
             ["Name", user.name],
             ["Username", user.username || "—"],
             ["Email", user.email],
-            ["Role", user.role === "super_admin" ? "Super Admin" : user.role === "seo" ? "SEO" : user.role === "viewer" ? "Viewer (view only)" : "Admin"],
+            ["Role", user.role === "super_admin" ? "Super Admin" : user.role === "seo" ? "SEO" : user.role === "viewer" ? "Viewer (view only)" : user.role === "hr" ? "HR" : "Admin"],
             ["Failed attempts in a row", String(attempts)],
             ["Time (IST)", when],
             ["IP address", meta.ip || "—"],

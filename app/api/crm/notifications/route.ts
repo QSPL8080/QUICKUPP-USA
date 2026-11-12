@@ -1,5 +1,5 @@
 import { getCurrentUser } from "@/lib/crm/auth";
-import { clearAll, getNotifications, markAllRead, markOneRead } from "@/lib/crm/notifications";
+import { clearAll, markAllRead, markOneRead, notificationsForRole } from "@/lib/crm/notifications";
 import { readJson } from "@/lib/enquiry";
 
 const TIME_RE = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
@@ -8,9 +8,8 @@ const TIME_RE = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
 export async function GET() {
   const me = await getCurrentUser();
   if (!me) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
-  // the SEO role gets no lead, payment or application alerts
-  if (me.role === "seo") return Response.json({ ok: true, asOf: "", unread: 0, items: [] });
-  const data = await getNotifications(me.id);
+  // SEO: no alerts; HR: job applications only
+  const data = await notificationsForRole(me.id, me.role);
   return Response.json({ ok: true, ...data });
 }
 

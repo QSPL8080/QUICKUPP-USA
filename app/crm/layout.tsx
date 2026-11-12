@@ -5,7 +5,7 @@ import SideToggle from "@/components/crm/SideToggle";
 import { cookies } from "next/headers";
 import { dashboardStats } from "@/lib/crm/data";
 import { newApplicationCount } from "@/lib/crm/applications";
-import { getNotifications } from "@/lib/crm/notifications";
+import { getNotifications, notificationsForRole } from "@/lib/crm/notifications";
 import NotifyCenter from "@/components/crm/NotifyCenter";
 import TableFit from "@/components/crm/TableFit";
 import { FeedbackProvider } from "@/components/crm/Feedback";
@@ -15,7 +15,6 @@ import TimeZoneCookie from "@/components/crm/TimeZoneCookie";
 import { viewerTimeZone } from "@/lib/crm/crmTime";
 import { IDLE_MINUTES } from "@/lib/crm/auth";
 import "./crm.css";
-import "./crm-cards.css";
 
 export const metadata: Metadata = {
   title: "CRM | Quickupp Softech",
@@ -26,8 +25,12 @@ export default async function CrmLayout({ children }: { children: React.ReactNod
   const user = await requireUser();
   // the SEO role only works on blogs and job openings: no lead, payment or application counts or alerts
   const seo = user.role === "seo";
+  // HR works on careers only: the new-applications count and application alerts, nothing about leads or payments
+  const hr = user.role === "hr";
   const [{ perSource }, applications, notifications] = seo
     ? [{ perSource: [] as { fresh: number }[] }, 0, { asOf: "", unread: 0, items: [] }]
+    : hr
+    ? await Promise.all([{ perSource: [] as { fresh: number }[] }, newApplicationCount(), notificationsForRole(user.id, user.role)])
     : await Promise.all([dashboardStats(), newApplicationCount(), getNotifications(user.id)]);
   const zone = await viewerTimeZone();
   const viewOnly = isViewOnly(user);

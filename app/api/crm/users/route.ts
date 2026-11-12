@@ -3,7 +3,7 @@ import { getCurrentUser, hashPassword, isSuperAdmin } from "@/lib/crm/auth";
 import { EMAIL_RE, USERNAME_RE, readAccountFields, savePassword, uniqueErrors } from "@/lib/crm/users";
 import { readJson } from "@/lib/enquiry";
 
-/* POST { name, username, email, password, role } → super admin adds an Admin, SEO or Viewer account */
+/* POST { name, username, email, password, role } → super admin adds an Admin, SEO, Viewer or HR account */
 export async function POST(request: Request) {
   const me = await getCurrentUser();
   if (!me) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
