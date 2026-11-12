@@ -4,6 +4,7 @@ import ThemeScripts from "@/components/ThemeScripts";
 import "./globals.css";
 import "./assurix-service.css";
 import "./site-type.css";
+import "./heading-fit.css";
 import QuickuppEngineReinit from "@/components/QuickuppEngineReinit";
 import MetaPixelPageView from "@/components/MetaPixelPageView";
 import ButtonTone from "@/components/ButtonTone";

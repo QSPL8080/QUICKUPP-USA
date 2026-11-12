@@ -1,0 +1,63 @@
+/*
+ * HEADINGS: NO WORD LEFT ALONE ON A LINE
+ *
+ * 1. Every heading outside the home page wraps evenly (text-wrap: balance),
+ *    so a long heading never leaves one word by itself on the last line
+ *    ("Healthcare Marketing That Goes Beyond Lead / Generation" becomes two
+ *    even lines), on every screen size. Each sentence of a heading is its own
+ *    line block (components/HeadingLines.tsx), so each sentence wraps evenly too.
+ * 2. On desktop, a heading that fits on one line in the space it has is no
+ *    longer held to a narrower width than that space:
+ *      - centred section headings may use the full content width;
+ *      - a heading at the top of a side column may run into the gap beside it
+ *        (never further than the gap, so it never reaches the next column).
+ *    Font sizes are unchanged.
+ * The home page keeps its own designed line breaks (its root is .hx-page).
+ */
+
+/* 1. even wrapping everywhere except the home page */
+body:not(:has(.hx-page)) :is(h1, h2, h3) {
+  text-wrap: balance;
+}
+
+@media (min-width: 900px) {
+  /* 2a. centred section headings: up to the content width */
+  body:not(:has(.hx-page)) :is(.inx-head-center, .ytv-head, .tlx-head, .tlx-hero-copy, .tlx-closing, .geo-closing) > :is(h1, h2),
+  body:not(:has(.hx-page)) .sef-heading {
+    width: max-content !important;
+    max-width: min(1120px, calc(100vw - 64px)) !important;
+  }
+  body:not(:has(.hx-page)) .tlx-hero-copy {
+    max-width: min(1120px, calc(100vw - 64px));
+  }
+
+  /* 2b. side-column headings: may run into the gap beside the column */
+  body:not(:has(.hx-page))
+    :is(
+      .inx-why-side,
+      .inx-ledger-side,
+      .inx-head-main,
+      .mkx-why-head .mkx-head,
+      .itx-why-titles,
+      .abx-statement-body,
+      .abx-close-main,
+      .acx-why-copy,
+      .acx-proc-side,
+      .cv-journey-copy,
+      .bk-copy
+    )
+    > :is(h1, h2) {
+    width: max-content !important;
+    max-width: calc(100% + 56px) !important;
+  }
+  body:not(:has(.hx-page)) .asx-hub-title {
+    width: max-content !important;
+    max-width: calc(100% + 28px) !important;
+  }
+
+  /* 2c. case study call to action: the card has room for a longer line */
+  body:not(:has(.hx-page)) .cd-page h2.cd-cta-title {
+    width: max-content !important;
+    max-width: min(800px, 100%) !important;
+  }
+}

@@ -4,8 +4,8 @@
  *   "Attract More Students. Generate Better Enquiries. Grow Your Institution."
  *
  * shows as three lines on every screen size. Wrap a heading's content in
- * <Lines> (or pass it through sentenceLines) and a line break goes after each
- * full stop that is followed by more of the heading, including across the
+ * <Lines> (or pass it through sentenceLines) and each full stop that is
+ * followed by more of the heading starts a new line, including across the
  * gradient spans a title is split into. A full stop at the very end adds
  * nothing, and abbreviations ("vs.", "e.g.", "U.S."), initials and numbered
  * steps ("1. Discover") never break.
@@ -106,9 +106,66 @@ function lineParts(children: ReactNode): ReactNode[] {
   return out;
 }
 
-/** a heading's content with a line break after every full stop that ends a sentence */
+/*
+ * Each sentence becomes its own line block, so it wraps on its own: with the
+ * site's even heading wrapping (app/heading-fit.css) a long sentence splits
+ * into even lines instead of leaving its last word alone. A span that holds
+ * the end of one sentence and the start of the next (a gradient part of a
+ * title) is split in two, one part in each sentence.
+ */
+function liftBreaks(nodes: ReactNode[]): ReactNode[] {
+  const out: ReactNode[] = [];
+  for (const node of nodes) {
+    if (!isValidElement(node) || isBreak(node)) {
+      out.push(node);
+      continue;
+    }
+    const nested = (node.props as { children?: ReactNode }).children;
+    if (nested === undefined || typeof nested === "function") {
+      out.push(node);
+      continue;
+    }
+    const inner = liftBreaks(Children.toArray(nested));
+    if (!inner.some(isBreak)) {
+      out.push(node);
+      continue;
+    }
+    let piece: ReactNode[] = [];
+    let n = 0;
+    const flush = () => {
+      if (piece.some((p) => textOf(p).trim() || (isValidElement(p) && !isBreak(p)))) {
+        out.push(cloneElement(node, { key: `${node.key ?? "h"}-part${n++}` }, ...piece));
+      }
+      piece = [];
+    };
+    for (const p of inner) {
+      if (isBreak(p)) {
+        flush();
+        out.push(p);
+      } else piece.push(p);
+    }
+    flush();
+  }
+  return out;
+}
+
+/** a heading's content with every sentence on its own line */
 export function sentenceLines(children: ReactNode): ReactNode {
-  return createElement(Fragment, null, ...lineParts(children));
+  const parts = liftBreaks(lineParts(children));
+  if (!parts.some(isBreak)) return createElement(Fragment, null, ...parts);
+  const sentences: ReactNode[][] = [[]];
+  for (const p of parts) {
+    const current = sentences[sentences.length - 1];
+    if (isBreak(p)) sentences.push([]);
+    else current.push(typeof p === "string" && current.length === 0 ? p.trimStart() : p);
+  }
+  return createElement(
+    Fragment,
+    null,
+    ...sentences
+      .filter((s) => s.length)
+      .map((s, i) => createElement("span", { key: `sentence-${i}`, className: "h-sentence", "data-sentence": "", style: { display: "block" } }, ...s)),
+  );
 }
 
 export default function Lines({ children }: { children?: ReactNode }) {
