@@ -4918,3 +4918,38 @@ a.crm-dash-legend-row:hover {
 .crm-root .crm-table-wrap.can-right { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent); }
 .crm-root .crm-table-wrap.can-left { -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(to left, #000 calc(100% - 40px), transparent); }
 .crm-root .crm-table-wrap.can-left.can-right { -webkit-mask-image: linear-gradient(to right, transparent, #000 40px, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(to right, transparent, #000 40px, #000 calc(100% - 40px), transparent); }
+
+/* dashboard point lists (Leads by form, Lead source, Project status) */
+.crm-dash-points { margin-top: 4px; }
+.crm-dash-point-badge { grid-column: 3; justify-self: end; margin: 0; white-space: nowrap; }
+
+/* hide-menu button inside the menu (laptops and desktops) */
+.crm-side-brand { position: relative; }
+.crm-side-hide {
+  position: absolute;
+  top: 2px;
+  right: 0;
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  color: #cbd5e1;
+  cursor: pointer;
+}
+.crm-side-hide:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+.crm-side-toggle.is-closed { width: auto; padding: 0 10px; gap: 6px; display: inline-flex; align-items: center; font-weight: 600; font-size: 13px; }
+@media (max-width: 900px) {
+  .crm-side-hide { display: none; }
+}
+
+/* Payments: the super admin's log of deleted payments */
+.crm-deleted-log summary { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; cursor: pointer; list-style: none; flex-wrap: wrap; }
+.crm-deleted-log summary::-webkit-details-marker { display: none; }
+.crm-deleted-log summary::before { content: "▸"; color: var(--crm-muted); margin-right: 4px; }
+.crm-deleted-log[open] summary::before { content: "▾"; }
+.crm-deleted-log ul { list-style: none; margin: 14px 0 0; padding: 0; }
+.crm-deleted-log li { padding: 10px 0; border-top: 1px solid #f1f3f8; }
+.crm-deleted-what { display: block; font-size: 13.5px; color: var(--crm-ink); }

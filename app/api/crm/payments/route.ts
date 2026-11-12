@@ -5,6 +5,7 @@ import { readJson } from "@/lib/enquiry";
 import { parseIds } from "@/lib/crm/ids";
 import { actorOf, logActivity, money } from "@/lib/crm/activity";
 import { statusLabel } from "@/lib/crm/paymentActivity";
+import { deletePayments } from "@/lib/crm/paymentDeletion";
 
 /* POST → add a payment entered by hand */
 export async function POST(request: Request) {
@@ -57,15 +58,14 @@ export async function DELETE(request: Request) {
     if (!ids) return Response.json({ ok: false, error: "Invalid request." }, { status: 400 });
     pay.push(...ids);
   }
-  const pool = getPool();
+  // removed from the database for good, with their transactions; who deleted them is kept in the history and emailed
   let deleted = 0;
-  if (pay.length) {
-    const [res] = await pool.query("DELETE FROM payments WHERE id IN (?)", [pay]);
-    deleted += (res as { affectedRows: number }).affectedRows;
-  }
-  if (link.length) {
-    const [res] = await pool.query("DELETE FROM payment_links WHERE id IN (?)", [link]).catch(() => [{ affectedRows: 0 }]);
-    deleted += (res as { affectedRows: number }).affectedRows;
+  try {
+    deleted += await deletePayments("payments", pay, user);
+    deleted += await deletePayments("payment_links", link, user);
+  } catch (err) {
+    console.error("[payments] delete failed:", err);
+    return Response.json({ ok: false, error: "Couldn't delete these payments. Please try again." }, { status: 500 });
   }
   if (!deleted) return Response.json({ ok: false, error: "These payments were already deleted." }, { status: 404 });
   return Response.json({ ok: true, deleted });

@@ -5,7 +5,7 @@ import { ENQUIRY_STATUS_LABEL, type EnquiryStatus } from "@/lib/crm/leadOptions"
 import { APPLICATION_STATUS_LABEL, type ApplicationStatus } from "@/lib/applications";
 import { PAYMENT_STATUS_LABEL, money } from "@/lib/crm/format";
 import { PageHead } from "@/components/crm/ListTools";
-import { ColumnChart, RankList, Ring, StackBar } from "@/components/crm/DashCharts";
+import { ColumnChart, PointList, RankList, Ring, StackBar } from "@/components/crm/DashCharts";
 
 /*
  * CRM Dashboard: one view of the whole CRM — leads, project progress,
@@ -20,6 +20,16 @@ const LEAD_COLORS: Record<string, string> = {
   closed: "#10b981",
 };
 const CHANNEL_COLORS: Record<string, string> = { Website: "#4f46e5", Manual: "#0ea5e9", Meta: "#a855f7" };
+/* a colour per form and per project status, for the dashboard's point lists */
+const POINT_COLORS = ["#4f46e5", "#0ea5e9", "#a855f7", "#10b981", "#f59e0b", "#ef4444", "#14b8a6", "#64748b"];
+const PROJECT_COLORS: Record<string, string> = {
+  "Not Started": "#94a3b8",
+  Discovery: "#a855f7",
+  "In Progress": "#0ea5e9",
+  Review: "#f59e0b",
+  Completed: "#10b981",
+  "On Hold": "#ef4444",
+};
 const APP_COLORS: Record<string, string> = {
   new: "#6366f1",
   reviewing: "#f59e0b",
@@ -59,7 +69,6 @@ export default async function CrmDashboard() {
   const user = await requireArea("dashboard");
   const [o, p] = await Promise.all([crmOverview(), paymentStats()]);
   const cur = p.currency;
-  const maxSource = Math.max(1, ...o.perSource.map((s) => s.total));
   const projectTotal = o.byProject.reduce((a, b) => a + b.count, 0);
 
   const now = new Date();
@@ -139,27 +148,23 @@ export default async function CrmDashboard() {
             <h2 className="crm-card-title">Leads by form</h2>
             <span className="crm-muted">{o.totals.leads} total</span>
           </div>
-          <ul className="crm-bars crm-dash-bars">
-            {o.perSource.map((s) => (
-              <li key={s.key}>
-                <Link href={s.href} className="crm-bar-row">
-                  <span className="crm-bar-label">{s.label}</span>
-                  <span className="crm-bar-track">
-                    <span className="crm-bar-fill" style={{ width: `${(s.total / maxSource) * 100}%` }} />
-                  </span>
-                  <span className="crm-bar-num">{s.total}</span>
-                  {s.fresh > 0 ? <span className="crm-nav-badge">{s.fresh} new</span> : <span />}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <PointList
+            parts={o.perSource.map((src, idx) => ({
+              key: src.key,
+              label: src.label,
+              color: POINT_COLORS[idx % POINT_COLORS.length],
+              count: src.total,
+              href: src.href,
+              badge: src.fresh > 0 ? `${src.fresh} new` : undefined,
+            }))}
+          />
         </div>
 
         <div className="crm-card">
           <div className="crm-card-head">
             <h2 className="crm-card-title">Lead source</h2>
           </div>
-          <StackBar
+          <PointList
             parts={o.byChannel.map((c) => ({
               key: c.label,
               label: c.label,
@@ -177,13 +182,14 @@ export default async function CrmDashboard() {
             <h2 className="crm-card-title">Project status</h2>
             <span className="crm-muted">{projectTotal} leads</span>
           </div>
-          <RankList
-            items={o.byProject.map((b) => ({
+          <PointList
+            parts={o.byProject.map((b) => ({
+              key: b.status,
               label: b.status,
-              value: b.count,
+              color: PROJECT_COLORS[b.status] || "#64748b",
+              count: b.count,
               href: `/crm/enquiries?projectStatus=${encodeURIComponent(b.status)}`,
             }))}
-            empty="No projects yet."
           />
         </div>
       </section>

@@ -4,8 +4,8 @@ import { validatePayment } from "@/lib/crm/payments";
 import { readJson } from "@/lib/enquiry";
 import { actorOf } from "@/lib/crm/activity";
 import { logPaymentChanges, paymentSnapshot } from "@/lib/crm/paymentActivity";
-import type { ResultSetHeader } from "mysql2/promise";
 import { resolvePayTable } from "@/lib/crm/paymentTable";
+import { deletePayments } from "@/lib/crm/paymentDeletion";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -48,9 +48,13 @@ export async function DELETE(request: Request, ctx: Ctx) {
   // ?table= says which record: a payment and a payment link can share an id
   const picked = await resolvePayTable(id, new URL(request.url).searchParams.get("table"));
   if ("error" in picked) return Response.json({ ok: false, error: picked.error }, { status: picked.status });
-  // permanently removed from the database (no hidden "deleted" copies are kept)
-  const [res] = await getPool().execute(`DELETE FROM \`${picked.table}\` WHERE id = ?`, [id]).catch(() => [{ affectedRows: 0 }]);
-  if (!Number((res as ResultSetHeader)?.affectedRows || 0)) {
+  // permanently removed from the database, with its transactions; who deleted it is kept in the history and emailed
+  const deleted = await deletePayments(picked.table, [id], user).catch((err) => {
+    console.error("[payments] delete failed:", err);
+    return -1;
+  });
+  if (deleted < 0) return Response.json({ ok: false, error: "Couldn't delete this payment. Please try again." }, { status: 500 });
+  if (!deleted) {
     return Response.json({ ok: false, error: "This payment was already deleted." }, { status: 404 });
   }
   return Response.json({ ok: true });

@@ -4,8 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import "@/app/crm/crm-more.css";
+import { SideHide } from "@/components/crm/SideToggle";
 
-type NavUser = { name: string; email: string; role: "super_admin" | "admin" | "seo" | "viewer" | "hr" };
+type NavUser = { id: number; name: string; email: string; role: "super_admin" | "admin" | "seo" | "viewer" | "hr" };
 
 const I = {
   dashboard: "M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z",
@@ -73,6 +74,7 @@ export default function CrmSidebar({ user, newCounts }: { user: NavUser; newCoun
       <aside className={`crm-side${open ? " is-open" : ""}`}>
         <div className="crm-side-brand">
           <img src="/images/quickupp-logo-white.png" alt="Quickupp Softech" />
+          <SideHide userId={user.id} />
         </div>
 
         <nav className="crm-nav" aria-label="CRM" onClick={() => setOpen(false)}>

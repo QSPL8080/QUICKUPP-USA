@@ -102,7 +102,41 @@ export function Ring({ value, label, tone = "indigo" }: { value: number; label: 
   );
 }
 
-export type StackPart = { key: string; label: string; count: number; color: string; note?: string; href?: string };
+export type StackPart = { key: string; label: string; count: number; color: string; note?: string; href?: string; badge?: string };
+
+/** A list of points: coloured dot, name, count and share (no bars); each point opens its list */
+export function PointList({ parts, unit = "", showPct = true }: { parts: StackPart[]; unit?: string; showPct?: boolean }) {
+  const total = parts.reduce((a, p) => a + p.count, 0);
+  return (
+    <ul className="crm-dash-legend crm-dash-points">
+      {parts.map((p) => {
+        const inner = (
+          <>
+            <span className="crm-dash-dot" style={{ background: p.color }} aria-hidden="true" />
+            <span className="crm-dash-legend-label">{p.label}</span>
+            {p.badge && <span className="crm-nav-badge crm-dash-point-badge">{p.badge}</span>}
+            <span className="crm-dash-legend-num">
+              {p.count}
+              {unit}
+            </span>
+            {showPct && <span className="crm-dash-legend-pct">{total ? Math.round((p.count / total) * 100) : 0}%</span>}
+          </>
+        );
+        return (
+          <li key={p.key}>
+            {p.href ? (
+              <Link href={p.href} className="crm-dash-legend-row" title={`View ${p.label} (${p.count})`}>
+                {inner}
+              </Link>
+            ) : (
+              <div className="crm-dash-legend-row">{inner}</div>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
 
 /** One horizontal bar split by share, with a legend list underneath */
 export function StackBar({ parts, unit = "" }: { parts: StackPart[]; unit?: string }) {
