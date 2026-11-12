@@ -1823,7 +1823,8 @@ a.button-link[data-wf--button--variant="white-bg"] .button-arrow,
 
 .qs-scalient-watermark-text {
   display: block;
-  font-size: clamp(100px, 19vw, 280px);
+  /* scales with the screen so the whole word fits on phones too (a 100px floor cut it off) */
+  font-size: clamp(56px, 19vw, 280px);
   font-weight: 900;
   line-height: 0.95;
   letter-spacing: -0.04em;

@@ -46,6 +46,11 @@
   -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.78) 0%, rgba(0, 0, 0, 0.36) 55%, rgba(0, 0, 0, 0.1) 100%);
   mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.78) 0%, rgba(0, 0, 0, 0.36) 55%, rgba(0, 0, 0, 0.1) 100%);
   animation: qs-wordmark-light 12s linear infinite;
+  /* the letters are drawn by clipping the gradient to the text, so the gradient
+     only fills the text's box; with the tight letter-spacing the last "p" pokes
+     out past the right edge of that box and got cut. Room on both sides keeps
+     every letter whole (and the word centred). */
+  padding-inline: 0.08em;
 }
 
 /* beam crosses in the first half; the colours drift the whole time and loop seamlessly */
