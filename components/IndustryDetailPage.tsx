@@ -203,6 +203,11 @@ interface IndustryMedia {
   arch: string;
   /** alt text for the Why Choose photo (default: the industry name) */
   archAlt?: string;
+  /** alt text for the photo beside the first list section (default: the industry name) */
+  storyAlt?: string;
+  /** the closing section's second photo (shown with ecosystemBg, one above the other) and the alt text */
+  closeImage2?: string;
+  closeAlt?: string;
   circle: string;
   video: string;
   ecosystemBg: string;
@@ -230,12 +235,14 @@ const industryImages: Record<string, IndustryMedia> = {
     aiBg: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1600&q=80",
   },
   Education: {
+    closeImage2: "/images/industries/ready-to-grow-your-student-enrolments-education-2.jpg",
+    closeAlt: "Ready to Grow Your Student Enrolments? - Education",
     hero: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1600&q=80",
     story: "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1000&q=80",
     arch: "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=800&q=80",
     circle: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80",
     video: "/video/Portfolio 2.mp4",
-    ecosystemBg: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1600&q=80",
+    ecosystemBg: "/images/industries/ready-to-grow-your-student-enrolments-education-1.jpg",
     channelsBg: "https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&w=1600&q=80",
     pipelineBg: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80",
     processBg: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1600&q=80",
@@ -244,7 +251,8 @@ const industryImages: Record<string, IndustryMedia> = {
   "Real Estate": {
     hero: "/images/industries/real-estate-hero.jpg",
     story: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1000&q=80",
-    arch: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
+    arch: "/images/industries/why-choose-quickupp-softech-real-estate-industry.jpg",
+    archAlt: "Why Choose Quickupp Softech? - Real Estate Industry",
     circle: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80",
     video: "/video/Portfolio 1.mp4",
     ecosystemBg: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1600&q=80",
@@ -255,7 +263,8 @@ const industryImages: Record<string, IndustryMedia> = {
   },
   "Home Services": {
     hero: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1600&q=80",
-    story: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1000&q=80",
+    story: "/images/industries/stop-paying-for-traffic-start-generating-customers-home-services.jpg",
+    storyAlt: "Stop Paying for Traffic. Start Generating Customers. - Home Services",
     arch: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80",
     circle: "https://images.unsplash.com/photo-1581579438747-1dc8d17bbce4?auto=format&fit=crop&w=600&q=80",
     video: "/video/Portfolio 2.mp4",
@@ -775,7 +784,7 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
           }
           if (block.type === "list") {
             const img = i === firstListIdx ? images.story : undefined;
-            return <ListSection key={i} block={block as ListBlock} image={img} alt={data.crumb} />;
+            return <ListSection key={i} block={block as ListBlock} image={img} alt={(img && images.storyAlt) || data.crumb} />;
           }
           if (block.type === "process") return <ProcessSection key={i} block={block as ProcessBlock} />;
           if (block.type === "whyChoose") return <WhySection key={i} block={block as WhyChooseBlock} image={images.arch} alt={images.archAlt || data.crumb} />;
@@ -807,8 +816,9 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                   </div>
                 )}
               </div>
-              <div className="inx-close-media" aria-hidden="true">
-                <img src={images.ecosystemBg} alt="" loading="lazy" />
+              <div className={`inx-close-media${images.closeImage2 ? " is-pair" : ""}`} aria-hidden={images.closeAlt ? undefined : true}>
+                <img src={images.ecosystemBg} alt={images.closeAlt || ""} loading="lazy" />
+                {images.closeImage2 && <img src={images.closeImage2} alt={images.closeAlt || ""} loading="lazy" />}
               </div>
             </div>
           </div>
