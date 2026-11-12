@@ -170,7 +170,7 @@ const data: ServicePageData = {
     {
       type: "ai",
       title: "AI-Powered SEO",
-      desc: "We use AI to support keyword research, content planning, competitor analysis, content optimization, SEO data analysis and AI search visibility—combined with human strategy and expertise.",
+      desc: "We use AI to support keyword research, content planning, competitor analysis, content optimization, SEO data analysis and AI search visibility - combined with human strategy and expertise.",
       bullets: [
         "Keyword Research",
         "Content Planning",

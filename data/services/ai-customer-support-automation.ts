@@ -104,11 +104,11 @@ const data: ServicePageData = {
       title: "Benefits of AI Customer Support Automation",
       tagline: "Marketing. AI. Technology. Built for Growth.",
       bullets: [
-      "Faster Responses to Routine Questions — Help customers obtain answers to common questions without waiting for every request to be handled manually.",
-      "Improved Support Team Productivity — Reduce repetitive ticket classification, conversation summarization, and information retrieval tasks.",
-      "More Consistent Communication — Use approved knowledge sources and defined response guidelines to support accurate and consistent customer interactions.",
-      "Better Ticket Organization — Structure incoming requests so teams can identify outstanding issues and route cases more efficiently.",
-      "Flexible Support Operations — Support routine customer interactions beyond standard working hours when the solution is configured and available to do so."
+      "Faster Responses to Routine Questions - Help customers obtain answers to common questions without waiting for every request to be handled manually.",
+      "Improved Support Team Productivity - Reduce repetitive ticket classification, conversation summarization, and information retrieval tasks.",
+      "More Consistent Communication - Use approved knowledge sources and defined response guidelines to support accurate and consistent customer interactions.",
+      "Better Ticket Organization - Structure incoming requests so teams can identify outstanding issues and route cases more efficiently.",
+      "Flexible Support Operations - Support routine customer interactions beyond standard working hours when the solution is configured and available to do so."
 ],
       desc: "We focus on solving real business challenges through reliable, enterprise-grade AI systems and structured automation.",
     },

@@ -269,12 +269,12 @@
           "paragraphs": [
             "Digital advertising offers the benefit of being able to measure the result of any campaign.",
             "**Academic institutions can observe the following key metrics:**",
-            "- **Impressions –** the total of ads served",
-            "- **Clicks –** the number of interactions with ads",
-            "- **Click-Through Rate (CTR) –** the total of impressions that resulted in clicks",
-            "- **Cost Per Lead (CPL) –** the advertising cost for obtaining a lead",
-            "- **Conversion Rate –** the percentage of visitors taking some action to obtain a lead",
-            "- **Admission Conversion Rate –** the percentage of qualified leads becoming students",
+            "- **Impressions - ** the total of ads served",
+            "- **Clicks - ** the number of interactions with ads",
+            "- **Click-Through Rate (CTR) - ** the total of impressions that resulted in clicks",
+            "- **Cost Per Lead (CPL) - ** the advertising cost for obtaining a lead",
+            "- **Conversion Rate - ** the percentage of visitors taking some action to obtain a lead",
+            "- **Admission Conversion Rate - ** the percentage of qualified leads becoming students",
             "Technologies like Google Analytics 4, Google Ads conversion tracking, Meta Pixel, and CRM systems allow institutions to learn how well their campaigns work."
           ]
         },

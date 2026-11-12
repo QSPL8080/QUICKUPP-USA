@@ -200,10 +200,10 @@ export default async function PaymentConfirmationPage({ searchParams }: Props) {
                   <div className="pc-txn-main">
                     <strong>{KIND[t.kind]}</strong>
                     <span>{when(t.at)} · PayPal</span>
-                    <span className="pc-txn-id">Transaction ID: {t.transactionId || "—"}</span>
+                    <span className="pc-txn-id">Transaction ID: {t.transactionId || "-"}</span>
                   </div>
                   <div className="pc-txn-amount">
-                    {t.amount > 0 ? usd(t.amount, t.currency) : "—"}
+                    {t.amount > 0 ? usd(t.amount, t.currency) : "-"}
                     {t.status === "pending" && <small>pending clearing</small>}
                   </div>
                 </div>

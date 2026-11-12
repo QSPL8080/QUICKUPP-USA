@@ -126,7 +126,7 @@ const data: ServicePageData = {
     {
       type: "whyChoose",
       title: "Why Choose Quickupp Softech?",
-      desc: "We don't design interfaces simply to look good—we create digital experiences that are intuitive, functional, and aligned with business objectives.",
+      desc: "We don't design interfaces simply to look good - we create digital experiences that are intuitive, functional, and aligned with business objectives.",
       bullets: [
         "User-Centered Design",
         "Business & Conversion Focus",

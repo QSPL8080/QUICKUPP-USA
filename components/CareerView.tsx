@@ -24,7 +24,7 @@ import Lines from "@/components/HeadingLines";
 
 const HR_EMAIL = "hr@quickuppsoftech.us";
 const mailto = (subject: string) => `mailto:${HR_EMAIL}?subject=${encodeURIComponent(subject)}`;
-const APPLY_SUBJECT = "Career Application – [Your Name] – [Position]";
+const APPLY_SUBJECT = "Career Application - [Your Name] - [Position]";
 
 const BENEFITS: { title: string; text: string; icon: LucideIconName }[] = [
   { title: "Global Exposure", text: "Work with international clients and projects across different industries and markets.", icon: "globe" },
@@ -663,7 +663,7 @@ export default function CareerView({ jobs }: { jobs: Job[] }) {
                 <span>Defined by Impact.</span>
               </p>
               <h1 className="cv-h1"><Lines>
-                Careers at Quickupp Softech – <span className="qs-gradient-text">Build Your Future With Us</span>
+                Careers at Quickupp Softech - <span className="qs-gradient-text">Build Your Future With Us</span>
               </Lines></h1>
               <p className="cv-lead">
                 At Quickupp Softech, we believe great companies are built by ambitious people who challenge possibilities, embrace innovation, and turn

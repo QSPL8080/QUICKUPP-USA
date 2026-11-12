@@ -244,7 +244,7 @@ const data: ServicePageData = {
     {
       type: "process",
       title: "From Business Idea to Production-Ready Product",
-      desc: "Our Product Engineering Company takes a structured approach to software development—from understanding your business problem to designing, developing, launching, and continuously improving your product.",
+      desc: "Our Product Engineering Company takes a structured approach to software development - from understanding your business problem to designing, developing, launching, and continuously improving your product.",
       steps: [
         {
           num: "01",

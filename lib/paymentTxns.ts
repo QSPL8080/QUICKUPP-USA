@@ -127,7 +127,7 @@ export async function receiptPdfFor(table: LinkTable, rec: RowDataPacket, txns?:
   const { date, time } = paymentDateTime(last ? new Date(last.at) : rec.paid_at || rec.created_at);
   const billingPeriod =
     rec.billing_start_date || rec.billing_end_date
-      ? `${rec.billing_start_date ? ymd(rec.billing_start_date) : "—"} to ${rec.billing_end_date ? ymd(rec.billing_end_date) : "—"}`
+      ? `${rec.billing_start_date ? ymd(rec.billing_start_date) : "-"} to ${rec.billing_end_date ? ymd(rec.billing_end_date) : "-"}`
       : null;
   const earlierPaid = earlier.reduce((a, t) => a + t.amount, 0) || (isBalance ? Math.max(0, paidTotal - (last?.amount || 0)) : 0);
   return generateReceiptPdf({

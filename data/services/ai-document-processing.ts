@@ -107,11 +107,11 @@ const data: ServicePageData = {
       title: "Benefits of AI Document Processing",
       tagline: "Marketing. AI. Technology. Built for Growth.",
       bullets: [
-      "Reduce Manual Data Entry — Automate repetitive information extraction and record preparation tasks.",
-      "Improve Processing Speed — Move supported documents through classification and extraction workflows more efficiently.",
-      "Standardize Document Handling — Apply consistent processing rules across recurring document types.",
-      "Improve Information Accessibility — Convert unstructured document information into searchable and organized data.",
-      "Support Better Data Quality — Use validation rules, confidence thresholds, and human review to identify uncertain or incomplete information."
+      "Reduce Manual Data Entry - Automate repetitive information extraction and record preparation tasks.",
+      "Improve Processing Speed - Move supported documents through classification and extraction workflows more efficiently.",
+      "Standardize Document Handling - Apply consistent processing rules across recurring document types.",
+      "Improve Information Accessibility - Convert unstructured document information into searchable and organized data.",
+      "Support Better Data Quality - Use validation rules, confidence thresholds, and human review to identify uncertain or incomplete information."
 ],
       desc: "We focus on solving real business challenges through reliable, enterprise-grade AI systems and structured automation.",
     },

@@ -102,11 +102,11 @@ const data: ServicePageData = {
       title: "Benefits of AI Chatbot Development",
       tagline: "Marketing. AI. Technology. Built for Growth.",
       bullets: [
-      "Faster Customer Responses — Provide relevant information without requiring a team member to manually answer every routine inquiry.",
-      "Improved Lead Capture — Engage visitors when they are exploring your products or services and collect relevant information for follow-up.",
-      "Reduced Repetitive Work — Automate common questions and routine interactions so employees can focus on more complex customer needs.",
-      "Consistent Customer Communication — Use approved information and defined response guidelines to maintain more consistent conversations.",
-      "Scalable Customer Engagement — Support higher volumes of routine conversations without proportionally increasing manual workload."
+      "Faster Customer Responses - Provide relevant information without requiring a team member to manually answer every routine inquiry.",
+      "Improved Lead Capture - Engage visitors when they are exploring your products or services and collect relevant information for follow-up.",
+      "Reduced Repetitive Work - Automate common questions and routine interactions so employees can focus on more complex customer needs.",
+      "Consistent Customer Communication - Use approved information and defined response guidelines to maintain more consistent conversations.",
+      "Scalable Customer Engagement - Support higher volumes of routine conversations without proportionally increasing manual workload."
 ],
       desc: "We focus on solving real business challenges through reliable, enterprise-grade AI systems and structured automation.",
     },

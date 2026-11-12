@@ -7,7 +7,7 @@ const data: ServicePageData = {
   heroEyebrow: "Web Design & Development",
   heroTitle: "Websites Designed to Look Better, Perform Better & Grow Your Business",
   heroParagraphs: [
-    "Your website is more than an online presence—it is a powerful tool for branding, lead generation, customer engagement and business growth.",
+    "Your website is more than an online presence - it is a powerful tool for branding, lead generation, customer engagement and business growth.",
     "Quickupp Softech provides professional Web Design & Development Services to help businesses create fast, responsive, secure and conversion-focused websites.",
     "From WordPress and Shopify development to custom websites, ecommerce platforms, React.js, Next.js, PHP development and landing pages, we build digital experiences around your business goals.",
   ],
@@ -216,7 +216,7 @@ const data: ServicePageData = {
   ],
   closingTitle: "Build a Website That Works for Your Business",
   closingDesc:
-    "Whether you need a WordPress website, Shopify store, custom website, ecommerce platform, React/Next.js application or conversion-focused landing page, Quickupp Softech can help.\n\nLet's Build Your Next Digital Experience.\nQuickupp Softech — Marketing. AI. Technology. Built for Growth.",
+    "Whether you need a WordPress website, Shopify store, custom website, ecommerce platform, React/Next.js application or conversion-focused landing page, Quickupp Softech can help.\n\nLet's Build Your Next Digital Experience.\nQuickupp Softech - Marketing. AI. Technology. Built for Growth.",
   closingCtas: [
     { label: "Get a Free Website Consultation", href: "/contact" },
     { label: "Request a Website Proposal", href: "/contact" },

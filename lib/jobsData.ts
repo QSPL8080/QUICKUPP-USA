@@ -1,6 +1,7 @@
 import "server-only";
 import { getPool } from "@/lib/db";
 import { lines, type Job } from "@/lib/jobs";
+import { plainDashesDeep } from "@/lib/dashes";
 
 /* Reading job openings (Careers page and CRM) */
 
@@ -35,7 +36,8 @@ export async function listOpenJobs(): Promise<Job[]> {
   const [rows] = await getPool().query(
     "SELECT * FROM job_openings WHERE is_open = 1 AND (deadline IS NULL OR deadline >= CURDATE()) ORDER BY created_at DESC, id DESC"
   );
-  return (rows as Record<string, unknown>[]).map(toJob);
+  // the website shows plain hyphens: long dashes and "--" typed in the CRM become "-" (lib/dashes)
+  return (rows as Record<string, unknown>[]).map((r) => plainDashesDeep(toJob(r), new Set(["deadline", "createdAt"])));
 }
 
 /** Every job, for the CRM */

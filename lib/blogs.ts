@@ -1,5 +1,6 @@
 import { getPool } from "@/lib/db";
 import type { BlogPost } from "@/data/blogs";
+import { plainDashesDeep } from "@/lib/dashes";
 
 export type { BlogPost };
 
@@ -138,7 +139,14 @@ export function blogDateTime(d: Date): string {
   return `${day} · ${time}`;
 }
 
+/* the website shows plain hyphens; long dashes and "--" typed in the CRM become "-" (lib/dashes) */
+const KEEP_AS_TYPED = new Set(["slug", "img", "src", "url", "href", "date", "publishedAt"]);
+
 export function rowToBlog(r: BlogDbRow): BlogPost {
+  return plainDashesDeep(blogFromRow(r), KEEP_AS_TYPED);
+}
+
+function blogFromRow(r: BlogDbRow): BlogPost {
   const d = publishedOf(r);
 
   return {

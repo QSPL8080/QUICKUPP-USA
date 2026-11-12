@@ -348,7 +348,7 @@ export const CASE_STUDY_DOCS: Record<string, CsDoc> = {
       },
       {
         "type": "p",
-        "text": "Data sources: Google Maps grid scans (133 points, 6-mile radius, 13 keywords), monthly organic rank tracking, and Google Business Profile insights. Map results compare March 13 and July 5, 2026; organic results compare November 2025 and January 2026; profile activity covers August 11 – October 9, 2026."
+        "text": "Data sources: Google Maps grid scans (133 points, 6-mile radius, 13 keywords), monthly organic rank tracking, and Google Business Profile insights. Map results compare March 13 and July 5, 2026; organic results compare November 2025 and January 2026; profile activity covers August 11 - October 9, 2026."
       }
     ]
   },
@@ -373,7 +373,7 @@ export const CASE_STUDY_DOCS: Record<string, CsDoc> = {
     "blocks": [
       {
         "type": "kicker",
-        "text": "HEADLINE RESULTS · AUG 11 – OCT 9, 2026"
+        "text": "HEADLINE RESULTS · AUG 11 - OCT 9, 2026"
       },
       {
         "type": "stats",
@@ -474,7 +474,7 @@ export const CASE_STUDY_DOCS: Record<string, CsDoc> = {
         "type": "table",
         "headers": [
           "Metric",
-          "Aug 11 – Oct 9, 2026",
+          "Aug 11 - Oct 9, 2026",
           "vs. same period 2025"
         ],
         "rows": [
@@ -814,7 +814,7 @@ export const CASE_STUDY_DOCS: Record<string, CsDoc> = {
       },
       {
         "type": "caption",
-        "text": "August 11 – October 9, 2026. Location totals exclude a small number of calls and ad conversions not tied to a single location."
+        "text": "August 11 - October 9, 2026. Location totals exclude a small number of calls and ad conversions not tied to a single location."
       },
       {
         "type": "kicker",
@@ -882,7 +882,7 @@ export const CASE_STUDY_DOCS: Record<string, CsDoc> = {
       },
       {
         "type": "caption",
-        "text": "Google Analytics, August 11 – October 9, 2026. Visitor numbers were flat year on year while engaged sessions nearly tripled."
+        "text": "Google Analytics, August 11 - October 9, 2026. Visitor numbers were flat year on year while engaged sessions nearly tripled."
       },
       {
         "type": "kicker",
@@ -1089,7 +1089,7 @@ export const CASE_STUDY_DOCS: Record<string, CsDoc> = {
       },
       {
         "type": "caption",
-        "text": "Call tracking and Google Search Console, August 11 – October 9, 2026. Calls came from across the US and Canada, reflecting nationwide shipping demand."
+        "text": "Call tracking and Google Search Console, August 11 - October 9, 2026. Calls came from across the US and Canada, reflecting nationwide shipping demand."
       },
       {
         "type": "kicker",
@@ -1132,7 +1132,7 @@ export const CASE_STUDY_DOCS: Record<string, CsDoc> = {
     "blocks": [
       {
         "type": "kicker",
-        "text": "HEADLINE RESULTS · AUG 11 – OCT 9, 2026"
+        "text": "HEADLINE RESULTS · AUG 11 - OCT 9, 2026"
       },
       {
         "type": "stats",
@@ -1311,7 +1311,7 @@ export const CASE_STUDY_DOCS: Record<string, CsDoc> = {
       },
       {
         "type": "caption",
-        "text": "Google Business Profile insights, August 11 – October 9, 2026."
+        "text": "Google Business Profile insights, August 11 - October 9, 2026."
       },
       {
         "type": "kicker",
@@ -1353,7 +1353,7 @@ export const CASE_STUDY_DOCS: Record<string, CsDoc> = {
       },
       {
         "type": "caption",
-        "text": "Google Search Console and Google Analytics, August 11 – October 9, 2026; rankings from monthly rank tracking."
+        "text": "Google Search Console and Google Analytics, August 11 - October 9, 2026; rankings from monthly rank tracking."
       },
       {
         "type": "kicker",
@@ -1396,7 +1396,7 @@ export const CASE_STUDY_DOCS: Record<string, CsDoc> = {
     "blocks": [
       {
         "type": "kicker",
-        "text": "HEADLINE RESULTS · AUG 11 – OCT 9, 2026"
+        "text": "HEADLINE RESULTS · AUG 11 - OCT 9, 2026"
       },
       {
         "type": "stats",
@@ -1573,7 +1573,7 @@ export const CASE_STUDY_DOCS: Record<string, CsDoc> = {
       },
       {
         "type": "caption",
-        "text": "August 11 – October 9, 2026. Location totals exclude a small number of calls not tied to a single location."
+        "text": "August 11 - October 9, 2026. Location totals exclude a small number of calls not tied to a single location."
       },
       {
         "type": "kicker",
@@ -1684,7 +1684,7 @@ export const CASE_STUDY_DOCS: Record<string, CsDoc> = {
     "blocks": [
       {
         "type": "kicker",
-        "text": "HEADLINE RESULTS · AUG 11 – OCT 9, 2026"
+        "text": "HEADLINE RESULTS · AUG 11 - OCT 9, 2026"
       },
       {
         "type": "stats",
@@ -2082,7 +2082,7 @@ export const CASE_STUDY_DOCS: Record<string, CsDoc> = {
       },
       {
         "type": "caption",
-        "text": "Google Search Console, Google Analytics 4 and Google Business Profile insights, August 11 – October 9, 2026."
+        "text": "Google Search Console, Google Analytics 4 and Google Business Profile insights, August 11 - October 9, 2026."
       },
       {
         "type": "kicker",
@@ -2338,7 +2338,7 @@ export const CASE_STUDY_DOCS: Record<string, CsDoc> = {
       },
       {
         "type": "caption",
-        "text": "Call tracking, Google Business Profile insights and Google Analytics 4, August 11 – October 9, 2026."
+        "text": "Call tracking, Google Business Profile insights and Google Analytics 4, August 11 - October 9, 2026."
       },
       {
         "type": "kicker",
@@ -2581,7 +2581,7 @@ export const CASE_STUDY_DOCS: Record<string, CsDoc> = {
       },
       {
         "type": "caption",
-        "text": "Google Search Console and Google Analytics 4, August 11 – October 9, 2026. 505 of 647 visitors came from Google organic search."
+        "text": "Google Search Console and Google Analytics 4, August 11 - October 9, 2026. 505 of 647 visitors came from Google organic search."
       },
       {
         "type": "kicker",
@@ -2806,7 +2806,7 @@ export const CASE_STUDY_DOCS: Record<string, CsDoc> = {
     "blocks": [
       {
         "type": "kicker",
-        "text": "HEADLINE RESULTS · AUG 11 – OCT 9, 2026"
+        "text": "HEADLINE RESULTS · AUG 11 - OCT 9, 2026"
       },
       {
         "type": "stats",
@@ -2986,7 +2986,7 @@ export const CASE_STUDY_DOCS: Record<string, CsDoc> = {
             "Amarillo",
             "557",
             "94.6%",
-            "—",
+            "-",
             "239",
             "$26.82"
           ]
@@ -2995,7 +2995,7 @@ export const CASE_STUDY_DOCS: Record<string, CsDoc> = {
       },
       {
         "type": "caption",
-        "text": "August 11 – October 9, 2026. Location totals exclude a small number of calls not tied to a single location."
+        "text": "August 11 - October 9, 2026. Location totals exclude a small number of calls not tied to a single location."
       },
       {
         "type": "kicker",
@@ -3099,7 +3099,7 @@ export const CASE_STUDY_DOCS: Record<string, CsDoc> = {
       },
       {
         "type": "caption",
-        "text": "Google Ads, Search Console, Analytics and Business Profile insights, August 11 – October 9, 2026."
+        "text": "Google Ads, Search Console, Analytics and Business Profile insights, August 11 - October 9, 2026."
       },
       {
         "type": "kicker",
@@ -3305,7 +3305,7 @@ export const CASE_STUDY_DOCS: Record<string, CsDoc> = {
     "blocks": [
       {
         "type": "kicker",
-        "text": "HEADLINE RESULTS · AUG 11 – OCT 9, 2026"
+        "text": "HEADLINE RESULTS · AUG 11 - OCT 9, 2026"
       },
       {
         "type": "stats",
@@ -3530,7 +3530,7 @@ export const CASE_STUDY_DOCS: Record<string, CsDoc> = {
       },
       {
         "type": "caption",
-        "text": "August 11 – October 9, 2026. Location totals exclude a small number of calls not tied to a single location."
+        "text": "August 11 - October 9, 2026. Location totals exclude a small number of calls not tied to a single location."
       },
       {
         "type": "kicker",
@@ -3564,7 +3564,7 @@ export const CASE_STUDY_DOCS: Record<string, CsDoc> = {
       },
       {
         "type": "caption",
-        "text": "Google Ads, Search Console and Analytics, August 11 – October 9, 2026. The Business Profiles also generated 1,201 call clicks and 1,067 direction requests."
+        "text": "Google Ads, Search Console and Analytics, August 11 - October 9, 2026. The Business Profiles also generated 1,201 call clicks and 1,067 direction requests."
       },
       {
         "type": "kicker",
@@ -3595,7 +3595,7 @@ export const CASE_STUDY_DOCS: Record<string, CsDoc> = {
         "Smoke It Up (smokeitup.co)",
         "Angleton, TX · Cypress, TX",
         "Local SEO, GBP management, content",
-        "Nov 2025 – present"
+        "Nov 2025 - present"
       ]
     },
     "blocks": [
@@ -4198,7 +4198,7 @@ export const CASE_STUDY_DOCS: Record<string, CsDoc> = {
       },
       {
         "type": "caption",
-        "text": "Call tracking, Google Ads and Search Console, August 11 – October 9, 2026. Google Ads spend: $11,857."
+        "text": "Call tracking, Google Ads and Search Console, August 11 - October 9, 2026. Google Ads spend: $11,857."
       },
       {
         "type": "kicker",

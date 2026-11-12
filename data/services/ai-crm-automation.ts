@@ -104,11 +104,11 @@ const data: ServicePageData = {
       title: "Benefits of AI-Powered CRM Automation",
       tagline: "Marketing. AI. Technology. Built for Growth.",
       bullets: [
-      "Improve Sales Productivity — Reduce the time sales representatives spend updating records and managing routine administrative tasks.",
-      "Reduce Missed Follow-Ups — Use structured reminders and automated task creation to help teams maintain consistent communication.",
-      "Improve CRM Data Quality — Standardize record updates, apply validation rules, and reduce unnecessary manual entry.",
-      "Strengthen Pipeline Visibility — Make it easier to track lead progress, pending activities, and opportunities that require attention.",
-      "Support More Personalized Communication — Use relevant customer context to assist with segmentation and follow-up preparation while keeping appropriate human oversight."
+      "Improve Sales Productivity - Reduce the time sales representatives spend updating records and managing routine administrative tasks.",
+      "Reduce Missed Follow-Ups - Use structured reminders and automated task creation to help teams maintain consistent communication.",
+      "Improve CRM Data Quality - Standardize record updates, apply validation rules, and reduce unnecessary manual entry.",
+      "Strengthen Pipeline Visibility - Make it easier to track lead progress, pending activities, and opportunities that require attention.",
+      "Support More Personalized Communication - Use relevant customer context to assist with segmentation and follow-up preparation while keeping appropriate human oversight."
 ],
       desc: "We focus on solving real business challenges through reliable, enterprise-grade AI systems and structured automation.",
     },

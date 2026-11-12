@@ -471,7 +471,7 @@ export default function ContactView() {
                 Your Trusted Digital Growth &amp; Technology Partner
               </span>
               <h1 className="ct-h1"><Lines>
-                Contact Quickupp Softech – <span className="qs-gradient-text">Let&apos;s Grow Your Business</span>
+                Contact Quickupp Softech - <span className="qs-gradient-text">Let&apos;s Grow Your Business</span>
               </Lines></h1>
               <div className="ct-stage-cols">
                 <p className="ct-lead">

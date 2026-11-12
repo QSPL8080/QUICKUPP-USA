@@ -118,12 +118,12 @@ const data: ServicePageData = {
       title: "Benefits of Custom AI Solutions",
       tagline: "Marketing. AI. Technology. Built for Growth.",
       bullets: [
-      "Designed for Your Business — Develop functionality around your workflows, requirements, and business objectives rather than forcing your processes to fit a generic solution.",
-      "Improve Operational Efficiency — Identify opportunities to automate repetitive activities, streamline information processing, and support employees with AI-assisted tools.",
-      "Integrate with Existing Systems — Connect AI applications to supported business software, databases, and internal information sources.",
-      "Support Better Access to Information — Help teams retrieve relevant knowledge, summarize documents, and work with business information more efficiently.",
-      "Build for Future Growth — Design solutions that can be expanded as your business requirements, data sources, and technology infrastructure evolve.",
-      "Maintain Appropriate Oversight — Incorporate validation, permissions, monitoring, and human review according to the risks and requirements of each use case."
+      "Designed for Your Business - Develop functionality around your workflows, requirements, and business objectives rather than forcing your processes to fit a generic solution.",
+      "Improve Operational Efficiency - Identify opportunities to automate repetitive activities, streamline information processing, and support employees with AI-assisted tools.",
+      "Integrate with Existing Systems - Connect AI applications to supported business software, databases, and internal information sources.",
+      "Support Better Access to Information - Help teams retrieve relevant knowledge, summarize documents, and work with business information more efficiently.",
+      "Build for Future Growth - Design solutions that can be expanded as your business requirements, data sources, and technology infrastructure evolve.",
+      "Maintain Appropriate Oversight - Incorporate validation, permissions, monitoring, and human review according to the risks and requirements of each use case."
 ],
       desc: "We focus on solving real business challenges through reliable, enterprise-grade AI systems and structured automation.",
     },

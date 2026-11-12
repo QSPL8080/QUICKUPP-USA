@@ -103,11 +103,11 @@ const data: ServicePageData = {
       title: "Benefits of AI Lead Generation and Qualification",
       tagline: "Marketing. AI. Technology. Built for Growth.",
       bullets: [
-      "Better Lead Organization — Centralize inquiries from supported sources and categorize them using consistent criteria.",
-      "More Focused Sales Activities — Help representatives prioritize leads that appear to match your business requirements.",
-      "Faster Lead Handling — Automate routing and task creation to reduce delays between inquiry submission and sales follow-up.",
-      "Reduced Administrative Work — Minimize repetitive activities associated with data entry, lead categorization, and record updates.",
-      "More Measurable Lead Management — Track lead sources, qualification stages, routing outcomes, and follow-up activities through connected systems."
+      "Better Lead Organization - Centralize inquiries from supported sources and categorize them using consistent criteria.",
+      "More Focused Sales Activities - Help representatives prioritize leads that appear to match your business requirements.",
+      "Faster Lead Handling - Automate routing and task creation to reduce delays between inquiry submission and sales follow-up.",
+      "Reduced Administrative Work - Minimize repetitive activities associated with data entry, lead categorization, and record updates.",
+      "More Measurable Lead Management - Track lead sources, qualification stages, routing outcomes, and follow-up activities through connected systems."
 ],
       desc: "We focus on solving real business challenges through reliable, enterprise-grade AI systems and structured automation.",
     },

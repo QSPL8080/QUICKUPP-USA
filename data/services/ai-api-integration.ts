@@ -108,11 +108,11 @@ const data: ServicePageData = {
       title: "Benefits of AI API Integration",
       tagline: "Marketing. AI. Technology. Built for Growth.",
       bullets: [
-      "Extend Existing Software Capabilities — Add AI-powered functionality to your current applications using suitable integration methods.",
-      "Connect Disconnected Systems — Enable information exchange between supported applications and reduce repetitive manual transfers.",
-      "Improve Workflow Efficiency — Use API-driven automation to move information between systems and trigger relevant business actions.",
-      "Support Scalable Development — Build modular integrations that can be maintained and expanded as your business requirements evolve.",
-      "Maintain Better Technical Control — Use defined access permissions, monitoring, validation, and error handling to improve integration reliability."
+      "Extend Existing Software Capabilities - Add AI-powered functionality to your current applications using suitable integration methods.",
+      "Connect Disconnected Systems - Enable information exchange between supported applications and reduce repetitive manual transfers.",
+      "Improve Workflow Efficiency - Use API-driven automation to move information between systems and trigger relevant business actions.",
+      "Support Scalable Development - Build modular integrations that can be maintained and expanded as your business requirements evolve.",
+      "Maintain Better Technical Control - Use defined access permissions, monitoring, validation, and error handling to improve integration reliability."
 ],
       desc: "We focus on solving real business challenges through reliable, enterprise-grade AI systems and structured automation.",
     },

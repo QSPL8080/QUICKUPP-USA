@@ -370,7 +370,7 @@ export const COOKIES: LegalDoc = {
           p: "Registered/Mailing Address: 167 Princeton Street, Bridgeport, Connecticut 06605, USA.",
         },
         {
-          p: 'For privacy-related requests, please use the subject line "Privacy Request – Cookie Policy".',
+          p: 'For privacy-related requests, please use the subject line "Privacy Request - Cookie Policy".',
         },
       ],
     },

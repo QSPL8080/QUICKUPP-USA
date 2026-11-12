@@ -5,7 +5,7 @@ import { listOpenJobs } from "@/lib/jobsData";
 import type { Job } from "@/lib/jobs";
 
 export const metadata: Metadata = {
-  title: "Careers at Quickupp Softech – Build Your Future With Us",
+  title: "Careers at Quickupp Softech - Build Your Future With Us",
   description:
     "We're always looking for talented individuals who are passionate about their work, eager to learn, and ready to make an impact. Explore career opportunities at Quickupp Softech.",
   alternates: {

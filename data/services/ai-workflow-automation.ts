@@ -102,11 +102,11 @@ const data: ServicePageData = {
       title: "Benefits of AI Workflow Automation",
       tagline: "Marketing. AI. Technology. Built for Growth.",
       bullets: [
-      "Reduce Manual Work — Automate repetitive steps that otherwise require employees to copy information, update records, or coordinate routine activities.",
-      "Improve Process Consistency — Apply standardized rules and workflows to recurring business operations.",
-      "Minimize Workflow Delays — Move information between teams and systems more efficiently through automated routing and notifications.",
-      "Improve Operational Visibility — Use workflow logs and monitoring to identify bottlenecks, exceptions, and process improvement opportunities.",
-      "Scale Business Processes — Expand automation to additional workflows as business needs evolve."
+      "Reduce Manual Work - Automate repetitive steps that otherwise require employees to copy information, update records, or coordinate routine activities.",
+      "Improve Process Consistency - Apply standardized rules and workflows to recurring business operations.",
+      "Minimize Workflow Delays - Move information between teams and systems more efficiently through automated routing and notifications.",
+      "Improve Operational Visibility - Use workflow logs and monitoring to identify bottlenecks, exceptions, and process improvement opportunities.",
+      "Scale Business Processes - Expand automation to additional workflows as business needs evolve."
 ],
       desc: "We focus on solving real business challenges through reliable, enterprise-grade AI systems and structured automation.",
     },

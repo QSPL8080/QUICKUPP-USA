@@ -102,11 +102,11 @@ const data: ServicePageData = {
       title: "Benefits of AI Agent Development",
       tagline: "Marketing. AI. Technology. Built for Growth.",
       bullets: [
-      "Automate Multi-Step Tasks — Coordinate related activities across multiple tools instead of automating each action independently.",
-      "Improve Team Productivity — Help employees reduce time spent on information gathering, repetitive tasks, and routine coordination.",
-      "Connect Business Systems — Enable agents to interact with supported applications through APIs and approved tools.",
-      "Maintain Human Oversight — Introduce approval steps and permission controls for important, sensitive, or irreversible actions.",
-      "Support Scalable Operations — Expand selected AI-assisted workflows as your business processes and operational requirements evolve."
+      "Automate Multi-Step Tasks - Coordinate related activities across multiple tools instead of automating each action independently.",
+      "Improve Team Productivity - Help employees reduce time spent on information gathering, repetitive tasks, and routine coordination.",
+      "Connect Business Systems - Enable agents to interact with supported applications through APIs and approved tools.",
+      "Maintain Human Oversight - Introduce approval steps and permission controls for important, sensitive, or irreversible actions.",
+      "Support Scalable Operations - Expand selected AI-assisted workflows as your business processes and operational requirements evolve."
 ],
       desc: "We focus on solving real business challenges through reliable, enterprise-grade AI systems and structured automation.",
     },
