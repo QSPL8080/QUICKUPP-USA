@@ -9,6 +9,7 @@ import { PAYMENT_STATUS_LABEL, money } from "@/lib/crm/format";
 import { BulkBar, SelectBox, useSelection } from "@/components/crm/Selection";
 import { PageHead, Pager } from "@/components/crm/ListTools";
 import { SERVICES_DATA } from "@/components/PayNowModal";
+import CategoryMulti from "@/components/crm/CategoryMulti";
 import { SOURCE_LABEL, isEnquirySource } from "@/lib/crm/leadOptions";
 import ActivityTimeline, { usePaymentActivity } from "@/components/crm/ActivityTimeline";
 import { SITE_URL, payLinkUrl } from "@/lib/siteUrl";
@@ -159,6 +160,8 @@ export const CRM_INDUSTRIES = [
   "Automotive",
   "General / Other",
 ] as const;
+
+const CATEGORY_REQUIRED = "Please select at least one category.";
 
 export const PAYMENT_LINK_SERVICES = SERVICES_DATA.map((s) => s.service);
 export const PAYMENT_LINK_QUANTITIES = SERVICES_DATA[0].categories;
@@ -450,6 +453,11 @@ export default function PaymentsView({
     const matchedService = SERVICES_DATA.find((s) => s.service === editLinkForm.service);
     const hasCategories = (matchedService?.categories?.length || 0) > 0;
     const finalCategory = hasCategories ? editLinkForm.category : "Not Applicable";
+    if (hasCategories && !finalCategory.trim()) {
+      setBusy(false);
+      setError(CATEGORY_REQUIRED);
+      return;
+    }
 
     const res = await fetch("/api/crm/payment-links", {
       method: "PATCH",
@@ -560,6 +568,11 @@ export default function PaymentsView({
     const matchedService = SERVICES_DATA.find((s) => s.service === linkForm.service);
     const hasCategories = (matchedService?.categories?.length || 0) > 0;
     const finalCategory = hasCategories ? linkForm.category : "Not Applicable";
+    if (hasCategories && !finalCategory.trim()) {
+      setBusy(false);
+      setError(CATEGORY_REQUIRED);
+      return;
+    }
 
     const res = await fetch("/api/crm/payment-links", {
       method: "POST",
@@ -1799,21 +1812,18 @@ export default function PaymentsView({
                     </select>
                   </label>
 
-                  <label className="crm-field">
+                  <div className="crm-field">
                     <span className="crm-label">Category / Scope *</span>
                     {(() => {
                       const cats = SERVICES_DATA.find((s) => s.service === linkForm.service)?.categories || [];
                       if (cats.length > 0) {
                         return (
-                          <select
-                            className="crm-input crm-select"
+                          <CategoryMulti
+                            options={cats}
                             value={linkForm.category}
-                            onChange={(e) => setLinkForm((f) => ({ ...f, category: e.target.value, quantity: e.target.value }))}
-                          >
-                            {cats.map((cat) => (
-                              <option key={cat} value={cat}>{cat}</option>
-                            ))}
-                          </select>
+                            invalid={error === CATEGORY_REQUIRED}
+                            onChange={(v) => setLinkForm((f) => ({ ...f, category: v, quantity: v }))}
+                          />
                         );
                       }
                       return (
@@ -1833,7 +1843,7 @@ export default function PaymentsView({
                         />
                       );
                     })()}
-                  </label>
+                  </div>
                 </div>
 
                 {/* Row 3: Industry, Amount, Payment Option */}
@@ -2189,21 +2199,18 @@ export default function PaymentsView({
                   ))}
                 </select>
               </label>
-              <label className="crm-field">
+              <div className="crm-field">
                 <span className="crm-label">Category / Scope *</span>
                 {(() => {
                   const cats = SERVICES_DATA.find((s) => s.service === editLinkForm.service)?.categories || [];
                   if (cats.length > 0) {
                     return (
-                      <select
-                        className="crm-input crm-select"
+                      <CategoryMulti
+                        options={cats}
                         value={editLinkForm.category}
-                        onChange={(e) => setEditLinkForm((f) => ({ ...f, category: e.target.value, quantity: e.target.value }))}
-                      >
-                        {cats.map((cat) => (
-                          <option key={cat} value={cat}>{cat}</option>
-                        ))}
-                      </select>
+                        invalid={error === CATEGORY_REQUIRED}
+                        onChange={(v) => setEditLinkForm((f) => ({ ...f, category: v, quantity: v }))}
+                      />
                     );
                   }
                   return (
@@ -2223,7 +2230,7 @@ export default function PaymentsView({
                     />
                   );
                 })()}
-              </label>
+              </div>
 
               {/* Row 3: Industry, Amount, Payment Option */}
               <label className="crm-field">
@@ -2463,21 +2470,17 @@ export default function PaymentsView({
                 {err("service")}
               </label>
 
-              <label className="crm-field">
+              <div className="crm-field">
                 <span className="crm-label">Category / Scope</span>
                 {(() => {
                   const match = SERVICES_DATA.find((s) => s.service === form.service);
                   if (match && match.categories.length > 0) {
                     return (
-                      <select
-                        className="crm-input crm-select"
+                      <CategoryMulti
+                        options={match.categories}
                         value={form.category}
-                        onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
-                      >
-                        {match.categories.map((cat) => (
-                          <option key={cat} value={cat}>{cat}</option>
-                        ))}
-                      </select>
+                        onChange={(v) => setForm((prev) => ({ ...prev, category: v }))}
+                      />
                     );
                   }
                   return (
@@ -2489,7 +2492,7 @@ export default function PaymentsView({
                     />
                   );
                 })()}
-              </label>
+              </div>
 
               <label className="crm-field">
                 <span className="crm-label">Amount paid *</span>

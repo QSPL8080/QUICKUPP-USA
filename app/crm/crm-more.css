@@ -1752,3 +1752,122 @@ a.crm-pdash-chip:hover {
   filter: brightness(1.1);
 }
 
+
+/* ---- Category / Scope multi-select (components/crm/CategoryMulti.tsx) ----- */
+.crm-multi {
+  width: 100%;
+}
+.crm-multi-anchor {
+  position: relative;
+}
+.crm-root .crm-multi-trigger {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: inherit;
+}
+.crm-root .crm-multi-trigger.is-empty {
+  color: var(--crm-muted);
+}
+.crm-root .crm-multi-trigger.is-invalid {
+  border-color: #ef4444 !important;
+}
+.crm-multi-panel {
+  position: absolute;
+  z-index: 60;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  min-width: 240px;
+  background: #fff;
+  border: 1px solid var(--crm-line);
+  border-radius: 10px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.16);
+  overflow: hidden;
+}
+.crm-multi-bulk {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--crm-line);
+  background: #f8fafc;
+  font-size: 12px;
+}
+.crm-multi-bulk button {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--crm-accent);
+  cursor: pointer;
+}
+.crm-multi-bulk span {
+  margin-left: auto;
+  color: var(--crm-muted);
+}
+.crm-multi-panel ul {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  max-height: 240px;
+  overflow-y: auto;
+}
+.crm-multi-panel label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 12px;
+  font-size: 13px;
+  color: var(--crm-text);
+  cursor: pointer;
+}
+.crm-multi-panel label:hover {
+  background: #f1f5f9;
+}
+.crm-multi-panel label.is-on {
+  color: var(--crm-ink);
+  font-weight: 600;
+}
+.crm-multi-panel input {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  accent-color: var(--crm-accent);
+  flex: none;
+}
+.crm-multi-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.crm-multi-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 4px 3px 9px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3730a3;
+  font-size: 12px;
+  font-weight: 500;
+}
+.crm-multi-chip button {
+  border: 0;
+  background: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  line-height: 1;
+  font-size: 14px;
+  color: inherit;
+  cursor: pointer;
+}
+.crm-multi-chip button:hover {
+  background: rgba(55, 48, 163, 0.12);
+}
