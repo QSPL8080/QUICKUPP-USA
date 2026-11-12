@@ -205,8 +205,7 @@ interface IndustryMedia {
   archAlt?: string;
   /** alt text for the photo beside the first list section (default: the industry name) */
   storyAlt?: string;
-  /** the closing section's second photo (shown with ecosystemBg, one above the other) and the alt text */
-  closeImage2?: string;
+  /** alt text for the closing section's photo (ecosystemBg); without it the photo is decorative */
   closeAlt?: string;
   circle: string;
   video: string;
@@ -235,14 +234,14 @@ const industryImages: Record<string, IndustryMedia> = {
     aiBg: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1600&q=80",
   },
   Education: {
-    closeImage2: "/images/industries/ready-to-grow-your-student-enrolments-education-2.jpg",
     closeAlt: "Ready to Grow Your Student Enrolments? - Education",
+    archAlt: "Why Choose Quickupp Softech? - Education Industry",
     hero: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1600&q=80",
     story: "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1000&q=80",
-    arch: "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=800&q=80",
+    arch: "/images/industries/why-choose-quickupp-softech-education-industry.jpg",
     circle: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80",
     video: "/video/Portfolio 2.mp4",
-    ecosystemBg: "/images/industries/ready-to-grow-your-student-enrolments-education-1.jpg",
+    ecosystemBg: "/images/industries/ready-to-grow-your-student-enrolments-education.jpg",
     channelsBg: "https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&w=1600&q=80",
     pipelineBg: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80",
     processBg: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1600&q=80",
@@ -816,9 +815,8 @@ export default function IndustryDetailPage({ data }: { data: ServicePageData }) 
                   </div>
                 )}
               </div>
-              <div className={`inx-close-media${images.closeImage2 ? " is-pair" : ""}`} aria-hidden={images.closeAlt ? undefined : true}>
+              <div className="inx-close-media" aria-hidden={images.closeAlt ? undefined : true}>
                 <img src={images.ecosystemBg} alt={images.closeAlt || ""} loading="lazy" />
-                {images.closeImage2 && <img src={images.closeImage2} alt={images.closeAlt || ""} loading="lazy" />}
               </div>
             </div>
           </div>
