@@ -93,7 +93,7 @@ export default function ProfileForm({ name, username, email, isSuperAdmin }: Pro
   return (
     <div className="crm-grid-2 crm-profile">
       {/* Profile Details Card */}
-      <form className="crm-card" onSubmit={saveProfile} noValidate>
+      <form className="crm-card" onSubmit={saveProfile} noValidate data-own-profile>
         <div className="crm-card-head">
           <h2 className="crm-card-title">Profile details</h2>
         </div>
@@ -133,7 +133,7 @@ export default function ProfileForm({ name, username, email, isSuperAdmin }: Pro
       </form>
 
       {/* Change Password Card */}
-      <form className="crm-card" onSubmit={savePassword} noValidate>
+      <form className="crm-card" onSubmit={savePassword} noValidate data-own-profile>
         <div className="crm-card-head">
           <h2 className="crm-card-title">Change password</h2>
         </div>

@@ -806,7 +806,7 @@ export default function LeadsView({
 
       {rows.length ? (
         <div className="crm-table-wrap">
-          <table className="crm-table crm-stack crm-selectable">
+          <table className="crm-table crm-stack crm-selectable crm-leads-table">
             <thead>
               <tr>
                 <th className="crm-col-check">
@@ -814,8 +814,8 @@ export default function LeadsView({
                 </th>
                 <th className="crm-col-num">Sr. No</th>
                 <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
+                <th className="crm-col-email">Email</th>
+                <th className="crm-col-phone">Phone</th>
                 <th>Source</th>
                 <th>Assigned To</th>
                 <th>Received</th>
@@ -836,11 +836,16 @@ export default function LeadsView({
                   <td data-label="Name" className="crm-cell-main">
                     <span className="crm-strong">{r.name}</span>
                     {r.company && <span className="crm-cell-sub">{r.company}</span>}
+                    {/* shown here when the Email and Phone columns are folded away (narrower screens) */}
+                    <span className="crm-lead-contact-inline">
+                      {r.email && <span className="crm-cell-sub">{r.email}</span>}
+                      {r.phone && <span className="crm-cell-sub">{r.phone}</span>}
+                    </span>
                   </td>
-                  <td data-label="Email" className="crm-nowrap">
+                  <td data-label="Email" className="crm-nowrap crm-col-email">
                     {r.email || <span className="crm-muted">—</span>}
                   </td>
-                  <td data-label="Phone" className="crm-nowrap">
+                  <td data-label="Phone" className="crm-nowrap crm-col-phone">
                     {r.phone || <span className="crm-muted">—</span>}
                   </td>
                   <td data-label="Source">

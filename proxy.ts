@@ -4,8 +4,9 @@ import { getPool } from "@/lib/db";
 
 /*
  * View-only CRM accounts (the Viewer role): every request that would change
- * something in the CRM, and the CSV exports, are refused here, in one place,
- * whatever screen or tool sends them. A viewer may still sign in and out, keep
+ * something in the CRM, the CSV exports and file downloads (lead attachments,
+ * resumes, payment receipts) are refused here, in one place, whatever screen
+ * or tool sends them. A viewer may still sign in and out, keep
  * the session alive, mark their own notifications read, and change their own
  * profile and password.
  */
@@ -17,7 +18,8 @@ const READS = new Set(["GET", "HEAD", "OPTIONS"]);
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const isExport = /\/export\/?$/.test(path);
-  if (READS.has(request.method) && !isExport) return NextResponse.next();
+  const isDownload = (path === "/api/crm/enquiries/attachments" && request.nextUrl.searchParams.has("fileId")) || /^\/api\/crm\/applications\/\d+\/resume\/?$/.test(path) || path === "/api/payments/receipt";
+  if (READS.has(request.method) && !isExport && !isDownload) return NextResponse.next();
   if (ALLOWED_FOR_VIEWERS.some((p) => path === p || path.startsWith(`${p}/`))) return NextResponse.next();
 
   const token = request.cookies.get(SESSION_COOKIE)?.value || "";
@@ -32,7 +34,7 @@ export async function proxy(request: NextRequest) {
     const role = (rows as { role: string }[])[0]?.role;
     if (role === "viewer") {
       return NextResponse.json(
-        { ok: false, viewOnly: true, error: isExport ? "Your account is view-only: exports aren't available." : "Your account is view-only: you can look at everything but can't make changes." },
+        { ok: false, viewOnly: true, error: isExport || isDownload ? "Your account is view-only: downloads and exports aren't available." : "Your account is view-only: you can look at everything but can't make changes." },
         { status: 403 }
       );
     }
@@ -45,5 +47,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/api/crm/:path*"],
+  matcher: ["/api/crm/:path*", "/api/payments/receipt"],
 };

@@ -4801,3 +4801,88 @@ a.crm-dash-legend-row:hover {
 .crm-viewonly-fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 .crm-viewonly a[href*="/crm/meetings?arrange=1"] { display: none !important; }
 .crm-viewonly select:disabled { cursor: default; opacity: 0.9; }
+
+/* ---- left menu: hide / show on laptops and desktops ---- */
+.crm-side-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--crm-line);
+  background: #fff;
+  color: #475569;
+  cursor: pointer;
+  flex: none;
+}
+.crm-side-toggle:hover { background: #f8fafc; color: #0f172a; }
+
+@media (min-width: 901px) {
+  .crm-root.crm-side-closed:not(.crm-login) {
+    grid-template-columns: minmax(0, 1fr);
+    background: var(--crm-bg);
+  }
+  .crm-root.crm-side-closed .crm-side { display: none; }
+}
+
+/* phones and tablets: the menu button is in the dark top bar; the open menu covers everything, the CRM bar included */
+@media (max-width: 900px) {
+  .crm-side-toggle { display: none; }
+  .crm-root .crm-side { z-index: 120; }
+  .crm-root .crm-scrim { z-index: 110; }
+}
+
+/* ---- tables fit their space: no sideways scrolling on any screen ---- */
+@media (min-width: 701px) {
+  .crm-root .crm-table { min-width: 0; }
+  .crm-root .crm-table th { white-space: normal; }
+  .crm-root .crm-table td { overflow-wrap: break-word; }
+  .crm-root .crm-table td.crm-nowrap { white-space: normal; }
+}
+@media (min-width: 701px) {
+  .crm-root .crm-table .crm-src { white-space: normal; }
+  /* dropdowns in a row (assigned to, statuses) shrink with their column */
+  .crm-root .crm-table td select { width: 100% !important; min-width: 118px !important; max-width: 170px; }
+  .crm-root .crm-table .crm-tbl-actions { gap: 2px; }
+  .crm-root .crm-table th,
+  .crm-root .crm-table td { padding-left: 10px; padding-right: 10px; }
+}
+
+/* view-only accounts can't contact clients, join calls, download files or copy text from the CRM */
+.crm-viewonly .crm-main a.crm-head-btn[href^="mailto:"],
+.crm-viewonly .crm-main a.crm-head-btn[href^="tel:"],
+.crm-viewonly .crm-main a.crm-act[href^="mailto:"],
+.crm-viewonly .crm-main a.crm-act[href^="tel:"],
+.crm-viewonly .crm-main a[href*="wa.me/"],
+.crm-viewonly .crm-main a[href*="api.whatsapp.com"],
+.crm-viewonly .crm-main a.crm-meet-join,
+.crm-viewonly .crm-main a[href*="/api/crm/enquiries/attachments"],
+.crm-viewonly .crm-main a[href*="/resume"],
+.crm-viewonly .crm-main a[href*="/api/payments/receipt"] {
+  display: none !important;
+}
+.crm-viewonly .crm-main a[href^="mailto:"],
+.crm-viewonly .crm-main a[href^="tel:"] {
+  pointer-events: none;
+  color: inherit !important;
+  text-decoration: none !important;
+}
+.crm-viewonly .crm-main {
+  -webkit-user-select: none;
+  user-select: none;
+}
+.crm-viewonly .crm-main input,
+.crm-viewonly .crm-main textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* the enquiries list: on narrower screens the Email and Phone columns fold under the name, so the table still fits */
+.crm-table-wrap { container-type: inline-size; }
+.crm-lead-contact-inline { display: none; }
+@container (max-width: 1280px) {
+  .crm-leads-table .crm-col-email,
+  .crm-leads-table .crm-col-phone,
+  .crm-leads-table .crm-col-num { display: none !important; }
+  .crm-leads-table .crm-lead-contact-inline { display: block; }
+}
