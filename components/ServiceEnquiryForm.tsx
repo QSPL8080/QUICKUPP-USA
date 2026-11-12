@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import CountrySelect from "@/components/CountrySelect";
 import { CONTACT_BUDGETS, CONTACT_TIMELINES, INDUSTRIES, SERVICE_FORMS, type ServiceFormKey } from "@/lib/formOptions";
+import { isWebLink, LINK_ERROR, normalizeLink } from "@/lib/webLink";
 
 /*
  * Enquiry form shown on every subpage of a service, and on every industry page.
@@ -141,6 +142,16 @@ export default function ServiceEnquiryForm({ service: fixedService, industry: fi
       return;
     }
     setAgreedError(false);
+    if (formData.companyWebsite.trim() && !isWebLink(formData.companyWebsite)) {
+      setSubmitError(LINK_ERROR);
+      document.getElementById(`${idp}-website`)?.focus();
+      return;
+    }
+    if (service === "youtube" && !isWebLink(formData.youtubeLink)) {
+      setSubmitError("Please enter a valid YouTube link, e.g. youtube.com/@yourchannel.");
+      document.getElementById(`${idp}-ytlink`)?.focus();
+      return;
+    }
     setSubmitError("");
     setSubmitting(true);
     try {
@@ -152,7 +163,7 @@ export default function ServiceEnquiryForm({ service: fixedService, industry: fi
           email: formData.email,
           phone: formData.phone,
           companyName: formData.companyName,
-          companyWebsite: formData.companyWebsite,
+          companyWebsite: normalizeLink(formData.companyWebsite),
           country: formData.country,
           industry: formData.industry,
           otherIndustry: formData.otherIndustry,
@@ -164,7 +175,7 @@ export default function ServiceEnquiryForm({ service: fixedService, industry: fi
             : {}),
           budget: formData.budget,
           timeline: formData.timeline,
-          youtubeLink: formData.youtubeLink,
+          youtubeLink: normalizeLink(formData.youtubeLink),
           message: formData.message,
           agreed: formData.agreed,
           service,
@@ -310,8 +321,10 @@ export default function ServiceEnquiryForm({ service: fixedService, industry: fi
                   </label>
                   <input
                     id={`${idp}-website`}
-                    type="url"
-                    placeholder="https://example.com"
+                    type="text"
+                    inputMode="url"
+                    autoComplete="url"
+                    placeholder="www.example.com"
                     className="su-text-input"
                     value={formData.companyWebsite}
                     onChange={(e) => set({ companyWebsite: e.target.value })}
@@ -341,9 +354,10 @@ export default function ServiceEnquiryForm({ service: fixedService, industry: fi
                     </label>
                     <input
                       id={`${idp}-ytlink`}
-                      type="url"
+                      type="text"
+                      inputMode="url"
                       required
-                      placeholder="https://www.youtube.com/@yourchannel or https://youtu.be/..."
+                      placeholder="youtube.com/@yourchannel or youtu.be/..."
                       className="su-text-input"
                       value={formData.youtubeLink}
                       onChange={(e) => set({ youtubeLink: e.target.value })}

@@ -9,6 +9,7 @@ import LucideIcon, { type LucideIconName } from "@/components/LucideIcon";
 import { AI_AUTOMATION_CATEGORIES, CONTACT_BUDGETS, CONTACT_SERVICES, CONTACT_TIMELINES, INDUSTRIES as INDUSTRY_OPTIONS } from "@/lib/formOptions";
 import { SERVICES_DATA } from "@/components/PayNowModal";
 import CountrySelect from "@/components/CountrySelect";
+import { isWebLink, LINK_ERROR, normalizeLink } from "@/lib/webLink";
 import { openDynamicEmailModal } from "@/components/DynamicEmailModal";
 import "@/app/contact.css";
 import { useCalendlyReset } from "@/components/BookingSection";
@@ -168,12 +169,17 @@ function InquiryForm() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError("");
+    if (form.companyWebsite.trim() && !isWebLink(form.companyWebsite)) {
+      setErrors((x) => ({ ...x, companyWebsite: LINK_ERROR }));
+      document.getElementById("ct-companyWebsite")?.focus();
+      return;
+    }
     setSubmitting(true);
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, website: trap }),
+        body: JSON.stringify({ ...form, companyWebsite: normalizeLink(form.companyWebsite), website: trap }),
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok || !json.ok) {
@@ -253,7 +259,7 @@ function InquiryForm() {
           <input id="ct-companyName" className="ct-input" autoComplete="organization" placeholder=" " value={form.companyName} onChange={set("companyName")} />
         </Field>
         <Field id="ct-companyWebsite" label="Company Website" error={errors.companyWebsite} filled={!!form.companyWebsite}>
-          <input id="ct-companyWebsite" type="url" className="ct-input" placeholder=" " value={form.companyWebsite} onChange={set("companyWebsite")} />
+          <input id="ct-companyWebsite" type="text" inputMode="url" autoComplete="url" className="ct-input" placeholder=" " value={form.companyWebsite} onChange={set("companyWebsite")} />
         </Field>
         <Field id="ct-country" label="Country" required error={errors.country} filled={!!form.country}>
           <CountrySelect

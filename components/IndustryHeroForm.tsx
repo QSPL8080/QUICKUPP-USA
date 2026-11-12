@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import CountrySelect from "@/components/CountrySelect";
+import { isWebLink, LINK_ERROR, normalizeLink } from "@/lib/webLink";
 import { CONTACT_BUDGETS, CONTACT_TIMELINES, INDUSTRIES, SERVICE_FORMS, type ServiceFormKey } from "@/lib/formOptions";
 
 /*
@@ -94,7 +95,7 @@ export default function IndustryHeroForm({ industry }: { industry: Industry }) {
     if (s === 0) {
       if (!form.service) e.service = "Please select a service.";
       else if (isYoutube) {
-        if (!/^https?:\/\/\S+$/i.test(form.youtubeLink.trim())) e.youtubeLink = "Please enter your YouTube video or channel link.";
+        if (!isWebLink(form.youtubeLink)) e.youtubeLink = "Please enter your YouTube video or channel link.";
       } else if (options.length && !form.categories.length) e.categories = "Please select at least one category.";
     }
     if (s === 1) {
@@ -102,6 +103,7 @@ export default function IndustryHeroForm({ industry }: { industry: Industry }) {
       if (!EMAIL_RE.test(form.email.trim())) e.email = "Please enter a valid business email.";
       if (!PHONE_RE.test(form.phone.trim())) e.phone = "Please enter a valid phone number.";
       if (!form.country.trim()) e.country = "Please enter your country.";
+      if (form.companyWebsite.trim() && !isWebLink(form.companyWebsite)) e.companyWebsite = LINK_ERROR;
     }
     if (s === 2) {
       if (!form.budget) e.budget = "Please select an estimated budget.";
@@ -160,14 +162,14 @@ export default function IndustryHeroForm({ industry }: { industry: Industry }) {
           email: form.email,
           phone: form.phone,
           companyName: form.companyName,
-          companyWebsite: form.companyWebsite,
+          companyWebsite: normalizeLink(form.companyWebsite),
           country: form.country,
           industry,
           otherIndustry: "",
           ...(isYoutube ? {} : { category: form.categories.join(", "), categories: form.categories }),
           budget: form.budget,
           timeline: form.timeline,
-          youtubeLink: form.youtubeLink,
+          youtubeLink: normalizeLink(form.youtubeLink),
           message: form.message,
           agreed: form.agreed,
           service: form.service,
@@ -271,9 +273,10 @@ export default function IndustryHeroForm({ industry }: { industry: Industry }) {
                 <label className="su-field-label" htmlFor={id("yt")}>YouTube Video or Channel Link*</label>
                 <input
                   id={id("yt")}
-                  type="url"
+                  type="text"
+                  inputMode="url"
                   className="su-text-input"
-                  placeholder="https://www.youtube.com/@yourchannel"
+                  placeholder="youtube.com/@yourchannel"
                   value={form.youtubeLink}
                   onChange={(e) => set({ youtubeLink: e.target.value })}
                 />
@@ -339,7 +342,8 @@ export default function IndustryHeroForm({ industry }: { industry: Industry }) {
             </div>
             <div className="ihf-field">
               <label className="su-field-label" htmlFor={id("site")}>Company Website</label>
-              <input id={id("site")} type="url" className="su-text-input" placeholder="https://example.com" value={form.companyWebsite} onChange={(e) => set({ companyWebsite: e.target.value })} />
+              <input id={id("site")} type="text" inputMode="url" autoComplete="url" className="su-text-input" placeholder="www.example.com" value={form.companyWebsite} onChange={(e) => set({ companyWebsite: e.target.value })} />
+              {err("companyWebsite")}
             </div>
           </div>
         )}

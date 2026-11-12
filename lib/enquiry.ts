@@ -1,3 +1,4 @@
+import { isWebLink, LINK_ERROR, normalizeLink } from "@/lib/webLink";
 import { BUDGETS, CONTACT_BUDGETS, CONTACT_SERVICES, CONTACT_TIMELINES, INDUSTRIES } from "@/lib/formOptions";
 
 /*
@@ -107,7 +108,7 @@ export function validateContactEnquiry(body: Record<string, unknown>): { ok: tru
   const email = text(body.email, 190).toLowerCase();
   const phone = text(body.phone, 40);
   const companyName = text(body.companyName, 190);
-  const companyWebsite = text(body.companyWebsite, 255);
+  const companyWebsite = normalizeLink(text(body.companyWebsite, 255)).slice(0, 255);
   const country = text(body.country, 100);
   const industry = text(body.industry, 100);
   const otherIndustry = text(body.otherIndustry, 150);
@@ -123,6 +124,7 @@ export function validateContactEnquiry(body: Record<string, unknown>): { ok: tru
   if (!country) errors.country = "Please enter your country.";
   if (!(INDUSTRIES as readonly string[]).includes(industry)) errors.industry = "Please select your industry.";
   if (industry === "Other" && !otherIndustry) errors.otherIndustry = "Please specify your industry.";
+  if (companyWebsite && !isWebLink(companyWebsite)) errors.companyWebsite = LINK_ERROR;
   if (!(CONTACT_SERVICES as readonly string[]).includes(service)) errors.projectType = "Please select a service.";
   if (!(CONTACT_BUDGETS as readonly string[]).includes(budget)) errors.budget = "Please select an estimated budget.";
   if (!(CONTACT_TIMELINES as readonly string[]).includes(timeline)) errors.timeline = "Please select a project timeline.";
@@ -159,7 +161,7 @@ export function validateServiceEnquiry(
   const email = text(body.email, 190).toLowerCase();
   const phone = text(body.phone, 40);
   const companyName = text(body.companyName, 190);
-  const companyWebsite = text(body.companyWebsite, 255);
+  const companyWebsite = normalizeLink(text(body.companyWebsite, 255)).slice(0, 255);
   const country = text(body.country, 100);
   const industry = text(body.industry, 100);
   const otherIndustry = text(body.otherIndustry, 150);
@@ -207,7 +209,7 @@ export function validateServiceEnquiry(
   const category = categoryList.join(", ").slice(0, 1000);
   const budget = text(body.budget, 60);
   const timeline = text(body.timeline, 60);
-  const youtubeLink = text(body.youtubeLink || body.youtube_link || body.channelLink, 500);
+  const youtubeLink = normalizeLink(text(body.youtubeLink || body.youtube_link || body.channelLink, 500)).slice(0, 500);
   const message = text(body.message, 5000);
 
   if (!fullName) errors.fullName = "Please enter your full name.";
@@ -216,6 +218,8 @@ export function validateServiceEnquiry(
   if (!country) errors.country = "Please enter your country.";
   if (!(INDUSTRIES as readonly string[]).includes(industry)) errors.industry = "Please select your industry.";
   if (industry === "Other" && !otherIndustry) errors.otherIndustry = "Please specify your industry.";
+  if (companyWebsite && !isWebLink(companyWebsite)) errors.companyWebsite = LINK_ERROR;
+  if (youtubeLink && !isWebLink(youtubeLink)) errors.youtubeLink = "Please enter a valid YouTube link, e.g. youtube.com/@yourchannel.";
   if (options.length > 0 && !category && !errors.category) {
     errors.category = "Please select at least one category.";
   }

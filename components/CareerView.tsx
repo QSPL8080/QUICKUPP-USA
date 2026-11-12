@@ -522,7 +522,7 @@ function ApplyForm({ job, onClose }: { job: Job; onClose: () => void }) {
                 {field(
                   "profileUrl",
                   "LinkedIn / Portfolio URL",
-                  { type: "url", placeholder: "https://" },
+                  { type: "text", inputMode: "url", autoComplete: "url", placeholder: "linkedin.com/in/yourname" },
                   false,
                 )}
               </div>
