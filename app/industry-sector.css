@@ -1497,8 +1497,11 @@
 }
 
 /* ---- Closing panel ------------------------------------------------------------------------- */
+/* the closing card sits on white with the same space above it as below, so it
+   never touches the coloured booking section before it */
 .inx-close-sec {
-  padding: 0 0 var(--inx-y);
+  padding: var(--inx-y) 0;
+  background: #ffffff;
 }
 
 .inx-close {
