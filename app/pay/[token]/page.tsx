@@ -45,12 +45,54 @@ export default function PayTokenPage({ params }: { params: Promise<{ token: stri
   const [isPaid, setIsPaid] = useState(false);
 
   const [selectedType, setSelectedType] = useState<"full" | "partial">("full");
+  const [gateway, setGateway] = useState<"paypal" | "payu">("paypal");
+  const [payuLoading, setPayuLoading] = useState(false);
   const [error, setError] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
 
   const paypalContainerRef = useRef<HTMLDivElement>(null);
   const cardContainerRef = useRef<HTMLDivElement>(null);
   const paypalRenderedRef = useRef(false);
+
+  const handlePayUPayment = async () => {
+    if (!order) return;
+    setPayuLoading(true);
+    setError("");
+    try {
+      const res = await fetch("/api/payments/payu/create-payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          token: order.token,
+          paymentType: selectedType,
+          amount: payAmount,
+          totalAmount: order.totalAmount,
+          clientName: order.clientName,
+          clientEmail: order.clientEmail,
+          clientPhone: order.clientPhone,
+          service: order.service,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.error || "Failed to initiate PayU payment");
+
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = data.actionUrl;
+      for (const [k, v] of Object.entries(data.params)) {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = k;
+        input.value = String(v);
+        form.appendChild(input);
+      }
+      document.body.appendChild(form);
+      form.submit();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "PayU checkout failed");
+      setPayuLoading(false);
+    }
+  };
 
   // Fetch payment link details
   useEffect(() => {
@@ -547,27 +589,105 @@ export default function PayTokenPage({ params }: { params: Promise<{ token: stri
               </div>
             </div>
 
-            {/* Fast PayPal Checkout Button */}
-            <div className="ck-paypal-section">
-              <div className="ck-paypal-title">
-                <span>Pay with PayPal Account:</span>
-              </div>
-              <div ref={paypalContainerRef} className="ck-paypal-box" />
+            {/* Payment Gateway Selector */}
+            <div style={{ display: "flex", gap: "8px", margin: "18px 0 14px", background: "#f1f5f9", padding: "4px", borderRadius: "8px" }}>
+              <button
+                type="button"
+                onClick={() => setGateway("paypal")}
+                style={{
+                  flex: 1,
+                  padding: "8px 12px",
+                  borderRadius: "6px",
+                  fontSize: "12.5px",
+                  fontWeight: 700,
+                  border: "none",
+                  background: gateway === "paypal" ? "#ffffff" : "transparent",
+                  color: gateway === "paypal" ? "#0f172a" : "#64748b",
+                  boxShadow: gateway === "paypal" ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
+                  cursor: "pointer",
+                }}
+              >
+                PayPal &amp; Cards
+              </button>
+              <button
+                type="button"
+                onClick={() => setGateway("payu")}
+                style={{
+                  flex: 1,
+                  padding: "8px 12px",
+                  borderRadius: "6px",
+                  fontSize: "12.5px",
+                  fontWeight: 700,
+                  border: "none",
+                  background: gateway === "payu" ? "#ffffff" : "transparent",
+                  color: gateway === "payu" ? "#0f172a" : "#64748b",
+                  boxShadow: gateway === "payu" ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
+                  cursor: "pointer",
+                }}
+              >
+                PayU Gateway
+              </button>
             </div>
+
+            {gateway === "payu" ? (
+              <div style={{ padding: "20px 16px", background: "#f8fafc", borderRadius: "8px", border: "1px solid #e2e8f0", textAlign: "center", marginBottom: "14px" }}>
+                <p style={{ margin: "0 0 14px", fontSize: "13px", color: "#334155" }}>
+                  Pay securely via PayU Gateway. Supports Credit/Debit Cards, NetBanking, UPI, and Wallets.
+                </p>
+                <button
+                  type="button"
+                  disabled={payuLoading}
+                  onClick={handlePayUPayment}
+                  style={{
+                    width: "100%",
+                    padding: "11px 20px",
+                    background: "#059669",
+                    color: "#ffffff",
+                    fontSize: "14px",
+                    fontWeight: 700,
+                    borderRadius: "6px",
+                    border: "none",
+                    cursor: payuLoading ? "not-allowed" : "pointer",
+                  }}
+                >
+                  {payuLoading ? "Connecting to PayU..." : `Pay $${payAmount.toFixed(2)} with PayU`}
+                </button>
+              </div>
+            ) : (
+              /* Fast PayPal Checkout Button */
+              <div className="ck-paypal-section">
+                <div className="ck-paypal-title">
+                  <span>Pay with PayPal Account:</span>
+                </div>
+                <div ref={paypalContainerRef} className="ck-paypal-box" />
+              </div>
+            )}
           </div>
 
           {/* RIGHT PANEL: Debit or Credit Card Panel (BESIDE!) */}
           <div className="ck-pay-card">
-            <h3 className="ck-pay-title"><Lines>Debit or Credit Card</Lines></h3>
+            <h3 className="ck-pay-title"><Lines>{gateway === "payu" ? "PayU Direct Checkout" : "Debit or Credit Card"}</Lines></h3>
             <p className="ck-pay-subtitle">
-              Pay securely with any major card. No PayPal login required.
+              {gateway === "payu"
+                ? "Click above to be redirected to PayU's 256-bit encrypted checkout portal."
+                : "Pay securely with any major card. No PayPal login required."}
             </p>
 
             {/* Card Standalone Button & Expanded Card Form Container */}
-            <div ref={cardContainerRef} className="ck-card-wrapper" />
+            {gateway === "paypal" ? (
+              <div ref={cardContainerRef} className="ck-card-wrapper" />
+            ) : (
+              <div style={{ padding: "30px 20px", textAlign: "center", background: "#f0fdf4", borderRadius: "8px", border: "1px solid #bbf7d0" }}>
+                <div style={{ fontSize: "28px", marginBottom: "8px" }}>🔒</div>
+                <h4 style={{ margin: "0 0 6px", fontSize: "15px", color: "#166534" }}>Encrypted PayU Checkout</h4>
+                <p style={{ margin: 0, fontSize: "12.5px", color: "#15803d" }}>
+                  Instant verification, official invoice receipt, and automated payment confirmation.
+                </p>
+              </div>
+            )}
 
             <div className="ck-footer-note">
-              Payments processed securely by Quickupp Softech LLC via PayPal.<br />
+              Payments processed securely by Quickupp Softech LLC via {gateway === "payu" ? "PayU" : "PayPal"}.<br />
               Need help? <a href="mailto:info@quickuppsoftech.us">info@quickuppsoftech.us</a>
             </div>
           </div>

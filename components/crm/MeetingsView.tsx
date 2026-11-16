@@ -116,7 +116,17 @@ function historyText(h: MeetingItem["history"][number]) {
   return { title: "Meeting canceled", text: [h.by ? `By ${h.by}` : "", h.reason ? `Reason: ${h.reason}` : ""].filter(Boolean).join(" · ") };
 }
 
-export default function MeetingsView({ rows, version, live }: { rows: MeetingItem[]; version: string; live: boolean }) {
+export default function MeetingsView({
+  rows,
+  version,
+  live,
+  bdmUsers = [],
+}: {
+  rows: MeetingItem[];
+  version: string;
+  live: boolean;
+  bdmUsers?: { id: number; name: string; email: string; role: string }[];
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { confirm, toast } = useFeedback();
@@ -239,12 +249,12 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
     };
   }, [live, check]);
 
-  // Delete from CRM list (soft delete)
+  // Delete from CRM list (soft delete to Deleted Bin)
   const removeIds = async (ids: number[], what: string) => {
     if (
       !(await confirm({
-        title: `Delete ${what}?`,
-        message: "It will be removed from the CRM list view. (To officially cancel a meeting on Calendly, use the 'Cancel Meeting' button).",
+        title: `Move ${what} to Bin?`,
+        message: "It will be moved to the Deleted Bin and can be restored within 30 days.",
       }))
     )
       return false;
@@ -259,9 +269,28 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
       toast("Couldn't delete. Please try again.", "error");
       return false;
     }
-    toast(ids.length === 1 ? "Meeting deleted from list" : `${ids.length} meetings deleted`);
+    toast(ids.length === 1 ? "Meeting moved to Deleted Bin" : `${ids.length} meetings moved to Deleted Bin`);
     router.refresh();
     return true;
+  };
+
+  const handleReassignBdm = async (id: number, assignedBdmId: number | null, assignedBdmName: string | null) => {
+    setBusy(true);
+    try {
+      const res = await fetch(`/api/crm/meetings/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ assignedBdmId, assignedBdmName }),
+      });
+      const d = await res.json();
+      if (!res.ok || !d.ok) throw new Error(d.error || "Failed to reassign BDM");
+      toast(assignedBdmName ? `Assigned to BDM ${assignedBdmName}` : "BDM unassigned");
+      router.refresh();
+    } catch (err: unknown) {
+      toast(err instanceof Error ? err.message : "Reassignment failed", "error");
+    } finally {
+      setBusy(false);
+    }
   };
 
   const removeSelected = async () => {
@@ -504,6 +533,8 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
                 <th>Meeting</th>
                 <th>Date &amp; time</th>
                 <th>Location</th>
+                <th>Arranged By</th>
+                <th>Assigned BDM</th>
                 <th>Status</th>
                 <th aria-label="Actions" />
               </tr>
@@ -538,6 +569,37 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
                     )}
                   </td>
                   <td data-label="Location">{locationName(m)}</td>
+                  <td data-label="Arranged By">
+                    <span className="crm-strong" style={{ fontSize: "12.5px" }}>{m.createdByName || m.hostName || "Website"}</span>
+                  </td>
+                  <td data-label="Assigned BDM" onClick={(e) => e.stopPropagation()}>
+                    {bdmUsers && bdmUsers.length > 0 ? (
+                      <select
+                        className="crm-mgmt-select"
+                        style={{ height: "28px", fontSize: "12px", minWidth: "120px" }}
+                        value={m.assignedBdmName || ""}
+                        disabled={busy || viewOnly}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          const bdm = bdmUsers.find((b) => b.name === val);
+                          void handleReassignBdm(m.id, bdm ? bdm.id : null, bdm ? bdm.name : null);
+                        }}
+                        aria-label={`Assigned BDM for ${m.name}`}
+                      >
+                        <option value="">Not assigned</option>
+                        {bdmUsers.map((b) => (
+                          <option key={b.id} value={b.name}>
+                            {b.name}
+                          </option>
+                        ))}
+                        {m.assignedBdmName && !bdmUsers.some((b) => b.name === m.assignedBdmName) && (
+                          <option value={m.assignedBdmName}>{m.assignedBdmName}</option>
+                        )}
+                      </select>
+                    ) : (
+                      <span style={{ fontSize: "12.5px" }}>{m.assignedBdmName || "—"}</span>
+                    )}
+                  </td>
                   <td data-label="Status">
                     <StatusPill m={m} />
                   </td>
@@ -750,6 +812,37 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
               )}
               <dt>Host</dt>
               <dd className="crm-break">{[open.hostName, open.hostEmail].filter(Boolean).join(" · ") || "—"}</dd>
+              <dt>Arranged By</dt>
+              <dd className="crm-break">{open.createdByName || open.hostName || "Website / Calendly"}</dd>
+              <dt>Assigned BDM</dt>
+              <dd className="crm-break">
+                {bdmUsers && bdmUsers.length > 0 ? (
+                  <select
+                    className="crm-mgmt-select"
+                    style={{ height: "30px", fontSize: "13px", minWidth: "160px" }}
+                    value={open.assignedBdmName || ""}
+                    disabled={busy || viewOnly}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      const bdm = bdmUsers.find((b) => b.name === val);
+                      void handleReassignBdm(open.id, bdm ? bdm.id : null, bdm ? bdm.name : null);
+                    }}
+                    aria-label="Assigned BDM"
+                  >
+                    <option value="">Not assigned</option>
+                    {bdmUsers.map((b) => (
+                      <option key={b.id} value={b.name}>
+                        {b.name}
+                      </option>
+                    ))}
+                    {open.assignedBdmName && !bdmUsers.some((b) => b.name === open.assignedBdmName) && (
+                      <option value={open.assignedBdmName}>{open.assignedBdmName}</option>
+                    )}
+                  </select>
+                ) : (
+                  <span>{open.assignedBdmName || "Not assigned"}</span>
+                )}
+              </dd>
               <dt>Booked</dt>
               <dd>{open.bookedAt ? fmtWhen(open.bookedAt) : "—"}</dd>
             </dl>

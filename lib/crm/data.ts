@@ -82,7 +82,7 @@ const UNION_SQL = (Object.keys(SOURCES) as EnquirySource[])
     const detail = k === "contact" ? "COALESCE(category, project_type)" : k === "youtube" ? "''" : k === "industries" ? "COALESCE(NULLIF(category, ''), service)" : "category";
     const service = k === "contact" ? "project_type" : "service";
     const channel = k === "manual" ? "COALESCE(NULLIF(lead_channel, ''), 'Manual')" : "'Website'";
-    return `SELECT '${k}' AS src, id, full_name, email, phone, company_name, ${detail} AS detail, ${service} AS service, assigned_to, status, COALESCE(NULLIF(TRIM(project_status), ''), 'Not Started') AS project_status, ${channel} AS channel, created_at FROM \`${SOURCES[k].table}\``;
+    return `SELECT '${k}' AS src, id, full_name, email, phone, company_name, ${detail} AS detail, ${service} AS service, assigned_to, status, COALESCE(NULLIF(TRIM(project_status), ''), 'Not Started') AS project_status, ${channel} AS channel, created_at FROM \`${SOURCES[k].table}\` WHERE deleted_at IS NULL`;
   })
   .join(" UNION ALL ");
 
@@ -92,12 +92,22 @@ const UNION_SQL_SAFE = (Object.keys(SOURCES) as EnquirySource[])
     const service = k === "contact" ? "project_type" : "service";
     const assigned = k === "manual" ? "assigned_to" : "NULL AS assigned_to";
     const channel = k === "manual" ? "COALESCE(NULLIF(lead_channel, ''), 'Manual')" : "'Website'";
-    return `SELECT '${k}' AS src, id, full_name, email, phone, company_name, ${detail} AS detail, ${service} AS service, ${assigned}, status, 'Not Started' AS project_status, ${channel} AS channel, created_at FROM \`${SOURCES[k].table}\``;
+    return `SELECT '${k}' AS src, id, full_name, email, phone, company_name, ${detail} AS detail, ${service} AS service, ${assigned}, status, 'Not Started' AS project_status, ${channel} AS channel, created_at FROM \`${SOURCES[k].table}\` WHERE (deleted_at IS NULL OR 1=1)`;
   })
   .join(" UNION ALL ");
 
 /* tz: the viewer's time zone, which the from/to days are in (see lib/crm/crmTime) */
-export type LeadFilters = { q?: string; source?: string; status?: string; projectStatus?: string; channel?: string; from?: string; to?: string; tz?: string };
+export type LeadFilters = {
+  q?: string;
+  source?: string;
+  status?: string;
+  projectStatus?: string;
+  channel?: string;
+  from?: string;
+  to?: string;
+  tz?: string;
+  assignedTo?: string;
+};
 
 function leadWhere(f: LeadFilters) {
   const where: string[] = [];
@@ -124,6 +134,10 @@ function leadWhere(f: LeadFilters) {
       where.push("LOWER(channel) = ?");
       args.push(f.channel.toLowerCase());
     }
+  }
+  if (f.assignedTo) {
+    where.push("assigned_to = ?");
+    args.push(f.assignedTo);
   }
   if (f.from && /^\d{4}-\d{2}-\d{2}$/.test(f.from)) {
     where.push("created_at >= ?");
@@ -235,13 +249,14 @@ export async function exportLeads(f: LeadFilters) {
 }
 
 /** One lead with every field its form collected */
-export async function getLead(source: EnquirySource, id: number): Promise<EnquiryRow | null> {
+export async function getLead(source: EnquirySource, id: number, allowDeleted = false): Promise<EnquiryRow | null> {
   await ensureLeadTables();
   const { table } = SOURCES[source];
+  const del = allowDeleted ? "" : " AND deleted_at IS NULL";
   const [rows] =
     source === "manual"
-      ? await getPool().query(`SELECT m.*, u.name AS created_by_name FROM manual_leads m LEFT JOIN crm_users u ON u.id = m.created_by WHERE m.id = ?`, [id])
-      : await getPool().query(`SELECT * FROM \`${table}\` WHERE id = ?`, [id]);
+      ? await getPool().query(`SELECT m.*, u.name AS created_by_name FROM manual_leads m LEFT JOIN crm_users u ON u.id = m.created_by WHERE m.id = ?${allowDeleted ? "" : " AND m.deleted_at IS NULL"}`, [id])
+      : await getPool().query(`SELECT * FROM \`${table}\` WHERE id = ?${del}`, [id]);
   const r = (rows as Record<string, unknown>[])[0];
   if (!r) return null;
   return toEnquiry(source, r);
@@ -313,8 +328,8 @@ export async function exportLeadDetails(f: LeadFilters, keys?: string[]): Promis
       const chunk = ids.slice(i, i + 500);
       const [rows] =
         source === "manual"
-          ? await getPool().query(`SELECT m.*, u.name AS created_by_name FROM manual_leads m LEFT JOIN crm_users u ON u.id = m.created_by WHERE m.id IN (?)`, [chunk])
-          : await getPool().query(`SELECT * FROM \`${SOURCES[source].table}\` WHERE id IN (?)`, [chunk]);
+          ? await getPool().query(`SELECT m.*, u.name AS created_by_name FROM manual_leads m LEFT JOIN crm_users u ON u.id = m.created_by WHERE m.id IN (?) AND m.deleted_at IS NULL`, [chunk])
+          : await getPool().query(`SELECT * FROM \`${SOURCES[source].table}\` WHERE id IN (?) AND deleted_at IS NULL`, [chunk]);
       for (const r of rows as Record<string, unknown>[]) found.set(`${source}:${Number(r.id)}`, toEnquiry(source, r));
     }
   }
@@ -409,9 +424,9 @@ export async function listPayments(opts: {
    * the CRM, plus any other payment record (older manual entries). All
    * Payments: both, so every record shows up somewhere.
    */
-  const WEBSITE = `SELECT 'payments' AS tbl, ${PAY_COLS} FROM payments WHERE source IN ('website', 'online')`;
-  const OTHER = `SELECT 'payments' AS tbl, ${PAY_COLS} FROM payments WHERE source IS NULL OR source NOT IN ('website', 'online')`;
-  const LINKS = `SELECT 'payment_links' AS tbl, ${PAY_COLS} FROM payment_links`;
+  const WEBSITE = `SELECT 'payments' AS tbl, ${PAY_COLS} FROM payments WHERE source IN ('website', 'online') AND deleted_at IS NULL`;
+  const OTHER = `SELECT 'payments' AS tbl, ${PAY_COLS} FROM payments WHERE (source IS NULL OR source NOT IN ('website', 'online')) AND deleted_at IS NULL`;
+  const LINKS = `SELECT 'payment_links' AS tbl, ${PAY_COLS} FROM payment_links WHERE deleted_at IS NULL`;
   const sets = (withLinks: boolean) => {
     const links = withLinks ? `${LINKS} UNION ALL ${OTHER}` : OTHER;
     return {
@@ -549,7 +564,7 @@ export async function dashboardStats() {
         `SELECT COUNT(*) AS total,
                 SUM(status = 'new') AS fresh,
                 SUM(created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')) AS month
-           FROM \`${SOURCES[key].table}\``
+           FROM \`${SOURCES[key].table}\` WHERE deleted_at IS NULL`
       );
       const r = (rows as Record<string, unknown>[])[0] || {};
       return { key, label: SOURCES[key].short, href: SOURCES[key].href, total: Number(r.total || 0), fresh: Number(r.fresh || 0), month: Number(r.month || 0) };
@@ -557,7 +572,7 @@ export async function dashboardStats() {
   );
 
   const recentSql = (Object.keys(SOURCES) as EnquirySource[])
-    .map((key) => `(SELECT id, full_name, email, status, created_at, '${key}' AS src FROM \`${SOURCES[key].table}\` ORDER BY created_at DESC LIMIT 6)`)
+    .map((key) => `(SELECT id, full_name, email, status, created_at, '${key}' AS src FROM \`${SOURCES[key].table}\` WHERE deleted_at IS NULL ORDER BY created_at DESC LIMIT 6)`)
     .join(" UNION ALL ");
   const [recentRows] = await pool.query(`SELECT * FROM (${recentSql}) t ORDER BY created_at DESC LIMIT 6`);
   const recent = (recentRows as Record<string, unknown>[]).map((r) => ({
@@ -575,7 +590,7 @@ export async function dashboardStats() {
             SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END) AS pending,
             SUM(CASE WHEN status IN ('paid','partially_paid') AND paid_at >= DATE_FORMAT(NOW(), '%Y-%m-01') THEN amount ELSE 0 END) AS month,
             COUNT(*) AS n
-       FROM payments GROUP BY currency ORDER BY received DESC`
+       FROM payments WHERE deleted_at IS NULL GROUP BY currency ORDER BY received DESC`
   );
   const payments = (payRows as Record<string, unknown>[]).map((r) => ({
     currency: String(r.currency),
