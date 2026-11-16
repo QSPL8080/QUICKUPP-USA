@@ -1,15 +1,19 @@
 import Link from "next/link";
-import { requireArea } from "@/lib/crm/auth";
+import { meetingPermsFor, requireArea } from "@/lib/crm/auth";
+import { listAssignees } from "@/lib/crm/users";
 import { listMeetings, meetingCounts, meetingsVersion, MEETING_STATUSES, MEETING_STATUS_LABEL, syncMeetings, type SyncResult } from "@/lib/crm/calendly";
 import MeetingsView from "@/components/crm/MeetingsView";
 import { PageHead, Pager } from "@/components/crm/ListTools";
 
 export const dynamic = "force-dynamic";
 
-type Props = { searchParams: Promise<{ q?: string; status?: string; when?: string; page?: string }> };
+type Props = { searchParams: Promise<{ q?: string; status?: string; when?: string; page?: string; open?: string }> };
 
 export default async function MeetingsPage({ searchParams }: Props) {
-  await requireArea("leads");
+  const user = await requireArea("meetings");
+  // a BDM/BDE sees only the meetings they scheduled and the ones assigned to them
+  const perms = meetingPermsFor(user);
+  const visibleTo = perms.ownOnly ? user.id : undefined;
   const sp = await searchParams;
   const f = {
     q: sp.q || "",
@@ -21,7 +25,12 @@ export default async function MeetingsPage({ searchParams }: Props) {
     syncMeetings({ maxAgeMs: 5_000 }),
     new Promise<SyncResult>((r) => setTimeout(() => r({ ok: true, configured: true }), 7000)),
   ]);
-  const [data, version, counts] = await Promise.all([listMeetings({ ...f, page: Number(sp.page) || 1 }), meetingsVersion().catch(() => ""), meetingCounts()]);
+  const [data, version, counts, bdms] = await Promise.all([
+    listMeetings({ ...f, visibleTo, page: Number(sp.page) || 1 }),
+    meetingsVersion().catch(() => ""),
+    meetingCounts(visibleTo),
+    perms.assign ? listAssignees(["bdm"]) : Promise.resolve([]),
+  ]);
   const chipHref = (status: string) => {
     const q = new URLSearchParams();
     if (f.q) q.set("q", f.q);
@@ -35,8 +44,12 @@ export default async function MeetingsPage({ searchParams }: Props) {
   return (
     <>
       <PageHead
-        title="Calendly Meetings"
-        sub="Meetings booked through the website and Calendly. Arrange, reschedule, edit, and cancel meetings directly with two-way Calendly & CRM synchronization."
+        title={perms.ownOnly ? "My Meetings" : "Calendly Meetings"}
+        sub={
+          perms.ownOnly
+            ? "The meetings you scheduled and the ones assigned to you. Arrange a call for one of your leads or for anyone, and add your notes after each meeting."
+            : "Meetings booked through the website and Calendly. Arrange, reschedule, edit, and cancel meetings directly with two-way Calendly & CRM synchronization."
+        }
       >
         <a href={`/api/crm/meetings/export${filtered ? `?${new URLSearchParams(Object.entries(f).filter(([, v]) => v) as [string, string][]).toString()}` : ""}`} className="crm-act crm-act-ghost">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -98,7 +111,14 @@ export default async function MeetingsPage({ searchParams }: Props) {
       </form>
 
       <div className="crm-card crm-card-flush">
-        <MeetingsView rows={data.items} version={version} live={sync.configured} />
+        <MeetingsView
+          rows={data.items}
+          version={version}
+          live={sync.configured}
+          perms={perms}
+          bdms={bdms.map((b) => ({ id: b.id, name: b.name }))}
+          openId={Number(sp.open) || undefined}
+        />
         <Pager {...data} q={f.q} status={f.status} extra={{ when: f.when }} />
       </div>
     </>

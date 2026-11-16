@@ -4,6 +4,7 @@ import { promisify } from "node:util";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getPool } from "@/lib/db";
+import { canAccess, homeFor, type CrmArea, type CrmRole } from "@/lib/crm/roles";
 
 /*
  * CRM sign-in. Passwords are stored as scrypt hashes; a signed-in browser
@@ -19,7 +20,7 @@ export const IDLE_MINUTES = 15;
 /** Signed out after this many hours even when active (sign in again) */
 const MAX_SESSION_HOURS = 12;
 
-export type CrmRole = "super_admin" | "admin" | "seo" | "viewer" | "hr";
+export type { CrmRole } from "@/lib/crm/roles";
 export type CrmUser = { id: number; name: string; username: string; email: string; role: CrmRole };
 
 export async function hashPassword(password: string): Promise<string> {
@@ -95,7 +96,7 @@ export async function getCurrentUser(): Promise<CrmUser | null> {
   const [rows] = await getPool().execute(
     `SELECT u.id, u.name, u.username, u.email, u.role
        FROM crm_sessions s JOIN crm_users u ON u.id = s.user_id
-      WHERE s.token_hash = ? AND u.is_active = 1
+      WHERE s.token_hash = ? AND u.is_active = 1 AND u.deleted_at IS NULL
       LIMIT 1`,
     [hash]
   );
@@ -120,31 +121,21 @@ export const isSuperAdmin = (u: CrmUser | null) => u?.role === "super_admin";
 export const isViewOnly = (u: { role: string } | null | undefined) => u?.role === "viewer";
 export const VIEW_ONLY_MESSAGE = "Your account is view-only: you can look at everything but can't make changes.";
 
-/*
- * What each role may open. Super Admin and Admin: everything (Team & Users is
- * the super admin's alone). Viewer: the same as Admin, but only to look (every
- * change is refused in proxy.ts), plus their own profile and password. SEO:
- * only the website's Blogs and Job Openings, plus their own profile; never
- * enquiries, payments, meetings or applications. HR: only Job Openings and
- * Job Applications (and their own profile), with full editing there.
- */
-export type CrmArea = "dashboard" | "leads" | "payments" | "applications" | "jobs" | "blogs" | "profile" | "users";
-const SEO_AREAS: readonly CrmArea[] = ["blogs", "jobs", "profile"];
-/** HR: only the Careers tabs (job openings and job applications), with full editing there */
-const HR_AREAS: readonly CrmArea[] = ["jobs", "applications", "profile"];
-
-export const canAccess = (u: { role: string } | null, area: CrmArea) => {
-  if (!u) return false;
-  if (area === "users") return u.role === "super_admin";
-  if (u.role === "seo") return SEO_AREAS.includes(area);
-  if (u.role === "hr") return HR_AREAS.includes(area);
-  return true;
-};
-
-/** Where a user lands after signing in (and when they open a page they can't use) */
-export const homeFor = (u: { role: string }) => (u.role === "seo" ? "/crm/blogs" : u.role === "hr" ? "/crm/applications" : "/crm");
-
-export const roleName = (role: string | null | undefined) => (role === "super_admin" ? "Super Admin" : role === "seo" ? "SEO" : role === "viewer" ? "Viewer" : role === "hr" ? "HR" : "Admin");
+export {
+  ROLES,
+  ASSIGNABLE_ROLES,
+  roleName,
+  isAdminLike,
+  isSalesRole,
+  canEditLeads,
+  canDelete,
+  deletesForGood,
+  canAccess,
+  homeFor,
+  leadPermsFor,
+  meetingPermsFor,
+} from "@/lib/crm/roles";
+export type { CrmArea, AssignableRole, LeadPerms, MeetingPerms } from "@/lib/crm/roles";
 
 /** For CRM pages: the signed-in user, sent to their own start page if this area isn't theirs */
 export async function requireArea(area: CrmArea): Promise<CrmUser> {

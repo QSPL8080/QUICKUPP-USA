@@ -6,6 +6,10 @@ import { useFeedback } from "@/components/crm/Feedback";
 import { BulkBar, SelectBox, useSelection } from "@/components/crm/Selection";
 import type { MeetingItem } from "@/lib/crm/calendly";
 import { useViewOnly } from "@/components/crm/ViewOnly";
+import LeadPicker from "@/components/crm/LeadPicker";
+import { roleName, type MeetingPerms } from "@/lib/crm/roles";
+import { SOURCE_LABEL } from "@/lib/crm/leadOptions";
+import { formatFileSize } from "@/lib/crm/format";
 
 /*
  * Dynamic Calendly ↔ CRM Meetings.
@@ -113,16 +117,66 @@ function historyText(h: MeetingItem["history"][number]) {
           ? `New time ${fmtWhen(h.to)}`
           : "",
     };
+  if (h.kind === "assigned")
+    return {
+      title: h.bdm ? (h.prevBdm ? `Moved to ${h.bdm} (BDM)` : `Assigned to ${h.bdm} (BDM)`) : "BDM removed",
+      text: [h.prevBdm ? `Was with ${h.prevBdm}` : "", h.by ? `By ${h.by}` : ""].filter(Boolean).join(" · "),
+    };
   return { title: "Meeting canceled", text: [h.by ? `By ${h.by}` : "", h.reason ? `Reason: ${h.reason}` : ""].filter(Boolean).join(" · ") };
 }
 
-export default function MeetingsView({ rows, version, live }: { rows: MeetingItem[]; version: string; live: boolean }) {
+type MeetingNote = { id: number; userName: string; note: string; fileName: string | null; fileType: string | null; fileSize: number | null; createdAt: string };
+type ArrangeLead = { source: string; id: number; name: string; email: string; sourceLabel: string };
+
+const ALL_PERMS: MeetingPerms = { schedule: true, work: true, assign: false, remove: true, toBin: false, ownOnly: false };
+
+export default function MeetingsView({
+  rows,
+  version,
+  live,
+  perms = ALL_PERMS,
+  bdms = [],
+  openId: openIdIn,
+}: {
+  rows: MeetingItem[];
+  version: string;
+  live: boolean;
+  perms?: MeetingPerms;
+  /** the BDMs a meeting can be assigned to (only passed to those who assign) */
+  bdms?: { id: number; name: string }[];
+  /** opens this meeting (links in alerts and emails) */
+  openId?: number;
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { confirm, toast } = useFeedback();
+  const { confirm, ask, toast } = useFeedback();
   const viewOnly = useViewOnly();
+  const canSchedule = !viewOnly && perms.schedule;
+  const canWork = !viewOnly && perms.work;
+  const canRemove = !viewOnly && perms.remove;
 
-  const [openId, setOpenId] = useState<number | null>(null);
+  const [openId, setOpenId] = useState<number | null>(openIdIn ?? null);
+
+  // "From lead": the lead the meeting being arranged is for (from the lead's Schedule Call, or picked here)
+  const [arrangeLead, setArrangeLead] = useState<ArrangeLead | null>(() => {
+    const src = searchParams.get("leadSource");
+    const lid = Number(searchParams.get("leadId"));
+    return src && lid > 0
+      ? { source: src, id: lid, name: searchParams.get("name") || "", email: searchParams.get("email") || "", sourceLabel: SOURCE_LABEL[src as keyof typeof SOURCE_LABEL] || "" }
+      : null;
+  });
+  const arrangeLeadRef = useRef<ArrangeLead | null>(arrangeLead);
+  useEffect(() => {
+    arrangeLeadRef.current = arrangeLead;
+  }, [arrangeLead]);
+
+  // notes after the meeting (typed, or a file)
+  const [notes, setNotes] = useState<MeetingNote[]>([]);
+  const [noteText, setNoteText] = useState("");
+  const [noteFile, setNoteFile] = useState<File | null>(null);
+  const [noteBusy, setNoteBusy] = useState(false);
+  const noteFileRef = useRef<HTMLInputElement>(null);
+  const [assignBusy, setAssignBusy] = useState(false);
   const [busy, setBusy] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const sel = useSelection(rows.map((r) => r.id));
@@ -174,10 +228,61 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
 
   // Auto-open Arrange modal if arrived with ?arrange=1 or action=arrange
   useEffect(() => {
-    if (!viewOnly && (searchParams.get("arrange") === "1" || searchParams.get("action") === "arrange")) {
+    if (canSchedule && (searchParams.get("arrange") === "1" || searchParams.get("action") === "arrange")) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- opens Arrange when the page is reached with ?arrange=1
       setShowArrange(true);
     }
-  }, [searchParams, viewOnly]);
+  }, [searchParams, canSchedule]);
+
+  // the open meeting's notes
+  useEffect(() => {
+    if (openId === null) return;
+    let live = true;
+    /* eslint-disable react-hooks/set-state-in-effect -- a different meeting: clear the last one's notes, then load these */
+    setNotes([]);
+    setNoteText("");
+    setNoteFile(null);
+    /* eslint-enable react-hooks/set-state-in-effect */
+    fetch(`/api/crm/meetings/${openId}/notes`, { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => live && Array.isArray(j?.notes) && setNotes(j.notes))
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, [openId]);
+
+  const addNote = async (meetingId: number) => {
+    if (!noteText.trim() && !noteFile) return toast("Type a note or choose a file.", "error");
+    setNoteBusy(true);
+    const fd = new FormData();
+    fd.append("note", noteText);
+    if (noteFile) fd.append("file", noteFile);
+    const res = await fetch(`/api/crm/meetings/${meetingId}/notes`, { method: "POST", body: fd }).catch(() => null);
+    const j = res ? await res.json().catch(() => null) : null;
+    setNoteBusy(false);
+    if (!res?.ok || !j?.ok) return toast(j?.error || "Couldn't save the note. Please try again.", "error");
+    setNotes(j.notes || []);
+    setNoteText("");
+    setNoteFile(null);
+    if (noteFileRef.current) noteFileRef.current.value = "";
+    toast("Meeting note added");
+    router.refresh();
+  };
+
+  const assignBdm = async (meetingId: number, value: string) => {
+    setAssignBusy(true);
+    const res = await fetch(`/api/crm/meetings/${meetingId}/assign`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ bdmId: value ? Number(value) : null }),
+    }).catch(() => null);
+    const j = res ? await res.json().catch(() => null) : null;
+    setAssignBusy(false);
+    if (!res?.ok || !j?.ok) return toast(j?.error || "Couldn't assign the meeting. Please try again.", "error");
+    toast(j.bdm ? `Assigned to ${j.bdm}. They've been notified.` : "BDM removed from the meeting");
+    router.refresh();
+  };
 
   const check = useCallback(
     async (force = false) => {
@@ -209,6 +314,10 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
             body: JSON.stringify({
               ...e.data.payload,
               meetingId: activeReschedule ? activeReschedule.id : undefined,
+              // scheduled here: who arranged it, and for which lead
+              crm: !activeReschedule,
+              leadSource: activeReschedule ? undefined : arrangeLeadRef.current?.source,
+              leadId: activeReschedule ? undefined : arrangeLeadRef.current?.id,
             }),
           }).catch(() => {});
         }
@@ -241,25 +350,25 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
 
   // Delete from CRM list (soft delete)
   const removeIds = async (ids: number[], what: string) => {
-    if (
-      !(await confirm({
-        title: `Delete ${what}?`,
-        message: "It will be removed from the CRM list view. (To officially cancel a meeting on Calendly, use the 'Cancel Meeting' button).",
-      }))
-    )
-      return false;
+    const reason = await ask({
+      title: `Delete ${what}?`,
+      message: "It moves to the Deleted bin, where the Super Admin can restore it or remove it for good. Calendly isn't changed (to cancel the meeting itself, use Cancel Meeting).",
+      input: { label: "Reason (optional)", placeholder: "e.g. duplicate, test entry, spam", optional: true },
+      confirmLabel: "Yes, delete",
+    });
+    if (reason === null) return false;
     setBusy(true);
     const res = await fetch("/api/crm/meetings", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ids }),
+      body: JSON.stringify({ ids, reason }),
     }).catch(() => null);
     setBusy(false);
     if (!res?.ok && res?.status !== 404) {
       toast("Couldn't delete. Please try again.", "error");
       return false;
     }
-    toast(ids.length === 1 ? "Meeting deleted from list" : `${ids.length} meetings deleted`);
+    toast(ids.length === 1 ? "Meeting moved to the Deleted bin" : `${ids.length} meetings moved to the Deleted bin`);
     router.refresh();
     return true;
   };
@@ -380,8 +489,8 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
       embed_domain: typeof window !== "undefined" ? window.location.host : "quickuppsoftech.us",
       embed_type: "Inline",
     });
-    const name = searchParams.get("name");
-    const email = searchParams.get("email");
+    const name = arrangeLead ? arrangeLead.name : searchParams.get("name");
+    const email = arrangeLead ? arrangeLead.email : searchParams.get("email");
     if (name) params.set("name", name);
     if (email) params.set("email", email);
     return `${CALENDLY_BASE_URL}?${params.toString()}`;
@@ -403,7 +512,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          {!viewOnly && (
+          {canSchedule && (
           <button
             type="button"
             className="crm-act crm-act-dark"
@@ -469,7 +578,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
       </div>
 
       {/* Bulk actions */}
-      <BulkBar sel={sel} noun={["meeting", "meetings"]} busy={busy} onDelete={removeSelected}>
+      <BulkBar sel={sel} noun={["meeting", "meetings"]} busy={busy} onDelete={canRemove ? removeSelected : undefined}>
         {sel.selected.length > 0 && (
           <a href={`/api/crm/meetings/export?ids=${sel.selected.join(",")}`} className="crm-act crm-act-ghost crm-act-sm">
             Export selected ({sel.selected.length})
@@ -485,7 +594,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
             Bookings from the website, Calendly, or arranged in the CRM will appear here automatically.
           </p>
           <div style={{ marginTop: "18px" }}>
-            {!viewOnly && (
+            {canSchedule && (
             <button type="button" className="crm-act crm-act-dark" onClick={() => setShowArrange(true)}>
               + Arrange a Meeting Now
             </button>
@@ -519,12 +628,23 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
                     <SelectBox checked={sel.has(m.id)} onChange={(on) => sel.toggle(m.id, on)} label={`Select ${m.name}`} />
                   </td>
                   <td data-label="Invitee" className="crm-cell-main">
-                    <span className="crm-strong">{m.name || "—"}</span>
+                    <span className="crm-strong">
+                      {m.name || "—"}
+                      {m.isClient && <span className="crm-client-tag">Client</span>}
+                    </span>
                     <span className="crm-cell-sub">{m.email}</span>
+                    {m.leadId && m.leadSource && <span className="crm-from-lead-tag">From lead</span>}
                   </td>
                   <td data-label="Meeting">
                     <span className="crm-strong">{m.eventName}</span>
                     {m.hostName && <span className="crm-cell-sub">With {m.hostName}</span>}
+                    {m.createdByName && (
+                      <span className="crm-cell-sub">
+                        Scheduled by {m.createdByName}
+                        {m.createdByRole ? ` (${roleName(m.createdByRole)})` : ""}
+                      </span>
+                    )}
+                    {m.assignedBdmName && <span className="crm-cell-sub crm-meet-bdm">BDM: {m.assignedBdmName}</span>}
                   </td>
                   <td data-label="Date & time" className="crm-nowrap">
                     <span className={`crm-strong${m.view === "canceled" ? " crm-meet-struck" : ""}`}>{fmtDay(m.startTime)}</span>
@@ -544,7 +664,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
                   <td data-label="" onClick={(e) => e.stopPropagation()}>
                     <span className="crm-meet-actions">
                       <JoinButton m={m} />
-                      {!viewOnly && (
+                      {canRemove && (
                       <button
                         type="button"
                         className="crm-act-btn crm-act-delete"
@@ -604,7 +724,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
                   Call
                 </a>
               )}
-              {!viewOnly && open.view !== "canceled" && open.view !== "completed" && (
+              {canWork && open.view !== "canceled" && open.view !== "completed" && (
                 <button
                   type="button"
                   className="crm-act crm-act-ghost crm-act-sm"
@@ -620,7 +740,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
                   Reschedule
                 </button>
               )}
-              {!viewOnly && (
+              {canWork && (
               <button
                 type="button"
                 className="crm-act crm-act-ghost crm-act-sm"
@@ -633,7 +753,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
                 Edit
               </button>
               )}
-              {!viewOnly && open.view !== "canceled" && (
+              {canWork && open.view !== "canceled" && (
                 <button
                   type="button"
                   className="crm-act crm-act-ghost crm-act-sm"
@@ -656,13 +776,138 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
               </p>
             )}
 
+            {/* Who: scheduled by, the lead, the BDM who takes it */}
+            <div className="crm-meet-team">
+              <div className="crm-meet-team-item">
+                <span className="crm-mgmt-label">Scheduled by</span>
+                <span className="crm-mgmt-val">
+                  {open.createdByName
+                    ? `${open.createdByName}${open.createdByRole ? ` (${roleName(open.createdByRole)})` : ""}`
+                    : open.source === "crm"
+                      ? "CRM"
+                      : "The client (website / Calendly)"}
+                </span>
+              </div>
+              <div className="crm-meet-team-item">
+                <span className="crm-mgmt-label">Lead</span>
+                <span className="crm-mgmt-val">
+                  {open.leadId && open.leadSource ? (
+                    <a href={`/crm/enquiries?open=${encodeURIComponent(`${open.leadSource}:${open.leadId}`)}`} className="crm-link">
+                      Open lead{open.isClient ? " · Client" : ""}
+                    </a>
+                  ) : (
+                    "Not linked to a lead"
+                  )}
+                </span>
+              </div>
+              <div className="crm-meet-team-item">
+                <span className="crm-mgmt-label">BDM taking it</span>
+                {perms.assign && !viewOnly ? (
+                  <select
+                    className="crm-mgmt-select"
+                    value={open.assignedBdmId ? String(open.assignedBdmId) : ""}
+                    disabled={assignBusy}
+                    onChange={(e) => assignBdm(open.id, e.target.value)}
+                    aria-label="BDM taking this meeting"
+                  >
+                    <option value="">Not assigned</option>
+                    {bdms.map((b) => (
+                      <option key={b.id} value={String(b.id)}>
+                        {b.name} (BDM)
+                      </option>
+                    ))}
+                    {open.assignedBdmId && !bdms.some((b) => b.id === open.assignedBdmId) && (
+                      <option value={String(open.assignedBdmId)}>{open.assignedBdmName || "Former BDM"}</option>
+                    )}
+                  </select>
+                ) : (
+                  <span className="crm-mgmt-val">{open.assignedBdmName || "Not assigned"}</span>
+                )}
+              </div>
+            </div>
+
+            {/* Notes after the meeting: typed, or a file */}
+            <div className="crm-drawer-card">
+              <div className="crm-drawer-card-head">
+                <span className="crm-drawer-card-title">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="8" y1="13" x2="16" y2="13" />
+                    <line x1="8" y1="17" x2="13" y2="17" />
+                  </svg>
+                  Meeting notes &amp; minutes
+                  {notes.length > 0 && <span className="crm-count-badge">{notes.length}</span>}
+                </span>
+              </div>
+              {canWork && (
+                <div className="crm-meet-note-form">
+                  <textarea
+                    className="crm-input"
+                    rows={3}
+                    value={noteText}
+                    onChange={(e) => setNoteText(e.target.value)}
+                    placeholder="What was discussed, decisions, next steps…"
+                  />
+                  <div className="crm-meet-note-actions">
+                    <input
+                      ref={noteFileRef}
+                      type="file"
+                      accept=".pdf,.doc,.docx,.txt,.rtf,.png,.jpg,.jpeg,.webp,.xls,.xlsx,.csv,.ppt,.pptx"
+                      onChange={(e) => setNoteFile(e.target.files?.[0] || null)}
+                      style={{ display: "none" }}
+                    />
+                    <button type="button" className="crm-act crm-act-ghost crm-act-sm" onClick={() => noteFileRef.current?.click()}>
+                      {noteFile ? `File: ${noteFile.name}` : "Attach a file"}
+                    </button>
+                    {noteFile && (
+                      <button
+                        type="button"
+                        className="crm-link-btn"
+                        onClick={() => {
+                          setNoteFile(null);
+                          if (noteFileRef.current) noteFileRef.current.value = "";
+                        }}
+                      >
+                        Remove file
+                      </button>
+                    )}
+                    <button type="button" className="crm-act crm-act-dark crm-act-sm" disabled={noteBusy} onClick={() => addNote(open.id)}>
+                      {noteBusy ? "Saving…" : "Add note"}
+                    </button>
+                  </div>
+                </div>
+              )}
+              {notes.length === 0 ? (
+                <p className="crm-drawer-card-empty">No notes yet.{canWork ? " After the meeting, type the notes or upload the minutes here." : ""}</p>
+              ) : (
+                <div className="crm-meet-notes">
+                  {notes.map((n) => (
+                    <div key={n.id} className="crm-meet-note">
+                      <div className="crm-meet-note-top">
+                        <span className="crm-strong">{n.userName || "Team"}</span>
+                        <span className="crm-muted">{n.createdAt ? fmtWhen(n.createdAt) : ""}</span>
+                      </div>
+                      {n.note && <p className="crm-message-text">{n.note}</p>}
+                      {n.fileName && (
+                        <a className="crm-att-btn" href={`/api/crm/meetings/${open.id}/notes?file=${n.id}`}>
+                          {n.fileName}
+                          {n.fileSize ? ` · ${formatFileSize(n.fileSize)}` : ""}
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* Internal CRM Notes Card */}
             <div className="crm-drawer-card" style={{ padding: "14px 16px", borderRadius: "10px", background: "#f8fafc", border: "1px solid #e2e8f0", marginTop: "14px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
                 <span style={{ fontSize: "12.5px", fontWeight: 700, color: "#1e293b", textTransform: "uppercase", letterSpacing: "0.5px" }}>
                   Internal CRM Meeting Notes
                 </span>
-                {!viewOnly && (
+                {canWork && (
                 <button
                   type="button"
                   className="crm-act crm-act-dark crm-act-sm"
@@ -679,7 +924,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
                 rows={3}
                 value={inlineNotes[open.id] !== undefined ? inlineNotes[open.id] : open.notes || ""}
                 onChange={(e) => setInlineNotes((prev) => ({ ...prev, [open.id]: e.target.value }))}
-                readOnly={viewOnly}
+                readOnly={!canWork}
                 placeholder="Add internal discussion points, customer requirements, action items, or followup notes..."
                 style={{ width: "100%", fontSize: "13px", resize: "vertical" }}
               />
@@ -797,7 +1042,7 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
               </div>
             )}
 
-            {!viewOnly && (
+            {canRemove && (
             <button
               type="button"
               className="crm-act crm-act-danger crm-meet-delete"
@@ -856,6 +1101,18 @@ export default function MeetingsView({ rows, version, live }: { rows: MeetingIte
                 </div>
               ) : (
                 <div>
+                  <LeadPicker
+                    label="Schedule for a lead (fills in the name and email)"
+                    picked={arrangeLead ? { name: arrangeLead.name || arrangeLead.email, sourceLabel: arrangeLead.sourceLabel } : null}
+                    onClear={() => {
+                      setArrangeLead(null);
+                      setLiveRound((r) => r + 1);
+                    }}
+                    onPick={(l) => {
+                      setArrangeLead({ source: l.source, id: l.id, name: l.name, email: l.email, sourceLabel: SOURCE_LABEL[l.source] || "" });
+                      setLiveRound((r) => r + 1);
+                    }}
+                  />
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
                     <span style={{ fontSize: "12.5px", color: "#64748b" }}>
                       Select an available date and time slot below:

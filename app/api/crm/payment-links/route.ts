@@ -1,3 +1,4 @@
+import { markClientFromRecord } from "@/lib/crm/clients";
 import { NextResponse } from "next/server";
 import { resolvePayTable } from "@/lib/crm/paymentTable";
 import { randomBytes } from "node:crypto";
@@ -457,6 +458,8 @@ export async function PATCH(req: Request) {
 
     const afterSnap = await paymentSnapshot(targetTable as PaymentTable, id);
     if (beforeSnap && afterSnap) await logPaymentChanges(targetTable as PaymentTable, id, beforeSnap, afterSnap, actorOf(user));
+    // paid (in part or in full) for a lead: the lead is a client
+    await markClientFromRecord(targetTable as PaymentTable, id);
 
     return NextResponse.json({ ok: true, message: "Payment link updated successfully." });
   } catch (err) {

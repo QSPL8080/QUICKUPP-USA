@@ -26,6 +26,10 @@ import { payLinkUrl } from "@/lib/siteUrl";
 import { payMessage, whatsAppNumber, whatsAppUrl } from "@/lib/payMessages";
 import ShareLinkButtons from "@/components/crm/ShareLinkButtons";
 import { useViewOnly } from "@/components/crm/ViewOnly";
+import { leadPermsFor, roleName, type LeadPerms } from "@/lib/crm/roles";
+
+/* a BDM or BDE a lead can be assigned to */
+export type LeadAssignee = { id: number; name: string; role: string };
 
 type LeadAudit = {
   createdBy: string;
@@ -102,6 +106,7 @@ type LeadForm = {
   timeline: string;
   channel: string;
   assignedTo: string;
+  assignedUserId: string;
   notes: string;
   status: EnquiryStatus;
   projectStatus: string;
@@ -121,6 +126,7 @@ const blankForm = (): LeadForm => ({
   timeline: "",
   channel: "Manual",
   assignedTo: "",
+  assignedUserId: "",
   notes: "",
   status: "new",
   projectStatus: "Not Started",
@@ -140,15 +146,16 @@ const formFrom = (l: EnquiryRow): LeadForm => ({
   timeline: l.timeline || "",
   channel: l.channel && (LEAD_CHANNELS as readonly string[]).includes(l.channel) ? l.channel : "Manual",
   assignedTo: l.assignedTo || "",
+  assignedUserId: l.assignedUserId ? String(l.assignedUserId) : "",
   notes: l.message || "",
   status: l.status,
   projectStatus: l.projectStatus || "Not Started",
 });
 
-function StatusSelect({ value, busy, label, onChange }: { value: EnquiryStatus; busy: boolean; label: string; onChange: (s: string) => void }) {
+function StatusSelect({ value, busy, label, locked, onChange }: { value: EnquiryStatus; busy: boolean; label: string; locked?: boolean; onChange: (s: string) => void }) {
   const viewOnly = useViewOnly();
   return (
-    <select className={`crm-status crm-lead-status crm-lead-status-${value}`} value={value} disabled={busy || viewOnly} onChange={(e) => onChange(e.target.value)} aria-label={label}>
+    <select className={`crm-status crm-lead-status crm-lead-status-${value}`} value={value} disabled={busy || viewOnly || locked} onChange={(e) => onChange(e.target.value)} aria-label={label}>
       {ENQUIRY_STATUSES.map((s) => (
         <option key={s} value={s}>
           {ENQUIRY_STATUS_LABEL[s]}
@@ -158,11 +165,11 @@ function StatusSelect({ value, busy, label, onChange }: { value: EnquiryStatus; 
   );
 }
 
-function ProjectStatusSelect({ value, busy, label, onChange }: { value: string; busy: boolean; label: string; onChange: (s: string) => void }) {
+function ProjectStatusSelect({ value, busy, label, locked, onChange }: { value: string; busy: boolean; label: string; locked?: boolean; onChange: (s: string) => void }) {
   const slug = (value || "Not Started").toLowerCase().replace(/\s+/g, "-");
   const viewOnly = useViewOnly();
   return (
-    <select className={`crm-status crm-project-status crm-project-status-${slug}`} value={value || "Not Started"} disabled={busy || viewOnly} onChange={(e) => onChange(e.target.value)} aria-label={label}>
+    <select className={`crm-status crm-project-status crm-project-status-${slug}`} value={value || "Not Started"} disabled={busy || viewOnly || locked} onChange={(e) => onChange(e.target.value)} aria-label={label}>
       {PROJECT_STATUSES.map((s) => (
         <option key={s} value={s}>
           {s}
@@ -172,22 +179,95 @@ function ProjectStatusSelect({ value, busy, label, onChange }: { value: string; 
   );
 }
 
+/* picks the BDM or BDE a lead is assigned to (lists both, labelled with the role) */
+function AssigneeSelect({
+  value,
+  legacyName,
+  team,
+  label,
+  disabled,
+  aria,
+  compact,
+  input,
+  onChange,
+}: {
+  value: number | null | undefined;
+  legacyName?: string | null;
+  team: LeadAssignee[];
+  label: (a: LeadAssignee) => string;
+  disabled?: boolean;
+  aria: string;
+  compact?: boolean;
+  input?: boolean;
+  onChange: (v: string) => void;
+}) {
+  const known = value ? team.some((t) => t.id === value) : false;
+  const bdms = team.filter((t) => t.role === "bdm");
+  const bdes = team.filter((t) => t.role === "bde");
+  return (
+    <select
+      className={input ? "crm-input crm-select" : "crm-mgmt-select"}
+      style={compact ? { height: "30px", fontSize: "12px", minWidth: "140px" } : undefined}
+      value={value ? String(value) : legacyName ? "__legacy" : ""}
+      disabled={disabled}
+      onChange={(e) => e.target.value !== "__legacy" && onChange(e.target.value)}
+      aria-label={aria}
+    >
+      <option value="">Not assigned</option>
+      {bdms.length > 0 && (
+        <optgroup label="BDM">
+          {bdms.map((t) => (
+            <option key={t.id} value={String(t.id)}>
+              {label(t)}
+            </option>
+          ))}
+        </optgroup>
+      )}
+      {bdes.length > 0 && (
+        <optgroup label="BDE">
+          {bdes.map((t) => (
+            <option key={t.id} value={String(t.id)}>
+              {label(t)}
+            </option>
+          ))}
+        </optgroup>
+      )}
+      {/* someone no longer on the list (an old name, or an account switched off) */}
+      {value && !known && <option value={String(value)}>{legacyName || "Former team member"}</option>}
+      {!value && legacyName && (
+        <option value="__legacy" disabled>
+          {legacyName}
+        </option>
+      )}
+    </select>
+  );
+}
+
 export default function LeadsView({
   rows,
   offset,
-  team,
+  assignees,
+  perms: permsIn,
   currentUser,
   openNew,
+  openKey,
 }: {
   rows: LeadRow[];
   offset: number;
-  team: string[];
+  /** the BDMs and BDEs a lead can be assigned to (only passed to those who assign) */
+  assignees: LeadAssignee[];
+  perms?: LeadPerms;
   currentUser?: { id?: number; name: string; email: string; role?: string };
   openNew?: boolean;
+  /** "source:id": opens that lead's details (links in alerts and emails) */
+  openKey?: string;
 }) {
   const router = useRouter();
-  const { confirm, toast } = useFeedback();
+  const { confirm, ask, toast } = useFeedback();
   const viewOnly = useViewOnly();
+  const perms = permsIn || leadPermsFor({ role: currentUser?.role || "viewer" });
+  const team = assignees;
+  const assigneeLabel = (a: LeadAssignee) => `${a.name} (${roleName(a.role)})`;
   const [open, setOpen] = useState<EnquiryRow | null>(null);
   const [loading, setLoading] = useState<string>("");
   const [busy, setBusy] = useState(false);
@@ -338,32 +418,42 @@ export default function LeadsView({
     router.refresh();
   };
 
-  const setAssignedTo = async (source: string, id: number, assignedTo: string) => {
+  /* assign to a BDM/BDE by account (they get a CRM notification and an email), or to nobody */
+  const setAssignee = async (source: string, id: number, value: string) => {
+    const who = team.find((t) => String(t.id) === value) || null;
     setBusy(true);
     setError("");
     const res = await fetch("/api/crm/enquiries", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ source, id, assignedTo }),
+      body: JSON.stringify({ source, id, assignedUserId: who ? who.id : null }),
     }).catch(() => null);
     setBusy(false);
-    if (!res?.ok) return setError("Couldn't update the assigned team member. Please try again.");
-    toast(assignedTo ? `Assigned to ${assignedTo}` : "Unassigned");
+    const json = res ? await res.json().catch(() => null) : null;
+    if (!res?.ok) return setError(json?.error || "Couldn't update the assigned team member. Please try again.");
+    toast(who ? `Assigned to ${who.name}. They've been notified.` : "Unassigned");
     if (open && open.source === source && open.id === id) {
-      setOpen({ ...open, assignedTo: assignedTo || null });
+      setOpen({ ...open, assignedTo: who?.name || null, assignedUserId: who?.id ?? null });
       void refreshOpen(source, id);
     }
     router.refresh();
   };
 
   const removeKeys = async (keys: string[], what: string) => {
-    if (!(await confirm({ title: `Delete ${what}?`, message: "It will be permanently removed from the CRM and the database. This can't be undone." }))) return false;
+    // a soft delete: to the Deleted bin, with an optional reason
+    const reason = await ask({
+      title: `Delete ${what}?`,
+      message: "It moves to the Deleted bin, where the Super Admin can restore it or remove it for good.",
+      input: { label: "Reason (optional)", placeholder: "e.g. duplicate, test entry, spam", optional: true },
+      confirmLabel: "Yes, delete",
+    });
+    if (reason === null) return false;
     setBusy(true);
     setError("");
     const res = await fetch("/api/crm/enquiries", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ keys }),
+      body: JSON.stringify({ keys, reason }),
     }).catch(() => null);
     setBusy(false);
     if (!res?.ok && res?.status !== 404) {
@@ -371,7 +461,7 @@ export default function LeadsView({
       toast("Couldn't delete. Please try again.", "error");
       return false;
     }
-    toast(keys.length === 1 ? "Lead deleted" : `${keys.length} leads deleted`);
+    toast(keys.length === 1 ? "Lead moved to the Deleted bin" : `${keys.length} leads moved to the Deleted bin`);
     router.refresh();
     return true;
   };
@@ -410,6 +500,19 @@ export default function LeadsView({
       openForm("new");
     }
   }, [openNew]);
+
+  /* ?open=source:id (from a notification or email): open that lead once */
+  const openedKey = useRef("");
+  useEffect(() => {
+    if (!openKey || openedKey.current === openKey) return;
+    const [src, raw] = openKey.split(":");
+    const id = Number(raw);
+    if (!src || !Number.isInteger(id) || id < 1) return;
+    openedKey.current = openKey;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- opens the lead the link points to, once
+    void show({ key: openKey, source: src, id } as LeadRow);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs when the link changes
+  }, [openKey]);
 
   useEffect(() => {
     const handleOpenNew = () => {
@@ -480,6 +583,14 @@ export default function LeadsView({
     setForm((f) => ({ ...f, category: "" }));
   };
 
+  /* the assignee is sent only when an Admin changed it (a BDM/BDE never sends one) */
+  const leadPayload = (was: EnquiryRow | null, id?: number, source?: string) => {
+    const { assignedUserId, ...rest } = form;
+    const before = was?.assignedUserId ? String(was.assignedUserId) : "";
+    const assignee = perms.assign && (!was || assignedUserId !== before) ? { assignedUserId: assignedUserId ? Number(assignedUserId) : null } : {};
+    return was ? { ...rest, ...assignee, id, source } : { ...rest, ...assignee };
+  };
+
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
@@ -491,7 +602,7 @@ export default function LeadsView({
     const res = await fetch("/api/crm/enquiries", {
       method: isNew ? "POST" : "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(isNew ? form : { ...form, id: editId, source: editSource }),
+      body: JSON.stringify(leadPayload(isNew ? null : (editing as EnquiryRow), editId, editSource)),
     }).catch(() => null);
     setBusy(false);
     const json = res ? await res.json().catch(() => ({})) : {};
@@ -788,7 +899,7 @@ export default function LeadsView({
 
   return (
     <>
-      <BulkBar sel={sel} noun={["lead", "leads"]} busy={busy} onDelete={removeSelected}>
+      <BulkBar sel={sel} noun={["lead", "leads"]} busy={busy} onDelete={perms.remove ? removeSelected : undefined}>
         {sel.selected.length > 0 && (
           <a href={`/api/crm/enquiries/export?keys=${encodeURIComponent(sel.selected.join(","))}`} className="crm-act crm-act-ghost crm-act-sm">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -835,6 +946,11 @@ export default function LeadsView({
                   </td>
                   <td data-label="Name" className="crm-cell-main">
                     <span className="crm-strong">{r.name}</span>
+                    {r.clientSince && (
+                      <span className="crm-client-tag" title={`Became a client on ${fmtDate(r.clientSince, true)}`} suppressHydrationWarning>
+                        Client
+                      </span>
+                    )}
                     {r.company && <span className="crm-cell-sub">{r.company}</span>}
                     {/* shown here when the Email and Phone columns are folded away (narrower screens) */}
                     <span className="crm-lead-contact-inline">
@@ -872,33 +988,29 @@ export default function LeadsView({
                     )}
                   </td>
                   <td data-label="Assigned To" className="crm-nowrap" onClick={(e) => e.stopPropagation()}>
-                    <select
-                      className="crm-mgmt-select"
-                      style={{ height: "30px", fontSize: "12px", minWidth: "125px" }}
-                      value={r.assignedTo || ""}
-                      disabled={busy || viewOnly}
-                      onChange={(e) => setAssignedTo(r.source, r.id, e.target.value)}
-                      aria-label={`Assigned team member for ${r.name}`}
-                    >
-                      <option value="">Not assigned</option>
-                      {team.map((t) => (
-                        <option key={t} value={t}>
-                          {t}
-                        </option>
-                      ))}
-                      {r.assignedTo && !team.includes(r.assignedTo) && (
-                        <option value={r.assignedTo}>{r.assignedTo}</option>
-                      )}
-                    </select>
+                    {perms.assign && !viewOnly ? (
+                      <AssigneeSelect
+                        value={r.assignedUserId}
+                        legacyName={r.assignedTo}
+                        team={team}
+                        label={assigneeLabel}
+                        disabled={busy}
+                        aria={`Assigned team member for ${r.name}`}
+                        compact
+                        onChange={(v) => setAssignee(r.source, r.id, v)}
+                      />
+                    ) : (
+                      <span className={r.assignedTo ? "" : "crm-muted"}>{r.assignedTo || "Not assigned"}</span>
+                    )}
                   </td>
                   <td data-label="Received" className="crm-nowrap">
                     {fmtDate(r.createdAt, true)}
                   </td>
                   <td data-label="Lead Status" onClick={(e) => e.stopPropagation()}>
-                    <StatusSelect value={r.status} busy={busy} label={`Lead status for ${r.name}`} onChange={(s) => setStatus(r.source, r.id, s)} />
+                    <StatusSelect value={r.status} busy={busy} locked={!perms.edit} label={`Lead status for ${r.name}`} onChange={(s) => setStatus(r.source, r.id, s)} />
                   </td>
                   <td data-label="Project Status" onClick={(e) => e.stopPropagation()}>
-                    <ProjectStatusSelect value={r.projectStatus || "Not Started"} busy={busy} label={`Project status for ${r.name}`} onChange={(s) => setProjectStatus(r.source, r.id, s)} />
+                    <ProjectStatusSelect value={r.projectStatus || "Not Started"} busy={busy} locked={!perms.edit} label={`Project status for ${r.name}`} onChange={(s) => setProjectStatus(r.source, r.id, s)} />
                   </td>
                   <td data-label="Actions" className="crm-nowrap" onClick={(e) => e.stopPropagation()} style={{ textAlign: "center" }}>
                     <div className="crm-tbl-actions">
@@ -914,7 +1026,7 @@ export default function LeadsView({
                           <circle cx="12" cy="12" r="3" />
                         </svg>
                       </button>
-                      {!viewOnly && (<>
+                      {!viewOnly && perms.edit && (
                       <button
                         type="button"
                         className="crm-tbl-btn crm-tbl-btn-edit"
@@ -926,6 +1038,8 @@ export default function LeadsView({
                           <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
                         </svg>
                       </button>
+                      )}
+                      {!viewOnly && perms.remove && (
                       <button
                         type="button"
                         className="crm-tbl-btn crm-tbl-btn-del"
@@ -938,7 +1052,7 @@ export default function LeadsView({
                           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                         </svg>
                       </button>
-                      </>)}
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -957,8 +1071,12 @@ export default function LeadsView({
             </svg>
           </div>
           <p className="crm-empty-title">No enquiries found</p>
-          <p className="crm-empty-sub">Contact form submissions, service requests, and manual leads will appear here.</p>
-          {!viewOnly && <button type="button" className="crm-act crm-act-dark" onClick={() => openForm("new")}>
+          <p className="crm-empty-sub">
+            {perms.ownOnly
+              ? "Leads an Admin assigns to you will appear here."
+              : "Contact form submissions, service requests, and manual leads will appear here."}
+          </p>
+          {!viewOnly && perms.add && <button type="button" className="crm-act crm-act-dark" onClick={() => openForm("new")}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
               <path d="M12 5v14M5 12h14" />
             </svg>
@@ -992,6 +1110,11 @@ export default function LeadsView({
                   <div className="crm-lead-title-row">
                     <h2 className="crm-drawer-title" style={{ fontSize: "18px" }}>{open.name}</h2>
                     <span className="crm-lead-badge-pill">{SOURCE_LABEL[open.source]}</span>
+                    {open.clientSince && (
+                      <span className="crm-client-tag" title={`Became a client on ${fmtDate(open.clientSince, true)}`}>
+                        Client since {fmtDate(open.clientSince, false)}
+                      </span>
+                    )}
                   </div>
                   <p className="crm-muted" style={{ margin: "2px 0 0 0", fontSize: "12px" }}>
                     {open.company ? `${open.company} · ` : ""}{open.service || SOURCE_LABEL[open.source]} • Received {fmtDate(open.createdAt, true)}
@@ -1030,9 +1153,10 @@ export default function LeadsView({
                     Email
                   </a>
                 )}
+                {perms.meetings && !viewOnly && (
                 <a
                   className="crm-head-btn"
-                  href={`/crm/meetings?arrange=1&name=${encodeURIComponent(open.name)}&email=${encodeURIComponent(open.email || "")}&phone=${encodeURIComponent(open.phone || "")}`}
+                  href={`/crm/meetings?arrange=1&name=${encodeURIComponent(open.name)}&email=${encodeURIComponent(open.email || "")}&phone=${encodeURIComponent(open.phone || "")}&leadSource=${encodeURIComponent(open.source)}&leadId=${open.id}`}
                   title="Schedule a Calendly call with this lead"
                 >
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -1043,13 +1167,16 @@ export default function LeadsView({
                   </svg>
                   Schedule Call
                 </a>
-                {!viewOnly && (<>
+                )}
+                {!viewOnly && perms.edit && (
                 <button type="button" className="crm-head-btn" onClick={() => editLead(open)}>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
                   </svg>
                   Edit
                 </button>
+                )}
+                {!viewOnly && perms.remove && (
                 <button
                   type="button"
                   className="crm-head-btn crm-head-btn-del"
@@ -1064,7 +1191,7 @@ export default function LeadsView({
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                   </svg>
                 </button>
-                </>)}
+                )}
               </div>
             </div>
 
@@ -1075,7 +1202,7 @@ export default function LeadsView({
                 <select
                   className="crm-mgmt-select crm-mgmt-status-select"
                   value={open.status}
-                  disabled={busy || viewOnly}
+                  disabled={busy || viewOnly || !perms.edit}
                   onChange={(e) => setStatus(open.source, open.id, e.target.value)}
                   aria-label="Lead status"
                 >
@@ -1092,7 +1219,7 @@ export default function LeadsView({
                 <select
                   className="crm-mgmt-select crm-mgmt-project-select"
                   value={open.projectStatus || "Not Started"}
-                  disabled={busy || viewOnly}
+                  disabled={busy || viewOnly || !perms.edit}
                   onChange={(e) => setProjectStatus(open.source, open.id, e.target.value)}
                   aria-label="Project status"
                 >
@@ -1106,23 +1233,19 @@ export default function LeadsView({
 
               <div className="crm-mgmt-card">
                 <span className="crm-mgmt-label">Handled By</span>
-                <select
-                  className="crm-mgmt-select"
-                  value={open.assignedTo || ""}
-                  disabled={busy || viewOnly}
-                  onChange={(e) => setAssignedTo(open.source, open.id, e.target.value)}
-                  aria-label="Assigned team member"
-                >
-                  <option value="">Not assigned yet</option>
-                  {team.map((t) => (
-                    <option key={t} value={t}>
-                      {t}
-                    </option>
-                  ))}
-                  {open.assignedTo && !team.includes(open.assignedTo) && (
-                    <option value={open.assignedTo}>{open.assignedTo}</option>
-                  )}
-                </select>
+                {perms.assign && !viewOnly ? (
+                  <AssigneeSelect
+                    value={open.assignedUserId}
+                    legacyName={open.assignedTo}
+                    team={team}
+                    label={assigneeLabel}
+                    disabled={busy}
+                    aria="Assigned team member"
+                    onChange={(v) => setAssignee(open.source, open.id, v)}
+                  />
+                ) : (
+                  <div className="crm-mgmt-val">{open.assignedTo || "Not assigned yet"}</div>
+                )}
               </div>
 
               <div className="crm-mgmt-card">
@@ -1147,7 +1270,8 @@ export default function LeadsView({
               </div>
             </div>
 
-            {/* Payment Links card */}
+            {/* Payment Links card (not for BDMs and BDEs) */}
+            {!perms.ownOnly && (
             <div className="crm-drawer-card">
               <div className="crm-drawer-card-head">
                 <span className="crm-drawer-card-title">
@@ -1158,7 +1282,7 @@ export default function LeadsView({
                   Payment Links · Orders &amp; Payments
                   {paymentLinks.length > 0 && <span className="crm-count-badge">{paymentLinks.length}</span>}
                 </span>
-                {!viewOnly && (
+                {!viewOnly && perms.payLinks && (
                 <button
                   type="button"
                   className="crm-act crm-act-sm"
@@ -1192,7 +1316,7 @@ export default function LeadsView({
                         <span>• Created {fmtDate(pl.createdAt, false)}</span>
                       </div>
                       <div className="crm-lead-link-actions">
-                        {!viewOnly && pl.linkStatus !== "cancelled" && (
+                        {!viewOnly && perms.payLinks && pl.linkStatus !== "cancelled" && (
                         <button
                           type="button"
                           className="crm-att-btn"
@@ -1212,7 +1336,7 @@ export default function LeadsView({
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                           Open Checkout
                         </a>
-                        {!viewOnly && open.phone && pl.linkStatus !== "cancelled" && (
+                        {!viewOnly && perms.payLinks && open.phone && pl.linkStatus !== "cancelled" && (
                           <a
                             href={leadWhatsAppUrl(pl, open.phone)}
                             target="_blank"
@@ -1224,7 +1348,7 @@ export default function LeadsView({
                             WhatsApp
                           </a>
                         )}
-                        {!viewOnly && pl.status !== "paid" && pl.linkStatus !== "used" && (
+                        {!viewOnly && perms.payLinks && pl.status !== "paid" && pl.linkStatus !== "used" && (
                           pl.linkStatus === "cancelled" ? (
                             <button type="button" className="crm-att-btn" onClick={() => setPaymentLinkActive(pl.id, true)}>
                               Activate Link
@@ -1241,6 +1365,7 @@ export default function LeadsView({
                 </div>
               )}
             </div>
+            )}
 
             {/* Attachments card */}
             <div className="crm-drawer-card">
@@ -1260,7 +1385,7 @@ export default function LeadsView({
                   Attachments
                   {attachments.length > 0 && <span className="crm-count-badge">{attachments.length}</span>}
                 </span>
-                {!viewOnly && (
+                {!viewOnly && perms.files && (
                 <button
                   type="button"
                   className="crm-act crm-act-ghost crm-act-sm"
@@ -1317,7 +1442,7 @@ export default function LeadsView({
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                           Download
                         </a>
-                        {!viewOnly && (
+                        {!viewOnly && perms.files && (
                         <button
                           type="button"
                           className="crm-att-btn crm-att-btn-del"
@@ -1767,15 +1892,27 @@ export default function LeadsView({
                 </select>
                 {err("projectStatus")}
               </label>
-              <label className="crm-field">
-                <span className="crm-label">Assigned to</span>
-                <input className="crm-input" list="crm-team" value={form.assignedTo} onChange={set("assignedTo")} placeholder="Select a team member or type a name" />
-                <datalist id="crm-team">
-                  {team.map((t) => (
-                    <option key={t} value={t} />
-                  ))}
-                </datalist>
-              </label>
+              {perms.assign ? (
+                <label className="crm-field">
+                  <span className="crm-label">Assigned to (BDM or BDE)</span>
+                  <AssigneeSelect
+                    value={form.assignedUserId ? Number(form.assignedUserId) : null}
+                    legacyName={form.assignedTo}
+                    team={team}
+                    label={assigneeLabel}
+                    disabled={busy}
+                    aria="Assigned to"
+                    input
+                    onChange={(v) => setForm((f) => ({ ...f, assignedUserId: v, assignedTo: team.find((t) => String(t.id) === v)?.name || "" }))}
+                  />
+                  {err("assignedTo")}
+                </label>
+              ) : (
+                <label className="crm-field">
+                  <span className="crm-label">Assigned to</span>
+                  <input className="crm-input" value={editing === "new" && perms.ownOnly ? currentUser?.name || "" : form.assignedTo || "Not assigned"} readOnly disabled />
+                </label>
+              )}
               <label className="crm-field crm-span-3">
                 <span className="crm-label">Notes &amp; requirements</span>
                 <textarea className="crm-input crm-textarea" rows={4} value={form.notes} onChange={set("notes")} placeholder="Requirements, deadlines or anything the team should know" />

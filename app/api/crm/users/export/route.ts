@@ -1,4 +1,5 @@
-import { getCurrentUser, isSuperAdmin } from "@/lib/crm/auth";
+import { getUserFor, roleName } from "@/lib/crm/auth";
+import { ROLE_ACCESS } from "@/lib/crm/roles";
 import { listUsers } from "@/lib/crm/users";
 import { getPool } from "@/lib/db";
 import type { RowDataPacket } from "mysql2/promise";
@@ -7,21 +8,12 @@ import { SOURCES } from "@/lib/crm/data";
 import { exportStamp, exportZone, viewerTimeZone } from "@/lib/crm/crmTime";
 
 /*
- * GET → the CRM team (super admin only) as a CSV file. Passwords are never
+ * GET → the CRM team (Super Admin and Admin) as a CSV file. Passwords are never
  * exported; the file only says when each one was last changed.
  */
-const ROLE = { super_admin: "Super Admin", admin: "Admin", seo: "SEO", viewer: "Viewer", hr: "HR" } as const;
-const ACCESS = {
-  super_admin: "Everything, including Team & Users",
-  admin: "Dashboard, enquiries, meetings, payments, blogs, job openings and applications",
-  seo: "Blogs and job openings only",
-  viewer: "Views everything except Team & Users; can't change anything",
-  hr: "Job openings and job applications only",
-} as const;
-
 export async function GET() {
-  const me = await getCurrentUser();
-  if (!me || !isSuperAdmin(me)) return new Response("Only the super admin can export the team.", { status: 403 });
+  const me = await getUserFor("users");
+  if (!me) return new Response("Please sign in again.", { status: 401 });
   const users = await listUsers({ withPasswords: false });
   const [extra] = await getPool()
     .query<RowDataPacket[]>("SELECT id, password_changed_at FROM crm_users")
@@ -45,8 +37,8 @@ export async function GET() {
     u.name,
     u.username,
     u.email,
-    ROLE[u.role],
-    ACCESS[u.role],
+    roleName(u.role),
+    ROLE_ACCESS[u.role],
     u.isActive ? "Active" : "Turned off",
     leads.get(u.name) || 0,
     exportStamp(u.lastLoginAt, tz) || "Never",

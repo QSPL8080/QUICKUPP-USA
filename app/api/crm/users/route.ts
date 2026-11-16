@@ -1,13 +1,12 @@
 import { getPool } from "@/lib/db";
-import { getCurrentUser, hashPassword, isSuperAdmin } from "@/lib/crm/auth";
+import { getUserFor, hashPassword } from "@/lib/crm/auth";
 import { EMAIL_RE, USERNAME_RE, readAccountFields, savePassword, uniqueErrors } from "@/lib/crm/users";
 import { readJson } from "@/lib/enquiry";
 
-/* POST { name, username, email, password, role } → super admin adds an Admin, SEO, Viewer or HR account */
+/* POST { name, username, email, password, role } → the Super Admin or an Admin adds a team account (any role but Super Admin) */
 export async function POST(request: Request) {
-  const me = await getCurrentUser();
+  const me = await getUserFor("users");
   if (!me) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
-  if (!isSuperAdmin(me)) return Response.json({ ok: false, error: "Only the super admin can add users." }, { status: 403 });
   const body = await readJson(request);
   if (!body) return Response.json({ ok: false, error: "Invalid request." }, { status: 400 });
 

@@ -5,8 +5,9 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import "@/app/crm/crm-more.css";
 import { SideHide } from "@/components/crm/SideToggle";
+import { canAccess, roleName, type CrmRole } from "@/lib/crm/roles";
 
-type NavUser = { id: number; name: string; email: string; role: "super_admin" | "admin" | "seo" | "viewer" | "hr" };
+type NavUser = { id: number; name: string; email: string; role: CrmRole };
 
 const I = {
   dashboard: "M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z",
@@ -16,6 +17,8 @@ const I = {
   jobs: "M10 6V5a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v1M4 6h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2zM2 12h20",
   blogs: "M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5zM6 6h10M6 10h10M6 14h6",
   users: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75",
+  clients: "M20 7h-4V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM10 5h4v2h-4zM2 13h20",
+  trash: "M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6",
   logout: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9",
   menu: "M4 6h16M4 12h16M4 18h16",
   chevron: "M6 9l6 6 6-6",
@@ -33,10 +36,9 @@ export default function CrmSidebar({ user, newCounts }: { user: NavUser; newCoun
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  // the SEO role sees only Blogs and Job Openings
+  // each role sees only its own tabs (lib/crm/roles)
+  const can = (area: Parameters<typeof canAccess>[1]) => canAccess(user, area);
   const seo = user.role === "seo";
-  // HR sees only the Careers tabs
-  const hr = user.role === "hr";
   const [leaving, setLeaving] = useState(false);
   const on = (href: string) => (href === "/crm" ? pathname === "/crm" : pathname.startsWith(href));
   const payOn = pathname.startsWith("/crm/payments");
@@ -78,81 +80,108 @@ export default function CrmSidebar({ user, newCounts }: { user: NavUser; newCoun
         </div>
 
         <nav className="crm-nav" aria-label="CRM" onClick={() => setOpen(false)}>
-          {!seo && !hr && (
+          {can("dashboard") && (
+            <Link href="/crm" className={`crm-nav-link${on("/crm") ? " is-on" : ""}`}>
+              <Icon d={I.dashboard} />
+              <span>Dashboard</span>
+            </Link>
+          )}
+          {can("leads") && (
+            <Link href="/crm/enquiries" className={`crm-nav-link${on("/crm/enquiries") ? " is-on" : ""}`}>
+              <Icon d={I.contact} />
+              <span>{user.role === "bdm" || user.role === "bde" ? "My Enquiries" : "All Enquiries"}</span>
+              {badge("leads")}
+            </Link>
+          )}
+
+          {can("meetings") && (
+            <Link href="/crm/meetings" className={`crm-nav-link${on("/crm/meetings") ? " is-on" : ""}`}>
+              <Icon d={I.meetings} />
+              <span>Calendly Meetings</span>
+            </Link>
+          )}
+
+          {can("payments") && (
             <>
-          <Link href="/crm" className={`crm-nav-link${on("/crm") ? " is-on" : ""}`}>
-            <Icon d={I.dashboard} />
-            <span>Dashboard</span>
-          </Link>
-          <Link href="/crm/enquiries" className={`crm-nav-link${on("/crm/enquiries") ? " is-on" : ""}`}>
-            <Icon d={I.contact} />
-            <span>All Enquiries</span>
-            {badge("leads")}
-          </Link>
-
-          <Link href="/crm/meetings" className={`crm-nav-link${on("/crm/meetings") ? " is-on" : ""}`}>
-            <Icon d={I.meetings} />
-            <span>Calendly Meetings</span>
-          </Link>
-
-          <button
-            type="button"
-            className={`crm-nav-link crm-nav-toggle${payOn ? " is-group-on" : ""}${payOpen ? " is-open" : ""}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              setPayOpen((o) => !o);
-            }}
-            aria-expanded={payOpen}
-            aria-controls="crm-nav-payments"
-          >
-            <Icon d={I.payments} />
-            <span>Payments</span>
-            <span className="crm-nav-chevron" aria-hidden="true">
-              <Icon d={I.chevron} />
-            </span>
-          </button>
-          <div id="crm-nav-payments" className={`crm-nav-sub crm-nav-collapse${payOpen ? " is-open" : ""}`} hidden={!payOpen}>
-            <Link href="/crm/payments/dashboard" className={`crm-nav-link crm-nav-sublink${payDash ? " is-on" : ""}`}>
-              <span className="crm-nav-dot" aria-hidden="true" />
-              <span>Payments Dashboard</span>
-            </Link>
-            <Link href="/crm/payments" className={`crm-nav-link crm-nav-sublink${payOn && !payDash ? " is-on" : ""}`}>
-              <span className="crm-nav-dot" aria-hidden="true" />
-              <span>All Payments</span>
-            </Link>
-          </div>
+              <button
+                type="button"
+                className={`crm-nav-link crm-nav-toggle${payOn ? " is-group-on" : ""}${payOpen ? " is-open" : ""}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setPayOpen((o) => !o);
+                }}
+                aria-expanded={payOpen}
+                aria-controls="crm-nav-payments"
+              >
+                <Icon d={I.payments} />
+                <span>Payments</span>
+                <span className="crm-nav-chevron" aria-hidden="true">
+                  <Icon d={I.chevron} />
+                </span>
+              </button>
+              <div id="crm-nav-payments" className={`crm-nav-sub crm-nav-collapse${payOpen ? " is-open" : ""}`} hidden={!payOpen}>
+                <Link href="/crm/payments/dashboard" className={`crm-nav-link crm-nav-sublink${payDash ? " is-on" : ""}`}>
+                  <span className="crm-nav-dot" aria-hidden="true" />
+                  <span>Payments Dashboard</span>
+                </Link>
+                <Link href="/crm/payments" className={`crm-nav-link crm-nav-sublink${payOn && !payDash ? " is-on" : ""}`}>
+                  <span className="crm-nav-dot" aria-hidden="true" />
+                  <span>All Payments</span>
+                </Link>
+              </div>
             </>
           )}
 
-          {!hr && (
-          <Link href="/crm/blogs" className={`crm-nav-link${on("/crm/blogs") ? " is-on" : ""}`}>
-            <Icon d={I.blogs} />
-            <span>Blogs (Website)</span>
-          </Link>
+          {can("clients") && (
+            <Link href="/crm/clients" className={`crm-nav-link${on("/crm/clients") ? " is-on" : ""}`}>
+              <Icon d={I.clients} />
+              <span>Clients</span>
+            </Link>
           )}
 
-          <p className="crm-nav-group">
-            <Icon d={I.jobs} />
-            <span>Careers</span>
-          </p>
-          <div className="crm-nav-sub">
-            <Link href="/crm/jobs" className={`crm-nav-link crm-nav-sublink${on("/crm/jobs") ? " is-on" : ""}`}>
-              <span className="crm-nav-dot" aria-hidden="true" />
-              <span>Job Openings (Website)</span>
+          {can("blogs") && (
+            <Link href="/crm/blogs" className={`crm-nav-link${on("/crm/blogs") ? " is-on" : ""}`}>
+              <Icon d={I.blogs} />
+              <span>Blogs (Website)</span>
             </Link>
-            {!seo && (
-              <Link href="/crm/applications" className={`crm-nav-link crm-nav-sublink${on("/crm/applications") ? " is-on" : ""}`}>
-                <span className="crm-nav-dot" aria-hidden="true" />
-                <span>Job Applications</span>
-                {badge("applications")}
-              </Link>
-            )}
-          </div>
+          )}
 
-          {user.role === "super_admin" && (
+          {(can("jobs") || can("applications")) && (
+            <>
+              <p className="crm-nav-group">
+                <Icon d={I.jobs} />
+                <span>Careers</span>
+              </p>
+              <div className="crm-nav-sub">
+                {can("jobs") && (
+                  <Link href="/crm/jobs" className={`crm-nav-link crm-nav-sublink${on("/crm/jobs") ? " is-on" : ""}`}>
+                    <span className="crm-nav-dot" aria-hidden="true" />
+                    <span>Job Openings (Website)</span>
+                  </Link>
+                )}
+                {can("applications") && !seo && (
+                  <Link href="/crm/applications" className={`crm-nav-link crm-nav-sublink${on("/crm/applications") ? " is-on" : ""}`}>
+                    <span className="crm-nav-dot" aria-hidden="true" />
+                    <span>Job Applications</span>
+                    {badge("applications")}
+                  </Link>
+                )}
+              </div>
+            </>
+          )}
+
+          {can("users") && (
             <Link href="/crm/users" className={`crm-nav-link${on("/crm/users") ? " is-on" : ""}`}>
               <Icon d={I.users} />
               <span>Team &amp; Users</span>
+            </Link>
+          )}
+
+          {can("trash") && (
+            <Link href="/crm/deleted" className={`crm-nav-link${on("/crm/deleted") ? " is-on" : ""}`}>
+              <Icon d={I.trash} />
+              <span>Deleted</span>
+              {badge("trash")}
             </Link>
           )}
         </nav>
@@ -167,7 +196,7 @@ export default function CrmSidebar({ user, newCounts }: { user: NavUser; newCoun
               <span className="crm-avatar" aria-hidden="true">{user.name.slice(0, 1).toUpperCase()}</span>
               <span className="crm-user-text">
                 <span className="crm-user-name">{user.name}</span>
-                <span className="crm-user-role">{user.role === "super_admin" ? "Super Admin" : seo ? "SEO" : hr ? "HR" : user.role === "viewer" ? "Viewer" : "Admin"}</span>
+                <span className="crm-user-role">{roleName(user.role)}</span>
               </span>
             </Link>
             <button type="button" className="crm-icon-act crm-logout" onClick={logout} disabled={leaving} aria-label="Sign out" title="Sign out">

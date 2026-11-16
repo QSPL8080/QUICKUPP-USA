@@ -1,11 +1,12 @@
 import { getPool } from "@/lib/db";
-import { getUserFor } from "@/lib/crm/auth";
+import { getUserFor, isAdminLike } from "@/lib/crm/auth";
 import { validatePayment } from "@/lib/crm/payments";
 import { readJson } from "@/lib/enquiry";
 import { actorOf } from "@/lib/crm/activity";
 import { logPaymentChanges, paymentSnapshot } from "@/lib/crm/paymentActivity";
 import { resolvePayTable } from "@/lib/crm/paymentTable";
 import { deletePayments } from "@/lib/crm/paymentDeletion";
+import { markClientFromRecord } from "@/lib/crm/clients";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -36,20 +37,24 @@ export async function PATCH(request: Request, ctx: Ctx) {
   );
   const after = await paymentSnapshot("payments", id);
   if (after) await logPaymentChanges("payments", id, before, after, actorOf(user));
+  await markClientFromRecord("payments", id);
   return Response.json({ ok: true });
 }
 
-/* DELETE → permanently remove a payment (any CRM user) */
+/* DELETE { reason? } → move a payment to the Deleted bin (Admins only) */
 export async function DELETE(request: Request, ctx: Ctx) {
   const user = await getUserFor("payments");
   if (!user) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
+  // only Admins and the Super Admin delete payment records (an Accountant cannot)
+  if (!isAdminLike(user)) return Response.json({ ok: false, error: "Only an Admin can delete payments." }, { status: 403 });
   const id = await parseId(ctx);
   if (!id) return Response.json({ ok: false, error: "Invalid request." }, { status: 400 });
   // ?table= says which record: a payment and a payment link can share an id
   const picked = await resolvePayTable(id, new URL(request.url).searchParams.get("table"));
   if ("error" in picked) return Response.json({ ok: false, error: picked.error }, { status: picked.status });
-  // permanently removed from the database, with its transactions; who deleted it is kept in the history and emailed
-  const deleted = await deletePayments(picked.table, [id], user).catch((err) => {
+  // see lib/crm/paymentDeletion: to the Deleted bin; who deleted it is kept in the history and emailed
+  const body = await request.json().catch(() => null);
+  const deleted = await deletePayments(picked.table, [id], user, typeof body?.reason === "string" ? body.reason : "").catch((err) => {
     console.error("[payments] delete failed:", err);
     return -1;
   });

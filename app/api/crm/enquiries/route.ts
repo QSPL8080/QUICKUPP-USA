@@ -1,5 +1,8 @@
 import { getPool } from "@/lib/db";
-import { getUserFor } from "@/lib/crm/auth";
+import { getUserFor, leadPermsFor, type CrmUser } from "@/lib/crm/auth";
+import { assignableMember, canOpenLead, leadAssigneeId, notifyLeadAssigned } from "@/lib/crm/leadAccess";
+import { deleteOrTrash } from "@/lib/crm/trash";
+import { SOURCE_LABEL } from "@/lib/crm/leadOptions";
 import { ENQUIRY_STATUSES, SOURCES, getLead, isEnquirySource, toDateOnly, type EnquirySource } from "@/lib/crm/data";
 import { validateManualLead } from "@/lib/crm/leadOptions";
 import { readJson } from "@/lib/enquiry";
@@ -10,16 +13,33 @@ import { errCode } from "@/lib/err";
 
 const unauthorized = () => Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
 const invalid = () => Response.json({ ok: false, error: "Invalid request." }, { status: 400 });
+const refused = (error = "Your role can't make this change.") => Response.json({ ok: false, error }, { status: 403 });
+const notYours = () => Response.json({ ok: false, error: "This lead isn't assigned to you." }, { status: 404 });
+
+/* tells the newly assigned BDM/BDE (never the person who assigned it to themselves) */
+async function tellAssignee(source: EnquirySource, id: number, assigneeId: number, by: CrmUser) {
+  if (assigneeId === by.id) return;
+  const [member, lead] = await Promise.all([assignableMember(assigneeId), getLead(source, id)]);
+  if (!member || !lead) return;
+  await notifyLeadAssigned(
+    { source, id, name: lead.name, email: lead.email, phone: lead.phone, company: lead.company, service: lead.service },
+    member,
+    by
+  ).catch((err) => console.error("[enquiries] could not notify the assignee:", err));
+}
 
 /* GET ?source=&id= → one lead with all its details, attachments, and payment links */
 export async function GET(request: Request) {
-  if (!(await getUserFor("leads"))) return unauthorized();
+  const user = await getUserFor("leads");
+  if (!user) return unauthorized();
   const url = new URL(request.url);
   const source = url.searchParams.get("source");
   const id = Number(url.searchParams.get("id"));
   if (!isEnquirySource(source) || !Number.isInteger(id) || id < 1) return invalid();
   const lead = await getLead(source, id);
   if (!lead) return Response.json({ ok: false, error: "This lead was deleted." }, { status: 404 });
+  // a BDM/BDE opens only the leads assigned to them
+  if (leadPermsFor(user).ownOnly && lead.assignedUserId !== user.id) return notYours();
 
   const pool = getPool();
 
@@ -100,30 +120,46 @@ export async function GET(request: Request) {
 
   const { activity, audit } = await leadHistory(source, id, lead);
 
-  return Response.json({ ok: true, lead, attachments, paymentLinks, activity, audit });
+  // BDMs and BDEs don't see payments
+  const perms = leadPermsFor(user);
+  return Response.json({ ok: true, lead, attachments, paymentLinks: perms.ownOnly ? [] : paymentLinks, activity, audit });
 }
 
-/* POST → add a lead by hand */
+/* POST → add a lead by hand (Admins and the Super Admin) */
 export async function POST(request: Request) {
   const user = await getUserFor("leads");
   if (!user) return unauthorized();
+  const perms = leadPermsFor(user);
+  if (!perms.add) return refused("Only an Admin can add enquiries.");
   const body = await readJson(request);
   if (!body) return invalid();
   const result = validateManualLead(body);
   if (!result.ok) return Response.json({ ok: false, errors: result.errors }, { status: 400 });
   const d = result.data;
-  // only who was actually chosen; the person adding the lead is not assumed to be the assignee
-  const assignedTo = d.assignedTo ? d.assignedTo : null;
+  // Admins pick a BDM/BDE (or nobody); a lead a BDM/BDE adds is theirs. The person
+  // adding the lead is not otherwise assumed to be the assignee.
+  let assigneeId: number | null = null;
+  let assignedTo: string | null = null;
+  if (perms.ownOnly) {
+    assigneeId = user.id;
+    assignedTo = user.name;
+  } else if (body.assignedUserId) {
+    const m = await assignableMember(body.assignedUserId);
+    if (!m) return Response.json({ ok: false, errors: { assignedTo: "Choose an active BDM or BDE." } }, { status: 400 });
+    assigneeId = m.id;
+    assignedTo = m.name;
+  }
   const [res] = await getPool().execute(
     `INSERT INTO manual_leads
       (full_name, email, phone, company_name, company_website, country, industry, service, category, budget, timeline,
-       lead_channel, assigned_to, message, status, project_status, created_by)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       lead_channel, assigned_to, assigned_user_id, message, status, project_status, created_by)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [d.fullName, d.email, d.phone, d.companyName, d.companyWebsite, d.country, d.industry, d.service, d.category, d.budget, d.timeline,
-      d.channel, assignedTo, d.notes, d.status, d.projectStatus || "Not Started", user.id]
+      d.channel, assignedTo, assigneeId, d.notes, d.status, d.projectStatus || "Not Started", user.id]
   );
   const newId = (res as { insertId: number }).insertId;
   await logLeadCreated(newId, actorOf(user), assignedTo || "", d.channel || "Manual");
+  if (assigneeId) await tellAssignee("manual", newId, assigneeId, user);
   return Response.json({ ok: true, id: newId });
 }
 
@@ -131,15 +167,34 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
   const user = await getUserFor("leads");
   if (!user) return unauthorized();
+  const perms = leadPermsFor(user);
+  if (!perms.edit) return refused();
   const body = await readJson(request);
   const id = Number(body?.id);
   const source: EnquirySource = isEnquirySource(body?.source) ? body.source : "manual";
   if (!body || !Number.isInteger(id) || id < 1) return invalid();
+  if (!(await canOpenLead(user, source, id))) return notYours();
   const result = validateManualLead(body);
   if (!result.ok) return Response.json({ ok: false, errors: result.errors }, { status: 400 });
   const d = result.data;
   const pool = getPool();
   const before = await leadSnapshot(source, id);
+  // only Admins change who the lead is assigned to (to a BDM/BDE, by account)
+  let newAssignee: number | null | undefined; // undefined: unchanged
+  if (perms.assign && body.assignedUserId !== undefined) {
+    if (body.assignedUserId) {
+      const m = await assignableMember(body.assignedUserId);
+      if (!m) return Response.json({ ok: false, errors: { assignedTo: "Choose an active BDM or BDE." } }, { status: 400 });
+      newAssignee = m.id;
+      d.assignedTo = m.name;
+    } else {
+      newAssignee = null;
+      d.assignedTo = null;
+    }
+  } else {
+    d.assignedTo = before?.assignedTo || null;
+  }
+  const previousAssignee = newAssignee === undefined ? undefined : await leadAssigneeIdSafe(source, id);
   try {
     if (source === "manual") {
       const [res] = await pool.execute(
@@ -191,6 +246,11 @@ export async function PUT(request: Request) {
     }
   }
 
+  if (newAssignee !== undefined) {
+    await pool.query(`UPDATE \`${SOURCES[source].table}\` SET assigned_user_id = ? WHERE id = ?`, [newAssignee, id]).catch(() => {});
+    if (newAssignee && newAssignee !== previousAssignee) await tellAssignee(source, id, newAssignee, user);
+  }
+
   // Keep linked payment links updated with latest customer info
   await pool.execute(
     `UPDATE payment_links SET
@@ -209,18 +269,26 @@ export async function PUT(request: Request) {
   return Response.json({ ok: true });
 }
 
-/* PATCH { source, id, status, projectStatus, assignedTo } → change a lead's status, projectStatus, or assignedTo (any CRM user) */
+/*
+ * PATCH { source, id, status, projectStatus, assignedUserId } → change a lead's
+ * statuses (Admins, and a BDM/BDE on their own leads) or assign it to a BDM/BDE
+ * (Admins; the BDM/BDE gets a CRM notification and an email)
+ */
 export async function PATCH(request: Request) {
   const user = await getUserFor("leads");
   if (!user) return unauthorized();
+  const perms = leadPermsFor(user);
+  if (!perms.edit) return refused();
   const body = await readJson(request);
   const id = Number(body?.id);
   if (!isEnquirySource(body?.source) || !Number.isInteger(id) || id < 1) {
     return invalid();
   }
   const source: EnquirySource = body.source;
+  if (!(await canOpenLead(user, source, id))) return notYours();
   const sets: string[] = [];
-  const args: (string | null)[] = [];
+  const args: (string | number | null)[] = [];
+  let newAssignee: number | null | undefined;
   if (body?.status !== undefined) {
     if (!(ENQUIRY_STATUSES as readonly string[]).includes(String(body.status))) {
       return invalid();
@@ -232,13 +300,23 @@ export async function PATCH(request: Request) {
     sets.push("project_status = ?");
     args.push(body.projectStatus ? String(body.projectStatus).trim() : "Not Started");
   }
-  if (body?.assignedTo !== undefined) {
-    sets.push("assigned_to = ?");
-    args.push(body.assignedTo ? String(body.assignedTo).trim() : null);
+  if (body?.assignedUserId !== undefined) {
+    if (!perms.assign) return refused("Only an Admin can assign leads.");
+    if (body.assignedUserId) {
+      const m = await assignableMember(body.assignedUserId);
+      if (!m) return Response.json({ ok: false, error: "Choose an active BDM or BDE." }, { status: 400 });
+      newAssignee = m.id;
+      sets.push("assigned_user_id = ?", "assigned_to = ?");
+      args.push(m.id, m.name);
+    } else {
+      newAssignee = null;
+      sets.push("assigned_user_id = NULL", "assigned_to = NULL");
+    }
   }
   if (!sets.length) return invalid();
   const before = await leadSnapshot(source, id);
   if (!before) return Response.json({ ok: false, error: "This lead was deleted." }, { status: 404 });
+  const previousAssignee = newAssignee === undefined ? undefined : await leadAssigneeIdSafe(source, id);
   try {
     await getPool().execute(
       `UPDATE \`${SOURCES[body.source].table}\` SET ${sets.join(", ")} WHERE id = ?`,
@@ -256,15 +334,21 @@ export async function PATCH(request: Request) {
   }
   const after = await leadSnapshot(source, id);
   if (after) await logLeadChanges(source, id, before, after, actorOf(user));
+  if (newAssignee && newAssignee !== previousAssignee) await tellAssignee(source, id, newAssignee, user);
   return Response.json({ ok: true });
 }
 
+const leadAssigneeIdSafe = async (source: EnquirySource, id: number) => (await leadAssigneeId(source, id)) ?? null;
+
 /*
- * DELETE { keys: ["contact:12", "manual:3", ...] } → permanently remove leads
- * from any source (super admin and admin)
+ * DELETE { keys: ["contact:12", "manual:3", ...], reason? } → delete leads from
+ * any source (Admins and the Super Admin): they move to the Deleted bin, where
+ * the Super Admin can put them back or remove them for good
  */
 export async function DELETE(request: Request) {
-  if (!(await getUserFor("leads"))) return unauthorized();
+  const user = await getUserFor("leads");
+  if (!user) return unauthorized();
+  if (!leadPermsFor(user).remove) return refused("Only an Admin can delete leads.");
   const body = await readJson(request);
   const keys = Array.isArray(body?.keys) ? body.keys : body?.source && body?.id ? [`${body.source}:${body.id}`] : null;
   if (!keys || !keys.length || keys.length > 500) return invalid();
@@ -276,20 +360,23 @@ export async function DELETE(request: Request) {
     bySource.set(src, [...(bySource.get(src) || []), id]);
   }
   let deleted = 0;
-  const pool = getPool();
+  let trashed = false;
   for (const [src, ids] of bySource) {
-    // permanently removed from the database (no hidden "deleted" copies are kept);
-    // its attachments live in the same row and go with it
-    const [res] = await pool.query(`DELETE FROM \`${SOURCES[src].table}\` WHERE id IN (?)`, [ids]);
-    deleted += (res as { affectedRows: number }).affectedRows;
-    // the lead's history and notification marks go too; payment links and payments
-    // made for it are kept (money records) but no longer point at the deleted lead
-    await pool.query("DELETE FROM crm_activity WHERE entity_type = 'lead' AND entity_source = ? AND entity_id IN (?)", [src, ids]).catch(() => {});
-    await pool.query("DELETE FROM crm_notification_reads WHERE item_key IN (?)", [ids.map((id) => `${src}:${id}`)]).catch(() => {});
-    for (const table of ["payment_links", "payments"]) {
-      await pool.query(`UPDATE \`${table}\` SET lead_id = NULL, lead_source = NULL WHERE lead_source = ? AND lead_id IN (?)`, [src, ids]).catch(() => {});
-    }
+    const r = await deleteOrTrash({
+      entity: "lead",
+      table: SOURCES[src].table,
+      ids,
+      user,
+      describe: (row) => ({
+        label: String(row.full_name || "Lead"),
+        detail: [SOURCE_LABEL[src], row.email, row.company_name].filter(Boolean).join(" · "),
+      }),
+      reason: typeof body?.reason === "string" ? body.reason : "",
+    });
+    deleted += r.count;
+    trashed = r.trashed;
   }
   if (!deleted) return Response.json({ ok: false, error: "Already deleted." }, { status: 404 });
-  return Response.json({ ok: true, deleted });
+  return Response.json({ ok: true, deleted, trashed });
 }
+

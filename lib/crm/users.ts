@@ -1,6 +1,6 @@
 import "server-only";
 import { getPool } from "@/lib/db";
-import { hashPassword } from "@/lib/crm/auth";
+import { ASSIGNABLE_ROLES, hashPassword, type AssignableRole, type CrmRole } from "@/lib/crm/auth";
 import { decryptSecret, encryptSecret } from "@/lib/crm/secret.mjs";
 import { SOURCES } from "@/lib/crm/data";
 
@@ -11,7 +11,7 @@ export type TeamUser = {
   name: string;
   username: string;
   email: string;
-  role: "super_admin" | "admin" | "seo" | "viewer" | "hr";
+  role: CrmRole;
   isActive: boolean;
   lastLoginAt: string | null;
   createdAt: string;
@@ -24,7 +24,7 @@ export async function listUsers(opts: { withPasswords?: boolean } = {}): Promise
   let rows: unknown;
   try {
     [rows] = await getPool().query(
-      "SELECT id, name, username, email, role, is_active, last_login_at, created_at, password_view, password_changed_at FROM crm_users ORDER BY role = 'super_admin' DESC, name"
+      "SELECT id, name, username, email, role, is_active, last_login_at, created_at, password_view, password_changed_at FROM crm_users WHERE deleted_at IS NULL ORDER BY role = 'super_admin' DESC, name"
     );
   } catch {
     // before the password columns exist
@@ -37,7 +37,7 @@ export async function listUsers(opts: { withPasswords?: boolean } = {}): Promise
     name: String(r.name ?? ""),
     username: String(r.username ?? ""),
     email: String(r.email ?? ""),
-    role: r.role === "super_admin" ? "super_admin" : r.role === "seo" ? "seo" : r.role === "viewer" ? "viewer" : r.role === "hr" ? "hr" : "admin",
+    role: (r.role === "super_admin" || (ASSIGNABLE_ROLES as readonly string[]).includes(String(r.role)) ? r.role : "admin") as CrmRole,
     isActive: Number(r.is_active) === 1,
     lastLoginAt: r.last_login_at ? new Date(r.last_login_at as string).toISOString() : null,
     createdAt: new Date(r.created_at as string).toISOString(),
@@ -81,10 +81,23 @@ export async function renameAssignee(oldName: string, newName: string) {
   }
 }
 
-/** Names of active team members who work on leads, for "Assigned to" (not the SEO, Viewer or HR roles) */
+/** Names of active team members who work on leads (not the SEO, Viewer, HR or Accountant roles) */
 export async function listTeamNames(): Promise<string[]> {
-  const [rows] = await getPool().query("SELECT name FROM crm_users WHERE is_active = 1 AND role NOT IN ('seo', 'viewer', 'hr') ORDER BY name");
+  const [rows] = await getPool().query(
+    "SELECT name FROM crm_users WHERE is_active = 1 AND deleted_at IS NULL AND role NOT IN ('seo', 'viewer', 'hr', 'accountant') ORDER BY name"
+  );
   return (rows as { name: string }[]).map((r) => r.name);
+}
+
+export type Assignee = { id: number; name: string; role: "bdm" | "bde" };
+
+/** Who a lead can be assigned to: every active BDM and BDE */
+export async function listAssignees(roles: readonly ("bdm" | "bde")[] = ["bdm", "bde"]): Promise<Assignee[]> {
+  const [rows] = await getPool().query(
+    "SELECT id, name, role FROM crm_users WHERE is_active = 1 AND deleted_at IS NULL AND role IN (?) ORDER BY role = 'bdm' DESC, name",
+    [roles]
+  );
+  return (rows as { id: number; name: string; role: "bdm" | "bde" }[]).map((r) => ({ id: Number(r.id), name: String(r.name), role: r.role }));
 }
 
 /* shared checks for account fields */
@@ -98,8 +111,8 @@ export function readAccountFields(body: Record<string, unknown>) {
     username: text(body.username, 30).toLowerCase(),
     email: text(body.email, 190).toLowerCase(),
     password: typeof body.password === "string" ? body.password.slice(0, 200) : "",
-    // the role a super admin gives a team member (never super admin)
-    role: body.role === "seo" ? ("seo" as const) : body.role === "viewer" ? ("viewer" as const) : body.role === "hr" ? ("hr" as const) : ("admin" as const),
+    // the role a team member is given (never super admin)
+    role: ((ASSIGNABLE_ROLES as readonly string[]).includes(String(body.role)) ? body.role : "admin") as AssignableRole,
   };
 }
 
@@ -109,6 +122,7 @@ export async function uniqueErrors(fields: { username?: string; email?: string }
   const pool = getPool();
   if (fields.username) {
     const [r] = await pool.query("SELECT id FROM crm_users WHERE username = ? AND id <> ?", [fields.username, exceptId]);
+    // a deleted account (in the Deleted bin) still holds its username until it is removed for good
     if ((r as unknown[]).length) errors.username = "This username is already taken.";
   }
   if (fields.email) {

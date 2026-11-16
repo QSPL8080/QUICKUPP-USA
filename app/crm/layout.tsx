@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
-import { isViewOnly, requireUser } from "@/lib/crm/auth";
+import { canAccess, isSalesRole, isViewOnly, requireUser } from "@/lib/crm/auth";
 import { ViewOnlyProvider } from "@/components/crm/ViewOnly";
 import SideToggle from "@/components/crm/SideToggle";
 import { cookies } from "next/headers";
 import { dashboardStats } from "@/lib/crm/data";
 import { newApplicationCount } from "@/lib/crm/applications";
-import { getNotifications, notificationsForRole } from "@/lib/crm/notifications";
+import { notificationsForRole } from "@/lib/crm/notifications";
+import { assignedNewCount } from "@/lib/crm/data";
+import { trashCount } from "@/lib/crm/trash";
 import NotifyCenter from "@/components/crm/NotifyCenter";
 import TableFit from "@/components/crm/TableFit";
 import { FeedbackProvider } from "@/components/crm/Feedback";
@@ -23,20 +25,21 @@ export const metadata: Metadata = {
 
 export default async function CrmLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser();
-  // the SEO role only works on blogs and job openings: no lead, payment or application counts or alerts
-  const seo = user.role === "seo";
-  // HR works on careers only: the new-applications count and application alerts, nothing about leads or payments
-  const hr = user.role === "hr";
-  const [{ perSource }, applications, notifications] = seo
-    ? [{ perSource: [] as { fresh: number }[] }, 0, { asOf: "", unread: 0, items: [] }]
-    : hr
-    ? await Promise.all([{ perSource: [] as { fresh: number }[] }, newApplicationCount(), notificationsForRole(user.id, user.role)])
-    : await Promise.all([dashboardStats(), newApplicationCount(), getNotifications(user.id)]);
+  // each role gets the counts and alerts for its own tabs (see lib/crm/roles and lib/crm/notifications):
+  // all new leads for Admins and Viewers, a BDM/BDE's own new leads, applications for those with Careers
+  const sales = isSalesRole(user);
+  const [{ perSource }, applications, notifications, ownNew, trash] = await Promise.all([
+    canAccess(user, "dashboard") ? dashboardStats() : { perSource: [] as { fresh: number }[] },
+    canAccess(user, "applications") ? newApplicationCount() : 0,
+    notificationsForRole(user.id, user.role),
+    sales ? assignedNewCount(user.id) : 0,
+    canAccess(user, "trash") ? trashCount() : 0,
+  ]);
   const zone = await viewerTimeZone();
   const viewOnly = isViewOnly(user);
   // the left menu hidden or shown on laptops and desktops, as this user left it (SideToggle)
   const sideClosed = (await cookies()).get(`crm_side_u${user.id}`)?.value === "closed";
-  const newCounts = { leads: perSource.reduce((a, s) => a + s.fresh, 0), applications };
+  const newCounts = { leads: sales ? ownNew : perSource.reduce((a, s) => a + s.fresh, 0), applications, trash };
   return (
     <div className={`crm-root${viewOnly ? " crm-viewonly" : ""}${sideClosed ? " crm-side-closed" : ""}`}>
       <ViewOnlyProvider viewOnly={viewOnly}>

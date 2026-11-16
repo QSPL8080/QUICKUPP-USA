@@ -5,7 +5,7 @@ import { getPool } from "@/lib/db";
 /*
  * View-only CRM accounts (the Viewer role): every request that would change
  * something in the CRM, the CSV exports and file downloads (lead attachments,
- * resumes, payment receipts) are refused here, in one place, whatever screen
+ * resumes, payment receipts, meeting-note files) are refused here, in one place, whatever screen
  * or tool sends them. A viewer may still sign in and out, keep
  * the session alive, mark their own notifications read, and change their own
  * profile and password.
@@ -18,7 +18,8 @@ const READS = new Set(["GET", "HEAD", "OPTIONS"]);
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const isExport = /\/export\/?$/.test(path);
-  const isDownload = (path === "/api/crm/enquiries/attachments" && request.nextUrl.searchParams.has("fileId")) || /^\/api\/crm\/applications\/\d+\/resume\/?$/.test(path) || path === "/api/payments/receipt";
+  const isDownload = (path === "/api/crm/enquiries/attachments" && request.nextUrl.searchParams.has("fileId")) || /^\/api\/crm\/applications\/\d+\/resume\/?$/.test(path) || path === "/api/payments/receipt" ||
+    (/^\/api\/crm\/meetings\/\d+\/notes\/?$/.test(path) && request.nextUrl.searchParams.has("file"));
   if (READS.has(request.method) && !isExport && !isDownload) return NextResponse.next();
   if (ALLOWED_FOR_VIEWERS.some((p) => path === p || path.startsWith(`${p}/`))) return NextResponse.next();
 

@@ -10,24 +10,80 @@ import { BulkBar, SelectBox, useSelection } from "@/components/crm/Selection";
 import { PageHead, Pager } from "@/components/crm/ListTools";
 import { SERVICES_DATA } from "@/components/PayNowModal";
 import CategoryMulti from "@/components/crm/CategoryMulti";
-import { SOURCE_LABEL, isEnquirySource } from "@/lib/crm/leadOptions";
+import { SOURCE_LABEL, clientCode, enquiryCode, isEnquirySource } from "@/lib/crm/leadOptions";
 import ActivityTimeline, { usePaymentActivity } from "@/components/crm/ActivityTimeline";
 import { SITE_URL, payLinkUrl } from "@/lib/siteUrl";
 import { payMessage, whatsAppUrl, type PayMessageInput } from "@/lib/payMessages";
 import ShareLinkButtons from "@/components/crm/ShareLinkButtons";
 import { useViewOnly } from "@/components/crm/ViewOnly";
+import LeadPicker from "@/components/crm/LeadPicker";
+import type { EnquiryRow } from "@/lib/crm/data";
 
-/* a payment link made from an enquiry shows which form that enquiry came from */
+/*
+ * Under the client's name: "From lead" (with the enquiry ID, opening that lead) for a payment made
+ * from an enquiry, "Manual Entry" for one typed in by hand, and "Client" once the lead has paid
+ */
 function EnquiryOrigin({ p }: { p: PaymentRow }) {
-  if (!p.leadId || !isEnquirySource(p.leadSource)) return null;
+  const paid = p.status === "paid" || p.status === "partially_paid";
+  if (!p.leadId || !isEnquirySource(p.leadSource)) {
+    if (p.source === "website") return null;
+    return (
+      <span className="crm-pay-origin-wrap">
+        <span className="crm-manual-tag">Manual Entry</span>
+      </span>
+    );
+  }
   return (
-    <a href={`/crm/enquiries?source=${p.leadSource}`} className="crm-pay-origin" onClick={(e) => e.stopPropagation()} title="Open enquiries from this form">
-      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="M4 4h16v12H5.2L4 17.2V4z" />
-      </svg>
-      <span>From enquiry · {SOURCE_LABEL[p.leadSource]}</span>
-    </a>
+    <span className="crm-pay-origin-wrap">
+      <a
+        href={`/crm/enquiries?open=${encodeURIComponent(`${p.leadSource}:${p.leadId}`)}`}
+        className="crm-pay-origin"
+        onClick={(e) => e.stopPropagation()}
+        title="Open the lead this payment was made from"
+      >
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M4 4h16v12H5.2L4 17.2V4z" />
+        </svg>
+        <span>From lead · {enquiryCode(p.leadSource, p.leadId)}</span>
+      </a>
+      {(paid || p.leadClient) && (
+        <a
+          href={`/crm/clients?open=${encodeURIComponent(`${p.leadSource}:${p.leadId}`)}`}
+          className="crm-client-tag"
+          onClick={(e) => e.stopPropagation()}
+          title="Open this client"
+        >
+          Client · {clientCode(p.leadSource, p.leadId)}
+        </a>
+      )}
+    </span>
   );
+}
+
+/* the link's details filled in from a lead ("Import from lead") */
+function linkFieldsFromLead(l: EnquiryRow) {
+  const wanted = (l.service || "").trim().toLowerCase();
+  const service =
+    SERVICES_DATA.find((s) => s.service.toLowerCase() === wanted) ||
+    SERVICES_DATA.find((s) => wanted && (s.service.toLowerCase().includes(wanted) || wanted.includes(s.service.toLowerCase().split(" ")[0])));
+  const picked = (l.interest || l.category || "")
+    .split(",")
+    .map((c) => c.trim())
+    .filter((c) => service?.categories.includes(c));
+  const industry = (CRM_INDUSTRIES as readonly string[]).find((i) => i.toLowerCase() === (l.industry || "").trim().toLowerCase());
+  return {
+    clientName: l.name || "",
+    clientPhone: l.phone || "",
+    clientEmail: l.email || "",
+    companyName: l.company || "",
+    ...(service
+      ? { service: service.service, category: (picked.length ? picked : service.categories.slice(0, 1)).join(", "), quantity: (picked.length ? picked : service.categories.slice(0, 1)).join(", ") }
+      : {}),
+    ...(industry ? { industry } : {}),
+    leadSource: l.source as string,
+    leadId: l.id,
+    leadName: l.name || l.email,
+  };
 }
 
 const fmtDate = (d: string | null, withTime = false) => {
@@ -211,7 +267,8 @@ export default function PaymentsView({
   openNew: boolean;
   /** a payment to show straight away (from a Payments Dashboard link) */
   openId?: number;
-  userRole?: "super_admin" | "admin";
+  /** the signed-in user's role: only Admins and the Super Admin delete payments */
+  userRole?: string;
   q?: string;
   status?: string;
   currentTab?: "website" | "payment_link" | "all";
@@ -230,7 +287,7 @@ export default function PaymentsView({
   pageSize?: number;
 }) {
   const router = useRouter();
-  const { confirm, toast } = useFeedback();
+  const { confirm, toast, ask } = useFeedback();
   const viewOnly = useViewOnly();
   const [editing, setEditing] = useState<PaymentRow | "new" | null>(openNew ? "new" : null);
   const [viewing, setViewing] = useState<PaymentRow | null>(() => {
@@ -310,6 +367,10 @@ export default function PaymentsView({
     billingEndDate: initialDates.end,
     balanceDueDate: initialDates.due,
     notes: "",
+    // "Import from lead": the lead this link is for
+    leadSource: "",
+    leadId: 0,
+    leadName: "",
   });
 
   // Edit Payment Link State
@@ -611,6 +672,8 @@ export default function PaymentsView({
         ...linkForm,
         category: finalCategory,
         quantity: finalCategory,
+        leadSource: linkForm.leadId ? linkForm.leadSource : undefined,
+        leadId: linkForm.leadId || undefined,
       }),
     }).catch(() => null);
     setBusy(false);
@@ -638,23 +701,36 @@ export default function PaymentsView({
     router.refresh();
   };
 
+  // deleting (Admins and the Super Admin): payments go to the Deleted bin; only the Super Admin
+  // removes them for good from there, and never one that received money (kept for the records)
+  const canDelete = !viewOnly && (userRole === "admin" || userRole === "super_admin");
+  const deleteMessage = (paid: boolean) =>
+    paid
+      ? "It moves to the Deleted bin. Money was received on it, so it is kept for your records and can only be restored, never removed for good."
+      : "It moves to the Deleted bin, where the Super Admin can restore it or remove it for good.";
+
   const deleteSingle = async (p: PaymentRow) => {
-    if (
-      !(await confirm({
-        title: `Delete payment from ${p.clientName}?`,
-        message: "It will be permanently removed from the CRM and the database. This action cannot be undone.",
-      }))
-    )
-      return;
+    const reason = await ask({
+      title: `Delete payment from ${p.clientName}?`,
+      message: deleteMessage(p.status === "paid" || p.status === "partially_paid" || p.status === "refunded"),
+      input: { label: "Reason (optional)", placeholder: "e.g. duplicate, test entry, spam", optional: true },
+      confirmLabel: "Yes, delete",
+    });
+    if (reason === null) return;
     setBusy(true);
-    const res = await fetch(`/api/crm/payments/${p.id}?table=${p.table}`, { method: "DELETE" }).catch(() => null);
+    const res = await fetch(`/api/crm/payments/${p.id}?table=${p.table}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reason }),
+    }).catch(() => null);
     setBusy(false);
     if (!res?.ok && res?.status !== 404) {
-      toast("Couldn't delete payment. Please try again.");
+      const j = res ? await res.json().catch(() => null) : null;
+      toast(j?.error || "Couldn't delete payment. Please try again.");
       return;
     }
     if (viewing && rowKey(viewing) === rowKey(p)) setViewing(null);
-    toast("Payment deleted");
+    toast("Payment moved to the Deleted bin");
     router.refresh();
   };
 
@@ -668,19 +744,19 @@ export default function PaymentsView({
     const ids = sel.selected;
     if (!ids.length) return;
     const what = ids.length === 1 ? "this payment" : `these ${ids.length} payments`;
-    if (
-      !(await confirm({
-        title: `Delete ${what}?`,
-        message: "They will be permanently removed from the CRM and the database. This can't be undone.",
-      }))
-    )
-      return;
+    const reason = await ask({
+      title: `Delete ${what}?`,
+      message: "They move to the Deleted bin, where the Super Admin can restore them. Payments that received money are kept for your records and are never removed for good.",
+      input: { label: "Reason (optional)", placeholder: "e.g. duplicate, test entry, spam", optional: true },
+      confirmLabel: "Yes, delete",
+    });
+    if (reason === null) return;
     setBusy(true);
     setListError("");
     const res = await fetch("/api/crm/payments", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ keys: ids }),
+      body: JSON.stringify({ keys: ids, reason }),
     }).catch(() => null);
     setBusy(false);
     if (!res?.ok) return setListError("Couldn't delete the selected payments. Please try again.");
@@ -834,7 +910,7 @@ export default function PaymentsView({
 
       <div className="crm-pay-table">
         {rows.length > 0 && (
-          <BulkBar sel={sel} noun={["payment", "payments"]} busy={busy} onDelete={removeSelected}>
+          <BulkBar sel={sel} noun={["payment", "payments"]} busy={busy} onDelete={canDelete ? removeSelected : undefined}>
             {sel.selected.length > 0 && (
               <a
                 href={`/api/crm/payments/export?${new URLSearchParams({
@@ -1183,7 +1259,7 @@ export default function PaymentsView({
                             )}
 
                             {/* Delete */}
-                            {!viewOnly && (
+                            {canDelete && (
                             <button
                               type="button"
                               className="crm-act crm-act-ghost crm-act-sm"
@@ -1446,7 +1522,7 @@ export default function PaymentsView({
                               </svg>
                             </button>
                           )}
-                          {!viewOnly && (
+                          {canDelete && (
                           <button
                             type="button"
                             className="crm-action-btn is-delete"
@@ -1735,9 +1811,11 @@ export default function PaymentsView({
                       </button>
                     )
                   )}
-                  <button type="button" className="crm-act crm-act-ghost crm-act-sm crm-act-danger" onClick={() => deleteSingle(viewing)}>
-                    Delete
-                  </button>
+                  {canDelete && (
+                    <button type="button" className="crm-act crm-act-ghost crm-act-sm crm-act-danger" onClick={() => deleteSingle(viewing)}>
+                      Delete
+                    </button>
+                  )}
                   </>)}
                 </div>
                 <button type="button" className="crm-act crm-act-dark" onClick={() => setViewing(null)}>
@@ -1776,6 +1854,12 @@ export default function PaymentsView({
             </div>
 
             <form onSubmit={savePaymentLink} style={{ padding: "18px 22px" }}>
+              <LeadPicker
+                label="Import from lead"
+                picked={linkForm.leadId ? { name: linkForm.leadName, sourceLabel: isEnquirySource(linkForm.leadSource) ? SOURCE_LABEL[linkForm.leadSource] : "" } : null}
+                onClear={() => setLinkForm((f) => ({ ...f, leadSource: "", leadId: 0, leadName: "" }))}
+                onPick={(l) => setLinkForm((f) => ({ ...f, ...linkFieldsFromLead(l) }))}
+              />
               <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                 {/* Row 1: Customer Name, Phone, Email */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
@@ -2607,7 +2691,7 @@ export default function PaymentsView({
             )}
 
             <div className="crm-drawer-foot">
-              {editing !== "new" && (
+              {editing !== "new" && canDelete && (
                 <button type="button" className="crm-act crm-act-danger" onClick={remove} disabled={busy}>
                   Delete
                 </button>

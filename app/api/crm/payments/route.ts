@@ -1,5 +1,5 @@
 import { getPool } from "@/lib/db";
-import { getUserFor } from "@/lib/crm/auth";
+import { getUserFor, isAdminLike } from "@/lib/crm/auth";
 import { validatePayment } from "@/lib/crm/payments";
 import { readJson } from "@/lib/enquiry";
 import { parseIds } from "@/lib/crm/ids";
@@ -36,13 +36,16 @@ export async function POST(request: Request) {
 }
 
 /*
- * DELETE { keys: ["pay:5", "link:3"] } → permanently remove several payment
+ * DELETE { keys: ["pay:5", "link:3"], reason? } → move several payment
  * records (pay) and payment links (link). A payment and a link can share an
- * id, so each key names its table. { ids: [...] } still removes payment records.
+ * id, so each key names its table. { ids: [...] } still works for payment
+ * records. They go to the Deleted bin (Admins only).
  */
 export async function DELETE(request: Request) {
   const user = await getUserFor("payments");
   if (!user) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
+  // only Admins and the Super Admin delete payment records (an Accountant cannot)
+  if (!isAdminLike(user)) return Response.json({ ok: false, error: "Only an Admin can delete payments." }, { status: 403 });
   const body = await readJson(request);
   const pay: number[] = [];
   const link: number[] = [];
@@ -58,11 +61,12 @@ export async function DELETE(request: Request) {
     if (!ids) return Response.json({ ok: false, error: "Invalid request." }, { status: 400 });
     pay.push(...ids);
   }
-  // removed from the database for good, with their transactions; who deleted them is kept in the history and emailed
+  // see lib/crm/paymentDeletion: to the Deleted bin; who deleted them is kept in the history and emailed
   let deleted = 0;
   try {
-    deleted += await deletePayments("payments", pay, user);
-    deleted += await deletePayments("payment_links", link, user);
+    const reason = typeof body?.reason === "string" ? body.reason : "";
+    deleted += await deletePayments("payments", pay, user, reason);
+    deleted += await deletePayments("payment_links", link, user, reason);
   } catch (err) {
     console.error("[payments] delete failed:", err);
     return Response.json({ ok: false, error: "Couldn't delete these payments. Please try again." }, { status: 500 });

@@ -337,7 +337,7 @@ export async function crmOverview() {
   const [team] = await q(
     `SELECT COUNT(*) AS total, SUM(is_active = 1) AS active, SUM(role = 'super_admin') AS supers,
             SUM(last_login_at >= NOW() - INTERVAL 7 DAY) AS recent
-       FROM crm_users`
+       FROM crm_users WHERE deleted_at IS NULL`
   );
   const [blogs] = await q(`SELECT COUNT(*) AS total, SUM(is_published = 1) AS live FROM blogs`);
 

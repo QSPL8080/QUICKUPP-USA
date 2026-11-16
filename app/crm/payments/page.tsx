@@ -1,7 +1,9 @@
+import { auditViewerView } from "@/lib/crm/audit";
 import { requireArea } from "@/lib/crm/auth";
 import { CURRENCIES, PAYMENT_METHODS, PAYMENT_SERVICES, PAYMENT_STATUSES, listPayments } from "@/lib/crm/data";
 import PaymentsView from "@/components/crm/PaymentsView";
 import { monthPeriod, viewerTimeZone } from "@/lib/crm/crmTime";
+import { leadClientKeys } from "@/lib/crm/clients";
 
 type Props = {
   searchParams: Promise<{
@@ -20,6 +22,7 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 export default async function PaymentsPage({ searchParams }: Props) {
   const user = await requireArea("payments");
+  await auditViewerView(user, "payments");
   const sp = await searchParams;
   const q = sp.q || "";
   const status = sp.status || "";
@@ -29,6 +32,9 @@ export default async function PaymentsPage({ searchParams }: Props) {
 
   const tz = await viewerTimeZone();
   const data = await listPayments({ q, status, tab, page: Number(sp.page) || 1, from, to, tz });
+  // a payment made for a lead that has paid (on this or another payment) shows the lead is a client
+  const clients = await leadClientKeys(data.items.map((p) => ({ source: p.leadSource, id: p.leadId })));
+  for (const p of data.items) p.leadClient = clients.has(`${p.leadSource}:${p.leadId}`);
 
   // month links: the month shown in the date filter (or this month), and the ones either side
   const period = monthPeriod(from, to, tz);
@@ -52,7 +58,7 @@ export default async function PaymentsPage({ searchParams }: Props) {
       rows={data.items}
       openNew={sp.new === "1"}
       openId={Number(sp.open) || undefined}
-      userRole={user.role === "super_admin" ? "super_admin" : "admin"}
+      userRole={user.role}
       options={{ services: PAYMENT_SERVICES, methods: PAYMENT_METHODS, currencies: CURRENCIES, statuses: PAYMENT_STATUSES }}
       q={q}
       status={status}

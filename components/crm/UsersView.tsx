@@ -5,11 +5,24 @@ import { useRouter } from "next/navigation";
 import { PageHead } from "@/components/crm/ListTools";
 import { useFeedback } from "@/components/crm/Feedback";
 import type { TeamUser } from "@/lib/crm/users";
+import { ASSIGNABLE_ROLES, ROLE_ACCESS, roleName, type AssignableRole, type CrmRole } from "@/lib/crm/roles";
 
 const fmtDate = (iso: string | null) =>
   iso ? new Date(iso).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }) : "Never";
 
-type Form = { name: string; username: string; email: string; password: string; isActive: boolean; role: "admin" | "seo" | "viewer" | "hr" };
+type Form = { name: string; username: string; email: string; password: string; isActive: boolean; role: AssignableRole };
+const asRole = (r: string): AssignableRole => ((ASSIGNABLE_ROLES as readonly string[]).includes(r) ? (r as AssignableRole) : "admin");
+
+/* what each role does, under the Role picker */
+const ROLE_HELP: Record<AssignableRole, string> = {
+  admin: "Can do everything in every tab, Team & Users included. Deletes go to the Deleted bin, where only the Super Admin restores them or removes them for good.",
+  bdm: "Sees only the enquiries assigned to them and the meetings they schedule or are assigned to; schedules meetings and adds meeting notes. Gets an email and a CRM alert for every lead or meeting assigned to them.",
+  bde: "Sees only the enquiries assigned to them and the meetings they schedule; schedules meetings for their leads. Gets an email and a CRM alert for every lead assigned to them.",
+  accountant: "Works in Payments (payment links, payments, receipts) and Clients, including uploading quotations and NDAs; looks at enquiries without changing them.",
+  viewer: "Can open every tab, but only to look: can't add, edit, delete, send or export anything. Can change their own profile and password.",
+  seo: "Can view and edit the website's blogs and job openings, and their own profile and password.",
+  hr: "Can view and edit job openings and job applications, and their own profile and password.",
+};
 
 /* current password, hidden until the eye is pressed (super admin only) */
 function PasswordCell({ value }: { value: string | null | undefined }) {
@@ -56,9 +69,11 @@ function PasswordCell({ value }: { value: string | null | undefined }) {
   );
 }
 
-export default function UsersView({ users, meId }: { users: TeamUser[]; meId: number }) {
+export default function UsersView({ users, meId, meRole }: { users: TeamUser[]; meId: number; meRole: CrmRole }) {
+  const superAdmin = meRole === "super_admin";
+  const readOnly = meRole === "viewer";
   const router = useRouter();
-  const { confirm, toast } = useFeedback();
+  const { confirm, toast, ask } = useFeedback();
   const [editing, setEditing] = useState<TeamUser | "new" | null>(null);
   const [form, setForm] = useState<Form>({ name: "", username: "", email: "", password: "", isActive: true, role: "admin" });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -69,10 +84,12 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
   const isSA = (u: TeamUser | "new" | null) => u !== "new" && u !== null && u.role === "super_admin";
 
   const openForm = (u: TeamUser | "new") => {
+    // only the Super Admin changes the Super Admin account; a Viewer only looks
+    if (readOnly || (u !== "new" && u.role === "super_admin" && !superAdmin)) return;
     setForm(
       u === "new"
         ? { name: "", username: "", email: "", password: "", isActive: true, role: "admin" }
-        : { name: u.name, username: u.username, email: u.email, password: "", isActive: u.isActive, role: u.role === "seo" ? "seo" : u.role === "viewer" ? "viewer" : u.role === "hr" ? "hr" : "admin" }
+        : { name: u.name, username: u.username, email: u.email, password: "", isActive: u.isActive, role: asRole(u.role) }
     );
     setErrors({});
     setError("");
@@ -123,12 +140,24 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
 
   const remove = async (u: TeamUser) => {
     setListError("");
-    if (!(await confirm({ title: `Delete ${u.name}'s account?`, message: "They will no longer be able to sign in. This can't be undone." }))) return;
-    const res = await fetch(`/api/crm/users/${u.id}`, { method: "DELETE" }).catch(() => null);
+    const reason = await ask({
+      title: `Delete ${u.name}'s account?`,
+      message: superAdmin
+        ? "They will be signed out and can't sign in. The account goes to the Deleted bin, where you can restore it or remove it for good."
+        : "They will be signed out and can't sign in. The account goes to the Deleted bin, where the Super Admin can restore it.",
+      input: { label: "Reason (optional)", placeholder: "e.g. duplicate, test entry, spam", optional: true },
+      confirmLabel: "Yes, delete",
+    });
+    if (reason === null) return;
+    const res = await fetch(`/api/crm/users/${u.id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reason }),
+    }).catch(() => null);
     const json = res ? await res.json().catch(() => ({})) : {};
     if (!res?.ok && res?.status !== 404) return setListError(json.error || "Couldn't delete the account. Please try again.");
     if (editing !== null) setEditing(null);
-    toast("Account deleted");
+    toast(json.trashed ? "Account moved to the Deleted bin" : "Account deleted");
     router.refresh();
   };
 
@@ -136,20 +165,20 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
     <>
       <PageHead
         title="Team & Users"
-        sub="Add admins, change names, usernames, emails, or passwords, and activate, deactivate or delete accounts. Changes to an admin account are emailed to info@quickuppsoftech.us."
+        sub="Add team members (Admin, BDM, BDE, Accountant, Viewer, SEO, HR), change names, usernames, emails, roles or passwords, and activate, deactivate or delete accounts. Changes to an account are emailed to info@quickuppsoftech.us."
       >
-        <a href="/api/crm/users/export" className="crm-act crm-act-ghost">
+        {!readOnly && <a href="/api/crm/users/export" className="crm-act crm-act-ghost">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
           </svg>
           Export CSV
-        </a>
-        <button type="button" className="crm-act crm-act-dark" onClick={() => openForm("new")}>
+        </a>}
+        {!readOnly && <button type="button" className="crm-act crm-act-dark" onClick={() => openForm("new")}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
             <path d="M12 5v14M5 12h14" />
           </svg>
           Add user
-        </button>
+        </button>}
       </PageHead>
 
       <div className="crm-card crm-card-flush">
@@ -174,7 +203,7 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
               <th>Username</th>
               <th>Email</th>
               <th>Role</th>
-              <th>Password</th>
+              {superAdmin && <th>Password</th>}
               <th>Last sign-in</th>
               <th>Account</th>
               <th>Actions</th>
@@ -183,6 +212,8 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
           <tbody>
             {users.map((u) => {
               const locked = u.role === "super_admin";
+              // Admins don't change the Super Admin account; Viewers only look
+              const canEdit = !readOnly && (!locked || superAdmin);
               return (
                 <tr key={u.id} className="crm-row" onClick={() => openForm(u)}>
                   <td data-label="Name" className="crm-cell-main">
@@ -201,12 +232,14 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
                     {u.email}
                   </td>
                   <td data-label="Role">
-                    <span className={`crm-pill ${locked ? "crm-pill-paid" : "crm-pill-pending"}`}>{locked ? "Super Admin" : u.role === "seo" ? "SEO" : u.role === "viewer" ? "Viewer" : u.role === "hr" ? "HR" : "Admin"}</span>
+                    <span className={`crm-pill ${locked ? "crm-pill-paid" : "crm-pill-pending"}`} title={ROLE_ACCESS[u.role]}>{roleName(u.role)}</span>
                   </td>
-                  <td data-label="Password" className="crm-nowrap" onClick={(e) => e.stopPropagation()}>
-                    <PasswordCell value={u.password} />
-                    {u.passwordChangedAt && <span className="crm-cell-sub">Changed {fmtDate(u.passwordChangedAt)}</span>}
-                  </td>
+                  {superAdmin && (
+                    <td data-label="Password" className="crm-nowrap" onClick={(e) => e.stopPropagation()}>
+                      <PasswordCell value={u.password} />
+                      {u.passwordChangedAt && <span className="crm-cell-sub">Changed {fmtDate(u.passwordChangedAt)}</span>}
+                    </td>
+                  )}
                   <td data-label="Last sign-in" className="crm-nowrap">
                     {fmtDate(u.lastLoginAt)}
                   </td>
@@ -215,6 +248,7 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
                   </td>
                   <td data-label="Actions" onClick={(e) => e.stopPropagation()}>
                     <span className="crm-row-acts">
+                      {canEdit && (
                       <button
                         type="button"
                         className="crm-act-btn crm-act-edit"
@@ -226,7 +260,8 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
                           <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
                         </svg>
                       </button>
-                      {!locked && (
+                      )}
+                      {!locked && canEdit && u.id !== meId && (
                         <>
                           <button
                             type="button"
@@ -281,7 +316,7 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
           <form className="crm-modal" onClick={(e) => e.stopPropagation()} onSubmit={save} noValidate role="dialog" aria-label={editing === "new" ? "Add user" : "Edit user"}>
             <div className="crm-drawer-head">
               <div>
-                <p className="crm-drawer-kicker">{editing === "new" ? "Team & Users" : isSA(editing) ? "Super Admin account" : editing.role === "seo" ? "SEO account" : editing.role === "viewer" ? "Viewer account" : editing.role === "hr" ? "HR account" : "Admin account"}</p>
+                <p className="crm-drawer-kicker">{editing === "new" ? "Team & Users" : `${roleName(editing.role)} account`}</p>
                 <h2 className="crm-drawer-title">{editing === "new" ? "Add user" : `Edit ${editing.name}`}</h2>
               </div>
               <button type="button" className="crm-icon-act" onClick={() => setEditing(null)} aria-label="Close">
@@ -307,7 +342,7 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
                 <input className="crm-input" type="email" value={form.email} onChange={set("email")} autoComplete="off" />
                 {err("email")}
               </label>
-              {editing !== "new" && (
+              {editing !== "new" && superAdmin && (
                 <div className="crm-field crm-span-2">
                   <span className="crm-label">Current password</span>
                   <PasswordCell value={editing.password} />
@@ -324,22 +359,17 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
                   <select
                     className="crm-input crm-select"
                     value={form.role}
-                    onChange={(e) => setForm((f) => ({ ...f, role: e.target.value === "seo" ? "seo" : e.target.value === "viewer" ? "viewer" : e.target.value === "hr" ? "hr" : "admin" }))}
+                    onChange={(e) => setForm((f) => ({ ...f, role: asRole(e.target.value) }))}
                   >
-                    <option value="admin">Admin — the whole CRM</option>
-                    <option value="seo">SEO — Blogs and Job Openings only</option>
-                    <option value="hr">HR — Job Openings and Job Applications only</option>
-                    <option value="viewer">Viewer — can view everything, can't change anything</option>
+                    <option value="admin">Admin - the whole CRM</option>
+                    <option value="bdm">BDM - Business Development Manager</option>
+                    <option value="bde">BDE - Business Development Executive</option>
+                    <option value="accountant">Accountant - Payments and Clients</option>
+                    <option value="viewer">Viewer - can view everything, can&apos;t change anything</option>
+                    <option value="seo">SEO - Blogs and Job Openings only</option>
+                    <option value="hr">HR - Job Openings and Job Applications only</option>
                   </select>
-                  <span className="crm-cell-sub">
-                    {form.role === "hr"
-                      ? "Can view and edit job openings and job applications (add, edit, close, delete, change status, download resumes), and their own profile and password. No dashboard, enquiries, meetings, payments, blogs or team."
-                      : form.role === "viewer"
-                      ? "Can open every part of the CRM except Team & Users, but only to look: can't add, edit, delete, send or export anything. Can change their own profile and password."
-                      : form.role === "seo"
-                      ? "Can view and edit the website's blogs and job openings, and their own profile and password. No enquiries, payments, meetings or job applications."
-                      : "Can use every part of the CRM except Team & Users."}
-                  </span>
+                  <span className="crm-cell-sub">{ROLE_HELP[form.role]}</span>
                 </div>
               )}
               {!isSA(editing) && (
@@ -365,7 +395,7 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
             )}
 
             <div className="crm-modal-foot">
-              {editing !== "new" && !isSA(editing) ? (
+              {editing !== "new" && !isSA(editing) && editing.id !== meId ? (
                 <button type="button" className="crm-act crm-act-danger" onClick={() => remove(editing as TeamUser)} disabled={busy}>
                   Delete account
                 </button>

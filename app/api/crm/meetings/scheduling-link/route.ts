@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
  * Generates a dynamic single-use Calendly scheduling link.
  */
 export async function POST(request: Request) {
-  const user = await getUserFor("leads");
+  const user = await getUserFor("meetings");
   if (!user) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
 
   const body = await readJson(request);

@@ -4944,3 +4944,241 @@ a.crm-dash-legend-row:hover {
 @media (max-width: 900px) {
   .crm-side-hide { display: none; }
 }
+
+/* a lead that has paid (partly or in full) is a client */
+.crm-client-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.crm-from-lead-tag {
+  display: inline-block;
+  margin-top: 3px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: #ede9fe;
+  color: #5b21b6;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* "From lead" picker (meetings and payment links) */
+.crm-leadpick {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+  padding: 12px;
+  border: 1px dashed #c4b5fd;
+  border-radius: 10px;
+  background: #faf5ff;
+}
+.crm-leadpick-picked {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  border-style: solid;
+}
+.crm-leadpick-picked .crm-from-lead-tag {
+  margin-top: 0;
+}
+.crm-leadpick-list {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% - 8px);
+  left: 12px;
+  right: 12px;
+  max-height: 280px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
+}
+.crm-leadpick-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  padding: 9px 12px;
+  border: 0;
+  border-bottom: 1px solid #f1f5f9;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+.crm-leadpick-item:hover,
+.crm-leadpick-item:focus-visible {
+  background: #f5f3ff;
+  outline: none;
+}
+.crm-leadpick-empty {
+  margin: 0;
+  padding: 12px;
+  color: #64748b;
+  font-size: 13px;
+}
+.crm-leadpick .crm-field-hint {
+  font-size: 11.5px;
+  color: #64748b;
+}
+
+/* Meetings: who scheduled it, the lead, the BDM taking it */
+.crm-meet-team {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+.crm-meet-team-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  min-width: 0;
+}
+.crm-meet-team-item .crm-mgmt-val {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+  overflow-wrap: anywhere;
+}
+.crm-meet-team-item a {
+  color: #4f46e5;
+  font-weight: 700;
+}
+@media (max-width: 640px) {
+  .crm-meet-team {
+    grid-template-columns: 1fr;
+  }
+}
+.crm-meet-bdm {
+  color: #4f46e5 !important;
+  font-weight: 600;
+}
+.crm-meet-note-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.crm-meet-note-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.crm-meet-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.crm-meet-note {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+.crm-meet-note-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: baseline;
+  font-size: 12.5px;
+}
+.crm-meet-note .crm-message-text {
+  margin: 0;
+  white-space: pre-wrap;
+}
+.crm-pay-origin-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.crm-pay-origin-wrap .crm-client-tag {
+  margin-left: 0;
+}
+.crm-client-tag-block {
+  margin: 3px 0 0;
+  align-self: flex-start;
+  width: fit-content;
+}
+
+/* Clients tab */
+.crm-client-balance-links {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+.crm-client-upload {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.crm-client-upload .crm-select {
+  width: auto;
+  min-width: 140px;
+}
+.crm-meet-note .crm-message-text {
+  background: none;
+  border: 0;
+  padding: 0;
+  box-shadow: none;
+}
+.crm-manual-tag {
+  display: inline-block;
+  margin-top: 3px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+a.crm-client-tag {
+  text-decoration: none;
+}
+a.crm-client-tag:hover {
+  background: #bbf7d0;
+}
+
+/* a text box inside the confirmation dialog (a reason, or a word to type) */
+.crm-confirm-input {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 4px 0 14px;
+  text-align: left;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #475569;
+}

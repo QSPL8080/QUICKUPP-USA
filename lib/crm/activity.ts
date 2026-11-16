@@ -1,3 +1,4 @@
+import { roleName } from "@/lib/crm/roles";
 import "server-only";
 import { getPool } from "@/lib/db";
 import type { CrmUser } from "@/lib/crm/auth";
@@ -35,7 +36,7 @@ export type ActivityItem = {
 };
 
 export const roleLabel = (role: string | null | undefined) =>
-  role === "super_admin" ? "Super Admin" : role === "admin" ? "Admin" : role === "seo" ? "SEO" : role === "viewer" ? "Viewer" : role === "hr" ? "HR" : role ? role.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "";
+  role ? roleName(role) : "";
 
 /** "Admin (Priya)", "Website — Contact Form", "PayPal", "System" */
 export function actorText(a: { actorType: string; actorName: string | null; actorRole: string | null }) {

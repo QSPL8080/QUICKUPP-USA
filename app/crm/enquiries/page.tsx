@@ -1,19 +1,21 @@
 import Link from "next/link";
-import { requireArea } from "@/lib/crm/auth";
+import { leadPermsFor, requireArea } from "@/lib/crm/auth";
 import { listLeads } from "@/lib/crm/data";
-import { listTeamNames } from "@/lib/crm/users";
+import { listAssignees } from "@/lib/crm/users";
 import { ENQUIRY_STATUSES, ENQUIRY_STATUS_LABEL, PROJECT_STATUSES } from "@/lib/crm/leadOptions";
 import LeadsView from "@/components/crm/LeadsView";
 import AddLeadButton from "@/components/crm/AddLeadButton";
 import { PageHead, Pager } from "@/components/crm/ListTools";
 import { monthPeriod, viewerTimeZone } from "@/lib/crm/crmTime";
 
-type Props = { searchParams: Promise<{ q?: string; source?: string; status?: string; projectStatus?: string; channel?: string; from?: string; to?: string; page?: string; new?: string }> };
+type Props = { searchParams: Promise<{ q?: string; source?: string; status?: string; projectStatus?: string; channel?: string; from?: string; to?: string; page?: string; new?: string; open?: string; clients?: string }> };
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 export default async function EnquiriesPage({ searchParams }: Props) {
   const user = await requireArea("leads");
+  // what this role may do here: a BDM/BDE sees only the leads assigned to them; an Accountant only looks
+  const perms = leadPermsFor(user);
   const sp = await searchParams;
   const f = {
     q: sp.q || "",
@@ -23,9 +25,13 @@ export default async function EnquiriesPage({ searchParams }: Props) {
     channel: sp.channel || "",
     from: DATE_RE.test(sp.from || "") ? (sp.from as string) : "",
     to: DATE_RE.test(sp.to || "") ? (sp.to as string) : "",
+    clients: sp.clients === "1" || sp.clients === "0" ? sp.clients : "",
   };
   const tz = await viewerTimeZone();
-  const [data, team] = await Promise.all([listLeads({ ...f, tz, page: Number(sp.page) || 1 }), listTeamNames()]);
+  const [data, assignees] = await Promise.all([
+    listLeads({ ...f, assignedUserId: perms.ownOnly ? user.id : undefined, tz, page: Number(sp.page) || 1 }),
+    perms.assign ? listAssignees() : Promise.resolve([]),
+  ]);
 
   // month links: the month shown in the date filter (or this month), and the ones either side
   const period = monthPeriod(f.from, f.to, tz);
@@ -38,6 +44,7 @@ export default async function EnquiriesPage({ searchParams }: Props) {
     if (f.status) p.set("status", f.status);
     if (f.projectStatus) p.set("projectStatus", f.projectStatus);
     if (f.channel) p.set("channel", f.channel);
+    if (f.clients) p.set("clients", f.clients);
     p.set("from", r.from);
     p.set("to", r.to);
     return `?${p.toString()}`;
@@ -45,7 +52,7 @@ export default async function EnquiriesPage({ searchParams }: Props) {
   const monthLabel = period.label;
 
   const exportHref = `/api/crm/enquiries/export?${new URLSearchParams(Object.entries(f).filter(([, v]) => v) as [string, string][]).toString()}`;
-  const filtered = Boolean(f.q || f.source || f.status || f.projectStatus || f.channel || f.from || f.to);
+  const filtered = Boolean(f.q || f.source || f.status || f.projectStatus || f.channel || f.from || f.to || f.clients);
 
   const sourceHref = (s: string) => {
     const p = new URLSearchParams();
@@ -56,20 +63,28 @@ export default async function EnquiriesPage({ searchParams }: Props) {
     if (f.channel) p.set("channel", f.channel);
     if (f.from) p.set("from", f.from);
     if (f.to) p.set("to", f.to);
+    if (f.clients) p.set("clients", f.clients);
     const qs = p.toString();
     return qs ? `?${qs}` : "/crm/enquiries";
   };
 
   return (
     <>
-      <PageHead title="All Enquiries" sub="Every lead in one place — Contact form, the four service forms, YouTube promotion, industry pages and manual leads. Newest first.">
+      <PageHead
+        title={perms.ownOnly ? "My Enquiries" : "All Enquiries"}
+        sub={
+          perms.ownOnly
+            ? "The leads assigned to you, from every form and manual entry. Newest first."
+            : "Every lead in one place — Contact form, the four service forms, YouTube promotion, industry pages and manual leads. Newest first."
+        }
+      >
         <a href={exportHref} className="crm-act crm-act-ghost">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
           </svg>
           Export CSV
         </a>
-        <AddLeadButton />
+        {perms.add && <AddLeadButton />}
       </PageHead>
 
       {/* Quick source tabs: All, Contact Form, Service Forms (4), YouTube Promotion, Industry Pages, Manual */}
@@ -165,6 +180,11 @@ export default async function EnquiriesPage({ searchParams }: Props) {
           <option value="Manual">Manual</option>
           <option value="Meta">Meta</option>
         </select>
+        <select className="crm-input crm-select" name="clients" defaultValue={f.clients} aria-label="Clients">
+          <option value="">Leads and clients</option>
+          <option value="1">Clients only (paid)</option>
+          <option value="0">Not yet clients</option>
+        </select>
         <span className="crm-date-range">
           <input className="crm-input" type="date" name="from" defaultValue={f.from} aria-label="Received from" />
           <span className="crm-muted">to</span>
@@ -202,8 +222,16 @@ export default async function EnquiriesPage({ searchParams }: Props) {
       </div>
 
       <div className="crm-card crm-card-flush">
-        <LeadsView rows={data.items} offset={(data.page - 1) * data.pageSize} team={team} currentUser={user} openNew={sp.new === "1"} />
-        <Pager {...data} q={f.q} status={f.status} extra={{ source: f.source, projectStatus: f.projectStatus, channel: f.channel, from: f.from, to: f.to }} />
+        <LeadsView
+          rows={data.items}
+          offset={(data.page - 1) * data.pageSize}
+          assignees={assignees}
+          perms={perms}
+          currentUser={user}
+          openNew={sp.new === "1" && perms.add}
+          openKey={sp.open || ""}
+        />
+        <Pager {...data} q={f.q} status={f.status} extra={{ source: f.source, projectStatus: f.projectStatus, channel: f.channel, from: f.from, to: f.to, clients: f.clients }} />
       </div>
     </>
   );

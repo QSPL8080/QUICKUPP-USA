@@ -1,4 +1,5 @@
 import { getUserFor } from "@/lib/crm/auth";
+import { canWorkOnMeeting } from "@/lib/crm/meetingTeam";
 import { readJson } from "@/lib/enquiry";
 import { rescheduleMeetingDetails, updateMeetingDetails } from "@/lib/crm/calendly";
 
@@ -9,7 +10,7 @@ export const dynamic = "force-dynamic";
  * Updates meeting details, notes, or reschedules time.
  */
 export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {
-  const user = await getUserFor("leads");
+  const user = await getUserFor("meetings");
   if (!user) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
 
   const { id: rawId } = await context.params;
@@ -17,6 +18,9 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
   if (!id || id < 1) {
     return Response.json({ ok: false, error: "Invalid meeting ID." }, { status: 400 });
   }
+
+  // Admins, and the BDM/BDE whose meeting it is (Viewers and others only look)
+  if (!(await canWorkOnMeeting(user, id))) return Response.json({ ok: false, error: "You can't change this meeting." }, { status: 403 });
 
   const body = await readJson(request);
   if (!body) return Response.json({ ok: false, error: "Missing body." }, { status: 400 });

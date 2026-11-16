@@ -50,6 +50,26 @@ export const SOURCE_LABEL: Record<EnquirySource, string> = {
 
 export const isEnquirySource = (v: unknown): v is EnquirySource => typeof v === "string" && (SOURCE_KEYS as string[]).includes(v);
 
+/*
+ * Readable IDs. Each lead lives in the table of the form it came from, so its
+ * number alone isn't unique: the form's short code makes it so.
+ * ENQ-MAN-32 is manual lead 32; once it has paid, its client ID is CLI-MAN-32.
+ */
+const SOURCE_CODE: Record<EnquirySource, string> = {
+  contact: "CON",
+  "digital-marketing": "DM",
+  "ai-automation": "AI",
+  "it-services": "IT",
+  "staff-augmentation": "SA",
+  youtube: "YT",
+  industries: "IND",
+  manual: "MAN",
+};
+export const enquiryCode = (source: string | null | undefined, id: number | null | undefined) =>
+  source && id && isEnquirySource(source) ? `ENQ-${SOURCE_CODE[source]}-${id}` : "";
+export const clientCode = (source: string | null | undefined, id: number | null | undefined) =>
+  source && id && isEnquirySource(source) ? `CLI-${SOURCE_CODE[source]}-${id}` : "";
+
 /* Add Lead form: the services and service pages offered on the website */
 export const LEAD_SERVICES = (Object.keys(SERVICE_FORMS) as ServiceFormKey[]).map((k) => ({
   value: SERVICE_FORMS[k].label,

@@ -376,7 +376,7 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
   const removeBlog = async (b: CrmBlog) => {
     const ok = await confirm({
       title: `Delete "${b.title}"?`,
-      message: "This will remove this article from the database and website permanently.",
+      message: "The article comes off the website and moves to the Deleted bin, where the Super Admin can restore it.",
       confirmLabel: "Delete blog",
       tone: "danger",
     });
@@ -590,7 +590,7 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
                         <button
                           type="button"
                           className="crm-act-btn crm-act-delete"
-                          title="Delete blog permanently"
+                          title="Delete blog"
                           aria-label="Delete blog"
                           onClick={() => removeBlog(b)}
                         >

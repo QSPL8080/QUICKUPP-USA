@@ -1,4 +1,5 @@
 import { getPool } from "@/lib/db";
+import { deleteOrTrash } from "@/lib/crm/trash";
 import { getUserFor } from "@/lib/crm/auth";
 import { parseIds } from "@/lib/crm/ids";
 import { readJson } from "@/lib/enquiry";
@@ -21,15 +22,31 @@ export async function POST(request: Request) {
   return Response.json({ ok: true, id: (res as { insertId: number }).insertId });
 }
 
-/* DELETE { ids: [...] } → permanently remove several job openings */
+/* DELETE { ids: [...] } → moves job openings to the Deleted bin (the Super Admin restores or removes them for good there) */
 export async function DELETE(request: Request) {
   const user = await getUserFor("jobs");
   if (!user) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
   const body = await readJson(request);
   const ids = parseIds(body?.ids);
   if (!ids) return Response.json({ ok: false, error: "Invalid request." }, { status: 400 });
-  const [res] = await getPool().query("DELETE FROM job_openings WHERE id IN (?)", [ids]);
-  const deleted = (res as { affectedRows: number }).affectedRows;
+  const { count: deleted, trashed } = await deleteOrTrash({
+    entity: "job",
+    table: "job_openings",
+    ids,
+    user,
+    describe: (r) => ({ label: String(r.title || "Job opening"), detail: `Job opening · ${String(r.department || "")}` }),
+    links: async (list, db) => {
+      // its applications are kept; on restore they point at it again
+      const [apps] = await db.query("SELECT id, job_id FROM job_applications WHERE job_id IN (?)", [list]);
+      const out: Record<number, { applications: number[] }> = {};
+      for (const a of apps as { id: number; job_id: number }[]) (out[Number(a.job_id)] ||= { applications: [] }).applications.push(Number(a.id));
+      return out;
+    },
+    forGood: async (list) => {
+      const [res] = await getPool().query("DELETE FROM job_openings WHERE id IN (?)", [list]);
+      return (res as { affectedRows: number }).affectedRows;
+    },
+  });
   if (!deleted) return Response.json({ ok: false, error: "These job openings were already deleted." }, { status: 404 });
-  return Response.json({ ok: true, deleted });
+  return Response.json({ ok: true, deleted, trashed });
 }

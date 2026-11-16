@@ -1,5 +1,5 @@
 import { getPool } from "@/lib/db";
-import { SUPER_ADMIN_EMAIL, startSession, verifyPassword } from "@/lib/crm/auth";
+import { SUPER_ADMIN_EMAIL, roleName, startSession, verifyPassword } from "@/lib/crm/auth";
 import { readJson, requestMeta } from "@/lib/enquiry";
 import { decryptSecret, encryptSecret } from "@/lib/crm/secret.mjs";
 import { escapeHtml, sendMail } from "@/lib/mailer";
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   try {
     const pool = getPool();
     const [rows] = await pool.execute(
-      "SELECT id, name, username, email, role, password_hash, is_active, failed_attempts FROM crm_users WHERE email = ? OR username = ? LIMIT 1",
+      "SELECT id, name, username, email, role, password_hash, is_active, failed_attempts FROM crm_users WHERE (email = ? OR username = ?) AND deleted_at IS NULL LIMIT 1",
       [login, login]
     );
     const user = (rows as Row[])[0];
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
             ["Name", user.name],
             ["Username", user.username || "—"],
             ["Email", user.email],
-            ["Role", user.role === "super_admin" ? "Super Admin" : user.role === "seo" ? "SEO" : user.role === "viewer" ? "Viewer (view only)" : user.role === "hr" ? "HR" : "Admin"],
+            ["Role", user.role === "viewer" ? "Viewer (view only)" : roleName(user.role)],
             ["Failed attempts in a row", String(attempts)],
             ["Time (IST)", when],
             ["IP address", meta.ip || "—"],

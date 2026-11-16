@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { actorOf, logMany } from "@/lib/crm/activity";
 import { getPool } from "@/lib/db";
-import { getUserFor } from "@/lib/crm/auth";
+import { getUserFor, isAdminLike, leadPermsFor } from "@/lib/crm/auth";
+import { canOpenLead } from "@/lib/crm/leadAccess";
 import { isEnquirySource, SOURCES, type EnquirySource } from "@/lib/crm/data";
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -13,6 +14,10 @@ const ALLOWED_EXTS = new Set([
   "pdf", "doc", "docx", "txt", "rtf",
   "csv", "xls", "xlsx", "zip",
 ]);
+
+/* a client's documents (quotation, NDA…): PDF, Word and images only */
+const CLIENT_DOC_TYPES = { quotation: "Quotation", nda: "NDA", agreement: "Agreement", invoice: "Invoice", receipt: "Payment Receipt", other: "Other" } as const;
+const CLIENT_DOC_EXTS = new Set(["pdf", "doc", "docx", "jpg", "jpeg", "png"]);
 
 function getFileExt(fileName: string): string {
   const parts = fileName.split(".");
@@ -29,6 +34,8 @@ export type StoredAttachment = {
   filePath: string;
   uploadedByName: string;
   createdAt: string;
+  /** a client document's kind (quotation, NDA…), when uploaded as one */
+  docType?: string;
 };
 
 function parseAttachments(raw: unknown): StoredAttachment[] {
@@ -57,7 +64,12 @@ export async function GET(request: Request) {
   const leadId = Number(searchParams.get("leadId") || searchParams.get("id"));
   const fileId = searchParams.get("fileId") || searchParams.get("attId");
   const download = searchParams.get("download") === "1";
-  const directFile = searchParams.get("file");
+  // a BDM/BDE only reaches the files of their own leads (and only through the lead)
+  const ownOnly = leadPermsFor(user).ownOnly;
+  const directFile = ownOnly ? null : searchParams.get("file");
+  if (ownOnly && (!isEnquirySource(source) || !(await canOpenLead(user, source, leadId)))) {
+    return new Response("File not found", { status: 404 });
+  }
 
   // Mode 1: Serve/download a specific file
   if (fileId || directFile) {
@@ -122,6 +134,9 @@ export async function POST(request: Request) {
   if (!user) {
     return NextResponse.json({ ok: false, error: "Please sign in again." }, { status: 401 });
   }
+  if (!leadPermsFor(user).files) {
+    return NextResponse.json({ ok: false, error: "Your role can't add files." }, { status: 403 });
+  }
 
   let form: FormData;
   try {
@@ -135,6 +150,15 @@ export async function POST(request: Request) {
 
   if (!isEnquirySource(source) || !Number.isInteger(leadId) || leadId < 1) {
     return NextResponse.json({ ok: false, error: "Invalid lead details." }, { status: 400 });
+  }
+  if (!(await canOpenLead(user, source, leadId))) {
+    return NextResponse.json({ ok: false, error: "This lead isn't assigned to you." }, { status: 404 });
+  }
+  const rawDocType = String(form.get("docType") || "").trim().toLowerCase();
+  const docType = rawDocType in CLIENT_DOC_TYPES ? (rawDocType as keyof typeof CLIENT_DOC_TYPES) : "";
+  // client documents (quotation, NDA…): Admins and the Accountant only
+  if (docType && !leadPermsFor(user).clientDocs) {
+    return NextResponse.json({ ok: false, error: "Only an Admin or the Accountant can add client documents." }, { status: 403 });
   }
 
   const uploadedFiles: File[] = [];
@@ -174,8 +198,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: `File "${file.name}" exceeds the 15 MB limit.` }, { status: 400 });
     }
     const ext = getFileExt(file.name);
-    if (!ALLOWED_EXTS.has(ext)) {
-      return NextResponse.json({ ok: false, error: `File type .${ext} is not supported.` }, { status: 400 });
+    if (!ALLOWED_EXTS.has(ext) || (docType && !CLIENT_DOC_EXTS.has(ext))) {
+      return NextResponse.json(
+        { ok: false, error: docType ? `"${file.name}": client documents can be PDF, DOC, DOCX, JPG or PNG.` : `File type .${ext} is not supported.` },
+        { status: 400 }
+      );
     }
 
     const attId = `att_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
@@ -196,6 +223,7 @@ export async function POST(request: Request) {
       filePath: `/uploads/attachments/${diskFilename}`,
       uploadedByName: user.name || "User",
       createdAt: new Date().toISOString(),
+      ...(docType ? { docType } : {}),
     };
     existing.unshift(item);
     newlyAdded.push(item);
@@ -215,7 +243,7 @@ export async function POST(request: Request) {
       action: "attachment",
       field: "attachments",
       newValue: a.fileName,
-      text: `Attachment ${a.fileName} added`,
+      text: docType ? `${CLIENT_DOC_TYPES[docType]} ${a.fileName} added` : `Attachment ${a.fileName} added`,
       actor: actorOf(user),
     }))
   );
@@ -232,6 +260,9 @@ export async function DELETE(request: Request) {
   const user = await getUserFor("leads");
   if (!user) {
     return NextResponse.json({ ok: false, error: "Please sign in again." }, { status: 401 });
+  }
+  if (!leadPermsFor(user).files) {
+    return NextResponse.json({ ok: false, error: "Your role can't remove files." }, { status: 403 });
   }
 
   const { searchParams } = new URL(request.url);
@@ -253,6 +284,9 @@ export async function DELETE(request: Request) {
   if (!isEnquirySource(finalSource) || !Number.isInteger(finalLeadId) || finalLeadId < 1 || !finalFileId) {
     return NextResponse.json({ ok: false, error: "Invalid parameters." }, { status: 400 });
   }
+  if (!(await canOpenLead(user, finalSource, finalLeadId))) {
+    return NextResponse.json({ ok: false, error: "This lead isn't assigned to you." }, { status: 404 });
+  }
 
   const pool = getPool();
   const [rows] = await pool.query(
@@ -266,6 +300,10 @@ export async function DELETE(request: Request) {
 
   const existing = parseAttachments(row.attachments);
   const target = existing.find((a) => String(a.id) === String(finalFileId) || a.filePath.includes(finalFileId));
+  // a client document is deleted only by an Admin or the Super Admin
+  if (target?.docType && !isAdminLike(user)) {
+    return NextResponse.json({ ok: false, error: "Only an Admin can delete client documents." }, { status: 403 });
+  }
   const remaining = existing.filter((a) => a !== target);
 
   if (target?.filePath) {

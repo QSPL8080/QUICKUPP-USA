@@ -1,3 +1,4 @@
+import { markClientFromRecord } from "@/lib/crm/clients";
 import { NextResponse, after } from "next/server";
 import { randomBytes } from "node:crypto";
 import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
@@ -230,6 +231,13 @@ export async function POST(req: Request) {
         isBalancePayment: kind === "balance",
         reason: failureReason || pendingReason || undefined,
       });
+      // the first payment for a lead makes it a client: done after the answer, so it can never
+      // slow down or change the payer's result (the payment itself is already recorded above)
+      if (status === "paid") {
+        const paidTable = table;
+        const paidId = id;
+        after(() => markClientFromRecord(paidTable, paidId).catch((err) => console.error("[payments] could not mark the client:", err)));
+      }
     }
 
     // 4. emails (sent after the answer)

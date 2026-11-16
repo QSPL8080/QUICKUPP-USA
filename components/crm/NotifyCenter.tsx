@@ -1,5 +1,6 @@
 "use client";
 
+import { roleName } from "@/lib/crm/roles";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -416,6 +417,13 @@ export default function NotifyCenter({
                               <rect x="2" y="7" width="20" height="14" rx="2" />
                               <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
                             </>
+                          ) : it.kind === "alert" ? (
+                            <>
+                              {/* something assigned to or done by a team member */}
+                              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                              <circle cx="9" cy="7" r="4" />
+                              <polyline points="16 11 18 13 22 9" />
+                            </>
                           ) : (
                             <>
                               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -476,7 +484,7 @@ export default function NotifyCenter({
                   <span className="crm-profile-dropdown-name">{user?.name || "Administrator"}</span>
                   <span className="crm-profile-dropdown-email">{user?.email || "admin@quickuppsoftech.us"}</span>
                   <span className="crm-profile-dropdown-role">
-                    {user?.role === "super_admin" ? "Super Admin" : user?.role === "admin" ? "Admin" : user?.role === "seo" ? "SEO" : user?.role === "viewer" ? "Viewer" : user?.role === "hr" ? "HR" : "Staff"}
+                    {user?.role ? roleName(user.role) : "Staff"}
                   </span>
                 </div>
               </div>

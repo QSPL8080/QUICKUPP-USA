@@ -1,4 +1,4 @@
-import { getUserFor } from "@/lib/crm/auth";
+import { getUserFor, leadPermsFor } from "@/lib/crm/auth";
 import { exportLeadDetails } from "@/lib/crm/data";
 import { ENQUIRY_STATUS_LABEL, SOURCE_LABEL } from "@/lib/crm/leadOptions";
 import { csvFile } from "@/lib/crm/csv";
@@ -14,10 +14,13 @@ import type { RowDataPacket } from "mysql2/promise";
  * GET ?keys=contact:12,manual:3 → just those (the selected rows).
  */
 export async function GET(request: Request) {
-  if (!(await getUserFor("leads"))) return new Response("Please sign in again.", { status: 401 });
+  const user = await getUserFor("leads");
+  if (!user) return new Response("Please sign in again.", { status: 401 });
+  // a BDM/BDE exports only the leads assigned to them, without payments
+  const ownOnly = leadPermsFor(user).ownOnly;
   const sp = new URL(request.url).searchParams;
   const keys = (sp.get("keys") || "").split(",").map((k) => k.trim()).filter(Boolean).slice(0, 2000);
-  const rows = await exportLeadDetails(
+  const all = await exportLeadDetails(
     {
       q: sp.get("q") || "",
       source: sp.get("source") || "",
@@ -26,10 +29,13 @@ export async function GET(request: Request) {
       channel: sp.get("channel") || "",
       from: sp.get("from") || "",
       to: sp.get("to") || "",
+      clients: sp.get("clients") === "1" || sp.get("clients") === "0" ? (sp.get("clients") as "1" | "0") : "",
+      assignedUserId: ownOnly ? user.id : undefined,
       tz: await viewerTimeZone(),
     },
     keys.length ? keys : undefined
   );
+  const rows = ownOnly ? all.filter((r) => r.assignedUserId === user.id) : all;
   const tz = await viewerTimeZone();
   const zone = exportZone(tz);
   const pool = getPool();
@@ -39,7 +45,7 @@ export async function GET(request: Request) {
   for (const r of rows) bySource.set(r.source, [...(bySource.get(r.source) || []), r.id]);
   const links = new Map<string, RowDataPacket[]>();
   const activity = new Map<string, { n: number; last: Date }>();
-  for (const [source, ids] of bySource) {
+  for (const [source, ids] of ownOnly ? [] : bySource) {
     for (let i = 0; i < ids.length; i += 500) {
       const chunk = ids.slice(i, i + 500);
       const [pl] = await pool

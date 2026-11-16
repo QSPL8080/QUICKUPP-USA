@@ -1,4 +1,5 @@
 import { getUserFor } from "@/lib/crm/auth";
+import { canWorkOnMeeting } from "@/lib/crm/meetingTeam";
 import { readJson } from "@/lib/enquiry";
 import { cancelCalendlyMeeting } from "@/lib/crm/calendly";
 
@@ -12,7 +13,7 @@ export const dynamic = "force-dynamic";
  * - Logs to CRM activity audit trail
  */
 export async function POST(request: Request) {
-  const user = await getUserFor("leads");
+  const user = await getUserFor("meetings");
   if (!user) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
 
   const body = await readJson(request);
@@ -20,6 +21,8 @@ export async function POST(request: Request) {
   if (!id || id < 1) {
     return Response.json({ ok: false, error: "Invalid meeting ID." }, { status: 400 });
   }
+
+  if (!(await canWorkOnMeeting(user, id))) return Response.json({ ok: false, error: "You can't change this meeting." }, { status: 403 });
 
   const reason = typeof body?.reason === "string" ? body.reason.trim() : "";
   const cancelInCalendly = body?.cancelInCalendly !== false;

@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
  * Returns active event types configured in Calendly.
  */
 export async function GET() {
-  const user = await getUserFor("leads");
+  const user = await getUserFor("meetings");
   if (!user) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
 
   try {

@@ -49,7 +49,9 @@ export type EnquiryRow = {
   sourcePage: string | null;
   pageUrl: string | null;
   channel: string | null; // manual leads
-  assignedTo: string | null; // manual leads
+  assignedTo: string | null; // the team member's name
+  assignedUserId: number | null; // the team member's account
+  clientSince: string | null; // first payment received: the lead is a client
   createdBy: string | null; // manual leads
   status: EnquiryStatus;
   projectStatus: string;
@@ -69,6 +71,8 @@ export type LeadRow = {
   service: string | null;
   detail: string;
   assignedTo?: string | null;
+  assignedUserId?: number | null;
+  clientSince?: string | null;
   status: EnquiryStatus;
   projectStatus: string;
   createdAt: string;
@@ -82,7 +86,7 @@ const UNION_SQL = (Object.keys(SOURCES) as EnquirySource[])
     const detail = k === "contact" ? "COALESCE(category, project_type)" : k === "youtube" ? "''" : k === "industries" ? "COALESCE(NULLIF(category, ''), service)" : "category";
     const service = k === "contact" ? "project_type" : "service";
     const channel = k === "manual" ? "COALESCE(NULLIF(lead_channel, ''), 'Manual')" : "'Website'";
-    return `SELECT '${k}' AS src, id, full_name, email, phone, company_name, ${detail} AS detail, ${service} AS service, assigned_to, status, COALESCE(NULLIF(TRIM(project_status), ''), 'Not Started') AS project_status, ${channel} AS channel, created_at FROM \`${SOURCES[k].table}\``;
+    return `SELECT '${k}' AS src, id, full_name, email, phone, company_name, ${detail} AS detail, ${service} AS service, assigned_to, assigned_user_id, client_since, status, COALESCE(NULLIF(TRIM(project_status), ''), 'Not Started') AS project_status, ${channel} AS channel, created_at FROM \`${SOURCES[k].table}\``;
   })
   .join(" UNION ALL ");
 
@@ -92,17 +96,36 @@ const UNION_SQL_SAFE = (Object.keys(SOURCES) as EnquirySource[])
     const service = k === "contact" ? "project_type" : "service";
     const assigned = k === "manual" ? "assigned_to" : "NULL AS assigned_to";
     const channel = k === "manual" ? "COALESCE(NULLIF(lead_channel, ''), 'Manual')" : "'Website'";
-    return `SELECT '${k}' AS src, id, full_name, email, phone, company_name, ${detail} AS detail, ${service} AS service, ${assigned}, status, 'Not Started' AS project_status, ${channel} AS channel, created_at FROM \`${SOURCES[k].table}\``;
+    return `SELECT '${k}' AS src, id, full_name, email, phone, company_name, ${detail} AS detail, ${service} AS service, ${assigned}, NULL AS assigned_user_id, NULL AS client_since, status, 'Not Started' AS project_status, ${channel} AS channel, created_at FROM \`${SOURCES[k].table}\``;
   })
   .join(" UNION ALL ");
 
 /* tz: the viewer's time zone, which the from/to days are in (see lib/crm/crmTime) */
-export type LeadFilters = { q?: string; source?: string; status?: string; projectStatus?: string; channel?: string; from?: string; to?: string; tz?: string };
+/* assignedUserId: only the leads assigned to this team member (a BDM or BDE sees only theirs);
+   clients: "1" only clients, "0" only leads that are not clients yet */
+export type LeadFilters = {
+  q?: string;
+  source?: string;
+  status?: string;
+  projectStatus?: string;
+  channel?: string;
+  from?: string;
+  to?: string;
+  tz?: string;
+  assignedUserId?: number;
+  clients?: string;
+};
 
 function leadWhere(f: LeadFilters) {
   const where: string[] = [];
   const args: (string | number | Date)[] = [];
   const tz = f.tz || DEFAULT_TZ;
+  if (f.assignedUserId) {
+    where.push("assigned_user_id = ?");
+    args.push(f.assignedUserId);
+  }
+  if (f.clients === "1") where.push("client_since IS NOT NULL");
+  else if (f.clients === "0") where.push("client_since IS NULL");
   if (f.source === "services") {
     where.push("src IN ('digital-marketing', 'ai-automation', 'it-services', 'staff-augmentation')");
   } else if (f.source && isEnquirySource(f.source)) {
@@ -153,6 +176,8 @@ const toLead = (r: Record<string, unknown>): LeadRow => ({
   service: (r.service as string) || null,
   detail: String(r.detail ?? ""),
   assignedTo: (r.assigned_to as string) || null,
+  assignedUserId: r.assigned_user_id ? Number(r.assigned_user_id) : null,
+  clientSince: r.client_since ? new Date(r.client_since as string).toISOString() : null,
   status: ((ENQUIRY_STATUSES as readonly string[]).includes(String(r.status)) ? r.status : "new") as EnquiryStatus,
   projectStatus: String(r.project_status || "Not Started"),
   createdAt: new Date(r.created_at as string).toISOString(),
@@ -273,6 +298,8 @@ function toEnquiry(source: EnquirySource, r: Record<string, unknown>): EnquiryRo
     pageUrl: isManual ? null : ((r.page_url as string) || null),
     channel: isManual ? ((r.lead_channel as string) || null) : null,
     assignedTo: (r.assigned_to as string) || null,
+    assignedUserId: r.assigned_user_id ? Number(r.assigned_user_id) : null,
+    clientSince: r.client_since ? new Date(r.client_since as string).toISOString() : null,
     createdBy: isManual ? ((r.created_by_name as string) || null) : null,
     status: ((ENQUIRY_STATUSES as readonly string[]).includes(String(r.status)) ? r.status : "new") as EnquiryStatus,
     projectStatus: String(r.project_status || "Not Started"),
@@ -323,6 +350,18 @@ export async function exportLeadDetails(f: LeadFilters, keys?: string[]): Promis
   return list;
 }
 
+/** How many of a team member's assigned leads are still New (the badge on a BDM's or BDE's menu) */
+export async function assignedNewCount(userId: number): Promise<number> {
+  await ensureLeadTables();
+  const sql = (Object.keys(SOURCES) as EnquirySource[])
+    .map((k) => `(SELECT COUNT(*) AS n FROM \`${SOURCES[k].table}\` WHERE assigned_user_id = ? AND status = 'new')`)
+    .join(" UNION ALL ");
+  const [rows] = await getPool()
+    .query<RowDataPacket[]>(`SELECT SUM(n) AS n FROM (${sql}) t`, (Object.keys(SOURCES) as EnquirySource[]).map(() => userId))
+    .catch(() => [[] as RowDataPacket[]]);
+  return Number((rows as RowDataPacket[])[0]?.n || 0);
+}
+
 /* ---- Payments --------------------------------------------------------------------------- */
 
 export const PAYMENT_STATUSES = ["paid", "pending", "partially_paid", "refunded", "failed"] as const;
@@ -371,6 +410,8 @@ export type PaymentRow = {
   linkStatus?: string | null;
   leadSource?: string | null;
   leadId?: number | null;
+  /** the lead it was made for has paid (now or on another payment): a client */
+  leadClient?: boolean;
   quantity?: string | null;
   balanceDueDate?: string | null;
   balanceReminderSentAt?: string | null;

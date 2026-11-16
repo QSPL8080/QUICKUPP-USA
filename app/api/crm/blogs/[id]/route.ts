@@ -1,5 +1,6 @@
 import { revalidatePath } from "next/cache";
 import { getPool } from "@/lib/db";
+import { deleteOrTrash } from "@/lib/crm/trash";
 import { getUserFor } from "@/lib/crm/auth";
 import { type BlogDbRow, blogStoredInFull, ensureBlogColumns, rowToCrmBlog, validateBlog } from "@/lib/blogs";
 import { readJson } from "@/lib/enquiry";
@@ -94,8 +95,19 @@ export async function DELETE(_request: Request, ctx: Ctx) {
   const id = await parseId(ctx);
   if (!id) return Response.json({ ok: false, error: "Blog not found." }, { status: 404 });
 
-  const pool = getPool();
-  await pool.execute("DELETE FROM blogs WHERE id = ?", [id]);
+  // to the Deleted bin (off the website); the Super Admin restores or removes it for good there
+  const { count } = await deleteOrTrash({
+    entity: "blog",
+    table: "blogs",
+    ids: [id],
+    user: me,
+    describe: (r) => ({ label: String(r.title || "Blog"), detail: `Blog · ${String(r.category || "")}` }),
+    forGood: async (list) => {
+      const [res] = await getPool().query("DELETE FROM blogs WHERE id IN (?)", [list]);
+      return (res as { affectedRows: number }).affectedRows;
+    },
+  });
+  if (!count) return Response.json({ ok: false, error: "This blog was already deleted." }, { status: 404 });
 
   revalidatePath("/blog", "layout");
   revalidatePath("/resources");

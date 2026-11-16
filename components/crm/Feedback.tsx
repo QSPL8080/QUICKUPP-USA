@@ -15,10 +15,17 @@ type ConfirmOptions = {
   tone?: "danger" | "default";
 };
 
+/* a confirmation that also asks for a line of text: a reason, or a word to type to confirm */
+type AskOptions = ConfirmOptions & {
+  input: { label: string; placeholder?: string; mustType?: string; optional?: boolean };
+};
+
 type Toast = { id: number; text: string; tone: "ok" | "error" };
 
 type Feedback = {
   confirm: (o: ConfirmOptions) => Promise<boolean>;
+  /** like confirm, with a text box: the text, or null when cancelled */
+  ask: (o: AskOptions) => Promise<string | null>;
   toast: (text: string, tone?: "ok" | "error") => void;
 };
 
@@ -27,16 +34,31 @@ const Ctx = createContext<Feedback | null>(null);
 export function useFeedback(): Feedback {
   const ctx = useContext(Ctx);
   // outside the provider (shouldn't happen): fall back to the browser's own boxes
-  return ctx || { confirm: async (o) => window.confirm(`${o.title}\n\n${o.message || ""}`), toast: () => {} };
+  return (
+    ctx || {
+      confirm: async (o) => window.confirm(`${o.title}\n\n${o.message || ""}`),
+      ask: async (o) => window.prompt(`${o.title}\n\n${o.message || ""}\n\n${o.input.label}`) ?? null,
+      toast: () => {},
+    }
+  );
 }
 
 export function FeedbackProvider({ children }: { children: React.ReactNode }) {
-  const [dialog, setDialog] = useState<(ConfirmOptions & { resolve: (ok: boolean) => void }) | null>(null);
+  const [dialog, setDialog] = useState<(ConfirmOptions & { input?: AskOptions["input"]; resolve: (ok: boolean, text?: string) => void }) | null>(null);
+  const [text, setText] = useState("");
   const [toasts, setToasts] = useState<Toast[]>([]);
   const okRef = useRef<HTMLButtonElement>(null);
   const nextId = useRef(1);
 
   const confirm = useCallback((o: ConfirmOptions) => new Promise<boolean>((resolve) => setDialog({ ...o, resolve })), []);
+  const ask = useCallback(
+    (o: AskOptions) =>
+      new Promise<string | null>((resolve) => {
+        setText("");
+        setDialog({ ...o, resolve: (ok, t) => resolve(ok ? (t ?? "").trim() : null) });
+      }),
+    []
+  );
 
   const toast = useCallback((text: string, tone: "ok" | "error" = "ok") => {
     const id = nextId.current++;
@@ -46,15 +68,17 @@ export function FeedbackProvider({ children }: { children: React.ReactNode }) {
 
   const answer = useCallback(
     (ok: boolean) => {
-      dialog?.resolve(ok);
+      dialog?.resolve(ok, text);
       setDialog(null);
     },
-    [dialog]
+    [dialog, text]
   );
+  // a word to type (e.g. DELETE) must match before the button works; a required reason can't be empty
+  const inputOk = !dialog?.input || (dialog.input.mustType ? text.trim() === dialog.input.mustType : dialog.input.optional || text.trim().length > 0);
 
   useEffect(() => {
     if (!dialog) return;
-    okRef.current?.focus();
+    if (!dialog.input) okRef.current?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") answer(false);
     };
@@ -65,7 +89,7 @@ export function FeedbackProvider({ children }: { children: React.ReactNode }) {
   const danger = (dialog?.tone || "danger") === "danger";
 
   return (
-    <Ctx.Provider value={{ confirm, toast }}>
+    <Ctx.Provider value={{ confirm, ask, toast }}>
       {children}
 
       {dialog && (
@@ -87,11 +111,27 @@ export function FeedbackProvider({ children }: { children: React.ReactNode }) {
               {dialog.title}
             </h2>
             {dialog.message && <p className="crm-confirm-text">{dialog.message}</p>}
+            {dialog.input && (
+              <label className="crm-confirm-input">
+                <span>{dialog.input.label}</span>
+                <input
+                  className="crm-input"
+                  autoFocus
+                  value={text}
+                  placeholder={dialog.input.placeholder}
+                  maxLength={255}
+                  onChange={(e) => setText(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && inputOk) answer(true);
+                  }}
+                />
+              </label>
+            )}
             <div className="crm-confirm-actions">
               <button type="button" className="crm-act crm-act-ghost" onClick={() => answer(false)}>
                 Cancel
               </button>
-              <button ref={okRef} type="button" className={`crm-act ${danger ? "crm-act-red" : "crm-act-dark"}`} onClick={() => answer(true)}>
+              <button ref={okRef} type="button" className={`crm-act ${danger ? "crm-act-red" : "crm-act-dark"}`} disabled={!inputOk} onClick={() => answer(true)}>
                 {dialog.confirmLabel || (danger ? "Yes, delete" : "Confirm")}
               </button>
             </div>

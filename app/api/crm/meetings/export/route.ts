@@ -1,4 +1,4 @@
-import { getUserFor } from "@/lib/crm/auth";
+import { getUserFor, isSalesRole } from "@/lib/crm/auth";
 import { listMeetings, MEETING_STATUSES, MEETING_STATUS_LABEL } from "@/lib/crm/calendly";
 import { csvFile } from "@/lib/crm/csv";
 import { exportStamp, exportZone, viewerTimeZone } from "@/lib/crm/crmTime";
@@ -6,13 +6,14 @@ import { parseIds } from "@/lib/crm/ids";
 
 /* GET ?q=&status=&when=&ids= → the Calendly meetings the list shows, every detail, as a CSV file */
 export async function GET(request: Request) {
-  if (!(await getUserFor("leads"))) return new Response("Please sign in again.", { status: 401 });
+  const user = await getUserFor("meetings");
+  if (!user) return new Response("Please sign in again.", { status: 401 });
   const sp = new URL(request.url).searchParams;
   const rawIds = sp.get("ids");
   const ids = rawIds ? parseIds(rawIds.split(","), 5000) || undefined : undefined;
   const status = (MEETING_STATUSES as readonly string[]).includes(sp.get("status") || "") ? String(sp.get("status")) : "";
   const when = sp.get("when") === "upcoming" || sp.get("when") === "past" ? String(sp.get("when")) : "";
-  const { items } = await listMeetings({ q: sp.get("q") || "", status, when, all: true, ids });
+  const { items } = await listMeetings({ q: sp.get("q") || "", status, when, all: true, ids, visibleTo: isSalesRole(user) ? user.id : undefined });
   const tz = await viewerTimeZone();
   const zone = exportZone(tz);
   const at = (v: string | null) => exportStamp(v, tz);
@@ -22,7 +23,7 @@ export async function GET(request: Request) {
     "Sr. No", "Meeting ID", "Status", "Meeting", `Starts (${zone})`, `Ends (${zone})`, "Length (minutes)", "Client's Time Zone",
     "Client Name", "Client Email", "Client Phone", "Guests", "Answers to Booking Questions", "Location", "Join Link",
     "Host", "Host Email", `Booked (${zone})`, "Times Rescheduled", `Previous Start (${zone})`, `Cancelled (${zone})`,
-    "Cancelled By", "Cancel Reason", "History",
+    "Cancelled By", "Cancel Reason", "Scheduled By", "Assigned BDM", "From Lead", "Client", "Notes Added", "History",
   ];
   const lines = items.map((m, i) => [
     i + 1,
@@ -48,12 +49,19 @@ export async function GET(request: Request) {
     at(m.canceledAt),
     m.canceledBy,
     m.cancelReason,
+    m.createdByName ? `${m.createdByName}${m.createdByRole ? ` (${m.createdByRole.toUpperCase().replace("_", " ")})` : ""}` : "",
+    m.assignedBdmName || "",
+    m.leadId ? "Yes" : "No",
+    m.isClient ? "Yes" : "No",
+    m.notesCount,
     m.history
       .map((h) =>
         h.kind === "booked"
           ? `Booked ${at(h.at)}${h.start ? ` for ${at(h.start)}` : ""}`
           : h.kind === "rescheduled"
           ? `Rescheduled ${at(h.at)}${h.from ? ` from ${at(h.from)}` : ""}${h.to ? ` to ${at(h.to)}` : ""}`
+          : h.kind === "assigned"
+          ? `${h.bdm ? `Assigned to ${h.bdm}` : "Unassigned"}${h.prevBdm ? ` (from ${h.prevBdm})` : ""} ${at(h.at)}${h.by ? ` by ${h.by}` : ""}`
           : `Cancelled ${at(h.at)}${h.by ? ` by ${h.by}` : ""}${h.reason ? ` (${h.reason})` : ""}`
       )
       .join(" | "),

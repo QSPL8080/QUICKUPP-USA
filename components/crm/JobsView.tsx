@@ -130,7 +130,7 @@ export default function JobsView({
 
   const remove = async () => {
     if (editing === "new" || !editing) return;
-    if (!(await confirm({ title: `Delete the "${editing.title}" opening?`, message: "It will be removed from the Careers page and the CRM. Applications already received are kept. This can't be undone." }))) return;
+    if (!(await confirm({ title: `Delete the "${editing.title}" opening?`, message: "It will be removed from the Careers page and moved to the Deleted bin. Applications already received are kept. The Super Admin can restore it." }))) return;
     setBusy(true);
     const res = await fetch(`/api/crm/jobs/${editing.id}`, { method: "DELETE" }).catch(() => null);
     setBusy(false);
@@ -141,7 +141,7 @@ export default function JobsView({
   };
 
   const removeOne = async (j: Job) => {
-    if (!(await confirm({ title: `Delete the "${j.title}" opening?`, message: "It will be removed from the Careers page and the CRM. Applications already received are kept. This can't be undone." }))) return;
+    if (!(await confirm({ title: `Delete the "${j.title}" opening?`, message: "It will be removed from the Careers page and moved to the Deleted bin. Applications already received are kept. The Super Admin can restore it." }))) return;
     setListError("");
     const res = await fetch(`/api/crm/jobs/${j.id}`, { method: "DELETE" }).catch(() => null);
     if (!res?.ok && res?.status !== 404) return setListError("Couldn't delete the job opening. Please try again.");
@@ -153,7 +153,7 @@ export default function JobsView({
     const ids = sel.selected;
     if (!ids.length) return;
     const what = ids.length === 1 ? "this job opening" : `these ${ids.length} job openings`;
-    if (!(await confirm({ title: `Delete ${what}?`, message: "They will be removed from the Careers page and the CRM. This can't be undone." }))) return;
+    if (!(await confirm({ title: `Delete ${what}?`, message: "They will be removed from the Careers page and moved to the Deleted bin, where the Super Admin can restore them." }))) return;
     setBusy(true);
     setListError("");
     const res = await fetch("/api/crm/jobs", {

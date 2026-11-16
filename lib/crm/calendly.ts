@@ -3,6 +3,10 @@ import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { getPool } from "@/lib/db";
 import { logActivity } from "@/lib/crm/activity";
 import type { CrmUser } from "@/lib/crm/auth";
+import { roleName } from "@/lib/crm/roles";
+import { audit } from "@/lib/crm/audit";
+import { SOURCES } from "@/lib/crm/data";
+import { isEnquirySource } from "@/lib/crm/leadOptions";
 import { notifyMeeting } from "@/lib/crm/meetingNotify";
 
 /*
@@ -99,7 +103,18 @@ const sqlTime = (iso?: string | null) => {
 const iso = (col: string) => `IF(${col} IS NULL, NULL, DATE_FORMAT(${col}, '%Y-%m-%dT%H:%i:%sZ'))`;
 
 /* ---------------------------------------------------------------- the row */
-type HistoryItem = { kind: "booked" | "rescheduled" | "canceled"; at: string; start?: string; from?: string; to?: string; by?: string; reason?: string };
+export type HistoryItem = {
+  kind: "booked" | "rescheduled" | "canceled" | "assigned";
+  at: string;
+  start?: string;
+  from?: string;
+  to?: string;
+  by?: string;
+  reason?: string;
+  /** "assigned": the BDM who takes the meeting now, and the one before (a transfer) */
+  bdm?: string;
+  prevBdm?: string;
+};
 
 type MeetingRow = {
   id: number;
@@ -501,8 +516,12 @@ export function verifyWebhook(raw: string, header: string | null): boolean {
 
 /* ---------------------------------------------------------------- reading for the CRM */
 export const MEETING_STATUSES = ["upcoming", "rescheduled", "completed", "canceled"] as const;
+/** What a BDM/BDE sees: the meetings they scheduled and the ones assigned to them */
+const ownMeetings = (userId?: number) => (userId ? { sql: " AND (created_by = ? OR assigned_bdm_id = ?)", args: [userId, userId] } : { sql: "", args: [] as number[] });
+
 /** How many meetings each status filter holds (for the chips above the list) */
-export async function meetingCounts(): Promise<Record<string, number>> {
+export async function meetingCounts(visibleTo?: number): Promise<Record<string, number>> {
+  const own = ownMeetings(visibleTo);
   try {
     const [rows] = await getPool().query(
       `SELECT COUNT(*) AS total,
@@ -510,7 +529,8 @@ export async function meetingCounts(): Promise<Record<string, number>> {
               SUM(status <> 'canceled' AND reschedule_count > 0 AND end_time >= UTC_TIMESTAMP()) AS rescheduled,
               SUM(status <> 'canceled' AND end_time < UTC_TIMESTAMP()) AS completed,
               SUM(status = 'canceled') AS canceled
-         FROM crm_meetings WHERE deleted_at IS NULL`
+         FROM crm_meetings WHERE deleted_at IS NULL${own.sql}`,
+      own.args
     );
     const r = (rows as Record<string, unknown>[])[0] || {};
     return Object.fromEntries(["total", "upcoming", "rescheduled", "completed", "canceled"].map((k) => [k, Number(r[k] || 0)]));
@@ -556,6 +576,19 @@ export type MeetingItem = {
   canceledAt: string | null;
   history: HistoryItem[];
   bookedAt: string | null;
+  /** the lead it was scheduled for ("From lead") */
+  leadSource: string | null;
+  /** the lead has paid: a client */
+  isClient: boolean;
+  /** the team member who scheduled it in the CRM */
+  createdById: number | null;
+  createdByName: string | null;
+  createdByRole: string | null;
+  /** the BDM who takes it */
+  assignedBdmId: number | null;
+  assignedBdmName: string | null;
+  assignedAt: string | null;
+  notesCount: number;
 };
 
 const PAGE_SIZE = 25;
@@ -568,9 +601,13 @@ const json = <T,>(v: unknown, fallback: T): T => {
 };
 
 /* all: every matching meeting on one page (the CSV export); ids: only these */
-export async function listMeetings(opts: { q?: string; status?: string; when?: string; page?: number; all?: boolean; ids?: number[] }) {
+export async function listMeetings(opts: { q?: string; status?: string; when?: string; page?: number; all?: boolean; ids?: number[]; visibleTo?: number }) {
   const where = ["deleted_at IS NULL"];
   const args: (string | number)[] = [];
+  if (opts.visibleTo) {
+    where.push("(created_by = ? OR assigned_bdm_id = ?)");
+    args.push(opts.visibleTo, opts.visibleTo);
+  }
   const q = (opts.q || "").trim().slice(0, 100);
   if (q) {
     const like = `%${q}%`;
@@ -598,6 +635,11 @@ export async function listMeetings(opts: { q?: string; status?: string; when?: s
     `SELECT id, event_name, status, ${iso("start_time")} AS start_time, ${iso("end_time")} AS end_time, invitee_timezone, invitee_name, invitee_email, invitee_phone,
             location_type, location_text, join_url, reschedule_url, cancel_url, notes, lead_id, source, answers, guests, host_name, host_email, reschedule_count, ${iso("previous_start_time")} AS previous_start_time,
             canceled_by, cancel_reason, ${iso("canceled_at")} AS canceled_at, history, ${iso("booked_at")} AS booked_at,
+            lead_source, created_by, assigned_bdm_id, ${iso("assigned_at")} AS assigned_at,
+            (SELECT u.name FROM crm_users u WHERE u.id = crm_meetings.created_by) AS created_by_name,
+            (SELECT u.role FROM crm_users u WHERE u.id = crm_meetings.created_by) AS created_by_role,
+            (SELECT u.name FROM crm_users u WHERE u.id = crm_meetings.assigned_bdm_id) AS assigned_bdm_name,
+            (SELECT COUNT(*) FROM crm_meeting_notes n WHERE n.meeting_id = crm_meetings.id) AS notes_count,
             (status <> 'canceled' AND end_time >= UTC_TIMESTAMP()) AS ahead
        FROM crm_meetings ${whereSql}
       ORDER BY ahead DESC, IF(ahead = 1, start_time, NULL) ASC, start_time DESC, id DESC
@@ -638,9 +680,34 @@ export async function listMeetings(opts: { q?: string; status?: string; when?: s
       canceledAt: r.canceled_at ? String(r.canceled_at) : null,
       history: json(r.history, []),
       bookedAt: r.booked_at ? String(r.booked_at) : null,
+      leadSource: r.lead_source ? String(r.lead_source) : null,
+      isClient: false,
+      createdById: r.created_by ? Number(r.created_by) : null,
+      createdByName: r.created_by_name ? String(r.created_by_name) : null,
+      createdByRole: r.created_by_role ? String(r.created_by_role) : null,
+      assignedBdmId: r.assigned_bdm_id ? Number(r.assigned_bdm_id) : null,
+      assignedBdmName: r.assigned_bdm_name ? String(r.assigned_bdm_name) : null,
+      assignedAt: r.assigned_at ? String(r.assigned_at) : null,
+      notesCount: Number(r.notes_count || 0),
     };
   });
+  await markClients(items);
   return { items, total, page, pages: Math.max(1, Math.ceil(total / PAGE_SIZE)), pageSize: PAGE_SIZE };
+}
+
+/* a meeting whose lead has paid shows that it is with a client */
+async function markClients(items: MeetingItem[]) {
+  const bySource = new Map<string, number[]>();
+  for (const m of items) if (m.leadSource && m.leadId && isEnquirySource(m.leadSource)) bySource.set(m.leadSource, [...(bySource.get(m.leadSource) || []), m.leadId]);
+  const clients = new Set<string>();
+  for (const [src, ids] of bySource) {
+    if (!isEnquirySource(src)) continue;
+    const [rows] = await getPool()
+      .query(`SELECT id FROM \`${SOURCES[src].table}\` WHERE id IN (?) AND client_since IS NOT NULL`, [ids])
+      .catch(() => [[]] as unknown as [Record<string, unknown>[]]);
+    for (const r of rows as Record<string, unknown>[]) clients.add(`${src}:${Number(r.id)}`);
+  }
+  for (const m of items) m.isClient = clients.has(`${m.leadSource}:${m.leadId}`);
 }
 
 /** A fingerprint of the list, so an open page can tell when something changed */
@@ -650,11 +717,32 @@ export async function meetingsVersion(): Promise<string> {
   return `${r?.n || 0}:${r?.u instanceof Date ? r.u.toISOString() : String(r?.u || "")}`;
 }
 
-/** Hides meetings from the CRM (nothing is changed in Calendly) */
-export async function deleteMeetings(ids: number[]) {
-  const [res] = await getPool().query("UPDATE crm_meetings SET deleted_at = UTC_TIMESTAMP() WHERE id IN (?) AND deleted_at IS NULL", [ids]);
-  return (res as { affectedRows: number }).affectedRows;
+/**
+ * Takes meetings off the CRM list (nothing is changed in Calendly): they go to the
+ * Deleted bin, where the Super Admin can restore them or remove them for good
+ * (the row is then kept, marked, so the Calendly sync doesn't bring it back).
+ */
+export async function deleteMeetings(ids: number[], user?: Pick<CrmUser, "id" | "name" | "role">, reason = "") {
+  const pool = getPool();
+  const [rows] = await pool.query("SELECT id, invitee_name, event_name, start_time FROM crm_meetings WHERE id IN (?) AND deleted_at IS NULL", [ids]);
+  const list = rows as { id: number; invitee_name: string | null; event_name: string | null; start_time: Date | string | null }[];
+  if (!list.length) return { count: 0, trashed: true };
+  const why = reason.trim().slice(0, 255) || null;
+  const [res] = await pool
+    .query("UPDATE crm_meetings SET deleted_at = UTC_TIMESTAMP(), deleted_by = ?, deleted_reason = ? WHERE id IN (?) AND deleted_at IS NULL", [user?.id ?? null, why, ids])
+    .catch(async (err) => {
+      // the reason column comes with a later database update
+      if ((err as { code?: string }).code !== "ER_BAD_FIELD_ERROR") throw err;
+      return pool.query("UPDATE crm_meetings SET deleted_at = UTC_TIMESTAMP(), deleted_by = ? WHERE id IN (?) AND deleted_at IS NULL", [user?.id ?? null, ids]);
+    });
+  for (const m of list) {
+    await audit(user, "soft_delete", "meeting", m.id, `Meeting with ${m.invitee_name || "a client"} (${m.event_name || "meeting"})${why ? ` (reason: ${why})` : ""}`);
+  }
+  return { count: (res as { affectedRows: number }).affectedRows, trashed: true };
 }
+
+/** Who did something to a meeting, for its history: "Amit (BDE)" */
+const byLabel = (user: Pick<CrmUser, "name" | "role">) => `${user.name} (${roleName(user.role)})`;
 
 /* ---------------------------------------------------------------- Dynamic CRM Meeting Actions */
 
@@ -705,7 +793,7 @@ export async function cancelCalendlyMeeting({
   history.push({
     kind: "canceled",
     at: nowIso,
-    by: `${user.name} (${user.role === "super_admin" ? "Super Admin" : "Admin"})`,
+    by: byLabel(user),
     reason: reason || undefined,
   });
 
@@ -770,7 +858,7 @@ export async function rescheduleMeetingDetails({
     from: String(row.start_time),
     to: startTime,
     reason: reason || undefined,
-    by: `${user.name} (${user.role === "super_admin" ? "Super Admin" : "Admin"})`,
+    by: byLabel(user),
   });
 
   const nextCount = Number(row.reschedule_count || 0) + 1;
@@ -877,6 +965,7 @@ export async function createCrmMeeting({
     hostName?: string;
     hostEmail?: string;
     leadId?: number;
+    leadSource?: string;
     source?: string;
   };
   user: Pick<CrmUser, "id" | "name" | "role">;
@@ -891,7 +980,7 @@ export async function createCrmMeeting({
       kind: "booked" as const,
       at: nowIso,
       start: data.startTime,
-      by: `${user.name} (${user.role === "super_admin" ? "Super Admin" : "Admin"})`,
+      by: byLabel(user),
     },
   ];
 
@@ -911,6 +1000,8 @@ export async function createCrmMeeting({
     join_url: data.joinUrl?.trim().slice(0, 700) || null,
     notes: data.notes?.trim() || null,
     lead_id: data.leadId || null,
+    lead_source: data.leadId && data.leadSource ? data.leadSource : null,
+    created_by: user.id,
     source: data.source || "crm",
     host_name: data.hostName?.trim().slice(0, 190) || user.name,
     host_email: data.hostEmail?.trim().slice(0, 190) || null,
