@@ -9,7 +9,7 @@ import type { TeamUser } from "@/lib/crm/users";
 const fmtDate = (iso: string | null) =>
   iso ? new Date(iso).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }) : "Never";
 
-type Form = { name: string; username: string; email: string; password: string; isActive: boolean; role: "admin" | "bdm" | "bde" | "accountant" | "viewer" | "seo" | "hr" };
+type Form = { name: string; username: string; email: string; password: string; isActive: boolean; role: "admin" | "seo" | "viewer" | "hr" };
 
 /* current password, hidden until the eye is pressed (super admin only) */
 function PasswordCell({ value }: { value: string | null | undefined }) {
@@ -201,23 +201,7 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
                     {u.email}
                   </td>
                   <td data-label="Role">
-                    <span className={`crm-pill ${locked ? "crm-pill-paid" : "crm-pill-pending"}`}>
-                      {locked
-                        ? "Super Admin"
-                        : u.role === "bdm"
-                        ? "BDM"
-                        : u.role === "bde"
-                        ? "BDE"
-                        : u.role === "accountant"
-                        ? "Accountant"
-                        : u.role === "viewer"
-                        ? "Viewer"
-                        : u.role === "seo"
-                        ? "SEO"
-                        : u.role === "hr"
-                        ? "HR"
-                        : "Admin"}
-                    </span>
+                    <span className={`crm-pill ${locked ? "crm-pill-paid" : "crm-pill-pending"}`}>{locked ? "Super Admin" : u.role === "seo" ? "SEO" : u.role === "viewer" ? "Viewer" : u.role === "hr" ? "HR" : "Admin"}</span>
                   </td>
                   <td data-label="Password" className="crm-nowrap" onClick={(e) => e.stopPropagation()}>
                     <PasswordCell value={u.password} />
@@ -340,30 +324,21 @@ export default function UsersView({ users, meId }: { users: TeamUser[]; meId: nu
                   <select
                     className="crm-input crm-select"
                     value={form.role}
-                    onChange={(e) => setForm((f) => ({ ...f, role: e.target.value as Form["role"] }))}
+                    onChange={(e) => setForm((f) => ({ ...f, role: e.target.value === "seo" ? "seo" : e.target.value === "viewer" ? "viewer" : e.target.value === "hr" ? "hr" : "admin" }))}
                   >
-                    <option value="admin">Admin — Operations & management (soft-delete only)</option>
-                    <option value="bdm">BDM — Leads, Clients, Meetings, Payments reports & BDE reassignment</option>
-                    <option value="bde">BDE — Assigned leads & meetings only (record-level access)</option>
-                    <option value="accountant">Accountant — Payments, Payment Links, Invoices & Client financial view</option>
-                    <option value="viewer">Viewer — can view everything, can't change anything</option>
+                    <option value="admin">Admin — the whole CRM</option>
                     <option value="seo">SEO — Blogs and Job Openings only</option>
                     <option value="hr">HR — Job Openings and Job Applications only</option>
+                    <option value="viewer">Viewer — can view everything, can't change anything</option>
                   </select>
                   <span className="crm-cell-sub">
-                    {form.role === "bdm"
-                      ? "Business Development Manager: Full access to Leads, Clients, Meetings, and Payments reports. Can assign and reassign leads and meetings to BDEs/BDMs. Can soft-delete records."
-                      : form.role === "bde"
-                      ? "Business Development Executive: Scoped strictly to enquiries assigned to them. Can update lead statuses, notes, and schedule meetings. Cannot reassign leads away."
-                      : form.role === "accountant"
-                      ? "Accountant: Dedicated access to Payments, Invoices, Payment Links, Transactions, and Client financial profiles. Cannot manage blogs, careers, or sales reassignments."
-                      : form.role === "hr"
-                      ? "Can view and edit job openings and job applications, and their own profile. No enquiries, meetings, payments or clients."
+                    {form.role === "hr"
+                      ? "Can view and edit job openings and job applications (add, edit, close, delete, change status, download resumes), and their own profile and password. No dashboard, enquiries, meetings, payments, blogs or team."
                       : form.role === "viewer"
-                      ? "Can view every standard part of the CRM in read-only mode: cannot add, edit, or delete anything."
+                      ? "Can open every part of the CRM except Team & Users, but only to look: can't add, edit, delete, send or export anything. Can change their own profile and password."
                       : form.role === "seo"
-                      ? "Can view and edit the website's blogs and job openings."
-                      : "Operations Admin: Full operational CRM access across leads, meetings, payments, and clients with soft-delete capabilities. Permanent delete and Team & Users are reserved for Super Admin."}
+                      ? "Can view and edit the website's blogs and job openings, and their own profile and password. No enquiries, payments, meetings or job applications."
+                      : "Can use every part of the CRM except Team & Users."}
                   </span>
                 </div>
               )}

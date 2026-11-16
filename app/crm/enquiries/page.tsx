@@ -23,7 +23,6 @@ export default async function EnquiriesPage({ searchParams }: Props) {
     channel: sp.channel || "",
     from: DATE_RE.test(sp.from || "") ? (sp.from as string) : "",
     to: DATE_RE.test(sp.to || "") ? (sp.to as string) : "",
-    assignedTo: user.role === "bde" ? user.name : undefined,
   };
   const tz = await viewerTimeZone();
   const [data, team] = await Promise.all([listLeads({ ...f, tz, page: Number(sp.page) || 1 }), listTeamNames()]);

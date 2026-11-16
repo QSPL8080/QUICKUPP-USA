@@ -339,10 +339,6 @@ export default function LeadsView({
   };
 
   const setAssignedTo = async (source: string, id: number, assignedTo: string) => {
-    if (currentUser?.role === "bde") {
-      toast("BDEs cannot assign or reassign leads.", "error");
-      return;
-    }
     setBusy(true);
     setError("");
     const res = await fetch("/api/crm/enquiries", {
@@ -361,11 +357,7 @@ export default function LeadsView({
   };
 
   const removeKeys = async (keys: string[], what: string) => {
-    if (currentUser?.role === "bde") {
-      toast("You do not have permission to delete leads.", "error");
-      return false;
-    }
-    if (!(await confirm({ title: `Move ${what} to Bin?`, message: "It will be moved to the Deleted Bin and can be restored within 30 days." }))) return false;
+    if (!(await confirm({ title: `Delete ${what}?`, message: "It will be permanently removed from the CRM and the database. This can't be undone." }))) return false;
     setBusy(true);
     setError("");
     const res = await fetch("/api/crm/enquiries", {
@@ -379,7 +371,7 @@ export default function LeadsView({
       toast("Couldn't delete. Please try again.", "error");
       return false;
     }
-    toast(keys.length === 1 ? "Lead moved to Deleted Bin" : `${keys.length} leads moved to Deleted Bin`);
+    toast(keys.length === 1 ? "Lead deleted" : `${keys.length} leads deleted`);
     router.refresh();
     return true;
   };
@@ -884,7 +876,7 @@ export default function LeadsView({
                       className="crm-mgmt-select"
                       style={{ height: "30px", fontSize: "12px", minWidth: "125px" }}
                       value={r.assignedTo || ""}
-                      disabled={busy || viewOnly || currentUser?.role === "bde"}
+                      disabled={busy || viewOnly}
                       onChange={(e) => setAssignedTo(r.source, r.id, e.target.value)}
                       aria-label={`Assigned team member for ${r.name}`}
                     >
@@ -1117,7 +1109,7 @@ export default function LeadsView({
                 <select
                   className="crm-mgmt-select"
                   value={open.assignedTo || ""}
-                  disabled={busy || viewOnly || currentUser?.role === "bde"}
+                  disabled={busy || viewOnly}
                   onChange={(e) => setAssignedTo(open.source, open.id, e.target.value)}
                   aria-label="Assigned team member"
                 >

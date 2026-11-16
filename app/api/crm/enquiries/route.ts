@@ -1,11 +1,10 @@
 import { getPool } from "@/lib/db";
-import { getUserFor, canSoftDelete, canPermanentlyDelete } from "@/lib/crm/auth";
+import { getUserFor } from "@/lib/crm/auth";
 import { ENQUIRY_STATUSES, SOURCES, getLead, isEnquirySource, toDateOnly, type EnquirySource } from "@/lib/crm/data";
 import { validateManualLead } from "@/lib/crm/leadOptions";
 import { readJson } from "@/lib/enquiry";
 import { actorOf } from "@/lib/crm/activity";
 import { leadHistory, leadSnapshot, logLeadChanges, logLeadCreated } from "@/lib/crm/leadActivity";
-import { notifyLeadAssigned } from "@/lib/crm/userNotify";
 import type { RowDataPacket } from "mysql2/promise";
 import { errCode } from "@/lib/err";
 
@@ -14,19 +13,13 @@ const invalid = () => Response.json({ ok: false, error: "Invalid request." }, { 
 
 /* GET ?source=&id= → one lead with all its details, attachments, and payment links */
 export async function GET(request: Request) {
-  const user = await getUserFor("leads");
-  if (!user) return unauthorized();
+  if (!(await getUserFor("leads"))) return unauthorized();
   const url = new URL(request.url);
   const source = url.searchParams.get("source");
   const id = Number(url.searchParams.get("id"));
   if (!isEnquirySource(source) || !Number.isInteger(id) || id < 1) return invalid();
   const lead = await getLead(source, id);
   if (!lead) return Response.json({ ok: false, error: "This lead was deleted." }, { status: 404 });
-
-  // Record-level access control: BDE can only view leads assigned to them
-  if (user.role === "bde" && lead.assignedTo !== user.name) {
-    return Response.json({ ok: false, error: "Access denied. You can only view leads assigned to you." }, { status: 403 });
-  }
 
   const pool = getPool();
 
@@ -55,7 +48,7 @@ export async function GET(request: Request) {
               currency, method, status, link_status, invoice_number, token, billing_start_date,
               billing_end_date, balance_due_date, created_at, paid_at, notes, lead_source, lead_id
        FROM payment_links
-       WHERE (${conditions.join(" OR ")}) AND deleted_at IS NULL
+       WHERE ${conditions.join(" OR ")}
        ORDER BY id DESC`,
       args
     );
@@ -67,7 +60,7 @@ export async function GET(request: Request) {
               currency, method, status, link_status, invoice_number, token, billing_start_date,
               billing_end_date, balance_due_date, created_at, paid_at, notes
        FROM payments
-       WHERE token IS NOT NULL AND (${conditions.join(" OR ")}) AND deleted_at IS NULL
+       WHERE token IS NOT NULL AND (${conditions.join(" OR ")})
        ORDER BY id DESC`,
       args
     ).catch(() => [[]]);
@@ -131,18 +124,6 @@ export async function POST(request: Request) {
   );
   const newId = (res as { insertId: number }).insertId;
   await logLeadCreated(newId, actorOf(user), assignedTo || "", d.channel || "Manual");
-
-  if (assignedTo && assignedTo !== user.name) {
-    void notifyLeadAssigned({
-      leadSource: "manual",
-      leadId: newId,
-      leadName: d.fullName,
-      leadEmail: d.email,
-      assignedToName: assignedTo,
-      assignedByName: user.name,
-    }).catch((e) => console.error("Failed to notify lead assigned:", e));
-  }
-
   return Response.json({ ok: true, id: newId });
 }
 
@@ -159,24 +140,12 @@ export async function PUT(request: Request) {
   const d = result.data;
   const pool = getPool();
   const before = await leadSnapshot(source, id);
-  if (!before) return Response.json({ ok: false, error: "This lead was deleted." }, { status: 404 });
-
-  // Record-level access control: BDE can only edit their assigned leads, and cannot reassign
-  if (user.role === "bde") {
-    if (before.assigned_to !== user.name) {
-      return Response.json({ ok: false, error: "Access denied. You can only edit leads assigned to you." }, { status: 403 });
-    }
-    if (d.assignedTo !== before.assigned_to) {
-      return Response.json({ ok: false, error: "BDEs cannot assign or reassign leads." }, { status: 403 });
-    }
-  }
-
   try {
     if (source === "manual") {
       const [res] = await pool.execute(
         `UPDATE manual_leads SET full_name = ?, email = ?, phone = ?, company_name = ?, company_website = ?, country = ?, industry = ?,
            service = ?, category = ?, budget = ?, timeline = ?, lead_channel = ?, assigned_to = ?, message = ?, status = ?, project_status = ?
-         WHERE id = ? AND deleted_at IS NULL`,
+         WHERE id = ?`,
         [d.fullName, d.email, d.phone, d.companyName, d.companyWebsite, d.country, d.industry, d.service, d.category, d.budget, d.timeline,
           d.channel, d.assignedTo, d.notes, d.status, d.projectStatus || "Not Started", id]
       );
@@ -185,7 +154,7 @@ export async function PUT(request: Request) {
       const [res] = await pool.execute(
         `UPDATE contact_enquiries SET full_name = ?, email = ?, phone = ?, company_name = ?, company_website = ?, country = ?, industry = ?,
            project_type = ?, budget = ?, timeline = ?, message = ?, assigned_to = ?, status = ?, project_status = ?
-         WHERE id = ? AND deleted_at IS NULL`,
+         WHERE id = ?`,
         [d.fullName, d.email, d.phone, d.companyName, d.companyWebsite, d.country, d.industry, d.service || d.category, d.budget, d.timeline,
           d.notes, d.assignedTo, d.status, d.projectStatus || "Not Started", id]
       );
@@ -194,7 +163,7 @@ export async function PUT(request: Request) {
       const [res] = await pool.execute(
         `UPDATE service_youtube_promotion SET full_name = ?, email = ?, phone = ?, company_name = ?, company_website = ?, country = ?, industry = ?,
            budget = ?, timeline = ?, message = ?, assigned_to = ?, status = ?, project_status = ?
-         WHERE id = ? AND deleted_at IS NULL`,
+         WHERE id = ?`,
         [d.fullName, d.email, d.phone, d.companyName, d.companyWebsite, d.country, d.industry, d.budget, d.timeline,
           d.notes, d.assignedTo, d.status, d.projectStatus || "Not Started", id]
       );
@@ -204,7 +173,7 @@ export async function PUT(request: Request) {
       const [res] = await pool.execute(
         `UPDATE \`${table}\` SET full_name = ?, email = ?, phone = ?, company_name = ?, company_website = ?, country = ?, industry = ?,
            service = ?, category = ?, budget = ?, timeline = ?, message = ?, assigned_to = ?, status = ?, project_status = ?
-         WHERE id = ? AND deleted_at IS NULL`,
+         WHERE id = ?`,
         [d.fullName, d.email, d.phone, d.companyName, d.companyWebsite, d.country, d.industry, d.service, d.category, d.budget, d.timeline,
           d.notes, d.assignedTo, d.status, d.projectStatus || "Not Started", id]
       );
@@ -214,7 +183,7 @@ export async function PUT(request: Request) {
     if (errCode(err) === "ER_BAD_FIELD_ERROR") {
       const table = SOURCES[source].table;
       await pool.execute(
-        `UPDATE \`${table}\` SET full_name = ?, email = ?, phone = ?, company_name = ?, status = ? WHERE id = ? AND deleted_at IS NULL`,
+        `UPDATE \`${table}\` SET full_name = ?, email = ?, phone = ?, company_name = ?, status = ? WHERE id = ?`,
         [d.fullName, d.email, d.phone, d.companyName, d.status, id]
       ).catch(() => {});
     } else {
@@ -233,26 +202,14 @@ export async function PUT(request: Request) {
     [d.fullName, d.email, d.phone, d.companyName, source, id]
   ).catch(() => {});
 
-  // History: only the fields that really changed
+  // history: only the fields that really changed (saving an unchanged lead logs nothing)
   const after = await leadSnapshot(source, id);
   if (before && after) await logLeadChanges(source, id, before, after, actorOf(user));
-
-  // Notify assignee if reassigned
-  if (d.assignedTo && d.assignedTo !== before.assigned_to) {
-    void notifyLeadAssigned({
-      leadSource: source,
-      leadId: id,
-      leadName: d.fullName,
-      leadEmail: d.email,
-      assignedToName: d.assignedTo,
-      assignedByName: user.name,
-    }).catch((e) => console.error("Failed to notify lead assigned:", e));
-  }
 
   return Response.json({ ok: true });
 }
 
-/* PATCH { source, id, status, projectStatus, assignedTo } → change a lead's status, projectStatus, or assignedTo */
+/* PATCH { source, id, status, projectStatus, assignedTo } → change a lead's status, projectStatus, or assignedTo (any CRM user) */
 export async function PATCH(request: Request) {
   const user = await getUserFor("leads");
   if (!user) return unauthorized();
@@ -262,19 +219,6 @@ export async function PATCH(request: Request) {
     return invalid();
   }
   const source: EnquirySource = body.source;
-  const before = await leadSnapshot(source, id);
-  if (!before) return Response.json({ ok: false, error: "This lead was deleted." }, { status: 404 });
-
-  // Record-level access control for BDE
-  if (user.role === "bde") {
-    if (before.assigned_to !== user.name) {
-      return Response.json({ ok: false, error: "Access denied. You can only update leads assigned to you." }, { status: 403 });
-    }
-    if (body?.assignedTo !== undefined) {
-      return Response.json({ ok: false, error: "BDEs cannot assign or reassign leads." }, { status: 403 });
-    }
-  }
-
   const sets: string[] = [];
   const args: (string | null)[] = [];
   if (body?.status !== undefined) {
@@ -293,59 +237,37 @@ export async function PATCH(request: Request) {
     args.push(body.assignedTo ? String(body.assignedTo).trim() : null);
   }
   if (!sets.length) return invalid();
-
+  const before = await leadSnapshot(source, id);
+  if (!before) return Response.json({ ok: false, error: "This lead was deleted." }, { status: 404 });
   try {
     await getPool().execute(
-      `UPDATE \`${SOURCES[body.source].table}\` SET ${sets.join(", ")} WHERE id = ? AND deleted_at IS NULL`,
+      `UPDATE \`${SOURCES[body.source].table}\` SET ${sets.join(", ")} WHERE id = ?`,
       [...args, id]
     );
   } catch (err) {
     if (errCode(err) === "ER_BAD_FIELD_ERROR" && body?.status !== undefined) {
       await getPool().execute(
-        `UPDATE \`${SOURCES[body.source].table}\` SET status = ? WHERE id = ? AND deleted_at IS NULL`,
+        `UPDATE \`${SOURCES[body.source].table}\` SET status = ? WHERE id = ?`,
         [String(body.status), id]
       ).catch(() => {});
     } else {
       throw err;
     }
   }
-
   const after = await leadSnapshot(source, id);
   if (after) await logLeadChanges(source, id, before, after, actorOf(user));
-
-  if (body?.assignedTo && String(body.assignedTo).trim() !== String(before.assigned_to || "").trim()) {
-    void notifyLeadAssigned({
-      leadSource: source,
-      leadId: id,
-      leadName: String(before.full_name || "Lead"),
-      leadEmail: String(before.email || ""),
-      assignedToName: String(body.assignedTo).trim(),
-      assignedByName: user.name,
-    }).catch((e) => console.error("Failed to notify lead assigned:", e));
-  }
-
   return Response.json({ ok: true });
 }
 
 /*
- * DELETE { keys: ["contact:12", "manual:3", ...], permanent?: boolean }
- * Soft delete: Admin, BDM, Super Admin (moves to Deleted Bin)
- * Permanent delete: Super Admin only
+ * DELETE { keys: ["contact:12", "manual:3", ...] } → permanently remove leads
+ * from any source (super admin and admin)
  */
 export async function DELETE(request: Request) {
-  const user = await getUserFor("leads");
-  if (!user) return unauthorized();
-  if (!canSoftDelete(user)) {
-    return Response.json({ ok: false, error: "You do not have permission to delete leads." }, { status: 403 });
-  }
+  if (!(await getUserFor("leads"))) return unauthorized();
   const body = await readJson(request);
   const keys = Array.isArray(body?.keys) ? body.keys : body?.source && body?.id ? [`${body.source}:${body.id}`] : null;
   if (!keys || !keys.length || keys.length > 500) return invalid();
-  const isPermanent = Boolean(body?.permanent);
-  if (isPermanent && !canPermanentlyDelete(user)) {
-    return Response.json({ ok: false, error: "Only Super Admin can permanently delete records." }, { status: 403 });
-  }
-
   const bySource = new Map<EnquirySource, number[]>();
   for (const k of keys) {
     const [src, rawId] = String(k).split(":");
@@ -353,26 +275,21 @@ export async function DELETE(request: Request) {
     if (!isEnquirySource(src) || !Number.isInteger(id) || id < 1) return invalid();
     bySource.set(src, [...(bySource.get(src) || []), id]);
   }
-  let affected = 0;
+  let deleted = 0;
   const pool = getPool();
   for (const [src, ids] of bySource) {
-    if (isPermanent) {
-      const [res] = await pool.query(`DELETE FROM \`${SOURCES[src].table}\` WHERE id IN (?)`, [ids]);
-      affected += (res as { affectedRows: number }).affectedRows;
-      await pool.query("DELETE FROM crm_activity WHERE entity_type = 'lead' AND entity_source = ? AND entity_id IN (?)", [src, ids]).catch(() => {});
-      await pool.query("DELETE FROM crm_notification_reads WHERE item_key IN (?)", [ids.map((id) => `${src}:${id}`)]).catch(() => {});
-      for (const table of ["payment_links", "payments"]) {
-        await pool.query(`UPDATE \`${table}\` SET lead_id = NULL, lead_source = NULL WHERE lead_source = ? AND lead_id IN (?)`, [src, ids]).catch(() => {});
-      }
-    } else {
-      // Soft delete: set deleted_at and deleted_by
-      const [res] = await pool.query(
-        `UPDATE \`${SOURCES[src].table}\` SET deleted_at = NOW(), deleted_by = ? WHERE id IN (?) AND deleted_at IS NULL`,
-        [user.id, ids]
-      );
-      affected += (res as { affectedRows: number }).affectedRows;
+    // permanently removed from the database (no hidden "deleted" copies are kept);
+    // its attachments live in the same row and go with it
+    const [res] = await pool.query(`DELETE FROM \`${SOURCES[src].table}\` WHERE id IN (?)`, [ids]);
+    deleted += (res as { affectedRows: number }).affectedRows;
+    // the lead's history and notification marks go too; payment links and payments
+    // made for it are kept (money records) but no longer point at the deleted lead
+    await pool.query("DELETE FROM crm_activity WHERE entity_type = 'lead' AND entity_source = ? AND entity_id IN (?)", [src, ids]).catch(() => {});
+    await pool.query("DELETE FROM crm_notification_reads WHERE item_key IN (?)", [ids.map((id) => `${src}:${id}`)]).catch(() => {});
+    for (const table of ["payment_links", "payments"]) {
+      await pool.query(`UPDATE \`${table}\` SET lead_id = NULL, lead_source = NULL WHERE lead_source = ? AND lead_id IN (?)`, [src, ids]).catch(() => {});
     }
   }
-  if (!affected) return Response.json({ ok: false, error: "Already deleted or not found." }, { status: 404 });
-  return Response.json({ ok: true, deleted: affected, permanent: isPermanent });
+  if (!deleted) return Response.json({ ok: false, error: "Already deleted." }, { status: 404 });
+  return Response.json({ ok: true, deleted });
 }

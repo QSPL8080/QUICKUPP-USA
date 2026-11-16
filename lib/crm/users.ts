@@ -1,6 +1,6 @@
 import "server-only";
 import { getPool } from "@/lib/db";
-import { hashPassword, type CrmRole } from "@/lib/crm/auth";
+import { hashPassword } from "@/lib/crm/auth";
 import { decryptSecret, encryptSecret } from "@/lib/crm/secret.mjs";
 import { SOURCES } from "@/lib/crm/data";
 
@@ -11,7 +11,7 @@ export type TeamUser = {
   name: string;
   username: string;
   email: string;
-  role: CrmRole;
+  role: "super_admin" | "admin" | "seo" | "viewer" | "hr";
   isActive: boolean;
   lastLoginAt: string | null;
   createdAt: string;
@@ -32,27 +32,22 @@ export async function listUsers(opts: { withPasswords?: boolean } = {}): Promise
       "SELECT id, name, username, email, role, is_active, last_login_at, created_at FROM crm_users ORDER BY role = 'super_admin' DESC, name"
     );
   }
-  const validRoles: Set<string> = new Set(["super_admin", "admin", "bdm", "bde", "accountant", "viewer", "seo", "hr"]);
-  return (rows as Record<string, unknown>[]).map((r) => {
-    const rawRole = String(r.role || "admin");
-    const role: CrmRole = validRoles.has(rawRole) ? (rawRole as CrmRole) : "admin";
-    return {
-      id: Number(r.id),
-      name: String(r.name ?? ""),
-      username: String(r.username ?? ""),
-      email: String(r.email ?? ""),
-      role,
-      isActive: Number(r.is_active) === 1,
-      lastLoginAt: r.last_login_at ? new Date(r.last_login_at as string).toISOString() : null,
-      createdAt: new Date(r.created_at as string).toISOString(),
-      ...(opts.withPasswords
-        ? {
-            password: decryptSecret(r.password_view),
-            passwordChangedAt: r.password_changed_at ? new Date(r.password_changed_at as string).toISOString() : null,
-          }
-        : {}),
-    };
-  });
+  return (rows as Record<string, unknown>[]).map((r) => ({
+    id: Number(r.id),
+    name: String(r.name ?? ""),
+    username: String(r.username ?? ""),
+    email: String(r.email ?? ""),
+    role: r.role === "super_admin" ? "super_admin" : r.role === "seo" ? "seo" : r.role === "viewer" ? "viewer" : r.role === "hr" ? "hr" : "admin",
+    isActive: Number(r.is_active) === 1,
+    lastLoginAt: r.last_login_at ? new Date(r.last_login_at as string).toISOString() : null,
+    createdAt: new Date(r.created_at as string).toISOString(),
+    ...(opts.withPasswords
+      ? {
+          password: decryptSecret(r.password_view),
+          passwordChangedAt: r.password_changed_at ? new Date(r.password_changed_at as string).toISOString() : null,
+        }
+      : {}),
+  }));
 }
 
 /** Account as stored now (for comparing before / after an edit) */
@@ -86,23 +81,10 @@ export async function renameAssignee(oldName: string, newName: string) {
   }
 }
 
-/** Names of active team members who work on leads, for "Assigned to" (BDM, BDE, Admin, Super Admin) */
+/** Names of active team members who work on leads, for "Assigned to" (not the SEO, Viewer or HR roles) */
 export async function listTeamNames(): Promise<string[]> {
-  const [rows] = await getPool().query("SELECT name FROM crm_users WHERE is_active = 1 AND role IN ('super_admin', 'admin', 'bdm', 'bde') ORDER BY name");
+  const [rows] = await getPool().query("SELECT name FROM crm_users WHERE is_active = 1 AND role NOT IN ('seo', 'viewer', 'hr') ORDER BY name");
   return (rows as { name: string }[]).map((r) => r.name);
-}
-
-/** Active users who can be assigned as BDMs for meetings and clients */
-export async function listBdmUsers(): Promise<{ id: number; name: string; email: string; role: CrmRole }[]> {
-  const [rows] = await getPool().query(
-    "SELECT id, name, email, role FROM crm_users WHERE is_active = 1 AND role IN ('bdm', 'admin', 'super_admin') ORDER BY role = 'bdm' DESC, name ASC"
-  );
-  return (rows as Record<string, unknown>[]).map((r) => ({
-    id: Number(r.id),
-    name: String(r.name ?? ""),
-    email: String(r.email ?? ""),
-    role: String(r.role ?? "bdm") as CrmRole,
-  }));
 }
 
 /* shared checks for account fields */
@@ -111,28 +93,13 @@ export const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const text = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 
 export function readAccountFields(body: Record<string, unknown>) {
-  const rawRole = String(body.role || "").toLowerCase();
-  const role: CrmRole =
-    rawRole === "bdm"
-      ? "bdm"
-      : rawRole === "bde"
-      ? "bde"
-      : rawRole === "accountant"
-      ? "accountant"
-      : rawRole === "viewer"
-      ? "viewer"
-      : rawRole === "seo"
-      ? "seo"
-      : rawRole === "hr"
-      ? "hr"
-      : "admin";
-
   return {
     name: text(body.name, 120),
     username: text(body.username, 30).toLowerCase(),
     email: text(body.email, 190).toLowerCase(),
     password: typeof body.password === "string" ? body.password.slice(0, 200) : "",
-    role,
+    // the role a super admin gives a team member (never super admin)
+    role: body.role === "seo" ? ("seo" as const) : body.role === "viewer" ? ("viewer" as const) : body.role === "hr" ? ("hr" as const) : ("admin" as const),
   };
 }
 

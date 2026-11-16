@@ -33,55 +33,10 @@ function CheckoutContent() {
   const remainingAmount = isPartial ? Math.max(0, Math.round((numTotal - payAmount) * 100) / 100) : 0;
 
   const [error, setError] = useState<string>("");
-  const [gateway, setGateway] = useState<"paypal" | "payu">("paypal");
-  const [payuLoading, setPayuLoading] = useState(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const paypalContainerRef = useRef<HTMLDivElement>(null);
   const cardContainerRef = useRef<HTMLDivElement>(null);
   const paypalRenderedRef = useRef<boolean>(false);
-
-  const handlePayUPayment = async () => {
-    setPayuLoading(true);
-    setError("");
-    try {
-      const res = await fetch("/api/payments/payu/create-payment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount: payAmount,
-          totalAmount: numTotal,
-          paymentType,
-          clientName,
-          clientEmail,
-          clientPhone,
-          companyName,
-          service,
-          category,
-          billingStartDate,
-          billingEndDate,
-          notes,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.ok) throw new Error(data.error || "Failed to initiate PayU payment");
-
-      const form = document.createElement("form");
-      form.method = "POST";
-      form.action = data.actionUrl;
-      for (const [k, v] of Object.entries(data.params)) {
-        const input = document.createElement("input");
-        input.type = "hidden";
-        input.name = k;
-        input.value = String(v);
-        form.appendChild(input);
-      }
-      document.body.appendChild(form);
-      form.submit();
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "PayU checkout failed");
-      setPayuLoading(false);
-    }
-  };
 
   useEffect(() => {
     const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "";

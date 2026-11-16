@@ -11,7 +11,6 @@ import { getRecord, listTransactions, orderNumberOf } from "@/lib/paymentTxns";
 import { teamEmail, type PaymentCase } from "@/lib/paymentEmails";
 import { sendClientReceipt } from "@/lib/clientReceipt";
 import { SITE_URL } from "@/lib/siteUrl";
-import { convertLeadToClient } from "@/lib/crm/clients";
 
 /*
  * PayPal approved a payment: take the money (capture), save it on the
@@ -272,20 +271,6 @@ export async function POST(req: Request) {
         await sendClientReceipt({ table, ctx, actor: { type: "system", label: "Email" }, eventKey: `receipt:${txnId}` }).catch((err) =>
           console.error("[payments] client email failed:", err),
         );
-        if (rec.client_email) {
-          await convertLeadToClient({
-            leadSource: rec.lead_source || null,
-            leadId: rec.lead_id ? Number(rec.lead_id) : null,
-            clientName: String(rec.client_name || "Valued Client"),
-            clientEmail: String(rec.client_email),
-            clientPhone: rec.client_phone ? String(rec.client_phone) : null,
-            companyName: rec.company_name ? String(rec.company_name) : null,
-            service: rec.service ? String(rec.service) : null,
-            amountPaid: paid,
-            totalAmount: Number(rec.total_amount || paid),
-            currency,
-          }).catch((err) => console.error("[payments] client conversion failed:", err));
-        }
       }
       try {
         const t = teamEmail(ctx);

@@ -14,8 +14,7 @@ import type { RowDataPacket } from "mysql2/promise";
  * GET ?keys=contact:12,manual:3 → just those (the selected rows).
  */
 export async function GET(request: Request) {
-  const user = await getUserFor("leads");
-  if (!user) return new Response("Please sign in again.", { status: 401 });
+  if (!(await getUserFor("leads"))) return new Response("Please sign in again.", { status: 401 });
   const sp = new URL(request.url).searchParams;
   const keys = (sp.get("keys") || "").split(",").map((k) => k.trim()).filter(Boolean).slice(0, 2000);
   const rows = await exportLeadDetails(
@@ -27,7 +26,6 @@ export async function GET(request: Request) {
       channel: sp.get("channel") || "",
       from: sp.get("from") || "",
       to: sp.get("to") || "",
-      assignedTo: user.role === "bde" ? user.name : (sp.get("assignedTo") || undefined),
       tz: await viewerTimeZone(),
     },
     keys.length ? keys : undefined

@@ -1,12 +1,12 @@
 import { getUserFor } from "@/lib/crm/auth";
 import { readJson } from "@/lib/enquiry";
-import { rescheduleMeetingDetails, updateMeetingDetails, reassignMeetingBdm } from "@/lib/crm/calendly";
+import { rescheduleMeetingDetails, updateMeetingDetails } from "@/lib/crm/calendly";
 
 export const dynamic = "force-dynamic";
 
 /*
  * PATCH /api/crm/meetings/:id
- * Updates meeting details, notes, BDM assignment, or reschedules time.
+ * Updates meeting details, notes, or reschedules time.
  */
 export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {
   const user = await getUserFor("leads");
@@ -22,17 +22,6 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
   if (!body) return Response.json({ ok: false, error: "Missing body." }, { status: 400 });
 
   try {
-    // If BDM reassignment requested
-    if (body.assignedBdmId !== undefined || body.assignedBdmName !== undefined) {
-      await reassignMeetingBdm({
-        id,
-        assignedBdmId: body.assignedBdmId ? Number(body.assignedBdmId) : null,
-        assignedBdmName: body.assignedBdmName ? String(body.assignedBdmName) : null,
-        user,
-      });
-      return Response.json({ ok: true });
-    }
-
     // If reschedule time provided, handle rescheduling
     if (body.startTime && body.endTime) {
       const res = await rescheduleMeetingDetails({

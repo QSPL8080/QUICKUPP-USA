@@ -4,7 +4,6 @@ import { getPool } from "@/lib/db";
 import { logActivity } from "@/lib/crm/activity";
 import type { CrmUser } from "@/lib/crm/auth";
 import { notifyMeeting } from "@/lib/crm/meetingNotify";
-import { notifyMeetingAssigned } from "@/lib/crm/userNotify";
 
 /*
  * Dynamic Calendly ↔ CRM Synchronization.
@@ -557,10 +556,6 @@ export type MeetingItem = {
   canceledAt: string | null;
   history: HistoryItem[];
   bookedAt: string | null;
-  createdById?: number | null;
-  createdByName?: string | null;
-  assignedBdmId?: number | null;
-  assignedBdmName?: string | null;
 };
 
 const PAGE_SIZE = 25;
@@ -579,8 +574,8 @@ export async function listMeetings(opts: { q?: string; status?: string; when?: s
   const q = (opts.q || "").trim().slice(0, 100);
   if (q) {
     const like = `%${q}%`;
-    where.push("(invitee_name LIKE ? OR invitee_email LIKE ? OR event_name LIKE ? OR answers LIKE ? OR notes LIKE ? OR assigned_bdm_name LIKE ? OR created_by_name LIKE ?)");
-    args.push(like, like, like, like, like, like, like);
+    where.push("(invitee_name LIKE ? OR invitee_email LIKE ? OR event_name LIKE ? OR answers LIKE ? OR notes LIKE ?)");
+    args.push(like, like, like, like, like);
   }
   if (opts.status === "canceled") where.push("status = 'canceled'");
   else if (opts.status === "completed") where.push("status <> 'canceled' AND end_time < UTC_TIMESTAMP()");
@@ -603,7 +598,6 @@ export async function listMeetings(opts: { q?: string; status?: string; when?: s
     `SELECT id, event_name, status, ${iso("start_time")} AS start_time, ${iso("end_time")} AS end_time, invitee_timezone, invitee_name, invitee_email, invitee_phone,
             location_type, location_text, join_url, reschedule_url, cancel_url, notes, lead_id, source, answers, guests, host_name, host_email, reschedule_count, ${iso("previous_start_time")} AS previous_start_time,
             canceled_by, cancel_reason, ${iso("canceled_at")} AS canceled_at, history, ${iso("booked_at")} AS booked_at,
-            created_by_id, created_by_name, assigned_bdm_id, assigned_bdm_name,
             (status <> 'canceled' AND end_time >= UTC_TIMESTAMP()) AS ahead
        FROM crm_meetings ${whereSql}
       ORDER BY ahead DESC, IF(ahead = 1, start_time, NULL) ASC, start_time DESC, id DESC
@@ -644,10 +638,6 @@ export async function listMeetings(opts: { q?: string; status?: string; when?: s
       canceledAt: r.canceled_at ? String(r.canceled_at) : null,
       history: json(r.history, []),
       bookedAt: r.booked_at ? String(r.booked_at) : null,
-      createdById: r.created_by_id ? Number(r.created_by_id) : null,
-      createdByName: r.created_by_name ? String(r.created_by_name) : null,
-      assignedBdmId: r.assigned_bdm_id ? Number(r.assigned_bdm_id) : null,
-      assignedBdmName: r.assigned_bdm_name ? String(r.assigned_bdm_name) : null,
     };
   });
   return { items, total, page, pages: Math.max(1, Math.ceil(total / PAGE_SIZE)), pageSize: PAGE_SIZE };
@@ -660,16 +650,9 @@ export async function meetingsVersion(): Promise<string> {
   return `${r?.n || 0}:${r?.u instanceof Date ? r.u.toISOString() : String(r?.u || "")}`;
 }
 
-/** Hides meetings from the CRM (soft delete to Deleted Bin) or permanently removes */
-export async function deleteMeetings(ids: number[], user?: Pick<CrmUser, "id" | "role">, permanent = false) {
-  if (permanent) {
-    const [res] = await getPool().query("DELETE FROM crm_meetings WHERE id IN (?)", [ids]);
-    return (res as { affectedRows: number }).affectedRows;
-  }
-  const [res] = await getPool().query(
-    "UPDATE crm_meetings SET deleted_at = UTC_TIMESTAMP(), deleted_by = ? WHERE id IN (?) AND deleted_at IS NULL",
-    [user?.id || null, ids]
-  );
+/** Hides meetings from the CRM (nothing is changed in Calendly) */
+export async function deleteMeetings(ids: number[]) {
+  const [res] = await getPool().query("UPDATE crm_meetings SET deleted_at = UTC_TIMESTAMP() WHERE id IN (?) AND deleted_at IS NULL", [ids]);
   return (res as { affectedRows: number }).affectedRows;
 }
 
@@ -895,8 +878,6 @@ export async function createCrmMeeting({
     hostEmail?: string;
     leadId?: number;
     source?: string;
-    assignedBdmId?: number | null;
-    assignedBdmName?: string | null;
   };
   user: Pick<CrmUser, "id" | "name" | "role">;
 }) {
@@ -933,10 +914,6 @@ export async function createCrmMeeting({
     source: data.source || "crm",
     host_name: data.hostName?.trim().slice(0, 190) || user.name,
     host_email: data.hostEmail?.trim().slice(0, 190) || null,
-    created_by_id: user.id,
-    created_by_name: user.name,
-    assigned_bdm_id: data.assignedBdmId || null,
-    assigned_bdm_name: data.assignedBdmName || null,
     reschedule_count: 0,
     history: JSON.stringify(history),
     booked_at: sqlTime(nowIso),
@@ -952,76 +929,15 @@ export async function createCrmMeeting({
   await mapInvitee(inviteeUri, insertId, eventUri, nowIso);
   notifyMeeting(insertId, "booked", { key: `booked:${inviteeUri}`, by: `${user.name} (CRM)` });
 
-  if (data.assignedBdmName) {
-    void notifyMeetingAssigned({
-      meetingId: insertId,
-      inviteeName: data.name,
-      inviteeEmail: data.email,
-      startTime: data.startTime,
-      assignedBdmName: data.assignedBdmName,
-      assignedByName: user.name,
-    }).catch((e) => console.error("Failed to notify BDM meeting assigned:", e));
-  }
-
   await logActivity({
     entity: "lead",
     id: data.leadId || insertId,
     action: "meeting_scheduled",
-    text: `Meeting "${row.event_name}" scheduled with ${data.name} (${data.email}) for ${new Date(data.startTime).toLocaleString()} (BDM: ${data.assignedBdmName || "Unassigned"})`,
+    text: `Meeting "${row.event_name}" scheduled with ${data.name} (${data.email}) for ${new Date(data.startTime).toLocaleString()}`,
     actor: { type: "user", user },
   });
 
   return { ok: true, id: insertId };
-}
-
-/**
- * Reassigns the BDM for a meeting, leaving the original creator intact,
- * and notifies the assigned BDM by email and in-app alert.
- */
-export async function reassignMeetingBdm({
-  id,
-  assignedBdmId,
-  assignedBdmName,
-  user,
-}: {
-  id: number;
-  assignedBdmId: number | null;
-  assignedBdmName: string | null;
-  user: Pick<CrmUser, "id" | "name" | "role">;
-}) {
-  const pool = getPool();
-  const [rows] = await pool.query(
-    "SELECT id, invitee_name, invitee_email, start_time, assigned_bdm_name FROM crm_meetings WHERE id = ? AND deleted_at IS NULL",
-    [id]
-  );
-  const m = (rows as { id: number; invitee_name: string; invitee_email: string; start_time: string; assigned_bdm_name: string | null }[])[0];
-  if (!m) throw new Error("Meeting not found");
-
-  await pool.query(
-    "UPDATE crm_meetings SET assigned_bdm_id = ?, assigned_bdm_name = ? WHERE id = ? AND deleted_at IS NULL",
-    [assignedBdmId || null, assignedBdmName || null, id]
-  );
-
-  await logActivity({
-    entity: "lead",
-    id,
-    action: "meeting_reassigned",
-    text: `Meeting with ${m.invitee_name} reassigned to BDM ${assignedBdmName || "Unassigned"} by ${user.name}`,
-    actor: { type: "user", user },
-  });
-
-  if (assignedBdmName && assignedBdmName !== m.assigned_bdm_name) {
-    void notifyMeetingAssigned({
-      meetingId: id,
-      inviteeName: m.invitee_name,
-      inviteeEmail: m.invitee_email,
-      startTime: String(m.start_time),
-      assignedBdmName,
-      assignedByName: user.name,
-    }).catch((e) => console.error("Failed to notify BDM meeting reassigned:", e));
-  }
-
-  return { ok: true };
 }
 
 /**

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { requireArea } from "@/lib/crm/auth";
 import { listMeetings, meetingCounts, meetingsVersion, MEETING_STATUSES, MEETING_STATUS_LABEL, syncMeetings, type SyncResult } from "@/lib/crm/calendly";
-import { listBdmUsers } from "@/lib/crm/users";
 import MeetingsView from "@/components/crm/MeetingsView";
 import { PageHead, Pager } from "@/components/crm/ListTools";
 
@@ -22,12 +21,7 @@ export default async function MeetingsPage({ searchParams }: Props) {
     syncMeetings({ maxAgeMs: 5_000 }),
     new Promise<SyncResult>((r) => setTimeout(() => r({ ok: true, configured: true }), 7000)),
   ]);
-  const [data, version, counts, bdmUsers] = await Promise.all([
-    listMeetings({ ...f, page: Number(sp.page) || 1 }),
-    meetingsVersion().catch(() => ""),
-    meetingCounts(),
-    listBdmUsers(),
-  ]);
+  const [data, version, counts] = await Promise.all([listMeetings({ ...f, page: Number(sp.page) || 1 }), meetingsVersion().catch(() => ""), meetingCounts()]);
   const chipHref = (status: string) => {
     const q = new URLSearchParams();
     if (f.q) q.set("q", f.q);
@@ -104,7 +98,7 @@ export default async function MeetingsPage({ searchParams }: Props) {
       </form>
 
       <div className="crm-card crm-card-flush">
-        <MeetingsView rows={data.items} version={version} live={sync.configured} bdmUsers={bdmUsers} />
+        <MeetingsView rows={data.items} version={version} live={sync.configured} />
         <Pager {...data} q={f.q} status={f.status} extra={{ when: f.when }} />
       </div>
     </>

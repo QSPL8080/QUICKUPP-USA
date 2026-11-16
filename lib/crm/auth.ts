@@ -19,7 +19,7 @@ export const IDLE_MINUTES = 15;
 /** Signed out after this many hours even when active (sign in again) */
 const MAX_SESSION_HOURS = 12;
 
-export type CrmRole = "super_admin" | "admin" | "bdm" | "bde" | "accountant" | "viewer" | "seo" | "hr";
+export type CrmRole = "super_admin" | "admin" | "seo" | "viewer" | "hr";
 export type CrmUser = { id: number; name: string; username: string; email: string; role: CrmRole };
 
 export async function hashPassword(password: string): Promise<string> {
@@ -114,22 +114,21 @@ export async function requireUser(): Promise<CrmUser> {
   return user;
 }
 
-export const isSuperAdmin = (u: { role: string } | null | undefined) => u?.role === "super_admin";
-export const isAdmin = (u: { role: string } | null | undefined) => u?.role === "admin" || u?.role === "super_admin";
-export const isBDM = (u: { role: string } | null | undefined) => u?.role === "bdm";
-export const isBDE = (u: { role: string } | null | undefined) => u?.role === "bde";
-export const isAccountant = (u: { role: string } | null | undefined) => u?.role === "accountant";
+export const isSuperAdmin = (u: CrmUser | null) => u?.role === "super_admin";
 
 /** The Viewer role sees the CRM but can't change anything in it (only its own profile and password) */
 export const isViewOnly = (u: { role: string } | null | undefined) => u?.role === "viewer";
 export const VIEW_ONLY_MESSAGE = "Your account is view-only: you can look at everything but can't make changes.";
 
-/** Super Admin alone can authorize permanent deletion */
-export const canPermanentlyDelete = (u: { role: string } | null | undefined) => u?.role === "super_admin";
-/** Admin, Super Admin, and BDM can soft delete records to the Deleted Bin */
-export const canSoftDelete = (u: { role: string } | null | undefined) => Boolean(u && ["super_admin", "admin", "bdm"].includes(u.role));
-
-export type CrmArea = "dashboard" | "leads" | "clients" | "meetings" | "payments" | "bin" | "applications" | "jobs" | "blogs" | "profile" | "users";
+/*
+ * What each role may open. Super Admin and Admin: everything (Team & Users is
+ * the super admin's alone). Viewer: the same as Admin, but only to look (every
+ * change is refused in proxy.ts), plus their own profile and password. SEO:
+ * only the website's Blogs and Job Openings, plus their own profile; never
+ * enquiries, payments, meetings or applications. HR: only Job Openings and
+ * Job Applications (and their own profile), with full editing there.
+ */
+export type CrmArea = "dashboard" | "leads" | "payments" | "applications" | "jobs" | "blogs" | "profile" | "users";
 const SEO_AREAS: readonly CrmArea[] = ["blogs", "jobs", "profile"];
 /** HR: only the Careers tabs (job openings and job applications), with full editing there */
 const HR_AREAS: readonly CrmArea[] = ["jobs", "applications", "profile"];
@@ -137,38 +136,15 @@ const HR_AREAS: readonly CrmArea[] = ["jobs", "applications", "profile"];
 export const canAccess = (u: { role: string } | null, area: CrmArea) => {
   if (!u) return false;
   if (area === "users") return u.role === "super_admin";
-  if (u.role === "super_admin") return true;
-  if (u.role === "admin") return area !== "users";
-  if (u.role === "bdm") return ["dashboard", "leads", "clients", "meetings", "payments", "bin", "profile"].includes(area);
-  if (u.role === "bde") return ["dashboard", "leads", "meetings", "profile"].includes(area);
-  if (u.role === "accountant") return ["dashboard", "clients", "payments", "profile"].includes(area);
   if (u.role === "seo") return SEO_AREAS.includes(area);
   if (u.role === "hr") return HR_AREAS.includes(area);
-  if (u.role === "viewer") return area !== "users" && area !== "bin";
   return true;
 };
 
 /** Where a user lands after signing in (and when they open a page they can't use) */
-export const homeFor = (u: { role: string }) => {
-  if (u.role === "seo") return "/crm/blogs";
-  if (u.role === "hr") return "/crm/applications";
-  if (u.role === "accountant") return "/crm/payments";
-  return "/crm";
-};
+export const homeFor = (u: { role: string }) => (u.role === "seo" ? "/crm/blogs" : u.role === "hr" ? "/crm/applications" : "/crm");
 
-export const roleName = (role: string | null | undefined) => {
-  switch (role) {
-    case "super_admin": return "Super Admin";
-    case "admin": return "Admin";
-    case "bdm": return "BDM";
-    case "bde": return "BDE";
-    case "accountant": return "Accountant";
-    case "viewer": return "Viewer";
-    case "seo": return "SEO";
-    case "hr": return "HR";
-    default: return "Admin";
-  }
-};
+export const roleName = (role: string | null | undefined) => (role === "super_admin" ? "Super Admin" : role === "seo" ? "SEO" : role === "viewer" ? "Viewer" : role === "hr" ? "HR" : "Admin");
 
 /** For CRM pages: the signed-in user, sent to their own start page if this area isn't theirs */
 export async function requireArea(area: CrmArea): Promise<CrmUser> {
