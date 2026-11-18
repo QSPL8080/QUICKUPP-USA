@@ -15,9 +15,13 @@ import { ColumnChart, PointList, RankList, Ring, StackBar } from "@/components/c
 const LEAD_COLORS: Record<string, string> = {
   new: "#6366f1",
   contacted: "#f59e0b",
-  in_progress: "#06b6d4",
-  on_hold: "#94a3b8",
-  closed: "#10b981",
+  received: "#0ea5e9",
+  not_received: "#f97316",
+  scheduled: "#8b5cf6",
+  cancelled: "#94a3b8",
+  rescheduled: "#06b6d4",
+  won: "#10b981",
+  lost: "#ef4444",
 };
 const CHANNEL_COLORS: Record<string, string> = { Website: "#4f46e5", Manual: "#0ea5e9", Meta: "#a855f7" };
 /* a colour per form and per project status, for the dashboard's point lists */

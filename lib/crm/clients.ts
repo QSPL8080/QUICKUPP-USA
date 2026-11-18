@@ -3,7 +3,8 @@ import type { RowDataPacket } from "mysql2/promise";
 import { getPool } from "@/lib/db";
 import { SOURCES, type EnquirySource } from "@/lib/crm/data";
 import { ensureLeadTables } from "@/lib/crm/ensureTables";
-import { SOURCE_LABEL, clientCode, enquiryCode, isEnquirySource } from "@/lib/crm/leadOptions";
+import { ENQUIRY_STATUS_LABEL, SOURCE_LABEL, clientCode, enquiryCode, isEnquirySource, type EnquiryStatus } from "@/lib/crm/leadOptions";
+import { logActivity } from "@/lib/crm/activity";
 import { addAlerts } from "@/lib/crm/alerts";
 import { audit } from "@/lib/crm/audit";
 
@@ -36,6 +37,7 @@ export async function markLeadClient(source: unknown, id: unknown, by = "System 
   const table = SOURCES[source].table;
   const pool = getPool();
   try {
+    const [before] = await pool.query<RowDataPacket[]>(`SELECT status FROM \`${table}\` WHERE id = ?`, [leadId]).catch(() => [[] as RowDataPacket[]]);
     const [res] = await pool
       .query(`UPDATE \`${table}\` SET client_since = UTC_TIMESTAMP(), client_by = ? WHERE id = ? AND client_since IS NULL`, [by.slice(0, 190), leadId])
       .catch(async (err) => {
@@ -43,6 +45,24 @@ export async function markLeadClient(source: unknown, id: unknown, by = "System 
         if ((err as { code?: string }).code !== "ER_BAD_FIELD_ERROR") throw err;
         return pool.query(`UPDATE \`${table}\` SET client_since = UTC_TIMESTAMP() WHERE id = ? AND client_since IS NULL`, [leadId]);
       });
+    // a lead that has paid is Won (the only way a lead becomes Won), and stays Won
+    const [won] = await pool
+      .query(`UPDATE \`${table}\` SET status = 'won' WHERE id = ? AND client_since IS NOT NULL AND status <> 'won'`, [leadId])
+      .catch(() => [{ affectedRows: 0 }]);
+    if (Number((won as { affectedRows?: number }).affectedRows || 0) > 0) {
+      const was = String(before[0]?.status || "");
+      await logActivity({
+        entity: "lead",
+        source,
+        id: leadId,
+        action: "status",
+        field: "status",
+        oldValue: was || null,
+        newValue: "won",
+        text: `Status changed from ${ENQUIRY_STATUS_LABEL[was as EnquiryStatus] || was || "—"} to Won (payment received)`,
+        actor: { type: "system", label: by },
+      }).catch(() => {});
+    }
     const converted = Number((res as { affectedRows?: number }).affectedRows || 0) > 0;
     if (!converted) return false;
     // the Admins, the Super Admin and the Accountants hear about the new client

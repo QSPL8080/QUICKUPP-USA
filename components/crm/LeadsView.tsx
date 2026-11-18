@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { useFeedback } from "@/components/crm/Feedback";
 import type { EnquiryRow, LeadRow } from "@/lib/crm/data";
 import {
-  ENQUIRY_STATUSES,
   ENQUIRY_STATUS_LABEL,
+  MANUAL_ENQUIRY_STATUSES,
   LEAD_BUDGETS,
   LEAD_CHANNELS,
   LEAD_INDUSTRIES,
@@ -149,15 +149,28 @@ const formFrom = (l: EnquiryRow): LeadForm => ({
   projectStatus: l.projectStatus || "Not Started",
 });
 
+/* the lead's status: picked by hand, except Won, which only a payment sets (and which then stays) */
 function StatusSelect({ value, busy, label, locked, onChange }: { value: EnquiryStatus; busy: boolean; label: string; locked?: boolean; onChange: (s: string) => void }) {
   const viewOnly = useViewOnly();
+  const won = value === "won";
   return (
-    <select className={`crm-status crm-lead-status crm-lead-status-${value}`} value={value} disabled={busy || viewOnly || locked} onChange={(e) => onChange(e.target.value)} aria-label={label}>
-      {ENQUIRY_STATUSES.map((s) => (
-        <option key={s} value={s}>
-          {ENQUIRY_STATUS_LABEL[s]}
-        </option>
-      ))}
+    <select
+      className={`crm-status crm-lead-status crm-lead-status-${value}`}
+      value={value}
+      disabled={busy || viewOnly || locked || won}
+      onChange={(e) => onChange(e.target.value)}
+      aria-label={label}
+      title={won ? "Won: this lead has paid (set automatically)" : undefined}
+    >
+      {won ? (
+        <option value="won">Won</option>
+      ) : (
+        MANUAL_ENQUIRY_STATUSES.map((s) => (
+          <option key={s} value={s}>
+            {ENQUIRY_STATUS_LABEL[s]}
+          </option>
+        ))
+      )}
     </select>
   );
 }
@@ -905,16 +918,21 @@ export default function LeadsView({
                 <select
                   className="crm-mgmt-select crm-mgmt-status-select"
                   value={open.status}
-                  disabled={busy || viewOnly || !perms.edit}
+                  disabled={busy || viewOnly || !perms.edit || open.status === "won"}
                   onChange={(e) => setStatus(open.source, open.id, e.target.value)}
                   aria-label="Lead status"
                 >
-                  {ENQUIRY_STATUSES.map((s) => (
-                    <option key={s} value={s}>
-                      {ENQUIRY_STATUS_LABEL[s]}
-                    </option>
-                  ))}
+                  {open.status === "won" ? (
+                    <option value="won">Won</option>
+                  ) : (
+                    MANUAL_ENQUIRY_STATUSES.map((s) => (
+                      <option key={s} value={s}>
+                        {ENQUIRY_STATUS_LABEL[s]}
+                      </option>
+                    ))
+                  )}
                 </select>
+                {open.status === "won" && <span className="crm-mgmt-sub">Set automatically: this lead has paid</span>}
               </div>
 
               <div className="crm-mgmt-card">
@@ -941,10 +959,8 @@ export default function LeadsView({
               </div>
 
               <div className="crm-mgmt-card">
-                <span className="crm-mgmt-label">Closed</span>
-                <div className="crm-mgmt-val">
-                  {open.status === "closed" ? "Closed" : "Not closed"}
-                </div>
+                <span className="crm-mgmt-label">Result</span>
+                <div className="crm-mgmt-val">{open.status === "won" ? "Won" : open.status === "lost" ? "Lost" : "Open"}</div>
               </div>
             </div>
 
@@ -1512,12 +1528,16 @@ export default function LeadsView({
               </label>
               <label className="crm-field">
                 <span className="crm-label">Lead status</span>
-                <select className="crm-input crm-select" value={form.status} onChange={set("status")}>
-                  {ENQUIRY_STATUSES.map((s) => (
-                    <option key={s} value={s}>
-                      {ENQUIRY_STATUS_LABEL[s]}
-                    </option>
-                  ))}
+                <select className="crm-input crm-select" value={form.status} onChange={set("status")} disabled={form.status === "won"}>
+                  {form.status === "won" ? (
+                    <option value="won">Won (set automatically: this lead has paid)</option>
+                  ) : (
+                    MANUAL_ENQUIRY_STATUSES.map((s) => (
+                      <option key={s} value={s}>
+                        {ENQUIRY_STATUS_LABEL[s]}
+                      </option>
+                    ))
+                  )}
                 </select>
                 {err("status")}
               </label>

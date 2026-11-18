@@ -3,7 +3,8 @@ import { getUserFor, leadPermsFor, type CrmUser } from "@/lib/crm/auth";
 import { assignableMember, canOpenLead, leadAssigneeId, recordLeadAssignment } from "@/lib/crm/leadAccess";
 import { deleteOrTrash } from "@/lib/crm/trash";
 import { SOURCE_LABEL } from "@/lib/crm/leadOptions";
-import { ENQUIRY_STATUSES, SOURCES, getLead, isEnquirySource, toDateOnly, type EnquirySource } from "@/lib/crm/data";
+import { SOURCES, getLead, isEnquirySource, toDateOnly, type EnquirySource } from "@/lib/crm/data";
+import { isManualStatus } from "@/lib/crm/leadOptions";
 import { validateManualLead } from "@/lib/crm/leadOptions";
 import { readJson } from "@/lib/enquiry";
 import { actorOf } from "@/lib/crm/activity";
@@ -169,9 +170,12 @@ export async function PUT(request: Request) {
   const source: EnquirySource = isEnquirySource(body?.source) ? body.source : "manual";
   if (!body || !Number.isInteger(id) || id < 1) return invalid();
   if (!(await canOpenLead(user, source, id))) return notYours();
-  const result = validateManualLead(body);
+  // a lead that has paid stays Won whatever the form sends (Won is never picked by hand)
+  const isWon = (await leadStatus(source, id)) === "won";
+  const result = validateManualLead(isWon ? { ...body, status: "new" } : body);
   if (!result.ok) return Response.json({ ok: false, errors: result.errors }, { status: 400 });
   const d = result.data;
+  if (isWon) d.status = "won";
   const pool = getPool();
   const before = await leadSnapshot(source, id);
   // only Admins change who the lead is assigned to (to a BDM/BDE, by account)
@@ -285,9 +289,10 @@ export async function PATCH(request: Request) {
   const args: (string | number | null)[] = [];
   let newAssignee: number | null | undefined;
   if (body?.status !== undefined) {
-    if (!(ENQUIRY_STATUSES as readonly string[]).includes(String(body.status))) {
-      return invalid();
-    }
+    // Won comes only from a payment, and a lead that has paid stays Won; Lost and the others are picked by hand
+    if (body.status === "won") return Response.json({ ok: false, error: "Won is set automatically when the lead pays." }, { status: 400 });
+    if (!isManualStatus(body.status)) return invalid();
+    if ((await leadStatus(source, id)) === "won") return Response.json({ ok: false, error: "This lead has paid, so it stays Won." }, { status: 409 });
     sets.push("status = ?");
     args.push(String(body.status));
   }
@@ -331,6 +336,12 @@ export async function PATCH(request: Request) {
   if (after) await logLeadChanges(source, id, before, after, actorOf(user));
   if (newAssignee !== undefined && newAssignee !== previousAssignee) await assignmentChanged(source, id, previousAssignee ?? null, newAssignee, user);
   return Response.json({ ok: true });
+}
+
+/* the lead's current status */
+async function leadStatus(source: EnquirySource, id: number) {
+  const [rows] = await getPool().query(`SELECT status FROM \`${SOURCES[source].table}\` WHERE id = ?`, [id]).catch(() => [[]] as unknown as [Record<string, unknown>[]]);
+  return String((rows as Record<string, unknown>[])[0]?.status || "");
 }
 
 const leadAssigneeIdSafe = async (source: EnquirySource, id: number) => (await leadAssigneeId(source, id)) ?? null;

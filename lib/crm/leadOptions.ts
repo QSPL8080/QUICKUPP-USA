@@ -4,15 +4,27 @@
  */
 import { BUDGETS, CONTACT_TIMELINES, INDUSTRIES, SERVICE_FORMS, type ServiceFormKey } from "@/lib/formOptions";
 
-export const ENQUIRY_STATUSES = ["new", "contacted", "in_progress", "on_hold", "closed"] as const;
+/*
+ * A lead's status. Everything is chosen by hand except Won: a lead becomes Won
+ * by itself the moment its first payment comes in (it is then a client), and
+ * stays Won. Lost is set by hand only.
+ */
+export const ENQUIRY_STATUSES = ["new", "contacted", "received", "not_received", "scheduled", "cancelled", "rescheduled", "won", "lost"] as const;
 export type EnquiryStatus = (typeof ENQUIRY_STATUSES)[number];
 export const ENQUIRY_STATUS_LABEL: Record<EnquiryStatus, string> = {
   new: "New",
   contacted: "Contacted",
-  in_progress: "In Progress",
-  on_hold: "On Hold",
-  closed: "Closed",
+  received: "Received",
+  not_received: "Not Received",
+  scheduled: "Scheduled",
+  cancelled: "Cancelled",
+  rescheduled: "Rescheduled",
+  won: "Won",
+  lost: "Lost",
 };
+/** The statuses a team member picks by hand (Won is set only by a payment) */
+export const MANUAL_ENQUIRY_STATUSES = ENQUIRY_STATUSES.filter((s) => s !== "won") as Exclude<EnquiryStatus, "won">[];
+export const isManualStatus = (v: unknown): v is Exclude<EnquiryStatus, "won"> => typeof v === "string" && (MANUAL_ENQUIRY_STATUSES as string[]).includes(v);
 
 export const PROJECT_STATUSES = [
   "Not Started",
@@ -156,7 +168,8 @@ export function validateManualLead(body: Record<string, unknown>): { ok: true; d
   if (budget && !LEAD_BUDGETS.includes(budget)) errors.budget = "Please choose a budget.";
   if (timeline && !(LEAD_TIMELINES as readonly string[]).includes(timeline)) errors.timeline = "Please choose a timeline.";
   if (!(LEAD_CHANNELS as readonly string[]).includes(channel)) errors.channel = "Please choose the lead source.";
-  if (!(ENQUIRY_STATUSES as readonly string[]).includes(status)) errors.status = "Please choose a status.";
+  // Won comes only from a payment, never from this form
+  if (!isManualStatus(status)) errors.status = status === "won" ? "Won is set automatically when the lead pays." : "Please choose a status.";
 
   if (Object.keys(errors).length) return { ok: false, errors };
   return {

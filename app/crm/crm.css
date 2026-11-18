@@ -1671,9 +1671,13 @@ a.crm-link-btn {
 
 .crm-root select.crm-lead-status-new { background-color: #eef2ff; color: #4f46e5; border-color: #e0e7ff; }
 .crm-root select.crm-lead-status-contacted { background-color: #fffbeb; color: #b45309; border-color: #fef3c7; }
-.crm-root select.crm-lead-status-in_progress { background-color: #ecfeff; color: #0e7490; border-color: #cffafe; }
-.crm-root select.crm-lead-status-on_hold { background-color: #f8fafc; color: #475569; border-color: #e2e8f0; }
-.crm-root select.crm-lead-status-closed { background-color: #ecfdf5; color: #047857; border-color: #d1fae5; }
+.crm-root select.crm-lead-status-received { background-color: #f0f9ff; color: #0369a1; border-color: #e0f2fe; }
+.crm-root select.crm-lead-status-not_received { background-color: #fff7ed; color: #c2410c; border-color: #ffedd5; }
+.crm-root select.crm-lead-status-scheduled { background-color: #f5f3ff; color: #6d28d9; border-color: #ede9fe; }
+.crm-root select.crm-lead-status-cancelled { background-color: #f8fafc; color: #475569; border-color: #e2e8f0; }
+.crm-root select.crm-lead-status-rescheduled { background-color: #ecfeff; color: #0e7490; border-color: #cffafe; }
+.crm-root select.crm-lead-status-won { background-color: #ecfdf5; color: #047857; border-color: #a7f3d0; font-weight: 700; opacity: 1; }
+.crm-root select.crm-lead-status-lost { background-color: #fef2f2; color: #b91c1c; border-color: #fee2e2; }
 
 .crm-root select.crm-project-status-not-started { background-color: #f1f5f9; color: #475569; border-color: #e2e8f0; }
 .crm-root select.crm-project-status-discovery { background-color: #f3e8ff; color: #7e22ce; border-color: #e9d5ff; }
@@ -4361,6 +4365,12 @@ a.crm-dash-legend-row:hover {
 
 .crm-pill-in_progress { background: #ecfeff; color: #0e7490; }
 .crm-pill-on_hold { background: #f1f5f9; color: #475569; }
+.crm-pill-received { background: #f0f9ff; color: #0369a1; }
+.crm-pill-not_received { background: #fff7ed; color: #c2410c; }
+.crm-pill-scheduled { background: #f5f3ff; color: #6d28d9; }
+.crm-pill-rescheduled { background: #ecfeff; color: #0e7490; }
+.crm-pill-won { background: #ecfdf5; color: #047857; }
+.crm-pill-lost { background: #fef2f2; color: #b91c1c; }
 .crm-pill-reviewing { background: #fffbeb; color: #b45309; }
 .crm-pill-shortlisted { background: #ecfeff; color: #0e7490; }
 .crm-pill-rejected { background: #f1f5f9; color: #475569; }
