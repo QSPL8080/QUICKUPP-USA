@@ -376,7 +376,7 @@ export default function BlogsView({ rows }: { rows: CrmBlog[] }) {
   const removeBlog = async (b: CrmBlog) => {
     const ok = await confirm({
       title: `Delete "${b.title}"?`,
-      message: "The article comes off the website and moves to the Deleted bin, where the Super Admin can restore it.",
+      message: "The article comes off the website and moves to the Bin, where the Super Admin can restore it.",
       confirmLabel: "Delete blog",
       tone: "danger",
     });

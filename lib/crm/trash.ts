@@ -5,7 +5,7 @@ import { getPool } from "@/lib/db";
 import type { CrmUser } from "@/lib/crm/auth";
 
 /*
- * The Deleted bin. When anyone but the Super Admin deletes a lead, payment,
+ * The Bin. When anyone but the Super Admin deletes a lead, payment,
  * payment link, blog, job opening or job application, the record is moved out
  * of its table into an exact copy of that table ("<table>__deleted") and listed
  * in crm_trash. Every list, count, export and website page therefore stops
@@ -37,12 +37,12 @@ export type TrashItem = {
 /*
  * Financial records are kept: a payment or payment link that has received money
  * (paid in part or in full, or with a completed PayPal transaction) is never
- * removed from the database. Deleting it only archives it in the Deleted bin.
+ * removed from the database. Deleting it only archives it in the Bin.
  */
 export const PROTECTED_CLIENT_MESSAGE =
-  "This lead became a client (it has paid), so it is kept with its payment records and cannot be permanently deleted. It stays archived in the Deleted bin.";
+  "This lead became a client (it has paid), so it is kept with its payment records and cannot be permanently deleted. It stays archived in the Bin.";
 export const PROTECTED_PAYMENT_MESSAGE =
-  "Payments that have received money are kept for your records, so they cannot be permanently deleted. They stay archived in the Deleted bin.";
+  "Payments that have received money are kept for your records, so they cannot be permanently deleted. They stay archived in the Bin.";
 
 /** Which of these payment records (in their live table, or archived in the bin) have received money */
 export async function protectedPaymentIds(table: "payments" | "payment_links", ids: number[], db?: PoolConnection): Promise<Set<number>> {
@@ -87,9 +87,16 @@ async function ensureCopy(db: PoolConnection, table: string) {
   );
   for (const u of uniq) await db.query(`ALTER TABLE \`${copy}\` DROP INDEX \`${String(u.i).replace(/`/g, "")}\``);
   const [main, have] = await Promise.all([columnsOf(db, table), columnsOf(db, copy)]);
-  const haveSet = new Set(have.map((c) => c.name));
+  const haveType = new Map(have.map((c) => [c.name, c.type]));
   for (const c of main) {
-    if (!haveSet.has(c.name)) await db.query(`ALTER TABLE \`${copy}\` ADD COLUMN \`${c.name}\` ${c.type} NULL`);
+    if (!haveType.has(c.name)) await db.query(`ALTER TABLE \`${copy}\` ADD COLUMN \`${c.name}\` ${c.type} NULL`);
+    // a column whose type changed since the copy was made (e.g. a new list of lead statuses):
+    // the copy follows, so the record can be copied in. If saved copies hold values the new
+    // type can't take, it is left as it was (a migration moves those values first).
+    else if (haveType.get(c.name) !== c.type)
+      await db
+        .query(`ALTER TABLE \`${copy}\` MODIFY COLUMN \`${c.name}\` ${c.type} NULL`)
+        .catch((err) => console.error(`[bin] could not update ${copy}.${c.name} to ${c.type}:`, err?.message || err));
   }
   const copyCols = new Set((await columnsOf(db, copy)).map((c) => c.name));
   return { copy, cols: main.map((c) => c.name).filter((n) => copyCols.has(n)) };
@@ -98,7 +105,7 @@ async function ensureCopy(db: PoolConnection, table: string) {
 const colList = (cols: string[]) => cols.map((c) => `\`${c}\``).join(", ");
 
 /**
- * Moves these records (all in one table) into the Deleted bin. `describe` gives
+ * Moves these records (all in one table) into the Bin. `describe` gives
  * the name and detail shown in the bin; `links` saves what to put back on
  * restore (e.g. the job applications of a job opening). Returns how many moved.
  */
@@ -221,7 +228,7 @@ export async function restoreFromTrash(trashId: number): Promise<{ ok: true; ent
     const t = await trashRow(db, trashId);
     if (!t) {
       await db.rollback();
-      return { ok: false, error: "This item is no longer in the Deleted bin." };
+      return { ok: false, error: "This item is no longer in the Bin." };
     }
     const table = String(t.source_table);
     const id = Number(t.record_id);
@@ -263,7 +270,7 @@ export async function purgeFromTrash(trashId: number): Promise<{ ok: true; entit
     const t = await trashRow(db, trashId);
     if (!t) {
       await db.rollback();
-      return { ok: false, error: "This item is no longer in the Deleted bin." };
+      return { ok: false, error: "This item is no longer in the Bin." };
     }
     const table = String(t.source_table);
     const copy = trashTable(table);
@@ -298,7 +305,7 @@ const iso = (v: unknown) => {
   return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
 };
 
-/** Everything in the Deleted bin, newest first */
+/** Everything in the Bin, newest first */
 export async function listTrash(): Promise<TrashItem[]> {
   const pool = getPool();
   const [t] = await pool
@@ -379,13 +386,13 @@ export async function trashCount(): Promise<number> {
 
 /**
  * The CRM's delete: for the Super Admin it removes for good (`forGood`), for
- * anyone else it moves the records to the Deleted bin. Returns how many went
+ * anyone else it moves the records to the Bin. Returns how many went
  * and whether they are in the bin.
  */
 export async function deleteOrTrash(
   o: Parameters<typeof moveToTrash>[0] & { user: Pick<CrmUser, "id" | "name" | "role">; forGood?: (ids: number[]) => Promise<number> }
 ): Promise<{ count: number; trashed: boolean }> {
-  // every delete (Admin or Super Admin) is a soft delete into the Deleted bin; removing
+  // every delete (Admin or Super Admin) is a soft delete into the Bin; removing
   // something for good is a separate, confirmed step the Super Admin takes from the bin
   return { count: await moveToTrash(o), trashed: true };
 }

@@ -36,7 +36,7 @@ export async function PATCH(request: Request, ctx: Ctx) {
   return Response.json({ ok: true });
 }
 
-/* DELETE → moves a job opening to the Deleted bin (the Super Admin restores or removes it for good there) */
+/* DELETE → moves a job opening to the Bin (the Super Admin restores or removes it for good there) */
 export async function DELETE(_request: Request, ctx: Ctx) {
   const user = await getUserFor("jobs");
   if (!user) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });

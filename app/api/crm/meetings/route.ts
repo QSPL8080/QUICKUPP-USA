@@ -19,7 +19,7 @@ export async function GET(request: Request) {
 
 /*
  * DELETE { ids: [...] } → remove meetings from the CRM list only; Calendly is not
- * changed. Admins only; they go to the Deleted bin (with an optional reason).
+ * changed. Admins only; they go to the Bin (with an optional reason).
  */
 export async function DELETE(request: Request) {
   const user = await getUserFor("meetings");

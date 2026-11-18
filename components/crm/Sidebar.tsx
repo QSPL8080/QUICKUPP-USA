@@ -178,9 +178,9 @@ export default function CrmSidebar({ user, newCounts }: { user: NavUser; newCoun
           )}
 
           {can("trash") && (
-            <Link href="/crm/deleted" className={`crm-nav-link${on("/crm/deleted") ? " is-on" : ""}`}>
+            <Link href="/crm/bin" className={`crm-nav-link${on("/crm/bin") ? " is-on" : ""}`}>
               <Icon d={I.trash} />
-              <span>Deleted</span>
+              <span>Bin</span>
               {badge("trash")}
             </Link>
           )}

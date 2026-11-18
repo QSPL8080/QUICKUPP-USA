@@ -386,10 +386,10 @@ export default function LeadsView({
   };
 
   const removeKeys = async (keys: string[], what: string) => {
-    // a soft delete: to the Deleted bin, with an optional reason
+    // a soft delete: to the Bin, with an optional reason
     const reason = await ask({
       title: `Delete ${what}?`,
-      message: "It will be moved to the Deleted bin, where the Super Admin can restore it or permanently delete it.",
+      message: "It will be moved to the Bin, where the Super Admin can restore it or permanently delete it.",
       input: { label: "Reason (optional)", placeholder: "e.g. duplicate, test entry, spam", optional: true },
       confirmLabel: "Move to Bin",
     });
@@ -407,7 +407,7 @@ export default function LeadsView({
       toast("Couldn't delete. Please try again.", "error");
       return false;
     }
-    toast(keys.length === 1 ? "Lead moved to the Deleted bin" : `${keys.length} leads moved to the Deleted bin`);
+    toast(keys.length === 1 ? "Lead moved to the Bin" : `${keys.length} leads moved to the Bin`);
     router.refresh();
     return true;
   };

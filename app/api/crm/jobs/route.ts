@@ -22,7 +22,7 @@ export async function POST(request: Request) {
   return Response.json({ ok: true, id: (res as { insertId: number }).insertId });
 }
 
-/* DELETE { ids: [...] } → moves job openings to the Deleted bin (the Super Admin restores or removes them for good there) */
+/* DELETE { ids: [...] } → moves job openings to the Bin (the Super Admin restores or removes them for good there) */
 export async function DELETE(request: Request) {
   const user = await getUserFor("jobs");
   if (!user) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });

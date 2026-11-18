@@ -39,7 +39,7 @@ export async function POST(request: Request) {
  * DELETE { keys: ["pay:5", "link:3"], reason? } → move several payment
  * records (pay) and payment links (link). A payment and a link can share an
  * id, so each key names its table. { ids: [...] } still works for payment
- * records. They go to the Deleted bin (Admins only).
+ * records. They go to the Bin (Admins only).
  */
 export async function DELETE(request: Request) {
   const user = await getUserFor("payments");
@@ -61,7 +61,7 @@ export async function DELETE(request: Request) {
     if (!ids) return Response.json({ ok: false, error: "Invalid request." }, { status: 400 });
     pay.push(...ids);
   }
-  // see lib/crm/paymentDeletion: to the Deleted bin; who deleted them is kept in the history and emailed
+  // see lib/crm/paymentDeletion: to the Bin; who deleted them is kept in the history and emailed
   let deleted = 0;
   try {
     const reason = typeof body?.reason === "string" ? body.reason : "";

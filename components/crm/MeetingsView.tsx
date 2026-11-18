@@ -421,7 +421,7 @@ export default function MeetingsView({
   const removeIds = async (ids: number[], what: string) => {
     const reason = await ask({
       title: `Delete ${what}?`,
-      message: "It will be moved to the Deleted bin, where the Super Admin can restore it or permanently delete it. Note: Calendly is not affected (to cancel the meeting in Calendly, use Cancel Meeting).",
+      message: "It will be moved to the Bin, where the Super Admin can restore it or permanently delete it. Note: Calendly is not affected (to cancel the meeting in Calendly, use Cancel Meeting).",
       input: { label: "Reason (optional)", placeholder: "e.g. duplicate, test entry, spam", optional: true },
       confirmLabel: "Move to Bin",
     });
@@ -437,7 +437,7 @@ export default function MeetingsView({
       toast("Couldn't delete. Please try again.", "error");
       return false;
     }
-    toast(ids.length === 1 ? "Meeting moved to the Deleted bin" : `${ids.length} meetings moved to the Deleted bin`);
+    toast(ids.length === 1 ? "Meeting moved to the Bin" : `${ids.length} meetings moved to the Bin`);
     router.refresh();
     return true;
   };

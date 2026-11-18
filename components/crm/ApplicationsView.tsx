@@ -61,7 +61,7 @@ export default function ApplicationsView({ rows }: { rows: ApplicationRow[] }) {
   };
 
   const removeIds = async (ids: number[], what: string) => {
-    if (!(await confirm({ title: `Delete ${what}?`, message: "The application and the candidate's resume move to the Deleted bin, where the Super Admin can restore them." }))) return false;
+    if (!(await confirm({ title: `Delete ${what}?`, message: "The application and the candidate's resume move to the Bin, where the Super Admin can restore them." }))) return false;
     setBusy(true);
     setError("");
     const res = await fetch("/api/crm/applications", {

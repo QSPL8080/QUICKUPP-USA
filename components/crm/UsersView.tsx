@@ -15,7 +15,7 @@ const asRole = (r: string): AssignableRole => ((ASSIGNABLE_ROLES as readonly str
 
 /* what each role does, under the Role picker */
 const ROLE_HELP: Record<AssignableRole, string> = {
-  admin: "Can do everything in every tab, Team & Users included. Deletes go to the Deleted bin, where only the Super Admin restores them or removes them for good.",
+  admin: "Can do everything in every tab, Team & Users included. Deletes go to the Bin, where only the Super Admin restores them or removes them for good.",
   bdm: "Sees only the enquiries assigned to them and the meetings they schedule or are assigned to; schedules meetings and adds meeting notes. Gets an email and a CRM alert for every lead or meeting assigned to them.",
   bde: "Sees only the enquiries assigned to them and the meetings they schedule; schedules meetings for their leads. Gets an email and a CRM alert for every lead assigned to them.",
   accountant: "Works in Payments (payment links, payments, receipts) and Clients, including uploading quotations and NDAs; looks at enquiries without changing them.",
@@ -143,8 +143,8 @@ export default function UsersView({ users, meId, meRole }: { users: TeamUser[]; 
     const reason = await ask({
       title: `Delete ${u.name}'s account?`,
       message: superAdmin
-        ? "They will be signed out and cannot sign in. The account will be moved to the Deleted bin, where you can restore it or permanently delete it."
-        : "They will be signed out and cannot sign in. The account will be moved to the Deleted bin, where the Super Admin can restore it.",
+        ? "They will be signed out and cannot sign in. The account will be moved to the Bin, where you can restore it or permanently delete it."
+        : "They will be signed out and cannot sign in. The account will be moved to the Bin, where the Super Admin can restore it.",
       input: { label: "Reason (optional)", placeholder: "e.g. duplicate, test entry, spam", optional: true },
       confirmLabel: "Move to Bin",
     });
@@ -157,7 +157,7 @@ export default function UsersView({ users, meId, meRole }: { users: TeamUser[]; 
     const json = res ? await res.json().catch(() => ({})) : {};
     if (!res?.ok && res?.status !== 404) return setListError(json.error || "Couldn't delete the account. Please try again.");
     if (editing !== null) setEditing(null);
-    toast(json.trashed ? "Account moved to the Deleted bin" : "Account deleted");
+    toast(json.trashed ? "Account moved to the Bin" : "Account deleted");
     router.refresh();
   };
 

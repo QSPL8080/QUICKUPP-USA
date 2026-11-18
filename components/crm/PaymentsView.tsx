@@ -701,13 +701,13 @@ export default function PaymentsView({
     router.refresh();
   };
 
-  // deleting (Admins and the Super Admin): payments go to the Deleted bin; only the Super Admin
+  // deleting (Admins and the Super Admin): payments go to the Bin; only the Super Admin
   // removes them for good from there, and never one that received money (kept for the records)
   const canDelete = !viewOnly && (userRole === "admin" || userRole === "super_admin");
   const deleteMessage = (paid: boolean) =>
     paid
-      ? "It will be moved to the Deleted bin. Money was received on this record, so it is preserved for accounting records and can be restored, but not permanently deleted."
-      : "It will be moved to the Deleted bin, where the Super Admin can restore it or permanently delete it.";
+      ? "It will be moved to the Bin. Money was received on this record, so it is preserved for accounting records and can be restored, but not permanently deleted."
+      : "It will be moved to the Bin, where the Super Admin can restore it or permanently delete it.";
 
   const deleteSingle = async (p: PaymentRow) => {
     const reason = await ask({
@@ -730,7 +730,7 @@ export default function PaymentsView({
       return;
     }
     if (viewing && rowKey(viewing) === rowKey(p)) setViewing(null);
-    toast("Payment moved to the Deleted bin");
+    toast("Payment moved to the Bin");
     router.refresh();
   };
 
@@ -746,7 +746,7 @@ export default function PaymentsView({
     const what = ids.length === 1 ? "this payment" : `these ${ids.length} payments`;
     const reason = await ask({
       title: `Delete ${what}?`,
-      message: "They will be moved to the Deleted bin, where the Super Admin can restore them. Payments that received money are preserved for accounting records and cannot be permanently deleted.",
+      message: "They will be moved to the Bin, where the Super Admin can restore them. Payments that received money are preserved for accounting records and cannot be permanently deleted.",
       input: { label: "Reason (optional)", placeholder: "e.g. duplicate, test entry, spam", optional: true },
       confirmLabel: "Move to Bin",
     });

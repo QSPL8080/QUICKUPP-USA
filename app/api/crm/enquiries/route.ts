@@ -348,7 +348,7 @@ const leadAssigneeIdSafe = async (source: EnquirySource, id: number) => (await l
 
 /*
  * DELETE { keys: ["contact:12", "manual:3", ...], reason? } → delete leads from
- * any source (Admins and the Super Admin): they move to the Deleted bin, where
+ * any source (Admins and the Super Admin): they move to the Bin, where
  * the Super Admin can put them back or remove them for good
  */
 export async function DELETE(request: Request) {

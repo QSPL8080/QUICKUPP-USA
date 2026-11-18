@@ -18,7 +18,7 @@ export async function PATCH(request: Request) {
   return Response.json({ ok: true });
 }
 
-/* DELETE { ids: [...] } → the Super Admin removes applications for good (resumes included); anyone else moves them to the Deleted bin */
+/* DELETE { ids: [...] } → the Super Admin removes applications for good (resumes included); anyone else moves them to the Bin */
 export async function DELETE(request: Request) {
   const user = await getUserFor("applications");
   if (!user) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });

@@ -41,7 +41,7 @@ export async function PATCH(request: Request, ctx: Ctx) {
   return Response.json({ ok: true });
 }
 
-/* DELETE { reason? } → move a payment to the Deleted bin (Admins only) */
+/* DELETE { reason? } → move a payment to the Bin (Admins only) */
 export async function DELETE(request: Request, ctx: Ctx) {
   const user = await getUserFor("payments");
   if (!user) return Response.json({ ok: false, error: "Please sign in again." }, { status: 401 });
@@ -52,7 +52,7 @@ export async function DELETE(request: Request, ctx: Ctx) {
   // ?table= says which record: a payment and a payment link can share an id
   const picked = await resolvePayTable(id, new URL(request.url).searchParams.get("table"));
   if ("error" in picked) return Response.json({ ok: false, error: picked.error }, { status: picked.status });
-  // see lib/crm/paymentDeletion: to the Deleted bin; who deleted it is kept in the history and emailed
+  // see lib/crm/paymentDeletion: to the Bin; who deleted it is kept in the history and emailed
   const body = await request.json().catch(() => null);
   const deleted = await deletePayments(picked.table, [id], user, typeof body?.reason === "string" ? body.reason : "").catch((err) => {
     console.error("[payments] delete failed:", err);

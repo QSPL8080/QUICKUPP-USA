@@ -86,7 +86,7 @@ export async function PATCH(request: Request, ctx: Ctx) {
 
 /*
  * DELETE { reason? } → signs the person out, switches the account off and moves
- * it to the Deleted bin (the Super Admin can restore it or remove it for good).
+ * it to the Bin (the Super Admin can restore it or remove it for good).
  * The Super Admin account, and your own, can't be deleted.
  */
 export async function DELETE(request: Request, ctx: Ctx) {
@@ -97,7 +97,7 @@ export async function DELETE(request: Request, ctx: Ctx) {
   if (t.role === "super_admin" || t.id === me.id) {
     return Response.json({ ok: false, error: t.id === me.id ? "You can't delete your own account." : "The Super Admin account can't be deleted." }, { status: 400 });
   }
-  // a soft delete (the Deleted bin), whoever does it: the Super Admin removes accounts for good from the bin
+  // a soft delete (the Bin), whoever does it: the Super Admin removes accounts for good from the bin
   const body = await request.json().catch(() => null);
   const reason = typeof body?.reason === "string" ? body.reason.trim().slice(0, 255) || null : null;
   await getPool()
@@ -106,7 +106,7 @@ export async function DELETE(request: Request, ctx: Ctx) {
       if ((err as { code?: string }).code !== "ER_BAD_FIELD_ERROR") throw err;
       return getPool().execute("UPDATE crm_users SET deleted_at = UTC_TIMESTAMP(), deleted_by = ?, is_active = 0 WHERE id = ?", [me.id, t.id]);
     });
-  await audit(me, "soft_delete", "user", t.id, `Team account ${t.name} (${t.role}) moved to the Deleted bin${reason ? ` (reason: ${reason})` : ""}`);
+  await audit(me, "soft_delete", "user", t.id, `Team account ${t.name} (${t.role}) moved to the Bin${reason ? ` (reason: ${reason})` : ""}`);
   await endUserSessions(t.id);
   return Response.json({ ok: true, trashed: true });
 }

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useFeedback } from "@/components/crm/Feedback";
+import { BulkBar, SelectBox, useSelection } from "@/components/crm/Selection";
 import type { TrashItem } from "@/lib/crm/trash";
 
 const KIND: Record<TrashItem["entity"], string> = {
@@ -30,6 +31,78 @@ export default function TrashView({ items }: { items: TrashItem[] }) {
     return c;
   }, [items]);
   const shown = kind ? items.filter((i) => i.entity === kind) : items;
+  const sel = useSelection<string>(shown.map((i) => i.key));
+  const picked = shown.filter((i) => sel.has(i.key));
+  const purgeable = picked.filter((i) => !i.locked);
+  const kept = picked.length - purgeable.length;
+  const plural = (n: number) => (n === 1 ? "1 item" : `${n} items`);
+
+  /* the typed DELETE confirmation, for one item or several */
+  const askDelete = (title: string, what: React.ReactNode, note?: string) =>
+    ask({
+      title,
+      message: (
+        <div className="crm-confirm-message-wrap">
+          <p className="crm-confirm-desc">Are you sure you want to permanently delete {what}?</p>
+          {note && <p className="crm-confirm-desc">{note}</p>}
+          <div className="crm-confirm-warning-box">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+            <span>
+              This action <strong>cannot be undone</strong>. Deleted records are removed from the database and recorded in the audit log.
+            </span>
+          </div>
+        </div>
+      ),
+      input: {
+        label: (
+          <span>
+            Type <strong style={{ color: "#dc2626", letterSpacing: "0.5px" }}>DELETE</strong> to confirm permanent deletion:
+          </span>
+        ),
+        placeholder: "DELETE",
+        mustType: "DELETE",
+      },
+      confirmLabel: "Delete Permanently",
+      tone: "danger",
+    });
+
+  /* bulk: restore, or delete for good, everything selected (locked items are never deleted) */
+  const bulk = async (how: "restore" | "purge") => {
+    const list = how === "purge" ? purgeable : picked;
+    if (!list.length) return;
+    let typed = "";
+    if (how === "purge") {
+      const t = await askDelete(
+        `Permanently Delete ${plural(list.length)}`,
+        <strong className="crm-confirm-highlight">{plural(list.length)}</strong>,
+        kept ? `${plural(kept)} kept for records (payments received or client conversions) will stay in the Bin.` : undefined,
+      );
+      if (t !== "DELETE") return;
+      typed = t;
+    }
+    setBusy("bulk");
+    const res = await fetch("/api/crm/trash", {
+      method: how === "restore" ? "POST" : "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ keys: list.map((i) => i.key), ...(how === "purge" ? { confirm: typed } : {}) }),
+    }).catch(() => null);
+    const j = res ? await res.json().catch(() => null) : null;
+    setBusy("");
+    sel.clear();
+    router.refresh();
+    if (!res?.ok || !j?.ok) {
+      toast(j?.error || "Couldn't do that. Please try again.", "error");
+      return;
+    }
+    const verb = how === "restore" ? "restored" : "permanently deleted";
+    const failed = Array.isArray(j.failed) ? (j.failed as { error: string }[]) : [];
+    if (failed.length) toast(`${plural(j.done)} ${verb}. ${plural(failed.length)} couldn't be: ${failed[0].error}`, "error");
+    else toast(`${plural(j.done)} ${verb}`);
+  };
 
   const act = async (item: TrashItem, how: "restore" | "purge") => {
     let typed = "";
@@ -37,37 +110,7 @@ export default function TrashView({ items }: { items: TrashItem[] }) {
       const entityLabel = KIND[item.entity] || "Item";
       const targetName = item.label || "this item";
 
-      const t = await ask({
-        title: `Permanently Delete ${entityLabel}`,
-        message: (
-          <div className="crm-confirm-message-wrap">
-            <p className="crm-confirm-desc">
-              Are you sure you want to permanently delete <strong className="crm-confirm-highlight">{targetName}</strong>?
-            </p>
-            <div className="crm-confirm-warning-box">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-                <line x1="12" y1="9" x2="12" y2="13" />
-                <line x1="12" y1="17" x2="12.01" y2="17" />
-              </svg>
-              <span>
-                This action <strong>cannot be undone</strong>. This record will be permanently deleted from the database and recorded in the audit log.
-              </span>
-            </div>
-          </div>
-        ),
-        input: {
-          label: (
-            <span>
-              Type <strong style={{ color: "#dc2626", letterSpacing: "0.5px" }}>DELETE</strong> to confirm permanent deletion:
-            </span>
-          ),
-          placeholder: "DELETE",
-          mustType: "DELETE",
-        },
-        confirmLabel: "Delete Permanently",
-        tone: "danger",
-      });
+      const t = await askDelete(`Permanently Delete ${entityLabel}`, <strong className="crm-confirm-highlight">{targetName}</strong>);
       if (t !== "DELETE") return;
       typed = t;
     }
@@ -91,7 +134,7 @@ export default function TrashView({ items }: { items: TrashItem[] }) {
   if (!items.length) {
     return (
       <div className="crm-empty">
-        <p className="crm-empty-title">The Deleted bin is empty</p>
+        <p className="crm-empty-title">The Bin is empty</p>
         <p className="crm-empty-sub">Leads, payments, meetings, blogs, jobs, applications and team accounts an Admin deletes will wait here.</p>
       </div>
     );
@@ -111,10 +154,31 @@ export default function TrashView({ items }: { items: TrashItem[] }) {
             </button>
           ))}
       </div>
+      <BulkBar sel={sel} noun={["item", "items"]} busy={busy === "bulk"}>
+        {picked.length > 0 && (
+          <>
+            <button type="button" className="crm-act crm-act-ghost crm-act-sm" disabled={busy === "bulk"} onClick={() => bulk("restore")}>
+              Restore {picked.length === 1 ? "" : `${picked.length} `}selected
+            </button>
+            <button
+              type="button"
+              className="crm-act crm-act-danger crm-act-sm"
+              disabled={busy === "bulk" || !purgeable.length}
+              title={!purgeable.length ? "The selected items are kept for records and can't be deleted permanently." : undefined}
+              onClick={() => bulk("purge")}
+            >
+              {busy === "bulk" ? "Working…" : `Delete ${purgeable.length === 1 ? "" : `${purgeable.length} `}permanently`}
+            </button>
+          </>
+        )}
+      </BulkBar>
       <div className="crm-table-wrap">
-        <table className="crm-table crm-stack">
+        <table className="crm-table crm-stack crm-selectable">
           <thead>
             <tr>
+              <th className="crm-col-check">
+                <SelectBox checked={sel.all} mixed={sel.some} onChange={sel.toggleAll} label="Select all" />
+              </th>
               <th>What</th>
               <th>Name</th>
               <th>Deleted by</th>
@@ -124,7 +188,10 @@ export default function TrashView({ items }: { items: TrashItem[] }) {
           </thead>
           <tbody>
             {shown.map((i) => (
-              <tr key={i.key}>
+              <tr key={i.key} className={sel.has(i.key) ? "is-picked" : undefined}>
+                <td className="crm-col-check">
+                  <SelectBox checked={sel.has(i.key)} onChange={(on) => sel.toggle(i.key, on)} label={`Select ${i.label || KIND[i.entity]}`} />
+                </td>
                 <td data-label="What">
                   <span className="crm-pill">{KIND[i.entity]}</span>
                 </td>
@@ -139,7 +206,7 @@ export default function TrashView({ items }: { items: TrashItem[] }) {
                 </td>
                 <td data-label="Actions" className="crm-nowrap" style={{ textAlign: "right" }}>
                   <span style={{ display: "inline-flex", gap: 8 }}>
-                    <button type="button" className="crm-act crm-act-ghost crm-act-sm" disabled={busy === i.key} onClick={() => act(i, "restore")}>
+                    <button type="button" className="crm-act crm-act-ghost crm-act-sm" disabled={busy === i.key || busy === "bulk"} onClick={() => act(i, "restore")}>
                       Restore
                     </button>
                     {i.locked ? (
@@ -151,7 +218,7 @@ export default function TrashView({ items }: { items: TrashItem[] }) {
                         Kept for records
                       </span>
                     ) : (
-                      <button type="button" className="crm-act crm-act-danger crm-act-sm" disabled={busy === i.key} onClick={() => act(i, "purge")}>
+                      <button type="button" className="crm-act crm-act-danger crm-act-sm" disabled={busy === i.key || busy === "bulk"} onClick={() => act(i, "purge")}>
                         Delete permanently
                       </button>
                     )}

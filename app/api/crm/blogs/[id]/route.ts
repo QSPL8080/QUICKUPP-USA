@@ -95,7 +95,7 @@ export async function DELETE(_request: Request, ctx: Ctx) {
   const id = await parseId(ctx);
   if (!id) return Response.json({ ok: false, error: "Blog not found." }, { status: 404 });
 
-  // to the Deleted bin (off the website); the Super Admin restores or removes it for good there
+  // to the Bin (off the website); the Super Admin restores or removes it for good there
   const { count } = await deleteOrTrash({
     entity: "blog",
     table: "blogs",

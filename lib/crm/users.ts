@@ -122,7 +122,7 @@ export async function uniqueErrors(fields: { username?: string; email?: string }
   const pool = getPool();
   if (fields.username) {
     const [r] = await pool.query("SELECT id FROM crm_users WHERE username = ? AND id <> ?", [fields.username, exceptId]);
-    // a deleted account (in the Deleted bin) still holds its username until it is removed for good
+    // a deleted account (in the Bin) still holds its username until it is removed for good
     if ((r as unknown[]).length) errors.username = "This username is already taken.";
   }
   if (fields.email) {

@@ -726,7 +726,7 @@ export async function meetingsVersion(): Promise<string> {
 
 /**
  * Takes meetings off the CRM list (nothing is changed in Calendly): they go to the
- * Deleted bin, where the Super Admin can restore them or remove them for good
+ * Bin, where the Super Admin can restore them or remove them for good
  * (the row is then kept, marked, so the Calendly sync doesn't bring it back).
  */
 export async function deleteMeetings(ids: number[], user?: Pick<CrmUser, "id" | "name" | "role">, reason = "") {

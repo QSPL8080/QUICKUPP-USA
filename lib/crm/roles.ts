@@ -8,7 +8,7 @@ export type CrmRole = "super_admin" | "admin" | "seo" | "viewer" | "hr" | "bdm" 
 /*
  * What each role may open.
  * - Super Admin and Admin: everything, Team & Users included. Only the Super
- *   Admin deletes for good and has the Deleted bin; an Admin's delete moves the
+ *   Admin deletes for good and has the Bin; an Admin's delete moves the
  *   record to that bin.
  * - Viewer: every tab, only to look (every change is refused in proxy.ts), plus
  *   their own profile and password.
@@ -40,11 +40,11 @@ export const isAdminLike = (u: { role: string } | null | undefined) => u?.role =
 export const isSalesRole = (u: { role: string } | null | undefined) => u?.role === "bdm" || u?.role === "bde";
 /** Who may change leads (status, details): Admins, and BDMs/BDEs on their own leads. Accountants and Viewers only look. */
 export const canEditLeads = (u: { role: string } | null | undefined) => isAdminLike(u) || isSalesRole(u);
-/** Who may delete records: Admins (to the Deleted bin) and the Super Admin (for good); Accountants their payments */
+/** Who may delete records: Admins (to the Bin) and the Super Admin (for good); Accountants their payments */
 export const canDelete = (u: { role: string } | null | undefined, area: CrmArea) =>
   isAdminLike(u) || (u?.role === "accountant" && area === "payments") || ((u?.role === "seo" || u?.role === "hr") && (area === "blogs" || area === "jobs" || area === "applications"));
-/** Only the Super Admin deletes for good; everyone else's delete goes to the Deleted bin */
-/** Removing something for good: only the Super Admin, and only from the Deleted bin */
+/** Only the Super Admin deletes for good; everyone else's delete goes to the Bin */
+/** Removing something for good: only the Super Admin, and only from the Bin */
 export const deletesForGood = (u: { role: string } | null | undefined) => u?.role === "super_admin";
 
 /** What a user may do on All Enquiries (the screen and the API use the same rules) */
@@ -55,9 +55,9 @@ export type LeadPerms = {
   edit: boolean;
   /** assign leads to a BDM or BDE */
   assign: boolean;
-  /** delete leads (an Admin's delete goes to the Deleted bin) */
+  /** delete leads (an Admin's delete goes to the Bin) */
   remove: boolean;
-  /** the delete goes to the Deleted bin, not for good */
+  /** the delete goes to the Bin, not for good */
   toBin: boolean;
   /** see and make payment links from a lead */
   payLinks: boolean;
@@ -101,7 +101,7 @@ export type MeetingPerms = {
   assign: boolean;
   /** delete meetings from the CRM list */
   remove: boolean;
-  /** the delete goes to the Deleted bin, not for good */
+  /** the delete goes to the Bin, not for good */
   toBin: boolean;
   /** a BDM or BDE: only the meetings they scheduled or that are assigned to them */
   ownOnly: boolean;
@@ -149,8 +149,8 @@ export const roleName = (role: string | null | undefined) => ROLE_NAMES[String(r
 
 /** What each role can do, in a line (Team & Users and its export) */
 export const ROLE_ACCESS: Record<CrmRole, string> = {
-  super_admin: "Everything in every tab; the only one who deletes for good (Deleted bin)",
-  admin: "Everything in every tab, Team & Users included; deletes go to the Deleted bin",
+  super_admin: "Everything in every tab; the only one who deletes for good (Bin)",
+  admin: "Everything in every tab, Team & Users included; deletes go to the Bin",
   bdm: "Own assigned enquiries and meetings; takes the meetings assigned to them",
   bde: "Own assigned enquiries and the meetings they schedule",
   accountant: "Payments, payment links and Clients; looks at enquiries",

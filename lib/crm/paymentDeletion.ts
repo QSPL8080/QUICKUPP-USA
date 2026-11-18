@@ -10,7 +10,7 @@ import { moveToTrash } from "@/lib/crm/trash";
 
 /*
  * Deleting a payment or a payment link from the CRM (Admins and the Super Admin)
- * moves it to the Deleted bin. From there the Super Admin can restore it, or
+ * moves it to the Bin. From there the Super Admin can restore it, or
  * remove it for good, but only when no money was received on it: a record that
  * has received money is a financial record and stays archived (lib/crm/trash). What was deleted, by whom and when is
  * kept in the CRM history (crm_activity, action "deleted") and emailed to the
@@ -37,7 +37,7 @@ function describe(table: Table, r: RowDataPacket) {
   };
 }
 
-/** Moves these records (all in one table) to the Deleted bin; returns how many were moved */
+/** Moves these records (all in one table) to the Bin; returns how many were moved */
 export async function deletePayments(table: Table, ids: number[], user: CrmUser, reason = ""): Promise<number> {
   if (!ids.length) return 0;
   const pool = getPool();
@@ -64,7 +64,7 @@ export async function deletePayments(table: Table, ids: number[], user: CrmUser,
       entity: table === "payment_links" ? "payment_link" : "payment",
       id: it.id,
       action: "deleted",
-      text: `${it.kind} ${it.order} from ${it.client} (${it.service || "no service"}, ${it.amounts}, ${it.status || "no status"}) was moved to the Deleted bin`,
+      text: `${it.kind} ${it.order} from ${it.client} (${it.service || "no service"}, ${it.amounts}, ${it.status || "no status"}) was moved to the Bin`,
       actor: actorOf(user),
       meta: { order: it.order, client: it.client, email: it.email, service: it.service, amounts: it.amounts, status: it.status },
     });
@@ -86,7 +86,7 @@ export async function deletePayments(table: Table, ids: number[], user: CrmUser,
       <div style="font-size:18px;font-weight:800;margin-top:6px">${items.length === 1 ? "A payment was deleted" : `${items.length} payments were deleted`}</div>
     </div>
     <div style="padding:22px 26px">
-      <p style="margin:0 0 14px;font-size:14.5px;line-height:1.6">Deleted by <strong>${escapeHtml(who)}</strong> on ${escapeHtml(when)}. They are in the CRM's Deleted bin: you can restore them there (payments that received money are kept and can't be removed for good).</p>
+      <p style="margin:0 0 14px;font-size:14.5px;line-height:1.6">Deleted by <strong>${escapeHtml(who)}</strong> on ${escapeHtml(when)}. They are in the CRM's Bin: you can restore them there (payments that received money are kept and can't be removed for good).</p>
       <table style="width:100%;border-collapse:collapse;font-size:13.5px">
         <tr><th align="left" style="padding:8px 0;color:#64748b;border-bottom:1px solid #e2e8f0">Order</th><th align="left" style="padding:8px;color:#64748b;border-bottom:1px solid #e2e8f0">Type</th><th align="left" style="padding:8px;color:#64748b;border-bottom:1px solid #e2e8f0">Client</th><th align="left" style="padding:8px 0;color:#64748b;border-bottom:1px solid #e2e8f0">Amount</th></tr>
         ${rowsHtml}
@@ -94,7 +94,7 @@ export async function deletePayments(table: Table, ids: number[], user: CrmUser,
       <p style="margin:18px 0 0"><a href="${SITE_URL}/crm/payments" style="display:inline-block;background:#0b0f17;color:#fff;text-decoration:none;font-weight:700;font-size:13.5px;padding:11px 20px;border-radius:8px">Open Payments</a></p>
     </div>
   </div></body></html>`;
-    const text = `${subject}\n\nDeleted by ${who} on ${when}. They are in the CRM's Deleted bin: you can restore them there (payments that received money are kept and can't be removed for good).\n\n${items
+    const text = `${subject}\n\nDeleted by ${who} on ${when}. They are in the CRM's Bin: you can restore them there (payments that received money are kept and can't be removed for good).\n\n${items
       .map((it) => `${it.order} · ${it.kind} · ${it.client}${it.email ? ` (${it.email})` : ""} · ${it.amounts} · ${it.status}`)
       .join("\n")}\n\n${SITE_URL}/crm/payments`;
     await sendMail({ channel: "info", to: SUPER_ADMIN_EMAIL, subject, html, text }).catch((err) => console.error("[payments] deletion email failed:", err));
