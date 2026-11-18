@@ -10,14 +10,14 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState } f
 
 type ConfirmOptions = {
   title: string;
-  message?: string;
+  message?: React.ReactNode;
   confirmLabel?: string;
   tone?: "danger" | "default";
 };
 
 /* a confirmation that also asks for a line of text: a reason, or a word to type to confirm */
 type AskOptions = ConfirmOptions & {
-  input: { label: string; placeholder?: string; mustType?: string; optional?: boolean };
+  input: { label: React.ReactNode; placeholder?: string; mustType?: string; optional?: boolean };
 };
 
 type Toast = { id: number; text: string; tone: "ok" | "error" };
@@ -36,8 +36,8 @@ export function useFeedback(): Feedback {
   // outside the provider (shouldn't happen): fall back to the browser's own boxes
   return (
     ctx || {
-      confirm: async (o) => window.confirm(`${o.title}\n\n${o.message || ""}`),
-      ask: async (o) => window.prompt(`${o.title}\n\n${o.message || ""}\n\n${o.input.label}`) ?? null,
+      confirm: async (o) => window.confirm(`${o.title}\n\n${typeof o.message === "string" ? o.message : ""}`),
+      ask: async (o) => window.prompt(`${o.title}\n\n${typeof o.message === "string" ? o.message : ""}`) ?? null,
       toast: () => {},
     }
   );
@@ -55,7 +55,17 @@ export function FeedbackProvider({ children }: { children: React.ReactNode }) {
     (o: AskOptions) =>
       new Promise<string | null>((resolve) => {
         setText("");
-        setDialog({ ...o, resolve: (ok, t) => resolve(ok ? (t ?? "").trim() : null) });
+        setDialog({
+          ...o,
+          resolve: (ok, t) => {
+            if (!ok) return resolve(null);
+            const trimmed = (t ?? "").trim();
+            if (o.input.mustType && trimmed.toUpperCase() === o.input.mustType.toUpperCase()) {
+              return resolve(o.input.mustType);
+            }
+            return resolve(trimmed);
+          },
+        });
       }),
     []
   );
@@ -74,7 +84,11 @@ export function FeedbackProvider({ children }: { children: React.ReactNode }) {
     [dialog, text]
   );
   // a word to type (e.g. DELETE) must match before the button works; a required reason can't be empty
-  const inputOk = !dialog?.input || (dialog.input.mustType ? text.trim() === dialog.input.mustType : dialog.input.optional || text.trim().length > 0);
+  const inputOk =
+    !dialog?.input ||
+    (dialog.input.mustType
+      ? text.trim().toUpperCase() === dialog.input.mustType.toUpperCase()
+      : dialog.input.optional || text.trim().length > 0);
 
   useEffect(() => {
     if (!dialog) return;
@@ -97,11 +111,11 @@ export function FeedbackProvider({ children }: { children: React.ReactNode }) {
           <div className="crm-confirm" role="alertdialog" aria-modal="true" aria-labelledby="crm-confirm-title" onClick={(e) => e.stopPropagation()}>
             <span className={`crm-confirm-icon${danger ? " is-danger" : ""}`} aria-hidden="true">
               {danger ? (
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6" />
                 </svg>
               ) : (
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="10" />
                   <path d="M12 8v4M12 16h.01" />
                 </svg>
@@ -110,17 +124,26 @@ export function FeedbackProvider({ children }: { children: React.ReactNode }) {
             <h2 id="crm-confirm-title" className="crm-confirm-title">
               {dialog.title}
             </h2>
-            {dialog.message && <p className="crm-confirm-text">{dialog.message}</p>}
+            {dialog.message && (
+              typeof dialog.message === "string" ? (
+                <p className="crm-confirm-text">{dialog.message}</p>
+              ) : (
+                <div className="crm-confirm-text">{dialog.message}</div>
+              )
+            )}
             {dialog.input && (
               <label className="crm-confirm-input">
-                <span>{dialog.input.label}</span>
+                <span className="crm-confirm-input-label">{dialog.input.label}</span>
                 <input
-                  className="crm-input"
+                  className={`crm-input ${dialog.input.mustType ? "crm-confirm-must-type" : ""}`}
                   autoFocus
                   value={text}
                   placeholder={dialog.input.placeholder}
                   maxLength={255}
-                  onChange={(e) => setText(e.target.value)}
+                  onChange={(e) => {
+                    const val = dialog.input?.mustType ? e.target.value.toUpperCase() : e.target.value;
+                    setText(val);
+                  }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && inputOk) answer(true);
                   }}
@@ -131,7 +154,13 @@ export function FeedbackProvider({ children }: { children: React.ReactNode }) {
               <button type="button" className="crm-act crm-act-ghost" onClick={() => answer(false)}>
                 Cancel
               </button>
-              <button ref={okRef} type="button" className={`crm-act ${danger ? "crm-act-red" : "crm-act-dark"}`} disabled={!inputOk} onClick={() => answer(true)}>
+              <button
+                ref={okRef}
+                type="button"
+                className={`crm-act ${danger ? "crm-act-red" : "crm-act-dark"}`}
+                disabled={!inputOk}
+                onClick={() => answer(true)}
+              >
                 {dialog.confirmLabel || (danger ? "Yes, delete" : "Confirm")}
               </button>
             </div>

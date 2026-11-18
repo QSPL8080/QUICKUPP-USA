@@ -143,10 +143,10 @@ export default function UsersView({ users, meId, meRole }: { users: TeamUser[]; 
     const reason = await ask({
       title: `Delete ${u.name}'s account?`,
       message: superAdmin
-        ? "They will be signed out and can't sign in. The account goes to the Deleted bin, where you can restore it or remove it for good."
-        : "They will be signed out and can't sign in. The account goes to the Deleted bin, where the Super Admin can restore it.",
+        ? "They will be signed out and cannot sign in. The account will be moved to the Deleted bin, where you can restore it or permanently delete it."
+        : "They will be signed out and cannot sign in. The account will be moved to the Deleted bin, where the Super Admin can restore it.",
       input: { label: "Reason (optional)", placeholder: "e.g. duplicate, test entry, spam", optional: true },
-      confirmLabel: "Yes, delete",
+      confirmLabel: "Move to Bin",
     });
     if (reason === null) return;
     const res = await fetch(`/api/crm/users/${u.id}`, {

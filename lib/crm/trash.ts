@@ -40,9 +40,9 @@ export type TrashItem = {
  * removed from the database. Deleting it only archives it in the Deleted bin.
  */
 export const PROTECTED_CLIENT_MESSAGE =
-  "This lead became a client (it has paid), so it is kept with its payment records and can't be deleted for good. It stays archived in the Deleted bin.";
+  "This lead became a client (it has paid), so it is kept with its payment records and cannot be permanently deleted. It stays archived in the Deleted bin.";
 export const PROTECTED_PAYMENT_MESSAGE =
-  "Payments that have received money are kept for your records, so they can't be deleted for good. They stay archived in the Deleted bin.";
+  "Payments that have received money are kept for your records, so they cannot be permanently deleted. They stay archived in the Deleted bin.";
 
 /** Which of these payment records (in their live table, or archived in the bin) have received money */
 export async function protectedPaymentIds(table: "payments" | "payment_links", ids: number[], db?: PoolConnection): Promise<Set<number>> {

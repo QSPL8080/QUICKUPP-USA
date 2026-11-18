@@ -75,22 +75,22 @@ export async function DELETE(request: Request) {
   const body = await readJson(request);
   const key = parseKey(body?.key);
   if (!key) return Response.json({ ok: false, error: "Invalid request." }, { status: 400 });
-  // the second confirmation: removing for good must be typed out
-  if (body?.confirm !== "DELETE") return Response.json({ ok: false, error: 'Type DELETE to confirm removing it for good.' }, { status: 400 });
+  // the confirmation: permanent deletion must be typed out
+  if (body?.confirm !== "DELETE") return Response.json({ ok: false, error: 'Type DELETE to confirm permanent deletion.' }, { status: 400 });
   const pool = getPool();
   if (key.kind === "user") {
     const [found] = await pool.query("SELECT id, name, email, role FROM crm_users WHERE id = ? AND deleted_at IS NOT NULL AND role <> 'super_admin'", [key.id]);
     const u = (found as Record<string, unknown>[])[0];
     if (!u) return gone();
     await pool.query("DELETE FROM crm_users WHERE id = ?", [key.id]);
-    await audit(me, "hard_delete", "user", key.id, `Team account ${u.name} (${u.email}, ${u.role}) removed for good`, { before: u });
+    await audit(me, "hard_delete", "user", key.id, `Team account ${u.name} (${u.email}, ${u.role}) permanently deleted`, { before: u });
     return Response.json({ ok: true, entity: "user" });
   }
   if (key.kind === "meeting") {
     // kept as a marked row so the Calendly sync doesn't bring the meeting back
     const [res] = await pool.query("UPDATE crm_meetings SET purged_at = UTC_TIMESTAMP() WHERE id = ? AND deleted_at IS NOT NULL AND purged_at IS NULL", [key.id]);
     if (!(res as { affectedRows: number }).affectedRows) return gone();
-    await audit(me, "hard_delete", "meeting", key.id, "Meeting removed for good from the Deleted bin");
+    await audit(me, "hard_delete", "meeting", key.id, "Meeting permanently deleted from Deleted bin");
     return Response.json({ ok: true, entity: "meeting" });
   }
   const r = await purgeFromTrash(key.id);
@@ -98,6 +98,6 @@ export async function DELETE(request: Request) {
     await audit(me, "hard_delete_refused", "bin", key.id, r.error);
     return Response.json({ ok: false, error: r.error }, { status: 409 });
   }
-  await audit(me, "hard_delete", r.entity, `bin:${key.id}`, `${r.label} removed for good from the Deleted bin`);
+  await audit(me, "hard_delete", r.entity, `bin:${key.id}`, `${r.label} permanently deleted from Deleted bin`);
   return Response.json({ ok: true, entity: r.entity });
 }

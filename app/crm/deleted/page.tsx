@@ -13,7 +13,7 @@ export default async function DeletedPage() {
     <>
       <PageHead
         title="Deleted"
-        sub="Everything deleted in the CRM waits here. Restore puts it back exactly as it was; Delete forever removes it for good after a second, typed confirmation. Payments that received money and leads that became clients are kept for your records."
+        sub="Items moved to the bin are kept here. Restore returns an item to its original location, while Delete Permanently removes it after typing DELETE. Records with payments or client conversions are preserved for accounting records."
       />
       <div className="crm-card crm-card-flush">
         <TrashView items={items} />

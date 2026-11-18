@@ -443,9 +443,9 @@ export default function LeadsView({
     // a soft delete: to the Deleted bin, with an optional reason
     const reason = await ask({
       title: `Delete ${what}?`,
-      message: "It moves to the Deleted bin, where the Super Admin can restore it or remove it for good.",
+      message: "It will be moved to the Deleted bin, where the Super Admin can restore it or permanently delete it.",
       input: { label: "Reason (optional)", placeholder: "e.g. duplicate, test entry, spam", optional: true },
-      confirmLabel: "Yes, delete",
+      confirmLabel: "Move to Bin",
     });
     if (reason === null) return false;
     setBusy(true);

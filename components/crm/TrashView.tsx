@@ -34,20 +34,39 @@ export default function TrashView({ items }: { items: TrashItem[] }) {
   const act = async (item: TrashItem, how: "restore" | "purge") => {
     let typed = "";
     if (how === "purge") {
-      // two steps: are you sure, then type DELETE
-      if (
-        !(await confirm({
-          title: `Delete ${item.label || "this item"} forever?`,
-          message: "It is removed from the CRM and the database for good. This can't be undone.",
-          confirmLabel: "Continue",
-        }))
-      )
-        return;
+      const entityLabel = KIND[item.entity] || "Item";
+      const targetName = item.label || "this item";
+
       const t = await ask({
-        title: "Confirm removing it for good",
-        message: `${KIND[item.entity]}: ${item.label || "this item"}. This is permanent and is recorded in the audit log.`,
-        input: { label: "Type DELETE to confirm", placeholder: "DELETE", mustType: "DELETE" },
-        confirmLabel: "Delete forever",
+        title: `Permanently Delete ${entityLabel}`,
+        message: (
+          <div className="crm-confirm-message-wrap">
+            <p className="crm-confirm-desc">
+              Are you sure you want to permanently delete <strong className="crm-confirm-highlight">{targetName}</strong>?
+            </p>
+            <div className="crm-confirm-warning-box">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+              <span>
+                This action <strong>cannot be undone</strong>. This record will be permanently deleted from the database and recorded in the audit log.
+              </span>
+            </div>
+          </div>
+        ),
+        input: {
+          label: (
+            <span>
+              Type <strong style={{ color: "#dc2626", letterSpacing: "0.5px" }}>DELETE</strong> to confirm permanent deletion:
+            </span>
+          ),
+          placeholder: "DELETE",
+          mustType: "DELETE",
+        },
+        confirmLabel: "Delete Permanently",
+        tone: "danger",
       });
       if (t !== "DELETE") return;
       typed = t;
@@ -65,7 +84,7 @@ export default function TrashView({ items }: { items: TrashItem[] }) {
       router.refresh();
       return;
     }
-    toast(how === "restore" ? `${KIND[item.entity]} restored` : `${KIND[item.entity]} deleted forever`);
+    toast(how === "restore" ? `${KIND[item.entity]} restored successfully` : `${KIND[item.entity]} permanently deleted`);
     router.refresh();
   };
 
@@ -133,7 +152,7 @@ export default function TrashView({ items }: { items: TrashItem[] }) {
                       </span>
                     ) : (
                       <button type="button" className="crm-act crm-act-danger crm-act-sm" disabled={busy === i.key} onClick={() => act(i, "purge")}>
-                        Delete forever
+                        Delete permanently
                       </button>
                     )}
                   </span>

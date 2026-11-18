@@ -706,15 +706,15 @@ export default function PaymentsView({
   const canDelete = !viewOnly && (userRole === "admin" || userRole === "super_admin");
   const deleteMessage = (paid: boolean) =>
     paid
-      ? "It moves to the Deleted bin. Money was received on it, so it is kept for your records and can only be restored, never removed for good."
-      : "It moves to the Deleted bin, where the Super Admin can restore it or remove it for good.";
+      ? "It will be moved to the Deleted bin. Money was received on this record, so it is preserved for accounting records and can be restored, but not permanently deleted."
+      : "It will be moved to the Deleted bin, where the Super Admin can restore it or permanently delete it.";
 
   const deleteSingle = async (p: PaymentRow) => {
     const reason = await ask({
       title: `Delete payment from ${p.clientName}?`,
       message: deleteMessage(p.status === "paid" || p.status === "partially_paid" || p.status === "refunded"),
       input: { label: "Reason (optional)", placeholder: "e.g. duplicate, test entry, spam", optional: true },
-      confirmLabel: "Yes, delete",
+      confirmLabel: "Move to Bin",
     });
     if (reason === null) return;
     setBusy(true);
@@ -746,9 +746,9 @@ export default function PaymentsView({
     const what = ids.length === 1 ? "this payment" : `these ${ids.length} payments`;
     const reason = await ask({
       title: `Delete ${what}?`,
-      message: "They move to the Deleted bin, where the Super Admin can restore them. Payments that received money are kept for your records and are never removed for good.",
+      message: "They will be moved to the Deleted bin, where the Super Admin can restore them. Payments that received money are preserved for accounting records and cannot be permanently deleted.",
       input: { label: "Reason (optional)", placeholder: "e.g. duplicate, test entry, spam", optional: true },
-      confirmLabel: "Yes, delete",
+      confirmLabel: "Move to Bin",
     });
     if (reason === null) return;
     setBusy(true);

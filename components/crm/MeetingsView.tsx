@@ -352,9 +352,9 @@ export default function MeetingsView({
   const removeIds = async (ids: number[], what: string) => {
     const reason = await ask({
       title: `Delete ${what}?`,
-      message: "It moves to the Deleted bin, where the Super Admin can restore it or remove it for good. Calendly isn't changed (to cancel the meeting itself, use Cancel Meeting).",
+      message: "It will be moved to the Deleted bin, where the Super Admin can restore it or permanently delete it. Note: Calendly is not affected (to cancel the meeting in Calendly, use Cancel Meeting).",
       input: { label: "Reason (optional)", placeholder: "e.g. duplicate, test entry, spam", optional: true },
-      confirmLabel: "Yes, delete",
+      confirmLabel: "Move to Bin",
     });
     if (reason === null) return false;
     setBusy(true);

@@ -82,7 +82,7 @@ export default function ClientsView({
 
   const remove = async (d: ClientDoc) => {
     if (!open) return;
-    if (!(await confirm({ title: `Delete ${d.fileName}?`, message: "The file is removed from this client for good." }))) return;
+    if (!(await confirm({ title: `Delete ${d.fileName}?`, message: "This file will be permanently removed from this client's profile.", confirmLabel: "Delete File" }))) return;
     const res = await fetch(`/api/crm/enquiries/attachments?source=${open.source}&leadId=${open.id}&fileId=${encodeURIComponent(d.id)}`, { method: "DELETE" }).catch(() => null);
     const j = res ? await res.json().catch(() => null) : null;
     if (!res?.ok || !j?.ok) return toast(j?.error || "Couldn't delete the file.", "error");
