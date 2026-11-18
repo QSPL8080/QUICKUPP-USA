@@ -6,6 +6,7 @@ import { addAlerts, adminMembers, emailTeam, membersById } from "@/lib/crm/alert
 import { isEnquirySource } from "@/lib/crm/leadOptions";
 import { logActivity } from "@/lib/crm/activity";
 import type { HistoryItem } from "@/lib/crm/calendly";
+import { audit } from "@/lib/crm/audit";
 
 /*
  * The team side of meetings:
@@ -108,7 +109,7 @@ export async function claimMeeting(id: number, user: U, lead?: { source?: unknow
  * scheduled it, the Admins and the Super Admin get an email and a CRM notification.
  * Never throws.
  */
-export async function announceScheduled(id: number, user: U) {
+export async function announceScheduled(id: number, user: U, opts: { emailClient?: boolean } = {}) {
   try {
     const m = await basics(id);
     if (!m) return;
@@ -139,7 +140,9 @@ export async function announceScheduled(id: number, user: U) {
         cta: { label: "Open the meeting", href: meetingHref(id) },
       });
     }
-    await emailClient(m, user);
+    // one confirmation for the client: ours for meetings made in the CRM; a booking made through
+    // Calendly already has Calendly's own confirmation, so ours is not sent again
+    if (opts.emailClient !== false) await emailClient(m, user);
   } catch (err) {
     console.error("[meetings] could not send the scheduling notices:", err);
   }
@@ -222,12 +225,18 @@ export async function assignMeetingBdm(id: number, bdmId: number | null, by: U):
     history = m.history ? JSON.parse(m.history) : [];
   } catch {}
   history.push({ kind: "assigned", at: new Date().toISOString(), by: `${by.name} (${roleName(by.role)})`, bdm: bdm?.name || "", prevBdm: prevName || undefined });
-  await getPool().query("UPDATE crm_meetings SET assigned_bdm_id = ?, assigned_at = IF(? IS NULL, NULL, UTC_TIMESTAMP()), history = ? WHERE id = ?", [
-    bdm?.id ?? null,
-    bdm?.id ?? null,
-    JSON.stringify(history),
-    id,
-  ]);
+  // only if nobody changed it in the meantime (two Admins assigning at once: the second is told to retry)
+  const [upd] = await getPool().query(
+    "UPDATE crm_meetings SET assigned_bdm_id = ?, assigned_at = IF(? IS NULL, NULL, UTC_TIMESTAMP()), history = ? WHERE id = ? AND assigned_bdm_id <=> ?",
+    [bdm?.id ?? null, bdm?.id ?? null, JSON.stringify(history), id, previousId]
+  );
+  if (!(upd as { affectedRows: number }).affectedRows) return { ok: false, error: "Someone else just changed this meeting's BDM. Refresh and try again.", status: 409 };
+  // who assigned it, and the assignment history (kept separately from the creator, which never changes)
+  await getPool().query("UPDATE crm_meetings SET assigned_by = ? WHERE id = ?", [bdm ? by.id : null, id]).catch(() => {});
+  await getPool()
+    .query("INSERT INTO crm_meeting_assignments (meeting_id, previous_bdm_id, new_bdm_id, changed_by) VALUES (?, ?, ?, ?)", [id, previousId, bdm?.id ?? null, by.id])
+    .catch((err) => console.error("[meetings] could not save the assignment history:", err?.message || err));
+  await audit(by, "assign_meeting", "meeting", id, `${prevName || "nobody"} → ${bdm?.name || "nobody"}`, { before: { bdmId: previousId }, after: { bdmId: bdm?.id ?? null } });
 
   const client = m.invitee_name || m.invitee_email || "a client";
   const whenEt = when(m.start_time, "America/New_York");
@@ -289,32 +298,112 @@ export async function assignMeetingBdm(id: number, bdmId: number | null, by: U):
 
 /* ---------------------------------------------------------------- notes after the meeting */
 
+/** The structured parts of a meeting note (all optional) */
+export const NOTE_FIELDS = [
+  ["summary", "Meeting summary"],
+  ["requirements", "Client requirements"],
+  ["discussion", "Discussion points"],
+  ["budget", "Budget discussion"],
+  ["serviceInterest", "Service interest"],
+  ["nextSteps", "Next steps"],
+  ["followUpDate", "Follow-up date"],
+  ["remarks", "Additional remarks"],
+] as const;
+export type NoteDetails = Partial<Record<(typeof NOTE_FIELDS)[number][0], string>>;
+
+export function readNoteDetails(raw: unknown): NoteDetails {
+  const out: NoteDetails = {};
+  let o: Record<string, unknown> = {};
+  try {
+    o = typeof raw === "string" ? JSON.parse(raw) : (raw as Record<string, unknown>) || {};
+  } catch {}
+  for (const [k] of NOTE_FIELDS) {
+    const v = typeof o?.[k] === "string" ? (o[k] as string).trim() : "";
+    if (!v) continue;
+    out[k] = k === "followUpDate" ? (/^\d{4}-\d{2}-\d{2}$/.test(v) ? v : "") : v.slice(0, 5000);
+    if (!out[k]) delete out[k];
+  }
+  return out;
+}
+
 export type MeetingNote = {
   id: number;
+  userId: number | null;
   userName: string;
   note: string;
+  details: NoteDetails;
   fileName: string | null;
   fileType: string | null;
   fileSize: number | null;
   createdAt: string;
+  updatedAt: string | null;
 };
 
-export async function listMeetingNotes(meetingId: number): Promise<MeetingNote[]> {
+/**
+ * The notes of a meeting this user may read: Admins, the Super Admin and Viewers
+ * read them all, and so does a BDM on the meeting; a BDE reads only their own
+ * notes (never the confidential notes a BDM wrote).
+ */
+export async function listMeetingNotes(meetingId: number, viewer?: Pick<CrmUser, "id" | "role">): Promise<MeetingNote[]> {
+  const onlyOwn = viewer?.role === "bde";
   const [rows] = await getPool()
     .query(
-      `SELECT id, user_name, note, file_name, file_type, file_size, ${iso("created_at")} AS created_at FROM crm_meeting_notes WHERE meeting_id = ? ORDER BY created_at DESC, id DESC`,
-      [meetingId]
+      `SELECT * FROM crm_meeting_notes WHERE meeting_id = ?${onlyOwn ? " AND user_id = ?" : ""} ORDER BY created_at DESC, id DESC`,
+      onlyOwn ? [meetingId, viewer!.id] : [meetingId]
     )
     .catch(() => [[]] as unknown as [Record<string, unknown>[]]);
+  const isoOf = (v: unknown) => (v ? new Date(v as string).toISOString() : null);
   return (rows as Record<string, unknown>[]).map((r) => ({
     id: Number(r.id),
+    userId: r.user_id ? Number(r.user_id) : null,
     userName: String(r.user_name || ""),
     note: String(r.note || ""),
+    details: readNoteDetails(r.details),
     fileName: r.file_name ? String(r.file_name) : null,
     fileType: r.file_type ? String(r.file_type) : null,
     fileSize: r.file_size ? Number(r.file_size) : null,
-    createdAt: String(r.created_at || ""),
+    createdAt: isoOf(r.created_at) || "",
+    updatedAt: isoOf(r.updated_at),
   }));
+}
+
+/**
+ * Who adds notes and sets the outcome: Admins and the Super Admin, and the BDM
+ * taking the meeting (or a BDM who scheduled it). A BDE doesn't, by default.
+ */
+export async function canAddMeetingNotes(user: Pick<CrmUser, "id" | "role">, id: number) {
+  if (isAdminLike(user)) return true;
+  if (user.role !== "bdm") return false;
+  const m = await basics(id);
+  return Boolean(m && (m.assigned_bdm_id === user.id || m.created_by === user.id));
+}
+
+/**
+ * After the meeting: Completed (needs notes, typed or a file) or No Show, or
+ * cleared. Completed tells the Admins and the Super Admin. Never throws.
+ */
+export async function setMeetingOutcome(id: number, outcome: "completed" | "no_show" | null, by: U): Promise<{ ok: true } | { ok: false; error: string; status: number }> {
+  const m = await basics(id);
+  if (!m) return { ok: false, error: "This meeting was deleted.", status: 404 };
+  if (outcome === "completed") {
+    const [n] = await getPool().query("SELECT COUNT(*) AS n FROM crm_meeting_notes WHERE meeting_id = ?", [id]);
+    if (!Number((n as { n: number }[])[0]?.n)) return { ok: false, error: "Add the meeting notes (typed or a file) before marking it Completed.", status: 400 };
+  }
+  await getPool().query("UPDATE crm_meetings SET outcome = ?, outcome_at = IF(? IS NULL, NULL, UTC_TIMESTAMP()), outcome_by = ? WHERE id = ?", [outcome, outcome, outcome ? by.id : null, id]);
+  await audit(by, "meeting_outcome", "meeting", id, `Outcome: ${outcome || "cleared"}`);
+  if (outcome === "completed") {
+    const admins = await adminMembers();
+    await addAlerts(
+      admins.map((a) => a.id).filter((a) => a !== by.id),
+      {
+        kind: "meeting_completed",
+        title: `Meeting completed: ${m.invitee_name || m.invitee_email || "client"}`,
+        sub: `By ${by.name} (${roleName(by.role)}) · notes added`,
+        href: meetingHref(id),
+      }
+    );
+  }
+  return { ok: true };
 }
 
 /** Tells the Admins a BDM/BDE added notes after a meeting (CRM notification only) */

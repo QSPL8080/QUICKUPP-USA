@@ -588,6 +588,10 @@ export type MeetingItem = {
   assignedBdmId: number | null;
   assignedBdmName: string | null;
   assignedAt: string | null;
+  /** the Admin who assigned the BDM */
+  assignedByName: string | null;
+  /** after the meeting: completed or no_show (set by the BDM taking it, or an Admin) */
+  outcome: string | null;
   notesCount: number;
 };
 
@@ -639,6 +643,7 @@ export async function listMeetings(opts: { q?: string; status?: string; when?: s
             (SELECT u.name FROM crm_users u WHERE u.id = crm_meetings.created_by) AS created_by_name,
             (SELECT u.role FROM crm_users u WHERE u.id = crm_meetings.created_by) AS created_by_role,
             (SELECT u.name FROM crm_users u WHERE u.id = crm_meetings.assigned_bdm_id) AS assigned_bdm_name,
+            (SELECT u.name FROM crm_users u WHERE u.id = crm_meetings.assigned_by) AS assigned_by_name, outcome,
             (SELECT COUNT(*) FROM crm_meeting_notes n WHERE n.meeting_id = crm_meetings.id) AS notes_count,
             (status <> 'canceled' AND end_time >= UTC_TIMESTAMP()) AS ahead
        FROM crm_meetings ${whereSql}
@@ -688,6 +693,8 @@ export async function listMeetings(opts: { q?: string; status?: string; when?: s
       assignedBdmId: r.assigned_bdm_id ? Number(r.assigned_bdm_id) : null,
       assignedBdmName: r.assigned_bdm_name ? String(r.assigned_bdm_name) : null,
       assignedAt: r.assigned_at ? String(r.assigned_at) : null,
+      assignedByName: r.assigned_by_name ? String(r.assigned_by_name) : null,
+      outcome: r.outcome ? String(r.outcome) : null,
       notesCount: Number(r.notes_count || 0),
     };
   });

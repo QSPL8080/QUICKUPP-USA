@@ -17,6 +17,9 @@ const READS = new Set(["GET", "HEAD", "OPTIONS"]);
 
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
+  // lead and client files (quotations, NDAs…) are never served straight from the public folder:
+  // only through /api/crm/enquiries/attachments, after the sign-in and access checks
+  if (path.startsWith("/uploads/attachments/")) return new NextResponse("Not found", { status: 404 });
   const isExport = /\/export\/?$/.test(path);
   const isDownload = (path === "/api/crm/enquiries/attachments" && request.nextUrl.searchParams.has("fileId")) || /^\/api\/crm\/applications\/\d+\/resume\/?$/.test(path) || path === "/api/payments/receipt" ||
     (/^\/api\/crm\/meetings\/\d+\/notes\/?$/.test(path) && request.nextUrl.searchParams.has("file"));
@@ -48,5 +51,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/api/crm/:path*", "/api/payments/receipt"],
+  matcher: ["/api/crm/:path*", "/api/payments/receipt", "/uploads/attachments/:path*"],
 };

@@ -1,5 +1,5 @@
 import { getPool } from "@/lib/db";
-import { getUserFor, isAdminLike } from "@/lib/crm/auth";
+import { getUserFor, isAdminLike, roleName } from "@/lib/crm/auth";
 import { validatePayment } from "@/lib/crm/payments";
 import { readJson } from "@/lib/enquiry";
 import { actorOf } from "@/lib/crm/activity";
@@ -37,7 +37,7 @@ export async function PATCH(request: Request, ctx: Ctx) {
   );
   const after = await paymentSnapshot("payments", id);
   if (after) await logPaymentChanges("payments", id, before, after, actorOf(user));
-  await markClientFromRecord("payments", id);
+  await markClientFromRecord("payments", id, `${user.name} (${roleName(user.role)})`);
   return Response.json({ ok: true });
 }
 

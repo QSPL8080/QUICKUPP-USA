@@ -1,3 +1,4 @@
+import { addAlerts } from "@/lib/crm/alerts";
 import "server-only";
 import { getPool } from "@/lib/db";
 import { CALENDLY_MEETING_EMAIL, EMAIL_LOGO_SRC, LEADS_NOTIFICATION_EMAIL, escapeHtml, sendMail } from "@/lib/mailer";
@@ -53,6 +54,8 @@ type Row = {
   cancel_reason: string | null;
   reschedule_count: number;
   source: string | null;
+  created_by?: number | null;
+  assigned_bdm_id?: number | null;
 };
 
 const iso = (col: string) => `IF(${col} IS NULL, NULL, DATE_FORMAT(${col}, '%Y-%m-%dT%H:%i:%sZ'))`;
@@ -72,7 +75,7 @@ async function send(meetingId: number, kind: MeetingNoticeKind, opts: Opts) {
   const [rows] = await pool.query(
     `SELECT id, event_name, status, ${iso("start_time")} AS start_time, ${iso("end_time")} AS end_time, ${iso("previous_start_time")} AS previous_start_time,
             invitee_name, invitee_email, invitee_phone, invitee_timezone, location_type, location_text, join_url, reschedule_url,
-            answers, guests, host_name, canceled_by, cancel_reason, reschedule_count, source
+            answers, guests, host_name, canceled_by, cancel_reason, reschedule_count, source, created_by, assigned_bdm_id
        FROM crm_meetings WHERE id = ? LIMIT 1`,
     [meetingId]
   );
@@ -90,6 +93,18 @@ async function send(meetingId: number, kind: MeetingNoticeKind, opts: Opts) {
   if (!ok) {
     // not sent (mail not set up or the server refused): allow a later try
     await pool.query("DELETE FROM crm_meeting_notices WHERE meeting_id = ? AND kind = ? AND notice_key = ?", [meetingId, kind, opts.key.slice(0, 255)]).catch(() => {});
+    return;
+  }
+  // a reschedule or a cancellation: the team members on this meeting (who scheduled it, the BDM taking it)
+  if (kind !== "booked") {
+    const who = [Number(m.created_by) || 0, Number(m.assigned_bdm_id) || 0].filter(Boolean);
+    const at = when(m.start_time, "America/New_York");
+    await addAlerts(who, {
+      kind: "meeting_changed",
+      title: `Meeting ${kind === "canceled" ? "cancelled" : "rescheduled"}: ${m.invitee_name || m.invitee_email || "client"}`,
+      sub: kind === "canceled" ? `${m.event_name || "Meeting"}${m.cancel_reason ? ` · ${m.cancel_reason}` : ""}` : `New time: ${at}`,
+      href: `/crm/meetings?open=${meetingId}`,
+    });
   }
 }
 

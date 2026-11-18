@@ -56,3 +56,6 @@ next-env.d.ts
 
 # reference documents kept locally, not part of the website
 *.pdf
+
+# CRM files kept privately on the server (lead and client documents)
+/storage

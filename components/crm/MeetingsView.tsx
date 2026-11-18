@@ -87,6 +87,15 @@ function JoinButton({ m, small = true }: { m: MeetingItem; small?: boolean }) {
 }
 
 function StatusPill({ m }: { m: MeetingItem }) {
+  // set after the meeting by the BDM taking it (or an Admin): Completed or No Show
+  if (m.view !== "canceled" && m.outcome) {
+    const st = meetingStatus(m);
+    return (
+      <span className="crm-meet-status">
+        <span className={`crm-pill crm-meet-pill crm-meet-outcome ${st.cls}`}>{st.label}</span>
+      </span>
+    );
+  }
   return (
     <span className="crm-meet-status">
       <span className={`crm-pill crm-meet-pill crm-meet-pill-${m.view}`}>{LABEL[m.view]}</span>
@@ -125,7 +134,38 @@ function historyText(h: MeetingItem["history"][number]) {
   return { title: "Meeting canceled", text: [h.by ? `By ${h.by}` : "", h.reason ? `Reason: ${h.reason}` : ""].filter(Boolean).join(" · ") };
 }
 
-type MeetingNote = { id: number; userName: string; note: string; fileName: string | null; fileType: string | null; fileSize: number | null; createdAt: string };
+type MeetingNote = {
+  id: number;
+  userName: string;
+  note: string;
+  details?: Record<string, string>;
+  fileName: string | null;
+  fileType: string | null;
+  fileSize: number | null;
+  createdAt: string;
+  updatedAt?: string | null;
+};
+
+/* the structured parts of a meeting note (the server checks the same list) */
+const NOTE_FIELDS: [string, string, "text" | "area" | "date"][] = [
+  ["summary", "Meeting summary", "area"],
+  ["requirements", "Client requirements", "area"],
+  ["discussion", "Discussion points", "area"],
+  ["budget", "Budget discussion", "text"],
+  ["serviceInterest", "Service interest", "text"],
+  ["nextSteps", "Next steps", "area"],
+  ["followUpDate", "Follow-up date", "date"],
+  ["remarks", "Additional remarks", "area"],
+];
+
+/* the meeting's status: Scheduled, Rescheduled, Cancelled, then Completed or No Show once set after it */
+function meetingStatus(m: MeetingItem) {
+  if (m.view === "canceled") return { label: "Cancelled", cls: "is-off" };
+  if (m.outcome === "completed") return { label: "Completed", cls: "is-done" };
+  if (m.outcome === "no_show") return { label: "No Show", cls: "is-noshow" };
+  if (m.rescheduleCount > 0) return { label: "Rescheduled", cls: "is-moved" };
+  return { label: "Scheduled", cls: "is-on" };
+}
 type ArrangeLead = { source: string; id: number; name: string; email: string; sourceLabel: string };
 
 const ALL_PERMS: MeetingPerms = { schedule: true, work: true, assign: false, remove: true, toBin: false, ownOnly: false };
@@ -149,7 +189,7 @@ export default function MeetingsView({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { confirm, ask, toast } = useFeedback();
+  const { ask, toast } = useFeedback();
   const viewOnly = useViewOnly();
   const canSchedule = !viewOnly && perms.schedule;
   const canWork = !viewOnly && perms.work;
@@ -174,7 +214,12 @@ export default function MeetingsView({
   const [notes, setNotes] = useState<MeetingNote[]>([]);
   const [noteText, setNoteText] = useState("");
   const [noteFile, setNoteFile] = useState<File | null>(null);
+  const [noteDetails, setNoteDetails] = useState<Record<string, string>>({});
+  const [noteMore, setNoteMore] = useState(false);
+  // the server says whether this user adds notes and sets the outcome (Admins, and the BDM taking the meeting)
+  const [noteCanAdd, setNoteCanAdd] = useState(false);
   const [noteBusy, setNoteBusy] = useState(false);
+  const [outcomeBusy, setOutcomeBusy] = useState(false);
   const noteFileRef = useRef<HTMLInputElement>(null);
   const [assignBusy, setAssignBusy] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -242,10 +287,16 @@ export default function MeetingsView({
     setNotes([]);
     setNoteText("");
     setNoteFile(null);
+    setNoteDetails({});
+    setNoteCanAdd(false);
     /* eslint-enable react-hooks/set-state-in-effect */
     fetch(`/api/crm/meetings/${openId}/notes`, { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
-      .then((j) => live && Array.isArray(j?.notes) && setNotes(j.notes))
+      .then((j) => {
+        if (!live || !j) return;
+        if (Array.isArray(j.notes)) setNotes(j.notes);
+        setNoteCanAdd(Boolean(j.canAdd));
+      })
       .catch(() => {});
     return () => {
       live = false;
@@ -253,10 +304,12 @@ export default function MeetingsView({
   }, [openId]);
 
   const addNote = async (meetingId: number) => {
-    if (!noteText.trim() && !noteFile) return toast("Type a note or choose a file.", "error");
+    const filled = Object.values(noteDetails).some((v) => v.trim());
+    if (!noteText.trim() && !noteFile && !filled) return toast("Type the notes or choose a file.", "error");
     setNoteBusy(true);
     const fd = new FormData();
     fd.append("note", noteText);
+    fd.append("details", JSON.stringify(noteDetails));
     if (noteFile) fd.append("file", noteFile);
     const res = await fetch(`/api/crm/meetings/${meetingId}/notes`, { method: "POST", body: fd }).catch(() => null);
     const j = res ? await res.json().catch(() => null) : null;
@@ -265,8 +318,24 @@ export default function MeetingsView({
     setNotes(j.notes || []);
     setNoteText("");
     setNoteFile(null);
+    setNoteDetails({});
     if (noteFileRef.current) noteFileRef.current.value = "";
     toast("Meeting note added");
+    router.refresh();
+  };
+
+  /* after the meeting: Completed (needs notes) or No Show, or cleared */
+  const setOutcome = async (meetingId: number, outcome: "completed" | "no_show" | null) => {
+    setOutcomeBusy(true);
+    const res = await fetch(`/api/crm/meetings/${meetingId}/outcome`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ outcome }),
+    }).catch(() => null);
+    const j = res ? await res.json().catch(() => null) : null;
+    setOutcomeBusy(false);
+    if (!res?.ok || !j?.ok) return toast(j?.error || "Couldn't save. Please try again.", "error");
+    toast(outcome === "completed" ? "Marked Completed. The Admins have been told." : outcome === "no_show" ? "Marked No Show" : "Outcome cleared");
     router.refresh();
   };
 
@@ -823,8 +892,40 @@ export default function MeetingsView({
                 ) : (
                   <span className="crm-mgmt-val">{open.assignedBdmName || "Not assigned"}</span>
                 )}
+                {open.assignedBdmName && open.assignedByName && <span className="crm-mgmt-sub">Assignment by {open.assignedByName}</span>}
               </div>
             </div>
+
+            {/* After the meeting: the BDM taking it (or an Admin) marks it Completed (needs notes) or No Show */}
+            {noteCanAdd && !viewOnly && open.view !== "canceled" && (
+              <div className="crm-meet-outcome-bar">
+                <span className="crm-mgmt-label">Outcome</span>
+                <span className="crm-strong">{meetingStatus(open).label}</span>
+                <span className="crm-meet-outcome-acts">
+                  {open.outcome !== "completed" && (
+                    <button
+                      type="button"
+                      className="crm-act crm-act-dark crm-act-sm"
+                      disabled={outcomeBusy}
+                      title={notes.length ? "" : "Add the meeting notes first"}
+                      onClick={() => setOutcome(open.id, "completed")}
+                    >
+                      Mark Completed
+                    </button>
+                  )}
+                  {open.outcome !== "no_show" && (
+                    <button type="button" className="crm-act crm-act-ghost crm-act-sm" disabled={outcomeBusy} onClick={() => setOutcome(open.id, "no_show")}>
+                      No Show
+                    </button>
+                  )}
+                  {open.outcome && (
+                    <button type="button" className="crm-link-btn" disabled={outcomeBusy} onClick={() => setOutcome(open.id, null)}>
+                      Clear
+                    </button>
+                  )}
+                </span>
+              </div>
+            )}
 
             {/* Notes after the meeting: typed, or a file */}
             <div className="crm-drawer-card">
@@ -840,14 +941,41 @@ export default function MeetingsView({
                   {notes.length > 0 && <span className="crm-count-badge">{notes.length}</span>}
                 </span>
               </div>
-              {canWork && (
+              {noteCanAdd && !viewOnly && (
                 <div className="crm-meet-note-form">
+                  <button type="button" className="crm-link-btn" style={{ alignSelf: "flex-start" }} onClick={() => setNoteMore((v) => !v)}>
+                    {noteMore ? "Hide the note fields" : "Show the note fields (summary, requirements, next steps…)"}
+                  </button>
+                  {noteMore && (
+                    <div className="crm-meet-note-fields">
+                      {NOTE_FIELDS.map(([k, label, kind]) => (
+                        <label key={k} className={`crm-field${kind === "area" ? " crm-field-wide" : ""}`}>
+                          <span className="crm-label">{label}</span>
+                          {kind === "area" ? (
+                            <textarea
+                              className="crm-input"
+                              rows={2}
+                              value={noteDetails[k] || ""}
+                              onChange={(e) => setNoteDetails((d) => ({ ...d, [k]: e.target.value }))}
+                            />
+                          ) : (
+                            <input
+                              className="crm-input"
+                              type={kind === "date" ? "date" : "text"}
+                              value={noteDetails[k] || ""}
+                              onChange={(e) => setNoteDetails((d) => ({ ...d, [k]: e.target.value }))}
+                            />
+                          )}
+                        </label>
+                      ))}
+                    </div>
+                  )}
                   <textarea
                     className="crm-input"
                     rows={3}
                     value={noteText}
                     onChange={(e) => setNoteText(e.target.value)}
-                    placeholder="What was discussed, decisions, next steps…"
+                    placeholder="Other notes (or upload the minutes as a file below)"
                   />
                   <div className="crm-meet-note-actions">
                     <input
@@ -879,7 +1007,7 @@ export default function MeetingsView({
                 </div>
               )}
               {notes.length === 0 ? (
-                <p className="crm-drawer-card-empty">No notes yet.{canWork ? " After the meeting, type the notes or upload the minutes here." : ""}</p>
+                <p className="crm-drawer-card-empty">No notes yet.{noteCanAdd ? " After the meeting, type the notes or upload the minutes here." : ""}</p>
               ) : (
                 <div className="crm-meet-notes">
                   {notes.map((n) => (
@@ -888,7 +1016,18 @@ export default function MeetingsView({
                         <span className="crm-strong">{n.userName || "Team"}</span>
                         <span className="crm-muted">{n.createdAt ? fmtWhen(n.createdAt) : ""}</span>
                       </div>
+                      {n.details && Object.keys(n.details).length > 0 && (
+                        <dl className="crm-meet-note-dl">
+                          {NOTE_FIELDS.filter(([k]) => n.details?.[k]).map(([k, label, kind]) => (
+                            <div key={k}>
+                              <dt>{label}</dt>
+                              <dd>{kind === "date" ? fmtDay(`${n.details![k]}T12:00:00Z`) : n.details![k]}</dd>
+                            </div>
+                          ))}
+                        </dl>
+                      )}
                       {n.note && <p className="crm-message-text">{n.note}</p>}
+                      {n.updatedAt && <span className="crm-muted" style={{ fontSize: 11.5 }}>Edited {fmtWhen(n.updatedAt)}</span>}
                       {n.fileName && (
                         <a className="crm-att-btn" href={`/api/crm/meetings/${open.id}/notes?file=${n.id}`}>
                           {n.fileName}

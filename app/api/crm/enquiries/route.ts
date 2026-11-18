@@ -1,6 +1,6 @@
 import { getPool } from "@/lib/db";
 import { getUserFor, leadPermsFor, type CrmUser } from "@/lib/crm/auth";
-import { assignableMember, canOpenLead, leadAssigneeId, notifyLeadAssigned } from "@/lib/crm/leadAccess";
+import { assignableMember, canOpenLead, leadAssigneeId, recordLeadAssignment } from "@/lib/crm/leadAccess";
 import { deleteOrTrash } from "@/lib/crm/trash";
 import { SOURCE_LABEL } from "@/lib/crm/leadOptions";
 import { ENQUIRY_STATUSES, SOURCES, getLead, isEnquirySource, toDateOnly, type EnquirySource } from "@/lib/crm/data";
@@ -16,16 +16,11 @@ const invalid = () => Response.json({ ok: false, error: "Invalid request." }, { 
 const refused = (error = "Your role can't make this change.") => Response.json({ ok: false, error }, { status: 403 });
 const notYours = () => Response.json({ ok: false, error: "This lead isn't assigned to you." }, { status: 404 });
 
-/* tells the newly assigned BDM/BDE (never the person who assigned it to themselves) */
-async function tellAssignee(source: EnquirySource, id: number, assigneeId: number, by: CrmUser) {
-  if (assigneeId === by.id) return;
-  const [member, lead] = await Promise.all([assignableMember(assigneeId), getLead(source, id)]);
-  if (!member || !lead) return;
-  await notifyLeadAssigned(
-    { source, id, name: lead.name, email: lead.email, phone: lead.phone, company: lead.company, service: lead.service },
-    member,
-    by
-  ).catch((err) => console.error("[enquiries] could not notify the assignee:", err));
+/* an assignment change: who and when, the history, the audit log, and the notices (see lib/crm/leadAccess) */
+async function assignmentChanged(source: EnquirySource, id: number, previousId: number | null, nextId: number | null, by: CrmUser) {
+  const lead = await getLead(source, id);
+  if (!lead) return;
+  await recordLeadAssignment({ source, id, name: lead.name, email: lead.email, phone: lead.phone, company: lead.company, service: lead.service }, previousId, nextId, by);
 }
 
 /* GET ?source=&id= → one lead with all its details, attachments, and payment links */
@@ -159,7 +154,7 @@ export async function POST(request: Request) {
   );
   const newId = (res as { insertId: number }).insertId;
   await logLeadCreated(newId, actorOf(user), assignedTo || "", d.channel || "Manual");
-  if (assigneeId) await tellAssignee("manual", newId, assigneeId, user);
+  if (assigneeId) await assignmentChanged("manual", newId, null, assigneeId, user);
   return Response.json({ ok: true, id: newId });
 }
 
@@ -248,7 +243,7 @@ export async function PUT(request: Request) {
 
   if (newAssignee !== undefined) {
     await pool.query(`UPDATE \`${SOURCES[source].table}\` SET assigned_user_id = ? WHERE id = ?`, [newAssignee, id]).catch(() => {});
-    if (newAssignee && newAssignee !== previousAssignee) await tellAssignee(source, id, newAssignee, user);
+    if (newAssignee !== previousAssignee) await assignmentChanged(source, id, previousAssignee ?? null, newAssignee, user);
   }
 
   // Keep linked payment links updated with latest customer info
@@ -334,7 +329,7 @@ export async function PATCH(request: Request) {
   }
   const after = await leadSnapshot(source, id);
   if (after) await logLeadChanges(source, id, before, after, actorOf(user));
-  if (newAssignee && newAssignee !== previousAssignee) await tellAssignee(source, id, newAssignee, user);
+  if (newAssignee !== undefined && newAssignee !== previousAssignee) await assignmentChanged(source, id, previousAssignee ?? null, newAssignee, user);
   return Response.json({ ok: true });
 }
 

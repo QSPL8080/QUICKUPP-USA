@@ -95,6 +95,11 @@ const ALERT_LABEL: Record<string, string> = {
   meeting_transferred: "MEETING TRANSFERRED",
   meeting_booked: "MEETING SCHEDULED",
   meeting_note: "MEETING NOTES",
+  meeting_changed: "MEETING CHANGED",
+  meeting_completed: "MEETING COMPLETED",
+  client_converted: "NEW CLIENT",
+  payment_received: "PAYMENT RECEIVED",
+  balance_paid: "BALANCE PAID",
 };
 
 const money = (extra: string) => {

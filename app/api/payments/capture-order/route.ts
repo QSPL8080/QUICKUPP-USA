@@ -1,4 +1,4 @@
-import { markClientFromRecord } from "@/lib/crm/clients";
+import { markClientFromRecord, notifyPaymentReceived } from "@/lib/crm/clients";
 import { NextResponse, after } from "next/server";
 import { randomBytes } from "node:crypto";
 import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
@@ -236,7 +236,12 @@ export async function POST(req: Request) {
       if (status === "paid") {
         const paidTable = table;
         const paidId = id;
-        after(() => markClientFromRecord(paidTable, paidId).catch((err) => console.error("[payments] could not mark the client:", err)));
+        const paidKind: "deposit" | "full" | "balance" = kind === "deposit" ? "deposit" : kind === "balance" ? "balance" : "full";
+        after(async () => {
+          await markClientFromRecord(paidTable, paidId).catch((err) => console.error("[payments] could not mark the client:", err));
+          // payment-link payments in the CRM bell (website payments are already listed there)
+          if (paidTable === "payment_links") await notifyPaymentReceived(paidTable, paidId, paidKind);
+        });
       }
     }
 

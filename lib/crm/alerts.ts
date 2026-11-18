@@ -11,7 +11,17 @@ import { roleName } from "@/lib/crm/roles";
  * to the member's own address.
  */
 
-export type AlertKind = "lead_assigned" | "meeting_assigned" | "meeting_transferred" | "meeting_booked" | "meeting_note";
+export type AlertKind =
+  | "lead_assigned"
+  | "meeting_assigned"
+  | "meeting_transferred"
+  | "meeting_booked"
+  | "meeting_note"
+  | "meeting_changed"
+  | "meeting_completed"
+  | "client_converted"
+  | "payment_received"
+  | "balance_paid";
 
 export type TeamMember = { id: number; name: string; email: string; role: string };
 
@@ -81,9 +91,14 @@ export async function emailTeam(
     .filter(([, v]) => v)
     .map(([k, v]) => `${k}: ${v.replace(/\n/g, " | ")}`)
     .join("\n")}\n\n${m.cta.label}: ${url}`;
-  // one email per person, so nobody sees the others' addresses
+  // one email per person, so nobody sees the others' addresses; a failed send is tried once more, then logged
   for (const address of addresses) {
-    await sendMail({ channel: "info", to: address, subject: m.subject, html, text }).catch(() => false);
+    let ok = await sendMail({ channel: "info", to: address, subject: m.subject, html, text }).catch(() => false);
+    if (!ok) {
+      await new Promise((r) => setTimeout(r, 2000));
+      ok = await sendMail({ channel: "info", to: address, subject: m.subject, html, text }).catch(() => false);
+    }
+    if (!ok) console.error(`[alerts] email not delivered after a retry: "${m.subject}" to ${address.replace(/^(.).*@/, "$1***@")}`);
   }
 }
 

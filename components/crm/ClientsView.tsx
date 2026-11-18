@@ -6,6 +6,7 @@ import { useFeedback } from "@/components/crm/Feedback";
 import { useViewOnly } from "@/components/crm/ViewOnly";
 import { PAYMENT_STATUS_LABEL, formatFileSize, money } from "@/lib/crm/format";
 import { payLinkUrl } from "@/lib/siteUrl";
+import { clientCode, enquiryCode } from "@/lib/crm/leadOptions";
 import type { ClientDoc, ClientItem } from "@/lib/crm/clients";
 
 /* the kinds of client documents (the server checks the same list) */
@@ -54,6 +55,13 @@ export default function ClientsView({
     // eslint-disable-next-line react-hooks/set-state-in-effect -- the open client's documents, from the list
     setDocs(open ? open.docs : []);
   }, [open]);
+
+  // each new file of a kind (a new quotation…) is its next version; older ones stay listed as its history
+  const versionOf = (d: ClientDoc) => {
+    if (!d.docType) return 0;
+    const same = docs.filter((x) => x.docType === d.docType).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+    return same.length > 1 ? same.findIndex((x) => x.id === d.id) + 1 : 0;
+  };
 
   const copy = (url: string) => {
     navigator.clipboard?.writeText(url).then(
@@ -130,7 +138,7 @@ export default function ClientsView({
                     </span>
                     {c.company && <span className="crm-cell-sub">{c.company}</span>}
                     <span className="crm-cell-sub">{[c.email, c.phone].filter(Boolean).join(" · ")}</span>
-                    <span className="crm-from-lead-tag">From lead · {c.sourceLabel}</span>
+                    <span className="crm-from-lead-tag">{clientCode(c.source, c.id)} · From lead {enquiryCode(c.source, c.id)}</span>
                   </td>
                   <td data-label="Client since" className="crm-nowrap">
                     {/* shown in the viewer's own time zone (the server's may differ) */}
@@ -195,7 +203,9 @@ export default function ClientsView({
           <aside className="crm-drawer" onClick={(e) => e.stopPropagation()} role="dialog" aria-label={`Client ${open.name}`}>
             <div className="crm-drawer-head">
               <div>
-                <p className="crm-drawer-kicker">Client · From lead · {open.sourceLabel}</p>
+                <p className="crm-drawer-kicker">
+                  Client {clientCode(open.source, open.id)} · Original enquiry {enquiryCode(open.source, open.id)} · {open.sourceLabel}
+                </p>
                 <h2 className="crm-drawer-title">
                   {open.name || open.email}
                   <span className="crm-client-tag">Client since {fmtWhen(open.clientSince, false)}</span>
@@ -211,18 +221,24 @@ export default function ClientsView({
               </button>
             </div>
 
-            <div className="crm-meet-team">
+            <div className="crm-meet-team crm-client-summary">
               <div className="crm-meet-team-item">
-                <span className="crm-mgmt-label">Became a client</span>
+                <span className="crm-mgmt-label">Converted on</span>
                 <span className="crm-mgmt-val">{fmtWhen(open.clientSince)}</span>
+                {open.clientBy && <span className="crm-mgmt-sub">by {open.clientBy}</span>}
+              </div>
+              <div className="crm-meet-team-item">
+                <span className="crm-mgmt-label">Total amount</span>
+                <span className="crm-mgmt-val">{money(open.totalAgreed, open.currency)}</span>
               </div>
               <div className="crm-meet-team-item">
                 <span className="crm-mgmt-label">Paid</span>
                 <span className="crm-mgmt-val">{money(open.totalPaid, open.currency)}</span>
               </div>
               <div className="crm-meet-team-item">
-                <span className="crm-mgmt-label">Balance due</span>
+                <span className="crm-mgmt-label">Balance</span>
                 <span className="crm-mgmt-val">{open.totalDue > 0 ? money(open.totalDue, open.currency) : "Nothing due"}</span>
+                <span className="crm-mgmt-sub">{open.totalDue > 0 ? "Partially paid" : "Paid"}</span>
               </div>
             </div>
             <p style={{ margin: "10px 0 0" }}>
@@ -261,6 +277,17 @@ export default function ClientsView({
                         {p.remaining > 0 && <span>• Due {money(p.remaining, p.currency)}{p.balanceDueDate ? ` by ${fmtWhen(p.balanceDueDate, false)}` : ""}</span>}
                         {p.paidAt && <span>• Last paid {fmtWhen(p.paidAt)}</span>}
                       </div>
+                      {p.transactions.length > 0 && (
+                        <ol className="crm-client-tx">
+                          {p.transactions.map((t, i) => (
+                            <li key={i}>
+                              <span className="crm-strong">{t.kind === "deposit" ? "Deposit" : t.kind === "balance" ? "Balance" : "Payment"}</span>{" "}
+                              {money(t.amount, t.currency)} · {t.status === "paid" ? "verified" : t.status} · <span suppressHydrationWarning>{fmtWhen(t.at)}</span>
+                              {t.transactionId && <span className="crm-muted"> · PayPal {t.transactionId}</span>}
+                            </li>
+                          ))}
+                        </ol>
+                      )}
                       {p.balanceToken && (
                         <div className="crm-lead-link-actions">
                           <a href={payLinkUrl(p.balanceToken)} target="_blank" rel="noreferrer" className="crm-att-btn">
@@ -276,6 +303,30 @@ export default function ClientsView({
                     </div>
                   ))}
                 </div>
+              )}
+            </div>
+
+            <div className="crm-drawer-card">
+              <div className="crm-drawer-card-head">
+                <span className="crm-drawer-card-title">
+                  Meetings
+                  <span className="crm-count-badge">{open.meetings.length}</span>
+                </span>
+              </div>
+              {open.meetings.length === 0 ? (
+                <p className="crm-drawer-card-empty">No meetings linked to this client.</p>
+              ) : (
+                <ul className="crm-client-tx">
+                  {open.meetings.map((m) => (
+                    <li key={m.id}>
+                      <a href={`/crm/meetings?open=${m.id}`} style={{ color: "#4f46e5", fontWeight: 700 }}>
+                        {m.title}
+                      </a>{" "}
+                      · <span suppressHydrationWarning>{m.startTime ? fmtWhen(m.startTime) : "—"}</span> ·{" "}
+                      {m.status === "canceled" ? "Cancelled" : m.outcome === "completed" ? "Completed" : m.outcome === "no_show" ? "No Show" : "Scheduled"}
+                    </li>
+                  ))}
+                </ul>
               )}
             </div>
 
@@ -312,7 +363,12 @@ export default function ClientsView({
                     <div key={d.id} className="crm-attachment-item">
                       <div className="crm-attachment-meta">
                         <span className="crm-attachment-name" title={d.fileName}>
-                          {d.docType && <span className="crm-from-lead-tag" style={{ marginRight: 6 }}>{DOC_LABEL[d.docType] || d.docType}</span>}
+                          {d.docType && (
+                            <span className="crm-from-lead-tag" style={{ marginRight: 6 }}>
+                              {DOC_LABEL[d.docType] || d.docType}
+                              {versionOf(d) ? ` v${versionOf(d)}` : ""}
+                            </span>
+                          )}
                           {d.fileName}
                         </span>
                         <span className="crm-attachment-sub">

@@ -7,24 +7,21 @@ import type { EnquiryRow, LeadRow } from "@/lib/crm/data";
 import {
   ENQUIRY_STATUSES,
   ENQUIRY_STATUS_LABEL,
-  PROJECT_STATUSES,
   LEAD_BUDGETS,
   LEAD_CHANNELS,
   LEAD_INDUSTRIES,
   LEAD_SERVICES,
   LEAD_TIMELINES,
   SOURCE_LABEL,
+  clientCode,
+  enquiryCode,
   type EnquiryStatus,
 } from "@/lib/crm/leadOptions";
 import { BulkBar, SelectBox, useSelection } from "@/components/crm/Selection";
-import { SERVICES_DATA } from "@/components/PayNowModal";
-import { CRM_INDUSTRIES } from "@/components/crm/PaymentsView";
 import { formatFileSize } from "@/lib/crm/format";
 import CountrySelect from "@/components/CountrySelect";
 import ActivityTimeline, { fmtWhen, sameEntries, type ActivityEntry } from "@/components/crm/ActivityTimeline";
-import { payLinkUrl } from "@/lib/siteUrl";
-import { payMessage, whatsAppNumber, whatsAppUrl } from "@/lib/payMessages";
-import ShareLinkButtons from "@/components/crm/ShareLinkButtons";
+import { whatsAppNumber } from "@/lib/payMessages";
 import { useViewOnly } from "@/components/crm/ViewOnly";
 import { leadPermsFor, roleName, type LeadPerms } from "@/lib/crm/roles";
 
@@ -165,20 +162,6 @@ function StatusSelect({ value, busy, label, locked, onChange }: { value: Enquiry
   );
 }
 
-function ProjectStatusSelect({ value, busy, label, locked, onChange }: { value: string; busy: boolean; label: string; locked?: boolean; onChange: (s: string) => void }) {
-  const slug = (value || "Not Started").toLowerCase().replace(/\s+/g, "-");
-  const viewOnly = useViewOnly();
-  return (
-    <select className={`crm-status crm-project-status crm-project-status-${slug}`} value={value || "Not Started"} disabled={busy || viewOnly || locked} onChange={(e) => onChange(e.target.value)} aria-label={label}>
-      {PROJECT_STATUSES.map((s) => (
-        <option key={s} value={s}>
-          {s}
-        </option>
-      ))}
-    </select>
-  );
-}
-
 /* picks the BDM or BDE a lead is assigned to (lists both, labelled with the role) */
 function AssigneeSelect({
   value,
@@ -263,7 +246,7 @@ export default function LeadsView({
   openKey?: string;
 }) {
   const router = useRouter();
-  const { confirm, ask, toast } = useFeedback();
+  const { ask, toast } = useFeedback();
   const viewOnly = useViewOnly();
   const perms = permsIn || leadPermsFor({ role: currentUser?.role || "viewer" });
   const team = assignees;
@@ -280,8 +263,6 @@ export default function LeadsView({
 
   /* ---- Attachments State ---- */
   const [attachments, setAttachments] = useState<AttachmentItem[]>([]);
-  const [uploadingFiles, setUploadingFiles] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   /* ---- Activity history (from the server) ---- */
   const [activity, setActivity] = useState<ActivityEntry[]>([]);
@@ -289,36 +270,6 @@ export default function LeadsView({
 
   /* ---- Payment Links State ---- */
   const [paymentLinks, setPaymentLinks] = useState<LeadPaymentLinkItem[]>([]);
-  const [generatingLink, setGeneratingLink] = useState(false);
-  const [linkBusy, setLinkBusy] = useState(false);
-  const [createdLink, setCreatedLink] = useState<{
-    url: string;
-    token: string;
-    orderNumber: string;
-    clientName?: string;
-    clientPhone?: string;
-    clientEmail?: string;
-    totalAmount?: number;
-    service?: string;
-    category?: string;
-    paymentType?: string;
-  } | null>(null);
-  const [linkForm, setLinkForm] = useState({
-    clientName: "",
-    clientPhone: "",
-    clientEmail: "",
-    companyName: "",
-    service: SERVICES_DATA[0].service,
-    category: SERVICES_DATA[0].categories[0] || "",
-    industry: CRM_INDUSTRIES[0] as string,
-    totalAmount: "",
-    paymentOption: "full" as "full" | "partial",
-    billingStartDate: "",
-    billingEndDate: "",
-    balanceDueDate: "",
-    notes: "",
-  });
-  const [linkErrors, setLinkErrors] = useState<Record<string, string>>({});
 
   /* ---- details ---- */
   const show = async (r: LeadRow) => {
@@ -395,24 +346,6 @@ export default function LeadsView({
     toast("Status updated");
     if (open && open.source === source && open.id === id) {
       setOpen({ ...open, status: status as EnquiryStatus });
-      void refreshOpen(source, id);
-    }
-    router.refresh();
-  };
-
-  const setProjectStatus = async (source: string, id: number, projectStatus: string) => {
-    setBusy(true);
-    setError("");
-    const res = await fetch("/api/crm/enquiries", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ source, id, projectStatus }),
-    }).catch(() => null);
-    setBusy(false);
-    if (!res?.ok) return setError("Couldn't update project status. Please try again.");
-    toast(`Project status: ${projectStatus}`);
-    if (open && open.source === source && open.id === id) {
-      setOpen({ ...open, projectStatus });
       void refreshOpen(source, id);
     }
     router.refresh();
@@ -627,228 +560,6 @@ export default function LeadsView({
   };
 
   /* ---- File Upload & Attachments Handlers ---- */
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || !files.length || !open) return;
-    setUploadingFiles(true);
-    const formData = new FormData();
-    formData.append("leadSource", open.source);
-    formData.append("leadId", String(open.id));
-    for (let i = 0; i < files.length; i++) {
-      formData.append("files", files[i]);
-    }
-
-    try {
-      const res = await fetch("/api/crm/enquiries/attachments", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json().catch(() => null);
-      if (!res.ok || !data?.ok) {
-        toast(data?.error || "Failed to upload file(s)", "error");
-      } else {
-        toast(files.length === 1 ? "File attached successfully" : `${files.length} files attached`);
-        if (Array.isArray(data.attachments)) {
-          setAttachments(data.attachments);
-        }
-        void refreshOpen();
-      }
-    } catch {
-      toast("Error uploading file(s). Please try again.", "error");
-    } finally {
-      setUploadingFiles(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    }
-  };
-
-  const handleRemoveAttachment = async (id: number | string, fileName: string) => {
-    if (!open) return;
-    if (
-      !(await confirm({
-        title: "Delete attachment?",
-        message: `"${fileName}" will be permanently removed from this lead.`,
-      }))
-    )
-      return;
-
-    try {
-      const res = await fetch(`/api/crm/enquiries/attachments?source=${open.source}&leadId=${open.id}&fileId=${id}`, {
-        method: "DELETE",
-      });
-      const data = await res.json().catch(() => null);
-      if (!res.ok || !data?.ok) {
-        toast(data?.error || "Failed to delete file", "error");
-      } else {
-        toast("File removed");
-        if (Array.isArray(data?.attachments)) {
-          setAttachments(data.attachments);
-        } else {
-          setAttachments((prev) => prev.filter((a) => String(a.id) !== String(id)));
-        }
-        void refreshOpen();
-      }
-    } catch {
-      toast("Error deleting file. Please try again.", "error");
-    }
-  };
-
-  /* ---- Payment Links Handlers ---- */
-  const openGeneratePaymentLink = () => {
-    if (!open) return;
-    setCreatedLink(null);
-    setLinkErrors({});
-    const matchedService = SERVICES_DATA.find((s) => s.service === open.service) || SERVICES_DATA[0];
-    const cat = matchedService.categories.find((c) => c === open.category) || matchedService.categories[0] || "";
-
-    const today = new Date().toISOString().split("T")[0];
-    const nextWeek = new Date(Date.now() + 7 * 86400000).toISOString().split("T")[0];
-
-    setLinkForm({
-      clientName: open.name || "",
-      clientPhone: open.phone || "",
-      clientEmail: open.email || "",
-      companyName: open.company || "",
-      service: matchedService.service,
-      category: cat,
-      industry: (CRM_INDUSTRIES.find((ind) => ind === open.industry) || CRM_INDUSTRIES[0]) as string,
-      totalAmount: "",
-      paymentOption: "full",
-      billingStartDate: today,
-      billingEndDate: nextWeek,
-      balanceDueDate: "",
-      notes: open.message ? `Enquiry notes: ${open.message.slice(0, 160)}` : "",
-    });
-    setGeneratingLink(true);
-  };
-
-  const submitGenerateLink = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!open) return;
-    setLinkErrors({});
-
-    const errs: Record<string, string> = {};
-    if (!linkForm.clientName.trim()) errs.clientName = "Client name is required";
-    if (!linkForm.clientEmail.trim()) errs.clientEmail = "Client email is required";
-    const cleanAmt = linkForm.totalAmount.replace(/[^0-9.]/g, "");
-    const amt = parseFloat(cleanAmt);
-    if (isNaN(amt) || amt <= 0) errs.totalAmount = "Valid total amount is required";
-
-    if (Object.keys(errs).length > 0) {
-      setLinkErrors(errs);
-      return;
-    }
-
-    setLinkBusy(true);
-    try {
-      const res = await fetch("/api/crm/payment-links", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...linkForm,
-          totalAmount: amt,
-          leadSource: open.source,
-          leadId: open.id,
-        }),
-      });
-      const data = await res.json().catch(() => null);
-      if (!res.ok || !data?.ok) {
-        toast(data?.error || "Failed to generate payment link", "error");
-      } else {
-        toast("Payment link generated!");
-        setCreatedLink({
-          url: data.url,
-          token: data.token,
-          orderNumber: data.orderNumber,
-          clientName: linkForm.clientName,
-          clientPhone: linkForm.clientPhone,
-          clientEmail: linkForm.clientEmail,
-          totalAmount: amt,
-          service: linkForm.service,
-          category: linkForm.category,
-          paymentType: linkForm.paymentOption,
-        });
-
-        // Refresh payment links for this lead
-        const pRes = await fetch(
-          `/api/crm/payment-links?leadSource=${open.source}&leadId=${open.id}&clientEmail=${encodeURIComponent(open.email || "")}`
-        );
-        const pData = await pRes.json().catch(() => null);
-        if (pData?.ok && Array.isArray(pData.paymentLinks)) {
-          setPaymentLinks(pData.paymentLinks);
-        }
-        void refreshOpen();
-      }
-    } catch {
-      toast("Error generating payment link", "error");
-    } finally {
-      setLinkBusy(false);
-    }
-  };
-
-  /* deactivate: the client can't pay with the link (no balance reminders either); activate: it works again */
-  const setPaymentLinkActive = async (id: number, activate: boolean) => {
-    if (
-      !(await confirm({
-        title: activate ? "Activate this payment link?" : "Deactivate this payment link?",
-        message: activate
-          ? "The client will be able to pay with this link again (a link with nothing paid yet gets a fresh 24 hours)."
-          : "The client won't be able to pay with this link, and no balance reminder emails will be sent. You can activate it again at any time.",
-        confirmLabel: activate ? "Yes, activate" : "Yes, deactivate",
-        tone: activate ? "default" : "danger",
-      }))
-    )
-      return;
-
-    try {
-      const res = await fetch("/api/crm/payment-links", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: activate ? "activate" : "deactivate", id }),
-      });
-      const data = await res.json().catch(() => null);
-      if (!res.ok || !data?.ok) {
-        toast(data?.error || `Couldn't ${activate ? "activate" : "deactivate"} the payment link`, "error");
-      } else {
-        toast(data.message || (activate ? "Payment link activated" : "Payment link deactivated"));
-        setPaymentLinks((prev) =>
-          prev.map((pl) => (pl.id === id ? { ...pl, linkStatus: activate ? "active" : "cancelled" } : pl))
-        );
-        void refreshOpen();
-      }
-    } catch {
-      toast(`Couldn't ${activate ? "activate" : "deactivate"} the payment link`, "error");
-    }
-  };
-
-  const copyPaymentLink = (tokenOrUrl: string) => {
-    const fullUrl = tokenOrUrl.startsWith("http")
-      ? tokenOrUrl
-      : payLinkUrl(tokenOrUrl);
-    if (typeof navigator !== "undefined" && navigator.clipboard) {
-      navigator.clipboard.writeText(fullUrl);
-      toast("Payment link copied to clipboard!");
-    }
-  };
-
-  // the same WhatsApp text the Payments tab sends (lib/payMessages)
-  const leadWhatsAppUrl = (link: LeadPaymentLinkItem | { orderNumber: string; token: string; totalAmount?: number; paymentType?: string }, phone: string) =>
-    whatsAppUrl(
-      phone,
-      payMessage({
-        clientName: ("clientName" in link && link.clientName) || open?.name || "",
-        service: "service" in link ? link.service : null,
-        category: "category" in link ? link.category : null,
-        amount: "amount" in link ? link.amount : 0,
-        totalAmount: link.totalAmount ?? 0,
-        remainingAmount: "remainingAmount" in link ? link.remainingAmount : null,
-        paymentType: ("paymentType" in link && link.paymentType) || null,
-        status: "status" in link ? link.status : null,
-        token: link.token,
-        invoiceNumber: ("orderNumber" in link && link.orderNumber) || ("invoiceNumber" in link && link.invoiceNumber) || null,
-        balanceDueDate: "balanceDueDate" in link ? link.balanceDueDate : null,
-      })
-    );
-
   const getFileIconClass = (fileName: string) => {
     const ext = fileName.split(".").pop()?.toLowerCase() || "";
     if (["png", "jpg", "jpeg", "webp", "gif", "svg"].includes(ext)) return "crm-att-img";
@@ -931,7 +642,6 @@ export default function LeadsView({
                 <th>Assigned To</th>
                 <th>Received</th>
                 <th>Lead Status</th>
-                <th>Project Status</th>
                 <th style={{ width: "115px", textAlign: "center" }}>Actions</th>
               </tr>
             </thead>
@@ -948,7 +658,7 @@ export default function LeadsView({
                     <span className="crm-strong">{r.name}</span>
                     {r.clientSince && (
                       <span className="crm-client-tag" title={`Became a client on ${fmtDate(r.clientSince, true)}`} suppressHydrationWarning>
-                        Client
+                        Converted to Client
                       </span>
                     )}
                     {r.company && <span className="crm-cell-sub">{r.company}</span>}
@@ -1008,9 +718,6 @@ export default function LeadsView({
                   </td>
                   <td data-label="Lead Status" onClick={(e) => e.stopPropagation()}>
                     <StatusSelect value={r.status} busy={busy} locked={!perms.edit} label={`Lead status for ${r.name}`} onChange={(s) => setStatus(r.source, r.id, s)} />
-                  </td>
-                  <td data-label="Project Status" onClick={(e) => e.stopPropagation()}>
-                    <ProjectStatusSelect value={r.projectStatus || "Not Started"} busy={busy} locked={!perms.edit} label={`Project status for ${r.name}`} onChange={(s) => setProjectStatus(r.source, r.id, s)} />
                   </td>
                   <td data-label="Actions" className="crm-nowrap" onClick={(e) => e.stopPropagation()} style={{ textAlign: "center" }}>
                     <div className="crm-tbl-actions">
@@ -1110,14 +817,10 @@ export default function LeadsView({
                   <div className="crm-lead-title-row">
                     <h2 className="crm-drawer-title" style={{ fontSize: "18px" }}>{open.name}</h2>
                     <span className="crm-lead-badge-pill">{SOURCE_LABEL[open.source]}</span>
-                    {open.clientSince && (
-                      <span className="crm-client-tag" title={`Became a client on ${fmtDate(open.clientSince, true)}`}>
-                        Client since {fmtDate(open.clientSince, false)}
-                      </span>
-                    )}
+                    {open.clientSince && <span className="crm-client-tag">Converted to Client</span>}
                   </div>
                   <p className="crm-muted" style={{ margin: "2px 0 0 0", fontSize: "12px" }}>
-                    {open.company ? `${open.company} · ` : ""}{open.service || SOURCE_LABEL[open.source]} • Received {fmtDate(open.createdAt, true)}
+                    <strong>{enquiryCode(open.source, open.id)}</strong> · {open.company ? `${open.company} · ` : ""}{open.service || SOURCE_LABEL[open.source]} • Received {fmtDate(open.createdAt, true)}
                   </p>
                 </div>
               </div>
@@ -1215,23 +918,6 @@ export default function LeadsView({
               </div>
 
               <div className="crm-mgmt-card">
-                <span className="crm-mgmt-label">Project Status</span>
-                <select
-                  className="crm-mgmt-select crm-mgmt-project-select"
-                  value={open.projectStatus || "Not Started"}
-                  disabled={busy || viewOnly || !perms.edit}
-                  onChange={(e) => setProjectStatus(open.source, open.id, e.target.value)}
-                  aria-label="Project status"
-                >
-                  {PROJECT_STATUSES.map((ps) => (
-                    <option key={ps} value={ps}>
-                      {ps}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="crm-mgmt-card">
                 <span className="crm-mgmt-label">Handled By</span>
                 {perms.assign && !viewOnly ? (
                   <AssigneeSelect
@@ -1246,6 +932,12 @@ export default function LeadsView({
                 ) : (
                   <div className="crm-mgmt-val">{open.assignedTo || "Not assigned yet"}</div>
                 )}
+                {open.assignedTo && (open.assignedByName || open.assignedAt) && (
+                  <span className="crm-mgmt-sub">
+                    {open.assignedByName ? `by ${open.assignedByName}` : ""}
+                    {open.assignedAt ? ` · ${fmtDate(open.assignedAt, true)}` : ""}
+                  </span>
+                )}
               </div>
 
               <div className="crm-mgmt-card">
@@ -1255,6 +947,39 @@ export default function LeadsView({
                 </div>
               </div>
             </div>
+
+            {/* Enquiry → Meeting → Payment → Client: a lead that has paid shows its client record */}
+            {open.clientSince && (
+              <div className="crm-converted-card">
+                <div>
+                  <span className="crm-mgmt-label">Status</span>
+                  <strong>Converted to Client</strong>
+                </div>
+                <div>
+                  <span className="crm-mgmt-label">Client ID</span>
+                  <strong>{clientCode(open.source, open.id)}</strong>
+                </div>
+                <div>
+                  <span className="crm-mgmt-label">Converted on</span>
+                  <strong>{fmtDate(open.clientSince, true)}</strong>
+                </div>
+                <div>
+                  <span className="crm-mgmt-label">Payment status</span>
+                  <strong>
+                    {paymentLinks.some((p) => p.status === "partially_paid")
+                      ? "Partially paid"
+                      : paymentLinks.some((p) => p.status === "paid")
+                        ? "Paid"
+                        : "Paid (recorded)"}
+                  </strong>
+                </div>
+                {perms.clients && (
+                  <a className="crm-act crm-act-dark crm-act-sm" href={`/crm/clients?open=${encodeURIComponent(`${open.source}:${open.id}`)}`}>
+                    Open client
+                  </a>
+                )}
+              </div>
+            )}
 
             {error && (
               <p className="crm-alert" role="alert">
@@ -1279,23 +1004,19 @@ export default function LeadsView({
                     <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
                     <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
                   </svg>
-                  Payment Links · Orders &amp; Payments
+                  Payments for this lead
                   {paymentLinks.length > 0 && <span className="crm-count-badge">{paymentLinks.length}</span>}
                 </span>
-                {!viewOnly && perms.payLinks && (
-                <button
-                  type="button"
-                  className="crm-act crm-act-sm"
-                  style={{ background: "#7c3aed", color: "#ffffff", padding: "5px 12px", fontSize: "12px", borderRadius: "7px", fontWeight: 600, border: "none", cursor: "pointer" }}
-                  onClick={openGeneratePaymentLink}
-                >
-                  + Generate Payment Link
-                </button>
+                {perms.payLinks && (
+                  <a className="crm-act crm-act-ghost crm-act-sm" style={{ fontSize: "12px", padding: "4px 10px" }} href={`/crm/payments?q=${encodeURIComponent(open.email || open.name)}`}>
+                    Open in Payments
+                  </a>
                 )}
               </div>
 
+              {/* shown here only: payment links are made and managed in the Payments tab ("Import from lead") */}
               {paymentLinks.length === 0 ? (
-                <p className="crm-drawer-card-empty">No payment links for this lead yet.</p>
+                <p className="crm-drawer-card-empty">No payments for this lead yet. Payment links are made in the Payments tab.</p>
               ) : (
                 <div className="crm-lead-link-list">
                   {paymentLinks.map((pl) => (
@@ -1315,51 +1036,6 @@ export default function LeadsView({
                         {pl.category && <span>• {pl.category}</span>}
                         <span>• Created {fmtDate(pl.createdAt, false)}</span>
                       </div>
-                      <div className="crm-lead-link-actions">
-                        {!viewOnly && perms.payLinks && pl.linkStatus !== "cancelled" && (
-                        <button
-                          type="button"
-                          className="crm-att-btn"
-                          onClick={() => copyPaymentLink(pl.token)}
-                          title="Copy payment link"
-                        >
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                          Copy Link
-                        </button>
-                        )}
-                        <a
-                          href={`/pay/${pl.token}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="crm-att-btn"
-                        >
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                          Open Checkout
-                        </a>
-                        {!viewOnly && perms.payLinks && open.phone && pl.linkStatus !== "cancelled" && (
-                          <a
-                            href={leadWhatsAppUrl(pl, open.phone)}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="crm-att-btn"
-                            style={{ color: "#15803d", borderColor: "#bbf7d0" }}
-                          >
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.54 1.777.804 2.791.805h.005c3.18 0 5.767-2.586 5.768-5.766 0-1.541-.6-2.99-1.69-4.08-1.09-1.09-2.54-1.691-4.084-1.691z"/></svg>
-                            WhatsApp
-                          </a>
-                        )}
-                        {!viewOnly && perms.payLinks && pl.status !== "paid" && pl.linkStatus !== "used" && (
-                          pl.linkStatus === "cancelled" ? (
-                            <button type="button" className="crm-att-btn" onClick={() => setPaymentLinkActive(pl.id, true)}>
-                              Activate Link
-                            </button>
-                          ) : (
-                            <button type="button" className="crm-att-btn crm-att-btn-del" onClick={() => setPaymentLinkActive(pl.id, false)}>
-                              Deactivate Link
-                            </button>
-                          )
-                        )}
-                      </div>
                     </div>
                   ))}
                 </div>
@@ -1367,16 +1043,8 @@ export default function LeadsView({
             </div>
             )}
 
-            {/* Attachments card */}
+            {/* Files: shown here to view and download; client documents are added in the Clients tab */}
             <div className="crm-drawer-card">
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                onChange={handleFileUpload}
-                accept=".png,.jpg,.jpeg,.webp,.gif,.svg,.pdf,.doc,.docx,.csv,.xls,.xlsx,.txt"
-                style={{ display: "none" }}
-              />
               <div className="crm-drawer-card-head">
                 <span className="crm-drawer-card-title">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -1385,30 +1053,12 @@ export default function LeadsView({
                   Attachments
                   {attachments.length > 0 && <span className="crm-count-badge">{attachments.length}</span>}
                 </span>
-                {!viewOnly && perms.files && (
-                <button
-                  type="button"
-                  className="crm-act crm-act-ghost crm-act-sm"
-                  style={{ fontSize: "12px", padding: "4px 10px" }}
-                  disabled={uploadingFiles}
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="17 8 12 3 7 8" />
-                    <line x1="12" y1="3" x2="12" y2="15" />
-                  </svg>
-                  {uploadingFiles ? "Uploading…" : "Add files"}
-                </button>
-                )}
               </div>
 
-              {uploadingFiles && (
-                <p className="crm-drawer-card-empty" style={{ color: "#7c3aed" }}>Uploading file(s) to CRM &amp; database…</p>
-              )}
-
-              {!uploadingFiles && attachments.length === 0 ? (
-                <p className="crm-drawer-card-empty">No files attached yet. PNG, JPG, PDF, DOC and CSV files up to 15 MB can be added.</p>
+              {attachments.length === 0 ? (
+                <p className="crm-drawer-card-empty">
+                  No files yet.{open.clientSince ? " Client documents (quotation, NDA…) are added in the Clients tab." : ""}
+                </p>
               ) : (
                 <div className="crm-attachment-list">
                   {attachments.map((att) => (
@@ -1442,16 +1092,6 @@ export default function LeadsView({
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                           Download
                         </a>
-                        {!viewOnly && perms.files && (
-                        <button
-                          type="button"
-                          className="crm-att-btn crm-att-btn-del"
-                          title="Delete attachment"
-                          onClick={() => handleRemoveAttachment(att.id, att.fileName)}
-                        >
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                        </button>
-                        )}
                       </div>
                     </div>
                   ))}
@@ -1881,17 +1521,6 @@ export default function LeadsView({
                 </select>
                 {err("status")}
               </label>
-              <label className="crm-field">
-                <span className="crm-label">Project status</span>
-                <select className="crm-input crm-select" value={form.projectStatus} onChange={set("projectStatus")}>
-                  {PROJECT_STATUSES.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
-                {err("projectStatus")}
-              </label>
               {perms.assign ? (
                 <label className="crm-field">
                   <span className="crm-label">Assigned to (BDM or BDE)</span>
@@ -1937,298 +1566,6 @@ export default function LeadsView({
               </span>
             </div>
           </form>
-        </div>
-      )}
-
-      {/* ---- Generate Payment Link Modal ---- */}
-      {generatingLink && (
-        <div className="crm-modal-wrap" role="dialog" aria-modal="true" onClick={() => setGeneratingLink(false)}>
-          <div className="crm-modal crm-modal-lg" onClick={(e) => e.stopPropagation()}>
-            <div className="crm-modal-head">
-              <div>
-                <h3 className="crm-modal-title">Generate Payment Link</h3>
-                <p className="crm-modal-sub">Create a secure checkout link for this lead with custom pricing &amp; services</p>
-              </div>
-              <button
-                type="button"
-                className="crm-icon-btn"
-                onClick={() => setGeneratingLink(false)}
-                aria-label="Close"
-              >
-                ✕
-              </button>
-            </div>
-
-            {createdLink ? (
-              <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: "16px" }}>
-                <div style={{ padding: "16px", background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "10px", display: "flex", alignItems: "flex-start", gap: "12px" }}>
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: "2px" }}>
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                    <polyline points="22 4 12 14.01 9 11.01" />
-                  </svg>
-                  <div>
-                    <h4 style={{ margin: "0 0 4px", fontSize: "15px", fontWeight: 700, color: "#166534" }}>
-                      Payment Link Ready!
-                    </h4>
-                    <p style={{ margin: 0, fontSize: "13px", color: "#15803d" }}>
-                      Order <strong>#{createdLink.orderNumber}</strong> for <strong>{createdLink.clientName}</strong> (${Number(createdLink.totalAmount || 0).toLocaleString()}) has been created.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="crm-field">
-                  <span className="crm-label">Checkout URL</span>
-                  <div style={{ display: "flex", gap: "8px" }}>
-                    <input
-                      className="crm-input"
-                      readOnly
-                      value={createdLink.url}
-                      style={{ background: "#f8fafc", fontFamily: "monospace", fontSize: "13px" }}
-                    />
-                    <button
-                      type="button"
-                      className="crm-act crm-act-dark"
-                      onClick={() => copyPaymentLink(createdLink.url)}
-                      style={{ whiteSpace: "nowrap" }}
-                    >
-                      Copy Link
-                    </button>
-                  </div>
-                </div>
-
-                <div className="crm-field">
-                  <span className="crm-label">Send to the client</span>
-                  <ShareLinkButtons
-                    link={{
-                      clientName: createdLink.clientName || open?.name || "",
-                      clientPhone: createdLink.clientPhone,
-                      clientEmail: createdLink.clientEmail,
-                      service: createdLink.service,
-                      category: createdLink.category,
-                      totalAmount: createdLink.totalAmount,
-                      paymentType: createdLink.paymentType,
-                      token: createdLink.token,
-                      invoiceNumber: createdLink.orderNumber,
-                    }}
-                  />
-                </div>
-
-                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "4px" }}>
-                  <a
-                    href={createdLink.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="crm-act crm-act-ghost"
-                    style={{ flex: 1, justifyContent: "center" }}
-                  >
-                    View Checkout Page
-                  </a>
-                </div>
-
-                <div className="crm-modal-foot" style={{ marginTop: "8px" }}>
-                  <span />
-                  <button
-                    type="button"
-                    className="crm-act crm-act-dark"
-                    onClick={() => {
-                      setGeneratingLink(false);
-                      setCreatedLink(null);
-                    }}
-                  >
-                    Done
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <form onSubmit={submitGenerateLink} style={{ display: "contents" }}>
-                <div className="crm-modal-body crm-form-grid">
-                  <label className="crm-field">
-                    <span className="crm-label">Client Name *</span>
-                    <input
-                      className="crm-input"
-                      value={linkForm.clientName}
-                      onChange={(e) => setLinkForm({ ...linkForm, clientName: e.target.value })}
-                      placeholder="e.g. John Doe"
-                      required
-                    />
-                    {linkErrors.clientName && <span className="crm-err">{linkErrors.clientName}</span>}
-                  </label>
-
-                  <label className="crm-field">
-                    <span className="crm-label">Client Email *</span>
-                    <input
-                      type="email"
-                      className="crm-input"
-                      value={linkForm.clientEmail}
-                      onChange={(e) => setLinkForm({ ...linkForm, clientEmail: e.target.value })}
-                      placeholder="client@company.com"
-                      required
-                    />
-                    {linkErrors.clientEmail && <span className="crm-err">{linkErrors.clientEmail}</span>}
-                  </label>
-
-                  <label className="crm-field">
-                    <span className="crm-label">Phone</span>
-                    <input
-                      className="crm-input"
-                      value={linkForm.clientPhone}
-                      onChange={(e) => setLinkForm({ ...linkForm, clientPhone: e.target.value })}
-                      placeholder="+1 (555) 000-0000"
-                    />
-                  </label>
-
-                  <label className="crm-field">
-                    <span className="crm-label">Company Name</span>
-                    <input
-                      className="crm-input"
-                      value={linkForm.companyName}
-                      onChange={(e) => setLinkForm({ ...linkForm, companyName: e.target.value })}
-                      placeholder="Acme Corp"
-                    />
-                  </label>
-
-                  <label className="crm-field">
-                    <span className="crm-label">Service *</span>
-                    <select
-                      className="crm-input crm-select"
-                      value={linkForm.service}
-                      onChange={(e) => {
-                        const srv = e.target.value;
-                        const match = SERVICES_DATA.find((s) => s.service === srv) || SERVICES_DATA[0];
-                        setLinkForm({
-                          ...linkForm,
-                          service: srv,
-                          category: match.categories[0] || "",
-                        });
-                      }}
-                    >
-                      {SERVICES_DATA.map((s) => (
-                        <option key={s.service} value={s.service}>
-                          {s.service}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-
-                  <label className="crm-field">
-                    <span className="crm-label">Category / Package</span>
-                    <select
-                      className="crm-input crm-select"
-                      value={linkForm.category}
-                      onChange={(e) => setLinkForm({ ...linkForm, category: e.target.value })}
-                    >
-                      {(SERVICES_DATA.find((s) => s.service === linkForm.service)?.categories || []).map((cat) => (
-                        <option key={cat} value={cat}>
-                          {cat}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-
-                  <label className="crm-field">
-                    <span className="crm-label">Industry</span>
-                    <select
-                      className="crm-input crm-select"
-                      value={linkForm.industry}
-                      onChange={(e) => setLinkForm({ ...linkForm, industry: e.target.value })}
-                    >
-                      {CRM_INDUSTRIES.map((ind) => (
-                        <option key={ind} value={ind}>
-                          {ind}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-
-                  <label className="crm-field">
-                    <span className="crm-label">Total Amount (USD) *</span>
-                    <div className="crm-input-group">
-                      <span className="crm-input-addon">$</span>
-                      <input
-                        className="crm-input"
-                        type="text"
-                        inputMode="decimal"
-                        value={linkForm.totalAmount}
-                        onChange={(e) => {
-                          const clean = e.target.value.replace(/[^0-9.]/g, "");
-                          const parts = clean.split(".");
-                          const sanitized = parts.length > 2 ? `${parts[0]}.${parts.slice(1).join("")}` : clean;
-                          setLinkForm({ ...linkForm, totalAmount: sanitized });
-                        }}
-                        placeholder="0.00"
-                        required
-                      />
-                    </div>
-                    {linkErrors.totalAmount && <span className="crm-err">{linkErrors.totalAmount}</span>}
-                  </label>
-
-                  <label className="crm-field">
-                    <span className="crm-label">Payment Terms</span>
-                    <select
-                      className="crm-input crm-select"
-                      value={linkForm.paymentOption}
-                      onChange={(e) => setLinkForm({ ...linkForm, paymentOption: e.target.value as "full" | "partial" })}
-                    >
-                      <option value="full">Full Payment (100% upfront)</option>
-                      <option value="partial">50% Advance + 50% on Delivery</option>
-                    </select>
-                  </label>
-
-                  <label className="crm-field">
-                    <span className="crm-label">Start Date</span>
-                    <input
-                      type="date"
-                      className="crm-input"
-                      value={linkForm.billingStartDate}
-                      onChange={(e) => setLinkForm({ ...linkForm, billingStartDate: e.target.value })}
-                    />
-                  </label>
-
-                  <label className="crm-field">
-                    <span className="crm-label">End / Delivery Date</span>
-                    <input
-                      type="date"
-                      className="crm-input"
-                      value={linkForm.billingEndDate}
-                      onChange={(e) => setLinkForm({ ...linkForm, billingEndDate: e.target.value })}
-                    />
-                  </label>
-
-                  {linkForm.paymentOption === "partial" && (
-                    <label className="crm-field">
-                      <span className="crm-label">Balance Due Date</span>
-                      <input
-                        type="date"
-                        className="crm-input"
-                        value={linkForm.balanceDueDate}
-                        onChange={(e) => setLinkForm({ ...linkForm, balanceDueDate: e.target.value })}
-                      />
-                    </label>
-                  )}
-
-                  <label className="crm-field crm-span-3">
-                    <span className="crm-label">Order Notes / Project Brief</span>
-                    <textarea
-                      className="crm-input crm-textarea"
-                      rows={3}
-                      value={linkForm.notes}
-                      onChange={(e) => setLinkForm({ ...linkForm, notes: e.target.value })}
-                      placeholder="Add project milestones, scope items or special instructions..."
-                    />
-                  </label>
-                </div>
-
-                <div className="crm-modal-foot">
-                  <button type="button" className="crm-act crm-act-ghost" onClick={() => setGeneratingLink(false)}>
-                    Cancel
-                  </button>
-                  <button type="submit" className="crm-act crm-act-dark" disabled={linkBusy}>
-                    {linkBusy ? "Generating…" : "Generate Link"}
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
         </div>
       )}
     </>

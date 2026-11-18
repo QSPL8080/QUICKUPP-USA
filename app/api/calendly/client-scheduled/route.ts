@@ -40,7 +40,8 @@ export async function POST(request: Request) {
             isEnquirySource(body.leadSource) && Number.isInteger(leadId) && leadId > 0 && (await canOpenLead(user, body.leadSource, leadId))
               ? { source: body.leadSource, id: leadId }
               : undefined;
-          if (await claimMeeting(id, user, lead)) await announceScheduled(id, user);
+          // Calendly has already sent the client its confirmation: no second one from us
+          if (await claimMeeting(id, user, lead)) await announceScheduled(id, user, { emailClient: false });
         }
       }
     }

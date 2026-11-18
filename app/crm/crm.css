@@ -3779,6 +3779,7 @@ h2.crm-view-modal-title {
 
 .crm-attachment-meta {
   min-width: 0;
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -5258,4 +5259,119 @@ a.crm-client-tag:hover {
 .crm-confirm-input .crm-input.crm-confirm-must-type:focus {
   border-color: #ef4444 !important;
   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+}
+
+/* a lead that became a client: its client record, inside the lead */
+.crm-converted-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 22px;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  background: #f0fdf4;
+}
+.crm-converted-card > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px;
+  color: #14532d;
+}
+.crm-converted-card .crm-act {
+  margin-left: auto;
+}
+.crm-mgmt-sub {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  color: #64748b;
+}
+
+/* Meetings: outcome after the meeting, and the note fields */
+.crm-meet-outcome.is-done {
+  background: #dcfce7;
+  color: #166534;
+}
+.crm-meet-outcome.is-noshow {
+  background: #fee2e2;
+  color: #991b1b;
+}
+.crm-meet-outcome-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+.crm-meet-outcome-acts {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-left: auto;
+  align-items: center;
+}
+.crm-meet-note-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.crm-meet-note-fields .crm-field-wide {
+  grid-column: 1 / -1;
+}
+@media (max-width: 640px) {
+  .crm-meet-note-fields {
+    grid-template-columns: 1fr;
+  }
+}
+.crm-meet-note-dl {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  width: 100%;
+}
+.crm-meet-note-dl div {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 8px;
+  font-size: 13px;
+}
+.crm-meet-note-dl dt {
+  color: #64748b;
+  font-weight: 600;
+}
+.crm-meet-note-dl dd {
+  margin: 0;
+  white-space: pre-wrap;
+}
+@media (max-width: 640px) {
+  .crm-meet-note-dl div {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Clients: the payment summary and each payment's transactions */
+.crm-client-summary {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+@media (max-width: 760px) {
+  .crm-client-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.crm-client-tx {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12.5px;
+  color: #334155;
 }

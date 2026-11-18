@@ -2,7 +2,7 @@ import Link from "next/link";
 import { leadPermsFor, requireArea } from "@/lib/crm/auth";
 import { listLeads } from "@/lib/crm/data";
 import { listAssignees } from "@/lib/crm/users";
-import { ENQUIRY_STATUSES, ENQUIRY_STATUS_LABEL, PROJECT_STATUSES } from "@/lib/crm/leadOptions";
+import { ENQUIRY_STATUSES, ENQUIRY_STATUS_LABEL } from "@/lib/crm/leadOptions";
 import LeadsView from "@/components/crm/LeadsView";
 import AddLeadButton from "@/components/crm/AddLeadButton";
 import { PageHead, Pager } from "@/components/crm/ListTools";
@@ -21,7 +21,7 @@ export default async function EnquiriesPage({ searchParams }: Props) {
     q: sp.q || "",
     source: sp.source || "",
     status: sp.status || "",
-    projectStatus: sp.projectStatus || "",
+    projectStatus: "",
     channel: sp.channel || "",
     from: DATE_RE.test(sp.from || "") ? (sp.from as string) : "",
     to: DATE_RE.test(sp.to || "") ? (sp.to as string) : "",
@@ -52,7 +52,7 @@ export default async function EnquiriesPage({ searchParams }: Props) {
   const monthLabel = period.label;
 
   const exportHref = `/api/crm/enquiries/export?${new URLSearchParams(Object.entries(f).filter(([, v]) => v) as [string, string][]).toString()}`;
-  const filtered = Boolean(f.q || f.source || f.status || f.projectStatus || f.channel || f.from || f.to || f.clients);
+  const filtered = Boolean(f.q || f.source || f.status || f.channel || f.from || f.to || f.clients);
 
   const sourceHref = (s: string) => {
     const p = new URLSearchParams();
@@ -166,14 +166,6 @@ export default async function EnquiriesPage({ searchParams }: Props) {
             </option>
           ))}
         </select>
-        <select className="crm-input crm-select" name="projectStatus" defaultValue={f.projectStatus} aria-label="Project status">
-          <option value="">All project statuses</option>
-          {PROJECT_STATUSES.map((ps) => (
-            <option key={ps} value={ps}>
-              {ps}
-            </option>
-          ))}
-        </select>
         <select className="crm-input crm-select" name="channel" defaultValue={f.channel} aria-label="Lead channel">
           <option value="">All channels</option>
           <option value="Website">Website</option>
@@ -231,7 +223,7 @@ export default async function EnquiriesPage({ searchParams }: Props) {
           openNew={sp.new === "1" && perms.add}
           openKey={sp.open || ""}
         />
-        <Pager {...data} q={f.q} status={f.status} extra={{ source: f.source, projectStatus: f.projectStatus, channel: f.channel, from: f.from, to: f.to, clients: f.clients }} />
+        <Pager {...data} q={f.q} status={f.status} extra={{ source: f.source, channel: f.channel, from: f.from, to: f.to, clients: f.clients }} />
       </div>
     </>
   );

@@ -52,6 +52,11 @@ export type EnquiryRow = {
   assignedTo: string | null; // the team member's name
   assignedUserId: number | null; // the team member's account
   clientSince: string | null; // first payment received: the lead is a client
+  /** what made it a client: a PayPal payment, or the team member who recorded the payment */
+  clientBy?: string | null;
+  /** when it was assigned to its BDM/BDE, and by whom */
+  assignedAt?: string | null;
+  assignedByName?: string | null;
   createdBy: string | null; // manual leads
   status: EnquiryStatus;
   projectStatus: string;
@@ -269,7 +274,14 @@ export async function getLead(source: EnquirySource, id: number): Promise<Enquir
       : await getPool().query(`SELECT * FROM \`${table}\` WHERE id = ?`, [id]);
   const r = (rows as Record<string, unknown>[])[0];
   if (!r) return null;
-  return toEnquiry(source, r);
+  const lead = toEnquiry(source, r);
+  lead.clientBy = r.client_by ? String(r.client_by) : null;
+  lead.assignedAt = r.assigned_at ? new Date(r.assigned_at as string).toISOString() : null;
+  if (r.assigned_by) {
+    const [u] = await getPool().query("SELECT name FROM crm_users WHERE id = ?", [r.assigned_by]).catch(() => [[]] as unknown as [Record<string, unknown>[]]);
+    lead.assignedByName = (u as Record<string, unknown>[])[0]?.name ? String((u as Record<string, unknown>[])[0].name) : null;
+  }
+  return lead;
 }
 
 /** One database row of a lead table → every field its form collected */

@@ -3,6 +3,7 @@ import { actorOf, logMany } from "@/lib/crm/activity";
 import { getPool } from "@/lib/db";
 import { getUserFor, isAdminLike, leadPermsFor } from "@/lib/crm/auth";
 import { canOpenLead } from "@/lib/crm/leadAccess";
+import { audit } from "@/lib/crm/audit";
 import { isEnquirySource, SOURCES, type EnquirySource } from "@/lib/crm/data";
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -18,6 +19,28 @@ const ALLOWED_EXTS = new Set([
 /* a client's documents (quotation, NDA…): PDF, Word and images only */
 const CLIENT_DOC_TYPES = { quotation: "Quotation", nda: "NDA", agreement: "Agreement", invoice: "Invoice", receipt: "Payment Receipt", other: "Other" } as const;
 const CLIENT_DOC_EXTS = new Set(["pdf", "doc", "docx", "jpg", "jpeg", "png"]);
+
+/*
+ * Where files are kept: new files go to private storage outside the website's
+ * public folder (served only through this route, after the access checks).
+ * Files added before that stay in public/uploads/attachments, which the site no
+ * longer serves directly (proxy.ts) — they too come only through this route.
+ */
+const PRIVATE_DIR = process.env.CRM_FILES_DIR || path.join(process.cwd(), "storage", "crm-attachments");
+const LEGACY_DIR = path.join(process.cwd(), "public", "uploads", "attachments");
+const diskPathOf = (filePath: string) =>
+  filePath.startsWith("private:") ? path.join(PRIVATE_DIR, path.basename(filePath.slice(8))) : path.join(LEGACY_DIR, path.basename(filePath));
+
+/* the first bytes of client document types, so a renamed file is refused */
+function contentMatches(ext: string, head: Buffer) {
+  const starts = (...b: number[]) => b.every((v, i) => head[i] === v);
+  if (ext === "pdf") return starts(0x25, 0x50, 0x44, 0x46);
+  if (ext === "docx") return starts(0x50, 0x4b);
+  if (ext === "doc") return starts(0xd0, 0xcf, 0x11, 0xe0);
+  if (ext === "png") return starts(0x89, 0x50, 0x4e, 0x47);
+  if (ext === "jpg" || ext === "jpeg") return starts(0xff, 0xd8, 0xff);
+  return true;
+}
 
 function getFileExt(fileName: string): string {
   const parts = fileName.split(".");
@@ -74,8 +97,10 @@ export async function GET(request: Request) {
   // Mode 1: Serve/download a specific file
   if (fileId || directFile) {
     let targetFileName = directFile;
+    let storedPath = directFile ? `/uploads/attachments/${path.basename(directFile)}` : "";
     let mimeType = "application/octet-stream";
     let displayName = directFile || "attachment";
+    let docType = "";
 
     if (fileId && isEnquirySource(source) && Number.isInteger(leadId) && leadId >= 1) {
       const [rows] = await getPool().query(
@@ -87,24 +112,27 @@ export async function GET(request: Request) {
       const found = list.find((a) => String(a.id) === String(fileId));
       if (found) {
         targetFileName = path.basename(found.filePath);
+        storedPath = found.filePath;
         mimeType = found.fileType || mimeType;
         displayName = found.fileName || displayName;
+        docType = found.docType || "";
       }
     }
 
-    if (!targetFileName) return new Response("File not found", { status: 404 });
-    const cleanBasename = path.basename(targetFileName);
-    const diskPath = path.join(process.cwd(), "public", "uploads", "attachments", cleanBasename);
+    if (!targetFileName || !storedPath) return new Response("File not found", { status: 404 });
+    const diskPath = diskPathOf(storedPath);
 
     try {
       const fileBuffer = await fs.readFile(diskPath);
+      // client documents (quotation, NDA…): every view and download is logged
+      if (docType) await audit(user, "document_download", "client_document", `${source}:${leadId}:${fileId}`, `${download ? "Downloaded" : "Viewed"} ${displayName}`);
       const disposition = download ? "attachment" : "inline";
       return new Response(new Uint8Array(fileBuffer), {
         headers: {
           "Content-Type": mimeType,
           "Content-Length": String(fileBuffer.length),
           "Content-Disposition": `${disposition}; filename="${displayName.replace(/"/g, "")}"; filename*=UTF-8''${encodeURIComponent(displayName)}`,
-          "Cache-Control": "private, max-age=3600",
+          "Cache-Control": "private, no-store",
           "X-Content-Type-Options": "nosniff",
         },
       });
@@ -186,7 +214,7 @@ export async function POST(request: Request) {
   }
 
   const existing = parseAttachments(row.attachments);
-  const uploadsDir = path.join(process.cwd(), "public", "uploads", "attachments");
+  const uploadsDir = PRIVATE_DIR;
   try {
     await fs.mkdir(uploadsDir, { recursive: true });
   } catch {}
@@ -205,6 +233,10 @@ export async function POST(request: Request) {
       );
     }
 
+    if (docType) {
+      const head = Buffer.from(await file.slice(0, 8).arrayBuffer());
+      if (!contentMatches(ext, head)) return NextResponse.json({ ok: false, error: `"${file.name}" doesn't look like a real .${ext} file.` }, { status: 400 });
+    }
     const attId = `att_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     const cleanName = file.name.replace(/[^\w.\- ()]+/g, "_").slice(0, 200) || `file_${Date.now()}.${ext}`;
     const diskFilename = `${source}_${leadId}_${attId}_${cleanName}`;
@@ -220,13 +252,14 @@ export async function POST(request: Request) {
       fileName: cleanName,
       fileType: file.type || "application/octet-stream",
       fileSize: file.size,
-      filePath: `/uploads/attachments/${diskFilename}`,
+      filePath: `private:${diskFilename}`,
       uploadedByName: user.name || "User",
       createdAt: new Date().toISOString(),
       ...(docType ? { docType } : {}),
     };
     existing.unshift(item);
     newlyAdded.push(item);
+    if (docType) await audit(user, "document_upload", "client_document", `${source}:${leadId}:${attId}`, `${CLIENT_DOC_TYPES[docType]} ${cleanName} (${file.size} bytes)`);
   }
 
   // Update attachments directly in this lead's own table
@@ -308,9 +341,9 @@ export async function DELETE(request: Request) {
 
   if (target?.filePath) {
     try {
-      const diskPath = path.join(process.cwd(), "public", target.filePath.replace(/^\//, ""));
-      await fs.unlink(diskPath);
+      await fs.unlink(diskPathOf(target.filePath));
     } catch {}
+    if (target.docType) await audit(user, "document_delete", "client_document", `${finalSource}:${finalLeadId}:${target.id}`, `Deleted ${target.fileName}`);
   }
 
   await pool.query(

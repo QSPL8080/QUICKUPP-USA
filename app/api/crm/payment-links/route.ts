@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { resolvePayTable } from "@/lib/crm/paymentTable";
 import { randomBytes } from "node:crypto";
 import { getPool } from "@/lib/db";
-import { getUserFor } from "@/lib/crm/auth";
+import { getUserFor, roleName } from "@/lib/crm/auth";
 import { readJson } from "@/lib/enquiry";
 import { toDateOnly } from "@/lib/crm/data";
 import { actorOf, logMany, money, type ActivityInput } from "@/lib/crm/activity";
@@ -459,7 +459,7 @@ export async function PATCH(req: Request) {
     const afterSnap = await paymentSnapshot(targetTable as PaymentTable, id);
     if (beforeSnap && afterSnap) await logPaymentChanges(targetTable as PaymentTable, id, beforeSnap, afterSnap, actorOf(user));
     // paid (in part or in full) for a lead: the lead is a client
-    await markClientFromRecord(targetTable as PaymentTable, id);
+    await markClientFromRecord(targetTable as PaymentTable, id, `${user.name} (${roleName(user.role)})`);
 
     return NextResponse.json({ ok: true, message: "Payment link updated successfully." });
   } catch (err) {

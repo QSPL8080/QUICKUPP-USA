@@ -25,7 +25,13 @@ export default async function ClientsPage({ searchParams }: Props) {
     from: DATE_RE.test(sp.from || "") ? (sp.from as string) : "",
     to: DATE_RE.test(sp.to || "") ? (sp.to as string) : "",
   };
+  // a link to one client (from a notification, a lead or a payment) shows that client, wherever it is in the list
+  const openKey = sp.open || "";
   const data = await listClients({ ...f, page: Number(sp.page) || 1 });
+  if (openKey && !data.items.some((c) => c.key === openKey)) {
+    const one = await listClients({ key: openKey });
+    if (one.items[0]) data.items.unshift(one.items[0]);
+  }
   const filtered = Boolean(f.q || f.from || f.to);
   return (
     <>
